@@ -1,57 +1,76 @@
-"use client";
+import Link from "next/link";
+import { ArrowUpRight, BookOpen, Boxes, Gauge, Images, Network, Sparkles, WandSparkles } from "lucide-react";
+import { archetypes } from "@/lib/archetypes";
 
-import * as React from "react";
-import { BookOpen, Boxes, Command as CommandIcon, FileText, FolderOpen, Gauge, GitBranch, Highlighter, Home, Library, MessageSquareText, Network, PanelLeft, Search, Settings2, Sparkles, WandSparkles } from "lucide-react";
-import type { Edge } from "@xyflow/react";
-import { AIChat, AnnotationToolbar, Badge, Button, CommandMenu, DataCard, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, Dock, DocumentRail, GlassPanel, InspectorPanel, KnowledgeGraph, PDFToolbar, SearchField, SegmentedControl, Sidebar, Tabs, TabsContent, TabsList, TabsTrigger, Toaster, toast, type AIChatMessage, type AnnotationTool, type ResearchGraphNode } from "@/components";
-
-const graphNodes: ResearchGraphNode[] = [
-  { id:"p1", type:"research", position:{x:0,y:130}, data:{kind:"paper",title:"EFB Torrefaction Review",subtitle:"Biomass & Bioenergy · 2025",strength:92} },
-  { id:"c1", type:"research", position:{x:290,y:20}, data:{kind:"concept",title:"Devolatilization",subtitle:"thermal decomposition",strength:84} },
-  { id:"m1", type:"research", position:{x:290,y:220}, data:{kind:"method",title:"CFD Co-firing",subtitle:"Eulerian + reaction model",strength:79} },
-  { id:"e1", type:"research", position:{x:590,y:30}, data:{kind:"equation",title:"Arrhenius rate",subtitle:"k = A exp(-Ea/RT)",strength:88} },
-  { id:"p2", type:"research", position:{x:590,y:230}, data:{kind:"paper",title:"CFB Biomass Co-combustion",subtitle:"Fuel · 2026",strength:73} }
-];
-const graphEdges: Edge[] = [
-  { id:"a",source:"p1",target:"c1",animated:true,style:{stroke:"rgba(127,127,127,.45)"} },
-  { id:"b",source:"p1",target:"m1",style:{stroke:"rgba(127,127,127,.45)"} },
-  { id:"c",source:"c1",target:"e1",style:{stroke:"rgba(127,127,127,.45)"} },
-  { id:"d",source:"m1",target:"p2",animated:true,style:{stroke:"rgba(127,127,127,.45)"} }
-];
+const icons = {
+  knowledge: BookOpen,
+  engineering: Gauge,
+  editorial: Images,
+  motion: Sparkles,
+};
 
 export default function HomePage() {
-  const [activeNav,setActiveNav]=React.useState("reader");
-  const [page,setPage]=React.useState(8);
-  const [zoom,setZoom]=React.useState(110);
-  const [annotation,setAnnotation]=React.useState<AnnotationTool>("highlight");
-  const [annotationColor,setAnnotationColor]=React.useState("#ffd60a");
-  const [commandOpen,setCommandOpen]=React.useState(false);
-  const [dialogOpen,setDialogOpen]=React.useState(false);
-  const [view,setView]=React.useState("reader");
-  const [query,setQuery]=React.useState("");
-  const [messages,setMessages]=React.useState<AIChatMessage[]>([
-    { id:"1",role:"user",content:"Why does torrefaction improve grindability?",timestamp:"14:32" },
-    { id:"2",role:"assistant",content:"Torrefaction preferentially decomposes hemicellulose and weakens the fibrous structure. The material becomes more brittle, so less milling energy is needed and the particle-size distribution becomes easier to control.",timestamp:"14:32",sources:[{id:"s1",label:"p.8 · §3.2"},{id:"s2",label:"Eq. 7 context"}] }
-  ]);
-  React.useEffect(()=>{ const handler=(e:KeyboardEvent)=>{ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();setCommandOpen(v=>!v);} }; window.addEventListener("keydown",handler); return()=>window.removeEventListener("keydown",handler);},[]);
-  const navItems=[{id:"home",label:"Home",icon:Home},{id:"reader",label:"Paper Reader",icon:BookOpen,badge:12},{id:"library",label:"Research Library",icon:Library},{id:"graph",label:"Knowledge Graph",icon:Network},{id:"components",label:"Components",icon:Boxes}];
-  const commandItems=[{id:"search",label:"Search papers",shortcut:"⌘ F",icon:<Search className="size-4"/>,group:"Navigate",onSelect:()=>toast("Search focused")},{id:"reader",label:"Open paper reader",icon:<BookOpen className="size-4"/>,group:"Navigate",onSelect:()=>setActiveNav("reader")},{id:"graph",label:"Open knowledge graph",icon:<GitBranch className="size-4"/>,group:"Navigate",onSelect:()=>setActiveNav("graph")},{id:"annotate",label:"Start highlighting",shortcut:"H",icon:<Highlighter className="size-4"/>,group:"Actions",onSelect:()=>setAnnotation("highlight")},{id:"ask",label:"Ask research assistant",shortcut:"⌘ J",icon:<Sparkles className="size-4"/>,group:"Actions",onSelect:()=>toast.success("Assistant ready")},{id:"settings",label:"Reader settings",icon:<Settings2 className="size-4"/>,group:"System",onSelect:()=>setDialogOpen(true)}];
-  return <main className="mx-auto min-h-screen max-w-[1720px] px-4 py-5 md:px-6 lg:px-8">
-    <Toaster />
-    <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} items={commandItems}/>
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogContent><DialogHeader><DialogTitle>Reader settings</DialogTitle><DialogDescription>This modal is built on Radix Dialog and inherits the same material, focus and motion language as the rest of Design Deck.</DialogDescription></DialogHeader><div className="mt-4 grid gap-3"><DataCard label="Reading mode" value="Focused" detail="Dense technical papers"/><Button variant="accent" onClick={()=>setDialogOpen(false)}>Done</Button></div></DialogContent></Dialog>
+  return (
+    <main className="mx-auto min-h-screen max-w-7xl px-5 py-8 md:px-8 md:py-12">
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="grid size-10 place-items-center rounded-[14px] bg-[var(--foreground)] text-[var(--background)] shadow-sm">
+            <WandSparkles className="size-[18px]" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold tracking-[-.025em]">Design Deck</div>
+            <div className="text-[10px] text-[var(--muted)]">Professional design archetype system</div>
+          </div>
+        </div>
+        <Link href="/archetypes" className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-xs font-medium shadow-sm">
+          Explore all <ArrowUpRight className="size-3.5" />
+        </Link>
+      </header>
 
-    <header className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"><div><div className="flex items-center gap-2"><div className="grid size-9 place-items-center rounded-[13px] bg-[var(--foreground)] text-[var(--background)] shadow-sm"><WandSparkles className="size-4"/></div><div><h1 className="text-lg font-semibold tracking-[-.035em]">Design Deck</h1><p className="text-xs text-[var(--muted)]">Premium product UI system · 30 production-oriented components</p></div></div></div><div className="flex flex-wrap items-center gap-2"><SearchField value={query} onChange={e=>setQuery(e.target.value)} onClear={()=>setQuery("")} placeholder="Search the system…" className="w-full sm:w-64"/><Button variant="secondary" onClick={()=>setCommandOpen(true)}><CommandIcon className="size-4"/>Command <span className="text-[10px] text-[var(--muted)]">⌘K</span></Button><DialogTrigger asChild><Button variant="accent" onClick={()=>setDialogOpen(true)}><Sparkles className="size-4"/>Launch</Button></DialogTrigger></div></header>
+      <section className="grid min-h-[520px] items-end gap-10 py-16 lg:grid-cols-[1.15fr_.85fr] lg:py-24">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[.18em] text-[var(--muted)]">One shared engine · multiple visual languages</div>
+          <h1 className="mt-5 max-w-4xl text-[clamp(3.5rem,8vw,8rem)] font-semibold leading-[.86] tracking-[-.075em]">
+            Design for the <span className="text-[var(--muted)]">work itself.</span>
+          </h1>
+        </div>
+        <div className="pb-2 lg:pb-4">
+          <p className="max-w-md text-sm leading-7 text-[var(--muted)]">
+            Design Deck separates research, engineering, editorial photography and motion UI into distinct archetypes instead of forcing every product into one generic SaaS look.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {['Radix semantics','Motion','XYFlow','Tailwind','Next.js','shadcn-compatible'].map(item => (
+              <span key={item} className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-[10px] font-medium text-[var(--muted)] backdrop-blur-xl">{item}</span>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4"><DataCard label="Core components" value="30" detail="Reusable primitives + product UI" icon={<Boxes className="size-4"/>}/><DataCard label="Accessibility base" value="Radix" detail="Keyboard & focus semantics" trend={{direction:"up",value:"A11y"}}/><DataCard label="Interaction" value="Motion" detail="Subtle state-first animation"/><DataCard label="Research graph" value="XYFlow" detail="Interactive node/edge canvas" icon={<Network className="size-4"/>}/></section>
+      <section className="grid gap-4 md:grid-cols-2">
+        {archetypes.map((archetype, index) => {
+          const Icon = icons[archetype.id];
+          return (
+            <Link key={archetype.id} href={archetype.href} className="dd-glass group relative min-h-72 overflow-hidden rounded-[24px] p-6 transition hover:-translate-y-1 md:p-8">
+              <div className="flex items-start justify-between">
+                <div className="grid size-11 place-items-center rounded-2xl bg-[var(--foreground)] text-[var(--background)]"><Icon className="size-5" /></div>
+                <div className="font-mono text-[10px] text-[var(--muted)]">0{index + 1}</div>
+              </div>
+              <div className="mt-16 max-w-lg">
+                <div className="text-[10px] font-semibold uppercase tracking-[.14em] text-[var(--muted)]">{archetype.eyebrow}</div>
+                <h2 className="mt-2 text-3xl font-semibold tracking-[-.045em]">{archetype.name}</h2>
+                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{archetype.description}</p>
+              </div>
+              <ArrowUpRight className="absolute bottom-7 right-7 size-5 text-[var(--muted)] transition duration-200 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-[var(--foreground)]" />
+            </Link>
+          );
+        })}
+      </section>
 
-    <div className="grid gap-4 xl:grid-cols-[244px_minmax(0,1fr)]"><Sidebar items={navItems} activeId={activeNav} onSelect={setActiveNav} header={<div className="flex items-center gap-2"><div className="grid size-8 place-items-center rounded-xl bg-[var(--foreground)] text-[var(--background)]"><FileText className="size-4"/></div><div><div className="text-xs font-semibold">Research OS</div><div className="text-[9px] text-[var(--muted)]">Workspace 01</div></div></div>} footer={<div className="text-[10px] leading-4 text-[var(--muted)]">Design language: restrained glass, high information density, legible motion.</div>}/>
-      <div className="min-w-0 space-y-4"><GlassPanel className="overflow-hidden"><div className="flex flex-col gap-3 border-b border-[var(--line)] px-4 py-3 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-center gap-3"><div className="grid size-9 place-items-center rounded-xl bg-red-500/10 text-red-500"><FileText className="size-4"/></div><div><div className="text-sm font-semibold">Biomass co-firing kinetics and CFB behavior.pdf</div><div className="mt-0.5 flex items-center gap-2 text-[10px] text-[var(--muted)]"><span>24 pages</span><span>·</span><span>4.8 MB</span><Badge tone="green">Indexed</Badge></div></div></div><SegmentedControl value={view} onValueChange={setView} items={[{value:"reader",label:"Reader"},{value:"notes",label:"Notes"},{value:"split",label:"Split"}]}/></div>
-        <div className="relative flex min-h-[650px] bg-black/[.025] p-3 dark:bg-white/[.015]"><DocumentRail pages={Array.from({length:12},(_,i)=>({id:String(i+1),page:i+1,annotations:i===7?3:i===4?1:0}))} activePage={page} onPageSelect={setPage} className="hidden shrink-0 lg:block"/><div className="relative flex min-w-0 flex-1 items-center justify-center overflow-hidden px-3 py-14"><div className="absolute left-1/2 top-3 z-10 -translate-x-1/2"><PDFToolbar page={page} pages={24} zoom={zoom} onPageChange={setPage} onZoomChange={setZoom} onSearch={()=>toast("Document search opened")} onAnnotate={()=>setAnnotation("highlight")} onFit={()=>setZoom(100)} onRotate={()=>toast("Rotated 90°")} onDownload={()=>toast.success("Download queued")}/></div><div style={{transform:`scale(${Math.min(1.16,zoom/100)})`}} className="relative aspect-[.72] h-[520px] origin-center rounded-sm bg-white px-14 py-12 text-neutral-950 shadow-[0_18px_60px_rgba(0,0,0,.18)] transition-transform"><div className="text-[9px] font-semibold uppercase tracking-[.18em] text-neutral-400">Journal of Advanced Energy Systems</div><h2 className="mt-5 text-[22px] font-semibold leading-tight tracking-[-.03em]">Co-combustion of torrefied biomass in circulating fluidized bed systems</h2><div className="mt-2 text-[9px] text-neutral-500">A. Researcher · B. Engineer · C. Scientist</div><div className="mt-8 grid grid-cols-2 gap-5 text-[8px] leading-[1.65]"><div className="space-y-3"><p><strong>Abstract — </strong>This study evaluates the combustion behavior of torrefied biomass under fluidized conditions, with emphasis on devolatilization, char conversion and ash-related operational constraints.</p><p>The thermal pretreatment decreases O/C ratio and increases hydrophobicity. <mark className="rounded-sm bg-yellow-200 px-0.5">Hemicellulose decomposition weakens the fibrous matrix and improves grindability</mark>, supporting more consistent fuel preparation.</p><p>Reaction kinetics were represented through an Arrhenius formulation and coupled with gas-solid hydrodynamics.</p></div><div className="space-y-3"><div className="rounded border border-neutral-200 bg-neutral-50 p-3 text-center font-serif text-[10px]">k = A · exp(−E<sub>a</sub> / RT)</div><p>At elevated substitution ratios, alkali loading and bed agglomeration risk become important boundary conditions. Fuel quality therefore has to be assessed together with furnace operating windows.</p><div className="mt-3 h-24 rounded bg-gradient-to-tr from-neutral-100 to-neutral-200 p-2 text-[7px] text-neutral-500">Figure 4. Conceptual relation between fuel conversion and residence time.</div></div></div><div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[8px] text-neutral-400">{page}</div></div><div className="absolute bottom-4 left-1/2 -translate-x-1/2"><AnnotationToolbar tool={annotation} onToolChange={setAnnotation} color={annotationColor} onColorChange={setAnnotationColor}/></div></div><InspectorPanel className="hidden w-[250px] shrink-0 2xl:block" title="Selection" subtitle="Highlighted passage · p.8" status="Linked" sections={[{title:"Annotation",rows:[{label:"Type",value:"Highlight"},{label:"Color",value:"Yellow"},{label:"Words",value:"11"}]},{title:"Research context",rows:[{label:"Concept",value:"Hemicellulose"},{label:"Method",value:"Torrefaction"},{label:"Confidence",value:"94%"}]}]} actions={<Button size="sm" variant="secondary" onClick={()=>toast("Saved to notes")}>Save note</Button>}/></div>
-      </GlassPanel>
-
-      <Tabs defaultValue="assistant"><TabsList><TabsTrigger value="assistant"><MessageSquareText className="mr-1.5 inline size-3.5"/>AI Assistant</TabsTrigger><TabsTrigger value="graph"><Network className="mr-1.5 inline size-3.5"/>Knowledge Graph</TabsTrigger></TabsList><TabsContent value="assistant"><div className="grid gap-4 xl:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)]"><AIChat messages={messages} onSend={text=>setMessages(v=>[...v,{id:crypto.randomUUID(),role:"user",content:text,timestamp:"now"},{id:crypto.randomUUID(),role:"assistant",content:"This demo keeps the UI local. Connect your preferred model and retrieval layer through the app backend to return paper-grounded answers.",timestamp:"now",sources:[{id:"ctx",label:`p.${page} context`}]}])}/><KnowledgeGraph nodes={graphNodes} edges={graphEdges} onNodeSelect={node=>toast(`Selected: ${node.data.title}`)}/></div></TabsContent><TabsContent value="graph"><KnowledgeGraph nodes={graphNodes} edges={graphEdges} className="h-[620px]" onNodeSelect={node=>toast(`Selected: ${node.data.title}`)}/></TabsContent></Tabs>
-      <div className="flex justify-center py-3"><Dock items={[{id:"reader",label:"Reader",icon:<BookOpen className="size-[18px]"/>,active:true},{id:"files",label:"Library",icon:<FolderOpen className="size-[18px]"/>},{id:"graph",label:"Graph",icon:<Network className="size-[18px]"/>},{id:"assistant",label:"AI Assistant",icon:<Sparkles className="size-[18px]"/>},{id:"settings",label:"Settings",icon:<Settings2 className="size-[18px]"/>}]}/></div></div>
-    </div>
-  </main>;
+      <section className="mt-4 grid gap-4 lg:grid-cols-3">
+        <div className="dd-glass rounded-[22px] p-6"><Boxes className="size-5 text-[var(--muted)]"/><div className="mt-8 text-2xl font-semibold tracking-[-.04em]">30+ shared components</div><p className="mt-2 text-xs leading-5 text-[var(--muted)]">Accessible primitives and product-specific controls remain reusable across archetypes.</p></div>
+        <div className="dd-glass rounded-[22px] p-6"><Network className="size-5 text-[var(--muted)]"/><div className="mt-8 text-2xl font-semibold tracking-[-.04em]">Benchmark → principle</div><p className="mt-2 text-xs leading-5 text-[var(--muted)]">Strong references are studied for hierarchy, motion, density and interaction—not copied as branded screens.</p></div>
+        <div className="dd-glass rounded-[22px] p-6"><Sparkles className="size-5 text-[var(--muted)]"/><div className="mt-8 text-2xl font-semibold tracking-[-.04em]">Project-specific layers</div><p className="mt-2 text-xs leading-5 text-[var(--muted)]">Aceternity, Magic UI, React Bits, Motion Primitives and community components stay selective rather than polluting the core.</p></div>
+      </section>
+    </main>
+  );
 }
