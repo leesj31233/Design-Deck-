@@ -1,0 +1,8 @@
+import * as React from "react";
+import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { GlassPanel } from "@/components/ui/glass-panel";
+
+export interface InspectorSection { title: string; rows: { label: string; value: React.ReactNode }[]; }
+export function InspectorPanel({ title, subtitle, status, sections, actions, className }: { title: string; subtitle?: string; status?: string; sections: InspectorSection[]; actions?: React.ReactNode; className?: string }) { return <GlassPanel className={cn("w-full overflow-hidden", className)}><div className="border-b border-[var(--line)] p-4"><div className="flex items-start justify-between gap-3"><div><div className="text-sm font-semibold tracking-[-.02em]">{title}</div>{subtitle ? <div className="mt-1 text-xs text-[var(--muted)]">{subtitle}</div>:null}</div>{status ? <Badge tone="blue">{status}</Badge>:null}</div>{actions ? <div className="mt-3 flex gap-2">{actions}</div>:null}</div><div>{sections.map(section=><section key={section.title} className="border-b border-[var(--line)] p-4 last:border-0"><h4 className="mb-2 text-[10px] font-semibold uppercase tracking-[.13em] text-[var(--muted)]">{section.title}</h4><div className="space-y-0.5">{section.rows.map(row=><div key={row.label} className="flex items-center justify-between gap-4 rounded-lg px-1 py-2 text-xs"><span className="text-[var(--muted)]">{row.label}</span><span className="flex items-center gap-1 text-right font-medium">{row.value}<ChevronRight className="size-3 text-[var(--muted)]/50"/></span></div>)}</div></section>)}</div></GlassPanel>; }
