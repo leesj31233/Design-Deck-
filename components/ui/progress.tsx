@@ -1,0 +1,3 @@
+import * as React from "react";
+import { cn } from "@/lib/utils";
+export function Progress({ value, className, label }: { value: number; className?: string; label?: string }) { const bounded = Math.max(0, Math.min(100, value)); return <div className={cn("space-y-1.5", className)}>{label ? <div className="flex justify-between text-xs text-[var(--muted)]"><span>{label}</span><span>{Math.round(bounded)}%</span></div> : null}<div role="progressbar" aria-valuenow={bounded} aria-valuemin={0} aria-valuemax={100} className="h-1.5 overflow-hidden rounded-full bg-black/[.07] dark:bg-white/[.08]"><div className="h-full rounded-full bg-[var(--foreground)] transition-[width] duration-300" style={{ width: `${bounded}%` }}/></div></div>; }

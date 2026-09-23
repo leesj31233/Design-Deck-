@@ -1,21 +1,31 @@
 {
   "name": "design-deck",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "latest",
+    "@radix-ui/react-dialog": "latest",
+    "@radix-ui/react-dropdown-menu": "latest",
+    "@radix-ui/react-popover": "latest",
     "@radix-ui/react-slot": "latest",
+    "@radix-ui/react-tabs": "latest",
+    "@radix-ui/react-tooltip": "latest",
+    "@xyflow/react": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
+    "cmdk": "latest",
     "lucide-react": "latest",
     "motion": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "sonner": "latest",
     "tailwind-merge": "latest"
   },
   "devDependencies": {

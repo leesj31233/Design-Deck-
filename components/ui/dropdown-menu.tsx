@@ -1,0 +1,19 @@
+"use client";
+import * as React from "react";
+import * as DropdownPrimitive from "@radix-ui/react-dropdown-menu";
+import { Check, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export const DropdownMenu = DropdownPrimitive.Root;
+export const DropdownMenuTrigger = DropdownPrimitive.Trigger;
+export const DropdownMenuSeparator = (props: React.ComponentPropsWithoutRef<typeof DropdownPrimitive.Separator>) => <DropdownPrimitive.Separator className="my-1 h-px bg-[var(--line)]" {...props} />;
+export const DropdownMenuContent = React.forwardRef<React.ElementRef<typeof DropdownPrimitive.Content>, React.ComponentPropsWithoutRef<typeof DropdownPrimitive.Content>>(({ className, sideOffset=7, ...props }, ref) => <DropdownPrimitive.Portal><DropdownPrimitive.Content ref={ref} sideOffset={sideOffset} className={cn("z-50 min-w-48 rounded-[14px] border border-[var(--line)] bg-[var(--surface-strong)] p-1.5 text-sm shadow-[var(--shadow-float)] backdrop-blur-2xl animate-in fade-in zoom-in-95", className)} {...props}/></DropdownPrimitive.Portal>);
+DropdownMenuContent.displayName = "DropdownMenuContent";
+export const DropdownMenuItem = React.forwardRef<React.ElementRef<typeof DropdownPrimitive.Item>, React.ComponentPropsWithoutRef<typeof DropdownPrimitive.Item>>(({ className, ...props }, ref) => <DropdownPrimitive.Item ref={ref} className={cn("flex cursor-default select-none items-center gap-2 rounded-lg px-2.5 py-2 outline-none data-[disabled]:opacity-40 data-[highlighted]:bg-black/[.06] dark:data-[highlighted]:bg-white/[.08]", className)} {...props}/>);
+DropdownMenuItem.displayName = "DropdownMenuItem";
+export const DropdownMenuCheckboxItem = React.forwardRef<React.ElementRef<typeof DropdownPrimitive.CheckboxItem>, React.ComponentPropsWithoutRef<typeof DropdownPrimitive.CheckboxItem>>(({ children, className, ...props }, ref) => <DropdownPrimitive.CheckboxItem ref={ref} className={cn("relative flex cursor-default select-none items-center rounded-lg py-2 pl-8 pr-2 outline-none data-[highlighted]:bg-black/[.06] dark:data-[highlighted]:bg-white/[.08]", className)} {...props}><span className="absolute left-2.5"><DropdownPrimitive.ItemIndicator><Check className="size-3.5"/></DropdownPrimitive.ItemIndicator></span>{children}</DropdownPrimitive.CheckboxItem>);
+DropdownMenuCheckboxItem.displayName = "DropdownMenuCheckboxItem";
+export const DropdownMenuSubTrigger = React.forwardRef<React.ElementRef<typeof DropdownPrimitive.SubTrigger>, React.ComponentPropsWithoutRef<typeof DropdownPrimitive.SubTrigger>>(({ children, className, ...props }, ref) => <DropdownPrimitive.SubTrigger ref={ref} className={cn("flex cursor-default select-none items-center rounded-lg px-2.5 py-2 outline-none data-[highlighted]:bg-black/[.06] dark:data-[highlighted]:bg-white/[.08]", className)} {...props}>{children}<ChevronRight className="ml-auto size-3.5"/></DropdownPrimitive.SubTrigger>);
+DropdownMenuSubTrigger.displayName = "DropdownMenuSubTrigger";
+export const DropdownMenuSub = DropdownPrimitive.Sub;
+export const DropdownMenuSubContent = DropdownMenuContent;
