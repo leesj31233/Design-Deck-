@@ -1,5 +1,6 @@
 import { createTextAnchor } from "../anchors/create-anchor";
 import { clientRectToPageRect } from "../anchors/geometry";
+import { mergeLineRects } from "../anchors/merge-line-rects";
 import type { Rect, TextAnchor } from "../anchors/types";
 function rangeText(range: Range): string {
   const fragment = range.cloneContents();
@@ -8,10 +9,10 @@ function rangeText(range: Range): string {
 }
 export function rangeRects(range: Range, page: HTMLElement): Rect[] {
   const bounds = page.getBoundingClientRect();
-  return Array.from(range.getClientRects()).filter(r => r.width > 0.5 && r.height > 0.5).map(r => {
+  return mergeLineRects(Array.from(range.getClientRects()).filter(r => r.width > 0.5 && r.height > 0.5).map(r => {
     const x = Math.max(bounds.left, r.left), y = Math.max(bounds.top, r.top);
     return clientRectToPageRect({ x, y, width: Math.max(0, Math.min(bounds.right, r.right) - x), height: Math.max(0, Math.min(bounds.bottom, r.bottom) - y) }, bounds);
-  }).filter(r => r.width > 0.5 && r.height > 0.5).filter((r, index, all) => !all.slice(0, index).some(a => Math.abs(a.x - r.x) < .5 && Math.abs(a.y - r.y) < .5 && Math.abs(a.width - r.width) < .5 && Math.abs(a.height - r.height) < .5));
+  }).filter(r => r.width > 0.5 && r.height > 0.5));
 }
 export function captureSelection(selection: Selection, page: HTMLElement, layer: HTMLElement, documentId: string, pageIndex: number): TextAnchor | null {
   if (selection.isCollapsed || !selection.rangeCount) return null;
