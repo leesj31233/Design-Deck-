@@ -28,10 +28,12 @@ export function ResearchInspector({ annotations, resolved, selected, onSelect, o
   const sourceText = anchor?.sourceQuote ?? (selection ? anchor?.textQuote : paragraph?.text ?? anchor?.textQuote);
   const sourcePage = paragraph ? paragraph.pageIndex + 1 : anchor ? anchor.pageIndex + 1 : null;
   const [draft, setDraft] = useState("");
+  const [accessCode, setAccessCode] = useState("");
   useEffect(() => { setDraft(active?.note ?? ""); }, [active?.id, active?.note, selection?.textQuote]);
   return <GlassPanel className="pf-inspector dd-scrollbar" data-inspector><header><div><span className="pf-kicker">SOURCE FIRST</span><h2>Research Inspector</h2></div><IconButton label="Close inspector" variant="ghost" size="sm" onClick={() => useReaderStore.getState().set({ inspectorOpen: false })}><X size={16}/></IconButton></header>
     <Tabs value={tab} onValueChange={setTab}><TabsList className="pf-inspector-tabs"><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="notes">Notes</TabsTrigger><TabsTrigger value="evidence">Evidence</TabsTrigger></TabsList>
       <TabsContent value="context">
+        <details className="pf-inspector-section pf-research-connection"><summary>연구 번역 서버 연결</summary><p>서버에 등록된 연구 접근 코드를 입력하면 OpenAI 번역과 개념 설명을 사용할 수 있다. API 키 자체를 입력하지 않는다.</p><input aria-label="연구 접근 코드" type="password" autoComplete="off" value={accessCode} onChange={event => setAccessCode(event.target.value)}/><Button size="sm" disabled={!accessCode.trim()} onClick={() => { sessionStorage.setItem("paperflow-access", accessCode.trim()); setAccessCode(""); }}>이 브라우저 세션에 연결</Button></details>
         <ConceptStudy source={sourceText ?? ""} selected={selection?.textQuote ?? ""} page={selection ? selection.pageIndex + 1 : sourcePage}/>
         <div className="pf-inspector-section">{sourceText ? <><Badge>원문 · p. {sourcePage}</Badge><blockquote>{sourceText}</blockquote></> : <div className="pf-inspector-empty"><BookOpen size={27}/><h3>문단을 클릭하세요</h3><p>원본 PDF의 문단을 클릭하면<br/>원래 문단 자리에서 한국어로 바뀝니다.</p><span>문단 클릭 → 한국어로 읽기 → 원문 전환</span></div>}</div>
         <section className="pf-inspector-section pf-translation-card" aria-live="polite"><div className="pf-section-title"><h3><Languages size={16}/> 한국어 번역</h3><span>공학 용어 영어 유지</span></div>
