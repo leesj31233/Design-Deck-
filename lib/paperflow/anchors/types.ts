@@ -11,7 +11,7 @@ export type AnnotationColor = "yellow" | "green" | "blue" | "pink" | "purple";
 export const annotationColors: AnnotationColor[] = ["yellow", "green", "blue", "pink", "purple"];
 export type Annotation = {
   points?: { x: number; y: number }[];
-  id: string; type: "highlight" | "ink"; documentId: string; pageIndex: number; color: AnnotationColor;
+  id: string; type: "highlight" | "ink" | "note"; documentId: string; pageIndex: number; color: AnnotationColor;
   anchor: TextAnchor; note?: string; createdAt: string; updatedAt: string;
   resolutionStatus: "resolved" | "unresolved";
 };

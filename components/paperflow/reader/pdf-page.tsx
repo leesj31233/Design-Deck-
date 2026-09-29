@@ -34,7 +34,7 @@ export function PdfPage({ page, scale, documentId, pageIndex, annotations, selec
     const paragraphs = extractParagraphs(layer.current, surface.current, pageIndex, canvas.current ?? undefined);
     setParagraphs(paragraphs); onParagraphs(paragraphs);
     const index = textIndex(layer.current, surface.current);
-    const results = annotations.filter(a => a.type !== "ink" && a.pageIndex === pageIndex && a.anchor.surface !== "translation").map(annotation => ({ annotation, recovery: recoverAnchor(annotation.anchor, { ...index, documentId, pageIndex }) }));
+    const results = annotations.filter(a => a.type === "highlight" && a.pageIndex === pageIndex && a.anchor.surface !== "translation").map(annotation => ({ annotation, recovery: recoverAnchor(annotation.anchor, { ...index, documentId, pageIndex }) }));
     setResolved(results); onResolved(results);
   }, [annotations, textReady, scale, documentId, pageIndex, onResolved, onParagraphs]);
   useEffect(() => {

@@ -113,6 +113,15 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   }, [annotations, selected, documentId, client, dismiss, notify]);
   useEffect(() => { if (tool !== "highlight") return; const finish = () => { setTimeout(() => { if (useReaderStore.getState().activeSelection) void save(); }, 30); }; document.addEventListener("pointerup", finish); return () => document.removeEventListener("pointerup", finish); }, [tool, save]);
   const showNote = useCallback(() => { useReaderStore.getState().set({ inspectorOpen: true }); setTab("notes"); }, []);
+  const saveNote = useCallback(async (text: string) => {
+    if (useReaderStore.getState().activeSelection || annotations.some(a => a.id === selected)) { await save("yellow", text); return; }
+    if (!text.trim()) return;
+    const now = new Date().toISOString(), pageIndex = currentPage - 1;
+    try {
+      await annotationRepository.create({ id: crypto.randomUUID(), type: "note", documentId, pageIndex, color: "yellow", note: text.trim(), anchor: { version: 1, documentId, pageIndex, textQuote: `페이지 ${currentPage} 메모`, rects: [], normalizedRects: [], createdAt: now }, createdAt: now, updatedAt: now, resolutionStatus: "resolved" });
+      await client.invalidateQueries({ queryKey: ["annotations"] }); notify("페이지 메모를 저장했다.");
+    } catch (reason) { notify(`메모 저장 실패: ${readableError(reason)}`); }
+  }, [annotations, selected, save, currentPage, documentId, client, notify]);
   const translateParagraph = useCallback(async (paragraph: PdfParagraph) => {
     translationController.current?.abort(); const controller = new AbortController(); translationController.current = controller;
     setActiveParagraph(paragraph); setTranslation({ pending: true }); setShowTranslations(true); setOriginalParagraphs(items => items.filter(id => id !== paragraph.id)); dismiss();
@@ -187,7 +196,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
       const number = Number(active?.dataset.continuousPage);
       if (number && number !== useReaderStore.getState().currentPage) { useReaderStore.getState().set({ currentPage: number }); void documentRepository.updateDocument(documentId, { currentPage: number, lastOpenedAt: new Date().toISOString() }); }
     }}><div className="pf-reader-hint">문단 클릭 → 그 자리에서 한국어로 · 공학 용어는 영어 유지</div>{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={Math.max(.1, scale)} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onParagraphs={collectParagraphs} onParagraph={paragraph => void translateParagraph(paragraph)} translations={showTranslations ? Object.fromEntries(Object.entries(inlineTranslations).filter(([id]) => !originalParagraphs.includes(id))) : {}} onOriginal={id => { dismiss(); setOriginalParagraphs(items => [...items, id]); }}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
-      {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={text => save("yellow", text)} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} onTranslate={translateSelection} onBatchTranslate={() => void batchTranslate()} onCancelBatch={() => bulkController.current?.abort()}/>}
+      {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={saveNote} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} onTranslate={translateSelection} onBatchTranslate={() => void batchTranslate()} onCancelBatch={() => bulkController.current?.abort()}/>}
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.length} 마킹 · {annotations.filter(a => a.note).length} 메모</span><span>H 마킹 · N 메모 · Ctrl K 명령</span></footer>
     <ReaderSelectionTools documentId={documentId} onHighlight={color => void save(color)} onNote={showNote} onTranslate={translateSelection} onShell={showShell} onDismiss={dismiss} saving={saving}/>

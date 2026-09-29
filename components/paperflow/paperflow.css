@@ -319,16 +319,17 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 .pf-book-title { display:block; }
 .pf-paper-list[data-layout="shelf"] .pf-book-title strong { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; min-height:38px; white-space:normal; line-height:1.55; font-size:12px; overflow-wrap:anywhere; }
 .pf-book-title small { font-size:9px; margin-top:9px; }
-.pf-book-details { display:flex; align-items:center; gap:12px; width:100%; margin-top:18px; padding-top:12px; border-top:1px solid var(--line); }
-.pf-book-details .pf-progress { flex:1; }
+.pf-book-details { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; width:100%; min-width:0; margin-top:18px; padding-top:12px; border-top:1px solid var(--line); }
+.pf-book-details .pf-progress { flex:1 1 100%; min-width:0; }
 .pf-book-details .pf-progress progress { margin-top:6px; height:2px; }
 .pf-book-details .pf-record-count { display:flex; align-items:center; gap:4px; }
-.pf-book-details>button { flex:none; border-radius:50%; }
+.pf-book-details>button { flex:0 0 auto; border-radius:12px; white-space:nowrap; }
+.pf-book-activity { flex:1 1 100%; min-width:0; overflow-wrap:anywhere; line-height:1.45; }
 .pf-paper-list[data-layout="list"] { display:flex; flex-direction:column; gap:10px; }
 .pf-paper-list[data-layout="list"] .pf-book-card { display:flex; padding:16px 20px; gap:24px; }
 .pf-paper-list[data-layout="list"] .pf-paper-link { flex:1; }
 .pf-paper-list[data-layout="list"] .pf-book-cover { width:48px; flex:none; margin:0 6px 0 0; }
-.pf-paper-list[data-layout="list"] .pf-book-details { width:180px; margin:0; padding:0; border:0; }
+.pf-paper-list[data-layout="list"] .pf-book-details { width:min(340px,42%); margin:0; padding:0; border:0; }
 .pf-collection-empty { grid-column:1/-1; min-height:330px; border:1px dashed color-mix(in srgb,var(--accent) 28%,var(--line)); border-radius:24px; background:color-mix(in srgb,var(--surface) 65%,transparent); }
 .pf-empty-book { display:grid; place-items:center; width:74px; height:84px; border-radius:17px; background:linear-gradient(135deg,var(--surface-strong),color-mix(in srgb,var(--accent) 12%,var(--surface))); box-shadow:inset 0 1px white,0 12px 26px rgba(20,50,90,.1); color:var(--accent); transform:rotate(-5deg); }
 .pf-map-empty { border-radius:24px; min-height:300px; }
@@ -367,3 +368,9 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 .pf-continuous-page { margin:0 auto 24px; width:max-content; scroll-margin-top:20px; position:relative; }.pf-page-placeholder { display:grid; place-items:center; height:100%; color:var(--muted-foreground); }.pf-translated-marks { position:absolute; inset:0; z-index:5; pointer-events:none; mix-blend-mode:multiply; }.pf-ink-layer { position:absolute; inset:0; width:100%; height:100%; z-index:6; pointer-events:none; }.pf-ink-layer[data-active="true"] { pointer-events:auto; touch-action:none; cursor:crosshair; }.pf-annotation-tools { display:flex; gap:4px; padding:5px 20px; flex-wrap:wrap; }.pf-annotation-tools [aria-pressed="true"] { background:color-mix(in srgb,var(--accent) 20%,transparent); box-shadow:inset 0 0 0 1px var(--accent); }.pf-inline-region { user-select:text; }.pf-pdf-viewport { scroll-behavior:smooth; overflow:auto; }.pf-reader-hint { position:sticky; top:0; z-index:8; }
 
 .pf-insights { padding:22px; margin-bottom:26px; }.pf-insight-totals { display:flex; gap:30px; flex-wrap:wrap; margin:17px 0; }.pf-insight-totals span { display:grid; gap:3px; }.pf-insight-totals strong { font-size:26px; }.pf-insight-columns { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }.pf-insight-columns p { overflow:hidden; text-overflow:ellipsis; }.pf-insight-columns small { color:var(--muted-foreground); }.pf-book-activity { font-size:11px; opacity:.72; }.pf-research-map>div { padding:25px; }.pf-map-nodes { display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:12px; margin:22px 0; }.pf-map-node { text-align:left; padding:16px; border-radius:18px; background:color-mix(in srgb,var(--accent) 9%,transparent); border:1px solid var(--line); display:grid; gap:10px; cursor:pointer; }.pf-map-node[aria-pressed="true"] { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent); }.pf-map-node small,.pf-map-edge small { opacity:.65; }.pf-map-edge { padding:10px 0; border-top:1px solid var(--line); }.pf-keywords { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }.pf-keywords [aria-pressed="true"] { color:var(--accent); }.pf-concept-study blockquote { line-height:1.5; }.pf-study-answer { white-space:pre-wrap; border-radius:14px; background:color-mix(in srgb,var(--accent) 8%,transparent); padding:14px; }
+.pf-wiki-map { position:relative; min-height:520px; margin:22px 0; border-radius:24px; overflow:hidden; background:radial-gradient(circle at center,color-mix(in srgb,var(--accent) 13%,transparent),transparent 55%),color-mix(in srgb,var(--surface) 77%,transparent); border:1px solid var(--line); }
+.pf-wiki-map svg { position:absolute; inset:0; width:100%; height:100%; }.pf-wiki-map line { stroke:var(--accent); stroke-width:.2; opacity:.42; }
+.pf-wiki-node { position:absolute; transform:translate(-50%,-50%); max-width:160px; min-width:110px; padding:10px 12px; border:1px solid var(--line); border-radius:15px; background:color-mix(in srgb,var(--surface-strong) 90%,transparent); box-shadow:0 10px 28px rgba(0,0,0,.12); backdrop-filter:blur(20px); color:var(--foreground); font-size:11px; line-height:1.35; cursor:pointer; transition:transform .2s ease,box-shadow .2s ease; }
+.pf-wiki-node:hover,.pf-wiki-node[aria-pressed="true"] { transform:translate(-50%,-50%) scale(1.08); box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 25%,transparent); border-color:var(--accent); z-index:1; }
+.pf-map-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px 22px; }.pf-map-edge { min-width:0; line-height:1.5; overflow-wrap:anywhere; }.pf-map-edge small { display:block; color:var(--accent); }
+.pf-concept-study input { width:100%; min-height:36px; border:1px solid var(--line); border-radius:10px; padding:7px 10px; background:var(--surface); color:var(--foreground); }

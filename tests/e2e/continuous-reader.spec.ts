@@ -21,3 +21,28 @@ test("continuous pages keep translated text and allow annotations on Korean text
   await expect(page.locator("[data-pdf-page='0'] .pf-translated-text")).toContainText("예측한다");
   await expect(page.locator("[data-pdf-page='0'] .pf-translated-marks [data-testid='highlight-rect']")).toHaveCount(1);
 });
+
+test("page notes and pen strokes stay in the reader and appear in the notebook", async ({ page }) => {
+  await page.goto("/library");
+  await page.getByLabel("Import PDF file").setInputFiles({ name: "Research notes.pdf", mimeType: "application/pdf", buffer: makePdf() });
+  await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
+  await page.getByRole("button", { name: "텍스트 메모" }).click();
+  await page.getByLabel("원문 메모").fill("실험 조건을 다시 확인한다.");
+  await page.getByRole("button", { name: "메모 저장" }).click();
+  await expect(page.getByText("실험 조건을 다시 확인한다.")).toBeVisible();
+  await page.getByRole("button", { name: "메모 펜" }).click();
+  const ink = page.locator("[data-pdf-page='0'] .pf-ink-layer");
+  const box = await ink.boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.move(box!.x + 100, box!.y + 100);
+  await page.mouse.down();
+  await page.mouse.move(box!.x + 130, box!.y + 125, { steps: 6 });
+  await page.mouse.up();
+  await expect(ink.locator("polyline")).toHaveCount(2);
+  await expect(page.locator(".pf-reader-shell")).toBeVisible();
+  await page.reload();
+  await expect(page.locator("[data-pdf-page='0'] .pf-ink-layer polyline")).toHaveCount(2);
+  await page.goto("/library");
+  await page.getByRole("button", { name: "노트 모아보기" }).click();
+  await expect(page.getByText("실험 조건을 다시 확인한다.")).toBeVisible();
+});
