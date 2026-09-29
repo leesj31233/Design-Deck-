@@ -1,4 +1,5 @@
 "use client";
+import { InkLayer } from "./ink-layer";
 import { useEffect, useRef, useState } from "react";
 import type { PdfPageHandle } from "@/lib/paperflow/pdf/pdf-adapter";
 import { captureSelection, textIndex } from "@/lib/paperflow/pdf/selection-geometry";
@@ -30,10 +31,10 @@ export function PdfPage({ page, scale, documentId, pageIndex, annotations, selec
   }, [page, scale]);
   useEffect(() => {
     if (!textReady || !surface.current || !layer.current) return;
-    const paragraphs = extractParagraphs(layer.current, surface.current, pageIndex);
+    const paragraphs = extractParagraphs(layer.current, surface.current, pageIndex, canvas.current ?? undefined);
     setParagraphs(paragraphs); onParagraphs(paragraphs);
     const index = textIndex(layer.current, surface.current);
-    const results = annotations.filter(a => a.pageIndex === pageIndex).map(annotation => ({ annotation, recovery: recoverAnchor(annotation.anchor, { ...index, documentId, pageIndex }) }));
+    const results = annotations.filter(a => a.type !== "ink" && a.pageIndex === pageIndex && a.anchor.surface !== "translation").map(annotation => ({ annotation, recovery: recoverAnchor(annotation.anchor, { ...index, documentId, pageIndex }) }));
     setResolved(results); onResolved(results);
   }, [annotations, textReady, scale, documentId, pageIndex, onResolved, onParagraphs]);
   useEffect(() => {
@@ -46,18 +47,25 @@ export function PdfPage({ page, scale, documentId, pageIndex, annotations, selec
         return;
       }
       // Ignore selections made in the inspector rather than replacing the source.
+      const element = selection.anchorNode instanceof Element ? selection.anchorNode : selection.anchorNode?.parentElement;
+      const translated = element?.closest<HTMLElement>("[data-paragraph-id]");
+      if (translated && surface.current.contains(translated)) {
+        const anchor = captureSelection(selection, surface.current, translated, documentId, pageIndex);
+        if (anchor) { anchor.surface = "translation"; anchor.paragraphId = translated.dataset.paragraphId; anchor.sourceQuote = paragraphs.find(item => item.id === anchor.paragraphId)?.text; useReaderStore.getState().set({ activeSelection: anchor }); }
+        return;
+      }
       if (!layer.current.contains(selection.anchorNode)) return;
       try { const start = performance.now(); performance.mark("paperflow:selection-start"); const anchor = captureSelection(selection, surface.current, layer.current, documentId, pageIndex); useReaderStore.getState().set({ activeSelection: anchor }); if (anchor) performance.measure("paperflow:selection-capture", { start }); }
       catch (reason) { notify(readableError(reason)); }
     };
     document.addEventListener("selectionchange", handle);
     return () => document.removeEventListener("selectionchange", handle);
-  }, [textReady, documentId, pageIndex, notify]);
+  }, [textReady, documentId, pageIndex, notify, paragraphs]);
   const openParagraph = (target: EventTarget | null) => {
     if (!layer.current || !target || !(target instanceof Element) || window.getSelection()?.toString().trim()) return;
     const id = target.closest<HTMLElement>("[data-pf-paragraph]")?.dataset.pfParagraph;
     if (!id) return;
-    const paragraphs = extractParagraphs(layer.current, surface.current!, pageIndex);
+    const paragraphs = extractParagraphs(layer.current, surface.current!, pageIndex, canvas.current ?? undefined);
     const paragraph = paragraphs.find(item => item.id === id);
     if (paragraph) onParagraph(paragraph);
   };
@@ -67,5 +75,7 @@ export function PdfPage({ page, scale, documentId, pageIndex, annotations, selec
     <div ref={layer} className="textLayer" aria-label={`선택 가능한 원문 ${pageIndex + 1}페이지`} onClick={event => openParagraph(event.target)}/>
     {textReady && <HighlightLayer annotations={resolved} selected={selected}/>}
     {textReady && canvas.current && <InlineTranslationLayer paragraphs={paragraphs} translations={translations} canvas={canvas.current} width={page.width * scale} height={page.height * scale} onOriginal={onOriginal} onRetry={onParagraph}/>}
+    {textReady && <div className="pf-translated-marks"><HighlightLayer annotations={annotations.filter(a => a.pageIndex === pageIndex && a.anchor.surface === "translation" && translations[a.anchor.paragraphId ?? ""]?.text).map(annotation => ({ annotation, recovery: { status: "resolved" as const, method: "geometry" as const, confidence: 1, rects: annotation.anchor.normalizedRects } }))} selected={selected}/></div>}
+    <InkLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations}/>
   </div>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
 }

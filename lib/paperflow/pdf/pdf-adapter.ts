@@ -4,7 +4,7 @@ export interface PdfPageHandle {
   render(canvas: HTMLCanvasElement, scale: number, signal: AbortSignal): Promise<void>;
   renderText(container: HTMLElement, scale: number, signal: AbortSignal): Promise<void>;
 }
-export interface PdfDocumentHandle { pageCount: number; fingerprint?: string; getPage(pageNumber: number): Promise<PdfPageHandle>; destroy(): Promise<void> }
+export interface PdfDocumentHandle { readMetadata(): Promise<{ text: string; info: Record<string, unknown> }>; pageCount: number; fingerprint?: string; getPage(pageNumber: number): Promise<PdfPageHandle>; destroy(): Promise<void> }
 let library: Promise<typeof import("pdfjs-dist")> | undefined;
 async function getLibrary() {
   library ??= import("pdfjs-dist").then(pdf => { pdf.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs"; return pdf; });
@@ -42,7 +42,7 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
 }
 function documentHandle(document: PDFDocumentProxy, destroy: () => Promise<void>): PdfDocumentHandle {
   const pages = new Map<number, Promise<PdfPageHandle>>();
-  return { pageCount: document.numPages, fingerprint: document.fingerprints[0] ?? undefined,
+  return { async readMetadata() { const metadata = await document.getMetadata(); const page = await document.getPage(1); const text = await page.getTextContent(); return { info: metadata.info as Record<string, unknown>, text: text.items.map(item => "str" in item ? item.str : "").join(" ") }; }, pageCount: document.numPages, fingerprint: document.fingerprints[0] ?? undefined,
     getPage(number) {
       if (!pages.has(number)) pages.set(number, document.getPage(number).then(pageHandle));
       // Keep a bounded wrapper cache. PDF.js owns the underlying page lifecycle.

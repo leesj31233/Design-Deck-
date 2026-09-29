@@ -2,6 +2,7 @@ import type { Annotation } from "../anchors/types";
 export type StoredDocument = {
   id: string; filename: string; title: string; mimeType: "application/pdf"; byteLength: number;
   createdAt: string; updatedAt: string; pageCount: number; fingerprint?: string; blobKey: string;
+  visitedPages?: number[]; opens?: string[]; keywords?: string[]; citationCount?: number; metadataSource?: string; metadataCheckedAt?: string; jif?: { value: number; year: number; source: string };
   currentPage: number; lastOpenedAt?: string; authors: string[]; journal?: string; year?: number; doi?: string;
   researchPoolIds: string[]; archived: boolean; sourceStatus: "local";
 };
@@ -11,7 +12,7 @@ export interface DocumentRepository {
   getDocument(id: string): Promise<StoredDocument | null>;
   getDocumentBlob(id: string): Promise<Blob | null>;
   listDocuments(): Promise<StoredDocument[]>;
-  updateDocument(id: string, patch: Partial<Pick<StoredDocument, "currentPage" | "lastOpenedAt" | "archived" | "title" | "researchPoolIds">>): Promise<void>;
+  updateDocument(id: string, patch: Partial<Omit<StoredDocument, "id" | "blobKey" | "mimeType" | "byteLength" | "createdAt">>): Promise<void>;
 }
 export interface AnnotationRepository {
   create(annotation: Annotation): Promise<void>;

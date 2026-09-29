@@ -20,7 +20,7 @@ export const documentRepository: DocumentRepository = {
   async updateDocument(id, patch) {
     const db = await openDatabase(), tx = db.transaction("documents", "readwrite"), done = transactionDone(tx), store = tx.objectStore("documents");
     const record: StoredDocument | undefined = await requestResult(store.get(id));
-    if (record) store.put({ ...record, ...patch, updatedAt: new Date().toISOString() });
+    if (record) store.put({ ...record, ...patch, visitedPages: patch.currentPage ? [...new Set([...(record.visitedPages ?? []), patch.currentPage])] : record.visitedPages, updatedAt: new Date().toISOString() });
     await done;
   }
 };

@@ -1,10 +1,10 @@
 export interface ParagraphLine { x: number; y: number; width: number; height: number }
-export interface PdfParagraph { id: string; pageIndex: number; text: string; x: number; y: number; width: number; height: number; lines: ParagraphLine[]; fontFamily: string; fontWeight: number; fontStyle: string }
+export interface PdfParagraph { id: string; pageIndex: number; text: string; x: number; y: number; width: number; height: number; lines: ParagraphLine[]; fontFamily: string; fontWeight: number; fontStyle: string; color?: string }
 
 type Line = { spans: HTMLElement[]; text: string; x: number; y: number; right: number; bottom: number; height: number };
 
 /** Groups PDF.js text spans in reading order without changing the source PDF layer. */
-export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageIndex: number): PdfParagraph[] {
+export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageIndex: number, canvas?: HTMLCanvasElement): PdfParagraph[] {
   const bounds = page.getBoundingClientRect();
   const lines: Line[] = [];
   for (const span of layer.querySelectorAll<HTMLElement>("span")) {
@@ -37,7 +37,30 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
     for (const line of group) for (const span of line.spans) span.dataset.pfParagraph = id;
     const representative = group.flatMap(line => line.spans).sort((a, b) => (b.textContent?.length ?? 0) - (a.textContent?.length ?? 0))[0];
     const style = getComputedStyle(representative);
-    const fontWeight = group.length <= 3 && group[0].height > bodySize * 1.25 ? 600 : Number(style.fontWeight) || 400;
-    return { id, pageIndex, text: group.map(line => line.text).join(" ").replace(/\s+/g, " ").trim(), x: (x - bounds.left) / bounds.width, y: (y - bounds.top) / bounds.height, width: (right - x) / bounds.width, height: (bottom - y) / bounds.height, lines: group.map(line => ({ x: (line.x - bounds.left) / bounds.width, y: (line.y - bounds.top) / bounds.height, width: (line.right - line.x) / bounds.width, height: (line.bottom - line.y) / bounds.height })), fontFamily: representative.dataset.pfSourceFont ? `${representative.dataset.pfSourceFont}, ${style.fontFamily}` : style.fontFamily, fontWeight, fontStyle: style.fontStyle };
+    const sourceFont = representative.dataset.pfSourceFont ?? "";
+    const fontWeight = /bold|demi|semibold|heavy/i.test(sourceFont) || group.length <= 3 && group[0].height > bodySize * 1.25 ? 700 : Number(style.fontWeight) || 400;
+    return { id, pageIndex, text: group.map(line => line.text).join(" ").replace(/\s+/g, " ").trim(), x: (x - bounds.left) / bounds.width, y: (y - bounds.top) / bounds.height, width: (right - x) / bounds.width, height: (bottom - y) / bounds.height, lines: group.map(line => ({ x: (line.x - bounds.left) / bounds.width, y: (line.y - bounds.top) / bounds.height, width: (line.right - line.x) / bounds.width, height: (line.bottom - line.y) / bounds.height })), fontFamily: sourceFont ? `${sourceFont}, ${style.fontFamily}` : style.fontFamily, fontWeight, fontStyle: style.fontStyle, color: sampleInk(canvas, representative, bounds) };
   }).filter(paragraph => paragraph.text.length >= 12);
+}
+
+function sampleInk(canvas: HTMLCanvasElement | undefined, span: HTMLElement, page: DOMRect): string | undefined {
+  if (!canvas?.width) return;
+  try {
+    const rect = span.getBoundingClientRect(), context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) return;
+    const x = Math.max(0, Math.floor((rect.left - page.left) / page.width * canvas.width));
+    const y = Math.max(0, Math.floor((rect.top - page.top) / page.height * canvas.height));
+    const width = Math.min(canvas.width - x, Math.max(1, Math.ceil(rect.width / page.width * canvas.width)));
+    const height = Math.min(canvas.height - y, Math.max(1, Math.ceil(rect.height / page.height * canvas.height)));
+    if (width * height > 80000) return;
+    const data = context.getImageData(x, y, width, height).data, counts = new Map<string, number>();
+    for (let i = 0; i < data.length; i += 16) {
+      const r = data[i], g = data[i + 1], b = data[i + 2];
+      if (Math.max(r, g, b) > 195 || Math.max(r, g, b) - Math.min(r, g, b) < 12 && Math.max(r, g, b) > 75) continue;
+      const key = [r, g, b].map(n => Math.floor(n / 16) * 16).join(",");
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    const color = [...counts].sort((a, b) => b[1] - a[1])[0]?.[0];
+    return color ? `rgb(${color})` : undefined;
+  } catch { return; }
 }

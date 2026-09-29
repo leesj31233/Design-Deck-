@@ -5,7 +5,7 @@ import type { PdfParagraph } from "@/lib/paperflow/translation/paragraphs";
 import { paragraphRegions, layoutTranslation } from "@/lib/paperflow/translation/inline-layout";
 import { paperFontStack, koreanFontStack, paperFontRuns } from "@/lib/paperflow/translation/paper-font";
 
-export interface InlineTranslation { text?: string; provider?: "device" | "MyMemory"; pending: boolean; error?: string }
+export interface InlineTranslation { text?: string; provider?: "device" | "MyMemory" | "OpenAI"; pending: boolean; error?: string }
 export type InlineTranslations = Record<string, InlineTranslation>;
 
 function backgroundAt(canvas: HTMLCanvasElement, region: { x: number; y: number; width: number; height: number }, width: number, height: number) {
@@ -40,7 +40,7 @@ function TranslatedParagraph({ paragraph, translation, canvas, width, height, on
   if (!translation.text) return <div className="pf-inline-status" style={{ left: first.x, top: first.y }} role={translation.error ? "alert" : "status"}>
     {translation.pending ? <><span className="pf-loader"/>문단 번역 중…</> : <button onClick={onRetry} title={translation.error}>번역 재시도</button>}
   </div>;
-  return <section className="pf-inline-paragraph pf-translated-text" aria-label="한국어 번역 문단" data-paragraph-id={paragraph.id} data-overflow={Boolean(layout.overflow)} style={{ fontFamily, fontSize: layout.fontSize, fontWeight: paragraph.fontWeight, fontStyle: paragraph.fontStyle }}>
+  return <section className="pf-inline-paragraph pf-translated-text" aria-label="한국어 번역 문단" data-paragraph-id={paragraph.id} data-overflow={Boolean(layout.overflow)} style={{ fontFamily, fontSize: layout.fontSize, fontWeight: paragraph.fontWeight, fontStyle: paragraph.fontStyle, color: paragraph.color }}>
     {regions.map((region, index) => <div key={index} className="pf-inline-region" data-inline-region style={{ left: region.x - .5, top: region.y - .5, width: region.width + 1, height: region.height + 1, backgroundColor: colors[index] }}>
       {layout.lines.filter(line => line.region === index).map((line, row) => <motion.span className="pf-inline-line" key={row} initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .18 }} style={{ top: line.y + .5 }}>{paperFontRuns(line.text).map((run, part) => <span key={part} style={run.latin ? { fontFamily: latinFont } : undefined}>{run.text}</span>)}{" "}</motion.span>)}
       {layout.overflow?.region === index && <div className="pf-inline-overflow" tabIndex={0} aria-label="긴 번역 문단 · 스크롤하여 계속 읽기" style={{ lineHeight: `${layout.lineHeight}px` }}>{layout.overflow.text}</div>}

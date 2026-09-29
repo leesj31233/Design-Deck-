@@ -1,6 +1,6 @@
 import { openDatabase, requestResult, transactionDone } from "./indexeddb";
 
-export interface StoredTranslation { id: string; documentId: string; pageIndex: number; source: string; text: string; provider: "device" | "MyMemory"; createdAt: string }
+export interface StoredTranslation { id: string; documentId: string; pageIndex: number; source: string; text: string; provider: "device" | "MyMemory" | "OpenAI"; createdAt: string }
 const idFor = (documentId: string, pageIndex: number, source: string) => `typeset-v2:${documentId}:${pageIndex}:${source.replace(/\s+/g, " ").trim()}`;
 export const translationRepository = {
   async get(documentId: string, pageIndex: number, source: string) {

@@ -10,7 +10,7 @@ await mkdir(target); // Refuse an existing target so stale build files cannot su
 for (const name of ["app", "components", "lib", "public", "scripts", "package.json", "package-lock.json", "tsconfig.json", "postcss.config.mjs", ".gitignore"]) {
   await cp(path.join(root, name), path.join(target, name), {
     recursive: true,
-    filter: source => !["app/page.tsx", "app/(paperflow)/reader/[documentId]"].includes(path.relative(root, source).split(path.sep).join("/")),
+    filter: source => !["app/page.tsx", "app/(paperflow)/reader/[documentId]", "app/api"].includes(path.relative(root, source).split(path.sep).join("/")),
   });
 }
 await writeFile(path.join(target, "next.config.ts"), 'import type { NextConfig } from "next";\nconst config: NextConfig = { reactStrictMode: true, output: "export" };\nexport default config;\n');
