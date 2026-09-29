@@ -8,8 +8,9 @@ export function protectTerms(source: string, customTerms: string[] = []) {
   const capture = (match: string) => { const id = captured.length; captured.push(match); return `ZZZTERM${id}ZZZ`; };
   const termsPattern = new RegExp(`(?<![\\p{L}\\p{N}])(?:${terms.map(escapeRegExp).join("|")})(?![\\p{L}\\p{N}])`, "giu");
   const acronymAndUnitPattern = /(?<![\p{L}\p{N}])(?:(?!ZZZTERM\d+ZZZ\b)[A-Z]{2,}[0-9]*|\d+(?:\.\d+)?\s?(?:°C|K|MPa|kPa|MW|kW|mg|kg|wt%|%))(?![\p{L}\p{N}])/gu;
-  const protectedText = source.replace(termsPattern, capture).replace(acronymAndUnitPattern, capture);
-  return { protectedText, terms: captured, restore: (translated: string) => translated.replace(/ZZZTERM\s*(\d+)\s*ZZZ/gi, (token, number: string) => captured[Number(number)] ?? token) };
+  const sectionNames = new Set(["ABSTRACT", "INTRODUCTION", "CONCLUSIONS", "CONCLUSION", "METHODS", "RESULTS", "DISCUSSION", "REFERENCES"]);
+  const protectedText = source.replace(termsPattern, capture).replace(acronymAndUnitPattern, match => sectionNames.has(match) ? match : capture(match));
+  return { protectedText, terms: captured, restore: (translated: string) => translated.replace(/Z{2,}\s*TERM\s*(\d+)\s*Z{2,}/gi, (token, number: string) => captured[Number(number)] ?? token) };
 }
 function escapeRegExp(value: string) { return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 

@@ -12,3 +12,9 @@ it("keeps engineering phrases, acronyms and units in English while restoring tra
   expect(restored).not.toContain("ZZZTERM");
   expect(restored).toContain("biomass co-firing");
 });
+
+it("restores tokens when the provider changes spacing or repeats the sentinel edge", () => {
+  const source = protectTerms("ABSTRACT: CO2 and heat flux are compared.");
+  expect(source.protectedText).toContain("ABSTRACT:");
+  expect(source.restore("ZZZ TERM 0 ZZZZ 및 ZZZTERM1ZZZZ")).toBe("CO2 및 heat flux");
+});

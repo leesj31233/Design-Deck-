@@ -9,10 +9,12 @@ import { readableError } from "@/lib/paperflow/errors";
 import { HighlightLayer, type ResolvedAnnotation } from "./highlight-layer";
 import { usePaperflow } from "../shell/paperflow-context";
 import { extractParagraphs, type PdfParagraph } from "@/lib/paperflow/translation/paragraphs";
-export function PdfPage({ page, scale, documentId, pageIndex, annotations, selected, onResolved, onParagraphs, onParagraph }: { page: PdfPageHandle; scale: number; documentId: string; pageIndex: number; annotations: Annotation[]; selected?: string; onResolved: (results: ResolvedAnnotation[]) => void; onParagraphs: (paragraphs: PdfParagraph[]) => void; onParagraph: (paragraph: PdfParagraph) => void }) {
+import { InlineTranslationLayer, type InlineTranslations } from "./inline-translation-layer";
+export function PdfPage({ page, scale, documentId, pageIndex, annotations, selected, onResolved, onParagraphs, onParagraph, translations, onOriginal }: { page: PdfPageHandle; scale: number; documentId: string; pageIndex: number; annotations: Annotation[]; selected?: string; onResolved: (results: ResolvedAnnotation[]) => void; onParagraphs: (paragraphs: PdfParagraph[]) => void; onParagraph: (paragraph: PdfParagraph) => void; translations: InlineTranslations; onOriginal: (id: string) => void }) {
   const canvas = useRef<HTMLCanvasElement>(null), layer = useRef<HTMLDivElement>(null), surface = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false), [textReady, setTextReady] = useState(false), [error, setError] = useState("");
   const [resolved, setResolved] = useState<ResolvedAnnotation[]>([]);
+  const [paragraphs, setParagraphs] = useState<PdfParagraph[]>([]);
   const { notify } = usePaperflow();
   useEffect(() => {
     const controller = new AbortController(), canvasNode = canvas.current!, layerNode = layer.current!;
@@ -29,7 +31,7 @@ export function PdfPage({ page, scale, documentId, pageIndex, annotations, selec
   useEffect(() => {
     if (!textReady || !surface.current || !layer.current) return;
     const paragraphs = extractParagraphs(layer.current, surface.current, pageIndex);
-    onParagraphs(paragraphs);
+    setParagraphs(paragraphs); onParagraphs(paragraphs);
     const index = textIndex(layer.current, surface.current);
     const results = annotations.filter(a => a.pageIndex === pageIndex).map(annotation => ({ annotation, recovery: recoverAnchor(annotation.anchor, { ...index, documentId, pageIndex }) }));
     setResolved(results); onResolved(results);
@@ -64,5 +66,6 @@ export function PdfPage({ page, scale, documentId, pageIndex, annotations, selec
     <canvas ref={canvas} aria-label={`원본 PDF ${pageIndex + 1}페이지`} style={{ width: "100%", height: "100%" }}/>
     <div ref={layer} className="textLayer" aria-label={`선택 가능한 원문 ${pageIndex + 1}페이지`} onClick={event => openParagraph(event.target)}/>
     {textReady && <HighlightLayer annotations={resolved} selected={selected}/>}
+    {textReady && canvas.current && <InlineTranslationLayer paragraphs={paragraphs} translations={translations} canvas={canvas.current} width={page.width * scale} height={page.height * scale} onOriginal={onOriginal} onRetry={onParagraph}/>}
   </div>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
 }

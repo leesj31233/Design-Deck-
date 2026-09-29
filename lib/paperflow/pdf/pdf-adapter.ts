@@ -28,7 +28,15 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
       container.replaceChildren();
       const layer = new pdf.TextLayer({ textContentSource: text, container, viewport: page.getViewport({ scale }) });
       const cancel = () => layer.cancel(); signal.addEventListener("abort", cancel, { once: true });
-      try { await layer.render(); } finally { signal.removeEventListener("abort", cancel); }
+      try {
+        await layer.render();
+        let index = 0;
+        for (const item of text.items) {
+          if (!("str" in item)) continue;
+          const span = layer.textDivs[index++];
+          if (span) span.dataset.pfSourceFont = item.fontName;
+        }
+      } finally { signal.removeEventListener("abort", cancel); }
     }
   };
 }

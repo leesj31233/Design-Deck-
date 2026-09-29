@@ -20,6 +20,7 @@ import type { ResolvedAnnotation } from "./highlight-layer";
 import { translateHybrid } from "@/lib/paperflow/translation/hybrid";
 import type { PdfParagraph } from "@/lib/paperflow/translation/paragraphs";
 import { translationRepository } from "@/lib/paperflow/persistence/translation-repository";
+import type { InlineTranslations } from "./inline-translation-layer";
 const emptyAnnotations: Annotation[] = [];
 
 export function ReaderShell({ documentId }: { documentId: string }) {
@@ -32,6 +33,8 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const [searchOpen, setSearchOpen] = useState(false), [search, setSearch] = useState("");
   const [paragraphs, setParagraphs] = useState<PdfParagraph[]>([]);
   const [activeParagraph, setActiveParagraph] = useState<PdfParagraph | null>(null);
+  const [inlineTranslations, setInlineTranslations] = useState<InlineTranslations>({});
+  const [showTranslations, setShowTranslations] = useState(true), [originalParagraphs, setOriginalParagraphs] = useState<string[]>([]);
   const [translation, setTranslation] = useState<{ text?: string; provider?: "device" | "MyMemory"; pending: boolean; error?: string } | null>(null);
   const [bulk, setBulk] = useState<{ done: number; total: number; failed: number; running: boolean } | null>(null);
   const viewport = useRef<HTMLDivElement>(null), searchInput = useRef<HTMLInputElement>(null), writing = useRef(false), translationController = useRef<AbortController | null>(null), bulkController = useRef<AbortController | null>(null);
@@ -59,7 +62,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   }, [documentId, client]);
   useEffect(() => {
     if (!pdf) return;
-    let active = true; setPage(null); setResolved([]); setParagraphs([]); setActiveParagraph(null); setTranslation(null); translationController.current?.abort(); bulkController.current?.abort(); bulkController.current = null; setBulk(null); useReaderStore.getState().set({ activeSelection: null });
+    let active = true; setPage(null); setResolved([]); setParagraphs([]); setActiveParagraph(null); setTranslation(null); setInlineTranslations({}); setOriginalParagraphs([]); translationController.current?.abort(); bulkController.current?.abort(); bulkController.current = null; setBulk(null); useReaderStore.getState().set({ activeSelection: null });
     void pdf.getPage(currentPage).then(result => {
       if (!active) return; setPage(result);
       if (currentPage < pdf.pageCount) void pdf.getPage(currentPage + 1).catch(() => { /* Foreground navigation reports actual failures. */ });
@@ -67,6 +70,14 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     viewport.current?.scrollTo({ top: 0, left: 0 });
     return () => { active = false; };
   }, [pdf, currentPage]);
+  useEffect(() => {
+    let alive = true;
+    void Promise.all(paragraphs.map(async paragraph => ({ paragraph, stored: await translationRepository.get(documentId, paragraph.pageIndex, paragraph.text) }))).then(items => {
+      if (!alive) return;
+      setInlineTranslations(current => { const next = { ...current }; for (const { paragraph, stored } of items) if (stored && !current[paragraph.id]?.pending) next[paragraph.id] = { text: stored.text, provider: stored.provider, pending: false }; return next; });
+    }).catch(reason => notify(readableError(reason)));
+    return () => { alive = false; };
+  }, [paragraphs, documentId, notify]);
   useEffect(() => {
     if (!viewport.current) return;
     const observer = new ResizeObserver(entries => { const { width, height } = entries[0].contentRect; setSize({ width, height }); });
@@ -97,17 +108,19 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const showNote = useCallback(() => { useReaderStore.getState().set({ inspectorOpen: true }); setTab("notes"); }, []);
   const translateParagraph = useCallback(async (paragraph: PdfParagraph) => {
     translationController.current?.abort(); const controller = new AbortController(); translationController.current = controller;
-    setActiveParagraph(paragraph); setTranslation({ pending: true }); setTab("context"); useReaderStore.getState().set({ inspectorOpen: true });
+    setActiveParagraph(paragraph); setTranslation({ pending: true }); setShowTranslations(true); setOriginalParagraphs(items => items.filter(id => id !== paragraph.id)); dismiss();
+    setInlineTranslations(current => ({ ...Object.fromEntries(Object.entries(current).filter(([, value]) => !value.pending)), [paragraph.id]: { pending: true } }));
     try {
       const saved = await translationRepository.get(documentId, paragraph.pageIndex, paragraph.text);
       if (controller.signal.aborted) return;
-      if (saved) { setTranslation({ text: saved.text, provider: saved.provider, pending: false }); return; }
+      if (saved) { const result = { text: saved.text, provider: saved.provider, pending: false }; setTranslation(result); setInlineTranslations(current => ({ ...current, [paragraph.id]: result })); return; }
       const result = await translateHybrid(paragraph.text, controller.signal);
       if (controller.signal.aborted) return;
       await translationRepository.put(documentId, paragraph.pageIndex, paragraph.text, result.text, result.provider);
       setTranslation({ text: result.text, provider: result.provider, pending: false });
-    } catch (reason) { if (!controller.signal.aborted) setTranslation({ pending: false, error: readableError(reason) }); }
-  }, [documentId]);
+      setInlineTranslations(current => ({ ...current, [paragraph.id]: { text: result.text, provider: result.provider, pending: false } }));
+    } catch (reason) { if (!controller.signal.aborted) { const failure = { pending: false, error: readableError(reason) }; setTranslation(failure); setInlineTranslations(current => ({ ...current, [paragraph.id]: failure })); } }
+  }, [documentId, dismiss]);
   const translateSelection = useCallback(() => {
     const anchor = useReaderStore.getState().activeSelection;
     const box = anchor?.normalizedRects[0], cx = box ? box.x + box.width / 2 : -1, cy = box ? box.y + box.height / 2 : -1;
@@ -119,11 +132,11 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     if (bulk?.running || !paragraphs.length) return;
     const controller = new AbortController(); bulkController.current = controller;
     const targets = paragraphs.filter(item => item.text.length >= 24); let index = 0, done = 0, failed = 0;
-    setBulk({ done: 0, total: targets.length, failed: 0, running: true }); setTab("context"); useReaderStore.getState().set({ inspectorOpen: true });
+    setBulk({ done: 0, total: targets.length, failed: 0, running: true }); setShowTranslations(true); setOriginalParagraphs([]); dismiss();
     const worker = async () => {
       while (index < targets.length && !controller.signal.aborted) {
         const item = targets[index++];
-        try { const stored = await translationRepository.get(documentId, item.pageIndex, item.text); if (!stored) { const result = await translateHybrid(item.text, controller.signal); if (controller.signal.aborted) break; await translationRepository.put(documentId, item.pageIndex, item.text, result.text, result.provider); } }
+        try { const stored = await translationRepository.get(documentId, item.pageIndex, item.text); const result = stored ?? await translateHybrid(item.text, controller.signal); if (controller.signal.aborted) break; if (!stored) await translationRepository.put(documentId, item.pageIndex, item.text, result.text, result.provider); if (!controller.signal.aborted) setInlineTranslations(current => ({ ...current, [item.id]: { text: result.text, provider: result.provider, pending: false } })); }
         catch (reason) { if (!controller.signal.aborted) { failed++; notify(`문단 번역 실패: ${readableError(reason)}`); } }
         if (controller.signal.aborted) break;
         done++; if (bulkController.current === controller) setBulk({ done, total: targets.length, failed, running: true });
@@ -131,8 +144,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     };
     await Promise.all(Array.from({ length: Math.min(3, targets.length) }, worker));
     if (bulkController.current === controller) setBulk({ done, total: targets.length, failed, running: false });
-    if (!controller.signal.aborted && targets[0]) void translateParagraph(targets[0]);
-  }, [bulk?.running, paragraphs, documentId, notify, translateParagraph]);
+  }, [bulk?.running, paragraphs, documentId, notify, dismiss]);
   const showShell = useCallback((name: string) => {
     if (name === "Copy citation") { notify("서지정보를 확인하지 않은 로컬 PDF입니다. 정확한 인용을 위해 저자·DOI 정보가 필요합니다."); return; }
     setShell(name); setTab("context"); useReaderStore.getState().set({ inspectorOpen: true }); notify(`${name} · Available in Phase 2`);
@@ -151,11 +163,12 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const remove = async (id: string) => { try { await annotationRepository.remove(id); await client.invalidateQueries({ queryKey: ["annotations"] }); if (selected === id) setSelected(undefined); } catch (reason) { notify(readableError(reason)); } };
   if (error || doc.error || marks.error) return <main className="pf-empty pf-reader-error"><h1>PDF를 열지 못했습니다</h1><p role="alert">{error || readableError(doc.error ?? marks.error)}</p><Button asChild><Link href="/library">라이브러리로</Link></Button><Button onClick={openImport}>PDF 다시 가져오기</Button></main>;
   return <div className="pf-reader-shell">
-    <ReaderToolbar title={doc.data?.filename ?? "PDF 불러오는 중…"} pages={pdf?.pageCount ?? 1} page={currentPage} effectiveZoom={Math.round(scale * 100)} onPage={navigate} onSearch={focusSearch} onDownload={() => void download()} onBatchTranslate={() => void batchTranslate()} batchRunning={bulk?.running ?? false} canTranslate={paragraphs.length > 0}/>
+    <ReaderToolbar title={doc.data?.filename ?? "PDF 불러오는 중…"} pages={pdf?.pageCount ?? 1} page={currentPage} effectiveZoom={Math.round(scale * 100)} onPage={navigate} onSearch={focusSearch} onDownload={() => void download()} onBatchTranslate={() => void batchTranslate()} batchRunning={bulk?.running ?? false} canTranslate={paragraphs.length > 0} translated={showTranslations && originalParagraphs.length === 0} hasTranslations={Object.values(inlineTranslations).some(item => item.text)} onToggleTranslation={() => { dismiss(); setShowTranslations(!showTranslations || originalParagraphs.length > 0); setOriginalParagraphs([]); }}/>
+    {bulk && <div className="pf-inline-bulk" role="status"><span>{bulk.running ? "페이지를 한국어로 바꾸는 중" : "페이지 번역"} · {bulk.done}/{bulk.total}{bulk.failed ? ` · ${bulk.failed}개 실패` : ""}</span><progress value={bulk.done} max={Math.max(1, bulk.total)} aria-label="페이지 번역 진행"/>{bulk.running && <Button size="sm" variant="ghost" onClick={() => bulkController.current?.abort()}>중지</Button>}</div>}
     {searchOpen && <div className="pf-search-strip"><SearchField ref={searchInput} aria-label="현재 페이지 검색" value={search} onChange={e => setSearch(e.target.value)} placeholder="검색 UI · Phase 2"/><span>전체 논문 검색은 후속 단계에서 제공됩니다.</span><Button size="sm" onClick={() => setSearchOpen(false)}>닫기</Button></div>}
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}
-      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport}><div className="pf-reader-hint">문단 클릭 → 바로 번역 · PDF 원본은 그대로</div>{page ? <PdfPage key={`${documentId}-${currentPage}-${scale}`} page={page} scale={Math.max(.1, scale)} documentId={documentId} pageIndex={currentPage - 1} annotations={annotations} selected={selected} onResolved={setResolved} onParagraphs={setParagraphs} onParagraph={paragraph => void translateParagraph(paragraph)}/> : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
+      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport}><div className="pf-reader-hint">문단 클릭 → 그 자리에서 한국어로 · 공학 용어는 영어 유지</div>{page ? <PdfPage key={`${documentId}-${currentPage}-${scale}`} page={page} scale={Math.max(.1, scale)} documentId={documentId} pageIndex={currentPage - 1} annotations={annotations} selected={selected} onResolved={setResolved} onParagraphs={setParagraphs} onParagraph={paragraph => void translateParagraph(paragraph)} translations={showTranslations ? Object.fromEntries(Object.entries(inlineTranslations).filter(([id]) => !originalParagraphs.includes(id))) : {}} onOriginal={id => { dismiss(); setOriginalParagraphs(items => [...items, id]); }}/> : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
       {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={text => save("yellow", text)} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} onTranslate={translateSelection} onBatchTranslate={() => void batchTranslate()} onCancelBatch={() => bulkController.current?.abort()}/>}
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.length} 마킹 · {annotations.filter(a => a.note).length} 메모</span><span>H 마킹 · N 메모 · Ctrl K 명령</span></footer>

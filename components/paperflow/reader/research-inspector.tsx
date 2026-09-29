@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+
 import { BookOpen, Highlighter, ArrowUpRight, Trash2, X, Save, Languages, Sparkles } from "lucide-react";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,7 +22,7 @@ interface InspectorProps {
 }
 
 export function ResearchInspector({ annotations, resolved, selected, onSelect, onSaveNote, onRemove, saving, tab, setTab, shell, paragraph, translation, bulk, onTranslate, onBatchTranslate, onCancelBatch }: InspectorProps) {
-  const selection = useReaderStore(s => s.activeSelection), reduced = useReducedMotion();
+  const selection = useReaderStore(s => s.activeSelection);
   const active = annotations.find(a => a.id === selected), anchor = selection ?? active?.anchor;
   const sourceText = paragraph?.text ?? anchor?.textQuote;
   const sourcePage = paragraph ? paragraph.pageIndex + 1 : anchor ? anchor.pageIndex + 1 : null;
@@ -31,9 +31,9 @@ export function ResearchInspector({ annotations, resolved, selected, onSelect, o
   return <GlassPanel className="pf-inspector dd-scrollbar" data-inspector><header><div><span className="pf-kicker">SOURCE FIRST</span><h2>Research Inspector</h2></div><IconButton label="Close inspector" variant="ghost" size="sm" onClick={() => useReaderStore.getState().set({ inspectorOpen: false })}><X size={16}/></IconButton></header>
     <Tabs value={tab} onValueChange={setTab}><TabsList className="pf-inspector-tabs"><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="notes">Notes</TabsTrigger><TabsTrigger value="evidence">Evidence</TabsTrigger></TabsList>
       <TabsContent value="context">
-        <div className="pf-inspector-section">{sourceText ? <><Badge>원문 · p. {sourcePage}</Badge><blockquote>{sourceText}</blockquote></> : <div className="pf-inspector-empty"><BookOpen size={27}/><h3>문단을 클릭하세요</h3><p>원본 PDF의 문단을 클릭하면<br/>옆에서 한국어 번역을 읽을 수 있습니다.</p><span>문단 클릭 → 번역 → 원문 비교</span></div>}</div>
+        <div className="pf-inspector-section">{sourceText ? <><Badge>원문 · p. {sourcePage}</Badge><blockquote>{sourceText}</blockquote></> : <div className="pf-inspector-empty"><BookOpen size={27}/><h3>문단을 클릭하세요</h3><p>원본 PDF의 문단을 클릭하면<br/>원래 문단 자리에서 한국어로 바뀝니다.</p><span>문단 클릭 → 한국어로 읽기 → 원문 전환</span></div>}</div>
         <section className="pf-inspector-section pf-translation-card" aria-live="polite"><div className="pf-section-title"><h3><Languages size={16}/> 한국어 번역</h3><span>공학 용어 영어 유지</span></div>
-          {translation?.pending ? <div className="pf-translation-loading"><span className="pf-loader" aria-hidden="true"/>문단을 번역하고 있습니다…</div> : translation?.error ? <p className="pf-error" role="alert">{translation.error}</p> : translation?.text ? <motion.p key={translation.text} className="pf-translated-text" initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .2 }}>{translation.text}</motion.p> : <p className="pf-muted">원문을 클릭하거나 선택한 뒤 문단 번역을 누르세요.</p>}
+          {translation?.pending ? <div className="pf-translation-loading"><span className="pf-loader" aria-hidden="true"/>문단을 번역하고 있습니다…</div> : translation?.error ? <p className="pf-error" role="alert">{translation.error}</p> : translation?.text ? <p>한국어 문단을 PDF 안에 표시했습니다. 상단의 원문 보기로 비교할 수 있습니다.</p> : <p className="pf-muted">원문을 클릭하거나 선택한 뒤 문단 번역을 누르세요.</p>}
           {sourceText && <Button size="sm" variant="ghost" onClick={onTranslate} disabled={translation?.pending}><Sparkles size={14}/> 다시 번역 보기</Button>}
           <small>{translation?.provider === "device" ? "이 기기에서 번역했습니다." : "기기 내 번역이 준비되지 않으면 원문 문단을 MyMemory 외부 번역 서비스로 보냅니다."} PDF 원본은 변경되지 않습니다.</small>
         </section>

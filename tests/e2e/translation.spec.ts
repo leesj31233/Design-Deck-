@@ -16,12 +16,21 @@ test("paragraph click translates, caches after reload, and real page previews re
   expect(await page.locator(".pf-translated-text").innerText()).not.toContain("ZZZTERM0ZZZ");
   const beforeReload = requests;
   await page.reload(); await expect(page.locator("[data-pdf-page][data-ready=true]")).toBeVisible();
-  await page.locator(".textLayer span").filter({ hasText: "realizable turbulence" }).click();
   await expect(page.locator(".pf-translated-text")).toContainText("공학 문단을 번역했습니다.");
+  await expect(page.locator(".pf-pdf-page .pf-translated-text")).toBeVisible();
+  await expect(page.locator(".pf-inspector .pf-translated-text")).toHaveCount(0);
+  expect(requests).toBe(beforeReload);
+  await page.getByRole("button", { name: "원문 보기", exact: true }).click();
+  await expect(page.locator(".pf-translated-text")).toHaveCount(0);
+  await page.getByRole("button", { name: "한국어 보기", exact: true }).click();
+  await expect(page.locator(".pf-pdf-page .pf-translated-text")).toBeVisible();
+  await page.getByLabel("Zoom in", { exact: true }).click();
+  await expect(page.locator("[data-pdf-page][data-ready=true]")).toBeVisible();
+  await expect(page.locator(".pf-pdf-page .pf-translated-text")).toBeVisible();
   expect(requests).toBe(beforeReload);
   await page.getByRole("button", { name: "현재 페이지 일괄 번역" }).click();
-  await expect(page.locator(".pf-batch-section progress")).toBeVisible();
-  await expect(page.locator(".pf-batch-section")).toContainText(/\d+\/\d+/);
+  await expect(page.locator(".pf-inline-bulk progress")).toBeVisible();
+  await expect(page.locator(".pf-inline-bulk")).toContainText(/\d+\/\d+/);
 });
 
 test("optional live English-to-Korean translation smoke check", async ({ page }) => {

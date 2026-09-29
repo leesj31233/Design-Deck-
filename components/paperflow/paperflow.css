@@ -347,3 +347,19 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 @media(min-width:1600px) { .pf-paper-list[data-layout="shelf"] { grid-template-columns:repeat(4,minmax(0,1fr)); } }
 @media(max-width:1100px) { .pf-paper-list[data-layout="shelf"] { grid-template-columns:repeat(2,minmax(0,1fr)); } .pf-collection-toolbar { align-items:flex-start; flex-direction:column; } .pf-collection-controls { width:100%; justify-content:space-between; } .pf-zoom-dial input { width:58px; } }
 @media(max-width:750px) { .pf-paper-list[data-layout="shelf"] { gap:12px; } .pf-paper-list[data-layout="shelf"] .pf-book-card { padding:16px 15px 10px; border-radius:17px; } .pf-book-details { gap:7px; } .pf-continue-card { gap:14px; padding:18px; } .pf-continue-copy h3 { font-size:14px; } .pf-continue-cover { width:56px; } .pf-continue-card>a:last-child { margin-left:auto; } .pf-paper-list[data-layout="list"] .pf-book-details { width:80px; } .pf-paper-list[data-layout="list"] .pf-record-count { display:none; } .pf-library-footer>span:last-child { display:none; } }
+
+/* Translated type lives on the paper, in the original text contour. */
+.pf-inline-layer { position:absolute; inset:0; z-index:4; pointer-events:none; color:#161616; color-scheme:light; }
+.pf-inline-paragraph { position:absolute; inset:0; pointer-events:none; font-weight:400; letter-spacing:0; text-align:left; }
+.pf-inline-region { position:absolute; pointer-events:auto; overflow:hidden; cursor:text; user-select:text; -webkit-user-select:text; }
+.pf-inline-line { position:absolute; left:.5px; display:block; white-space:pre; line-height:1.05; font-size:inherit; font-weight:inherit; letter-spacing:0; color:inherit; }
+.pf-inline-region ::selection { background:rgba(10,132,255,.22); color:inherit; }
+.pf-inline-overflow { height:100%; overflow:auto; scrollbar-width:thin; padding-right:3px; white-space:normal; overflow-wrap:anywhere; word-break:normal; }
+.pf-inline-original { position:absolute; pointer-events:auto; opacity:0; z-index:1; height:22px!important; min-height:22px!important; padding:2px 10px; border:1px solid rgba(15,50,85,.15); border-radius:99px; background:rgba(250,252,255,.96); color:#30435b; font:10px/16px -apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif; box-shadow:0 2px 9px rgba(10,30,65,.10); transition:opacity .15s ease; }
+.pf-inline-paragraph:has(.pf-inline-region:hover) .pf-inline-original,.pf-inline-original:hover,.pf-inline-original:focus-visible { opacity:1; }
+.pf-inline-status { position:absolute; pointer-events:auto; display:flex; align-items:center; gap:7px; padding:5px 9px; border:1px solid rgba(10,132,255,.25); border-radius:99px; background:#f4f9ff; color:#24446c; font:11px/1.4 -apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif; box-shadow:0 3px 12px rgba(0,0,0,.10); transform:translateY(-100%); }
+.pf-inline-bulk { display:flex; align-items:center; justify-content:center; gap:15px; padding:6px 18px 0; color:var(--muted); font-size:11px; }
+.pf-inline-bulk progress { max-width:130px; }
+.pf-inline-bulk button { height:26px; min-height:26px!important; }
+.pf-language-toggle { font-size:11px; border:1px solid var(--line)!important; background:var(--surface)!important; }
+@media(hover:none) { .pf-inline-original { opacity:.9; } }

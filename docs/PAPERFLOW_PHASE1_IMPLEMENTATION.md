@@ -26,7 +26,7 @@ The original showcase remains at `/design-deck`; all `/archetypes/*` routes rema
 - Search by filename/title, archive/restore, note collection, continue reading.
 - Command palette, keyboard shortcuts, system-aware and persistent light/dark theme.
 - Desktop and iPad landscape layout; tablet inspector opens on demand.
-- Click-to-translate paragraphs, a current-page bulk translation control, locally cached Korean results, and engineering terms protected in English. Translation appears beside the original PDF; it never replaces the source page.
+- Click-to-translate paragraphs, a current-page bulk translation control, locally cached Korean results, and engineering terms protected in English. Translation is typeset over the original paragraph footprint, with original/Korean toggles; source PDF bytes remain immutable.
 - Actual PDF page thumbnails in a lazily rendered rail. Reader chrome uses layered glass and motion from Design Deck patterns while the paper stays visually unchanged.
 - A first-page cover shelf, a compact list alternative, a real-cover continue-reading card, and a keyboard-operable zoom slider. Cover rendering is limited to two concurrent documents.
 - Line-continuous highlighting composites the whole mark layer against the PDF with multiply, retaining black text contrast. Adjacent word rectangles merge without bridging columns.
@@ -39,7 +39,7 @@ Shortcuts do not intercept text input. `Ctrl/Cmd+F` opens the explicitly labelle
 
 Enhanced v2 was the initial Phase 1 scope. Subsequent user requests explicitly expanded the reader to paragraph translation, page-level bulk translation, real previews and a cover shelf. Scientific explanation, citation lookup, automatic concept extraction, research-map generation, cloud accounts and sync are not implemented. Demo research pools were removed from the library; no paper conclusions or DOIs are fabricated.
 
-Hybrid translation protects a starter engineering glossary, acronyms and selected units in English before translating sentence structure to Korean. The browser's native Translator API is used if already ready; otherwise paragraph text is sent to the external MyMemory API. Results are shown beside the original and cached in IndexedDB. Network or browser-model latency means a 1–2 second response is an optimization target, not a guarantee; failures appear in the Inspector. The current-page bulk button has progress and cancel. A user-editable glossary, terminology QA and a production translation provider with service guarantees are follow-up work. Notes are visibly user-authored. Research-map edges must later resolve to document/page/anchor evidence and be confirmed by the user.
+Hybrid translation protects a starter engineering glossary, acronyms and selected units in English before translating sentence structure to Korean. The browser's native Translator API is used if already ready; otherwise paragraph text is sent to the external MyMemory API. Results replace the visible paragraph in place and are cached in IndexedDB. Network or browser-model latency means a 1–2 second response is an optimization target, not a guarantee; failures offer an inline retry. The current-page bulk button has progress and cancel. A user-editable glossary, terminology QA and a production translation provider with service guarantees are follow-up work. Notes are visibly user-authored. Research-map edges must later resolve to document/page/anchor evidence and be confirmed by the user.
 
 ## Architecture
 
@@ -85,3 +85,9 @@ PDF integration reference: https://mozilla.github.io/pdf.js/examples/
 4. Add durable backup/export and optional authenticated storage adapters.
 5. Add user-confirmed concept relationships; every node/edge links back to paper evidence.
 6. Validate on physical iPad/Safari before Pencil or touch selection claims.
+
+## Inline Korean typesetting update
+
+Paragraph line regions follow column and Figure boundaries. The source embedded font is retained for Latin technical terms; Hangul and whitespace use matching Korean serif/sans fallbacks. This avoids zero-width spaces from embedded Latin subsets. Background samples preserve tinted abstracts. Text fit measures the same font runs used for rendering; exceptionally long translations scroll within the final region instead of being truncated. Original view is immediate and source bytes remain unchanged. Motion fades the replacement text without moving Figures and respects reduced motion.
+
+Validation: 25 unit/integration tests and 41 browser tests passed (2 skipped), including a 23-PDF private corpus. A live ACS abstract check measured 3.5 seconds and zero changed pixels across 82,940 checked Figure-region pixels. These are sample observations, not guarantees for all layouts or providers.
