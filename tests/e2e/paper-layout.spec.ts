@@ -18,8 +18,9 @@ test("real paper keeps Methods distinct and excludes page furniture from batch t
   await expect(page.locator("[data-pdf-page='3'][data-ready=true]")).toBeVisible();
   const methods = page.locator("[data-pdf-page='3'] .textLayer span").filter({ hasText: /METHODS/i }).first();
   await expect(methods).toHaveAttribute("data-pf-kind", "title");
-  await page.getByRole("button", { name: "현재 페이지 일괄 번역" }).click();
-  await expect(page.locator(".pf-inline-bulk")).toContainText("페이지 번역");
+  await page.getByRole("button", { name: "논문 전체 일괄 번역" }).click();
+  await expect(page.locator(".pf-inline-bulk")).toContainText("논문 전체 번역");
+  await expect(page.locator(".pf-inline-bulk")).toContainText("15/15페이지", { timeout: 120_000 });
   expect(sources.some(source => /METHODS/i.test(source))).toBe(true);
   expect(sources.some(source => /http:\/\/pubs\.acs\.org|ACS Omega/i.test(source))).toBe(false);
   expect(sources.some(source => /Figure 4\./i.test(source))).toBe(true);
@@ -30,4 +31,9 @@ test("real paper keeps Methods distinct and excludes page furniture from batch t
   expect(await page.locator("[data-pdf-page='3'] .pf-translated-text").count()).toBeGreaterThan(0);
   await pageNumber.fill("4"); await pageNumber.press("Enter");
   await expect(translated).toBeVisible();
+  await pageNumber.fill("13"); await pageNumber.press("Enter");
+  await expect(page.locator("[data-pdf-page='12'][data-ready=true]")).toBeVisible();
+  await expect(page.locator("[data-pdf-page='12'] .pf-translated-text").first()).toBeVisible();
+  await expect(page.locator(".pf-inline-overflow")).toHaveCount(0);
 });
+

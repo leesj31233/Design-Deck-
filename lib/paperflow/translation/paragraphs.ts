@@ -36,7 +36,7 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
     if (!rect.width || !rect.height) continue;
     const last = lines.at(-1);
     const overlap = last ? Math.min(last.bottom, rect.bottom) - Math.max(last.y, rect.top) : 0;
-    if (last && overlap >= Math.min(rect.height, last.height) * .3 && rect.left >= last.x - 3 && rect.left - last.right < Math.max(18, rect.height * 2.5)) {
+    if (last && overlap >= Math.min(rect.height, last.height) * .3 && rect.left >= last.x - rect.height * .25 && rect.left - last.right < rect.height * 2.5) {
       const script = rect.height < last.height * .85;
       last.spans.push(span); last.text += (!script && rect.left - last.right > rect.height * .16 ? " " : "") + value;
       last.y = Math.min(last.y, rect.top); last.right = Math.max(last.right, rect.right); last.bottom = Math.max(last.bottom, rect.bottom); last.height = Math.max(last.height, rect.height);
@@ -66,8 +66,8 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
     const previousKind = previous && paragraphKind(previous.text, previous.y - bounds.top, previous.height, bounds.height);
     const separate = lineKind === "title" || lineKind === "caption" || lineKind === "skip" || previousKind === "title" || previousKind === "skip";
     const columnJump = previous ? line.y < previous.y - previous.height || line.x > previous.right + previous.height * 1.4 : false;
-    const paragraphIndent = previous && group && group.length > 1 && line.x - group[1].x > Math.max(18, previous.height * 1.15) && /[.!?;:]\s*$/.test(previous.text);
-    if (!group || !previous || separate || columnJump || verticalGap > Math.max(7, previous.height * .72) || paragraphIndent) groups.push([line]);
+    const paragraphIndent = previous && group && group.length > 1 && line.x - group[1].x > previous.height * 1.4 && /[.!?;:]\s*$/.test(previous.text);
+    if (!group || !previous || separate || columnJump || verticalGap > previous.height * .72 || paragraphIndent) groups.push([line]);
     else group.push(line);
   }
   const bodySizes = lines.map(line => line.height).sort((a, b) => a - b), bodySize = bodySizes[Math.floor(bodySizes.length / 2)] ?? 12;

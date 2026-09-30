@@ -29,7 +29,7 @@ test("paragraph click translates, caches after reload, and real page previews re
   await expect(page.locator("[data-pdf-page][data-ready=true]").first()).toBeVisible();
   await expect(page.locator(".pf-pdf-page .pf-translated-text")).toBeVisible();
   expect(requests).toBe(beforeReload);
-  await page.getByRole("button", { name: "현재 페이지 일괄 번역" }).click();
+  await page.getByRole("button", { name: "논문 전체 일괄 번역" }).click();
   await expect(page.locator(".pf-inline-bulk progress")).toBeVisible();
   await expect(page.locator(".pf-inline-bulk")).toContainText(/\d+\/\d+/);
 });
@@ -57,9 +57,10 @@ test("page translation batches all extracted paragraphs without public translato
   await page.goto("/library");
   await page.getByLabel("Import PDF file").setInputFiles({ name: "Batch.pdf", mimeType: "application/pdf", buffer: makePdf() });
   await expect(page.locator("[data-pdf-page][data-ready=true]").first()).toBeVisible();
-  await page.getByRole("button", { name: "현재 페이지 일괄 번역" }).click();
-  await expect(page.locator(".pf-inline-bulk")).toContainText("페이지 번역");
+  await page.getByRole("button", { name: "논문 전체 일괄 번역" }).click();
+  await expect(page.locator(".pf-inline-bulk")).toContainText("논문 전체 번역");
   await expect(page.locator(".pf-inline-bulk")).not.toContainText("실패");
   await expect(page.locator(".pf-pdf-page .pf-translated-text").first()).toBeVisible();
   expect(batches).toBeGreaterThan(0);
 });
+

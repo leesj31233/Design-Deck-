@@ -21,13 +21,14 @@ it("preserves the figure cutout in an abstract with narrow then full-width text"
   expect(regions).toEqual([{ x: 30, y: 100, width: 195, height: 46 }, { x: 30, y: 151, width: 400, height: 29 }]);
   const translation = "이 연구에서는 methane co-firing 조건을 분석하고 NOx 배출량을 비교하였다.";
   const result = layoutTranslation(translation, regions, 12, (text, size) => text.length * size * .8);
-  expect(result.overflow).toBeNull();
+  expect(result.fits).toBe(true);
   expect(result.lines.map(line => line.text).join(" ")).toBe(translation);
 });
 
-it("retains a long translation in a bounded overflow region rather than deleting words", () => {
+it("shrinks long translations into the source region without a nested scrollbar", () => {
   const text = "긴 문단을 생략하지 않고 모두 표시한다. ".repeat(25).trim();
   const result = layoutTranslation(text, [{ x: 0, y: 0, width: 150, height: 30 }], 12, (value, size) => value.length * size);
-  expect(result.overflow?.text).toBe(text);
-  expect(result.fontSize).toBeGreaterThanOrEqual(12 * .82);
+  expect(result.fits).toBe(true);
+  expect(result.lines.map(line => line.text).join(" ")).toBe(text);
+  expect(result.fontSize).toBeLessThan(12 * .82);
 });

@@ -1,8 +1,8 @@
 import { researchTranslationInstructions } from "@/lib/paperflow/translation/research-style";
 
 const requestTimes = new Map<string, number[]>();
-const LIMIT_PER_MINUTE = 20;
-const LIMIT_PER_HOUR = 180;
+const LIMIT_PER_MINUTE = 90;
+const LIMIT_PER_HOUR = 600;
 
 function rateLimited(request: Request) {
   const ip = request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";

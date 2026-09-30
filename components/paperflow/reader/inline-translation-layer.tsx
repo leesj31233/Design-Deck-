@@ -40,10 +40,10 @@ function TranslatedParagraph({ paragraph, translation, canvas, width, height, on
   if (!translation.text) return <div className="pf-inline-status" style={{ left: first.x, top: first.y }} role={translation.error ? "alert" : "status"}>
     {translation.pending ? <><span className="pf-loader"/>문단 번역 중…</> : <button onClick={onRetry} title={translation.error}>번역 재시도</button>}
   </div>;
-  return <section className="pf-inline-paragraph pf-translated-text" aria-label="한국어 번역 문단" data-paragraph-id={paragraph.id} data-kind={paragraph.kind} data-overflow={Boolean(layout.overflow)} style={{ fontFamily, fontSize: layout.fontSize, fontWeight: paragraph.fontWeight, fontStyle: paragraph.fontStyle, color: paragraph.color }}>
+  if (!layout.fits) return <div className="pf-inline-status" style={{ left: first.x, top: first.y }} role="alert">이 문단은 지면에 맞지 않아 원문을 유지한다.</div>;
+  return <section className="pf-inline-paragraph pf-translated-text" aria-label="한국어 번역 문단" data-paragraph-id={paragraph.id} data-kind={paragraph.kind} style={{ fontFamily, fontSize: layout.fontSize, fontWeight: paragraph.fontWeight, fontStyle: paragraph.fontStyle, color: paragraph.color }}>
     {regions.map((region, index) => <div key={index} className="pf-inline-region" data-inline-region style={{ left: region.x - .5, top: region.y - .5, width: region.width + 1, height: region.height + 1, backgroundColor: colors[index] }}>
       {layout.lines.filter(line => line.region === index).map((line, row) => <span className="pf-inline-line" key={row} style={{ top: line.y + .5 }}>{line.text.split(/(Figure\s*\d+[a-z]?|Fig\.\s*\d+[a-z]?)/gi).flatMap((piece, part) => paperFontRuns(piece).map((run, runIndex) => <span key={`${part}-${runIndex}`} style={{ fontFamily: run.latin ? latinFont : undefined, color: /^(?:Figure|Fig\.)\s*\d+/i.test(piece) && paragraph.kind !== "title" ? "#0878c7" : undefined, fontWeight: /^(?:Figure|Fig\.)\s*\d+/i.test(piece) && paragraph.kind === "caption" ? 700 : undefined }}>{run.text}</span>))}{" "}</span>)}
-      {layout.overflow?.region === index && <div className="pf-inline-overflow" tabIndex={0} aria-label="긴 번역 문단 · 스크롤하여 계속 읽기" style={{ lineHeight: `${layout.lineHeight}px` }}>{layout.overflow.text}</div>}
     </div>)}
     <motion.button className="pf-inline-original" aria-label="이 문단 원문 보기" onClick={onOriginal} whileTap={reduced ? undefined : { scale: .94 }} style={{ left: first.x + Math.max(0, first.width - 52), top: first.y - 23 }}>원문</motion.button>
   </section>;

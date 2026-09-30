@@ -24,9 +24,9 @@ type Measure = (text: string, fontSize: number) => number;
 /** Fit Korean at natural tracking and consistent leading, never stretch glyphs. */
 export function layoutTranslation(text: string, regions: FlowRegion[], originalSize: number, measure: Measure) {
   const source = text.replace(/\s+/g, " ").trim();
-  const minimum = originalSize * .82;
+  const minimum = 1;
   const attempt = (fontSize: number) => {
-    const lineHeight = fontSize * 1.46, result: TranslatedLine[] = [];
+    const lineHeight = fontSize * 1.18, result: TranslatedLine[] = [];
     let remaining = source;
     regions.forEach((region, regionIndex) => {
       const count = Math.max(1, Math.floor((region.height + fontSize * .15) / lineHeight));
@@ -47,12 +47,7 @@ export function layoutTranslation(text: string, regions: FlowRegion[], originalS
     return { lines: result, remaining, fontSize, lineHeight };
   };
   let layout = attempt(originalSize);
-  for (let size = originalSize - .35; layout.remaining && size >= minimum; size -= .35) layout = attempt(size);
-  // Exceptional long translations retain all text in a bounded scroll region.
-  if (layout.remaining && regions.length) {
-    const last = regions.length - 1;
-    const lastLines = layout.lines.filter(line => line.region === last).map(line => line.text);
-    return { ...layout, lines: layout.lines.filter(line => line.region !== last), overflow: { region: last, text: [...lastLines, layout.remaining].join(" ") } };
-  }
-  return { ...layout, overflow: null };
+  for (let size = originalSize - .2; layout.remaining && size >= minimum; size -= .2) layout = attempt(size);
+  if (layout.remaining) layout = attempt(minimum);
+  return { ...layout, fits: !layout.remaining };
 }
