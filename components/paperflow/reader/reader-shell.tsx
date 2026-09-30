@@ -18,6 +18,7 @@ import { ResearchInspector } from "./research-inspector";
 import { ReaderSelectionTools } from "./reader-selection-tools";
 import type { ResolvedAnnotation } from "./highlight-layer";
 import { translateHybrid } from "@/lib/paperflow/translation/hybrid";
+import { researchBatchTranslate } from "@/lib/paperflow/translation/research-api";
 import type { PdfParagraph } from "@/lib/paperflow/translation/paragraphs";
 import { translationRepository } from "@/lib/paperflow/persistence/translation-repository";
 import type { InlineTranslations } from "./inline-translation-layer";
@@ -150,16 +151,34 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     const targets = paragraphs.filter(item => item.pageIndex === currentPage - 1 && item.text.length >= 12); let index = 0, done = 0, failed = 0;
     if (!targets.length) { notify("현재 페이지의 텍스트를 불러오는 중이다. 잠시 후 다시 눌러 달라."); return; }
     setBulk({ done: 0, total: targets.length, failed: 0, running: true }); setShowTranslations(true); setOriginalParagraphs([]); dismiss();
-    const worker = async () => {
-      while (index < targets.length && !controller.signal.aborted) {
-        const item = targets[index++];
-        try { const stored = await translationRepository.get(documentId, item.pageIndex, item.text); const result = stored ?? await translateHybrid(item.text, controller.signal); if (controller.signal.aborted) break; if (!stored) await translationRepository.put(documentId, item.pageIndex, item.text, result.text, result.provider); if (!controller.signal.aborted) setInlineTranslations(current => ({ ...current, [item.id]: { text: result.text, provider: result.provider, pending: false } })); }
-        catch (reason) { if (!controller.signal.aborted) { failed++; const message = readableError(reason); setInlineTranslations(current => ({ ...current, [item.id]: { pending: false, error: message } })); if (/요청 한도|429/.test(message)) { notify("번역 서비스 한도에 도달하여 작업을 멈췄다. 완료된 문단은 유지된다."); break; } notify(`문단 번역 실패: ${message}`); } }
+    while (index < targets.length && !controller.signal.aborted) {
+      const group: PdfParagraph[] = []; let length = 0;
+      while (index < targets.length && group.length < 4 && length + targets[index].text.length < 6500) { const item = targets[index++]; group.push(item); length += item.text.length; }
+      if (!group.length) group.push(targets[index++]);
+      try {
+        const stored = await Promise.all(group.map(item => translationRepository.get(documentId, item.pageIndex, item.text)));
+        const missing = group.filter((_, offset) => !stored[offset]);
+        const batch = missing.length ? await researchBatchTranslate(missing.map(item => item.text), controller.signal) : [];
+        if (batch === null) throw new Error("페이지 일괄 번역은 OpenAI 서버 연결이 필요하다. 연구 공간 접근 코드를 설정하고 다시 시도해 달라.");
         if (controller.signal.aborted) break;
-        done++; if (bulkController.current === controller) setBulk({ done, total: targets.length, failed, running: true });
+        const results = await Promise.all(group.map(async (item, offset) => {
+          const saved = stored[offset];
+          if (saved) return saved;
+          const translated = { text: batch[missing.indexOf(item)], provider: "OpenAI" as const };
+          await translationRepository.put(documentId, item.pageIndex, item.text, translated.text, translated.provider);
+          return translated;
+        }));
+        if (controller.signal.aborted) break;
+        setInlineTranslations(current => { const next = { ...current }; group.forEach((item, offset) => { next[item.id] = { text: results[offset].text, provider: results[offset].provider, pending: false }; }); return next; });
+      } catch (reason) {
+        if (controller.signal.aborted) break;
+        failed += group.length; const message = readableError(reason);
+        setInlineTranslations(current => { const next = { ...current }; group.forEach(item => { next[item.id] = { pending: false, error: message }; }); return next; });
+        if (/요청 한도|429|OpenAI 서버 연결/.test(message)) { notify(message); done += group.length; break; }
+        notify(`문단 번역 실패: ${message}`);
       }
-    };
-    await Promise.all(Array.from({ length: Math.min(1, targets.length) }, worker));
+      done += group.length; if (bulkController.current === controller) setBulk({ done, total: targets.length, failed, running: true });
+    }
     if (bulkController.current === controller) setBulk({ done, total: targets.length, failed, running: false });
   }, [bulk?.running, paragraphs, currentPage, documentId, notify, dismiss]);
   const showShell = useCallback((name: string) => {
