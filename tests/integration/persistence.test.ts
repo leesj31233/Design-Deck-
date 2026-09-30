@@ -1,0 +1,26 @@
+import "fake-indexeddb/auto";
+import { afterEach, expect, it } from "vitest";
+import { documentRepository as documents } from "@/lib/paperflow/persistence/document-repository";
+import { annotationRepository as annotations } from "@/lib/paperflow/persistence/annotation-repository";
+import { closeDatabase } from "@/lib/paperflow/persistence/indexeddb";
+import { translationRepository as translations } from "@/lib/paperflow/persistence/translation-repository";
+import { createTextAnchor } from "@/lib/paperflow/anchors/create-anchor";
+afterEach(closeDatabase);
+it("persists immutable source + annotation across database reconnect and deduplicates bytes", async () => {
+  const original = new Blob(["%PDF-1.7 deterministic test bytes"], { type: "application/pdf" });
+  const doc = await documents.saveDocument({ blob: original, filename: "first.pdf", pageCount: 3 });
+  const duplicate = await documents.saveDocument({ blob: original, filename: "renamed.pdf", pageCount: 3 });
+  expect(duplicate.id).toBe(doc.id); expect(duplicate.filename).toBe("first.pdf");
+  const anchor = createTextAnchor({ documentId: doc.id, pageIndex: 1, textQuote: "coal co-firing", rects: [{ x: 10, y: 10, width: 100, height: 10 }], width: 600, height: 800 });
+  await annotations.create({ id: "annotation-1", type: "highlight", documentId: doc.id, pageIndex: 1, color: "yellow", anchor, note: "사용자 근거 메모", createdAt: anchor.createdAt, updatedAt: anchor.createdAt, resolutionStatus: "resolved" });
+  await documents.updateDocument(doc.id, { currentPage: 2, archived: true });
+  await translations.put(doc.id, 1, "The heat flux increased.", "heat flux가 증가했습니다.", "MyMemory");
+  await closeDatabase();
+  expect((await documents.listDocuments()).filter(d => d.id === doc.id)).toHaveLength(1);
+  expect(await documents.getDocument(doc.id)).toMatchObject({ currentPage: 2, archived: true });
+  expect((await annotations.listByDocument(doc.id))[0]).toMatchObject({ anchor, pageIndex: 1, note: "사용자 근거 메모" });
+  expect(await (await documents.getDocumentBlob(doc.id))!.text()).toBe(await original.text());
+  expect(await translations.get(doc.id, 1, "The heat flux increased.")).toMatchObject({ text: "heat flux가 증가했습니다." });
+  await annotations.remove("annotation-1"); expect(await annotations.listByDocument(doc.id)).toEqual([]);
+  expect(await (await documents.getDocumentBlob(doc.id))!.text()).toBe(await original.text());
+});
