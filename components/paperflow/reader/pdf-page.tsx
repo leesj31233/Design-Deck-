@@ -67,7 +67,7 @@ export function PdfPage({ page, scale, documentId, pageIndex, annotations, selec
     if (!id) return;
     const paragraphs = extractParagraphs(layer.current, surface.current!, pageIndex, canvas.current ?? undefined);
     const paragraph = paragraphs.find(item => item.id === id);
-    if (paragraph) onParagraph(paragraph);
+    if (paragraph && paragraph.kind !== "skip") onParagraph(paragraph);
   };
   return <div className="pf-page-wrap"><div ref={surface} className="pf-pdf-page" data-pdf-page={pageIndex} data-ready={ready && textReady} style={{ width: page.width * scale, height: page.height * scale, "--scale-factor": scale, "--total-scale-factor": scale } as React.CSSProperties}>
     {!ready && !error && <div className="pf-page-loading" role="status">원문 페이지를 불러오는 중…</div>}

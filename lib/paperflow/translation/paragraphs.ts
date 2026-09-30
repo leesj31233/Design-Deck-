@@ -1,7 +1,20 @@
 export interface ParagraphLine { x: number; y: number; width: number; height: number }
-export interface PdfParagraph { id: string; pageIndex: number; text: string; x: number; y: number; width: number; height: number; lines: ParagraphLine[]; fontFamily: string; fontWeight: number; fontStyle: string; color?: string }
+export interface PdfParagraph { id: string; pageIndex: number; text: string; kind: "body" | "title" | "caption" | "skip"; x: number; y: number; width: number; height: number; lines: ParagraphLine[]; fontFamily: string; fontWeight: number; fontStyle: string; color?: string }
 
-type Line = { spans: HTMLElement[]; text: string; x: number; y: number; right: number; bottom: number; height: number };
+type Line = { spans: HTMLElement[]; text: string; x: number; y: number; right: number; bottom: number; height: number; forceBodyWeight?: boolean };
+
+export function paragraphKind(text: string, y: number, height: number, pageHeight: number): PdfParagraph["kind"] {
+  const value = text.trim();
+  if (!value || /^https?:\/\/|^(?:www\.|doi:|©|copyright|received:|accepted:|published:|correspondence|keywords?:|article info|cite this|read online)/i.test(value)) return "skip";
+  if (/^(?:contents|table of contents|references|acknowledg(?:e)?ments?)\s*$/i.test(value) || /\.{3,}\s*\d+\s*$/.test(value) || /^\[\d+\]\s+[A-Z]/.test(value)) return "skip";
+  if (/^(?:fig(?:ure)?\.?|table)\s*\d+[a-z]?[.:\s]/i.test(value)) return "caption";
+  if (/^(?:abstract|\d+(?:\.\d+)*\.?\s*)?(?:introduction|methods?|results?|discussion|conclusions?|computational models?|general models?|boiler mesh|experimental setup|materials and methods)\.?\s*$/i.test(value) || /^\d+(?:\.\d+)*\.?\s*[A-Za-z][A-Za-z\s-]{2,65}\.?$/.test(value)) return "title";
+  if (y < pageHeight * .075 || y + height > pageHeight * .94) return "skip";
+  if (y < pageHeight * .4 && /\band\b/.test(value) && (value.match(/\b[A-Z][a-z]+\b/g) ?? []).length >= 4 && !/\b(?:study|model|results|analysis|method|boiler|fuel)\b/i.test(value)) return "skip";
+  if (/^(?:\[?\d+\]?\s+)?(?:[A-Z][a-z]+\s+[A-Z]\.|[A-Z][a-z]+,\s+[A-Z])/.test(value) && /(?:et al\.|\b(?:university|department|journal|institute|author|received|published)\b)/i.test(value)) return "skip";
+  if ((value.match(/\b[A-Za-z]+\b/g) ?? []).length < 5) return "skip";
+  return "body";
+}
 
 // Equations must remain PDF artwork: translating their PDF.js glyph stream
 // produces prose such as "bykd (Pg-PS)" and can cover the formula itself.
@@ -29,17 +42,36 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
       last.y = Math.min(last.y, rect.top); last.right = Math.max(last.right, rect.right); last.bottom = Math.max(last.bottom, rect.bottom); last.height = Math.max(last.height, rect.height);
     } else lines.push({ spans: [span], text: value, x: rect.left, y: rect.top, right: rect.right, bottom: rect.bottom, height: rect.height });
   }
+  // PDF.js often places a bold subsection label and the first sentence on one
+  // visual line. Give them separate boxes so translated prose cannot repaint
+  // the label with body styling.
+  const separatedLines = lines.flatMap(line => {
+    const parts: Line[] = [];
+    let rest = line;
+    for (let index = 0; index < 3; index++) {
+      const match = rest.text.match(/^(\d+(?:\.\d+)+\.?\s+[A-Z][A-Za-z -]{2,55}?\.)(?:\s+)(.{12,})$/);
+      if (!match) break;
+      const split = rest.x + (rest.right - rest.x) * Math.min(.65, match[1].length / rest.text.length);
+      parts.push({ ...rest, text: match[1], right: split });
+      rest = { ...rest, text: match[2], x: split + 2, forceBodyWeight: true };
+    }
+    return [...parts, rest];
+  });
   const groups: Line[][] = [];
-  for (const line of lines) {
+  for (const line of separatedLines) {
     if (isEquationLine(line.text)) { groups.push([]); continue; }
     const group = groups.at(-1), previous = group?.at(-1);
     const verticalGap = previous ? line.y - previous.bottom : 0;
+    const lineKind = paragraphKind(line.text, line.y - bounds.top, line.height, bounds.height);
+    const previousKind = previous && paragraphKind(previous.text, previous.y - bounds.top, previous.height, bounds.height);
+    const separate = lineKind === "title" || lineKind === "caption" || lineKind === "skip" || previousKind === "title" || previousKind === "skip";
     const columnJump = previous ? line.y < previous.y - previous.height || line.x > previous.right + previous.height * 1.4 : false;
     const paragraphIndent = previous && group && group.length > 1 && line.x - group[1].x > Math.max(18, previous.height * 1.15) && /[.!?;:]\s*$/.test(previous.text);
-    if (!group || !previous || columnJump || verticalGap > Math.max(7, previous.height * .72) || paragraphIndent) groups.push([line]);
+    if (!group || !previous || separate || columnJump || verticalGap > Math.max(7, previous.height * .72) || paragraphIndent) groups.push([line]);
     else group.push(line);
   }
   const bodySizes = lines.map(line => line.height).sort((a, b) => a - b), bodySize = bodySizes[Math.floor(bodySizes.length / 2)] ?? 12;
+  const contentsPage = lines.some(line => /^(?:table of )?contents\s*$/i.test(line.text.trim())) && lines.filter(line => /\.{3,}\s*\d+\s*$/.test(line.text)).length >= 2;
   return groups.filter(group => group.length > 0).map((group, index) => {
     const x = Math.min(...group.map(line => line.x)), y = Math.min(...group.map(line => line.y));
     const right = Math.max(...group.map(line => line.right)), bottom = Math.max(...group.map(line => line.bottom));
@@ -48,9 +80,12 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
     const representative = group.flatMap(line => line.spans).sort((a, b) => (b.textContent?.length ?? 0) - (a.textContent?.length ?? 0))[0];
     const style = getComputedStyle(representative);
     const sourceFont = representative.dataset.pfSourceFont ?? "";
-    const fontWeight = /bold|demi|semibold|heavy/i.test(sourceFont) || group.length <= 3 && group[0].height > bodySize * 1.25 ? 700 : Number(style.fontWeight) || 400;
-    return { id, pageIndex, text: group.map(line => line.text).join(" ").replace(/\s+/g, " ").trim(), x: (x - bounds.left) / bounds.width, y: (y - bounds.top) / bounds.height, width: (right - x) / bounds.width, height: (bottom - y) / bounds.height, lines: group.map(line => ({ x: (line.x - bounds.left) / bounds.width, y: (line.y - bounds.top) / bounds.height, width: (line.right - line.x) / bounds.width, height: (line.bottom - line.y) / bounds.height })), fontFamily: sourceFont ? `${sourceFont}, ${style.fontFamily}` : style.fontFamily, fontWeight, fontStyle: style.fontStyle, color: sampleInk(canvas, representative, bounds) };
-  }).filter(paragraph => paragraph.text.length >= 12);
+    const fontWeight = group[0].forceBodyWeight ? 400 : /bold|demi|semibold|heavy/i.test(sourceFont) || group.length <= 3 && group[0].height > bodySize * 1.25 ? 700 : Number(style.fontWeight) || 400;
+    const text = group.map(line => line.text).join(" ").replace(/\s+/g, " ").trim();
+    const kind = contentsPage ? "skip" : paragraphKind(text, y - bounds.top, bottom - y, bounds.height);
+    for (const line of group) for (const span of line.spans) span.dataset.pfKind = kind;
+    return { id, pageIndex, text, kind, x: (x - bounds.left) / bounds.width, y: (y - bounds.top) / bounds.height, width: (right - x) / bounds.width, height: (bottom - y) / bounds.height, lines: group.map(line => ({ x: (line.x - bounds.left) / bounds.width, y: (line.y - bounds.top) / bounds.height, width: (line.right - line.x) / bounds.width, height: (line.bottom - line.y) / bounds.height })), fontFamily: sourceFont ? `${sourceFont}, ${style.fontFamily}` : style.fontFamily, fontWeight: kind === "title" ? 700 : fontWeight, fontStyle: style.fontStyle, color: sampleInk(canvas, representative, bounds) };
+  }).filter(paragraph => paragraph.kind === "title" || paragraph.text.length >= 12);
 }
 
 function sampleInk(canvas: HTMLCanvasElement | undefined, span: HTMLElement, page: DOMRect): string | undefined {

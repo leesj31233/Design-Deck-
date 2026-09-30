@@ -10,6 +10,6 @@ export function ContinuousPage({ pdf, index, scale, ...props }: Omit<ComponentPr
   }, []);
   useEffect(() => { let alive = true; if (near) void pdf.getPage(index + 1).then(result => { if (alive) setPage(result); }).catch(() => { if (alive) setError("페이지를 불러오지 못했다."); }); return () => { alive = false; }; }, [near, pdf, index]);
   return <div ref={node} data-continuous-page={index + 1} className="pf-continuous-page" style={{ minHeight: (page?.height ?? 792) * scale, minWidth: (page?.width ?? 612) * scale }}>
-    {near && page ? <PdfPage {...props} page={page} pageIndex={index} scale={scale}/> : <div className="pf-page-placeholder" role="status">{error || `${index + 1} 페이지`}</div>}
+    {page ? <PdfPage {...props} page={page} pageIndex={index} scale={scale}/> : <div className="pf-page-placeholder" role="status">{error || `${index + 1} 페이지`}</div>}
   </div>;
 }

@@ -141,14 +141,14 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const translateSelection = useCallback(() => {
     const anchor = useReaderStore.getState().activeSelection;
     const box = anchor?.normalizedRects[0], cx = box ? box.x + box.width / 2 : -1, cy = box ? box.y + box.height / 2 : -1;
-    const paragraph = paragraphs.find(item => item.pageIndex === currentPage - 1 && cx >= item.x - .02 && cx <= item.x + item.width + .02 && cy >= item.y - .02 && cy <= item.y + item.height + .02)
-      ?? paragraphs.find(item => anchor && item.text.includes(anchor.textQuote.slice(0, 30))) ?? activeParagraph ?? paragraphs[0];
+    const paragraph = paragraphs.find(item => item.kind !== "skip" && item.pageIndex === currentPage - 1 && cx >= item.x - .02 && cx <= item.x + item.width + .02 && cy >= item.y - .02 && cy <= item.y + item.height + .02)
+      ?? paragraphs.find(item => item.kind !== "skip" && anchor && item.text.includes(anchor.textQuote.slice(0, 30))) ?? (activeParagraph?.kind !== "skip" ? activeParagraph : null) ?? paragraphs.find(item => item.kind !== "skip");
     if (paragraph) void translateParagraph(paragraph); else notify("번역할 문단을 불러오는 중입니다.");
   }, [paragraphs, currentPage, activeParagraph, translateParagraph, notify]);
   const batchTranslate = useCallback(async () => {
     if (bulk?.running) return;
     const controller = new AbortController(); bulkController.current = controller;
-    const targets = paragraphs.filter(item => item.pageIndex === currentPage - 1 && item.text.length >= 12); let index = 0, done = 0, failed = 0;
+    const targets = paragraphs.filter(item => item.pageIndex === currentPage - 1 && item.kind !== "skip" && (item.kind === "title" || item.text.length >= 12)); let index = 0, done = 0, failed = 0;
     if (!targets.length) { notify("현재 페이지의 텍스트를 불러오는 중이다. 잠시 후 다시 눌러 달라."); return; }
     setBulk({ done: 0, total: targets.length, failed: 0, running: true }); setShowTranslations(true); setOriginalParagraphs([]); dismiss();
     while (index < targets.length && !controller.signal.aborted) {
@@ -199,7 +199,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const remove = async (id: string) => { try { await annotationRepository.remove(id); await client.invalidateQueries({ queryKey: ["annotations"] }); if (selected === id) setSelected(undefined); } catch (reason) { notify(readableError(reason)); } };
   if (error || doc.error || marks.error) return <main className="pf-empty pf-reader-error"><h1>PDF를 열지 못했습니다</h1><p role="alert">{error || readableError(doc.error ?? marks.error)}</p><Button asChild><Link href="/library">라이브러리로</Link></Button><Button onClick={openImport}>PDF 다시 가져오기</Button></main>;
   return <div className="pf-reader-shell">
-    <ReaderToolbar title={doc.data?.filename ?? "PDF 불러오는 중…"} pages={pdf?.pageCount ?? 1} page={currentPage} effectiveZoom={Math.round(scale * 100)} onPage={navigate} onSearch={focusSearch} onDownload={() => void download()} onBatchTranslate={() => void batchTranslate()} batchRunning={bulk?.running ?? false} canTranslate={paragraphs.some(item => item.pageIndex === currentPage - 1)} translated={showTranslations && originalParagraphs.length === 0} hasTranslations={Object.values(inlineTranslations).some(item => item.text)} onToggleTranslation={() => { dismiss(); setShowTranslations(!showTranslations || originalParagraphs.length > 0); setOriginalParagraphs([]); }}/>
+    <ReaderToolbar title={doc.data?.filename ?? "PDF 불러오는 중…"} pages={pdf?.pageCount ?? 1} page={currentPage} effectiveZoom={Math.round(scale * 100)} onPage={navigate} onSearch={focusSearch} onDownload={() => void download()} onBatchTranslate={() => void batchTranslate()} batchRunning={bulk?.running ?? false} canTranslate={paragraphs.some(item => item.pageIndex === currentPage - 1 && item.kind !== "skip")} translated={showTranslations && originalParagraphs.length === 0} hasTranslations={Object.values(inlineTranslations).some(item => item.text)} onToggleTranslation={() => { dismiss(); setShowTranslations(!showTranslations || originalParagraphs.length > 0); setOriginalParagraphs([]); }}/>
     <div className="pf-annotation-tools" data-selection-ui onPointerDown={event => event.preventDefault()}>
       {([['select','선택'],['highlight','형광펜'],['pen','메모 펜'],['eraser','지우개']] as const).map(([value,label]) => <Button key={value} size="sm" variant="ghost" aria-pressed={tool === value} onClick={() => { useReaderStore.getState().set({ tool: value }); if (value === 'highlight' && useReaderStore.getState().activeSelection) void save(); }}>{label}</Button>)}
       <Button size="sm" variant="ghost" onClick={showNote}>텍스트 메모</Button><Button size="sm" variant="ghost" onClick={() => showShell("개념 설명")}>선택 개념 공부</Button>

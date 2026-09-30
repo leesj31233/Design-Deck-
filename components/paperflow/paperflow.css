@@ -130,8 +130,8 @@ html[data-pf-theme="dark"] .pf-error { color:#ffb0a9; }
 .pf-pdf-page .textLayer .markedContent { display:contents; }
 .pf-pdf-page .textLayer ::selection { background:rgba(10,132,255,.3); color:transparent; }
 .pf-highlight-layer { position:absolute; inset:0; pointer-events:none; z-index:3; mix-blend-mode:multiply; }
-.pf-highlight { position:absolute; pointer-events:none; background:var(--mark); }
-[data-color="yellow"] { --mark:rgba(255,225,0,.48); --swatch:#d3a000; }
+.pf-highlight { position:absolute; pointer-events:none; background:var(--mark); border-radius:2px; }
+[data-color="yellow"] { --mark:rgba(255,221,46,.57); --swatch:#d3a000; }
 [data-color="green"] { --mark:rgba(87,210,145,.30); --swatch:#219960; }
 [data-color="blue"] { --mark:rgba(85,164,255,.30); --swatch:#257acb; }
 [data-color="pink"] { --mark:rgba(246,107,157,.30); --swatch:#ce4b7a; }
