@@ -82,7 +82,9 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
     const sourceFont = representative.dataset.pfSourceFont ?? "";
     const fontWeight = group[0].forceBodyWeight ? 400 : /bold|demi|semibold|heavy/i.test(sourceFont) || group.length <= 3 && group[0].height > bodySize * 1.25 ? 700 : Number(style.fontWeight) || 400;
     const text = group.map(line => line.text).join(" ").replace(/\s+/g, " ").trim();
-    const kind = contentsPage ? "skip" : paragraphKind(text, y - bounds.top, bottom - y, bounds.height);
+    const candidateKind = contentsPage ? "skip" : paragraphKind(text, y - bounds.top, bottom - y, bounds.height);
+    const groupSizes = group.map(line => line.height).sort((a, b) => a - b);
+    const kind = candidateKind === "body" && groupSizes[Math.floor(groupSizes.length / 2)] < bodySize * .72 ? "skip" : candidateKind;
     for (const line of group) for (const span of line.spans) span.dataset.pfKind = kind;
     return { id, pageIndex, text, kind, x: (x - bounds.left) / bounds.width, y: (y - bounds.top) / bounds.height, width: (right - x) / bounds.width, height: (bottom - y) / bounds.height, lines: group.map(line => ({ x: (line.x - bounds.left) / bounds.width, y: (line.y - bounds.top) / bounds.height, width: (line.right - line.x) / bounds.width, height: (line.bottom - line.y) / bounds.height })), fontFamily: sourceFont ? `${sourceFont}, ${style.fontFamily}` : style.fontFamily, fontWeight: kind === "title" ? 700 : fontWeight, fontStyle: style.fontStyle, color: sampleInk(canvas, representative, bounds) };
   }).filter(paragraph => paragraph.kind === "title" || paragraph.text.length >= 12);
