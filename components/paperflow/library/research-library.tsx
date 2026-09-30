@@ -1,11 +1,11 @@
 "use client";
 import { CollectionInsights, ResearchMap } from "./collection-insights";
 import { lookupDoi } from "@/lib/paperflow/pdf/metadata";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowUpRight, BookOpen, Command, Moon, Plus, Sun, Upload, Archive, ArrowLeft, Network, Bookmark } from "lucide-react";
+import { ArrowUpRight, BookOpen, Command, Moon, Plus, Sun, Upload, Archive, ArrowLeft, Network, Bookmark, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { GlassPanel } from "@/components/ui/glass-panel";
@@ -18,11 +18,18 @@ import { documentRepository } from "@/lib/paperflow/persistence/document-reposit
 import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
 import { readableError } from "@/lib/paperflow/errors";
 import { DocumentCover } from "./document-cover";
+import { startTranslationJob, type TranslationJobStatus } from "@/lib/paperflow/translation/document-job";
 
 export function ResearchLibrary() {
   const { openImport, importFiles, importing, openCommand, toggleTheme, dark, notify } = usePaperflow();
   const [view, setView] = useState("library"), [search, setSearch] = useState(""), [dragging, setDragging] = useState(false), [limit, setLimit] = useState(30), [layout, setLayout] = useState("shelf");
   const [jifId, setJifId] = useState<string | null>(null), [jifValue, setJifValue] = useState(""), [jifYear, setJifYear] = useState(""), [jifSource, setJifSource] = useState("");
+  const [translationJobs, setTranslationJobs] = useState<Record<string, TranslationJobStatus>>({});
+  useEffect(() => {
+    const onProgress = (event: Event) => { const status = (event as CustomEvent<TranslationJobStatus>).detail; setTranslationJobs(current => ({ ...current, [status.documentId]: status })); };
+    window.addEventListener("paperflow:translation-progress", onProgress);
+    return () => window.removeEventListener("paperflow:translation-progress", onProgress);
+  }, []);
   const reduced = useReducedMotion(), client = useQueryClient();
   const docs = useQuery({ queryKey: ["documents"], queryFn: () => documentRepository.listDocuments() });
   const annotations = useQuery({ queryKey: ["annotations"], queryFn: () => annotationRepository.listAll() });
@@ -47,7 +54,7 @@ export function ResearchLibrary() {
           <div className="pf-paper-list" data-layout={layout}>
           {docs.isPending ? <div className="pf-empty" role="status">저장한 논문을 불러오는 중…</div> : filtered.length === 0 ? <div className="pf-empty pf-collection-empty"><span className="pf-empty-book"><BookOpen size={35}/></span><h3>{search ? "검색 결과가 없습니다" : view === "archive" ? "아직 보관한 논문이 없다" : "첫 논문을 서재에 놓아보세요"}</h3><p>{view === "archive" ? "서재의 논문 카드에서 보관 버튼을 누르면 여기로 이동한다." : <>PDF를 이곳에 놓으면 첫 페이지가 표지가 된다.<br/>읽은 문장과 메모가 논문 곁에 쌓인다.</>}</p><Button onClick={view === "archive" ? () => setView("library") : openImport}>{view === "archive" ? "서재에서 논문 고르기" : <><Plus size={15}/> PDF 선택</>}</Button></div> : filtered.slice(0, limit).map((doc, index) => { const marks = (annotations.data ?? []).filter(a => a.documentId === doc.id); return <motion.article className="pf-paper-row pf-book-card" key={doc.id} initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .24, delay: Math.min(index, 7) * .025 }}>
             <Link className="pf-paper-link" href={`/reader/${doc.id}`}><DocumentCover documentId={doc.id} title={doc.title}/><span className="pf-book-title"><strong>{doc.title.replace(/\.pdf$/i, "")}</strong><small>{doc.authors?.slice(0, 2).join(", ") || "저자 미확인"} · {doc.journal || "저널 미확인"} · {doc.pageCount}p</small></span></Link>
-            <div className="pf-book-details"><div className="pf-progress"><span>{doc.lastOpenedAt ? `${Math.round((doc.visitedPages?.length ?? doc.currentPage) / doc.pageCount * 100)}% 읽음` : "새로운 논문"}</span><progress aria-label={`${doc.title} 읽기 진행`} value={doc.lastOpenedAt ? (doc.visitedPages?.length ?? doc.currentPage) : 0} max={doc.pageCount}/></div><div className="pf-record-count"><Bookmark size={12}/>{marks.filter(a => a.type === "highlight").length}<span className="sr-only"> 마킹</span></div><span className="pf-book-activity">메모 {marks.filter(a => a.note).length} · Hot {doc.opens?.filter(date => Date.now() - Date.parse(date) < 604800000).length ?? 0}{doc.jif ? ` · JIF ${doc.jif.value} (${doc.jif.year})` : " · JIF 미확인"}</span>{doc.doi && <Button size="sm" variant="ghost" onClick={() => void refreshMetadata(doc.id, doc.doi!)}>서지 확인</Button>}<Button size="sm" variant="ghost" onClick={() => { setJifId(doc.id); setJifValue(doc.jif?.value?.toString() ?? ""); setJifYear(doc.jif?.year?.toString() ?? ""); setJifSource(doc.jif?.source ?? ""); }}>JIF 기록</Button><IconButton label={doc.archived ? "아카이브에서 복원" : "논문 보관"} variant="ghost" size="sm" disabled={archive.isPending} onClick={() => archive.mutate({ id: doc.id, archived: !doc.archived })}>{doc.archived ? <ArrowLeft size={15}/> : <Archive size={15}/>}</IconButton></div>
+            <div className="pf-book-details"><div className="pf-progress"><span>{doc.lastOpenedAt ? `${Math.round((doc.visitedPages?.length ?? doc.currentPage) / doc.pageCount * 100)}% 읽음` : "새로운 논문"}</span><progress aria-label={`${doc.title} 읽기 진행`} value={doc.lastOpenedAt ? (doc.visitedPages?.length ?? doc.currentPage) : 0} max={doc.pageCount}/></div><div className="pf-record-count"><Bookmark size={12}/>{marks.filter(a => a.type === "highlight").length}<span className="sr-only"> 마킹</span></div><span className="pf-book-activity">메모 {marks.filter(a => a.note).length} · Hot {doc.opens?.filter(date => Date.now() - Date.parse(date) < 604800000).length ?? 0}{doc.jif ? ` · JIF ${doc.jif.value} (${doc.jif.year})` : " · JIF 미확인"}</span><Button size="sm" variant="ghost" disabled={translationJobs[doc.id]?.running} onClick={() => void startTranslationJob(doc.id).catch(error => notify(readableError(error)))}><Languages size={14}/>{translationJobs[doc.id]?.running ? `${translationJobs[doc.id].done}/${doc.pageCount} 번역 중` : translationJobs[doc.id] ? "번역 재시도" : "전체 번역"}</Button>{doc.doi && <Button size="sm" variant="ghost" onClick={() => void refreshMetadata(doc.id, doc.doi!)}>서지 확인</Button>}<Button size="sm" variant="ghost" onClick={() => { setJifId(doc.id); setJifValue(doc.jif?.value?.toString() ?? ""); setJifYear(doc.jif?.year?.toString() ?? ""); setJifSource(doc.jif?.source ?? ""); }}>JIF 기록</Button><IconButton label={doc.archived ? "아카이브에서 복원" : "논문 보관"} variant="ghost" size="sm" disabled={archive.isPending} onClick={() => archive.mutate({ id: doc.id, archived: !doc.archived })}>{doc.archived ? <ArrowLeft size={15}/> : <Archive size={15}/>}</IconButton></div>
           </motion.article>; })}</div>
           {jifId && <GlassPanel className="pf-jif-form" role="form" aria-label="JIF 출처 기록"><h3>JIF 출처 기록</h3><p>저널의 해당 연도 공식 수치와 출처를 확인한 뒤 기록하세요.</p><label>JIF 수치<input aria-label="JIF 수치" type="number" min="0.001" step="0.001" value={jifValue} onChange={e => setJifValue(e.target.value)}/></label><label>발표 연도<input aria-label="JIF 연도" type="number" value={jifYear} onChange={e => setJifYear(e.target.value)}/></label><label>출처 URL<input aria-label="JIF 출처 URL" type="url" value={jifSource} onChange={e => setJifSource(e.target.value)}/></label><Button onClick={() => void saveJif()}>저장</Button><Button variant="ghost" onClick={() => setJifId(null)}>취소</Button></GlassPanel>}
           {filtered.length > limit && <Button onClick={() => setLimit(number => number + 30)}>30개 더 보기</Button>}

@@ -6,13 +6,14 @@ type Line = { spans: HTMLElement[]; text: string; x: number; y: number; right: n
 export function paragraphKind(text: string, y: number, height: number, pageHeight: number): PdfParagraph["kind"] {
   const value = text.trim();
   if (!value || /^https?:\/\/|^(?:www\.|doi:|©|copyright|received:|accepted:|published:|correspondence|keywords?:|article info|cite this|read online)/i.test(value)) return "skip";
-  if (/^(?:contents|table of contents|references|acknowledg(?:e)?ments?)\s*$/i.test(value) || /\.{3,}\s*\d+\s*$/.test(value) || /^\[\d+\]\s+[A-Z]/.test(value)) return "skip";
+  if (/^(?:[^A-Za-z]*)(?:contents|table of contents|references|author information|acknowledg(?:e)?ments?)/i.test(value) || /\.{3,}\s*\d+\s*$/.test(value) || /^\[\d+\]\s+[A-Z]/.test(value)) return "skip";
   if (/^(?:fig(?:ure)?\.?|table)\s*\d+[a-z]?[.:\s]/i.test(value)) return "caption";
+  if (y < pageHeight * .4 && /,/.test(value) && /\band\b|\*/i.test(value) && (value.match(/[A-Z][a-z]+(?:-[A-Z][a-z]+)*\s+[A-Z][a-z]+(?:-[A-Z][a-z]+)*/g) ?? []).length >= 3 && !/[.!?]\s*$/.test(value)) return "skip";
+  if (/^[A-Z][a-z]+(?:-[A-Z][a-z]+)?(?:-[A-Z][a-z]+)?\s+[A-Z][a-z]+\s*[−–-]\s*(?:School|Department|University|Institute)\b/.test(value)) return "skip";
   if (/^(?:abstract|\d+(?:\.\d+)*\.?\s*)?(?:introduction|methods?|results?|discussion|conclusions?|computational models?|general models?|boiler mesh|experimental setup|materials and methods)\.?\s*$/i.test(value) || /^\d+(?:\.\d+)*\.?\s*[A-Za-z][A-Za-z\s-]{2,65}\.?$/.test(value)) return "title";
   if (y < pageHeight * .075 || y + height > pageHeight * .94) return "skip";
-  if (y < pageHeight * .4 && /\band\b/.test(value) && (value.match(/\b[A-Z][a-z]+\b/g) ?? []).length >= 4 && !/\b(?:study|model|results|analysis|method|boiler|fuel)\b/i.test(value)) return "skip";
   if (/^(?:\[?\d+\]?\s+)?(?:[A-Z][a-z]+\s+[A-Z]\.|[A-Z][a-z]+,\s+[A-Z])/.test(value) && /(?:et al\.|\b(?:university|department|journal|institute|author|received|published)\b)/i.test(value)) return "skip";
-  if ((value.match(/\b[A-Za-z]+\b/g) ?? []).length < 5) return "skip";
+  if ((value.match(/\b[A-Za-z]+\b/g) ?? []).length < 3 && !/[.!?;:]\s*$/.test(value)) return "skip";
   return "body";
 }
 
@@ -72,6 +73,7 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
   }
   const bodySizes = lines.map(line => line.height).sort((a, b) => a - b), bodySize = bodySizes[Math.floor(bodySizes.length / 2)] ?? 12;
   const contentsPage = lines.some(line => /^(?:table of )?contents\s*$/i.test(line.text.trim())) && lines.filter(line => /\.{3,}\s*\d+\s*$/.test(line.text)).length >= 2;
+  const stopLines = lines.filter(line => /^(?:[^A-Za-z]*)(?:author information|references)/i.test(line.text.trim()));
   return groups.filter(group => group.length > 0).map((group, index) => {
     const x = Math.min(...group.map(line => line.x)), y = Math.min(...group.map(line => line.y));
     const right = Math.max(...group.map(line => line.right)), bottom = Math.max(...group.map(line => line.bottom));
@@ -82,9 +84,11 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
     const sourceFont = representative.dataset.pfSourceFont ?? "";
     const fontWeight = group[0].forceBodyWeight ? 400 : /bold|demi|semibold|heavy/i.test(sourceFont) || group.length <= 3 && group[0].height > bodySize * 1.25 ? 700 : Number(style.fontWeight) || 400;
     const text = group.map(line => line.text).join(" ").replace(/\s+/g, " ").trim();
-    const candidateKind = contentsPage ? "skip" : paragraphKind(text, y - bounds.top, bottom - y, bounds.height);
+    const afterMetadata = stopLines.some(line => y >= line.y && x >= line.x - bounds.width * .08 && x <= line.x + bounds.width * .45);
+    const candidateKind = contentsPage || afterMetadata ? "skip" : paragraphKind(text, y - bounds.top, bottom - y, bounds.height);
     const groupSizes = group.map(line => line.height).sort((a, b) => a - b);
-    const kind = candidateKind === "body" && groupSizes[Math.floor(groupSizes.length / 2)] < bodySize * .72 ? "skip" : candidateKind;
+    const coverTitle = pageIndex === 0 && candidateKind === "body" && fontWeight >= 700 && y - bounds.top < bounds.height * .3 && text.length > 25 && group.length <= 3;
+    const kind = coverTitle ? "title" : candidateKind === "body" && groupSizes[Math.floor(groupSizes.length / 2)] < bodySize * .72 ? "skip" : candidateKind;
     for (const line of group) for (const span of line.spans) span.dataset.pfKind = kind;
     return { id, pageIndex, text, kind, x: (x - bounds.left) / bounds.width, y: (y - bounds.top) / bounds.height, width: (right - x) / bounds.width, height: (bottom - y) / bounds.height, lines: group.map(line => ({ x: (line.x - bounds.left) / bounds.width, y: (line.y - bounds.top) / bounds.height, width: (line.right - line.x) / bounds.width, height: (line.bottom - line.y) / bounds.height })), fontFamily: sourceFont ? `${sourceFont}, ${style.fontFamily}` : style.fontFamily, fontWeight: kind === "title" ? 700 : fontWeight, fontStyle: style.fontStyle, color: sampleInk(canvas, representative, bounds) };
   }).filter(paragraph => paragraph.kind === "title" || paragraph.text.length >= 12);

@@ -1,7 +1,7 @@
 import type { ParagraphLine } from "./paragraphs";
 
 export interface FlowRegion { x: number; y: number; width: number; height: number }
-export interface TranslatedLine { region: number; text: string; y: number }
+export interface TranslatedLine { region: number; text: string; x: number; y: number; wordSpacing: number }
 
 /** Preserve the text contour: an abstract wrapping an illustration is not a rectangle. */
 export function paragraphRegions(lines: ParagraphLine[]): FlowRegion[] {
@@ -22,7 +22,7 @@ export function paragraphRegions(lines: ParagraphLine[]): FlowRegion[] {
 
 type Measure = (text: string, fontSize: number) => number;
 /** Fit Korean at natural tracking and consistent leading, never stretch glyphs. */
-export function layoutTranslation(text: string, regions: FlowRegion[], originalSize: number, measure: Measure) {
+export function layoutTranslation(text: string, regions: FlowRegion[], originalSize: number, measure: Measure, firstIndent = 0) {
   const source = text.replace(/\s+/g, " ").trim();
   const minimum = 1;
   const attempt = (fontSize: number) => {
@@ -31,8 +31,10 @@ export function layoutTranslation(text: string, regions: FlowRegion[], originalS
     regions.forEach((region, regionIndex) => {
       const count = Math.max(1, Math.floor((region.height + fontSize * .15) / lineHeight));
       for (let row = 0; row < count && remaining; row++) {
+        const indent = regionIndex === 0 && row === 0 ? Math.min(firstIndent, region.width * .2) : 0;
+        const available = region.width - indent;
         let low = 1, high = remaining.length, length = 0;
-        while (low <= high) { const middle = Math.floor((low + high) / 2); if (measure(remaining.slice(0, middle), fontSize) <= region.width) { length = middle; low = middle + 1; } else high = middle - 1; }
+        while (low <= high) { const middle = Math.floor((low + high) / 2); if (measure(remaining.slice(0, middle), fontSize) <= available) { length = middle; low = middle + 1; } else high = middle - 1; }
         length = Math.max(1, length);
         if (length < remaining.length) {
           const wordEnd = remaining.lastIndexOf(" ", length);
@@ -40,8 +42,11 @@ export function layoutTranslation(text: string, regions: FlowRegion[], originalS
           // Keep surrogate pairs intact when a long unbroken token must wrap.
           const code = remaining.charCodeAt(length - 1); if (code >= 0xd800 && code <= 0xdbff && length > 1) length--;
         }
-        result.push({ region: regionIndex, text: remaining.slice(0, length).trimEnd(), y: row * lineHeight });
+        const line = remaining.slice(0, length).trimEnd();
         remaining = remaining.slice(length).trimStart();
+        const spaces = (line.match(/ /g) ?? []).length;
+        const gap = spaces >= 3 && remaining ? (available - measure(line, fontSize)) / spaces : 0;
+        result.push({ region: regionIndex, text: line, x: indent, y: row * lineHeight, wordSpacing: gap > 0 && gap < fontSize * .3 ? gap : 0 });
       }
     });
     return { lines: result, remaining, fontSize, lineHeight };

@@ -9,13 +9,13 @@ test("compiled design, real cover shelf, zoom control and readable highlight com
   expect(await page.getByRole("button", { name: "PDF 가져오기", exact: true }).evaluate(element => getComputedStyle(element).display)).toMatch(/^(inline-)?flex$/);
   expect(await page.locator(".pf-sidebar nav").evaluate(element => getComputedStyle(element).flexDirection)).toBe("column");
   await page.getByLabel("Import PDF file").setInputFiles({ name: "Collected research.pdf", mimeType: "application/pdf", buffer: makePdf() });
-  await expect(page.locator("[data-pdf-page][data-ready=true]")).toBeVisible();
+  await expect(page.locator("[data-pdf-page][data-ready=true]").first()).toBeVisible();
   await page.getByLabel("확대 비율", { exact: true }).focus();
   await page.keyboard.press("End");
   await expect(page.getByLabel("확대 비율", { exact: true })).toHaveValue("250");
   await page.getByRole("button", { name: "맞춤", exact: true }).click();
-  await expect(page.locator("[data-pdf-page][data-ready=true]")).toBeVisible();
-  await page.locator(".textLayer").evaluate(layer => {
+  await expect(page.locator("[data-pdf-page][data-ready=true]").first()).toBeVisible();
+  await page.locator(".textLayer").first().evaluate(layer => {
     const span = Array.from(layer.querySelectorAll("span")).find(item => item.textContent?.includes("turbulence"))!;
     const range = document.createRange(); range.selectNodeContents(span);
     const selection = window.getSelection()!; selection.removeAllRanges(); selection.addRange(range);
@@ -23,7 +23,7 @@ test("compiled design, real cover shelf, zoom control and readable highlight com
   });
   await page.getByRole("button", { name: "Highlight selection", exact: true }).click();
   await expect(page.getByTestId("highlight-rect")).toHaveCount(1);
-  expect(await page.locator(".pf-highlight-layer").evaluate(element => getComputedStyle(element).mixBlendMode)).toBe("multiply");
+  expect(await page.locator(".pf-highlight-layer").first().evaluate(element => getComputedStyle(element).mixBlendMode)).toBe("multiply");
   expect(await page.getByTestId("highlight-rect").evaluate(element => getComputedStyle(element).mixBlendMode)).toBe("normal");
   await page.getByLabel("Open Library", { exact: true }).click();
   await expect(page.locator(".pf-paper-list .pf-book-cover[data-cover-ready=true] img")).toBeVisible();

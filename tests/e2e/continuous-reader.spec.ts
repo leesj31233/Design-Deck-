@@ -31,7 +31,7 @@ test("page notes and pen strokes stay in the reader and appear in the notebook",
   await page.getByLabel("Import PDF file").setInputFiles({ name: "Research notes.pdf", mimeType: "application/pdf", buffer: makePdf() });
   await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
   await page.getByRole("button", { name: "텍스트 메모" }).click();
-  await page.getByLabel("원문 메모").fill("실험 조건을 다시 확인한다.");
+  await page.getByLabel("텍스트 메모 입력").fill("실험 조건을 다시 확인한다.");
   await page.getByRole("button", { name: "메모 저장" }).click();
   await expect(page.getByText("실험 조건을 다시 확인한다.")).toBeVisible();
   await page.getByRole("button", { name: "메모 펜" }).click();

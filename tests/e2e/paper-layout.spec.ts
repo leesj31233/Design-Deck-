@@ -22,6 +22,9 @@ test("real paper keeps Methods distinct and excludes page furniture from batch t
   await expect(page.locator(".pf-inline-bulk")).toContainText("논문 전체 번역");
   await expect(page.locator(".pf-inline-bulk")).toContainText("15/15페이지", { timeout: 120_000 });
   expect(sources.some(source => /METHODS/i.test(source))).toBe(true);
+  expect(sources.some(source => /Methane Gas Cofiring Effects/i.test(source))).toBe(true);
+  expect(sources.some(source => /Kang-Min Kim, Gyu-Bo Kim/i.test(source))).toBe(false);
+  expect(sources.some(source => /^AUTHOR INFORMATION/i.test(source))).toBe(false);
   expect(sources.some(source => /http:\/\/pubs\.acs\.org|ACS Omega/i.test(source))).toBe(false);
   expect(sources.some(source => /Figure 4\./i.test(source))).toBe(true);
   const translated = page.locator("[data-pdf-page='3'] .pf-translated-text").first();

@@ -361,6 +361,12 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 .pf-inline-bulk { display:flex; align-items:center; justify-content:center; gap:15px; padding:6px 18px 0; color:var(--muted); font-size:11px; }
 .pf-inline-bulk progress { max-width:130px; }
 .pf-inline-bulk button { height:26px; min-height:26px!important; }
+.pf-note-backdrop { position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:rgba(5,12,24,.58); padding:20px; }
+.pf-note-dialog { width:min(460px,100%); padding:26px; border:1px solid var(--line); border-radius:20px; background:var(--surface-strong); color:var(--text); box-shadow:0 24px 80px rgba(0,0,0,.28); }
+.pf-note-dialog h2 { margin:0 0 8px; font-size:19px; }
+.pf-note-dialog p { margin:0 0 15px; color:var(--muted); font-size:13px; }
+.pf-note-dialog textarea { display:block; width:100%; min-height:150px; resize:vertical; padding:12px; border:1px solid var(--line); border-radius:11px; background:var(--surface); color:var(--text); font:inherit; line-height:1.5; }
+.pf-note-dialog>div { display:flex; justify-content:flex-end; gap:9px; margin-top:15px; }
 .pf-language-toggle { font-size:11px; border:1px solid var(--line)!important; background:var(--surface)!important; }
 @media(hover:none) { .pf-inline-original { opacity:.9; } }
 
