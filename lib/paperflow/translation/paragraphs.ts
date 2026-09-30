@@ -3,6 +3,15 @@ export interface PdfParagraph { id: string; pageIndex: number; text: string; x: 
 
 type Line = { spans: HTMLElement[]; text: string; x: number; y: number; right: number; bottom: number; height: number };
 
+// Equations must remain PDF artwork: translating their PDF.js glyph stream
+// produces prose such as "bykd (Pg-PS)" and can cover the formula itself.
+export function isEquationLine(value: string): boolean {
+  const text = value.trim();
+  const words = text.match(/[A-Za-z]{3,}/g) ?? [];
+  const symbols = text.match(/[=+−→×∑∫(){}_^]/g) ?? [];
+  return words.length < 5 && (symbols.length >= 2 || /\(\s*\d+\s*\)$/.test(text) && symbols.length > 0);
+}
+
 /** Groups PDF.js text spans in reading order without changing the source PDF layer. */
 export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageIndex: number, canvas?: HTMLCanvasElement): PdfParagraph[] {
   const bounds = page.getBoundingClientRect();
@@ -22,6 +31,7 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
   }
   const groups: Line[][] = [];
   for (const line of lines) {
+    if (isEquationLine(line.text)) { groups.push([]); continue; }
     const group = groups.at(-1), previous = group?.at(-1);
     const verticalGap = previous ? line.y - previous.bottom : 0;
     const columnJump = previous ? line.y < previous.y - previous.height || line.x > previous.right + previous.height * 1.4 : false;
@@ -30,7 +40,7 @@ export function extractParagraphs(layer: HTMLElement, page: HTMLElement, pageInd
     else group.push(line);
   }
   const bodySizes = lines.map(line => line.height).sort((a, b) => a - b), bodySize = bodySizes[Math.floor(bodySizes.length / 2)] ?? 12;
-  return groups.map((group, index) => {
+  return groups.filter(group => group.length > 0).map((group, index) => {
     const x = Math.min(...group.map(line => line.x)), y = Math.min(...group.map(line => line.y));
     const right = Math.max(...group.map(line => line.right)), bottom = Math.max(...group.map(line => line.bottom));
     const id = `p${pageIndex}-${index}`;

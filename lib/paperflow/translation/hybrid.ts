@@ -49,8 +49,9 @@ export async function translateHybrid(source: string, signal?: AbortSignal): Pro
   if (cached) return { ...cached, cached: true };
   const ai = await researchRequest("translate", clean, "", signal);
   if (ai) { const result = { text: declarativeKorean(ai.text), provider: ai.provider }; memory.set(clean, result); return { ...result, cached: false }; }
-  const { protectedText, restore } = protectTerms(clean);
-  const parts = chunks(protectedText);
+  // Public translators routinely mutate sentinel tokens into prose. Send the
+  // actual passage and reject damaged output instead of painting it over a PDF.
+  const parts = chunks(clean);
   const native = await readyLocalTranslator();
   let provider: "device" | "MyMemory" | "OpenAI" = native ? "device" : "MyMemory";
   const translated = await Promise.all(parts.map(async part => {
@@ -63,8 +64,8 @@ export async function translateHybrid(source: string, signal?: AbortSignal): Pro
     if (body.responseStatus !== 200 || !body.responseData?.translatedText) throw new Error("번역 결과를 받지 못했습니다.");
     return body.responseData.translatedText;
   }));
-  const text = declarativeKorean(restore(translated.join(" ")));
-  if (text.includes("ZZZTERM") || (/[A-Za-z]{12}/.test(clean) && !/[가-힣]/.test(text))) throw new Error("번역 품질을 확인할 수 없습니다. 다시 시도해 주세요.");
+  const text = declarativeKorean(translated.join(" "));
+  if (/Z{2,}|\bTERM\d+\b|(?:[A-Z]{4,}){2,}/i.test(text) || (/[A-Za-z]{12}/.test(clean) && !/[가-힣]/.test(text))) throw new Error("번역 품질을 확인할 수 없습니다. 다시 시도해 주세요.");
   if (memory.size >= 300) memory.delete(memory.keys().next().value!);
   memory.set(clean, { text, provider });
   return { text, provider, cached: false };
