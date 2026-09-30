@@ -44,3 +44,22 @@ test("optional live English-to-Korean translation smoke check", async ({ page })
   await expect(page.locator(".pf-translated-text")).toContainText(/[가-힣]/, { timeout: 15_000 });
   console.log(`Live paragraph translation: ${Date.now() - start} ms`);
 });
+
+test("page translation batches all extracted paragraphs without public translator requests", async ({ page }) => {
+  let batches = 0;
+  await page.route("**/api/research", async route => {
+    const request = route.request().postDataJSON();
+    expect(request.task).toBe("translate_batch");
+    batches++;
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: request.sources.map(() => "공학 연구 문단을 번역하였다."), provider: "OpenAI" }) });
+  });
+  await page.route("https://api.mymemory.translated.net/get?**", route => route.abort());
+  await page.goto("/library");
+  await page.getByLabel("Import PDF file").setInputFiles({ name: "Batch.pdf", mimeType: "application/pdf", buffer: makePdf() });
+  await expect(page.locator("[data-pdf-page][data-ready=true]").first()).toBeVisible();
+  await page.getByRole("button", { name: "현재 페이지 일괄 번역" }).click();
+  await expect(page.locator(".pf-inline-bulk")).toContainText("페이지 번역");
+  await expect(page.locator(".pf-inline-bulk")).not.toContainText("실패");
+  await expect(page.locator(".pf-pdf-page .pf-translated-text").first()).toBeVisible();
+  expect(batches).toBeGreaterThan(0);
+});
