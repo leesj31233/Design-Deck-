@@ -49,6 +49,9 @@ export async function translateHybrid(source: string, signal?: AbortSignal): Pro
   if (cached) return { ...cached, cached: true };
   const ai = await researchRequest("translate", clean, "", signal);
   if (ai) { const result = { text: declarativeKorean(ai.text), provider: ai.provider }; memory.set(clean, result); return { ...result, cached: false }; }
+  if (typeof location !== "undefined" && !["localhost", "127.0.0.1"].includes(location.hostname)) {
+    throw new Error("OpenAI 서버 연결이 필요하다. 연구 공간 접근 코드를 설정하거나 서버 배포 상태를 확인해 달라.");
+  }
   // Public translators routinely mutate sentinel tokens into prose. Send the
   // actual passage and reject damaged output instead of painting it over a PDF.
   const parts = chunks(clean);
