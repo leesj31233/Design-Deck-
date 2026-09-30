@@ -1,11 +1,28 @@
 import { researchTranslationInstructions } from "@/lib/paperflow/translation/research-style";
 
-export async function GET() { return Response.json({ available: Boolean(process.env.OPENAI_API_KEY && process.env.PAPERFLOW_ACCESS_TOKEN), provider: "OpenAI" }); }
+const requestTimes = new Map<string, number[]>();
+const LIMIT_PER_MINUTE = 20;
+const LIMIT_PER_HOUR = 180;
+
+function rateLimited(request: Request) {
+  const ip = request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const now = Date.now();
+  if (requestTimes.size > 2000) {
+    for (const [key, times] of requestTimes) if (!times.some(time => now - time < 3_600_000)) requestTimes.delete(key);
+  }
+  const times = (requestTimes.get(ip) ?? []).filter(time => now - time < 3_600_000);
+  if (times.length >= LIMIT_PER_HOUR || times.filter(time => now - time < 60_000).length >= LIMIT_PER_MINUTE) return true;
+  times.push(now);
+  requestTimes.set(ip, times);
+  return false;
+}
+
+export async function GET() { return Response.json({ available: Boolean(process.env.OPENAI_API_KEY), provider: "OpenAI" }); }
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY || !process.env.PAPERFLOW_ACCESS_TOKEN) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았다." }, { status: 503 });
-  const host = request.headers.get("host") ?? "", origin = request.headers.get("origin") ?? "";
-  const local = /^(?:localhost|127\.0\.0\.1):\d+$/.test(host) && origin === `http://${host}`;
-  if (!local && request.headers.get("authorization") !== `Bearer ${process.env.PAPERFLOW_ACCESS_TOKEN}`) return Response.json({ error: "연구 공간 접근 코드가 필요하다." }, { status: 401 });
+  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았다." }, { status: 503 });
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있다." }, { status: 403 });
+  if (rateLimited(request)) return Response.json({ error: "번역 요청이 일시적으로 많다. 잠시 후 다시 시도해 달라." }, { status: 429, headers: { "Retry-After": "60" } });
   let body: { source?: unknown; sources?: unknown; task?: unknown; selection?: unknown };
   try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청이다." }, { status: 400 }); }
   const batch = body.task === "translate_batch";

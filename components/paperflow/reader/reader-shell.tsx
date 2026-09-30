@@ -159,7 +159,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
         const stored = await Promise.all(group.map(item => translationRepository.get(documentId, item.pageIndex, item.text)));
         const missing = group.filter((_, offset) => !stored[offset]);
         const batch = missing.length ? await researchBatchTranslate(missing.map(item => item.text), controller.signal) : [];
-        if (batch === null) throw new Error("페이지 일괄 번역은 OpenAI 서버 연결이 필요하다. 연구 공간 접근 코드를 설정하고 다시 시도해 달라.");
+        if (batch === null) throw new Error("페이지 번역 서버에 연결하지 못했다. 잠시 후 다시 시도해 달라.");
         if (controller.signal.aborted) break;
         const results = await Promise.all(group.map(async (item, offset) => {
           const saved = stored[offset];
