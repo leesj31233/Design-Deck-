@@ -183,13 +183,17 @@ function clusterLines(items: SpanItem[]): Line[] {
 
   for (const item of sorted) {
     let target: SpanItem[] | undefined;
-    for (let index = lines.length - 1; index >= Math.max(0, lines.length - 6); index--) {
+    for (let index = lines.length - 1; index >= Math.max(0, lines.length - 8); index--) {
       const candidate = lines[index];
       const top = Math.min(...candidate.map(span => span.y));
       const bottom = Math.max(...candidate.map(span => span.bottom));
+      const left = Math.min(...candidate.map(span => span.x));
+      const right = Math.max(...candidate.map(span => span.right));
       const height = Math.max(...candidate.map(span => span.height));
       const overlap = Math.min(bottom, item.bottom) - Math.max(top, item.y);
-      if (overlap >= Math.min(height, item.height) * 0.35) {
+      const horizontalGap = item.x > right ? item.x - right : left > item.right ? left - item.right : 0;
+      const maxGap = Math.max(22, Math.max(height, item.height) * 3.2);
+      if (overlap >= Math.min(height, item.height) * 0.35 && horizontalGap <= maxGap) {
         target = candidate;
         break;
       }
