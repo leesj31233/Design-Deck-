@@ -54,10 +54,13 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
       const [content, library, operators] = await Promise.all([page.getTextContent(), getLibrary(), page.getOperatorList()]);
       signal?.throwIfAborted();
       const forms = clippedFormFonts(operators.fnArray, operators.argsArray, library.OPS as unknown as Record<string, number>);
+      // A pasted page also repeats the page's own caption and sentences inside its box: keep the page's copy.
+      const pageText = forms.size ? content.items.filter(item => "str" in item && !forms.has(item.fontName)).map(item => "str" in item ? item.str : "").join(" ").replace(/\s+/g, " ") : "";
       return content.items.flatMap(item => {
         if (!("str" in item) || !item.str.trim()) return [];
         const boxes = forms.get(item.fontName);
         if (boxes && !boxes.some(([x1, y1, x2, y2]) => item.transform[4] >= x1 - 2 && item.transform[4] <= x2 + 2 && item.transform[5] >= y1 - 2 && item.transform[5] <= y2 + 2)) return [];
+        if (boxes && (/^(?:fig(?:ure)?\.?|table|scheme)\s*\d/i.test(item.str.trim()) || item.str.trim().length >= 8 && pageText.includes(item.str.replace(/\s+/g, " ").trim()))) return [];
         // Rotated text (axis titles, side labels) belongs to figures and would stretch a column.
         const [m0, m1, m2, m3] = item.transform;
         if (Math.abs(m1) > Math.abs(m0) * .1 || Math.abs(m2) > Math.abs(m3) * .1) return [];
