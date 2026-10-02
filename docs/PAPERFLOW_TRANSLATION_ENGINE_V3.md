@@ -53,6 +53,35 @@ lib/paperflow/pdf/export-annotated.ts   같은 조판기로 PDF 출력(추가 �
   - pdf.js 렌더링 p50 53 ms
   - 남은 긴 작업은 대부분 pdf.js의 원문 렌더링이다.
 
+## 배포 사이트 다양한 양식 QA (2026-10-03, production, 처음부터 번역)
+
+| # | 양식 | 쪽 | 번역 단위 | 결과 | 전체 시간 |
+|---|---|---|---|---|---|
+| 1 | MDPI Energies (그림 = 붙여 넣은 원고 PDF) | 23 | 75 | 75/75 | 19 s |
+| 2 | Springer, Frontiers in Energy | 8 | 43 | 43/43 | 11 s |
+| 3 | Nature Communications Earth & Environment | 14 | 87 | 85/87 | 34 s |
+| 4 | Archives of Thermodynamics | 17 | 60 | 60/60 | 12 s |
+| 5 | IOP Conference Series | 7 | 26 | 26/26 | 12 s |
+| 6 | Journal of the Japan Petroleum Institute | 8 | 21 | 21/21 | 7 s |
+| 7 | Elsevier 원고(accepted manuscript, 1단) | 41 | 71 | 71/71 | 22 s |
+| 8 | 줄 번호가 있는 투고 원고(2배 줄간격) | 76 | 209 | 208/209 | 33 s |
+| 9 | Elsevier Bioresource Technology | 10 | 64 | 64/64 | 17 s |
+| 10 | Elsevier Applied Energy | 14 | 103 | 103/103 | 21 s |
+| 11 | 오래된 학회지(oil palm leaching) | 6 | 52 | 52/52 | 25 s |
+| 12 | 기술 학회지(Vol56No2) | 4 | 25 | 24/25 | 19 s |
+| 13 | IEA 기술 보고서 | 43 | 146 | 146/146 | 23 s |
+
+QA 중에 고친 양식별 원인:
+- **MDPI:** 그림이 원고 PDF 한 페이지를 잘라 붙인 것이라 잘려 안 보이는 원고 글자가 텍스트층에 남는다. form XObject의 clip 영역 밖 글자와, 페이지 본문·캡션을 되풀이하는 글자를 제외한다(`clippedFormFonts`).
+- **투고 원고:** 왼쪽 여백의 줄 번호를 제외하고, 2배 줄간격 문단을 인식한다.
+- **Elsevier 첫 페이지:** ARTICLE INFO와 ABSTRACT가 한 줄씩 엇갈리는 구간은 그 구간 고유의 단 경계로 읽는다.
+- **그 밖의 공통 수정:**
+  - 회전된 그림 글자(축 이름 등)를 제외한다.
+  - 내용으로 머리글을 인식한다(IOP, MDPI, 학회명 등).
+  - ⇑ 교신저자 각주를 제외한다.
+  - 가운데 정렬 표와 표의 행 이름 열은 번역하지 않는다.
+  - 한 줄에 run-in 소제목이 둘 있으면 둘 다 소제목으로 인식한다.
+
 ## 남은 제약
 
 - **화학식·첨자 서식:** 번역문 안에서는 CO2, K2SO4가 첨자 없이 평문으로 나온다.
