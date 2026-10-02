@@ -10,19 +10,19 @@ import { Badge } from "@/components/ui/badge";
 import { IconButton } from "@/components/ui/icon-button";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import type { Annotation } from "@/lib/paperflow/anchors/types";
-import type { PdfParagraph } from "@/lib/paperflow/translation/paragraphs";
+import type { PdfParagraph } from "@/lib/paperflow/layout/types";
 import type { ResolvedAnnotation } from "./highlight-layer";
 
 type TranslationState = { text?: string; provider?: "device" | "MyMemory" | "OpenAI"; pending: boolean; error?: string } | null;
-type BulkState = { done: number; total: number; failed: number; running: boolean } | null;
+type BulkState = { done: number; total: number; failed: number; running: boolean; translated: number; translatableBlocks: number; complete: boolean; failedUnits: { unitId: string; page: number; error: string; preview: string }[] } | null;
 interface InspectorProps {
   annotations: Annotation[]; resolved: ResolvedAnnotation[]; selected?: string; onSelect: (a: Annotation) => void;
   onSaveNote: (text: string) => Promise<void>; onRemove: (id: string) => void; saving: boolean;
   tab: string; setTab: (tab: string) => void; shell: string; paragraph: PdfParagraph | null;
-  translation: TranslationState; bulk: BulkState; onTranslate: () => void; onBatchTranslate: () => void; onCancelBatch: () => void;
+  translation: TranslationState; bulk: BulkState; keywords: string[]; onTranslate: () => void; onBatchTranslate: () => void; onCancelBatch: () => void;
 }
 
-export function ResearchInspector({ annotations, resolved, selected, onSelect, onSaveNote, onRemove, saving, tab, setTab, shell, paragraph, translation, bulk, onTranslate, onBatchTranslate, onCancelBatch }: InspectorProps) {
+export function ResearchInspector({ annotations, resolved, selected, onSelect, onSaveNote, onRemove, saving, tab, setTab, shell, paragraph, translation, bulk, keywords, onTranslate, onBatchTranslate, onCancelBatch }: InspectorProps) {
   const selection = useReaderStore(s => s.activeSelection);
   const active = annotations.find(a => a.id === selected), anchor = selection ?? active?.anchor;
   const sourceText = anchor?.sourceQuote ?? (selection ? anchor?.textQuote : paragraph?.text ?? anchor?.textQuote);
@@ -39,7 +39,13 @@ export function ResearchInspector({ annotations, resolved, selected, onSelect, o
           {sourceText && <Button size="sm" variant="ghost" onClick={onTranslate} disabled={translation?.pending}><Sparkles size={14}/> 다시 번역 보기</Button>}
           <small>{translation?.provider === "OpenAI" ? "서버에서 번역했다." : translation?.provider === "device" ? "이 기기에서 번역했습니다." : "번역은 서버에서 처리한다."} PDF 원본은 변경되지 않습니다.</small>
         </section>
-        <section className="pf-inspector-section pf-batch-section"><div className="pf-section-title"><h3>논문 전체 번역</h3><span>{bulk ? `${bulk.done}/${bulk.total}페이지` : "상단 버튼"}</span></div><p>상단의 ‘논문 전체 일괄 번역’을 누르면 본문·제목·그림 설명을 저장한다. 수식과 그림 내부는 원문으로 유지한다.</p>{bulk && bulk.failed > 0 && <p role="status">{bulk.failed}페이지는 번역하지 못했다. 다시 실행하면 미완료 문단을 재시도한다.</p>}{bulk && <progress value={bulk.done} max={Math.max(1, bulk.total)} aria-label="논문 전체 번역 진행"/>}{bulk?.running && <Button size="sm" variant="ghost" onClick={onCancelBatch}>중지</Button>}</section>
+        <section className="pf-inspector-section pf-batch-section"><div className="pf-section-title"><h3>논문 전체 번역</h3><span>{bulk && bulk.translatableBlocks ? `${bulk.translated}/${bulk.translatableBlocks}문단` : "상단 버튼"}</span></div>
+          <p>본문·초록·장절 제목·그림 설명을 원래 지면 안에 한국어로 넣는다. 논문 제목·저자·References·수식·표·그림 내부는 원문으로 둔다.</p>
+          {bulk && bulk.translatableBlocks > 0 && <progress value={bulk.translated} max={Math.max(1, bulk.translatableBlocks)} aria-label="논문 전체 번역 진행"/>}
+          {bulk && bulk.failedUnits.length > 0 && <div role="status" className="pf-failed-units"><p>{bulk.failedUnits.length}개 문단을 번역하지 못했다. 성공한 문단은 저장됐고, 재시도하면 이 문단만 다시 요청한다.</p><ul>{bulk.failedUnits.slice(0, 8).map(item => <li key={item.unitId}><b>p. {item.page}</b> {item.preview}…</li>)}</ul></div>}
+          {bulk?.running ? <Button size="sm" variant="ghost" onClick={onCancelBatch}>중지</Button> : bulk && !bulk.complete && <Button size="sm" variant="ghost" onClick={onBatchTranslate}>{bulk.failed ? "실패 문단 재시도" : "이어서 번역"}</Button>}
+        </section>
+        {keywords.length > 0 && <section className="pf-inspector-section pf-keywords"><div className="pf-section-title"><h3>논문 키워드</h3><span>서재 수집</span></div><div className="pf-keyword-chips">{keywords.map(keyword => <span key={keyword}>{keyword}</span>)}</div></section>}
         {shell && shell !== "개념 설명" && shell !== "Hybrid 번역" && <div className="pf-inspector-section pf-future"><h3>{shell}</h3><p>원문 근거를 연결한 설명 기능은 다음 단계에서 제공됩니다.</p></div>}
       </TabsContent>
       <TabsContent value="notes"><div className="pf-inspector-section"><h3>사용자 메모</h3><small>{anchor ? `원문 ${anchor.pageIndex + 1}페이지에 연결된다.` : "선택한 텍스트가 없으면 현재 페이지에 저장된다."}</small><textarea aria-label="원문 메모" placeholder="이 문장에서 발견한 점, 궁금한 점…" value={draft} onChange={event => setDraft(event.target.value)}/><Button disabled={!draft.trim() || saving} onClick={() => void onSaveNote(draft)}><Save size={14}/>{saving ? "저장 중…" : "메모 저장"}</Button></div></TabsContent>

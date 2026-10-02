@@ -1,25 +1,23 @@
 import { PDFDocument } from "pdf-lib";
 import { annotationRepository } from "../persistence/annotation-repository";
 import { documentRepository } from "../persistence/document-repository";
-import { translationRepository, translationSourceKey, TRANSLATION_PROMPT_VERSION } from "../persistence/translation-repository";
+import { translationRepository } from "../persistence/translation-repository";
 import { pdfAdapter } from "./pdf-adapter";
-import { layoutTranslation, paragraphRegions, translationFlowRegions } from "../translation/inline-layout";
-import { koreanFontStack } from "../translation/paper-font";
-import { buildTranslationManifest, manifestRepository } from "../translation/manifest";
-import { planColumnReflow } from "../translation/column-reflow";
+import { ensureManifest } from "../translation/manifest";
+import { typesetPage } from "../typeset/page-typesetter";
+import { canvasMeasure, ensurePaperFonts, paperFontStack } from "../typeset/measure";
 import type { AnnotationColor } from "../anchors/types";
 
 const highlightColors: Record<AnnotationColor, string> = { yellow: "rgba(255,225,45,.38)", green: "rgba(74,211,122,.33)", blue: "rgba(69,155,255,.33)", pink: "rgba(255,106,164,.33)", purple: "rgba(166,121,245,.33)" };
-function background(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
-  const samples = new Map<string, number>();
-  for (let row = 0; row < 3; row++) for (let col = 0; col < 8; col++) {
-    const px = Math.max(0, Math.min(context.canvas.width - 1, Math.round(x + width * (col + .5) / 8)));
+function lightest(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
+  let best = -1, color = "rgb(255,255,255)";
+  for (let row = 0; row < 3; row++) for (let col = 0; col < 6; col++) {
+    const px = Math.max(0, Math.min(context.canvas.width - 1, Math.round(x + width * (col + .5) / 6)));
     const py = Math.max(0, Math.min(context.canvas.height - 1, Math.round(y + height * (row + .5) / 3)));
-    const value = context.getImageData(px, py, 1, 1).data;
-    const key = `${value[0]},${value[1]},${value[2]}`;
-    samples.set(key, (samples.get(key) ?? 0) + 1);
+    const [r, g, b] = context.getImageData(px, py, 1, 1).data;
+    if (r + g + b > best) { best = r + g + b; color = `rgb(${r},${g},${b})`; }
   }
-  return `rgb(${[...samples].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "255,255,255"})`;
+  return color;
 }
 function wrap(text: string, maxWidth: number, context: CanvasRenderingContext2D) {
   const lines: string[] = []; let line = "";
@@ -30,80 +28,55 @@ function wrap(text: string, maxWidth: number, context: CanvasRenderingContext2D)
   if (line) lines.push(line);
   return lines;
 }
-function subtractRect(rect: { x: number; y: number; width: number; height: number }, obstacle: { x: number; y: number; width: number; height: number }) {
-  const left = Math.max(rect.x, obstacle.x - 2), right = Math.min(rect.x + rect.width, obstacle.x + obstacle.width + 2);
-  const top = Math.max(rect.y, obstacle.y - 2), bottom = Math.min(rect.y + rect.height, obstacle.y + obstacle.height + 2);
-  if (left >= right || top >= bottom) return [rect];
-  return [
-    { x: rect.x, y: rect.y, width: left - rect.x, height: rect.height },
-    { x: right, y: rect.y, width: rect.x + rect.width - right, height: rect.height },
-    { x: left, y: rect.y, width: right - left, height: top - rect.y },
-    { x: left, y: bottom, width: right - left, height: rect.y + rect.height - bottom }
-  ].filter(part => part.width > 2 && part.height > 1);
-}
-/** Flatten the reader view into a portable PDF; the source file is never modified. */
-export async function exportAnnotatedPdf(documentId: string, onProgress?: (done: number, total: number) => void) {
-  const [record, blob, translations, annotations] = await Promise.all([
-    documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId), translationRepository.listByDocument(documentId), annotationRepository.listByDocument(documentId)
+/**
+ * Flatten the reader view into a portable PDF with the same typesetter as the
+ * reader: same page, same columns, no continuation pages. The source file is never modified.
+ */
+export async function exportAnnotatedPdf(documentId: string, onProgress?: (done: number, total: number) => void): Promise<{ unfit: number }> {
+  const [record, blob, texts, annotations] = await Promise.all([
+    documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId), translationRepository.unitTexts(documentId), annotationRepository.listByDocument(documentId)
   ]);
   if (!record || !blob) throw new Error("저장된 원본 PDF를 찾지 못했다.");
-  const translated = new Map(translations.map(item => [translationSourceKey(item.pageIndex, item.source), item.text]));
-  const translatedBlocks = new Map(translations.filter(item => item.blockId && item.promptVersion === TRANSLATION_PROMPT_VERSION).map(item => [item.blockId!, item.text]));
-  const pdf = await pdfAdapter.open(await blob.arrayBuffer());
+  const bytes = await blob.arrayBuffer();
+  const pdf = await pdfAdapter.open(bytes.slice(0));
   const output = await PDFDocument.create();
-  const scale = 1.8;
+  const scale = 2;
+  let unfit = 0;
   try {
-    await document.fonts.ready;
-    let manifest = await manifestRepository.get(documentId);
-    if (!manifest || manifest.pageCount !== pdf.pageCount) {
-      manifest = await buildTranslationManifest(documentId, pdf);
-      await manifestRepository.put(manifest);
-    }
-    const continuations: { pageIndex: number; text: string }[] = [];
+    const manifest = await ensureManifest(documentId, () => pdfAdapter.open(bytes.slice(0)));
+    await ensurePaperFonts([...texts.values()].join(""));
+    const measure = canvasMeasure(), family = paperFontStack();
     for (let index = 0; index < pdf.pageCount; index++) {
       const page = await pdf.getPage(index + 1);
       const canvas = document.createElement("canvas");
       await page.render(canvas, scale, new AbortController().signal);
       const context = canvas.getContext("2d", { willReadFrequently: true })!;
-      const blocks = manifest.blocks.filter(block => block.pageIndex === index);
-      const allSizes = blocks.filter(block => block.translatable).flatMap(block => block.lines.map(line => line.height * canvas.height)).sort((a, b) => a - b);
-      const bodySize = allSizes[Math.floor(allSizes.length / 2)] || 14;
-      const prepared = blocks.filter(block => block.translatable).map(block => {
-        const text = translatedBlocks.get(block.id) ?? translated.get(translationSourceKey(index, block.text));
-        if (!text) return null;
-        const lines = block.lines.map(line => ({ x: line.x * canvas.width, y: line.y * canvas.height, width: line.width * canvas.width, height: line.height * canvas.height }));
-        if (!lines.length) return null;
-        const regions = paragraphRegions(lines), heights = lines.map(line => line.height).sort((a, b) => a - b);
-        const originalSize = Math.min((heights[Math.floor(heights.length / 2)] || bodySize) * .96, bodySize * (block.kind === "title" ? 1.55 : block.kind === "caption" ? 1.12 : 1.18));
-        return { block, text, lines, regions, flowRegions: translationFlowRegions(block, regions, canvas.width), originalSize, family: koreanFontStack(block.fontFamily), colors: lines.map(line => background(context, line.x, line.y, line.width, line.height)) };
-      }).filter((item): item is NonNullable<typeof item> => Boolean(item));
-      const byId = new Map(prepared.map(item => [item.block.id, item]));
-      const fixed = blocks.filter(block => !block.translatable).map(block => block.role === "EQUATION" ? {
-        x: (block.x < .48 ? .075 : .515) * canvas.width, y: block.y * canvas.height - bodySize * .35,
-        width: (block.x < .48 ? .41 : .42) * canvas.width, height: block.height * canvas.height + bodySize * .7
-      } : { x: block.x * canvas.width, y: block.y * canvas.height, width: block.width * canvas.width, height: block.height * canvas.height });
-      const placements = planColumnReflow(prepared.map(item => ({ id: item.block.id, x: item.block.x * canvas.width, y: item.block.y * canvas.height, width: item.block.width * canvas.width, height: item.block.height * canvas.height, lineHeight: item.originalSize * 1.18, column: item.block.kind === "title" && item.block.width > .55 ? 2 : item.block.x < .48 ? 0 : 1 })), fixed, canvas.height, (flow, top, availableHeight) => {
-        const item = byId.get(flow.id)!;
-        const shift = top - item.regions[0].y, regions = item.flowRegions.map(region => ({ ...region, y: region.y + shift }));
-        const last = regions.at(-1)!;
-        last.height = Math.max(0, availableHeight - (last.y - top));
-        for (const region of regions) region.height = Math.max(0, Math.min(region.height, availableHeight - (region.y - top)));
-        const font = (size: number) => `${item.block.fontStyle} ${item.block.fontWeight} ${size}px ${item.family}`;
-        const layout = layoutTranslation(item.text, regions, item.originalSize, (value, size) => { context.font = font(size); return context.measureText(value).width; }, Math.max(0, item.lines[0].x - item.regions[0].x), item.block.kind === "title" ? .94 : .82);
-        const usedHeight = Math.max(0, ...layout.lines.map(line => regions[line.region].y + line.y + layout.lineHeight - top));
-        return { usedHeight, output: { item, regions, layout, font } };
-      });
-      // Erase all translated source rectangles before drawing any shifted text.
-      for (const item of prepared) item.lines.forEach((line, lineIndex) => { context.fillStyle = item.colors[lineIndex]; for (const part of fixed.reduce((parts, obstacle) => parts.flatMap(rect => subtractRect(rect, obstacle)), [line])) context.fillRect(part.x, part.y, part.width, part.height); });
-      for (const placement of placements) {
-        const { item, regions, layout, font } = placement.output;
-        if (layout.remaining) continuations.push({ pageIndex: index, text: layout.remaining });
-        context.font = font(layout.fontSize); context.textBaseline = "top"; context.fillStyle = item.block.color ?? "#171717";
-        for (const line of layout.lines) {
-          const region = regions[line.region];
-          context.fillText(line.text, region.x + line.x, region.y + line.y);
+      const layout = typesetPage({ manifest, pageIndex: index, measure, translations: texts, inkAt: rect => {
+        const x = Math.max(0, Math.floor(rect.x * scale)), y = Math.max(0, Math.floor(rect.y * scale)), w = Math.min(canvas.width - x, Math.ceil(rect.width * scale)), h = Math.min(canvas.height - y, Math.ceil(rect.height * scale));
+        if (w < 1 || h < 1) return true;
+        const data = context.getImageData(x, y, w, h).data;
+        let paper = 0, ink = 0;
+        for (let offset = 0; offset < data.length; offset += 4) paper = Math.max(paper, data[offset] + data[offset + 1] + data[offset + 2]);
+        for (let offset = 0; offset < data.length; offset += 4) if (data[offset] + data[offset + 1] + data[offset + 2] < paper - 110) ink++;
+        return ink > Math.max(2, w * h * .0015);
+      } });
+      unfit += layout.unfit.length;
+      // Sample every mask colour before painting any of them.
+      const colors = layout.masks.map(mask => lightest(context, mask.x * scale, mask.y * scale, mask.width * scale, mask.height * scale));
+      layout.masks.forEach((mask, offset) => { context.fillStyle = colors[offset]; context.fillRect(mask.x * scale, mask.y * scale, mask.width * scale, mask.height * scale); });
+      const typed = context as CanvasRenderingContext2D & { fontKerning: string; letterSpacing: string; wordSpacing: string };
+      typed.fontKerning = "none"; context.textBaseline = "alphabetic"; context.fillStyle = "#111";
+      for (const line of layout.lines) {
+        // Same baseline as the reader's 1.15 line box positioned at y − 0.08 em.
+        let x = line.x * scale; const baseline = (line.y + line.fontSize * .8325) * scale;
+        typed.wordSpacing = `${line.wordSpacing * scale}px`; typed.letterSpacing = `${line.letterSpacing * scale}px`;
+        for (const run of line.runs) {
+          context.font = `${run.bold || line.bold ? 700 : 400} ${line.fontSize * scale}px ${line.sans ? paperFontStack(true) : family}`;
+          context.fillText(run.text, x, baseline);
+          x += context.measureText(run.text).width;
         }
       }
+      typed.wordSpacing = "0px"; typed.letterSpacing = "0px";
       for (const annotation of annotations.filter(item => item.pageIndex === index)) {
         if (annotation.type === "highlight") {
           context.fillStyle = highlightColors[annotation.color];
@@ -118,10 +91,8 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
       output.addPage([page.width, page.height]).drawImage(image, { x: 0, y: 0, width: page.width, height: page.height });
       onProgress?.(index + 1, pdf.pageCount);
     }
-    const notes = [
-      ...continuations.map(item => ({ pageIndex: item.pageIndex, note: `이어지는 번역: ${item.text}` })),
-      ...annotations.filter(item => item.note?.trim()).map(item => ({ pageIndex: item.pageIndex, note: item.note! }))
-    ];
+    // User memos are the only appended pages; translated text always stays on its own page.
+    const notes = annotations.filter(item => item.note?.trim()).map(item => ({ pageIndex: item.pageIndex, note: item.note! }));
     if (notes.length) {
       const width = 900, height = 1200;
       const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height;
@@ -145,10 +116,11 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
       }
       await newPage();
     }
-    const bytes = await output.save();
-    const file = new Blob([new Uint8Array(bytes)], { type: "application/pdf" });
+    const saved = await output.save();
+    const file = new Blob([new Uint8Array(saved)], { type: "application/pdf" });
     const url = URL.createObjectURL(file), link = document.createElement("a");
     link.href = url; link.download = record.filename.replace(/\.pdf$/i, "") + "-paperflow.pdf"; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    return { unfit };
   } finally { await pdf.destroy(); }
 }

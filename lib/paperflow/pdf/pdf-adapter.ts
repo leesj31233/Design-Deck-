@@ -1,5 +1,5 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
-export interface PdfTextItem { text: string; x: number; y: number; width: number; height: number; fontName: string; fontFamily: string; hasEOL: boolean }
+export interface PdfTextItem { text: string; x: number; y: number; width: number; height: number; fontName: string; fontFamily: string; hasEOL: boolean; /** Baseline in pt; ligature glyphs often sit in another font with a different ascent. */ baseline?: number }
 export interface PdfPageHandle {
   width: number; height: number;
   getTextItems(signal?: AbortSignal): Promise<PdfTextItem[]>;
@@ -26,7 +26,7 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
         const height = Math.max(1, Math.abs(item.height) || Math.hypot(item.transform[2], item.transform[3]));
         const style = content.styles[item.fontName];
         const ascent = typeof style?.ascent === "number" ? style.ascent : .8;
-        return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL }];
+        return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL, baseline }];
       });
     },
     async getRasterImageCount() {

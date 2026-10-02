@@ -14,13 +14,14 @@ it("persists immutable source + annotation across database reconnect and dedupli
   const anchor = createTextAnchor({ documentId: doc.id, pageIndex: 1, textQuote: "coal co-firing", rects: [{ x: 10, y: 10, width: 100, height: 10 }], width: 600, height: 800 });
   await annotations.create({ id: "annotation-1", type: "highlight", documentId: doc.id, pageIndex: 1, color: "yellow", anchor, note: "사용자 근거 메모", createdAt: anchor.createdAt, updatedAt: anchor.createdAt, resolutionStatus: "resolved" });
   await documents.updateDocument(doc.id, { currentPage: 2, archived: true });
-  await translations.put(doc.id, 1, "The heat flux increased.", "heat flux가 증가했습니다.", "MyMemory");
+  await translations.putUnits(doc.id, [{ unitId: "unit-1", pageIndex: 1, source: "The heat flux increased.", text: "heat flux가 증가하였다." }]);
   await closeDatabase();
   expect((await documents.listDocuments()).filter(d => d.id === doc.id)).toHaveLength(1);
   expect(await documents.getDocument(doc.id)).toMatchObject({ currentPage: 2, archived: true });
   expect((await annotations.listByDocument(doc.id))[0]).toMatchObject({ anchor, pageIndex: 1, note: "사용자 근거 메모" });
   expect(await (await documents.getDocumentBlob(doc.id))!.text()).toBe(await original.text());
-  expect(await translations.get(doc.id, 1, "The heat flux increased.")).toMatchObject({ text: "heat flux가 증가했습니다." });
+  expect((await translations.unitTexts(doc.id)).get("unit-1")).toBe("heat flux가 증가하였다.");
+  expect((await translations.listByDocument(doc.id)).every(item => item.documentId === doc.id)).toBe(true);
   await annotations.remove("annotation-1"); expect(await annotations.listByDocument(doc.id)).toEqual([]);
   expect(await (await documents.getDocumentBlob(doc.id))!.text()).toBe(await original.text());
 });

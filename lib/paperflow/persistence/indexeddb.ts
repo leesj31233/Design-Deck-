@@ -3,13 +3,15 @@ export function openDatabase(): Promise<IDBDatabase> {
   if (connection) return connection;
   connection = new Promise((resolve, reject) => {
     if (typeof indexedDB === "undefined") { reject(new Error("이 브라우저에서는 로컬 저장소를 사용할 수 없습니다.")); return; }
-    const request = indexedDB.open("paperflow-v1", 3);
+    const request = indexedDB.open("paperflow-v1", 4);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains("documents")) db.createObjectStore("documents", { keyPath: "id" });
       if (!db.objectStoreNames.contains("blobs")) db.createObjectStore("blobs");
       if (!db.objectStoreNames.contains("annotations")) { const annotations = db.createObjectStore("annotations", { keyPath: "id" }); annotations.createIndex("documentId", "documentId"); }
-      if (!db.objectStoreNames.contains("translations")) db.createObjectStore("translations", { keyPath: "id" });
+      const translations = db.objectStoreNames.contains("translations") ? request.transaction!.objectStore("translations") : db.createObjectStore("translations", { keyPath: "id" });
+      // v4: read one paper's translations without scanning every paper in the library.
+      if (!translations.indexNames.contains("documentId")) translations.createIndex("documentId", "documentId");
       if (!db.objectStoreNames.contains("translationManifests")) db.createObjectStore("translationManifests", { keyPath: "documentId" });
     };
     request.onsuccess = () => { request.result.onversionchange = () => { request.result.close(); connection = undefined; }; resolve(request.result); };

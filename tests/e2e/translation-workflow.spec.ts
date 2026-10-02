@@ -1,12 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { makePdf } from "../fixtures/make-pdf";
+import { mockResearch } from "./mock-research";
 
 test("library pretranslation, page memo, and annotated PDF export", async ({ page }) => {
-  await page.route("**/api/research", async route => {
-    const body = route.request().postDataJSON();
-    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: body.passages.map((item: { id: string }) => ({ id: item.id, text: "공학 연구의 결과를 확인하였다." })), provider: "OpenAI" }) });
-  });
+  await mockResearch(page, "공학 연구의 결과를 확인하였다.");
   await page.goto("/library");
   await page.getByLabel("Import PDF file").setInputFiles({ name: "Workflow.pdf", mimeType: "application/pdf", buffer: makePdf() });
   await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
@@ -14,7 +12,7 @@ test("library pretranslation, page memo, and annotated PDF export", async ({ pag
   await page.getByRole("button", { name: "전체 번역", exact: true }).click();
   await expect(page.getByRole("button", { name: "번역 재시도" })).toBeVisible({ timeout: 30_000 });
   await page.getByRole("link", { name: /Workflow/ }).first().click();
-  await expect(page.locator("[data-pdf-page='0'] .pf-translated-text").first()).toBeVisible();
+  await expect(page.locator("[data-pdf-page='0'] .pf-tx-line").first()).toBeVisible();
   await page.getByRole("button", { name: "텍스트 메모" }).click();
   await page.getByLabel("텍스트 메모 입력").fill("열전달 조건을 재검토할 것");
   await page.getByRole("dialog", { name: "텍스트 메모" }).getByRole("button", { name: "메모 저장" }).click();
