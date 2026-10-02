@@ -1,6 +1,6 @@
 import type { PdfTextItem } from "../pdf/pdf-adapter";
 import type { PdfParagraph } from "./types";
-import { buildTextLines, findGutter, median, orderLines, type Gutter, type TextLine } from "./text-lines";
+import { buildTextLines, dropGhostLayer, dropLineNumbers, findGutter, median, orderLines, type Gutter, type TextLine } from "./text-lines";
 
 const SECTION_NAMES = /^(?:■\s*)?(?:abstract|introduction|background|literature review|methods?|methodology|materials and methods|experimental(?: section| setup| methods)?|results(?: and discussion)?|discussion|conclusions?|concluding remarks|summary|acknowledg(?:e)?ments?|references|nomenclature|appendix(?: [a-z0-9]+)?|supporting information|author information|notes|abbreviations)\.?$/i;
 const NUMBERED_HEADING = /^(?:■\s*)?(?:\d+(?:\.\d+){0,4}\.?|[IVX]{1,5}\.|[A-H]\.)\s+[A-Z(]/;
@@ -51,7 +51,7 @@ function headingLine(line: TextLine, columnWidth: number, bodySize: number) {
 
 /** Deterministic page analysis from PDF text objects: no DOM, zoom, or canvas state. */
 export function analyzePage(items: PdfTextItem[], pageIndex: number, width: number, height: number): PdfParagraph[] {
-  const raw = buildTextLines(items);
+  const raw = dropLineNumbers(buildTextLines(dropGhostLayer(items)), width);
   if (!raw.length) return [];
   const gutter = findGutter(raw, width);
   const ordered = splitRunInHeadings(orderLines(raw, gutter));
@@ -60,7 +60,7 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
   const bounds = new Map([-1, 0, 1].map(column => [column, columnBounds(column)]));
   const leftEdge = new Map([-1, 0, 1].map(column => [column, modeEdge(ordered.filter(line => line.column === column && line.text.length > 30).map(line => line.x))]));
   const rightEdge = new Map([-1, 0, 1].map(column => [column, modeEdge(ordered.filter(line => line.column === column && line.text.length > 30).map(line => line.right))]));
-  const pitches = ordered.slice(1).map((line, index) => ({ line, previous: ordered[index] })).filter(({ line, previous }) => line.column === previous.column && Math.abs(line.size - previous.size) < line.size * .1 && line.y > previous.y && line.y - previous.y < line.size * 2.2).map(({ line, previous }) => line.y - previous.y);
+  const pitches = ordered.slice(1).map((line, index) => ({ line, previous: ordered[index] })).filter(({ line, previous }) => line.column === previous.column && Math.abs(line.size - previous.size) < line.size * .1 && line.y > previous.y && line.y - previous.y < line.size * 3).map(({ line, previous }) => line.y - previous.y);
   const bodyPitch = median(pitches) || bodySize * 1.2;
   const groups: Group[] = [], noise: TextLine[] = [];
   for (const line of ordered) {
