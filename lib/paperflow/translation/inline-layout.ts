@@ -1,4 +1,4 @@
-import type { ParagraphLine } from "./paragraphs";
+import type { ParagraphLine, PdfParagraph } from "./paragraphs";
 
 export interface FlowRegion { x: number; y: number; width: number; height: number }
 export interface TranslatedLine { region: number; text: string; x: number; y: number; wordSpacing: number }
@@ -20,16 +20,26 @@ export function paragraphRegions(lines: ParagraphLine[]): FlowRegion[] {
   return regions;
 }
 
+/** A short section label may use the rest of its column when translated. */
+export function translationFlowRegions(paragraph: PdfParagraph, sourceRegions: FlowRegion[], pageWidth: number): FlowRegion[] {
+  const regions = sourceRegions.map(region => ({ ...region }));
+  if (paragraph.kind !== "title" || !regions.length) return regions;
+  const last = regions.at(-1)!;
+  const right = paragraph.width > .55 ? pageWidth * .93 : paragraph.x < .48 ? pageWidth * .475 : pageWidth * .93;
+  last.width = Math.max(last.width, right - last.x);
+  return regions;
+}
+
 type Measure = (text: string, fontSize: number) => number;
 /** Fit Korean at natural tracking and consistent leading, never stretch glyphs. */
-export function layoutTranslation(text: string, regions: FlowRegion[], originalSize: number, measure: Measure, firstIndent = 0) {
+export function layoutTranslation(text: string, regions: FlowRegion[], originalSize: number, measure: Measure, firstIndent = 0, minimumRatio = .82) {
   const source = text.replace(/\s+/g, " ").trim();
-  const minimum = 1;
+  const minimum = Math.max(1, originalSize * minimumRatio);
   const attempt = (fontSize: number) => {
     const lineHeight = fontSize * 1.18, result: TranslatedLine[] = [];
     let remaining = source;
     regions.forEach((region, regionIndex) => {
-      const count = Math.max(1, Math.floor((region.height + fontSize * .15) / lineHeight));
+      const count = Math.max(0, Math.floor((region.height + fontSize * .15) / lineHeight));
       for (let row = 0; row < count && remaining; row++) {
         const indent = regionIndex === 0 && row === 0 ? Math.min(firstIndent, region.width * .2) : 0;
         const available = region.width - indent;

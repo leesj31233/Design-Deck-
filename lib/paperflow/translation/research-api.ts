@@ -1,5 +1,14 @@
 export class ResearchHttpError extends Error {
-  constructor(message: string, readonly status: number) { super(message); this.name = "ResearchHttpError"; }
+  constructor(message: string, readonly status: number, readonly retryAfterMs = 0, readonly kind: "rate_limit" | "transient" | "malformed" | "configuration" = status === 429 ? "rate_limit" : status >= 500 ? "transient" : "configuration") { super(message); this.name = "ResearchHttpError"; }
+}
+
+import { validateTranslationResults, type TranslationPassage, type TranslationResult } from "./block-contract";
+
+export async function researchTranslateBlocks(passages: TranslationPassage[], signal?: AbortSignal): Promise<TranslationResult[]> {
+  const response = await fetch("/api/research", { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "translate_blocks", passages }) });
+  const body = await response.json().catch(() => ({ error: "번역 서버 응답을 읽을 수 없다." }));
+  if (!response.ok) throw new ResearchHttpError(body.error || "문단 번역을 완료하지 못했다.", response.status, Math.max(0, Number(response.headers.get("retry-after")) || 0) * 1000, body.kind);
+  return validateTranslationResults(passages, body.translations);
 }
 
 export async function researchRequest(task: "translate" | "explain", source: string, selection = "", signal?: AbortSignal) {

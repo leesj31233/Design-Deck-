@@ -1,13 +1,15 @@
 import { test, expect } from "@playwright/test";
 
 test("real paper keeps Methods distinct and excludes page furniture from batch translation", async ({ page }) => {
+  if (process.env.PAPERFLOW_VISUAL_QA) test.setTimeout(360_000);
   const sample = process.env.PAPERFLOW_LAYOUT_SAMPLE;
   test.skip(!sample, "Set PAPERFLOW_LAYOUT_SAMPLE to a local research PDF for layout QA.");
   const sources: string[] = [];
+  let requests = 0;
   await page.route("**/api/research", async route => {
     const body = route.request().postDataJSON();
-    if (body.task === "translate_batch") sources.push(...body.sources);
-    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: body.sources.map(() => "공학 연구 문단이다."), provider: "OpenAI" }) });
+    if (body.task === "translate_blocks") { requests++; sources.push(...body.passages.map((item: { text: string }) => item.text)); }
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: body.passages.map((item: { id: string; text: string }) => ({ id: item.id, text: process.env.PAPERFLOW_VISUAL_QA ? "보일러의 열전달과 연소 특성을 분석하였다. ".repeat(Math.max(1, Math.round(item.text.length / 40))).trim() : "공학 연구 문단이다." })), provider: "OpenAI" }) });
   });
   await page.goto("/library");
   await page.getByLabel("Import PDF file").setInputFiles(sample!);
@@ -27,8 +29,11 @@ test("real paper keeps Methods distinct and excludes page furniture from batch t
   expect(sources.some(source => /^AUTHOR INFORMATION/i.test(source))).toBe(false);
   expect(sources.some(source => /http:\/\/pubs\.acs\.org|ACS Omega/i.test(source))).toBe(false);
   expect(sources.some(source => /Figure 4\./i.test(source))).toBe(true);
+  expect(requests).toBeLessThan(sources.length / 3);
+  if (process.env.PAPERFLOW_LAYOUT_BENCHMARK === "1") console.log(JSON.stringify({ requests, translatedBlocks: sources.length, pages: 15 }));
   const translated = page.locator("[data-pdf-page='3'] .pf-translated-text").first();
   await expect(translated).toBeVisible();
+  if (process.env.PAPERFLOW_VISUAL_QA) await page.screenshot({ path: "test-results/translation-v2-page4.png" });
   await pageNumber.fill("7"); await pageNumber.press("Enter");
   await expect(page.locator("[data-pdf-page='6'][data-ready=true]")).toBeVisible();
   expect(await page.locator("[data-pdf-page='3'] .pf-translated-text").count()).toBeGreaterThan(0);
@@ -38,5 +43,9 @@ test("real paper keeps Methods distinct and excludes page furniture from batch t
   await expect(page.locator("[data-pdf-page='12'][data-ready=true]")).toBeVisible();
   await expect(page.locator("[data-pdf-page='12'] .pf-translated-text").first()).toBeVisible();
   await expect(page.locator(".pf-inline-overflow")).toHaveCount(0);
+  if (process.env.PAPERFLOW_VISUAL_QA) {
+    await page.locator("[data-pdf-page='12']").scrollIntoViewIfNeeded();
+    await page.locator("[data-pdf-page='12']").screenshot({ path: "test-results/translation-v2-page13.png", timeout: 30000 });
+  }
 });
 

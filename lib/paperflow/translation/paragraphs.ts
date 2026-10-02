@@ -7,11 +7,13 @@ export function paragraphKind(text: string, y: number, height: number, pageHeigh
   const value = text.trim();
   if (!value || /^https?:\/\/|^(?:www\.|doi:|©|copyright|received:|accepted:|published:|correspondence|keywords?:|article info|cite this|read online)/i.test(value)) return "skip";
   if (/^(?:[^A-Za-z]*)(?:contents|table of contents|references|author information|acknowledg(?:e)?ments?)/i.test(value) || /\.{3,}\s*\d+\s*$/.test(value) || /^\[\d+\]\s+[A-Z]/.test(value)) return "skip";
-  if (/^(?:fig(?:ure)?\.?|table)\s*\d+[a-z]?[.:\s]/i.test(value)) return "caption";
+  if (/^(?:fig(?:ure)?\.?|table)\s*[a-z]?\d+[a-z]?[.:]/i.test(value)) return "caption";
+  if (/^■?\s*APPENDIX\s+\d+:\s+[A-Z0-9\s-]{8,}$/.test(value)) return "title";
   if (y < pageHeight * .4 && /,/.test(value) && /\band\b|\*/i.test(value) && (value.match(/[A-Z][a-z]+(?:-[A-Z][a-z]+)*\s+[A-Z][a-z]+(?:-[A-Z][a-z]+)*/g) ?? []).length >= 3 && !/[.!?]\s*$/.test(value)) return "skip";
   if (/^[A-Z][a-z]+(?:-[A-Z][a-z]+)?(?:-[A-Z][a-z]+)?\s+[A-Z][a-z]+\s*[−–-]\s*(?:School|Department|University|Institute)\b/.test(value)) return "skip";
   if (/^(?:abstract|\d+(?:\.\d+)*\.?\s*)?(?:introduction|methods?|results?|discussion|conclusions?|computational models?|general models?|boiler mesh|experimental setup|materials and methods)\.?\s*$/i.test(value) || /^\d+(?:\.\d+)*\.?\s*[A-Za-z][A-Za-z\s-]{2,65}\.?$/.test(value)) return "title";
-  if (y < pageHeight * .075 || y + height > pageHeight * .94) return "skip";
+  // Dense journal pages can carry real prose almost to the trim edge.
+  if (y < pageHeight * .06 || y + height > pageHeight * .975) return "skip";
   if (/^(?:\[?\d+\]?\s+)?(?:[A-Z][a-z]+\s+[A-Z]\.|[A-Z][a-z]+,\s+[A-Z])/.test(value) && /(?:et al\.|\b(?:university|department|journal|institute|author|received|published)\b)/i.test(value)) return "skip";
   if ((value.match(/\b[A-Za-z]+\b/g) ?? []).length < 3 && !/[.!?;:]\s*$/.test(value)) return "skip";
   return "body";
@@ -23,7 +25,7 @@ export function isEquationLine(value: string): boolean {
   const text = value.trim();
   const words = text.match(/[A-Za-z]{3,}/g) ?? [];
   const symbols = text.match(/[=+−→×∑∫(){}_^]/g) ?? [];
-  return words.length < 5 && (symbols.length >= 2 || /\(\s*\d+\s*\)$/.test(text) && symbols.length > 0);
+  return words.length < 5 && (symbols.length >= 2 || /\(\s*\d+\s*\)$/.test(text) && symbols.length > 0 || text.includes("=") && (text.length < 75 || /[α-ωΑ-Ω∑∫₀-₉]/.test(text)));
 }
 
 /** Groups PDF.js text spans in reading order without changing the source PDF layer. */

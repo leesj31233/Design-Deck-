@@ -351,10 +351,14 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 
 /* Translated type lives on the paper, in the original text contour. */
 .pf-inline-layer { position:absolute; inset:0; z-index:4; pointer-events:none; color:#161616; color-scheme:light; }
+.pf-inline-source-mask { position:absolute; pointer-events:none; }
 .pf-inline-paragraph { position:absolute; inset:0; pointer-events:none; font-weight:400; letter-spacing:0; text-align:left; }
 .pf-inline-region { position:absolute; pointer-events:auto; overflow:hidden; cursor:text; user-select:text; -webkit-user-select:text; }
 .pf-inline-line { position:absolute; left:.5px; display:block; white-space:pre; line-height:1.05; font-size:inherit; font-weight:inherit; letter-spacing:0; color:inherit; }
 .pf-inline-region ::selection { background:rgba(10,132,255,.22); color:inherit; }
+.pf-translation-continuations { box-sizing:border-box; max-width:100%; background:#fff; color:#171717; padding:22px 8%; border-top:1px solid #d6dde5; font-family:"Noto Serif KR","Batang",serif; font-size:15px; line-height:1.65; box-shadow:0 12px 24px rgba(0,0,0,.08); }
+.pf-translation-continuations strong { display:block; color:#176aca; font:700 12px "Noto Sans KR",sans-serif; margin-bottom:12px; }
+.pf-translation-continuations p { margin:0 0 14px; text-indent:1em; overflow-wrap:anywhere; }
 .pf-inline-original { position:absolute; pointer-events:auto; opacity:0; z-index:1; height:22px!important; min-height:22px!important; padding:2px 10px; border:1px solid rgba(15,50,85,.15); border-radius:99px; background:rgba(250,252,255,.96); color:#30435b; font:10px/16px -apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif; box-shadow:0 2px 9px rgba(10,30,65,.10); transition:opacity .15s ease; }
 .pf-inline-paragraph:has(.pf-inline-region:hover) .pf-inline-original,.pf-inline-original:hover,.pf-inline-original:focus-visible { opacity:1; }
 .pf-inline-status { position:absolute; pointer-events:auto; display:flex; align-items:center; gap:7px; padding:5px 9px; border:1px solid rgba(10,132,255,.25); border-radius:99px; background:#f4f9ff; color:#24446c; font:11px/1.4 -apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif; box-shadow:0 3px 12px rgba(0,0,0,.10); transform:translateY(-100%); }

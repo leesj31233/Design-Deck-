@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { paragraphRegions, layoutTranslation } from "../../lib/paperflow/translation/inline-layout";
+import { paragraphRegions, translationFlowRegions, layoutTranslation } from "../../lib/paperflow/translation/inline-layout";
 import { paperFontStack, paperFontRuns } from "../../lib/paperflow/translation/paper-font";
 
 it("keeps embedded Latin faces and matches Korean serif/sans fallbacks", () => {
@@ -25,10 +25,24 @@ it("preserves the figure cutout in an abstract with narrow then full-width text"
   expect(result.lines.map(line => line.text).join(" ")).toBe(translation);
 });
 
-it("shrinks long translations into the source region without a nested scrollbar", () => {
+it("keeps a readable minimum size and exposes overflow for page continuation", () => {
   const text = "긴 문단을 생략하지 않고 모두 표시한다. ".repeat(25).trim();
   const result = layoutTranslation(text, [{ x: 0, y: 0, width: 150, height: 30 }], 12, (value, size) => value.length * size);
-  expect(result.fits).toBe(true);
-  expect(result.lines.map(line => line.text).join(" ")).toBe(text);
-  expect(result.fontSize).toBeLessThan(12 * .82);
+  expect(result.fits).toBe(false);
+  expect(result.fontSize).toBeGreaterThanOrEqual(12 * .82);
+  expect(`${result.lines.map(line => line.text).join(" ")} ${result.remaining}`.trim()).toBe(text);
+});
+
+it("does not draw translated text into a zero-height obstacle gap", () => {
+  const result = layoutTranslation("수식 아래 본문", [{ x: 0, y: 0, width: 100, height: 0 }], 12, () => 20);
+  expect(result.lines).toHaveLength(0);
+  expect(result.remaining).toBe("수식 아래 본문");
+});
+
+it("extends a short section heading to its column without enlarging the source mask", () => {
+  const source = [{ x: 300, y: 100, width: 85, height: 15 }];
+  const heading = { id: "heading", pageIndex: 0, text: "3. METHODS", kind: "title" as const, x: .52, y: .1, width: .15, height: .02, lines: [{ x: .52, y: .1, width: .15, height: .02 }], fontFamily: "serif", fontWeight: 700, fontStyle: "normal" };
+  const result = translationFlowRegions(heading, source, 600);
+  expect(result[0].width).toBeGreaterThan(240);
+  expect(source[0].width).toBe(85);
 });

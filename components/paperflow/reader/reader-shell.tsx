@@ -62,7 +62,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
       setSelected(params.get("annotation") ?? undefined);
       handle = await pdfAdapter.open(await blob.arrayBuffer(), controller.signal);
       if (controller.signal.aborted) { await handle.destroy(); return; }
-      setSourceTranslations(Object.fromEntries(storedTranslations.map(item => [translationSourceKey(item.pageIndex, item.source), { text: item.text, provider: item.provider, pending: false }])));
+      setSourceTranslations(Object.fromEntries(storedTranslations.flatMap(item => [[translationSourceKey(item.pageIndex, item.source), { text: item.text, provider: item.provider, pending: false }], ...(item.blockId ? [[item.blockId, { text: item.text, provider: item.provider, pending: false }]] : [])] as const)));
       setPdf(handle);
       await documentRepository.updateDocument(documentId, { opens: [...(record.opens ?? []), new Date().toISOString()].slice(-500), lastOpenedAt: new Date().toISOString(), currentPage: initialPage });
       await client.invalidateQueries({ queryKey: ["documents"] });
@@ -77,7 +77,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     const progress = (event: Event) => apply((event as CustomEvent<TranslationJobStatus>).detail);
     const saved = (event: Event) => {
       if ((event as CustomEvent<{ documentId: string }>).detail.documentId !== documentId) return;
-      void translationRepository.listByDocument(documentId).then(items => setSourceTranslations(Object.fromEntries(items.map(item => [translationSourceKey(item.pageIndex, item.source), { text: item.text, provider: item.provider, pending: false }]))));
+      void translationRepository.listByDocument(documentId).then(items => setSourceTranslations(Object.fromEntries(items.flatMap(item => [[translationSourceKey(item.pageIndex, item.source), { text: item.text, provider: item.provider, pending: false }], ...(item.blockId ? [[item.blockId, { text: item.text, provider: item.provider, pending: false }]] : [])] as const))));
     };
     window.addEventListener("paperflow:translation-progress", progress);
     window.addEventListener("paperflow:translations-saved", saved);
@@ -95,7 +95,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   }, [pdf, currentPage]);
   useEffect(() => {
     let alive = true;
-    void Promise.all(paragraphs.map(async paragraph => ({ paragraph, stored: await translationRepository.get(documentId, paragraph.pageIndex, paragraph.text) }))).then(items => {
+    void Promise.all(paragraphs.map(async paragraph => ({ paragraph, stored: await translationRepository.getBlock(documentId, paragraph.id) ?? await translationRepository.get(documentId, paragraph.pageIndex, paragraph.text) }))).then(items => {
       if (!alive) return;
       setInlineTranslations(current => { const next = { ...current }; for (const { paragraph, stored } of items) if (stored && !current[paragraph.id]?.pending) next[paragraph.id] = { text: stored.text, provider: stored.provider, pending: false }; return next; });
     }).catch(reason => notify(readableError(reason)));
@@ -193,7 +193,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
       {([['select','선택'],['highlight','형광펜'],['pen','메모 펜'],['eraser','지우개']] as const).map(([value,label]) => <Button key={value} size="sm" variant="ghost" aria-pressed={tool === value} onClick={() => { useReaderStore.getState().set({ tool: value }); if (value === 'highlight' && useReaderStore.getState().activeSelection) void save(); }}>{label}</Button>)}
       <Button size="sm" variant="ghost" onClick={showNote}>텍스트 메모</Button><Button size="sm" variant="ghost" onClick={() => showShell("개념 설명")}>선택 개념 공부</Button>
     </div>
-    {bulk && <div className="pf-inline-bulk" role="status"><span>{bulk.running ? "논문 전체 번역 중" : "논문 전체 번역"} · {bulk.done}/{bulk.total}페이지{bulk.failed ? ` · ${bulk.failed}문단 실패` : ""}{bulk.error ? ` · ${bulk.error}` : ""}</span><progress value={bulk.done} max={Math.max(1, bulk.total)} aria-label="논문 전체 번역 진행"/>{bulk.running && <Button size="sm" variant="ghost" onClick={() => cancelTranslationJob(documentId)}>중지</Button>}</div>}
+    {bulk && <div className="pf-inline-bulk" role="status"><span>{bulk.running ? "논문 전체 번역 중" : bulk.complete ? "논문 전체 번역 완료" : "논문 전체 번역 대기"} · {bulk.translated}/{bulk.translatableBlocks}문단 · {bulk.done}/{bulk.total}페이지{bulk.failed ? ` · ${bulk.failed}문단 실패` : ""}{bulk.error ? ` · ${bulk.error}` : ""}</span><progress value={bulk.translated} max={Math.max(1, bulk.translatableBlocks)} aria-label="논문 전체 번역 진행"/>{bulk.running && <Button size="sm" variant="ghost" onClick={() => cancelTranslationJob(documentId)}>중지</Button>}</div>}
     {searchOpen && <div className="pf-search-strip"><SearchField ref={searchInput} aria-label="현재 페이지 검색" value={search} onChange={e => setSearch(e.target.value)} placeholder="검색 UI · Phase 2"/><span>전체 논문 검색은 후속 단계에서 제공됩니다.</span><Button size="sm" onClick={() => setSearchOpen(false)}>닫기</Button></div>}
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}

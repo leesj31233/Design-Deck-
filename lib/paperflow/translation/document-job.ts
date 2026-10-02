@@ -1,19 +1,18 @@
 import { documentRepository } from "../persistence/document-repository";
-import { translationRepository } from "../persistence/translation-repository";
+import { translationRepository, TRANSLATION_PROMPT_VERSION } from "../persistence/translation-repository";
 import { pdfAdapter } from "../pdf/pdf-adapter";
 import { readableError } from "../errors";
-import { extractPageForTranslation } from "./extract-page";
-import { researchBatchTranslate, ResearchHttpError } from "./research-api";
-import type { PdfParagraph } from "./paragraphs";
+import { buildTranslationManifest, manifestCounts, manifestRepository, type ManifestBlock, type TranslationManifest } from "./manifest";
+import { researchTranslateBlocks, ResearchHttpError } from "./research-api";
+import { runTranslationScheduler, type SchedulerState } from "./scheduler";
 
 export interface TranslationJobStatus {
   documentId: string;
-  done: number;
-  total: number;
-  translated: number;
-  failed: number;
-  running: boolean;
-  error?: string;
+  done: number; total: number; translated: number; failed: number;
+  totalBlocks: number; translatableBlocks: number; excludedBlocks: number; pendingBlocks: number; cancelledBlocks: number;
+  extractedPages: number; ocrPages: number; ocrCandidatePages: number; requests: number; concurrency: number; rateLimitHits: number;
+  extractionMs: number; translationMs: number;
+  running: boolean; complete: boolean; error?: string;
 }
 
 type Listener = (status: TranslationJobStatus) => void;
@@ -33,73 +32,66 @@ function update(documentId: string, patch: Partial<TranslationJobStatus>) {
 }
 export function cancelTranslationJob(documentId: string) { jobs.get(documentId)?.controller.abort(); }
 
-async function translateGroup(documentId: string, pageIndex: number, group: PdfParagraph[], signal: AbortSignal): Promise<{ translated: number; failed: number }> {
-  signal.throwIfAborted();
-  try {
-    const translations = await researchBatchTranslate(group.map(item => item.text), signal);
-    if (!translations) throw new Error("번역 서버에 연결하지 못했다.");
-    await Promise.all(group.map((item, index) => translationRepository.put(documentId, pageIndex, item.text, translations[index], "OpenAI")));
-    window.dispatchEvent(new CustomEvent("paperflow:translations-saved", { detail: { documentId, pageIndex } }));
-    return { translated: group.length, failed: 0 };
-  } catch (error) {
-    if (signal.aborted) throw error;
-    if (error instanceof ResearchHttpError && error.status === 429) throw error;
-    if (group.length === 1) return { translated: 0, failed: 1 };
-    const middle = Math.ceil(group.length / 2);
-    const first = await translateGroup(documentId, pageIndex, group.slice(0, middle), signal);
-    const second = await translateGroup(documentId, pageIndex, group.slice(middle), signal);
-    return { translated: first.translated + second.translated, failed: first.failed + second.failed };
-  }
+function countCompletedPages(manifest: TranslationManifest, translatedIds: Set<string>) {
+  const pages = new Map<number, ManifestBlock[]>();
+  for (const block of manifest.blocks) if (block.translatable) pages.set(block.pageIndex, [...(pages.get(block.pageIndex) ?? []), block]);
+  let done = 0;
+  for (let index = 0; index < manifest.pageCount; index++) if (!manifest.ocrCandidates?.includes(index) && (pages.get(index) ?? []).every(block => translatedIds.has(block.id))) done++;
+  return done;
 }
 
 export async function startTranslationJob(documentId: string): Promise<TranslationJobStatus> {
   const existing = jobs.get(documentId);
   if (existing?.status.running) return existing.status;
   const controller = new AbortController();
-  const record = await documentRepository.getDocument(documentId);
-  const blob = await documentRepository.getDocumentBlob(documentId);
+  const [record, blob] = await Promise.all([documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId)]);
   if (!record || !blob) throw new Error("이 브라우저에 저장된 PDF를 찾지 못했다.");
-  const status: TranslationJobStatus = { documentId, done: 0, total: record.pageCount, translated: 0, failed: 0, running: true };
+  const status: TranslationJobStatus = { documentId, done: 0, total: record.pageCount, translated: 0, failed: 0, totalBlocks: 0, translatableBlocks: 0, excludedBlocks: 0, pendingBlocks: 0, cancelledBlocks: 0, extractedPages: 0, ocrPages: 0, ocrCandidatePages: 0, requests: 0, concurrency: 4, rateLimitHits: 0, extractionMs: 0, translationMs: 0, running: true, complete: false };
   jobs.set(documentId, { status, controller, listeners: existing?.listeners ?? new Set() });
   update(documentId, status);
   let pdf: Awaited<ReturnType<typeof pdfAdapter.open>> | undefined;
   try {
-    pdf = await pdfAdapter.open(await blob.arrayBuffer(), controller.signal);
-    let next = 0, rateLimited = false;
-    const worker = async () => {
-      while (next < pdf!.pageCount && !controller.signal.aborted && !rateLimited) {
-        const pageIndex = next++;
-        let translated = 0, failed = 0;
-        try {
-          const handle = await pdf!.getPage(pageIndex + 1);
-          const targets = await extractPageForTranslation(handle, pageIndex, controller.signal);
-          const stored = await Promise.all(targets.map(item => translationRepository.get(documentId, pageIndex, item.text)));
-          const missing = targets.filter((_, index) => !stored[index]);
-          for (let index = 0; index < missing.length && !controller.signal.aborted;) {
-            const group: PdfParagraph[] = []; let chars = 0;
-            while (index < missing.length && group.length < 4 && chars + missing[index].text.length <= 4500) {
-              const item = missing[index++]; group.push(item); chars += item.text.length;
-            }
-            if (!group.length) group.push(missing[index++]);
-            const result = await translateGroup(documentId, pageIndex, group, controller.signal);
-            translated += result.translated; failed += result.failed;
-          }
-        } catch (error) {
-          if (controller.signal.aborted) break;
-          if (error instanceof ResearchHttpError && error.status === 429) {
-            rateLimited = true;
-            update(documentId, { error: "번역 서비스 요청 한도에 도달했다. 저장된 번역은 유지된다. 잠시 후 전체 번역을 다시 누르면 남은 문단부터 진행한다." });
-            break;
-          }
-          failed++;
-          update(documentId, { error: `${pageIndex + 1}페이지: ${readableError(error)}` });
-        }
-        const current = jobs.get(documentId)?.status;
-        if (current) update(documentId, { done: current.done + 1, translated: current.translated + translated, failed: current.failed + failed });
-      }
+    const extractionStarted = performance.now();
+    let manifest = await manifestRepository.get(documentId);
+    if (!manifest || manifest.pageCount !== record.pageCount) {
+      pdf = await pdfAdapter.open(await blob.arrayBuffer(), controller.signal);
+      manifest = await buildTranslationManifest(documentId, pdf, controller.signal, extractedPages => update(documentId, { extractedPages }));
+      await manifestRepository.put(manifest);
+    }
+    update(documentId, { extractionMs: Math.round(performance.now() - extractionStarted) });
+    controller.signal.throwIfAborted();
+    const target = manifest.blocks.filter(block => block.translatable);
+    const stored = await translationRepository.listByDocument(documentId);
+    const translatedIds = new Set(stored.filter(item => item.blockId && item.promptVersion === TRANSLATION_PROMPT_VERSION && item.text.trim()).map(item => item.blockId!));
+    const failedIds = new Set<string>();
+    const byId = new Map(target.map(block => [block.id, block]));
+    let latestScheduler: SchedulerState | undefined;
+    const refresh = (scheduler?: SchedulerState) => {
+      if (scheduler) latestScheduler = scheduler;
+      const counts = manifestCounts(manifest!, translatedIds, failedIds);
+      update(documentId, { done: countCompletedPages(manifest!, translatedIds), translated: counts.translatedBlocks, failed: counts.failedBlocks, totalBlocks: counts.totalBlocks, translatableBlocks: counts.translatableBlocks, excludedBlocks: counts.excludedBlocks, pendingBlocks: counts.pendingBlocks, cancelledBlocks: counts.cancelledBlocks, extractedPages: manifest!.extractedPages, ocrPages: manifest!.ocrPages, ocrCandidatePages: counts.ocrCandidatePages, complete: counts.complete, requests: latestScheduler?.requests ?? 0, concurrency: latestScheduler?.concurrency ?? 4, rateLimitHits: latestScheduler?.rateLimitHits ?? 0 });
     };
-    await Promise.all([worker(), worker()]);
-  } catch (error) { if (!controller.signal.aborted) update(documentId, { error: readableError(error) }); }
-  finally { await pdf?.destroy(); update(documentId, { running: false }); }
+    refresh();
+    const missing = target.filter(block => !translatedIds.has(block.id)).map(block => ({ id: block.id, text: block.text }));
+    const translationStarted = performance.now();
+    if (missing.length) await runTranslationScheduler(missing, controller.signal, researchTranslateBlocks, async result => {
+      const block = byId.get(result.id);
+      if (!block) throw new Error("Manifest에 없는 번역 블록이다.");
+      await translationRepository.putBlock(documentId, block.id, block.pageIndex, block.text, result.text);
+      translatedIds.add(block.id);
+      failedIds.delete(block.id);
+      refresh();
+      window.dispatchEvent(new CustomEvent("paperflow:translations-saved", { detail: { documentId, pageIndex: block.pageIndex } }));
+    }, (passage, error) => { failedIds.add(passage.id); update(documentId, { error: `${(byId.get(passage.id)?.pageIndex ?? 0) + 1}페이지: ${readableError(error)}` }); refresh(); }, refresh);
+    update(documentId, { translationMs: Math.round(performance.now() - translationStarted) });
+    refresh();
+    const final = jobs.get(documentId)!.status;
+    if (!final.complete && !controller.signal.aborted && !final.error) update(documentId, { error: final.ocrCandidatePages ? `${final.ocrCandidatePages}개 이미지 기반 페이지에는 OCR이 필요하다. 다른 페이지의 번역은 저장됐다.` : `${final.failed}개 실패, ${final.pendingBlocks}개 대기 중이다. 다시 시도하면 저장된 번역을 재사용한다.` });
+  } catch (error) {
+    if (!controller.signal.aborted) update(documentId, { error: error instanceof ResearchHttpError && error.status === 429 ? "번역 서비스 사용량 제한으로 일시 중지했다. 완료된 블록은 저장됐다. 나중에 재시도하면 남은 블록부터 진행한다." : readableError(error) });
+  } finally {
+    await pdf?.destroy();
+    update(documentId, { running: false });
+  }
   return jobs.get(documentId)!.status;
 }

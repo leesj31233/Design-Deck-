@@ -5,7 +5,7 @@ import { makePdf } from "../fixtures/make-pdf";
 test("library pretranslation, page memo, and annotated PDF export", async ({ page }) => {
   await page.route("**/api/research", async route => {
     const body = route.request().postDataJSON();
-    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: body.sources.map(() => "공학 연구의 결과를 확인하였다."), provider: "OpenAI" }) });
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: body.passages.map((item: { id: string }) => ({ id: item.id, text: "공학 연구의 결과를 확인하였다." })), provider: "OpenAI" }) });
   });
   await page.goto("/library");
   await page.getByLabel("Import PDF file").setInputFiles({ name: "Workflow.pdf", mimeType: "application/pdf", buffer: makePdf() });

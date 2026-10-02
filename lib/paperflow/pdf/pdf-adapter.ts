@@ -1,6 +1,9 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+export interface PdfTextItem { text: string; x: number; y: number; width: number; height: number; fontName: string; fontFamily: string; hasEOL: boolean }
 export interface PdfPageHandle {
   width: number; height: number;
+  getTextItems(signal?: AbortSignal): Promise<PdfTextItem[]>;
+  getRasterImageCount?(): Promise<number>;
   render(canvas: HTMLCanvasElement, scale: number, signal: AbortSignal): Promise<void>;
   renderText(container: HTMLElement, scale: number, signal: AbortSignal): Promise<void>;
 }
@@ -14,6 +17,23 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
   const base = page.getViewport({ scale: 1 });
   return {
     width: base.width, height: base.height,
+    async getTextItems(signal) {
+      const content = await page.getTextContent();
+      signal?.throwIfAborted();
+      return content.items.flatMap(item => {
+        if (!("str" in item) || !item.str.trim()) return [];
+        const [x, baseline] = base.convertToViewportPoint(item.transform[4], item.transform[5]);
+        const height = Math.max(1, Math.abs(item.height) || Math.hypot(item.transform[2], item.transform[3]));
+        const style = content.styles[item.fontName];
+        const ascent = typeof style?.ascent === "number" ? style.ascent : .8;
+        return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL }];
+      });
+    },
+    async getRasterImageCount() {
+      const pdf = await getLibrary(), operators = await page.getOperatorList();
+      const imageOps = new Set([pdf.OPS.paintImageXObject, pdf.OPS.paintInlineImageXObject, pdf.OPS.paintImageMaskXObject]);
+      return operators.fnArray.filter(operation => imageOps.has(operation)).length;
+    },
     async render(canvas, scale, signal) {
       signal.throwIfAborted();
       const viewport = page.getViewport({ scale }), ratio = Math.min(window.devicePixelRatio || 1, 2);

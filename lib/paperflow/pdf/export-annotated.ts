@@ -1,11 +1,12 @@
 import { PDFDocument } from "pdf-lib";
 import { annotationRepository } from "../persistence/annotation-repository";
 import { documentRepository } from "../persistence/document-repository";
-import { translationRepository, translationSourceKey } from "../persistence/translation-repository";
+import { translationRepository, translationSourceKey, TRANSLATION_PROMPT_VERSION } from "../persistence/translation-repository";
 import { pdfAdapter } from "./pdf-adapter";
-import { extractPageForTranslation } from "../translation/extract-page";
-import { layoutTranslation, paragraphRegions } from "../translation/inline-layout";
+import { layoutTranslation, paragraphRegions, translationFlowRegions } from "../translation/inline-layout";
 import { koreanFontStack } from "../translation/paper-font";
+import { buildTranslationManifest, manifestRepository } from "../translation/manifest";
+import { planColumnReflow } from "../translation/column-reflow";
 import type { AnnotationColor } from "../anchors/types";
 
 const highlightColors: Record<AnnotationColor, string> = { yellow: "rgba(255,225,45,.38)", green: "rgba(74,211,122,.33)", blue: "rgba(69,155,255,.33)", pink: "rgba(255,106,164,.33)", purple: "rgba(166,121,245,.33)" };
@@ -29,6 +30,17 @@ function wrap(text: string, maxWidth: number, context: CanvasRenderingContext2D)
   if (line) lines.push(line);
   return lines;
 }
+function subtractRect(rect: { x: number; y: number; width: number; height: number }, obstacle: { x: number; y: number; width: number; height: number }) {
+  const left = Math.max(rect.x, obstacle.x - 2), right = Math.min(rect.x + rect.width, obstacle.x + obstacle.width + 2);
+  const top = Math.max(rect.y, obstacle.y - 2), bottom = Math.min(rect.y + rect.height, obstacle.y + obstacle.height + 2);
+  if (left >= right || top >= bottom) return [rect];
+  return [
+    { x: rect.x, y: rect.y, width: left - rect.x, height: rect.height },
+    { x: right, y: rect.y, width: rect.x + rect.width - right, height: rect.height },
+    { x: left, y: rect.y, width: right - left, height: top - rect.y },
+    { x: left, y: bottom, width: right - left, height: rect.y + rect.height - bottom }
+  ].filter(part => part.width > 2 && part.height > 1);
+}
 /** Flatten the reader view into a portable PDF; the source file is never modified. */
 export async function exportAnnotatedPdf(documentId: string, onProgress?: (done: number, total: number) => void) {
   const [record, blob, translations, annotations] = await Promise.all([
@@ -36,31 +48,57 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
   ]);
   if (!record || !blob) throw new Error("저장된 원본 PDF를 찾지 못했다.");
   const translated = new Map(translations.map(item => [translationSourceKey(item.pageIndex, item.source), item.text]));
+  const translatedBlocks = new Map(translations.filter(item => item.blockId && item.promptVersion === TRANSLATION_PROMPT_VERSION).map(item => [item.blockId!, item.text]));
   const pdf = await pdfAdapter.open(await blob.arrayBuffer());
   const output = await PDFDocument.create();
   const scale = 1.8;
   try {
     await document.fonts.ready;
+    let manifest = await manifestRepository.get(documentId);
+    if (!manifest || manifest.pageCount !== pdf.pageCount) {
+      manifest = await buildTranslationManifest(documentId, pdf);
+      await manifestRepository.put(manifest);
+    }
+    const continuations: { pageIndex: number; text: string }[] = [];
     for (let index = 0; index < pdf.pageCount; index++) {
       const page = await pdf.getPage(index + 1);
       const canvas = document.createElement("canvas");
       await page.render(canvas, scale, new AbortController().signal);
       const context = canvas.getContext("2d", { willReadFrequently: true })!;
-      const paragraphs = await extractPageForTranslation(page, index, new AbortController().signal, canvas);
-      for (const paragraph of paragraphs) {
-        const text = translated.get(translationSourceKey(index, paragraph.text));
-        if (!text) continue;
-        const lines = paragraph.lines.map(line => ({ x: line.x * canvas.width, y: line.y * canvas.height, width: line.width * canvas.width, height: line.height * canvas.height }));
-        const regions = paragraphRegions(lines);
-        const heights = lines.map(line => line.height).sort((a, b) => a - b);
-        const originalSize = (heights[Math.floor(heights.length / 2)] || 14) * .96;
-        const family = koreanFontStack(paragraph.fontFamily);
-        const font = (size: number) => `${paragraph.fontStyle} ${paragraph.fontWeight} ${size}px ${family}`;
-        const layout = layoutTranslation(text, regions, originalSize, (value, size) => { context.font = font(size); return context.measureText(value).width; }, Math.max(0, lines[0]?.x - regions[0]?.x));
-        if (!layout.fits) continue;
-        const fills = regions.map(region => background(context, region.x, region.y, region.width, region.height));
-        regions.forEach((region, regionIndex) => { context.fillStyle = fills[regionIndex]; context.fillRect(region.x - 1, region.y - 1, region.width + 2, region.height + 2); });
-        context.font = font(layout.fontSize); context.textBaseline = "top"; context.fillStyle = paragraph.color ?? "#171717";
+      const blocks = manifest.blocks.filter(block => block.pageIndex === index);
+      const allSizes = blocks.filter(block => block.translatable).flatMap(block => block.lines.map(line => line.height * canvas.height)).sort((a, b) => a - b);
+      const bodySize = allSizes[Math.floor(allSizes.length / 2)] || 14;
+      const prepared = blocks.filter(block => block.translatable).map(block => {
+        const text = translatedBlocks.get(block.id) ?? translated.get(translationSourceKey(index, block.text));
+        if (!text) return null;
+        const lines = block.lines.map(line => ({ x: line.x * canvas.width, y: line.y * canvas.height, width: line.width * canvas.width, height: line.height * canvas.height }));
+        if (!lines.length) return null;
+        const regions = paragraphRegions(lines), heights = lines.map(line => line.height).sort((a, b) => a - b);
+        const originalSize = Math.min((heights[Math.floor(heights.length / 2)] || bodySize) * .96, bodySize * (block.kind === "title" ? 1.55 : block.kind === "caption" ? 1.12 : 1.18));
+        return { block, text, lines, regions, flowRegions: translationFlowRegions(block, regions, canvas.width), originalSize, family: koreanFontStack(block.fontFamily), colors: lines.map(line => background(context, line.x, line.y, line.width, line.height)) };
+      }).filter((item): item is NonNullable<typeof item> => Boolean(item));
+      const byId = new Map(prepared.map(item => [item.block.id, item]));
+      const fixed = blocks.filter(block => !block.translatable).map(block => block.role === "EQUATION" ? {
+        x: (block.x < .48 ? .075 : .515) * canvas.width, y: block.y * canvas.height - bodySize * .35,
+        width: (block.x < .48 ? .41 : .42) * canvas.width, height: block.height * canvas.height + bodySize * .7
+      } : { x: block.x * canvas.width, y: block.y * canvas.height, width: block.width * canvas.width, height: block.height * canvas.height });
+      const placements = planColumnReflow(prepared.map(item => ({ id: item.block.id, x: item.block.x * canvas.width, y: item.block.y * canvas.height, width: item.block.width * canvas.width, height: item.block.height * canvas.height, lineHeight: item.originalSize * 1.18, column: item.block.kind === "title" && item.block.width > .55 ? 2 : item.block.x < .48 ? 0 : 1 })), fixed, canvas.height, (flow, top, availableHeight) => {
+        const item = byId.get(flow.id)!;
+        const shift = top - item.regions[0].y, regions = item.flowRegions.map(region => ({ ...region, y: region.y + shift }));
+        const last = regions.at(-1)!;
+        last.height = Math.max(0, availableHeight - (last.y - top));
+        for (const region of regions) region.height = Math.max(0, Math.min(region.height, availableHeight - (region.y - top)));
+        const font = (size: number) => `${item.block.fontStyle} ${item.block.fontWeight} ${size}px ${item.family}`;
+        const layout = layoutTranslation(item.text, regions, item.originalSize, (value, size) => { context.font = font(size); return context.measureText(value).width; }, Math.max(0, item.lines[0].x - item.regions[0].x), item.block.kind === "title" ? .94 : .82);
+        const usedHeight = Math.max(0, ...layout.lines.map(line => regions[line.region].y + line.y + layout.lineHeight - top));
+        return { usedHeight, output: { item, regions, layout, font } };
+      });
+      // Erase all translated source rectangles before drawing any shifted text.
+      for (const item of prepared) item.lines.forEach((line, lineIndex) => { context.fillStyle = item.colors[lineIndex]; for (const part of fixed.reduce((parts, obstacle) => parts.flatMap(rect => subtractRect(rect, obstacle)), [line])) context.fillRect(part.x, part.y, part.width, part.height); });
+      for (const placement of placements) {
+        const { item, regions, layout, font } = placement.output;
+        if (layout.remaining) continuations.push({ pageIndex: index, text: layout.remaining });
+        context.font = font(layout.fontSize); context.textBaseline = "top"; context.fillStyle = item.block.color ?? "#171717";
         for (const line of layout.lines) {
           const region = regions[line.region];
           context.fillText(line.text, region.x + line.x, region.y + line.y);
@@ -80,7 +118,10 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
       output.addPage([page.width, page.height]).drawImage(image, { x: 0, y: 0, width: page.width, height: page.height });
       onProgress?.(index + 1, pdf.pageCount);
     }
-    const notes = annotations.filter(item => item.note?.trim());
+    const notes = [
+      ...continuations.map(item => ({ pageIndex: item.pageIndex, note: `이어지는 번역: ${item.text}` })),
+      ...annotations.filter(item => item.note?.trim()).map(item => ({ pageIndex: item.pageIndex, note: item.note! }))
+    ];
     if (notes.length) {
       const width = 900, height = 1200;
       const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height;
@@ -95,7 +136,7 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
       for (const note of notes) {
         if (!y) { context.fillStyle = "#fff"; context.fillRect(0, 0, width, height); context.fillStyle = "#17243b"; context.font = 'bold 30px "Noto Sans KR", "Malgun Gothic", sans-serif'; context.fillText("Paperflow · 연구 메모", 55, 70); y = 130; }
         context.font = '21px "Noto Sans KR", "Malgun Gothic", sans-serif';
-        const lines = wrap(note.note ?? "", width - 110, context);
+        const lines = wrap(note.note, width - 110, context);
         if (y + lines.length * 33 + 70 > height - 50) { await newPage(); context.fillStyle = "#fff"; context.fillRect(0, 0, width, height); y = 70; }
         context.fillStyle = "#176aca"; context.font = 'bold 18px "Noto Sans KR", "Malgun Gothic", sans-serif'; context.fillText(`원문 ${note.pageIndex + 1}페이지`, 55, y); y += 32;
         context.fillStyle = "#17243b"; context.font = '21px "Noto Sans KR", "Malgun Gothic", sans-serif';

@@ -49,9 +49,9 @@ test("page translation batches all extracted paragraphs without public translato
   let batches = 0;
   await page.route("**/api/research", async route => {
     const request = route.request().postDataJSON();
-    expect(request.task).toBe("translate_batch");
+    expect(request.task).toBe("translate_blocks");
     batches++;
-    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: request.sources.map(() => "공학 연구 문단을 번역하였다."), provider: "OpenAI" }) });
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ translations: request.passages.map((item: { id: string }) => ({ id: item.id, text: "공학 연구 문단을 번역하였다." })), provider: "OpenAI" }) });
   });
   await page.route("https://api.mymemory.translated.net/get?**", route => route.abort());
   await page.goto("/library");
