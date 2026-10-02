@@ -45,7 +45,7 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
   if (/^https?:\/\/|^(?:www\.|doi:|©|copyright)/i.test(value) || /©|all rights reserved|creativecommons|this article is licensed/i.test(value) && value.length < 260) return { role: "OTHER", reason: "copyright-or-link" };
   if (block.y < .065 && value.length < 160) return { role: "HEADER", reason: "page-header" };
   if (block.y > .93 && (value.length < 100 && proseScore(value).words < 9 || /doi|©|\d{4},\s*\d+,\s*\d+|^\d+$/i.test(value))) return { role: "FOOTER", reason: "page-footer" };
-  if (/^(?:\*|†|‡)?\s*(?:corresponding author|e-?mail|tel\.?|fax|orcid)/i.test(value) || /\b[\w.-]+@[\w-]+\.[\w.]+/.test(value) && value.length < 300) return { role: "CONTACT", reason: "contact" };
+  if (/^(?:[*†‡⇑⁎§]|[a-z]\s)?\s*(?:corresponding author|e-?mail|tel\.?|fax|orcid)/i.test(value) || /\b[\w.-]+@[\w-]+\.[\w.]+/.test(value) && value.length < 300) return { role: "CONTACT", reason: "contact" };
   if (FRONT_LABELS.test(squashed)) return { role: "OTHER", reason: "front-label" };
   // An article-info block often runs "Article history … Keywords: …" together; keep it findable as keywords.
   if (/^keywords?\s*[:：]?/i.test(value) || block.hint === "keywords" || block.lineTexts?.some(line => /^keywords?\b/i.test(line.trim()))) return { role: "KEYWORDS", reason: "keywords" };

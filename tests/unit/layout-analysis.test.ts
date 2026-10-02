@@ -112,3 +112,30 @@ it("splits two run-in headings even when only one word of prose follows on the l
   expect(blocks.slice(0, 2).map(block => [block.kind, block.text])).toEqual([["title", "3.2. Computational Models."], ["title", "3.2.1. General Models."]]);
   expect(blocks[2].text.startsWith("The CFD analysis")).toBe(true);
 });
+
+describe("publisher quirks", () => {
+  it("drops a hidden manuscript layer drawn in its own, slightly smaller fonts", async () => {
+    const visible = [item("2. Torrefaction-Based Co-Firing System", 76, 160, 200, 10), ...column(76, 180, prose("visible", 5), 450, 13.5, 10)];
+    const ghost = [item("2. Torrefaction-Based Co-Firing System", 78, 165, 192, 9.58), ...column(78, 185, prose("visible", 5), 430, 13, 9.58)].map(entry => ({ ...entry, fontName: "ghost" }));
+    const blocks = await buildPageBlocks("doc", 2, [...visible, ...ghost], W, H);
+    expect(blocks.filter(block => block.text.startsWith("2. Torrefaction")).length).toBe(1);
+    expect(blocks.filter(block => block.translatable).every(block => !/visible line 0.*visible line 0/.test(block.text))).toBe(true);
+  });
+  it("ignores manuscript line numbers and reads double-spaced paragraphs", async () => {
+    const lines = Array.from({ length: 8 }, (_, index) => [item(String(430 + index), 30, 100 + index * 26, 14, 11), item(`manuscript prose line ${index} about bed agglomeration in fluidized bed combustors here`, 72, 100 + index * 26, 420, 11)]).flat();
+    const blocks = await buildPageBlocks("doc", 19, lines, W, H);
+    const body = blocks.filter(block => block.translatable);
+    expect(body).toHaveLength(1);
+    expect(body[0].text.startsWith("manuscript prose line 0")).toBe(true);
+  });
+  it("reads a front-matter band with its own column split before the body below", async () => {
+    const info = ["Article history:", "Received 16 January 2017", "Accepted 27 April 2017", "Keywords:", "Corrosion monitoring", "Boilers"].map((text, index) => item(text, 33, 400 + index * 9.6 + 4, 100, 6.4));
+    const abstract = Array.from({ length: 8 }, (_, index) => item(`abstract line ${index} explains corrosion risk monitoring with CO and O2 measurements`, 200, 400 + index * 9.6, 360, 7.2));
+    const body = [...column(33, 560, prose("left", 6), 255, 10.5, 8), ...column(310, 560, prose("right", 6), 255, 10.5, 8)];
+    const blocks = await buildPageBlocks("doc", 0, [item("Development of a corrosion monitoring system for pulverized coal boilers", 33, 200, 480, 13.4), ...info, ...abstract, ...body], W, H);
+    const abstractBlocks = blocks.filter(block => block.text.includes("abstract line"));
+    expect(abstractBlocks).toHaveLength(1);
+    expect(abstractBlocks[0].translatable).toBe(true);
+    expect(blocks.findIndex(block => block.text.startsWith("abstract line 0"))).toBeLessThan(blocks.findIndex(block => block.text.startsWith("left line 0")));
+  });
+});

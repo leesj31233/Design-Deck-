@@ -54,7 +54,7 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
   const raw = dropLineNumbers(buildTextLines(dropGhostLayer(items)), width);
   if (!raw.length) return [];
   const gutter = findGutter(raw, width);
-  const ordered = splitRunInHeadings(orderLines(raw, gutter));
+  const ordered = splitRunInHeadings(orderLines(raw, gutter, width));
   const bodySize = median(ordered.filter(line => line.text.length > 40).map(line => line.size)) || median(ordered.map(line => line.size)) || 9;
   const columnBounds = (column: number) => column === 0 && gutter ? { left: Math.min(...ordered.filter(line => line.column === 0).map(line => line.x)), right: gutter.left } : column === 1 && gutter ? { left: gutter.right, right: Math.max(...ordered.filter(line => line.column === 1).map(line => line.right)) } : { left: Math.min(...ordered.map(line => line.x)), right: Math.max(...ordered.map(line => line.right)) };
   const bounds = new Map([-1, 0, 1].map(column => [column, columnBounds(column)]));

@@ -56,7 +56,10 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
     const colourOf = (span: HTMLElement) => {
       const box = span.getBoundingClientRect(), color = inkColor(canvas.current!, { x: (box.left - bounds.left) / bounds.width * page.width, y: (box.top - bounds.top) / bounds.height * page.height, width: box.width / bounds.width * page.width, height: box.height / bounds.height * page.height }, page.width);
       const [r, g, b] = (color?.match(/\d+/g) ?? []).map(Number);
-      return color && Math.max(r, g, b) - Math.min(r, g, b) > 60 ? color : undefined;
+      if (!color || Math.max(r, g, b) - Math.min(r, g, b) <= 60) return undefined;
+      // Anti-aliased small text samples lighter than its ink; keep links readable on white paper.
+      const light = r + g + b > 420 ? .62 : 1;
+      return `rgb(${Math.round(r * light)},${Math.round(g * light)},${Math.round(b * light)})`;
     };
     const reference = spans.find(span => /^(?:Figures?|Fig\.|Tables?|Equations?|eqs?)\s*\d/i.test(span.textContent ?? "") && colourOf(span));
     const citation = spans.find(span => /^\[?\d+(?:[,–-]\d+)*\]?$/.test(span.textContent?.trim() ?? "") && colourOf(span));

@@ -22,6 +22,9 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
       signal?.throwIfAborted();
       return content.items.flatMap(item => {
         if (!("str" in item) || !item.str.trim()) return [];
+        // Rotated text (axis titles, side labels) belongs to figures and would stretch a column.
+        const [m0, m1, m2, m3] = item.transform;
+        if (Math.abs(m1) > Math.abs(m0) * .1 || Math.abs(m2) > Math.abs(m3) * .1) return [];
         const [x, baseline] = base.convertToViewportPoint(item.transform[4], item.transform[5]);
         const height = Math.max(1, Math.abs(item.height) || Math.hypot(item.transform[2], item.transform[3]));
         const style = content.styles[item.fontName];

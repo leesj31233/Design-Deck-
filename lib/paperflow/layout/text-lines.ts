@@ -164,8 +164,24 @@ export function findGutter(lines: TextLine[], width: number): Gutter | null {
 }
 
 /** Assign columns, merge same-baseline fragments within a column, and return reading order. */
-export function orderLines(lines: TextLine[], gutter: Gutter | null): TextLine[] {
+export function orderLines(lines: TextLine[], gutter: Gutter | null, width = 612): TextLine[] {
   for (const line of lines) line.column = !gutter ? 0 : line.right <= gutter.center + 2 ? 0 : line.x >= gutter.center - 2 ? 1 : -1;
+  // A front-matter band can have its own split (Elsevier: narrow ARTICLE INFO beside a wide
+  // ABSTRACT) while the body below uses the page gutter. Lines that "span" the page gutter but
+  // share one left edge are a column of that band: find the band's own gutter.
+  const spanning = lines.filter(line => line.column === -1 || !gutter);
+  const edges = new Map<number, TextLine[]>(), bandEnds: number[] = [];
+  for (const line of spanning) { const key = Math.round(line.x / 3); edges.set(key, [...(edges.get(key) ?? []), line]); }
+  for (const cluster of edges.values()) {
+    if (cluster.length < 4) continue;
+    const top = Math.min(...cluster.map(line => line.y)), bottom = Math.max(...cluster.map(line => line.bottom));
+    const inside = lines.filter(line => line.y >= top - 2 && line.bottom <= bottom + 2);
+    const local = findGutter(inside, width);
+    if (!local || gutter && Math.abs(local.center - gutter.center) < 20) continue;
+    for (const line of inside) line.column = line.right <= local.center + 2 ? 0 : line.x >= local.center - 2 ? 1 : -1;
+    bandEnds.push(bottom + 1);
+    gutter ??= local;
+  }
   const merged: TextLine[] = [];
   for (const line of [...lines].sort((a, b) => (a.y + a.bottom) / 2 - (b.y + b.bottom) / 2 || a.x - b.x)) {
     const center = (line.y + line.bottom) / 2;
@@ -187,7 +203,9 @@ export function orderLines(lines: TextLine[], gutter: Gutter | null): TextLine[]
     const inside = columns.filter(line => line.y >= lower && line.y < upper);
     result.push(...inside.filter(line => line.column === 0).sort(byTop), ...inside.filter(line => line.column === 1).sort(byTop));
   };
-  for (const separator of separators) { band(separator.y); result.push(separator); lower = separator.y; }
+  // A front-matter band with its own split is read completely before the body below it.
+  const stops = [...separators.map(line => ({ y: line.y, line })), ...bandEnds.map(y => ({ y, line: null as TextLine | null }))].sort((a, b) => a.y - b.y);
+  for (const stop of stops) { band(stop.y); if (stop.line) result.push(stop.line); lower = stop.y; }
   band(Infinity);
   return result;
 }
