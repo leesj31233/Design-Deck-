@@ -69,7 +69,9 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
     // They belong to the prose line they sit in and must not split the paragraph.
     if (!/[A-Za-z0-9]/.test(line.text) && line.right - line.x < columnWidth * .7) { noise.push(line); continue; }
     const equation = isEquationLine(line.text, (line.right - line.x) / Math.max(1, columnWidth));
-    const heading = !equation && headingLine(line, columnWidth, bodySize);
+    // "3.2. Mathematical model. Gas phase kinetics": an unnumbered title closing a run-in line is a heading too.
+    const runInTitle = (line as TextLine & { runInTail?: boolean }).runInTail && line.text.length < 70 && !SENTENCE_END.test(line.text) && words(line.text).length >= 2 && /^[A-Z]/.test(line.text);
+    const heading = !equation && (headingLine(line, columnWidth, bodySize) || Boolean(runInTitle));
     const group = groups.at(-1), previous = group?.lines.at(-1);
     // "Figure 5a shows…" can open a line in the middle of a paragraph; a caption starts after a
     // finished sentence or a gap, or is set smaller than the body.
@@ -137,7 +139,7 @@ function splitOnce(lines: TextLine[]): TextLine[] {
       }
     }
     const rest = line.items.filter(item => item.x >= splitX - 1);
-    return [{ ...line, text: match[1], right: splitX, items: [] }, { ...line, text: match[2], x: splitX + line.size * .25, items: rest.length ? rest : [{ text: match[2], x: splitX + line.size * .25, right: line.right }] }].map((part, index) => ({ ...part, runIn: index === 0 || (line as TextLine & { runIn?: boolean }).runIn } as TextLine));
+    return [{ ...line, text: match[1], right: splitX, items: [] }, { ...line, text: match[2], x: splitX + line.size * .25, items: rest.length ? rest : [{ text: match[2], x: splitX + line.size * .25, right: line.right }] }].map((part, index) => ({ ...part, runIn: index === 0 || (line as TextLine & { runIn?: boolean }).runIn, runInTail: index === 1 } as TextLine));
   });
 }
 

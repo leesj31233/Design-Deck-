@@ -200,7 +200,8 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
         let free = [{ from: current.x, to: current.x + current.width }];
         for (const hit of hits) free = free.flatMap(range => [{ from: range.from, to: Math.min(range.to, hit.x - 1) }, { from: Math.max(range.from, hit.x + hit.width + 1), to: range.to }]).filter(range => range.to - range.from > 1);
         const widest = free.sort((a, b) => (b.to - b.from) - (a.to - a.from))[0];
-        if (widest && widest.to - widest.from >= current.width * .5) return { x: widest.from, width: widest.to - widest.from, y };
+        // A heading may share its line with another heading or label; prose needs at least half the measure.
+        if (widest && widest.to - widest.from >= current.width * (flow.kind === "heading" ? .2 : .5)) return { x: widest.from, width: widest.to - widest.from, y };
         y = Math.max(...hits.map(hit => hit.y + hit.height)) + 0.5;
       }
       return null;

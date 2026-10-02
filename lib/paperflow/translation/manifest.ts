@@ -5,7 +5,7 @@ import { classifyBlock, extractKeywords, nextSection, pageContext, type BlockRol
 import type { PageSize, PdfParagraph } from "../layout/types";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.14";
+export const EXTRACTOR_VERSION = "layout-v3.15";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
