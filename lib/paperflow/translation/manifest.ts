@@ -5,7 +5,7 @@ import { classifyBlock, extractKeywords, nextSection, pageContext, type BlockRol
 import type { PageSize, PdfParagraph } from "../layout/types";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.9";
+export const EXTRACTOR_VERSION = "layout-v3.13";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -40,7 +40,7 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     let { role, reason } = classifyBlock(paragraph, index, context, section);
     const columnIndex = paragraph.x + paragraph.width / 2 < .5 ? 0 : 1;
     // Rows after a table caption stay data until real prose resumes.
-    if (role === "CAPTION" && /^table/i.test(paragraph.text)) { tableUntil = paragraph.y + .45; tableColumn = paragraph.width > .6 ? -1 : columnIndex; }
+    if (role === "CAPTION" && /^table/i.test(paragraph.text)) { tableUntil = paragraph.y + .45; tableColumn = paragraph.width > .6 || Math.abs(paragraph.x + paragraph.width / 2 - .5) < .08 ? -1 : columnIndex; }
     else if (role === "BODY" && paragraph.y < tableUntil && (tableColumn === -1 || tableColumn === columnIndex) && !/[a-z]{3,}[.!?]\s/.test(paragraph.text + " ")) { role = "TABLE"; reason = "table-data"; }
     else if (role === "BODY") tableUntil = -1;
     section = nextSection(role, reason, paragraph.text, section);

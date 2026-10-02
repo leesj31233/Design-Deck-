@@ -114,12 +114,14 @@ it("splits two run-in headings even when only one word of prose follows on the l
 });
 
 describe("publisher quirks", () => {
-  it("drops a hidden manuscript layer drawn in its own, slightly smaller fonts", async () => {
-    const visible = [item("2. Torrefaction-Based Co-Firing System", 76, 160, 200, 10), ...column(76, 180, prose("visible", 5), 450, 13.5, 10)];
-    const ghost = [item("2. Torrefaction-Based Co-Firing System", 78, 165, 192, 9.58), ...column(78, 185, prose("visible", 5), 430, 13, 9.58)].map(entry => ({ ...entry, fontName: "ghost" }));
-    const blocks = await buildPageBlocks("doc", 2, [...visible, ...ghost], W, H);
-    expect(blocks.filter(block => block.text.startsWith("2. Torrefaction")).length).toBe(1);
-    expect(blocks.filter(block => block.translatable).every(block => !/visible line 0.*visible line 0/.test(block.text))).toBe(true);
+  it("finds text that a pasted PDF figure clips away", async () => {
+    const { clippedFormFonts } = await import("../../lib/paperflow/pdf/pdf-adapter");
+    const OPS = { beginGroup: 1, paintFormXObjectBegin: 2, paintFormXObjectEnd: 3, setFont: 4, showText: 5 };
+    const fnArray = [4, 5, 1, 2, 4, 5, 4, 5, 3];
+    const argsArray = [["visible", 10], [], [{ bbox: { 0: 120, 1: 180, 2: 470, 3: 440 }, matrix: null }], [null, null], ["pasted", 10], [], ["visible", 10], [], []];
+    const forms = clippedFormFonts(fnArray, argsArray as unknown[][], OPS);
+    expect([...forms.keys()]).toEqual(["pasted"]);
+    expect(forms.get("pasted")![0]).toEqual([120, 180, 470, 440]);
   });
   it("ignores manuscript line numbers and reads double-spaced paragraphs", async () => {
     const lines = Array.from({ length: 8 }, (_, index) => [item(String(430 + index), 30, 100 + index * 26, 14, 11), item(`manuscript prose line ${index} about bed agglomeration in fluidized bed combustors here`, 72, 100 + index * 26, 420, 11)]).flat();

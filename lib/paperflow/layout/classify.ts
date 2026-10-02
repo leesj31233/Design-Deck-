@@ -44,6 +44,8 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
   if (block.hint === "equation" || isEquationLine(value, block.width / Math.max(.05, (block.column?.right ?? 1) - (block.column?.left ?? 0))) && block.lines.length <= 2) return { role: "EQUATION", reason: "equation" };
   if (/^https?:\/\/|^(?:www\.|doi:|©|copyright)/i.test(value) || /©|all rights reserved|creativecommons|this article is licensed/i.test(value) && value.length < 260) return { role: "OTHER", reason: "copyright-or-link" };
   if (block.y < .065 && value.length < 160) return { role: "HEADER", reason: "page-header" };
+  // Running heads sit a little lower in some templates (IOP, MDPI): recognise them by what they say.
+  if (block.y < .1 && block.lines.length <= 2 && value.length < 200 && /\bdoi\b|doi\.org|\bvol\.|\bseries\b|proceedings|publishing|journal|conference|symposium|workshop|congress|issn|\b\d+\s+of\s+\d+\b|\(\d{4}\)\s*\d|\d{4},\s*\d+,\s*\d+/i.test(value)) return { role: "HEADER", reason: "page-header" };
   if (block.y > .93 && (value.length < 100 && proseScore(value).words < 9 || /doi|©|\d{4},\s*\d+,\s*\d+|^\d+$/i.test(value))) return { role: "FOOTER", reason: "page-footer" };
   if (/^(?:[*†‡⇑⁎§]|[a-z]\s)?\s*(?:corresponding author|e-?mail|tel\.?|fax|orcid)/i.test(value) || /\b[\w.-]+@[\w-]+\.[\w.]+/.test(value) && value.length < 300) return { role: "CONTACT", reason: "contact" };
   if (FRONT_LABELS.test(squashed)) return { role: "OTHER", reason: "front-label" };
@@ -74,6 +76,8 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
   if ((value.match(/\b[A-Z][A-Za-z0-9]{0,6}\s*[:=]\s*[^;:]{2,60};/g) ?? []).length >= 3) return { role: "TABLE", reason: "abbreviation-key" };
   // Display formula systems ("While Cl ratio (K2O + Na2O)/(SiO2 + Al2O3) ≥ 2.4") are artwork, not prose.
   if (block.lines.length <= 2 && score.sentences === 0 && !/[.!?]\s*$/.test(value) && block.width < columnWidth * .85 && /[()≥≤=]/.test(value) && (value.match(/\d/g) ?? []).length >= 3 && score.words < 12) return { role: "EQUATION", reason: "formula" };
+  // A stack of 1–3 word lines with no sentence is a table column (row labels), not prose.
+  if (block.lines.length >= 3 && score.sentences === 0 && score.words / block.lines.length <= 3.5 && !/[.!?]\s*$/.test(value)) return { role: "TABLE", reason: "table-column" };
   const numeric = (value.match(/(?:^|\s)[-+−]?\d+(?:[.,]\d+)?%?(?=\s|$)/g) ?? []).length;
   if (numeric >= 4 && numeric > score.words * .6) return { role: "TABLE", reason: "numeric-cells" };
   if (context.pageIndex === 0 && index === context.abstractIndex) return { role: "ABSTRACT", reason: null };

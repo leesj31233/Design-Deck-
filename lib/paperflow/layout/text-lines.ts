@@ -87,46 +87,6 @@ export function buildTextLines(items: PdfTextItem[]): TextLine[] {
   }).filter(line => line.text);
 }
 
-/**
- * Some publishers (MDPI among them) embed the submitted manuscript as a second, unseen text
- * layer under the typeset page: the same sentences in their own fonts, about 4% smaller and
- * a few points away. Left in, every heading is translated twice and lines fuse across layers.
- * A font whose long strings repeatedly duplicate another font's strings at a smaller size is
- * that ghost layer; all of its items are dropped.
- */
-export function dropGhostLayer(items: PdfTextItem[]): PdfTextItem[] {
-  const key = (text: string) => text.replace(/\s+/g, " ").trim();
-  const byText = new Map<string, PdfTextItem[]>();
-  for (const item of items) { const text = key(item.text); if (text.length >= 5) byText.set(text, [...(byText.get(text) ?? []), item]); }
-  const ghostVotes = new Map<string, number>(), visibleVotes = new Map<string, number>();
-  let pairs = 0;
-  for (const group of byText.values()) {
-    if (group.length < 2) continue;
-    for (let a = 0; a < group.length; a++) for (let b = a + 1; b < group.length; b++) {
-      const p = group[a], q = group[b];
-      if (p.fontName === q.fontName || Math.abs(p.x - q.x) > 40 || Math.abs(p.y - q.y) > 80) continue;
-      const ratio = Math.min(p.height, q.height) / Math.max(p.height, q.height);
-      if (ratio > .99 || ratio < .85) continue;
-      const [ghost, visible] = p.height < q.height ? [p, q] : [q, p];
-      ghostVotes.set(ghost.fontName, (ghostVotes.get(ghost.fontName) ?? 0) + 1);
-      visibleVotes.set(visible.fontName, (visibleVotes.get(visible.fontName) ?? 0) + 1);
-      pairs++;
-    }
-  }
-  if (pairs < 3) return items;
-  const ghostFonts = new Set([...ghostVotes].filter(([font, votes]) => votes > (visibleVotes.get(font) ?? 0)).map(([font]) => font));
-  // Fonts used only by the ghost manuscript but never paired (its header, symbols): every
-  // string they carry also appears in the ghost fonts' text.
-  const ghostText = items.filter(item => ghostFonts.has(item.fontName)).map(item => item.text).join(" ");
-  const fonts = new Set(items.map(item => item.fontName));
-  for (const font of fonts) {
-    if (ghostFonts.has(font) || visibleVotes.has(font)) continue;
-    const own = items.filter(item => item.fontName === font && item.text.trim().length >= 2);
-    if (own.length && own.every(item => ghostText.includes(item.text.trim()))) ghostFonts.add(font);
-  }
-  return items.filter(item => !ghostFonts.has(item.fontName));
-}
-
 /** Manuscript line numbers ("432" down the left margin) are not text of the paper. */
 export function dropLineNumbers(lines: TextLine[], width: number): TextLine[] {
   const numbers = lines.filter(line => /^\d{1,4}$/.test(line.text) && line.right < width * .2);

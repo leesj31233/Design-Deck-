@@ -1,6 +1,6 @@
 import type { PdfTextItem } from "../pdf/pdf-adapter";
 import type { PdfParagraph } from "./types";
-import { buildTextLines, dropGhostLayer, dropLineNumbers, findGutter, median, orderLines, type Gutter, type TextLine } from "./text-lines";
+import { buildTextLines, dropLineNumbers, findGutter, median, orderLines, type Gutter, type TextLine } from "./text-lines";
 
 const SECTION_NAMES = /^(?:■\s*)?(?:abstract|introduction|background|literature review|methods?|methodology|materials and methods|experimental(?: section| setup| methods)?|results(?: and discussion)?|discussion|conclusions?|concluding remarks|summary|acknowledg(?:e)?ments?|references|nomenclature|appendix(?: [a-z0-9]+)?|supporting information|author information|notes|abbreviations)\.?$/i;
 const NUMBERED_HEADING = /^(?:■\s*)?(?:\d+(?:\.\d+){0,4}\.?|[IVX]{1,5}\.|[A-H]\.)\s+[A-Z(]/;
@@ -51,7 +51,7 @@ function headingLine(line: TextLine, columnWidth: number, bodySize: number) {
 
 /** Deterministic page analysis from PDF text objects: no DOM, zoom, or canvas state. */
 export function analyzePage(items: PdfTextItem[], pageIndex: number, width: number, height: number): PdfParagraph[] {
-  const raw = dropLineNumbers(buildTextLines(dropGhostLayer(items)), width);
+  const raw = dropLineNumbers(buildTextLines(items), width);
   if (!raw.length) return [];
   const gutter = findGutter(raw, width);
   const ordered = splitRunInHeadings(orderLines(raw, gutter, width));

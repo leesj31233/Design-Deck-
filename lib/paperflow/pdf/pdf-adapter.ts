@@ -13,15 +13,51 @@ async function getLibrary() {
   library ??= import("pdfjs-dist").then(pdf => { pdf.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs"; return pdf; });
   return library;
 }
+type Box = [number, number, number, number];
+/**
+ * Figures are sometimes a whole PDF page pasted in as a form XObject and clipped to the figure
+ * (MDPI does this): the text layer then carries the entire pasted manuscript although only the
+ * part inside the figure is painted. Returns, for fonts used only inside such forms, the form
+ * boxes (PDF space) their text is visible in.
+ */
+export function clippedFormFonts(fnArray: number[], argsArray: unknown[][], ops: Record<string, number>): Map<string, Box[]> {
+  const inside = new Map<string, Box[]>(), outside = new Set<string>(), stack: (Box | null)[] = [];
+  let pendingGroup: Box | null = null;
+  const toBox = (bbox: unknown, matrix: unknown): Box | null => {
+    const b = bbox && typeof bbox === "object" ? Object.values(bbox as Record<string, number>).map(Number) : null;
+    if (!b || b.length < 4 || b.some(value => !Number.isFinite(value))) return null;
+    const m = Array.isArray(matrix) && matrix.length === 6 ? matrix.map(Number) : [1, 0, 0, 1, 0, 0];
+    const xs = [b[0], b[2]].flatMap(x => [b[1], b[3]].map(y => m[0] * x + m[2] * y + m[4]));
+    const ys = [b[0], b[2]].flatMap(x => [b[1], b[3]].map(y => m[1] * x + m[3] * y + m[5]));
+    return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  };
+  fnArray.forEach((fn, index) => {
+    const args = argsArray[index] ?? [];
+    if (fn === ops.beginGroup) { const group = args[0] as { bbox?: unknown; matrix?: unknown } | undefined; pendingGroup = toBox(group?.bbox, group?.matrix); }
+    else if (fn === ops.paintFormXObjectBegin) { stack.push(toBox(args[1], args[0]) ?? pendingGroup); pendingGroup = null; }
+    else if (fn === ops.paintFormXObjectEnd) stack.pop();
+    else if (fn === ops.setFont && typeof args[0] === "string") {
+      const box = stack.at(-1);
+      if (!stack.length) outside.add(args[0]);
+      else if (box) inside.set(args[0], [...(inside.get(args[0]) ?? []), box]);
+    }
+  });
+  for (const font of outside) inside.delete(font);
+  return inside;
+}
+
 function pageHandle(page: PDFPageProxy): PdfPageHandle {
   const base = page.getViewport({ scale: 1 });
   return {
     width: base.width, height: base.height,
     async getTextItems(signal) {
-      const content = await page.getTextContent();
+      const [content, library, operators] = await Promise.all([page.getTextContent(), getLibrary(), page.getOperatorList()]);
       signal?.throwIfAborted();
+      const forms = clippedFormFonts(operators.fnArray, operators.argsArray, library.OPS as unknown as Record<string, number>);
       return content.items.flatMap(item => {
         if (!("str" in item) || !item.str.trim()) return [];
+        const boxes = forms.get(item.fontName);
+        if (boxes && !boxes.some(([x1, y1, x2, y2]) => item.transform[4] >= x1 - 2 && item.transform[4] <= x2 + 2 && item.transform[5] >= y1 - 2 && item.transform[5] <= y2 + 2)) return [];
         // Rotated text (axis titles, side labels) belongs to figures and would stretch a column.
         const [m0, m1, m2, m3] = item.transform;
         if (Math.abs(m1) > Math.abs(m0) * .1 || Math.abs(m2) > Math.abs(m3) * .1) return [];
