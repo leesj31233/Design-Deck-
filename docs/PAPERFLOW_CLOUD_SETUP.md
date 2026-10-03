@@ -44,8 +44,9 @@
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key | 공개 가능(RLS가 보호) |
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role key | **비밀** |
 | `PAPERFLOW_OWNER_EMAILS` | `seungjun.lee@naysor.com` | 서버 전용 |
+| `NEXT_PUBLIC_PAPERFLOW_GOOGLE` | `1` (Google 공급자를 켠 뒤에만) | 공개 가능 |
 
-입력을 마친 뒤 재배포하면 사이드바에 "Google로 로그인"과 "이메일로 로그인"이 나타난다. 이메일 로그인은 Supabase 기본 메일로 로그인 링크를 보내므로 Google 설정 없이도 바로 쓸 수 있다(기본 메일은 시간당 발송 수가 적으니, 사용자가 늘면 Auth → SMTP에 회사 메일을 연결한다). 재배포는 요청하면 바로 한다.
+입력을 마친 뒤 재배포하면 사이드바에 이메일 로그인이 나타나고, `NEXT_PUBLIC_PAPERFLOW_GOOGLE=1`을 넣으면 "Google로 로그인"도 함께 나타난다. 이메일 로그인은 Supabase 기본 메일로 로그인 링크를 보내므로 Google 설정 없이도 바로 쓸 수 있다(기본 메일은 시간당 발송 수가 적으니, 사용자가 늘면 Auth → SMTP에 회사 메일을 연결한다). 재배포는 요청하면 바로 한다.
 
 ## 저장 방식과 용량
 

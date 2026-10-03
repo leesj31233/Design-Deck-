@@ -646,3 +646,5 @@ html[data-pf-theme="dark"] .pf-guide-marks span { mix-blend-mode:normal; backgro
 .pf-account-email button:active { scale:.95; }
 .pf-account-sent { display:flex; gap:6px; margin:0!important; padding:8px 9px; border-radius:10px; background:color-mix(in srgb,var(--success) 12%,transparent); font-size:10px!important; line-height:1.5!important; color:var(--foreground)!important; }
 .pf-account-sent svg { flex-shrink:0; margin-top:2px; }
+.pf-account-hint { display:flex; gap:6px; margin:16px 0 0!important; font-size:10px!important; line-height:1.5!important; color:var(--muted); }
+.pf-account-hint svg { flex-shrink:0; margin-top:2px; }

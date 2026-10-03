@@ -6,6 +6,8 @@
 export const cloudUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 export const cloudAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 export const cloudEnabled = Boolean(cloudUrl && cloudAnonKey);
+/** Google sign-in shows only once the Google provider is configured in Supabase (NEXT_PUBLIC_PAPERFLOW_GOOGLE=1). */
+export const googleEnabled = process.env.NEXT_PUBLIC_PAPERFLOW_GOOGLE === "1";
 
 /** Beta quota for PDFs kept in the cloud. */
 export const BETA_QUOTA_BYTES = 200 * 1024 * 1024;
