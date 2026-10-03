@@ -510,3 +510,32 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 .pf-years span { flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:3px; height:100%; min-width:10px; }
 .pf-years i { display:block; width:100%; max-width:22px; border-radius:5px 5px 2px 2px; background:linear-gradient(180deg,var(--accent),color-mix(in srgb,var(--accent) 45%,transparent)); }
 .pf-years small { font-size:9px; color:var(--muted); }
+
+/* Recommendations (논문 추천) */
+.pf-discover { display:grid; gap:22px; }
+.pf-discover-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; }
+.pf-discover-head p { margin:0; max-width:640px; font-size:12.5px; line-height:1.6; color:var(--muted); }
+.pf-discover-section header { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; }
+.pf-discover-section h3 { margin:0; font-size:16px; letter-spacing:-.015em; }
+.pf-discover-section header small { font-size:11px; color:var(--muted); }
+.pf-discover-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:14px; }
+.pf-rec { position:relative; display:flex; flex-direction:column; gap:8px; padding:16px 16px 12px; border:1px solid var(--line); border-radius:18px; background:var(--surface-strong); box-shadow:var(--shadow-soft); overflow:hidden; transition:transform .25s cubic-bezier(.2,.9,.25,1), box-shadow .25s ease; }
+.pf-rec::before { content:""; position:absolute; inset:0 0 auto; height:3px; background:linear-gradient(90deg,var(--accent),#a855f7); opacity:.7; }
+@media (hover:hover) and (pointer:fine) { .pf-rec:hover { transform:translateY(-3px); box-shadow:var(--shadow-float); } }
+.pf-rec-why { width:max-content; max-width:100%; padding:2px 8px; border-radius:99px; background:color-mix(in srgb,var(--accent) 10%,transparent); color:var(--accent); font-size:10.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-rec h4 { margin:0; font-size:14px; line-height:1.38; letter-spacing:-.01em; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-rec-meta { font-size:11px; color:var(--muted); line-height:1.45; }
+.pf-rec-abstract { margin:0; font-size:12px; line-height:1.55; color:color-mix(in srgb,var(--foreground) 76%,transparent); display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-rec footer { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:auto; padding-top:8px; border-top:1px solid var(--line); }
+.pf-rec-cited { display:inline-flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.pf-rec-cited em { margin-left:4px; padding:1px 6px; border-radius:99px; background:rgba(22,163,74,.12); color:#15803d; font-style:normal; font-size:9.5px; font-weight:700; }
+.pf-rec-actions { display:inline-flex; gap:4px; }
+.pf-rec-actions a, .pf-rec-actions button { display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border:0; border-radius:9px; background:transparent; color:var(--muted); font-size:11px; text-decoration:none; cursor:pointer; }
+.pf-rec-actions a:active, .pf-rec-actions button:active { transform:scale(.95); }
+@media (hover:hover) and (pointer:fine) { .pf-rec-actions a:hover, .pf-rec-actions button:hover { background:var(--line); color:var(--foreground); } }
+.pf-discover-empty { padding:40px 20px; text-align:center; color:var(--muted); }
+.pf-discover-empty h2 { color:var(--foreground); font-size:18px; }
+.pf-discover-loading { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+.pf-discover-loading span { height:190px; border-radius:18px; background:linear-gradient(100deg,var(--line) 30%,color-mix(in srgb,var(--line) 40%,transparent) 50%,var(--line) 70%); background-size:300% 100%; animation:pf-shimmer 1.4s ease-in-out infinite; }
+@keyframes pf-shimmer { from { background-position:100% 0; } to { background-position:0 0; } }
+@media (prefers-reduced-motion: reduce) { .pf-discover-loading span { animation:none; } .pf-rec { transition:none; } }

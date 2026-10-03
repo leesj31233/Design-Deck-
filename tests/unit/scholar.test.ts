@@ -12,7 +12,7 @@ const work = (id: string, authors: string[], source: string, topics = [topic("T1
   topics, keywords: [{ display_name: "co-firing" }], related_works: ["https://openalex.org/W9"], referenced_works: []
 });
 const doc = (id: string, scholar: ReturnType<typeof normalizeWork> | undefined, visited: number[]): StoredDocument => ({ id, filename: `${id}.pdf`, title: id, mimeType: "application/pdf", byteLength: 1, createdAt: "", updatedAt: "", pageCount: 10, blobKey: id, currentPage: 1, authors: [], researchPoolIds: [], archived: false, sourceStatus: "local", visitedPages: visited, scholar });
-const mark = (documentId: string, note = ""): Annotation => ({ id: `${documentId}${note}`, type: "highlight", documentId, pageIndex: 0, color: "yellow", anchor: { rects: [], normalizedRects: [], createdAt: "" }, note, createdAt: "", updatedAt: "", resolutionStatus: "resolved" });
+const mark = (documentId: string, note = ""): Annotation => ({ id: `${documentId}${note}`, type: "highlight", documentId, pageIndex: 0, color: "yellow", anchor: { rects: [], normalizedRects: [], createdAt: "" } as unknown as Annotation["anchor"], note, createdAt: "", updatedAt: "", resolutionStatus: "resolved" });
 
 describe("OpenAlex records", () => {
   it("normalises authors, journal, topic hierarchy and DOI", () => {

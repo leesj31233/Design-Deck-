@@ -1,5 +1,7 @@
 /**
- * Server-side OpenAlex access: one place for the polite-pool contact (OPENALEX_MAILTO, optional),
+ * Server-side OpenAlex access: one place for the contact (OPENALEX_MAILTO) and the free API key
+ * (OPENALEX_API_KEY, both optional; the key raises the free daily budget 10x; heavier use is
+ * pay-as-you-go at about $0.0001 per list request),
  * a short in-memory cache, and a timeout. Responses are public CC0 metadata.
  */
 const cache = new Map<string, { at: number; value: unknown }>();
@@ -12,7 +14,7 @@ export async function openAlex<T = unknown>(path: string, params: Record<string,
   const key = url.toString(), hit = cache.get(key);
   if (hit && Date.now() - hit.at < TTL) return hit.value as T;
   try {
-    const response = await fetch(url, { headers: { "User-Agent": "PAPERFLOW research reader" }, signal: AbortSignal.timeout(12_000) });
+    const response = await fetch(url, { headers: { "User-Agent": "PAPERFLOW research reader", ...(process.env.OPENALEX_API_KEY ? { Authorization: `Bearer ${process.env.OPENALEX_API_KEY}` } : {}) }, signal: AbortSignal.timeout(12_000) });
     if (response.status === 404) { cache.set(key, { at: Date.now(), value: null }); return null; }
     if (!response.ok) return null;
     const value = await response.json() as T;

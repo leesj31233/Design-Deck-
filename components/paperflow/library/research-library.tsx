@@ -2,6 +2,7 @@
 import { CollectionInsights } from "./collection-insights";
 import dynamic from "next/dynamic";
 // The research map pulls in WebGL graph code: load it only when the map is opened.
+const DiscoverView = dynamic(() => import("../discover/discover-view").then(module => module.DiscoverView), { ssr: false, loading: () => <div className="pf-empty" role="status">추천을 준비하는 중…</div> });
 const ResearchMapView = dynamic(() => import("../map/research-map-view").then(module => module.ResearchMapView), { ssr: false, loading: () => <div className="pf-empty" role="status">연구맵을 준비하는 중…</div> });
 import { lookupDoi } from "@/lib/paperflow/pdf/metadata";
 import { useEffect, useMemo, useState } from "react";
@@ -41,7 +42,7 @@ export function ResearchLibrary() {
   const archive = useMutation({ mutationFn: ({ id, archived }: { id: string; archived: boolean }) => documentRepository.updateDocument(id, { archived }), onSuccess: () => client.invalidateQueries({ queryKey: ["documents"] }), onError: error => notify(readableError(error)) });
   const filtered = useMemo(() => (docs.data ?? []).filter(d => d.archived === (view === "archive") && `${d.title} ${d.filename}`.toLowerCase().includes(search.toLowerCase())), [docs.data, view, search]);
   const recent = (docs.data ?? []).find(d => !d.archived && d.lastOpenedAt);
-  const heading = view === "archive" ? "아카이브" : view === "notes" ? "나의 연구 노트" : view === "map" ? "연구맵" : "나의 연구 서재";
+  const heading = view === "archive" ? "아카이브" : view === "notes" ? "나의 연구 노트" : view === "map" ? "연구맵" : view === "discover" ? "논문 추천" : "나의 연구 서재";
   return <div className="pf-library-shell" onDragOver={event => { event.preventDefault(); setDragging(true); }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false); }} onDrop={event => { event.preventDefault(); setDragging(false); void importFiles(Array.from(event.dataTransfer.files)); }}>
     <PaperflowSidebar view={view} onView={setView}/>
     <main className="pf-library-main">
@@ -64,6 +65,7 @@ export function ResearchLibrary() {
         </section>}
         {view === "notes" && <section className="pf-notebook">{(annotations.data ?? []).map(a => <GlassPanel className="pf-note-card" key={a.id}><Badge>{a.type === "ink" ? "손글씨 메모" : a.note ? "사용자 메모" : "마킹"}</Badge><blockquote>{a.anchor.textQuote}</blockquote>{a.note && <p>{a.note}</p>}<Link href={`/reader/${a.documentId}?page=${a.pageIndex + 1}&annotation=${a.id}`}>원문 {a.pageIndex + 1}페이지로 <ArrowUpRight size={14}/></Link></GlassPanel>)}{!annotations.data?.length && <div className="pf-empty"><h3>원문에서 시작하는 메모</h3><p>Reader에서 마킹·펜·텍스트 메모를 남기면 이곳에 모인다.</p></div>}</section>}
         {view === "map" && <ResearchMapView docs={docs.data ?? []} annotations={annotations.data ?? []}/>}
+        {view === "discover" && <DiscoverView docs={docs.data ?? []} annotations={annotations.data ?? []}/>}
         <footer className="pf-library-footer"><span>원문은 그대로, 생각은 더 깊게.</span><span>PRIVATE LIBRARY · LOCAL STORAGE</span></footer>
       </div>
     </main>
