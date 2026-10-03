@@ -15,3 +15,7 @@ tests/private/
 
 .vercel
 .env*
+
+# Supabase CLI link state
+supabase/.temp/
+supabase/.branches/
