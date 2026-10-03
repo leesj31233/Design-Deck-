@@ -578,3 +578,71 @@ html[data-pf-theme="dark"] .pf-guide-marks span { mix-blend-mode:normal; backgro
 .pf-guide-footer small { width:100%; font-size:10px; color:var(--muted); }
 .pf-guide-intro p { font-size:12.5px; line-height:1.65; }
 .pf-guide-note { font-size:11px !important; color:var(--muted); }
+
+/* ── Motion system (V4) ─────────────────────────────────────────────────────────────────────────
+   One vocabulary everywhere: surfaces settle with --ease-out, pressed things spring with --ease-spring,
+   panels slide in from the edge they live on. Hover lifts only where a fine pointer can hover. */
+.pf-view { will-change:auto; }
+.pf-inspector { animation:pf-panel-right .38s var(--ease-out) backwards; }
+.pf-page-rail { animation:pf-panel-left .34s var(--ease-out) backwards; }
+@keyframes pf-panel-right { from { opacity:0; transform:translateX(18px); } }
+@keyframes pf-panel-left { from { opacity:0; transform:translateX(-14px); } }
+.pf-notification { animation:pf-toast-in .46s var(--ease-spring) backwards; }
+@keyframes pf-toast-in { from { opacity:0; transform:translate(-50%,14px) scale(.96); } to { opacity:1; transform:translate(-50%,0) scale(1); } }
+.pf-notification button { transition:background-color var(--dur-fast) var(--ease-out),scale var(--dur-med) var(--ease-spring); }
+.pf-notification button:hover { background:var(--line); }
+.pf-notification button:active { scale:.9; }
+
+/* The active nav item already carries the gliding pill; it should not also nudge sideways. */
+.pf-sidebar nav button[aria-current="page"]:hover { transform:none; }
+.pf-sidebar nav button { transition-property:background-color,color,transform,scale; }
+
+/* Inspector tabs: the gliding pill replaces the static active background. */
+.pf-inspector-tabs>button { height:28px; letter-spacing:-.005em; }
+
+/* Language toggle reads as a switch when the translation is shown. */
+.pf-language-toggle[aria-pressed="true"] { background:color-mix(in srgb,var(--accent) 14%,var(--surface-strong))!important; color:var(--accent)!important; box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent); }
+
+/* Toolbar hover lift only for real hover; touch gets the press spring alone. */
+@media (hover:none) {
+  .pf-reader-tools button:not(:disabled):hover,.pf-reader-top button:not(:disabled):hover,.pf-sidebar nav button:not(:disabled):hover { transform:none; box-shadow:none; }
+}
+
+/* Cards: a gentle lift on hover, a press that gives under the finger. */
+.pf-continue-card { transition:transform var(--dur-med) var(--ease-out),box-shadow var(--dur-med) var(--ease-out),border-color var(--dur-med) var(--ease-out); }
+@media (hover:hover) and (pointer:fine) { .pf-continue-card:hover { transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.4),var(--shadow-float); } }
+.pf-paper-list .pf-book-card { transition:box-shadow .3s var(--ease-out),border-color .3s var(--ease-out),background .3s var(--ease-out),transform .3s var(--ease-out); }
+@media (hover:hover) and (pointer:fine) { .pf-paper-list[data-layout="shelf"] .pf-book-card:hover { transform:translateY(-3px); } }
+.pf-paper-link .pf-book-cover { transition:transform .38s var(--ease-spring),box-shadow .38s var(--ease-out); }
+.pf-paper-link:active .pf-book-cover { transform:perspective(900px) translateY(-1px) scale(.975); transition-duration:.08s; }
+.pf-continue-cover:active .pf-book-cover { transform:scale(.975); }
+
+/* Inputs: the focus ring grows in rather than blinking on. */
+.paperflow input:not([type="range"]):not([type="checkbox"]),.paperflow textarea { transition:border-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-med) var(--ease-out),background-color var(--dur-fast) var(--ease-out); }
+.paperflow label:focus-within { transition:box-shadow var(--dur-med) var(--ease-out),border-color var(--dur-fast) var(--ease-out); }
+
+/* Progress fills ease to their value. */
+.paperflow progress::-webkit-progress-value { transition:width .6s var(--ease-out); }
+
+/* Page tiles, guide cards, recommendation cards and journal covers share the press spring. */
+.pf-page-tile,.pf-guide-findings button,.pf-rec,.pf-journal-cover { transition:transform var(--dur-med) var(--ease-spring),box-shadow var(--dur-med) var(--ease-out),background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out); }
+.pf-page-tile:active,.pf-guide-findings button:active { transform:scale(.97); transition-duration:.07s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-inspector,.pf-page-rail,.pf-notification { animation:none; }
+  .pf-continue-card,.pf-paper-list .pf-book-card,.pf-paper-link .pf-book-cover,.pf-page-tile,.pf-guide-findings button,.pf-rec,.pf-journal-cover { transition:none; }
+}
+
+/* Email sign-in under the Google button. */
+.pf-account-signin-group { display:grid; gap:6px; }
+.pf-account-email-toggle { display:flex; align-items:center; justify-content:center; gap:6px; height:28px; border-radius:10px; font-size:10px; color:var(--muted); transition:background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out),scale var(--dur-med) var(--ease-spring); }
+.pf-account-email-toggle:active { scale:.97; }
+@media (hover:hover) and (pointer:fine) { .pf-account-email-toggle:hover { background:var(--line); color:var(--foreground); } }
+.pf-account-email { display:flex; gap:5px; animation:dd-rise .26s var(--ease-out) backwards; }
+.pf-account-email input { flex:1; min-width:0; height:30px; padding:0 9px; border:1px solid var(--line); border-radius:9px; background:var(--surface-strong); color:var(--foreground); font-size:11px; }
+.pf-account-email input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 16%,transparent); }
+.pf-account-email button { height:30px; padding:0 9px; border-radius:9px; background:var(--foreground); color:var(--background); font-size:10px; font-weight:600; white-space:nowrap; transition:opacity var(--dur-fast) var(--ease-out),scale var(--dur-med) var(--ease-spring); }
+.pf-account-email button:disabled { opacity:.45; }
+.pf-account-email button:active { scale:.95; }
+.pf-account-sent { display:flex; gap:6px; margin:0!important; padding:8px 9px; border-radius:10px; background:color-mix(in srgb,var(--success) 12%,transparent); font-size:10px!important; line-height:1.5!important; color:var(--foreground)!important; }
+.pf-account-sent svg { flex-shrink:0; margin-top:2px; }

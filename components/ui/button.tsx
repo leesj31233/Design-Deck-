@@ -4,13 +4,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 export const buttonVariants = cva(
-  "inline-flex select-none items-center justify-center gap-2 rounded-xl font-medium tracking-[-0.01em] transition-all duration-150 disabled:pointer-events-none disabled:opacity-45 active:scale-[.985] dd-focus",
+  "inline-flex select-none items-center justify-center gap-2 rounded-xl font-medium tracking-[-0.01em] disabled:pointer-events-none disabled:opacity-45 active:scale-[.96] dd-focus [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "border border-transparent bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:opacity-90",
-        accent: "border border-transparent bg-[var(--accent)] text-white shadow-sm hover:brightness-105",
-        secondary: "border border-[var(--line)] bg-[var(--surface-strong)] text-[var(--foreground)] hover:bg-white/90 dark:hover:bg-white/10",
+        primary: "border border-transparent bg-[var(--foreground)] text-[var(--background)] shadow-sm hover:-translate-y-px hover:shadow-[0_8px_22px_rgba(0,0,0,.16)] active:translate-y-0 active:shadow-sm",
+        accent: "border border-transparent bg-[var(--accent)] text-white shadow-sm hover:-translate-y-px hover:brightness-105 hover:shadow-[0_8px_22px_color-mix(in_srgb,var(--accent)_32%,transparent)] active:translate-y-0",
+        secondary: "border border-[var(--line)] bg-[var(--surface-strong)] text-[var(--foreground)] shadow-[0_1px_2px_rgba(0,0,0,.04)] hover:border-[color-mix(in_srgb,var(--foreground)_18%,transparent)] hover:shadow-[0_4px_14px_rgba(0,0,0,.07)]",
         ghost: "border border-transparent bg-transparent text-[var(--foreground)] hover:bg-black/[.055] dark:hover:bg-white/[.075]",
         danger: "border border-transparent bg-[var(--danger)] text-white hover:brightness-105"
       },

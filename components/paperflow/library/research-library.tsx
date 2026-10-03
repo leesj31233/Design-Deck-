@@ -48,8 +48,10 @@ export function ResearchLibrary() {
     <main className="pf-library-main">
       <header className="pf-library-top"><span className="pf-breadcrumb">Workspace <span>/</span> {heading}</span><div className="pf-toolbar-group"><IconButton label="Toggle theme" variant="ghost" onClick={toggleTheme}>{dark ? <Sun size={18}/> : <Moon size={18}/>}</IconButton><Button variant="ghost" onClick={openCommand}><Command size={15}/><span className="pf-command-label">명령</span><kbd>Ctrl K</kbd></Button></div></header>
       <div className="pf-library-content">
-        <div className="pf-heading"><div><div className="pf-kicker">YOUR RESEARCH, COLLECTED.</div><h1>{heading}</h1><p>한 편씩 모으고, 한 문장씩 깊이 읽는 나만의 공간.</p></div><Button variant="primary" className="pf-import-button" onClick={openImport} disabled={importing}><Plus size={17}/>{importing ? "가져오는 중…" : "PDF 가져오기"}</Button></div>
+        <div className="pf-heading"><div><div className="pf-kicker">YOUR RESEARCH, COLLECTED.</div><motion.h1 key={heading} initial={reduced ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>{heading}</motion.h1><p>한 편씩 모으고, 한 문장씩 깊이 읽는 나만의 공간.</p></div><Button variant="primary" className="pf-import-button" onClick={openImport} disabled={importing}><Plus size={17}/>{importing ? "가져오는 중…" : "PDF 가져오기"}</Button></div>
         {(docs.error || annotations.error) && <p role="alert" className="pf-error">{readableError(docs.error ?? annotations.error)}</p>}
+        {/* Switching views settles the new one in from just below, like a page turning into place. */}
+        <motion.div key={view} className="pf-view" initial={reduced ? false : { opacity: 0, y: 12, filter: "blur(3px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }} transition={{ type: "spring", stiffness: 260, damping: 30, mass: .8 }}>
         {view === "library" && <CollectionInsights docs={docs.data ?? []} annotations={annotations.data ?? []}/>}
         {view === "library" && recent && <section className="pf-continue">
           <GlassPanel className="pf-continue-card"><Link className="pf-continue-cover" href={`/reader/${recent.id}`} aria-label="최근 논문 이어 읽기"><DocumentCover documentId={recent.id} title={recent.title}/></Link><div className="pf-continue-copy"><span className="pf-kicker">CONTINUE READING</span><h3>{recent.title}</h3><p>{recent.currentPage} / {recent.pageCount} 페이지 · 마지막으로 읽던 곳에서</p><progress value={recent.currentPage} max={recent.pageCount} aria-label="Reading progress"/></div><Button asChild variant="primary"><Link href={`/reader/${recent.id}`}>이어 읽기 <ArrowUpRight size={16}/></Link></Button></GlassPanel>
@@ -66,6 +68,7 @@ export function ResearchLibrary() {
         {view === "notes" && <section className="pf-notebook">{(annotations.data ?? []).map(a => <GlassPanel className="pf-note-card" key={a.id}><Badge>{a.type === "ink" ? "손글씨 메모" : a.note ? "사용자 메모" : "마킹"}</Badge><blockquote>{a.anchor.textQuote}</blockquote>{a.note && <p>{a.note}</p>}<Link href={`/reader/${a.documentId}?page=${a.pageIndex + 1}&annotation=${a.id}`}>원문 {a.pageIndex + 1}페이지로 <ArrowUpRight size={14}/></Link></GlassPanel>)}{!annotations.data?.length && <div className="pf-empty"><h3>원문에서 시작하는 메모</h3><p>Reader에서 마킹·펜·텍스트 메모를 남기면 이곳에 모인다.</p></div>}</section>}
         {view === "map" && <ResearchMapView docs={docs.data ?? []} annotations={annotations.data ?? []}/>}
         {view === "discover" && <DiscoverView docs={docs.data ?? []} annotations={annotations.data ?? []}/>}
+        </motion.div>
         <footer className="pf-library-footer"><span>원문은 그대로, 생각은 더 깊게.</span><span>PRIVATE LIBRARY · LOCAL STORAGE</span></footer>
       </div>
     </main>
