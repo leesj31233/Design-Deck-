@@ -10,6 +10,7 @@ import { useTranslationStore } from "@/lib/paperflow/translation/translation-sto
 import { HighlightLayer, type ResolvedAnnotation } from "./highlight-layer";
 import { InkLayer } from "./ink-layer";
 import { TranslationOverlay, type OverlayState } from "./translation-overlay";
+import { GuideMarks } from "./guide-marks";
 import { linkInk } from "@/lib/paperflow/typeset/ink";
 import { usePaperflow } from "../shell/paperflow-context";
 
@@ -124,6 +125,7 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
     {textReady && <HighlightLayer annotations={resolved} selected={selected}/>}
     {ready && <TranslationOverlay documentId={documentId} pageIndex={pageIndex} scale={scale} canvas={canvas.current} canvasVersion={canvasVersion} referenceColor={linkColors.reference} citationColor={linkColors.citation} onState={setOverlay} onOriginal={onOriginal} onRetry={onRetry}/>}
     {textReady && translationMarks.length > 0 && <div className="pf-translated-marks"><HighlightLayer annotations={translationMarks} selected={selected}/></div>}
+    <GuideMarks pageIndex={pageIndex}/>
     <InkLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations}/>
   </div>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
 });

@@ -1,5 +1,6 @@
 import type { Annotation } from "../anchors/types";
 import type { ScholarWork } from "../scholar/openalex";
+import type { PaperGuide } from "../guide/guide";
 export type StoredDocument = {
   id: string; filename: string; title: string; mimeType: "application/pdf"; byteLength: number;
   createdAt: string; updatedAt: string; pageCount: number; fingerprint?: string; blobKey: string;
@@ -11,6 +12,8 @@ export type StoredDocument = {
   storagePath?: string;
   /** OpenAlex record: authors, institutions, journal, topic hierarchy, related works. */
   scholar?: ScholarWork;
+  /** AI study guide (overview, findings tied to source paragraphs, terms, questions). */
+  guide?: PaperGuide;
 };
 export type StoredDocumentInput = { blob: Blob; filename: string; pageCount: number; fingerprint?: string };
 export interface DocumentRepository {

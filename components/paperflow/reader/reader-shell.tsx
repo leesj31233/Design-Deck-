@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { GuideArrow } from "./guide-arrow";
 import { Maximize2, Minimize2, Minus, Plus } from "lucide-react";
 import { SearchField } from "@/components/ui/search-field";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
@@ -256,6 +257,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>H 마킹 · N 메모 · Ctrl K 명령</span></footer>
     {textNoteOpen && <div className="pf-note-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTextNoteOpen(false); }}><section className="pf-note-dialog" role="dialog" aria-modal="true" aria-label="텍스트 메모"><h2>텍스트 메모</h2><p>{useReaderStore.getState().activeSelection ? "선택한 문장에 메모를 연결한다." : `${currentPage}페이지에 메모를 저장한다.`}</p><textarea autoFocus aria-label="텍스트 메모 입력" value={textNoteDraft} onChange={event => setTextNoteDraft(event.target.value)} onKeyDown={event => { if (event.key === "Escape") setTextNoteOpen(false); }} placeholder="읽으며 떠오른 생각이나 질문을 기록하세요."/><div><Button variant="ghost" onClick={() => setTextNoteOpen(false)}>취소</Button><Button disabled={!textNoteDraft.trim() || saving} onClick={() => void saveNote(textNoteDraft).then(() => setTextNoteOpen(false))}>메모 저장</Button></div></section></div>}
+    {inspector && !focus && <GuideArrow/>}
     <ReaderSelectionTools documentId={documentId} onHighlight={color => void save(color)} onNote={showNote} onTranslate={translateSelection} onShell={showShell} onDismiss={dismiss} saving={saving}/>
   </div>;
 }

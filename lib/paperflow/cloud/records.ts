@@ -1,7 +1,7 @@
 import type { StoredDocument } from "../persistence/types";
 
 /** Reading state and bibliography that travel with a paper; the PDF bytes travel separately. */
-const META_KEYS = ["visitedPages", "opens", "keywords", "citationCount", "metadataSource", "metadataCheckedAt", "jif", "currentPage", "lastOpenedAt", "authors", "journal", "year", "doi", "researchPoolIds", "fingerprint", "scholar"] as const;
+const META_KEYS = ["visitedPages", "opens", "keywords", "citationCount", "metadataSource", "metadataCheckedAt", "jif", "currentPage", "lastOpenedAt", "authors", "journal", "year", "doi", "researchPoolIds", "fingerprint", "scholar", "guide"] as const;
 export type DocumentRow = { id: string; filename: string; title: string; byte_length: number; page_count: number; storage_path: string | null; metadata: Record<string, unknown>; archived: boolean; created_at: string; updated_at: string };
 
 export function rowOf(userId: string, doc: StoredDocument, storagePath: string | null): DocumentRow & { user_id: string } {

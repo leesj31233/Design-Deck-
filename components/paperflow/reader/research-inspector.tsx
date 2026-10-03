@@ -1,5 +1,6 @@
 "use client";
 import { ConceptStudy } from "./concept-study";
+import { GuidePanel } from "./guide-panel";
 import { useEffect, useState } from "react";
 
 import { BookOpen, Highlighter, ArrowUpRight, Trash2, X, Save, Languages, Sparkles } from "lucide-react";
@@ -30,7 +31,8 @@ export function ResearchInspector({ annotations, resolved, selected, onSelect, o
   const [draft, setDraft] = useState("");
   useEffect(() => { setDraft(active?.note ?? ""); }, [active?.id, active?.note, selection?.textQuote]);
   return <GlassPanel className="pf-inspector dd-scrollbar" data-inspector><header><div><span className="pf-kicker">SOURCE FIRST</span><h2>Research Inspector</h2></div><IconButton label="Close inspector" variant="ghost" size="sm" onClick={() => useReaderStore.getState().set({ inspectorOpen: false })}><X size={16}/></IconButton></header>
-    <Tabs value={tab} onValueChange={setTab}><TabsList className="pf-inspector-tabs"><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="notes">Notes</TabsTrigger><TabsTrigger value="evidence">Evidence</TabsTrigger></TabsList>
+    <Tabs value={tab} onValueChange={setTab}><TabsList className="pf-inspector-tabs"><TabsTrigger value="guide">AI 가이드</TabsTrigger><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="notes">Notes</TabsTrigger><TabsTrigger value="evidence">Evidence</TabsTrigger></TabsList>
+      <TabsContent value="guide"><GuidePanel/></TabsContent>
       <TabsContent value="context">
         <ConceptStudy source={sourceText ?? ""} selected={selection?.textQuote ?? ""} page={selection ? selection.pageIndex + 1 : sourcePage}/>
         <div className="pf-inspector-section">{sourceText ? <><Badge>원문 · p. {sourcePage}</Badge><blockquote>{sourceText}</blockquote></> : <div className="pf-inspector-empty"><BookOpen size={27}/><h3>문단을 클릭하세요</h3><p>원본 PDF의 문단을 클릭하면<br/>원래 문단 자리에서 한국어로 바뀝니다.</p><span>문단 클릭 → 한국어로 읽기 → 원문 전환</span></div>}</div>
