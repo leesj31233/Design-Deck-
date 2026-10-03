@@ -8,7 +8,7 @@ export const cloudAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 export const cloudEnabled = Boolean(cloudUrl && cloudAnonKey);
 
 /** Beta quota for PDFs kept in the cloud. */
-export const BETA_QUOTA_BYTES = 500 * 1024 * 1024;
+export const BETA_QUOTA_BYTES = 200 * 1024 * 1024;
 export const PAPER_BUCKET = "papers";
 
 export type StorageMode = "cloud" | "local";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { recordOf, rowOf } from "@/lib/paperflow/cloud/records";
-import { isOwnerEmail, paperPath } from "@/lib/paperflow/cloud/config";
+import { BETA_QUOTA_BYTES, isOwnerEmail, paperPath } from "@/lib/paperflow/cloud/config";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import type { StoredDocument } from "@/lib/paperflow/persistence/types";
 
@@ -28,6 +28,8 @@ describe("cloud library records", () => {
     expect(isOwnerEmail("someone@example.com", "owner@example.com")).toBe(false);
     expect(isOwnerEmail(undefined, "owner@example.com")).toBe(false);
     expect(paperPath("uid", "doc")).toBe("uid/doc.pdf");
+    // Everyone else: 200 MB of cloud PDFs during the beta.
+    expect(BETA_QUOTA_BYTES).toBe(200 * 1024 * 1024);
   });
   it("keys the shared translation cache by prompt version and normalised source text", async () => {
     const a = await sourceHash("Coal  is\nburned."), b = await sourceHash("Coal is burned.");

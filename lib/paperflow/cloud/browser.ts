@@ -19,4 +19,15 @@ export async function signInWithGoogle(next = "/library") {
   if (error) throw error;
 }
 
+/** One-time sign-in link by email (also creates the account on first use); returns through the same callback. */
+export async function signInWithEmail(email: string, next = "/library") {
+  const supabase = cloudClient();
+  if (!supabase) throw new Error("클라우드 계정이 아직 설정되지 않았다.");
+  const address = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) throw new Error("이메일 주소를 확인해 달라.");
+  const emailRedirectTo = `${location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+  const { error } = await supabase.auth.signInWithOtp({ email: address, options: { emailRedirectTo, shouldCreateUser: true } });
+  if (error) throw error;
+}
+
 export async function signOut() { await cloudClient()?.auth.signOut(); }

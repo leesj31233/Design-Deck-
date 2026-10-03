@@ -29,6 +29,7 @@
    - 승인된 리디렉션 URI: `https://<project-ref>.supabase.co/auth/v1/callback`
    - OAuth 동의 화면: 외부, 앱 이름 PAPERFLOW. 범위는 기본값(email, profile, openid)만 쓴다.
 2. Supabase **Authentication → Providers → Google**을 켜고, 1에서 받은 Client ID와 Client Secret을 입력한다.
+   - 같은 화면의 **Email** 공급자는 기본으로 켜져 있다(이메일 로그인 링크용). 꺼져 있으면 켠다.
 3. Supabase **Authentication → URL Configuration**을 설정한다.
    - Site URL: `https://temporary-speedy-thunder-fmo0cqz.vercel.app`
    - Redirect URLs:
@@ -44,12 +45,12 @@
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role key | **비밀** |
 | `PAPERFLOW_OWNER_EMAILS` | `seungjun.lee@naysor.com` | 서버 전용 |
 
-입력을 마친 뒤 재배포하면 사이드바에 "Google로 로그인"이 나타난다. 재배포는 요청하면 바로 한다.
+입력을 마친 뒤 재배포하면 사이드바에 "Google로 로그인"과 "이메일로 로그인"이 나타난다. 이메일 로그인은 Supabase 기본 메일로 로그인 링크를 보내므로 Google 설정 없이도 바로 쓸 수 있다(기본 메일은 시간당 발송 수가 적으니, 사용자가 늘면 Auth → SMTP에 회사 메일을 연결한다). 재배포는 요청하면 바로 한다.
 
 ## 저장 방식과 용량
 
 - **기본 계정(베타):**
-  - PDF를 클라우드 비공개 버킷에 저장하고, **1인 500MB**(논문 약 150편)까지 쓴다.
+  - PDF를 클라우드 비공개 버킷에 저장하고, **1인 200MB**(논문 약 60편)까지 쓴다.
   - 한도는 서버가 업로드 주소를 발급하기 전에 검사한다.
 - **소유자 계정**(`PAPERFLOW_OWNER_EMAILS`):
   - PDF는 **기기 저장소**에 두고, **용량 제한이 없다**.
@@ -64,10 +65,10 @@
 
 ## 수용 인원과 비용 (Supabase 2026-10 공개 요금 기준, 변동 가능)
 
-| 플랜 | 파일 저장 | DB | 500MB를 꽉 채운 사용자 | 평균 50MB 사용자 |
+| 플랜 | 파일 저장 | DB | 200MB를 꽉 채운 사용자 | 평균 50MB 사용자 |
 |---|---|---|---|---|
-| Free | 1 GB | 500 MB | 2명 | 약 20명 |
-| Pro (월 $25) | 100 GB 포함, 초과 GB당 월 약 $0.021 | 8 GB | 약 200명 | 약 2,000명 |
+| Free | 1 GB | 500 MB | 5명 | 약 20명 |
+| Pro (월 $25) | 100 GB 포함, 초과 GB당 월 약 $0.021 | 8 GB | 약 500명 | 약 2,000명 |
 
 - **DB 사용량:** 번역문과 메모는 논문 한 편에 약 0.1~0.3MB다. 따라서 사용자 수천 명까지는 DB가 먼저 차지 않는다.
 - **로컬 방식 계정:** 클라우드 파일 저장량이 0이다.

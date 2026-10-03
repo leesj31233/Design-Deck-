@@ -1,8 +1,9 @@
 "use client";
-import { Cloud, HardDrive, LogIn, LogOut, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { Cloud, HardDrive, LogIn, LogOut, Mail, RefreshCw } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { useCloud, syncAll } from "@/lib/paperflow/cloud/sync";
-import { signInWithGoogle, signOut } from "@/lib/paperflow/cloud/browser";
+import { signInWithEmail, signInWithGoogle, signOut } from "@/lib/paperflow/cloud/browser";
 import { usePaperflow } from "./paperflow-context";
 import { readableError } from "@/lib/paperflow/errors";
 
@@ -13,7 +14,7 @@ export function AccountCard() {
   const cloud = useCloud(), { notify } = usePaperflow();
   if (cloud.status === "disabled") return <small className="pf-account-local"><HardDrive size={12}/> 로컬 저장 · 이 브라우저</small>;
   if (cloud.status === "loading") return <small className="pf-account-local">계정 확인 중…</small>;
-  if (cloud.status === "signed-out") return <button type="button" className="pf-account-signin" onClick={() => void signInWithGoogle(location.pathname).catch(error => notify(readableError(error)))}><LogIn size={14}/> Google로 로그인<small>모든 기기에서 서재·메모 이어 보기</small></button>;
+  if (cloud.status === "signed-out") return <SignIn/>;
   const plan = cloud.plan, local = plan?.mode === "local";
   const ratio = plan && plan.quotaBytes ? Math.min(1, plan.usedBytes / plan.quotaBytes) : 0;
   return <div className="pf-account">
@@ -27,5 +28,24 @@ export function AccountCard() {
       <button type="button" onClick={() => void signOut()} aria-label="로그아웃"><LogOut size={12}/>로그아웃</button>
     </div>
     {cloud.error && <small className="pf-account-error">{cloud.error}</small>}
+  </div>;
+}
+
+/** Signed out: Google, or a one-time link by email. Either one creates the account on first use. */
+function SignIn() {
+  const { notify } = usePaperflow();
+  const [email, setEmail] = useState(""), [open, setOpen] = useState(false), [sending, setSending] = useState(false), [sentTo, setSentTo] = useState("");
+  const send = async (event: React.FormEvent) => {
+    event.preventDefault(); setSending(true);
+    try { await signInWithEmail(email, location.pathname); setSentTo(email.trim()); } catch (error) { notify(readableError(error)); } finally { setSending(false); }
+  };
+  return <div className="pf-account-signin-group">
+    <button type="button" className="pf-account-signin" onClick={() => void signInWithGoogle(location.pathname).catch(error => notify(readableError(error)))}><LogIn size={14}/> Google로 로그인<small>모든 기기에서 서재·메모 이어 보기</small></button>
+    {sentTo ? <p className="pf-account-sent" role="status"><Mail size={12}/> {sentTo}로 로그인 링크를 보냈다. 메일의 링크를 누르면 로그인된다.</p>
+      : open ? <form className="pf-account-email" onSubmit={event => void send(event)}>
+        <input type="email" autoComplete="email" required aria-label="로그인 이메일" placeholder="이메일 주소" value={email} onChange={event => setEmail(event.target.value)} autoFocus/>
+        <button type="submit" disabled={sending || !email}>{sending ? "보내는 중" : "링크 받기"}</button>
+      </form>
+      : <button type="button" className="pf-account-email-toggle" onClick={() => setOpen(true)}><Mail size={12}/> 이메일로 로그인 · 가입</button>}
   </div>;
 }

@@ -1,13 +1,13 @@
 -- PAPERFLOW cloud library: accounts, per-user papers/notes/translations, private PDF storage,
--- a 500 MB beta quota per user, and a shared translation cache keyed by source-text hash.
+-- a 200 MB beta quota per user, and a shared translation cache keyed by source-text hash.
 -- Every user table is protected by row level security: a user only ever sees their own rows.
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
   avatar_url text,
-  -- Beta quota: 500 MB of PDFs per user; null means unlimited.
-  storage_quota_bytes bigint default 524288000,
+  -- Beta quota: 200 MB of PDFs per user; null means unlimited.
+  storage_quota_bytes bigint default 209715200,
   -- cloud: PDFs in the private bucket. local: PDFs stay on the device, only notes/metadata sync.
   storage_mode text not null default 'cloud' check (storage_mode in ('cloud', 'local')),
   created_at timestamptz not null default now(),

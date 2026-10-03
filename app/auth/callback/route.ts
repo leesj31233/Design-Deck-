@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { userClient } from "@/lib/paperflow/cloud/server";
 
-/** Google sign-in returns here with a one-time code; exchange it for a session cookie. */
+/** Google sign-in and the email sign-in link return here with a one-time code; exchange it for a session cookie. */
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
