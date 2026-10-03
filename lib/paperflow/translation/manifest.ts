@@ -3,9 +3,10 @@ import { openDatabase, requestResult, transactionDone } from "../persistence/ind
 import { analyzePage } from "../layout/page-blocks";
 import { classifyBlock, extractKeywords, nextSection, pageContext, type BlockRole, type Section } from "../layout/classify";
 import type { PageSize, PdfParagraph } from "../layout/types";
+import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.15";
+export const EXTRACTOR_VERSION = "layout-v3.16";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -14,6 +15,8 @@ export interface TranslationManifest {
   documentId: string; version: string; createdAt: string; pageCount: number;
   pages: PageSize[]; blocks: ManifestBlock[]; units: TranslationUnit[]; keywords: string[];
   extractedPages: number; ocrPages: number; ocrCandidates?: number[];
+  /** How the paper prints sub/superscripts and citations, for the translated text. */
+  scripts?: ScriptTable;
 }
 
 export interface OcrProvider { extractPage(documentId: string, pageIndex: number, signal?: AbortSignal): Promise<PdfTextItem[]> }
@@ -86,6 +89,7 @@ export async function buildUnits(documentId: string, blocks: ManifestBlock[]): P
 export async function buildTranslationManifest(documentId: string, pdf: PdfDocumentHandle, signal?: AbortSignal, onPage?: (completed: number) => void, ocr?: OcrProvider): Promise<TranslationManifest> {
   const blocks: ManifestBlock[] = [], ids = new Set<string>(), ocrCandidates: number[] = [], pages: PageSize[] = [], keywords: string[] = [];
   let ocrPages = 0, section: Section = "none";
+  const marks: string[] = [], texts: string[] = [], citations = { raised: 0, total: 0 };
   for (let pageIndex = 0; pageIndex < pdf.pageCount; pageIndex++) {
     signal?.throwIfAborted();
     const page = await pdf.getPage(pageIndex + 1);
@@ -104,14 +108,18 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
       if (block.role === "KEYWORDS" && pageIndex < 2) keywords.push(...extractKeywords(block));
       if (ids.has(block.id)) throw new Error(`${pageIndex + 1}페이지에 중복된 번역 블록 ID가 있다.`);
       ids.add(block.id);
-      blocks.push({ ...block, readingOrder: blocks.length, lineTexts: undefined });
+      if (block.translatable) {
+        marks.push(...block.marks ?? []); texts.push(block.text);
+        citations.raised += block.raised ?? 0; citations.total += (block.text.match(/\[\d+(?:\s*[,–-]\s*\d+)*\]/g) ?? []).length;
+      }
+      blocks.push({ ...block, readingOrder: blocks.length, lineTexts: undefined, marks: undefined, raised: undefined });
     }
     onPage?.(pageIndex + 1);
     // Yield so a long extraction never freezes the reader.
     await new Promise(resolve => setTimeout(resolve, 0));
   }
   const units = await buildUnits(documentId, blocks);
-  return { documentId, version: EXTRACTOR_VERSION, createdAt: new Date().toISOString(), pageCount: pdf.pageCount, pages, blocks, units, keywords: [...new Set(keywords)], extractedPages: pdf.pageCount, ocrPages, ocrCandidates };
+  return { documentId, version: EXTRACTOR_VERSION, createdAt: new Date().toISOString(), pageCount: pdf.pageCount, pages, blocks, units, keywords: [...new Set(keywords)], extractedPages: pdf.pageCount, ocrPages, ocrCandidates, scripts: buildScriptTable(marks, texts, citations) };
 }
 
 const memory = new Map<string, TranslationManifest>();

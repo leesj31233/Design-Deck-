@@ -1,3 +1,4 @@
+import { fixTerminology } from "../translation/research-style";
 import { openDatabase, requestResult, transactionDone } from "./indexeddb";
 
 export interface StoredTranslation { id: string; documentId: string; pageIndex: number; source: string; text: string; provider: "OpenAI"; createdAt: string; unitId?: string; blockId?: string; promptVersion?: string }
@@ -13,7 +14,7 @@ export const translationRepository = {
   /** Current-version unit translations only. */
   async unitTexts(documentId: string): Promise<Map<string, string>> {
     const items = await translationRepository.listByDocument(documentId);
-    return new Map(items.filter(item => item.unitId && item.promptVersion === TRANSLATION_PROMPT_VERSION && item.text.trim()).map(item => [item.unitId!, item.text]));
+    return new Map(items.filter(item => item.unitId && item.promptVersion === TRANSLATION_PROMPT_VERSION && item.text.trim()).map(item => [item.unitId!, fixTerminology(item.text)]));
   },
   /** One transaction per model response, not per paragraph. */
   async putUnits(documentId: string, items: { unitId: string; pageIndex: number; source: string; text: string }[]) {

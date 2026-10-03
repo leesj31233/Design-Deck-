@@ -71,7 +71,9 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
   if (size < context.bodySize * .8 && score.sentences === 0 && block.lines.length <= 3) return { role: "FIGURE_TEXT", reason: "small-label" };
   if ((narrow || offEdge) && score.sentences === 0 && score.words < 14) return { role: "FIGURE_TEXT", reason: "figure-label" };
   // Chemical reactions: an arrow between species with little prose around it.
-  if (/[→⇌⟶⇄↔]/.test(value) && score.sentences === 0 && (value.match(/\b[a-z]{3,}\b/g) ?? []).length < 6) return { role: "EQUATION", reason: "reaction" };
+  // Fonts without a Unicode map turn the arrow into "?"; species joined by " + " give a reaction away too.
+  const reaction = /[→⇌⟶⇄↔]|\s\?\s/.test(value) || (value.match(/\s\+\s/g) ?? []).length >= 2 && /\b[A-Z][a-z]?\d|\b(?:CO|NO|SO|OH)\b/.test(value);
+  if (reaction && score.sentences === 0 && (value.match(/\b[a-z]{3,}\b/g) ?? []).length < 6) return { role: "EQUATION", reason: "reaction" };
   // Abbreviation keys under tables ("FA: Fly ash; FYM: farmyard manure; …") stay as printed.
   if ((value.match(/\b[A-Z][A-Za-z0-9]{0,6}\s*[:=]\s*[^;:]{2,60};/g) ?? []).length >= 3) return { role: "TABLE", reason: "abbreviation-key" };
   // Display formula systems ("While Cl ratio (K2O + Na2O)/(SiO2 + Al2O3) ≥ 2.4") are artwork, not prose.

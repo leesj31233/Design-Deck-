@@ -1,5 +1,23 @@
 export const researchTerms = ["Duke Energy", "North Carolina", "Marshall Steam Station", "natural gas", "methane", "cofiring", "co-firing", "steam station", "power plant", "power generation", "boiler", "furnace", "burner", "combustion", "emission", "emissions", "numerical simulation", "numerical modeling", "air distribution", "airflow", "flow rate", "mass flow", "heat transfer", "heat flux", "realizable turbulence model", "realizable k-ε", "turbulence", "mesh", "boundary condition", "boundary conditions", "particle", "particles", "coal", "char", "fuel", "reburning", "stoichiometric ratio", "excess air", "overfire air", "windbox", "damper", "injector", "injection", "pulverized-coal", "pulverized coal", "tangentially fired", "base case", "furnace exit gas temperature", "unburned carbon", "Eulerian", "Lagrangian", "Navier–Stokes"];
 
+/**
+ * Literal coinages the model still writes now and then although the prompt forbids them.
+ * Replaced with the English term (or the field's standard Korean), particles kept.
+ */
+const COINAGES: [RegExp, string][] = [
+  [/보일러\s?메쉬/g, "boiler mesh"], [/메쉬/g, "mesh"], [/숯탄/g, "char"], [/동소각/g, "혼소"],
+  [/복사\s?전송/g, "radiative transfer"], [/열전달\s?모드/g, "heat transfer mode"]
+];
+export function fixTerminology(text: string) {
+  let out = text;
+  for (const [pattern, term] of COINAGES) out = out.replace(pattern, term);
+  // A term that opens a sentence keeps its capital, as the paper writes it (Boiler mesh).
+  return out === text ? text : out.replace(/(^|[.!?]\s+)(boiler mesh|mesh|char|radiative transfer|heat transfer mode)/g, (_, lead: string, term: string) => lead + term[0].toUpperCase() + term.slice(1));
+}
+
+/** Every translation passes through here before it is stored or shown. */
+export const polishKorean = (text: string) => fixTerminology(declarativeKorean(text));
+
 /** Only finite declarative endings: preserve quotations, questions and noun phrases. */
 export function declarativeKorean(text: string) {
   return text.replace(/입니다(?=[.!?\s]|$)/g, "이다").replace(/아닙니다(?=[.!?\s]|$)/g, "아니다")

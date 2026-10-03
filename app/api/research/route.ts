@@ -54,7 +54,8 @@ export async function POST(request: Request) {
     if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 또는 요청 한도에 도달했다. 잠시 후 자동으로 다시 시도한다." : "OpenAI 요청을 완료하지 못했다.", kind: upstream.status === 429 ? "rate_limit" : upstream.status >= 500 ? "transient" : "configuration" }, { status: upstream.status === 429 ? 429 : upstream.status >= 500 ? 503 : 502, headers: { "Retry-After": upstream.headers.get("retry-after") || "20" } });
     const data = await upstream.json();
     const text = outputText(data);
-    const usage = { input: data.usage?.input_tokens ?? 0, output: data.usage?.output_tokens ?? 0 };
+    // Cached prompt tokens are billed at a discount; the model name lets cost reports use the right price.
+    const usage = { input: data.usage?.input_tokens ?? 0, output: data.usage?.output_tokens ?? 0, cached: data.usage?.input_tokens_details?.cached_tokens ?? 0, model: typeof data.model === "string" ? data.model : undefined };
     if (!blocks) return text ? Response.json({ text, provider: "OpenAI" }) : Response.json({ error: "설명을 받지 못했다.", kind: "malformed" }, { status: 502 });
     let parsed: { translations?: unknown } = {};
     // An incomplete response can still carry complete items; keep those and report the rest.

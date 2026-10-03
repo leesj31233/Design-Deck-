@@ -18,6 +18,8 @@ export interface PdfParagraph {
   hint?: "title" | "front-matter" | "label" | "keywords" | "figure-text" | "table" | "equation" | "furniture" | "run-in-heading";
   /** Raw visual lines, used for keyword extraction only. */
   lineTexts?: string[];
+  /** Tokens printed with sub/superscripts and the count of raised citations; folded into the manifest. */
+  marks?: string[]; raised?: number;
 }
 
 export interface PageSize { width: number; height: number }

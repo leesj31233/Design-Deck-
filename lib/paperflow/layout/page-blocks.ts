@@ -6,6 +6,9 @@ const SECTION_NAMES = /^(?:■\s*)?(?:abstract|introduction|background|literatur
 const NUMBERED_HEADING = /^(?:■\s*)?(?:\d+(?:\.\d+){0,4}\.?|[IVX]{1,5}\.|[A-H]\.)\s+[A-Z(]/;
 const RUN_IN_HEADING = /^(\d+(?:\.\d+)+\.?\s+[A-Z][^.]{2,90}?[.:])\s+([A-Z(\[\d].*)$/;
 export const CAPTION_START = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate)\s*[A-Z]?\d+[a-z]?\s*[.:|]/i;
+/** Elsevier sets the label alone on its own line: "Table 2" / "Investigated global reaction mechanisms." */
+const CAPTION_LABEL = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate)\s*[A-Z]?\d+[a-z]?\s*$/i;
+const TRAILING_FUNCTION_WORD = /\b(?:the|a|an|of|and|or|in|on|to|for|with|by|from|at|as|is|are|was|were|that|which|this|these)$/i;
 const SENTENCE_END = /[.!?](?:["”’)\]]|\[[\d,–−-]+\])?\s*$/;
 
 const words = (text: string) => text.match(/[A-Za-z]{3,}/g) ?? [];
@@ -53,7 +56,9 @@ function headingLine(line: TextLine, columnWidth: number, bodySize: number) {
 export function analyzePage(items: PdfTextItem[], pageIndex: number, width: number, height: number): PdfParagraph[] {
   const raw = dropLineNumbers(buildTextLines(items), width);
   if (!raw.length) return [];
-  const gutter = findGutter(raw, width);
+  // A page whose table is set smaller than the body can have more table lines than prose lines,
+  // and a table column may start inside the body gutter: look for the gutter among body lines.
+  const gutter = findGutter(raw, width) ?? findGutter(dominantSizeLines(raw), width);
   const ordered = splitRunInHeadings(orderLines(raw, gutter, width));
   const bodySize = median(ordered.filter(line => line.text.length > 40).map(line => line.size)) || median(ordered.map(line => line.size)) || 9;
   const columnBounds = (column: number) => column === 0 && gutter ? { left: Math.min(...ordered.filter(line => line.column === 0).map(line => line.x)), right: gutter.left } : column === 1 && gutter ? { left: gutter.right, right: Math.max(...ordered.filter(line => line.column === 1).map(line => line.right)) } : { left: Math.min(...ordered.map(line => line.x)), right: Math.max(...ordered.map(line => line.right)) };
@@ -63,19 +68,21 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
   const pitches = ordered.slice(1).map((line, index) => ({ line, previous: ordered[index] })).filter(({ line, previous }) => line.column === previous.column && Math.abs(line.size - previous.size) < line.size * .1 && line.y > previous.y && line.y - previous.y < line.size * 3).map(({ line, previous }) => line.y - previous.y);
   const bodyPitch = median(pitches) || bodySize * 1.2;
   const groups: Group[] = [], noise: TextLine[] = [];
-  for (const line of ordered) {
+  for (const [lineIndex, line] of ordered.entries()) {
     const column = bounds.get(line.column)!, columnWidth = column.right - column.left;
     // Operators of inline math are often drawn on their own baseline ("+ + +").
     // They belong to the prose line they sit in and must not split the paragraph.
     if (!/[A-Za-z0-9]/.test(line.text) && line.right - line.x < columnWidth * .7) { noise.push(line); continue; }
     const equation = isEquationLine(line.text, (line.right - line.x) / Math.max(1, columnWidth));
     // "3.2. Mathematical model. Gas phase kinetics": an unnumbered title closing a run-in line is a heading too.
-    const runInTitle = (line as TextLine & { runInTail?: boolean }).runInTail && line.text.length < 70 && !SENTENCE_END.test(line.text) && words(line.text).length >= 2 && /^[A-Z]/.test(line.text);
-    const heading = !equation && (headingLine(line, columnWidth, bodySize) || Boolean(runInTitle));
+    // "In the CFD model, the" is the paragraph's first words, not a title: titles carry no comma and
+    // do not stop on a function word.
+    const runInTitle = (line as TextLine & { runInTail?: boolean }).runInTail && line.text.length < 70 && !SENTENCE_END.test(line.text) && words(line.text).length >= 2 && /^[A-Z]/.test(line.text) && !/,/.test(line.text) && !TRAILING_FUNCTION_WORD.test(line.text.trim()) && !continuesSentence(line, ordered[lineIndex + 1]);
+    const heading = !equation && (headingLine(line, columnWidth, bodySize) || Boolean(runInTitle) || Boolean((line as TextLine & { forceHeading?: boolean }).forceHeading));
     const group = groups.at(-1), previous = group?.lines.at(-1);
     // "Figure 5a shows…" can open a line in the middle of a paragraph; a caption starts after a
     // finished sentence or a gap, or is set smaller than the body.
-    const caption = CAPTION_START.test(line.text) && (!previous || line.size < bodySize * .97 || SENTENCE_END.test(previous.text) || line.y - previous.bottom > previous.size * .8 || line.column !== previous.column);
+    const caption = (CAPTION_START.test(line.text) || CAPTION_LABEL.test(line.text.trim())) && (!previous || line.size < bodySize * .97 || SENTENCE_END.test(previous.text) || line.y - previous.bottom > previous.size * .8 || line.column !== previous.column);
     const left = leftEdge.get(line.column) ?? column.left, right = rightEdge.get(line.column) ?? column.right;
     // A long heading wraps onto a second line of the same size.
     const sameHeadingFace = previous && Math.abs(line.size - previous.size) < previous.size * .08 && line.y - previous.y < Math.max(bodyPitch, previous.size * 1.2) * 1.45;
@@ -108,6 +115,14 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
   return [...paragraphs, ...noise.map((line, index) => ({ ...toParagraph({ lines: [line], kind: "skip", hint: "furniture" }, groups.length + index, pageIndex, width, height, bodySize, bounds, leftEdge, gutter), text: line.text }))];
 }
 
+/** Lines set in the size that carries most of the page's text. */
+function dominantSizeLines(lines: TextLine[]) {
+  const mass = new Map<number, number>();
+  for (const line of lines) { const key = Math.round(line.size * 2) / 2; mass.set(key, (mass.get(key) ?? 0) + line.text.length); }
+  const dominant = [...mass].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 0;
+  return lines.filter(line => Math.abs(line.size - dominant) < dominant * .1);
+}
+
 function modeEdge(values: number[]) {
   if (!values.length) return undefined;
   const counts = new Map<number, number>();
@@ -118,28 +133,62 @@ function modeEdge(values: number[]) {
 /** "2.2. Boiler Operating Conditions. For boundary…" → heading line + prose line. */
 function splitRunInHeadings(lines: TextLine[]): TextLine[] {
   // "3.2. Computational Models. 3.2.1. General Models. The CFD…" carries two headings.
-  let result = lines;
+  let result = joinWrappedRunIn(lines);
   for (let pass = 0; pass < 3; pass++) result = splitOnce(result);
   return result;
+}
+
+/** The next line of the column carries on in lower case: "…for the boiler" / "water wall was…". */
+function continuesSentence(line: TextLine, next: TextLine | undefined) {
+  return Boolean(next && next.column === line.column && next.y > line.y && next.y - line.y < line.size * 1.8 && /^[a-z]/.test(next.text));
+}
+
+/** Most long words capitalised: "Heat Transfer of the Furnace Water Wall". */
+function titleCase(text: string) {
+  const long = text.match(/[A-Za-z][A-Za-z-]{3,}/g) ?? [];
+  return long.length > 0 && long.filter(word => /^[A-Z]/.test(word)).length / long.length >= .6;
+}
+
+/**
+ * A run-in heading too long for one line: "3.2.3. Heat Transfer of the Furnace Water Wall and Tube" /
+ * "Bundles in the Convective Pass. The heat transfer…". The first line becomes a heading line and
+ * the second line splits after the title.
+ */
+function joinWrappedRunIn(lines: TextLine[]): TextLine[] {
+  const out: TextLine[] = [];
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index], next = lines[index + 1];
+    const opening = /^\d+(?:\.\d+)+\.?\s+[A-Z][^.:]*$/.test(line.text) && titleCase(line.text) && !RUN_IN_HEADING.test(line.text);
+    const close = next && next.column === line.column && next.y > line.y && next.y - line.y < line.size * 1.8 && Math.abs(next.size - line.size) < line.size * .08 ? next.text.match(/^([^.:]{2,70}?[.:])\s+([A-Z(\[\d].*)$/) : null;
+    if (!opening || !close || !titleCase(close[1]) || line.text.length + close[1].length > 170) { out.push(line); continue; }
+    out.push({ ...line, runIn: true, forceHeading: true } as TextLine, ...splitAt(next, close[1], close[2]));
+    index++;
+  }
+  return out;
+}
+
+/** Split a line after `head` (heading part) and keep `tail` as the paragraph that runs in. */
+function splitAt(line: TextLine, head: string, tail: string): TextLine[] {
+  const headingLength = head.length;
+  let consumed = 0, splitX = line.x + (line.right - line.x) * Math.min(.7, headingLength / line.text.length);
+  for (const item of line.items) {
+    consumed += item.text.length;
+    if (consumed >= headingLength - 1) {
+      // The heading ends inside this item: interpolate within it.
+      const start = consumed - item.text.length, inside = Math.max(0, Math.min(1, (headingLength - start) / Math.max(1, item.text.length)));
+      splitX = item.x + (item.right - item.x) * inside;
+      break;
+    }
+  }
+  const rest = line.items.filter(item => item.x >= splitX - 1);
+  return [{ ...line, text: head, right: splitX, items: [] }, { ...line, text: tail, x: splitX + line.size * .25, items: rest.length ? rest : [{ text: tail, x: splitX + line.size * .25, right: line.right }] }].map((part, index) => ({ ...part, runIn: index === 0 || (line as TextLine & { runIn?: boolean }).runIn, runInTail: index === 1 } as TextLine));
 }
 
 function splitOnce(lines: TextLine[]): TextLine[] {
   return lines.flatMap(line => {
     const match = line.text.match(RUN_IN_HEADING);
     if (!match || isEquationLine(match[1]) || words(match[1]).length < 2) return [line];
-    const headingLength = match[1].length;
-    let consumed = 0, splitX = line.x + (line.right - line.x) * Math.min(.7, headingLength / line.text.length);
-    for (const item of line.items) {
-      consumed += item.text.length;
-      if (consumed >= headingLength - 1) {
-        // The heading ends inside this item: interpolate within it.
-        const start = consumed - item.text.length, inside = Math.max(0, Math.min(1, (headingLength - start) / Math.max(1, item.text.length)));
-        splitX = item.x + (item.right - item.x) * inside;
-        break;
-      }
-    }
-    const rest = line.items.filter(item => item.x >= splitX - 1);
-    return [{ ...line, text: match[1], right: splitX, items: [] }, { ...line, text: match[2], x: splitX + line.size * .25, items: rest.length ? rest : [{ text: match[2], x: splitX + line.size * .25, right: line.right }] }].map((part, index) => ({ ...part, runIn: index === 0 || (line as TextLine & { runIn?: boolean }).runIn, runInTail: index === 1 } as TextLine));
+    return splitAt(line, match[1], match[2]);
   });
 }
 
@@ -163,6 +212,7 @@ function toParagraph(group: Group, index: number, pageIndex: number, width: numb
     fontFamily: lines.filter(line => line.sans).length > lines.length / 2 ? "sans-serif" : "serif", fontWeight: group.kind === "title" ? 700 : 400, fontStyle: "normal",
     fontSize: size, pitch, indent: indent > size * .5 ? indent : 0,
     column: columnIndex === -1 && gutter ? { left: Math.min(x, column.left) / width, right: Math.max(right, column.right) / width } : { left: Math.min(column.left, x) / width, right: Math.max(column.right, right) / width },
-    hint, lineTexts: lines.map(line => line.text)
+    hint, lineTexts: lines.map(line => line.text),
+    marks: lines.flatMap(line => line.marks ?? []), raised: lines.reduce((sum, line) => sum + (line.raised ?? 0), 0)
   };
 }

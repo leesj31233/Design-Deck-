@@ -6,6 +6,7 @@ import { pdfAdapter } from "./pdf-adapter";
 import { ensureManifest } from "../translation/manifest";
 import { typesetPage } from "../typeset/page-typesetter";
 import { canvasMeasure, ensurePaperFonts, paperFontStack } from "../typeset/measure";
+import { SCRIPT_SCALE, scriptSegments, scriptedMeasure } from "../typeset/scripts";
 import type { AnnotationColor } from "../anchors/types";
 
 const highlightColors: Record<AnnotationColor, string> = { yellow: "rgba(255,225,45,.38)", green: "rgba(74,211,122,.33)", blue: "rgba(69,155,255,.33)", pink: "rgba(255,106,164,.33)", purple: "rgba(166,121,245,.33)" };
@@ -45,7 +46,7 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
   try {
     const manifest = await ensureManifest(documentId, () => pdfAdapter.open(bytes.slice(0)));
     await ensurePaperFonts([...texts.values()].join(""));
-    const measure = canvasMeasure(), family = paperFontStack();
+    const measure = scriptedMeasure(canvasMeasure(), manifest.scripts), family = paperFontStack();
     for (let index = 0; index < pdf.pageCount; index++) {
       const page = await pdf.getPage(index + 1);
       const canvas = document.createElement("canvas");
@@ -70,10 +71,11 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
         // Same baseline as the reader's 1.15 line box positioned at y − 0.08 em.
         let x = line.x * scale; const baseline = (line.y + line.fontSize * .8325) * scale;
         typed.wordSpacing = `${line.wordSpacing * scale}px`; typed.letterSpacing = `${line.letterSpacing * scale}px`;
-        for (const run of line.runs) {
-          context.font = `${run.bold || line.bold ? 700 : 400} ${line.fontSize * scale}px ${line.sans ? paperFontStack(true) : family}`;
-          context.fillText(run.text, x, baseline);
-          x += context.measureText(run.text).width;
+        for (const run of line.runs) for (const segment of scriptSegments(run.text, manifest.scripts)) {
+          const size = line.fontSize * scale * (segment.kind ? SCRIPT_SCALE : 1), shift = segment.kind === "sub" ? line.fontSize * scale * .21 : segment.kind === "sup" ? -line.fontSize * scale * .35 : 0;
+          context.font = `${run.bold || line.bold ? 700 : 400} ${size}px ${line.sans ? paperFontStack(true) : family}`;
+          context.fillText(segment.text, x, baseline + shift);
+          x += context.measureText(segment.text).width;
         }
       }
       typed.wordSpacing = "0px"; typed.letterSpacing = "0px";

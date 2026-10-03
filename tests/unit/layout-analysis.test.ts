@@ -140,4 +140,17 @@ describe("publisher quirks", () => {
     expect(abstractBlocks[0].translatable).toBe(true);
     expect(blocks.findIndex(block => block.text.startsWith("abstract line 0"))).toBeLessThan(blocks.findIndex(block => block.text.startsWith("left line 0")));
   });
+  it("reads a small-type table whose column starts inside the body gutter, and its bare \"Table 2\" label", async () => {
+    // Table rows at 6.4 pt (under a rule, below the caption) outnumber the 9 pt prose; the "Rate" column starts inside the body gutter.
+    const table = Array.from({ length: 14 }, (_, index) => [item(`CmHn + mH2O ? mCO + (n/2 + m)H2 row ${index}`, 50, 124 + index * 8, 190, 6.4), item(`k${index}[CmHn][O2] 1.00e13 0 1.25e08`, 296, 124 + index * 8, 200, 6.4)]).flat();
+    const page = [item("Table 2", 40, 100, 30, 6.4), item("Investigated global reaction mechanisms.", 40, 108, 140, 6.4), ...table, ...column(40, 300, prose("left", 12)), ...column(320, 300, prose("right", 12))];
+    const blocks = await buildPageBlocks("doc", 0, page, W, H);
+    const caption = blocks.find(block => block.text.startsWith("Table 2"));
+    expect(caption?.role).toBe("CAPTION");
+    expect(caption?.text).toBe("Table 2 Investigated global reaction mechanisms.");
+    expect(blocks.filter(block => /CmHn + mH2O/.test(block.text)).every(block => !block.translatable)).toBe(true);
+    const left = blocks.find(block => block.text.startsWith("left line 0")), right = blocks.find(block => block.text.startsWith("right line 0"));
+    expect(left?.text).not.toContain("right line");
+    expect(right?.text).toContain("right line 11");
+  });
 });

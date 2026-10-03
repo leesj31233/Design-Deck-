@@ -4,9 +4,15 @@ import { useTranslationStore, visibleTranslations } from "@/lib/paperflow/transl
 import { cachedPageLayout, pageLayout } from "@/lib/paperflow/typeset/layout-cache";
 import { paperFontStack } from "@/lib/paperflow/typeset/measure";
 import type { PageLayout, Rect } from "@/lib/paperflow/typeset/page-typesetter";
+import { scriptSegments, type ScriptTable } from "@/lib/paperflow/typeset/scripts";
 
-/** Layout is in PDF points; render at 4× and scale down so tiny captions never hit the browser's minimum font size. */
-const K = 4;
+/**
+ * Layout is in PDF points and is painted at the page's own pixel scale. A scaled-down layer
+ * loses LCD antialiasing, and unhinted stems then land on different pixel phases: some
+ * syllables come out visibly darker than their neighbours. Only very small zoom levels
+ * paint larger and scale down, so captions never hit a browser minimum font size.
+ */
+const MIN_PAINT_SCALE = 1;
 
 /** One small read of the rendered page; every mask takes the paper colour under its own text. */
 function backgroundSampler(canvas: HTMLCanvasElement, width: number, height: number) {
@@ -69,11 +75,21 @@ export function inkColor(canvas: HTMLCanvasElement, rect: Rect, width: number) {
 
 interface Props { documentId: string; pageIndex: number; scale: number; canvas: HTMLCanvasElement | null; canvasVersion: number; referenceColor?: string; citationColor?: string; onState?: (state: OverlayState) => void; onOriginal: (unitId: string) => void; onRetry: (unitId: string) => void }
 
+/**
+ * Scripts as the paper prints them (CO₂, Kᵢ, m², raised citations), then link colours on
+ * references, as the journal did. Widths were measured with the same segments.
+ */
+function paintText(text: string, scripts: ScriptTable | undefined, referenceColor: string | undefined, citationColor: string | undefined) {
+  const colour = (piece: string, key: number) => !referenceColor && !citationColor ? piece : piece.split(REFERENCE).map((part, index) => index % 2 ? <span key={`${key}.${index}`} style={{ color: part.startsWith("[") ? citationColor : referenceColor }}>{part}</span> : part);
+  const segments = scriptSegments(text, scripts);
+  if (segments.length === 1 && !segments[0].kind) return colour(text, 0);
+  return segments.map((segment, index) => segment.kind ? <span key={index} className={segment.kind === "sub" ? "pf-sub" : "pf-sup"} style={segment.citation ? { color: citationColor } : undefined}>{segment.text}</span> : colour(segment.text, index));
+}
+
 export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, scale, canvas, canvasVersion, referenceColor, citationColor, onState, onOriginal, onRetry }: Props) {
-  // Colour only the reference itself, as the journal did; the measured width is unchanged.
-  const paint = (text: string) => !referenceColor && !citationColor ? text : text.split(REFERENCE).map((piece, index) => index % 2 ? <span key={index} style={{ color: piece.startsWith("[") ? citationColor : referenceColor }}>{piece}</span> : piece);
   const version = useTranslationStore(state => state.pageVersions[pageIndex] ?? 0);
   const manifest = useTranslationStore(state => state.manifest);
+  const paint = (text: string, colored: boolean) => paintText(text, manifest?.scripts, colored ? referenceColor : undefined, colored ? citationColor : undefined);
   const [layout, setLayout] = useState<PageLayout | null>(() => manifest ? cachedPageLayout(manifest, pageIndex, visibleTranslations(useTranslationStore.getState())) ?? null : null);
   const [typesetFailed, setTypesetFailed] = useState(false);
   useEffect(() => {
@@ -115,23 +131,27 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
     return new Map(layout.units.filter(unit => layout.lines.some(line => line.unitId === unit.unitId && line.kind === "heading")).flatMap(unit => { const color = inkColor(canvas, unit.box, layout.width); return color ? [[unit.unitId, color] as const] : []; }));
   }, [layout, canvas, canvasVersion]);
 
-  // Canvas and DOM shaping can still differ by a fraction of a point: read each line once
-  // after paint and nudge its spacing so justified lines end exactly on the column edge.
+  // At reading sizes the browser rounds glyph advances, so a painted line runs up to ~2% wider
+  // or narrower than its linear measurement. Read each line once after paint and spread the
+  // difference over its glyphs: that is where the drift comes from, and word gaps stay even.
   const root = useRef<HTMLDivElement>(null);
+  const K = Math.max(scale, MIN_PAINT_SCALE);
   useLayoutEffect(() => {
     if (!layout || !root.current) return;
     const nodes = root.current.querySelectorAll<HTMLElement>(".pf-tx-line");
-    const widths = Array.from(nodes, node => node.offsetWidth);
+    // React leaves an unchanged style prop alone, so undo an earlier correction before measuring.
+    nodes.forEach(node => { node.style.letterSpacing = `${node.dataset.ls}px`; node.style.wordSpacing = `${node.dataset.ws}px`; });
+    const ratio = root.current.getBoundingClientRect().width / Math.max(1, root.current.offsetWidth);
+    const widths = Array.from(nodes, node => node.getBoundingClientRect().width / ratio);
     nodes.forEach((node, index) => {
-      const target = Number(node.dataset.w), text = node.textContent ?? "", spaces = (text.match(/ /g) ?? []).length, chars = [...text].length;
+      const target = Number(node.dataset.w), text = node.textContent ?? "", chars = [...text].length;
       const error = target - widths[index] + Number(node.dataset.ls ?? 0), size = Number(node.style.fontSize.replace("px", ""));
       const justified = node.dataset.justify === "1";
-      // Only correct shaping drift; a gap bigger than ~an em is a layout decision, not drift.
-      if (!justified && error >= 0 || Math.abs(error) > size * 1.2) return;
-      if (spaces && Math.abs(error / spaces) < size * .5) node.style.wordSpacing = `${Number(node.dataset.ws) + error / spaces}px`;
-      else if (chars > 1) node.style.letterSpacing = `${Number(node.dataset.ls) + error / (chars - 1)}px`;
+      // A ragged last line may end short; it must never run long. Anything beyond drift is a layout decision.
+      if (!justified && error >= 0 || Math.abs(error) > Math.max(size * 1.2, target * .06)) return;
+      if (chars > 1) node.style.letterSpacing = `${Number(node.dataset.ls) + error / (chars - 1)}px`;
     });
-  }, [layout]);
+  }, [layout, K]);
 
   const byUnit = useMemo(() => {
     const groups = new Map<string, PageLayout["lines"]>();
@@ -140,11 +160,11 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
   }, [layout]);
 
   return <>
-    {layout && <div ref={root} className="pf-tx-layer" data-unfit={layout.unfit.length || undefined} data-body-scale={layout.bodyScale} style={{ width: layout.width * K, height: layout.height * K, transform: `scale(${scale / K})`, fontFamily: paperFontStack() }}>
+    {layout && <div ref={root} className="pf-tx-layer" data-unfit={layout.unfit.length || undefined} data-body-scale={layout.bodyScale} style={{ width: layout.width * K, height: layout.height * K, transform: K === scale ? undefined : `scale(${scale / K})`, fontFamily: paperFontStack() }}>
       {layout.masks.map((mask, index) => <div key={index} className="pf-tx-mask" style={{ left: mask.x * K, top: mask.y * K, width: mask.width * K, height: mask.height * K, background: colors?.[index] ?? "#fff" }}/>)}
       {[...byUnit].map(([unitId, lines]) => <div key={unitId} className="pf-tx-unit" data-paragraph-id={unitId} data-kind={lines[0].kind}>
-        {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08) * K, fontSize: line.fontSize * K, lineHeight: `${line.fontSize * 1.15 * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: line.kind === "heading" ? headingInk.get(unitId) : undefined }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{line.kind === "body" ? paint(run.text) : run.text}</b> : <span key={part}>{line.kind === "heading" ? run.text : paint(run.text)}</span>)}</span>)}
-        <button type="button" className="pf-tx-original" style={{ left: (lines[0].x + lines[0].width) * K - 150, top: lines[0].y * K - 76 }} onClick={() => onOriginal(unitId)} aria-label="이 문단 원문 보기">원문</button>
+        {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08) * K, fontSize: line.fontSize * K, lineHeight: `${line.fontSize * 1.15 * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: line.kind === "heading" ? headingInk.get(unitId) : undefined }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{paint(run.text, line.kind === "body")}</b> : <span key={part}>{paint(run.text, line.kind !== "heading")}</span>)}</span>)}
+        <button type="button" className="pf-tx-original" style={{ left: (lines[0].x + lines[0].width) * K - 37.5 * K, top: lines[0].y * K - 19 * K, transform: `scale(${K / 4})`, transformOrigin: "0 0" }} onClick={() => onOriginal(unitId)} aria-label="이 문단 원문 보기">원문</button>
       </div>)}
     </div>}
     {(pending > 0 || failed.length > 0) && <div className="pf-tx-page-status" role="status">

@@ -1,6 +1,7 @@
 import type { TranslationManifest } from "../translation/manifest";
 import { canvasMeasure, ensurePaperFonts, fontGeneration } from "./measure";
 import { typesetPage, type PageLayout, type Rect } from "./page-typesetter";
+import { scriptedMeasure } from "./scripts";
 
 const cache = new Map<string, PageLayout>();
 const LIMIT = 120;
@@ -31,7 +32,7 @@ export async function pageLayout(manifest: TranslationManifest, pageIndex: numbe
   const key = keyOf(manifest, pageIndex, texts), hit = cache.get(key);
   if (hit) return hit;
   const started = performance.now();
-  const layout = typesetPage({ manifest, pageIndex, measure: canvasMeasure(), translations: texts, inkAt });
+  const layout = typesetPage({ manifest, pageIndex, measure: scriptedMeasure(canvasMeasure(), manifest.scripts), translations: texts, inkAt });
   performance.measure("paperflow:typeset-page", { start: started });
   cache.set(key, layout);
   if (cache.size > LIMIT) cache.delete(cache.keys().next().value!);

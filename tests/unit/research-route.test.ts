@@ -13,7 +13,7 @@ it("constrains ids with an enum schema and returns every valid translation", asy
   const response = await post({ task: "translate_blocks", passages });
   expect(response.status).toBe(200);
   const body = await response.json();
-  expect(body.translations).toHaveLength(2); expect(body.missing).toEqual([]); expect(body.usage).toEqual({ input: 120, output: 90 });
+  expect(body.translations).toHaveLength(2); expect(body.missing).toEqual([]); expect(body.usage).toEqual({ input: 120, output: 90, cached: 0 });
   const sent = JSON.parse(upstream.mock.calls[0][1].body);
   expect(sent.text.format.schema.properties.translations.items.properties.id.enum).toEqual(["p0", "p1"]);
   expect(sent.input).toContain("heading");

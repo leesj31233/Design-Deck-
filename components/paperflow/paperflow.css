@@ -378,6 +378,10 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 .pf-tx-unit { position:absolute; left:0; top:0; width:0; height:0; }
 .pf-tx-line { position:absolute; display:block; white-space:pre; pointer-events:auto; cursor:text; user-select:text; -webkit-user-select:text; font-kerning:none; font-variant-ligatures:normal; letter-spacing:0; }
 .pf-tx-line b { font-weight:700; }
+/* Same 0.7 scale the typesetter measures with (lib/paperflow/typeset/scripts.ts). */
+.pf-tx-line .pf-sub, .pf-tx-line .pf-sup { position:relative; font-size:.7em; line-height:0; }
+.pf-tx-line .pf-sub { top:.3em; }
+.pf-tx-line .pf-sup { top:-.5em; }
 .pf-tx-unit[data-kind="heading"] .pf-tx-line { color:inherit; }
 .pf-tx-line::selection, .pf-tx-line ::selection { background:rgba(10,132,255,.24); color:inherit; }
 .pf-tx-original { position:absolute; pointer-events:auto; opacity:0; height:68px; padding:0 34px; border:3px solid rgba(15,50,85,.16); border-radius:999px; background:rgba(250,252,255,.97); color:#30435b; font:34px/62px -apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif; box-shadow:0 6px 24px rgba(10,30,65,.12); transition:opacity .15s ease; cursor:pointer; }

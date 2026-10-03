@@ -5,7 +5,7 @@ import { readableError } from "../errors";
 import { ensureManifest, manifestCounts, type TranslationManifest, type TranslationUnit } from "./manifest";
 import { researchTranslateBlocks, ResearchHttpError } from "./research-api";
 import { runTranslationScheduler, type SchedulerState } from "./scheduler";
-import { declarativeKorean } from "./research-style";
+import { polishKorean } from "./research-style";
 import { useTranslationStore } from "./translation-store";
 import type { PassageRole } from "./block-contract";
 import { paperGlossary } from "./glossary";
@@ -104,7 +104,7 @@ export async function startTranslationJob(documentId: string, options: { fromPag
     if (target.length) await runTranslationScheduler(
       target.map(unit => ({ id: unit.id, text: unit.text, role: roleOf(unit) })), controller.signal, (group, signal) => researchTranslateBlocks(group, signal, paperGlossary(manifest)),
       async results => {
-        const entries = results.map(result => ({ id: result.id, text: declarativeKorean(result.text) }));
+        const entries = results.map(result => ({ id: result.id, text: polishKorean(result.text) }));
         await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.get(entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
         for (const entry of entries) { translated.add(entry.id); failed.delete(entry.id); }
         store().addTexts(documentId, entries);
@@ -144,7 +144,7 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
   store().setPending(documentId, units.map(unit => unit.id), true);
   try {
     const { results, missing } = await researchTranslateBlocks(units.map(unit => ({ id: unit.id, text: unit.text, role: roleOf(unit) })), undefined, paperGlossary(manifest));
-    const entries = results.map(result => ({ id: result.id, text: declarativeKorean(result.text) }));
+    const entries = results.map(result => ({ id: result.id, text: polishKorean(result.text) }));
     await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.find(item => item.id === entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
     store().addTexts(documentId, entries);
     for (const id of missing) store().setFailed(documentId, id, "모델 응답에서 이 문단의 번역이 누락되었다.");

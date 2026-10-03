@@ -1,4 +1,5 @@
 import type { PdfTextItem } from "../pdf/pdf-adapter";
+import { coreOf } from "../typeset/scripts";
 
 /** One visual line of text inside a single column. Coordinates are pt, top-left origin. */
 export interface TextLine {
@@ -14,6 +15,10 @@ export interface TextLine {
   sans?: boolean;
   /** Left edge of each main item, for splitting run-in headings. */
   items: { text: string; x: number; right: number }[];
+  /** Tokens printed with sub/superscripts, marked "CO_{2}" / "m^{2}". */
+  marks?: string[];
+  /** Superscript citation numbers turned into "[n]". */
+  raised?: number;
 }
 
 export const median = (values: number[]) => {
@@ -64,27 +69,59 @@ export function buildTextLines(items: PdfTextItem[]): TextLine[] {
     const dominant = [...piece.main].sort((a, b) => b.text.trim().length - a.text.trim().length)[0];
     const size = dominant.height;
     const all = [...piece.main.map(item => ({ item, script: false })), ...piece.scripts.map(item => ({ item, script: true }))].sort((a, b) => a.item.x - b.item.x);
-    let text = "", previousRight = -Infinity;
+    let text = "", marked = "", raised = 0, previousRight = -Infinity, previousKind = "", citationOpen = false;
     // In a formula a raised digit is an exponent, never a citation.
     const formula = all.some(({ item }) => /[=≤≥∝]/.test(item.text));
     for (const { item, script } of all) {
       const gap = item.x - previousRight, value = item.text.replace(/\s+/g, " ");
       const superscript = script && baselineOf(item) < piece.base - size * .15;
-      if (superscript && !formula && CITATION.test(value.trim()) && /(?:[A-Za-z]{3,}|[.,;:)\]])$/.test(text.trimEnd())) {
+      const kind = !script ? "" : baselineOf(item) > piece.base ? "_" : "^";
+      // A raised number after a word, "%", a closing mark or a subscript ("tCO₂¹³") is a citation;
+      // an exponent never carries a comma or a range.
+      const cites = /(?:[A-Za-z]{3,}|[.,;:)\]%])$/.test(text.trimEnd()) || previousKind === "_" || /[,–-]/.test(value.trim());
+      // "⁵³", "–", "⁵⁶" set as separate raised glyphs are one citation: "[53–56]".
+      if (superscript && !formula && CITATION.test(value.trim()) && citationOpen && gap < size * .4) {
+        const piece = value.trim().replace(/\s+/g, "");
+        text = `${text.trimEnd().slice(0, -1)}${piece}]`; marked = `${marked.trimEnd().slice(0, -1)}${piece}]`;
+        if (/\s$/.test(item.text)) { text += " "; marked += " "; citationOpen = false; }
+      } else if (superscript && !formula && CITATION.test(value.trim()) && /\d/.test(value) && cites) {
+        citationOpen = !/\s$/.test(item.text);
         text = text.trimEnd() + `[${value.trim().replace(/\s+/g, "")}]`;
-      } else if (script) text += value.trim();
-      else {
-        if (text && gap > size * .12 && !text.endsWith(" ") && !value.startsWith(" ")) text += " ";
-        text += value;
+        marked = marked.trimEnd() + `[${value.trim().replace(/\s+/g, "")}]`; raised++;
+        // "rotation.¹⁷ Radiation": the word space can travel inside the raised item.
+        if (/\s$/.test(item.text)) { text += " "; marked += " "; }
+      } else if (script) {
+        text += value.trim();
+        // "K⁻¹" often arrives as two raised glyphs: keep one script.
+        if (previousKind === kind && marked.endsWith("}") && gap < size * .15) marked = `${marked.slice(0, -1)}${value.trim()}}`;
+        else marked += `${kind}{${value.trim()}}`;
+        // "m" + "p " + "is the particle mass": the word space travels inside the subscript item.
+        if (/\s$/.test(item.text)) { text += " "; marked += " "; }
+      } else {
+        if (text && gap > size * .12 && !text.endsWith(" ") && !value.startsWith(" ")) { text += " "; marked += " "; }
+        text += value; marked += value;
       }
+      if (!superscript) citationOpen = false;
+      previousKind = kind && !(superscript && marked.endsWith("]")) ? kind : "";
       previousRight = Math.max(previousRight, item.x + item.width);
     }
     // A missing glyph inside a word ("NO■x") is an artefact of the PDF font, not text.
     text = text.replace(/(?<=[A-Za-z0-9])[■□](?=[A-Za-z0-9])/g, "");
     const regular = piece.main.filter(item => Math.abs(item.height - size) < size * .15);
     const top = piece.base - size * .8, bottom = Math.max(piece.base + size * .2, ...regular.map(item => item.y + item.height).filter(value => value < piece.base + size * .5));
-    return { text: text.replace(/\s+/g, " ").trim(), x: piece.x, right: piece.right, y: Math.min(top, ...regular.map(item => item.y).filter(value => value > top - size * .3)), bottom, size, column: 0, tabular: false, sans: /sans/i.test(dominant.fontFamily) && !/serif/i.test(dominant.fontFamily.replace(/sans-serif/i, "")), items: piece.main.map(item => ({ text: item.text, x: item.x, right: item.x + item.width })) };
+    const marks = piece.scripts.length ? markedTokens(marked) : undefined;
+    return { marks, raised: raised || undefined, text: text.replace(/\s+/g, " ").trim(), x: piece.x, right: piece.right, y: Math.min(top, ...regular.map(item => item.y).filter(value => value > top - size * .3)), bottom, size, column: 0, tabular: false, sans: /sans/i.test(dominant.fontFamily) && !/serif/i.test(dominant.fontFamily.replace(/sans-serif/i, "")), items: piece.main.map(item => ({ text: item.text, x: item.x, right: item.x + item.width })) };
   }).filter(line => line.text);
+}
+
+/** Symbols worth remembering: short scripts on a short token ("CO_{2}", "K_{i}", "m^{2}"), not footnote marks on words. */
+function markedTokens(marked: string) {
+  return marked.split(/\s+/).map(token => coreOf(token)[1]).filter(token => {
+    const scripts = [...token.matchAll(/[_^]\{([^{}]*)\}/g)].map(match => match[1]);
+    if (!scripts.length || scripts.some(script => !/^[A-Za-z0-9+\-−.,*′']{1,6}$/.test(script))) return false;
+    const base = token.replace(/[_^]\{[^{}]*\}/g, " ").trim();
+    return token.length <= 48 && !/[a-z]{4,}|\[\d/.test(base) && !/^[\d%]+$/.test(base.replace(/\s/g, ""));
+  });
 }
 
 /** Manuscript line numbers ("432" down the left margin) are not text of the paper. */

@@ -245,7 +245,9 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
     const last = result.lines.at(-1);
     if (last) {
       const width = last.runs.reduce((sum, run) => sum + measure(run.text, true, flow.sans) * last.fontSize, 0) + last.wordSpacing * Math.max(0, last.runs.map(run => run.text).join("").split(" ").length - 1);
-      const follower = blocks.find(other => other.readingOrder > block.readingOrder && shown(other) && other.role !== "HEADING" && Math.abs(other.y - block.y) * page.height < (block.fontSize ?? 9) * .4);
+      // The paragraph runs in on the heading's last line (a long run-in heading wraps).
+      const lastLine = block.lines.at(-1) ?? block;
+      const follower = blocks.find(other => other.readingOrder > block.readingOrder && shown(other) && other.role !== "HEADING" && Math.abs(other.y - lastLine.y) * page.height < (block.fontSize ?? 9) * .4);
       if (follower) headingLines.set(follower.id, { y: last.y, right: last.x + width });
     }
   }
