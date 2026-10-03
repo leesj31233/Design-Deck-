@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { Maximize2, Minimize2, Minus, Plus } from "lucide-react";
 import { SearchField } from "@/components/ui/search-field";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
 import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
@@ -33,6 +35,25 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const [searchOpen, setSearchOpen] = useState(false), [search, setSearch] = useState("");
   const [exportRunning, setExportRunning] = useState(false);
   const [textNoteOpen, setTextNoteOpen] = useState(false), [textNoteDraft, setTextNoteDraft] = useState("");
+  // Focus mode: only the paper and the marking tools, full screen when the browser allows it.
+  const [focus, setFocus] = useState(false), wentFullscreen = useRef(false);
+  const enterFocus = useCallback(() => {
+    setFocus(true);
+    void document.documentElement.requestFullscreen?.().then(() => { wentFullscreen.current = true; }).catch(() => { /* Focus mode still works inside the window. */ });
+  }, []);
+  const exitFocus = useCallback(() => {
+    setFocus(false);
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+    wentFullscreen.current = false;
+  }, []);
+  useEffect(() => {
+    if (!focus) return;
+    // Leaving browser full screen (Esc, F11) leaves focus mode too; Esc alone works without it.
+    const onChange = () => { if (!document.fullscreenElement && wentFullscreen.current) exitFocus(); };
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape" && !(event.target instanceof HTMLTextAreaElement)) exitFocus(); };
+    document.addEventListener("fullscreenchange", onChange); window.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("fullscreenchange", onChange); window.removeEventListener("keydown", onKey); };
+  }, [focus, exitFocus]);
   const [activeUnit, setActiveUnit] = useState<string | null>(null);
   const [bulk, setBulk] = useState<TranslationJobStatus | null>(null);
   const viewport = useRef<HTMLDivElement>(null), searchInput = useRef<HTMLInputElement>(null), writing = useRef(false);
@@ -206,11 +227,20 @@ export function ReaderShell({ documentId }: { documentId: string }) {
 
   if (error || doc.error || marks.error) return <main className="pf-empty pf-reader-error"><h1>PDF를 열지 못했습니다</h1><p role="alert">{error || readableError(doc.error ?? marks.error)}</p><Button asChild><Link href="/library">라이브러리로</Link></Button><Button onClick={openImport}>PDF 다시 가져오기</Button></main>;
   const elapsed = bulk ? Math.round(((bulk.running ? 0 : bulk.translationMs) || 0) / 1000) : 0;
-  return <div className="pf-reader-shell">
+  return <div className="pf-reader-shell" data-focus={focus || undefined}>
     <ReaderToolbar title={doc.data?.filename ?? "PDF 불러오는 중…"} pages={pdf?.pageCount ?? 1} page={currentPage} effectiveZoom={Math.round(scale * 100)} onPage={navigate} onSearch={focusSearch} onDownload={() => void download()} onExport={() => void exportPdf()} exportRunning={exportRunning} onBatchTranslate={batchTranslate} batchRunning={bulk?.running ?? false} canTranslate={Boolean(pdf)} translated={showTranslations} hasTranslations={translatedCount > 0} onToggleTranslation={() => { dismiss(); useTranslationStore.getState().setShowTranslations(!showTranslations); }}/>
     <div className="pf-annotation-tools" data-selection-ui onPointerDown={event => event.preventDefault()}>
       {([['select','선택'],['highlight','형광펜'],['pen','메모 펜'],['eraser','지우개']] as const).map(([value,label]) => <Button key={value} size="sm" variant="ghost" aria-pressed={tool === value} onClick={() => { useReaderStore.getState().set({ tool: value }); if (value === 'highlight' && useReaderStore.getState().activeSelection) void save(); }}>{label}</Button>)}
       <Button size="sm" variant="ghost" onClick={showNote}>텍스트 메모</Button><Button size="sm" variant="ghost" onClick={() => showShell("개념 설명")}>선택 개념 공부</Button>
+      <span className="pf-focus-controls">
+        {focus && <>
+          <IconButton label="축소" size="sm" variant="ghost" disabled={Math.round(scale * 100) <= 25} onClick={() => useReaderStore.getState().set({ zoom: Math.max(25, Math.round(scale * 100) - 10), fitMode: "custom", activeSelection: null })}><Minus size={15}/></IconButton>
+          <span className="pf-focus-zoom">{Math.round(scale * 100)}%</span>
+          <IconButton label="확대" size="sm" variant="ghost" disabled={Math.round(scale * 100) >= 250} onClick={() => useReaderStore.getState().set({ zoom: Math.min(250, Math.round(scale * 100) + 10), fitMode: "custom", activeSelection: null })}><Plus size={15}/></IconButton>
+          <span className="pf-focus-page">{currentPage} / {pdf?.pageCount ?? 1}</span>
+        </>}
+        <IconButton label={focus ? "확장 종료 (Esc)" : "확장: PDF와 마킹 도구만 전체화면으로"} size="sm" variant="ghost" aria-pressed={focus} onClick={focus ? exitFocus : enterFocus}>{focus ? <Minimize2 size={15}/> : <Maximize2 size={15}/>}</IconButton>
+      </span>
     </div>
     {bulk && <div className="pf-inline-bulk" role="status" data-state={bulk.running ? "running" : bulk.complete ? "complete" : "partial"}>
       <span>{bulk.running ? (bulk.translatableBlocks ? "논문 번역 중" : `문단 구조 분석 중 · ${bulk.extractedPages}/${bulk.total}쪽`) : bulk.complete ? "논문 전체 번역 완료" : "번역 미완료"}{bulk.translatableBlocks ? ` · ${bulk.translated}/${bulk.translatableBlocks}문단` : ""}{bulk.failed ? ` · 실패 ${bulk.failed}` : ""}{!bulk.running && bulk.translationMs ? ` · ${elapsed}초` : ""}{bulk.rateLimitHits ? ` · 한도 대기 ${bulk.rateLimitHits}회` : ""}</span>
