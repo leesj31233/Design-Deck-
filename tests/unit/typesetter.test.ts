@@ -53,6 +53,19 @@ describe("line breaker", () => {
 });
 
 describe("page typesetter", () => {
+  it("keeps each list item's hanging indent when the Korean is longer than the source item", async () => {
+    // (1) (2) (3): marker line at x=40, continuation lines at x=56; item 1's Korean needs more lines than its source.
+    const listItem = (n: number, top: number) => [item(`(${n}) Item ${n} explains how the furnace stoichiometric ratio changes the NO profile`, 40, top, 240), item("in the burner zone and the upper furnace with methane injection and the", 56, top + 11, 224), item("overfire air ports at the design load of the boiler.", 56, top + 22, 160)];
+    const manifest = await manifestOf([[...listItem(1, 100), ...listItem(2, 135), ...listItem(3, 170)]]);
+    const translations = new Map(manifest.units.map((unit, index) => [unit.id, `(${index + 1}) ${korean(index === 0 ? 17 : 7)}`]));
+    const layout = typesetPage({ manifest, pageIndex: 0, measure, translations });
+    for (const unit of manifest.units) {
+      const own = layout.lines.filter(line => line.unitId === unit.id);
+      expect(own.length).toBeGreaterThan(1);
+      expect(own[0].x).toBeCloseTo(40, 0);
+      for (const line of own.slice(1)) expect(line.x).toBeCloseTo(56, 0);
+    }
+  });
   it("sets one body size per page, keeps indents, fits the original columns and masks only translated text", async () => {
     const page = [item("1. Introduction", 40, 90, 80), ...lines(40, 105, 10, "left"), item("Q = h A (T_w − T_g) (3)", 110, 225, 120), ...lines(320, 100, 12, "right")];
     const manifest = await manifestOf([page]);

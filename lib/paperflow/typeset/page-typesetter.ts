@@ -20,7 +20,12 @@ export interface PageLayout {
   bodyScale: number;
 }
 
-interface Paragraph { unitId: string; text: string; indent: number; startsUnit: boolean; endsUnit: boolean; gapBefore: number; runInEnd?: string }
+interface Paragraph {
+  unitId: string; text: string; indent: number; startsUnit: boolean; endsUnit: boolean; gapBefore: number; runInEnd?: string;
+  /** A list item set with a hanging indent ("(1) …" out, the rest in): its own first-line and body x in pt. */
+  hang?: { first: number; body: number };
+}
+const LIST_MARKER = /^\s*(?:\(?\d{1,2}[).]|\(?[a-z][).]|\(?[ivx]{1,4}\)|[•●▪◦–-])\s/i;
 interface Flow { kind: FlowKind; blocks: ManifestBlock[]; paragraphs: Paragraph[]; areas: Rect[]; obstacles: Rect[]; size: number; pitch: number; bold: boolean; sans?: boolean; /** White space below each area the ink probe cleared. */ extra: number[]; /** May use that white space (only when the source area alone cannot hold the text). */ extended: boolean }
 
 // Korean is set at most at the source size (so pages look alike) and down to 80%; spare room becomes leading.
@@ -148,7 +153,9 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       const unit = units.get(unitId)!, first = unitBlocks[0];
       const startsUnit = unit.blockIds[0] === first.id, endsUnit = unit.blockIds.at(-1) === unitBlocks.at(-1)!.id;
       const gap = first.y * page.height - previousBottom;
-      flow.paragraphs.push({ unitId, text: unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0 });
+      const firstX = first.lines[0].x * page.width, bodyX = first.lines.length > 1 ? Math.min(...first.lines.slice(1).map(line => line.x)) * page.width : firstX;
+      const hang = startsUnit && LIST_MARKER.test(first.text) && bodyX - firstX > flow.size * .6 && bodyX - firstX < flow.size * 4 ? { first: firstX, body: bodyX } : undefined;
+      flow.paragraphs.push({ unitId, text: unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0, hang });
       previousBottom = Math.max(...unitBlocks.map(block => (block.y + block.height) * page.height));
     }
     const regions = flow.blocks.flatMap(block => blockRegions(block, page));
@@ -217,6 +224,12 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
         const runIn = first && paragraph.startsUnit ? headingLines.get(flow.blocks.find(block => block.unitId === paragraph.unitId)!.id) : undefined;
         if (runIn) { x = Math.max(x, runIn.right + size * .3); width = place.x + place.width - x; }
         else if (first && paragraph.indent) { x += paragraph.indent * scale; width -= paragraph.indent * scale; }
+        // A list item keeps its own hanging indent wherever its Korean lines land in the list:
+        // the source lines under it may belong to a neighbouring item with the other indent.
+        else if (paragraph.hang && Math.abs(place.x - paragraph.hang.first) < paragraph.hang.body - paragraph.hang.first + size * 2) {
+          const target = first ? paragraph.hang.first : paragraph.hang.body;
+          if (target >= place.x - size * 4) { width = place.x + place.width - target; x = target; }
+        }
         const broken = feeder.next(width, size), last = feeder.done;
         const spacing = justify(broken, width, size, last || flow.kind === "heading");
         if (commit) out.push({ unitId: paragraph.unitId, kind: flow.kind, x, y: place.y, width, fontSize: size, lineHeight: pitch, runs: broken.runs, bold: flow.bold, sans: flow.sans, ...spacing });

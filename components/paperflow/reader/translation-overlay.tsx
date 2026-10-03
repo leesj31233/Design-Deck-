@@ -4,7 +4,10 @@ import { useTranslationStore, visibleTranslations } from "@/lib/paperflow/transl
 import { cachedPageLayout, pageLayout } from "@/lib/paperflow/typeset/layout-cache";
 import { paperFontStack } from "@/lib/paperflow/typeset/measure";
 import type { PageLayout, Rect } from "@/lib/paperflow/typeset/page-typesetter";
-import { scriptSegments, type ScriptTable } from "@/lib/paperflow/typeset/scripts";
+import type { ScriptTable } from "@/lib/paperflow/typeset/scripts";
+import { inkColor, styledPieces } from "@/lib/paperflow/typeset/ink";
+
+export { inkColor };
 
 /**
  * Layout is in PDF points and is painted at the page's own pixel scale. A scaled-down layer
@@ -52,27 +55,6 @@ function hasInk(data: Uint8ClampedArray, pixels: number) {
   return ink > Math.max(2, pixels * .0015);
 }
 
-/** Figure / table / equation references and bracketed citations inside translated prose. */
-const REFERENCE = /((?:Figures?|Figs?\.|Tables?|Equations?|Eqs?\.|eqs?)\s*\(?\d+[a-z]?\)?(?:\s*(?:and|,|–|-)\s*\(?\d+[a-z]?\)?)*|\[\d+(?:\s*[,–-]\s*\d+)*\])/;
-
-/** Dominant ink colour of a source heading (journal headings are often blue). */
-export function inkColor(canvas: HTMLCanvasElement, rect: Rect, width: number) {
-  const ratio = canvas.width / width, x = Math.max(0, Math.floor(rect.x * ratio)), y = Math.max(0, Math.floor(rect.y * ratio));
-  const w = Math.min(canvas.width - x, Math.ceil(rect.width * ratio)), h = Math.min(canvas.height - y, Math.ceil(rect.height * ratio));
-  if (w < 2 || h < 2 || w * h > 400_000) return undefined;
-  try {
-    const data = canvas.getContext("2d", { willReadFrequently: true })!.getImageData(x, y, w, h).data, votes = new Map<string, number>();
-    for (let offset = 0; offset < data.length; offset += 12) {
-      const r = data[offset], g = data[offset + 1], b = data[offset + 2];
-      if (Math.min(r, g, b) > 200) continue;
-      const key = [r, g, b].map(value => Math.round(value / 24) * 24).join(",");
-      votes.set(key, (votes.get(key) ?? 0) + 1);
-    }
-    const best = [...votes].sort((a, b) => b[1] - a[1])[0]?.[0];
-    return best ? `rgb(${best})` : undefined;
-  } catch { return undefined; }
-}
-
 interface Props { documentId: string; pageIndex: number; scale: number; canvas: HTMLCanvasElement | null; canvasVersion: number; referenceColor?: string; citationColor?: string; onState?: (state: OverlayState) => void; onOriginal: (unitId: string) => void; onRetry: (unitId: string) => void }
 
 /**
@@ -80,10 +62,9 @@ interface Props { documentId: string; pageIndex: number; scale: number; canvas: 
  * references, as the journal did. Widths were measured with the same segments.
  */
 function paintText(text: string, scripts: ScriptTable | undefined, referenceColor: string | undefined, citationColor: string | undefined) {
-  const colour = (piece: string, key: number) => !referenceColor && !citationColor ? piece : piece.split(REFERENCE).map((part, index) => index % 2 ? <span key={`${key}.${index}`} style={{ color: part.startsWith("[") ? citationColor : referenceColor }}>{part}</span> : part);
-  const segments = scriptSegments(text, scripts);
-  if (segments.length === 1 && !segments[0].kind) return colour(text, 0);
-  return segments.map((segment, index) => segment.kind ? <span key={index} className={segment.kind === "sub" ? "pf-sub" : "pf-sup"} style={segment.citation ? { color: citationColor } : undefined}>{segment.text}</span> : colour(segment.text, index));
+  const pieces = styledPieces(text, scripts, referenceColor, citationColor);
+  if (pieces.length === 1 && !pieces[0].kind && !pieces[0].color) return text;
+  return pieces.map((piece, index) => piece.kind || piece.color ? <span key={index} className={piece.kind === "sub" ? "pf-sub" : piece.kind === "sup" ? "pf-sup" : undefined} style={piece.color ? { color: piece.color } : undefined}>{piece.text}</span> : piece.text);
 }
 
 export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, scale, canvas, canvasVersion, referenceColor, citationColor, onState, onOriginal, onRetry }: Props) {
