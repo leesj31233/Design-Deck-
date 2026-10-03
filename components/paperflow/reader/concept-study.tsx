@@ -1,24 +1,78 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { Sparkles, Search, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { researchTerms } from "@/lib/paperflow/translation/research-style";
-import { researchRequest } from "@/lib/paperflow/translation/research-api";
-const definitions: Record<string, string> = {
-  combustion: "fuel과 oxidizer의 반응으로 열이 발생하는 과정이다.",
-  "co-firing": "둘 이상의 fuel을 같은 연소 설비에서 함께 사용하는 방식이다.", cofiring: "둘 이상의 fuel을 같은 연소 설비에서 함께 사용하는 방식이다.",
-  mesh: "수치 계산을 위해 공간을 작은 cell로 나눈 구조이다.", turbulence: "유속과 압력이 시간·공간에 따라 불규칙하게 변하는 유동 상태이다.",
-  "heat flux": "단위 면적을 통과하는 열전달률이다.", "boundary condition": "계산 영역 경계에 지정하는 유속·온도·압력 등의 조건이다.",
-  "natural gas": "주로 methane으로 구성된 gaseous fuel이다.", boiler: "연소 등의 열원으로 물을 가열하거나 steam을 만드는 설비이다.",
-};
-export function ConceptStudy({ source, selected, page }: { source: string; selected: string; page: number | null }) {
+import type { ConceptExplanation } from "@/lib/paperflow/concept/concept";
+
+// Answers already fetched on this device: the same term in the same paragraph is never asked twice.
+const memory = new Map<string, ConceptExplanation>();
+const STORE = "paperflow-concepts";
+const keyOf = (term: string, source: string) => { let hash = 0; for (const char of `${term.toLowerCase()}|${source}`) hash = (hash * 31 + char.charCodeAt(0)) | 0; return String(hash); };
+function remembered(key: string): ConceptExplanation | undefined {
+  if (memory.has(key)) return memory.get(key);
+  try { const value = JSON.parse(localStorage.getItem(STORE) ?? "{}")[key]; if (value) memory.set(key, value); return value; } catch { return undefined; }
+}
+function remember(key: string, value: ConceptExplanation) {
+  memory.set(key, value);
+  try { const all = JSON.parse(localStorage.getItem(STORE) ?? "{}"); all[key] = value; const keys = Object.keys(all); for (const old of keys.slice(0, Math.max(0, keys.length - 150))) delete all[old]; localStorage.setItem(STORE, JSON.stringify(all)); } catch { /* Memory cache only. */ }
+}
+
+/** 선택 개념 공부: pick or drag a term; the AI explains it as this paper uses it, grounded in the paragraph. */
+export function ConceptStudy({ source, selected, page, paper }: { source: string; selected: string; page: number | null; paper?: string }) {
   const terms = researchTerms.filter(term => source.toLowerCase().includes(term.toLowerCase())).slice(0, 12);
-  const [term, setTerm] = useState(""), [answer, setAnswer] = useState(""), [pending, setPending] = useState(false), [error, setError] = useState("");
-  useEffect(() => { setTerm(selected.length <= 70 ? selected.trim() : ""); setAnswer(""); setError(""); }, [source, selected]);
-  const active = term || terms[0] || selected.trim().split(/\s+/).slice(0, 4).join(" ") || "";
-  const evidence = source.split(/(?<=[.!?])\s+/).find(sentence => sentence.toLowerCase().includes(active.toLowerCase()));
-  async function explain() { setPending(true); setError(""); try { const result = await researchRequest("explain", source, active); if (!result) { setAnswer(`일반 개념: ${definitions[active.toLowerCase()] ?? `${active}의 일반 정의는 원문 밖의 근거가 필요하다.`}\n\n이 문단에서의 역할: 아래 원문 근거에서 ${active}가 어떤 대상·조건·결과와 연결되는지 확인할 수 있다.\n\n원문 근거: ${evidence || source.slice(0, 400)}\n\n확인할 질문: 이 논문에서 ${active}의 정의와 측정·계산 방법은 무엇인가?`); return; } setAnswer(result.text); } catch (e) { setError(e instanceof Error ? e.message : "설명을 불러오지 못했다."); } finally { setPending(false); } }
-  return <section className="pf-inspector-section pf-concept-study"><h3>개념 공부 <small>p. {page ?? "—"}</small></h3><p>원문·번역문을 드래그하거나 키워드를 선택하세요.</p><input aria-label="공부할 개념" placeholder="공부할 용어 입력" value={term} onChange={event => setTerm(event.target.value)}/><div className="pf-keywords">{terms.map(item => <Button key={item} size="sm" variant="ghost" aria-pressed={active === item} onClick={() => { setTerm(item); setAnswer(""); }}>{item}</Button>)}</div>
-    {active && <><strong>{active}</strong>{definitions[active.toLowerCase()] && <p><small>일반 개념</small><br/>{definitions[active.toLowerCase()]}</p>}<p><small>이 문단의 원문 근거</small></p><blockquote>{evidence || "선택한 번역어의 역할은 아래 OpenAI 설명에서 원문 문맥과 함께 확인할 수 있다."}</blockquote><Button size="sm" disabled={pending || !source} onClick={() => void explain()}>{pending ? "근거 확인 중…" : "이 연구에서의 의미 설명"}</Button></>}
-    {error && <p role="status">{error}</p>}{answer && <div className="pf-study-answer"><small>AI 설명 · 원문과 대조하여 확인</small><p style={{ whiteSpace: "pre-wrap" }}>{answer}</p></div>}
+  const [draft, setDraft] = useState(""), [term, setTerm] = useState(""), [concept, setConcept] = useState<ConceptExplanation | null>(null);
+  const [pending, setPending] = useState(false), [error, setError] = useState("");
+  const reduced = useReducedMotion(), request = useRef<AbortController | null>(null);
+
+  const explain = async (value: string) => {
+    const name = value.trim();
+    if (!name || !source) return;
+    setTerm(name); setDraft(name); setError("");
+    const key = keyOf(name, source), hit = remembered(key);
+    if (hit) { setConcept(hit); return; }
+    request.current?.abort(); const controller = new AbortController(); request.current = controller;
+    setPending(true); setConcept(null);
+    try {
+      const response = await fetch("/api/concept", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ term: name, passage: source, paper }) });
+      const body = await response.json().catch(() => ({ error: "설명 응답을 읽지 못했다." }));
+      if (!response.ok || !body.concept) throw new Error(body.error || "개념 설명을 만들지 못했다.");
+      remember(key, body.concept); setConcept(body.concept);
+    } catch (cause) { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "개념 설명을 만들지 못했다."); }
+    finally { if (request.current === controller) setPending(false); }
+  };
+
+  // A short drag selection is a term to study: explain it right away. A new paragraph starts fresh.
+  useEffect(() => {
+    request.current?.abort(); setConcept(null); setError(""); setPending(false);
+    const pick = selected.trim();
+    if (pick && pick.length <= 70 && source) void explain(pick); else { setTerm(""); setDraft(""); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source, selected]);
+  useEffect(() => () => request.current?.abort(), []);
+  const rise = (index: number) => reduced ? {} : { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, transition: { delay: index * .04, type: "spring" as const, stiffness: 320, damping: 28 } };
+
+  return <section className="pf-inspector-section pf-concept-study">
+    <h3><Sparkles size={15}/> 개념 공부 <small>p. {page ?? "—"}</small></h3>
+    {!source ? <p>문단을 클릭하거나 원문·번역문에서 용어를 드래그하면, 이 논문에서의 의미를 AI가 설명한다.</p> : <>
+      <form className="pf-concept-ask" onSubmit={event => { event.preventDefault(); void explain(draft); }}>
+        <Search size={14} aria-hidden="true"/><input aria-label="공부할 개념" placeholder="용어 입력 또는 아래에서 선택" value={draft} onChange={event => setDraft(event.target.value)}/>
+        <Button size="sm" variant="primary" type="submit" disabled={pending || !draft.trim()}>설명</Button>
+      </form>
+      {terms.length > 0 && <div className="pf-keywords">{terms.map(item => <Button key={item} size="sm" variant="ghost" aria-pressed={term === item} onClick={() => void explain(item)}>{item}</Button>)}</div>}
+      {pending && <div className="pf-concept-loading" role="status" aria-label={`${term} 설명을 만드는 중`}><span/><span/><span/><small>{term}의 의미를 이 문단과 대조하는 중…</small></div>}
+      {error && <p className="pf-error" role="alert">{error}</p>}
+      {concept && !pending && <div className="pf-concept" aria-live="polite">
+        <motion.div className="pf-concept-head" {...rise(0)}><strong>{concept.term || term}</strong><span className="pf-concept-badge">AI 설명 · 원문 대조</span></motion.div>
+        <motion.div className="pf-concept-block" {...rise(1)}><small>일반 개념</small><p>{concept.definition}</p></motion.div>
+        <motion.div className="pf-concept-block" {...rise(2)}><small>이 논문에서의 의미</small><p>{concept.inPaper}</p></motion.div>
+        {concept.evidence.length > 0 && <motion.div className="pf-concept-block" {...rise(3)}><small>원문 근거</small>{concept.evidence.map(quote => <blockquote key={quote}>{quote}</blockquote>)}</motion.div>}
+        {concept.quantities.length > 0 && <motion.div className="pf-concept-block" {...rise(4)}><small>수치 · 조건</small><dl className="pf-concept-values">{concept.quantities.map(item => <div key={item.label + item.value}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl></motion.div>}
+        {concept.related.length > 0 && <motion.div className="pf-concept-block" {...rise(5)}><small>다음에 볼 개념</small><div className="pf-keywords">{concept.related.map(item => <Button key={item} size="sm" variant="ghost" onClick={() => void explain(item)}>{item}</Button>)}</div></motion.div>}
+        {concept.questions.length > 0 && <motion.div className="pf-concept-block" {...rise(6)}><small>공부할 질문</small><ol>{concept.questions.map(item => <li key={item}>{item}</li>)}</ol></motion.div>}
+        {concept.needsMoreContext && <p className="pf-concept-note"><AlertTriangle size={12}/> 이 문단만으로는 역할을 다 설명하기 어렵다. 앞뒤 문단이나 방법 절을 함께 확인한다.</p>}
+      </div>}
+    </>}
   </section>;
 }

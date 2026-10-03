@@ -20,13 +20,6 @@ export async function researchTranslateBlocks(passages: TranslationPassage[], si
   return { results, missing: passages.map(passage => passage.id).filter(id => !done.has(id)), usage: body.usage };
 }
 
-export async function researchRequest(task: "explain", source: string, selection = "", signal?: AbortSignal) {
-  const response = await fetch("/api/research", { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task, source, selection }) });
-  const body = await response.json().catch(() => ({ error: "OpenAI 서버가 연결되지 않았다." }));
-  if (!response.ok) throw new Error(body.error || "연구 서비스에 연결하지 못했다.");
-  return body as { text: string; provider: "OpenAI" };
-}
-
 /**
  * Paragraphs someone already translated (same source text, same prompt) come from the shared
  * cache instead of the model. Any failure simply means "nothing cached".

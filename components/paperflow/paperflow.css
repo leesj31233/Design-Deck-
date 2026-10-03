@@ -726,3 +726,29 @@ html[data-pf-theme="dark"] .pf-guide-marks span { mix-blend-mode:normal; backgro
 .pf-login-form input[aria-invalid="true"] { border-color:color-mix(in srgb,var(--danger) 60%,var(--line)); }
 .pf-login-reset { text-align:left; }
 a.pf-account-signin { color:inherit; text-decoration:none; }
+
+/* 선택 개념 공부 (AI) */
+.pf-concept-study h3 { display:flex; align-items:center; gap:6px; }
+.pf-concept-study h3 small { margin-left:auto; }
+.pf-concept-ask { display:flex; align-items:center; gap:6px; margin:10px 0 8px; padding:4px 4px 4px 10px; border:1px solid var(--line); border-radius:12px; background:var(--surface); transition:border-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-med) var(--ease-out); }
+.pf-concept-ask:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent); }
+.pf-concept-ask svg { flex-shrink:0; color:var(--muted); }
+.pf-concept-study .pf-concept-ask input { flex:1; min-width:0; min-height:30px; padding:0; border:0; background:transparent; outline:none; }
+.pf-concept-loading { display:grid; gap:7px; margin-top:12px; }
+.pf-concept-loading span { height:11px; border-radius:6px; background:linear-gradient(100deg,var(--line) 30%,color-mix(in srgb,var(--line) 35%,transparent) 50%,var(--line) 70%); background-size:300% 100%; animation:pf-shimmer 1.3s ease-in-out infinite; }
+.pf-concept-loading span:nth-child(2) { width:86%; } .pf-concept-loading span:nth-child(3) { width:64%; }
+.pf-concept-loading small { font-size:10.5px; color:var(--muted); }
+.pf-concept { display:grid; gap:12px; margin-top:12px; }
+.pf-concept-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.pf-concept-head strong { font-size:15px; letter-spacing:-.02em; }
+.pf-concept-badge { flex-shrink:0; padding:3px 7px; border-radius:999px; background:color-mix(in srgb,var(--accent) 12%,transparent); color:var(--accent); font-size:9.5px; font-weight:650; }
+.pf-concept-block small { display:block; margin-bottom:4px; font-size:9.5px; font-weight:650; letter-spacing:.06em; color:var(--muted); }
+.pf-concept-block p { font-size:12px; line-height:1.75; }
+.pf-concept-block blockquote { margin:4px 0 0; padding:7px 10px; border-left:3px solid color-mix(in srgb,var(--accent) 55%,transparent); border-radius:0 8px 8px 0; background:color-mix(in srgb,var(--accent) 6%,transparent); font-size:11.5px; line-height:1.6; font-style:italic; }
+.pf-concept-block ol { margin:0; padding-left:18px; font-size:12px; line-height:1.7; }
+.pf-concept-values { display:grid; gap:4px; margin:0; }
+.pf-concept-values div { display:flex; justify-content:space-between; gap:10px; padding:5px 8px; border-radius:8px; background:var(--surface); font-size:11.5px; }
+.pf-concept-values dt { color:var(--muted); } .pf-concept-values dd { margin:0; font-weight:600; text-align:right; font-variant-numeric:tabular-nums; }
+.pf-concept-note { display:flex; gap:6px; align-items:flex-start; font-size:11px; line-height:1.6; color:var(--muted); }
+.pf-concept-note svg { flex-shrink:0; margin-top:3px; }
+@media (prefers-reduced-motion: reduce) { .pf-concept-loading span { animation:none; } }

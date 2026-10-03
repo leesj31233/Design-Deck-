@@ -3,12 +3,12 @@ import type { TranslationBatchResult, TranslationPassage, TranslationResult } fr
 
 export interface TranslationBatch { passages: TranslationPassage[]; attempts: number }
 export interface SchedulerState { concurrency: number; requests: number; rateLimitHits: number; completed: number; failed: number; retried: number; inputTokens: number; outputTokens: number }
-export interface SchedulerOptions { maxPassages: number; maxChars: number; concurrency: number; maxConcurrency: number; firstChars?: number }
+export interface SchedulerOptions { maxPassages: number; maxChars: number; concurrency: number; maxConcurrency: number; firstChars?: number; warmupMs?: number }
 /**
  * Larger batches repeat the instructions fewer times (they are most of the input tokens); the first
  * batch stays small so the page being read shows Korean within a few seconds.
  */
-export const DEFAULT_SCHEDULER: SchedulerOptions = { maxPassages: 16, maxChars: 9000, concurrency: 6, maxConcurrency: 8, firstChars: 3000 };
+export const DEFAULT_SCHEDULER: SchedulerOptions = { maxPassages: 12, maxChars: 5000, concurrency: 8, maxConcurrency: 10, firstChars: 2500, warmupMs: 1200 };
 
 export function makeTranslationBatches(passages: TranslationPassage[], maxPassages = DEFAULT_SCHEDULER.maxPassages, maxChars = DEFAULT_SCHEDULER.maxChars, firstChars = maxChars): TranslationBatch[] {
   const batches: TranslationBatch[] = [];
@@ -45,9 +45,10 @@ export async function runTranslationScheduler(passages: TranslationPassage[], si
   const queue = makeTranslationBatches(passages, options.maxPassages, options.maxChars, options.firstChars);
   const state: SchedulerState = { concurrency: options.concurrency, requests: 0, rateLimitHits: 0, completed: 0, failed: 0, retried: 0, inputTokens: 0, outputTokens: 0 };
   let pauseUntil = 0, streak = 0, fatal: Error | null = null, active = 0;
-  // The first request goes alone: once it returns, OpenAI has cached the shared prompt prefix and
-  // every parallel request after it pays a quarter of the price for those tokens.
-  let warm = queue.length <= 1;
+  // The first request goes alone. OpenAI caches the shared prompt prefix as soon as it has read it
+  // (well before the answer is written), so the rest follow after a short head start and pay a
+  // quarter of the price for those tokens, without waiting a whole translation for it.
+  let warm = queue.length <= 1, warming = false;
   const publish = () => onState?.({ ...state });
   const fail = (batch: TranslationBatch, error: Error) => {
     if (batch.passages.length > 1) { queue.unshift(...batch.passages.map(passage => ({ passages: [passage], attempts: batch.attempts + 1 }))); state.retried += batch.passages.length; return; }
@@ -63,6 +64,7 @@ export async function runTranslationScheduler(passages: TranslationPassage[], si
       const batch = queue.shift();
       if (!batch) { if (!active) return; await wait(250, signal); continue; }
       active++;
+      if (!warm && !warming) { warming = true; setTimeout(() => { warm = true; }, options.warmupMs ?? 1200); }
       try {
         state.requests++; publish();
         const response = await translate(batch.passages, signal);

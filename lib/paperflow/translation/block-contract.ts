@@ -3,9 +3,19 @@ export interface TranslationPassage { id: string; text: string; role?: PassageRo
 export interface TranslationResult { id: string; text: string }
 export interface TranslationBatchResult { results: TranslationResult[]; missing: string[] }
 
-const PROSE_WORDS = /[A-Za-z]{3,}/g;
-/** Prose must come back in Korean; a label or symbol-only passage may legitimately stay as it is. */
-export function needsHangul(source: string) { return (source.match(PROSE_WORDS) ?? []).length >= 5; }
+const WORDS = /[A-Za-z]{2,}/g, GLUE = /\b(the|of|and|is|are|was|were|to|in|with|for|by|that|this|as|on|from|be|been|which|at|an|or|it|its|than|into)\b/g;
+/**
+ * Prose must come back in Korean. A label, a symbol run, or a list that is correctly left as written
+ * (author names, affiliations, keyword lists: capitalised words without the glue words of a
+ * sentence) may come back unchanged, instead of being retried and reported as failed.
+ */
+export function needsHangul(source: string) {
+  const words = source.match(WORDS) ?? [];
+  if (words.filter(word => word.length >= 3).length < 5) return false;
+  const capitalised = words.filter(word => /^[A-Z]/.test(word)).length / words.length;
+  const glue = (source.match(GLUE) ?? []).length, sentence = /[.!?]["')\]]?\s*$/.test(source.trim());
+  return (glue >= 2 || (glue >= 1 && sentence)) && capitalised < .6;
+}
 
 /**
  * Keep every valid item and report the rest. A model that drops one passage

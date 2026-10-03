@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makeTranslationBatches, runTranslationScheduler } from "../../lib/paperflow/translation/scheduler";
-import { partitionTranslationResults } from "../../lib/paperflow/translation/block-contract";
+import { needsHangul, partitionTranslationResults } from "../../lib/paperflow/translation/block-contract";
 import { ResearchHttpError } from "../../lib/paperflow/translation/research-api";
 import { manifestCounts, type TranslationManifest } from "../../lib/paperflow/translation/manifest";
 
@@ -18,6 +18,12 @@ describe("result contract", () => {
   it("accepts a heading made only of technical terms", () => {
     const heading = [{ id: "h", text: "2.2. Silicate melt-induced slagging (ash fusion)", role: "heading" as const }];
     expect(partitionTranslationResults(heading, [{ id: "h", text: "2.2. Silicate melt-induced slagging (ash fusion)" }]).missing).toEqual([]);
+  });
+  it("asks Korean only of prose; names, affiliations and keyword lists may stay as written", () => {
+    expect(needsHangul("The NOx reduction rate was proportional to the methane cofiring rate in the boiler.")).toBe(true);
+    expect(needsHangul("Jonathan D. Morrisa, Syed Sheraz Daooda*, Stephen Chiltonb, William Nimmo")).toBe(false);
+    expect(needsHangul("Energy Engineering Group, Energy 2050, Department of Mechanical Engineering, University of Sheffield, UK")).toBe(false);
+    expect(needsHangul("Fluidized bed; Combustion; Biomass; Agglomeration; Review")).toBe(false);
   });
   it("accepts a short label that legitimately stays in English", () => {
     expect(partitionTranslationResults([{ id: "h", text: "CFD" }], [{ id: "h", text: "CFD" }]).missing).toEqual([]);
