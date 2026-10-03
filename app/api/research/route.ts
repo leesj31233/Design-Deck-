@@ -1,4 +1,6 @@
-import { researchTranslationInstructions } from "@/lib/paperflow/translation/research-style";
+import { polishKorean, researchTranslationInstructions } from "@/lib/paperflow/translation/research-style";
+import { TRANSLATION_PROMPT_VERSION, sourceHash } from "@/lib/paperflow/translation/prompt-version";
+import { adminClient } from "@/lib/paperflow/cloud/server";
 import { partitionTranslationResults, type TranslationPassage } from "@/lib/paperflow/translation/block-contract";
 
 export const maxDuration = 120;
@@ -39,6 +41,20 @@ function outputText(data: { output?: { content?: { type: string; text?: string }
   return (data.output ?? []).flatMap(item => item.content ?? []).filter(item => item.type === "output_text").map(item => item.text ?? "").join("\n");
 }
 
+/**
+ * Store what the model just produced in the shared cache, keyed by the source paragraph hash.
+ * Written here, on the server, so a client can never plant a translation for someone else.
+ */
+async function shareTranslations(passages: TranslationPassage[], results: { id: string; text: string }[]) {
+  const admin = adminClient();
+  if (!admin || !results.length) return;
+  const byId = new Map(passages.map(passage => [passage.id, passage.text]));
+  try {
+    const rows = await Promise.all(results.filter(result => byId.has(result.id)).map(async result => ({ source_hash: await sourceHash(byId.get(result.id)!), prompt_version: TRANSLATION_PROMPT_VERSION, text: polishKorean(result.text) })));
+    await admin.from("shared_translations").upsert(rows, { onConflict: "source_hash", ignoreDuplicates: true });
+  } catch { /* The cache is an optimisation; a failed write never fails the translation. */ }
+}
+
 export async function GET() { return Response.json({ available: Boolean(process.env.OPENAI_API_KEY), provider: "OpenAI" }); }
 
 export async function POST(request: Request) {
@@ -75,6 +91,7 @@ export async function POST(request: Request) {
     try { parsed = JSON.parse(text); } catch { parsed = { translations: [...text.matchAll(/\{"id":"([^"]+)","text":"((?:[^"\\]|\\.)*)"\}/g)].map(match => ({ id: match[1], text: JSON.parse(`"${match[2]}"`) })) }; }
     const { results, missing } = partitionTranslationResults(passages, parsed.translations);
     if (!results.length) return Response.json({ error: "번역 결과를 확인할 수 없어 더 작은 묶음으로 다시 시도한다.", kind: "malformed", usage }, { status: 502 });
+    await shareTranslations(passages, results);
     return Response.json({ translations: results, missing, provider: "OpenAI", usage, incomplete: data.status === "incomplete" });
   } catch { return Response.json({ error: "연결 시간이 초과되었거나 요청이 취소되었다.", kind: "transient" }, { status: 504 }); }
 }

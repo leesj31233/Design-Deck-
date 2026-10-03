@@ -3,7 +3,7 @@ import { translationRepository } from "../persistence/translation-repository";
 import { pdfAdapter } from "../pdf/pdf-adapter";
 import { readableError } from "../errors";
 import { ensureManifest, manifestCounts, type TranslationManifest, type TranslationUnit } from "./manifest";
-import { researchTranslateBlocks, ResearchHttpError } from "./research-api";
+import { researchTranslateBlocks, sharedTranslations, ResearchHttpError } from "./research-api";
 import { runTranslationScheduler, type SchedulerState } from "./scheduler";
 import { polishKorean } from "./research-style";
 import { useTranslationStore } from "./translation-store";
@@ -19,6 +19,8 @@ export interface TranslationJobStatus {
   extractedPages: number; ocrPages: number; ocrCandidatePages: number;
   requests: number; concurrency: number; rateLimitHits: number; retried: number; inputTokens: number; outputTokens: number;
   extractionMs: number; translationMs: number; firstResultMs: number | null;
+  /** Units served by the shared cache (no model call). */
+  sharedUnits?: number;
   failedUnits: { unitId: string; page: number; error: string; preview: string }[];
   running: boolean; complete: boolean; error?: string;
 }
@@ -101,6 +103,17 @@ export async function startTranslationJob(documentId: string, options: { fromPag
     refresh();
     store().setPending(documentId, target.map(unit => unit.id), true);
     const translationStarted = performance.now();
+    // Paragraphs already translated by anyone (same text, same prompt) cost nothing and appear at once.
+    const shared = await sharedTranslations(target, controller.signal);
+    if (shared.size) {
+      const entries = [...shared].map(([id, text]) => ({ id, text: polishKorean(text) }));
+      await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.get(entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
+      for (const entry of entries) translated.add(entry.id);
+      store().addTexts(documentId, entries);
+      update(documentId, { firstResultMs: Math.round(performance.now() - translationStarted), sharedUnits: entries.length });
+      target = target.filter(unit => !shared.has(unit.id));
+      refresh();
+    }
     if (target.length) await runTranslationScheduler(
       target.map(unit => ({ id: unit.id, text: unit.text, role: roleOf(unit) })), controller.signal, (group, signal) => researchTranslateBlocks(group, signal, paperGlossary(manifest)),
       async results => {
@@ -143,7 +156,10 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
   if (!units.length) return;
   store().setPending(documentId, units.map(unit => unit.id), true);
   try {
-    const { results, missing } = await researchTranslateBlocks(units.map(unit => ({ id: unit.id, text: unit.text, role: roleOf(unit) })), undefined, paperGlossary(manifest));
+    const shared = await sharedTranslations(units);
+    const missingUnits = units.filter(unit => !shared.has(unit.id));
+    const response = missingUnits.length ? await researchTranslateBlocks(missingUnits.map(unit => ({ id: unit.id, text: unit.text, role: roleOf(unit) })), undefined, paperGlossary(manifest)) : { results: [], missing: [] as string[] };
+    const results = [...[...shared].map(([id, text]) => ({ id, text })), ...response.results], missing = response.missing;
     const entries = results.map(result => ({ id: result.id, text: polishKorean(result.text) }));
     await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.find(item => item.id === entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
     store().addTexts(documentId, entries);

@@ -8,6 +8,7 @@ import { PaperflowContext, type ReaderCommands } from "./paperflow-context";
 import { useShortcuts } from "@/lib/paperflow/state/use-shortcuts";
 import { readableError } from "@/lib/paperflow/errors";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
+import { initCloud } from "@/lib/paperflow/cloud/sync";
 export function PaperflowProvider({ children }: { children: React.ReactNode }) {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 30_000 } } }));
   return <QueryClientProvider client={client}><MotionConfig reducedMotion="user"><AppControls client={client}>{children}</AppControls></MotionConfig></QueryClientProvider>;
@@ -24,6 +25,13 @@ function AppControls({ children, client }: { children: React.ReactNode; client: 
     const sync = () => { let saved: string | null = null; try { saved = localStorage.getItem("paperflow-theme"); } catch { /* OS preference still works. */ } const isDark = saved ? saved === "dark" : media.matches; setDark(isDark); document.documentElement.dataset.pfTheme = isDark ? "dark" : "light"; };
     sync(); media.addEventListener("change", sync); return () => { media.removeEventListener("change", sync); delete document.documentElement.dataset.pfTheme; };
   }, []);
+  // The account session (if cloud is configured) and a library refresh after every sync.
+  useEffect(() => {
+    initCloud();
+    const refresh = () => void client.invalidateQueries();
+    window.addEventListener("paperflow:library-synced", refresh);
+    return () => window.removeEventListener("paperflow:library-synced", refresh);
+  }, [client]);
   const toggleTheme = useCallback(() => setDark(current => { const next = !current; document.documentElement.dataset.pfTheme = next ? "dark" : "light"; try { localStorage.setItem("paperflow-theme", next ? "dark" : "light"); } catch { notify("테마 설정을 저장하지 못했습니다."); } return next; }), [notify]);
   const openCommand = useCallback(() => { returnFocus.current = document.activeElement as HTMLElement; setOpen(true); }, []);
   const changeOpen = (value: boolean) => { setOpen(value); if (!value) setTimeout(() => returnFocus.current?.focus(), 0); };

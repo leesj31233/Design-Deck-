@@ -51,7 +51,9 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     useTranslationStore.getState().open(documentId);
     void (async () => {
       const [record, blob] = await Promise.all([documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId)]);
-      if (!record || !blob) throw new Error("이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
+      if (!record) throw new Error("이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
+      // Listed by the account but kept on another device: the same file imported here links automatically.
+      if (!blob) throw new Error(record.sourceStatus === "remote" ? "이 논문의 PDF는 다른 기기에 저장되어 있다. 같은 PDF 파일을 이 기기에서 가져오면 메모·번역과 자동으로 연결된다." : "이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
       if (controller.signal.aborted) return;
       const params = new URLSearchParams(window.location.search), requestedPage = Number(params.get("page"));
       const initialPage = requestedPage >= 1 && requestedPage <= record.pageCount ? requestedPage : record.currentPage;

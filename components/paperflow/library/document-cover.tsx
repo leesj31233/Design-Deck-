@@ -14,7 +14,7 @@ async function coverFor(id: string) {
       if (active >= 2) await new Promise<void>(resolve => waiting.push(resolve));
       active++;
       try {
-        const blob = await documentRepository.getDocumentBlob(id);
+        const blob = await documentRepository.getDocumentBlob(id, { remote: false });
         if (!blob) throw new Error("Source PDF missing");
         const pdf = await pdfAdapter.open(await blob.arrayBuffer());
         try {

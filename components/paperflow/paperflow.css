@@ -394,3 +394,30 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 .pf-failed-units li { margin:3px 0; }
 .pf-keyword-chips { display:flex; flex-wrap:wrap; gap:6px; }
 .pf-keyword-chips span { padding:3px 10px; border-radius:99px; background:color-mix(in srgb,var(--accent) 14%,transparent); border:1px solid color-mix(in srgb,var(--accent) 30%,transparent); font-size:12px; }
+
+/* Account card (sidebar footer) */
+.pf-account-local { display:flex; align-items:center; gap:6px; margin-top:20px; font-size:10px; color:var(--muted); }
+.pf-account-signin { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:2px 8px; width:100%; margin-top:16px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:var(--surface-strong); color:var(--foreground); font-size:12px; font-weight:600; text-align:left; cursor:pointer; transition:transform .14s ease, box-shadow .2s ease; }
+.pf-account-signin small { grid-column:2; margin:0; font-size:10px; font-weight:400; color:var(--muted); }
+.pf-account-signin:active { transform:scale(.98); }
+@media (hover:hover) and (pointer:fine) { .pf-account-signin:hover { box-shadow:var(--shadow-soft); } }
+.pf-account { display:grid; gap:8px; margin-top:16px; padding:10px; border:1px solid var(--line); border-radius:14px; background:var(--surface-strong); }
+.pf-account-who { display:flex; align-items:center; gap:8px; min-width:0; }
+.pf-account-who > span { display:grid; min-width:0; }
+.pf-account-who b { font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-account-who small { margin:0; font-size:10px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-account-plan { display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--muted); }
+.pf-account-plan[data-mode="local"] { color:#1f8f5f; }
+.pf-account-meter { height:4px; border-radius:99px; background:var(--line); overflow:hidden; }
+.pf-account-meter i { display:block; height:100%; border-radius:inherit; background:var(--accent); transition:width .4s cubic-bezier(.2,.8,.2,1); }
+.pf-account-meter i[data-full] { background:#d9534f; }
+.pf-account-actions { display:flex; justify-content:space-between; gap:6px; }
+.pf-account-actions button { display:inline-flex; align-items:center; gap:4px; padding:3px 6px; border:0; border-radius:8px; background:transparent; color:var(--muted); font-size:10.5px; cursor:pointer; }
+.pf-account-actions button:active { transform:scale(.96); }
+@media (hover:hover) and (pointer:fine) { .pf-account-actions button:hover { background:var(--line); color:var(--foreground); } }
+.pf-account-error { margin:0 !important; font-size:10px; color:#c0392b; }
+.pf-spin { animation:pf-spin 1s linear infinite; }
+@keyframes pf-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .pf-spin { animation:none; } }
+.pf-source-badge { display:inline-flex; width:max-content; margin-top:4px; padding:1px 7px; border-radius:99px; font-size:9.5px; font-weight:600; letter-spacing:.01em; background:rgba(10,132,255,.1); color:var(--accent); }
+.pf-source-badge[data-source="remote"] { background:rgba(255,159,10,.14); color:#b26a00; }
