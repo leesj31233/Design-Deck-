@@ -39,5 +39,17 @@ export const documentRepository: DocumentRepository = {
     if (record) store.put({ ...record, ...patch, visitedPages: patch.currentPage ? [...new Set([...(record.visitedPages ?? []), patch.currentPage])] : record.visitedPages, updatedAt: new Date().toISOString() });
     await done;
     if (record) emitLocalChange({ kind: "document", id });
+  },
+  async removeDocument(id) {
+    const db = await openDatabase(), stores = ["documents", "blobs", "annotations", "translations", "translationManifests"].filter(name => db.objectStoreNames.contains(name));
+    const tx = db.transaction(stores, "readwrite"), done = transactionDone(tx);
+    tx.objectStore("documents").delete(id); tx.objectStore("blobs").delete(id);
+    if (stores.includes("translationManifests")) tx.objectStore("translationManifests").delete(id);
+    for (const name of ["annotations", "translations"]) {
+      if (!stores.includes(name)) continue;
+      const request = tx.objectStore(name).index("documentId").openKeyCursor(IDBKeyRange.only(id));
+      request.onsuccess = () => { const cursor = request.result; if (cursor) { tx.objectStore(name).delete(cursor.primaryKey); cursor.continue(); } };
+    }
+    await done;
   }
 };

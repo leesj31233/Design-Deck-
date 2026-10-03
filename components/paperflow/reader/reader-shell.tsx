@@ -47,6 +47,16 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     wentFullscreen.current = false;
   }, []);
+  // iPad Safari lifts a selection for system drag-and-drop when the finger moves on it, dimming the
+  // whole page. The reader has its own selection tools, so native dragging of page content is off.
+  useEffect(() => {
+    const onDragStart = (event: DragEvent) => {
+      const target = event.target instanceof Element ? event.target : (event.target as Node | null)?.parentElement;
+      if (target?.closest(".pf-reader-body")) event.preventDefault();
+    };
+    document.addEventListener("dragstart", onDragStart, true);
+    return () => document.removeEventListener("dragstart", onDragStart, true);
+  }, []);
   useEffect(() => {
     if (!focus) return;
     // Leaving browser full screen (Esc, F11) leaves focus mode too; Esc alone works without it.

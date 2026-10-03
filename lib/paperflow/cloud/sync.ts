@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { cloudClient } from "./browser";
-import { PAPER_BUCKET, type AccountPlan } from "./config";
+import { PAPER_BUCKET, paperPath, type AccountPlan } from "./config";
 import { documentRepository } from "../persistence/document-repository";
 import { annotationRepository } from "../persistence/annotation-repository";
 import { translationRepository, TRANSLATION_PROMPT_VERSION } from "../persistence/translation-repository";
@@ -62,21 +62,50 @@ async function pushTranslations(documentId: string, unitIds?: string[]) {
   }
 }
 
+// Purges are remembered on the device until the account has them, so a paper deleted for good while
+// offline (or signed out) is not pulled back from the account by the next sync.
+type Purge = Extract<LocalChange, { kind: "purge" }>;
+const PURGE_KEY = "paperflow-pending-purges";
+function pendingPurges(): Purge[] { try { return JSON.parse(localStorage.getItem(PURGE_KEY) ?? "[]"); } catch { return []; } }
+function setPendingPurges(items: Purge[]) { try { if (items.length) localStorage.setItem(PURGE_KEY, JSON.stringify(items)); else localStorage.removeItem(PURGE_KEY); } catch { /* Retried from memory only. */ } }
+
+/**
+ * Delete a paper from the account for good: the PDF, marks and translations. The document row stays
+ * as a small tombstone (metadata.purged) so every other device removes its copy instead of
+ * uploading it again.
+ */
+async function purgeRemote(item: Purge) {
+  if (!session) return false;
+  const db = supabase(), uid = session.user.id, now = new Date().toISOString();
+  await db.storage.from(PAPER_BUCKET).remove([paperPath(uid, item.id)]);
+  const [notes, texts] = await Promise.all([db.from("annotations").delete().eq("document_id", item.id), db.from("translations").delete().eq("document_id", item.id)]);
+  const { error } = await db.from("documents").upsert({ user_id: uid, id: item.id, filename: item.filename || "deleted.pdf", title: item.title || "deleted", byte_length: Math.max(1, item.byteLength), page_count: item.pageCount || 1, storage_path: null, metadata: { purged: true }, archived: false, updated_at: now }, { onConflict: "user_id,id" });
+  return !error && !notes.error && !texts.error;
+}
+async function flushPurges() {
+  const left: Purge[] = [];
+  for (const item of pendingPurges()) { try { if (!(await purgeRemote(item))) left.push(item); } catch { left.push(item); } }
+  setPendingPurges(left);
+}
+
 /** Two-way merge of the whole library; the newer side wins per paper, note and translation. */
 export async function syncAll() {
   if (!session || useCloud.getState().syncing) return;
   set({ syncing: true, error: undefined });
   try {
     const db = supabase();
+    await flushPurges();
     const [{ data: rows, error }, local] = await Promise.all([db.from("documents").select("id, filename, title, byte_length, page_count, storage_path, metadata, archived, created_at, updated_at"), documentRepository.listDocuments()]);
     if (error) throw error;
     const remote = new Map((rows as DocumentRow[] ?? []).map(row => [row.id, row])), mine = new Map(local.map(doc => [doc.id, doc]));
+    const purged = new Set([...remote.values()].filter(row => (row.metadata as { purged?: boolean } | null)?.purged).map(row => row.id));
+    for (const id of purged) { if (mine.has(id)) { await documentRepository.removeDocument(id); mine.delete(id); } remote.delete(id); }
     for (const row of remote.values()) {
       const doc = mine.get(row.id);
       if (!doc || row.updated_at > doc.updatedAt) await documentRepository.putRecord(recordOf(row, doc));
     }
     const uploads = useCloud.getState().plan?.mode === "cloud";
-    for (const doc of local) { const row = remote.get(doc.id); if (!row || doc.updatedAt > row.updated_at || (uploads && !row.storage_path && doc.sourceStatus !== "remote")) await pushDocument(doc, row); }
+    for (const doc of local) { if (purged.has(doc.id)) continue; const row = remote.get(doc.id); if (!row || doc.updatedAt > row.updated_at || (uploads && !row.storage_path && doc.sourceStatus !== "remote")) await pushDocument(doc, row); }
 
     const [{ data: notes }, localNotes] = await Promise.all([db.from("annotations").select("id, document_id, data, deleted, updated_at"), annotationRepository.listAll()]);
     const remoteNotes = new Map((notes ?? []).map(row => [row.id as string, row])), localById = new Map(localNotes.map(note => [note.id, note]));
@@ -113,6 +142,7 @@ export async function syncAll() {
 const queued = new Map<string, LocalChange>();
 let timer: ReturnType<typeof setTimeout> | undefined;
 function queue(change: LocalChange) {
+  if (change.kind === "purge") { setPendingPurges([...pendingPurges().filter(item => item.id !== change.id), change]); if (session) void flushPurges(); return; }
   if (!session) return;
   const key = change.kind === "document" ? `d:${change.id}` : change.kind === "annotation" ? `a:${change.id}` : `t:${change.documentId}`;
   const previous = queued.get(key);
@@ -126,7 +156,7 @@ async function flush() {
     try {
       if (change.kind === "document") { const doc = await documentRepository.getDocument(change.id); if (doc) await pushDocument(doc); }
       else if (change.kind === "annotation") await pushAnnotation(change.id, change.documentId, Boolean(change.deleted));
-      else await pushTranslations(change.documentId, change.unitIds);
+      else if (change.kind === "translation") await pushTranslations(change.documentId, change.unitIds);
     } catch { set({ error: "일부 변경을 계정에 저장하지 못했다. 다음 동기화 때 다시 시도한다." }); }
   }
   set({ lastSyncedAt: new Date().toISOString() });

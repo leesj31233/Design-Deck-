@@ -5,7 +5,8 @@
 export type LocalChange =
   | { kind: "document"; id: string }
   | { kind: "annotation"; id: string; documentId: string; deleted?: boolean }
-  | { kind: "translation"; documentId: string; unitIds: string[] };
+  | { kind: "translation"; documentId: string; unitIds: string[] }
+  | { kind: "purge"; id: string; title: string; filename: string; byteLength: number; pageCount: number };
 
 const listeners = new Set<(change: LocalChange) => void>();
 export function onLocalChange(listener: (change: LocalChange) => void) { listeners.add(listener); return () => { listeners.delete(listener); }; }

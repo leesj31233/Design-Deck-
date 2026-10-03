@@ -7,6 +7,8 @@ export type StoredDocument = {
   visitedPages?: number[]; opens?: string[]; keywords?: string[]; citationCount?: number; metadataSource?: string; metadataCheckedAt?: string; jif?: { value: number; year: number; source: string };
   currentPage: number; lastOpenedAt?: string; authors: string[]; journal?: string; year?: number; doi?: string;
   researchPoolIds: string[]; archived: boolean;
+  /** In the trash since then (purged for good after 30 days); null when restored, so the restore syncs too. */
+  deletedAt?: string | null;
   /** local: PDF only here. cloud: PDF also in the account's cloud storage. remote: listed by the account, PDF on another device. */
   sourceStatus: "local" | "cloud" | "remote";
   storagePath?: string;
@@ -26,6 +28,8 @@ export interface DocumentRepository {
   /** Sync only: write a record as received from the account, without announcing a local change. */
   putRecord(record: StoredDocument): Promise<void>;
   putBlob(id: string, blob: Blob): Promise<void>;
+  /** Permanent delete on this device: the record, the PDF, its marks, translations and layout manifest. */
+  removeDocument(id: string): Promise<void>;
 }
 export interface AnnotationRepository {
   create(annotation: Annotation): Promise<void>;
