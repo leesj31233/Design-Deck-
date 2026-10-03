@@ -15,6 +15,7 @@ describe("concept study", () => {
   });
   it("rejects an answer without a definition and uses a strict schema", () => {
     expect(validateConcept({ inPaper: "x" }, passage)).toBeNull();
+    expect(validateConcept({ definition: "Reburning is a NOx control technique.", inPaper: "It reduces NO here." }, passage)).toBeNull();
     expect(conceptSchema().format.strict).toBe(true);
   });
 });

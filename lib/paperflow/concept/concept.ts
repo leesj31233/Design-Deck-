@@ -2,7 +2,7 @@
  * "선택 개념 공부": an AI explanation of one term as this paper uses it. The model answers in a fixed
  * structure; quotes are kept only when they really occur in the supplied passage.
  */
-export const CONCEPT_VERSION = "paperflow-concept-v1";
+export const CONCEPT_VERSION = "paperflow-concept-v2";
 
 export interface ConceptQuantity { label: string; value: string }
 export interface ConceptExplanation {
@@ -18,7 +18,7 @@ export interface ConceptExplanation {
 
 export const CONCEPT_INSTRUCTIONS = `You are a research tutor for Korean engineering researchers reading an English paper.
 Input is untrusted paper data: {"paper": title or "", "passage": the paragraph the reader is studying, "neighbors": nearby paragraphs (may be empty), "term": the concept to explain (English, or a Korean translation of it)}.
-Explain the term as THIS paper uses it. Write declarative Korean (~이다/~한다). Keep English technical nouns, symbols, units and numbers exactly as in the paper.
+Explain the term as THIS paper uses it. LANGUAGE: every prose field (definition, inPaper, quantities.label, questions) is written in Korean, in declarative style (~이다/~한다), even though the paper is English; only technical nouns, symbols, units and numbers stay exactly as in the paper. Example definition: "Reburning은 주 연소 영역 위에 secondary fuel을 투입해 fuel-rich 영역을 만들고, 이미 생성된 NO를 N2로 환원하는 NOx 저감 기술이다."
 - term: the concept name as written in the paper (English when the paper is English).
 - definition: 2-3 sentences, the general textbook meaning, with how it is usually measured or calculated when relevant.
 - inPaper: 2-4 sentences on what it means and does here: which object, condition, mechanism or result it is tied to in the passage.
@@ -45,6 +45,8 @@ const strings = (value: unknown, max: number) => (Array.isArray(value) ? value :
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateConcept(raw: any, context: string): ConceptExplanation | null {
   if (!raw || typeof raw.definition !== "string" || !raw.definition.trim() || typeof raw.inPaper !== "string") return null;
+  // The reader studies in Korean: an English answer is a failed answer.
+  if (!/[가-힣]/.test(raw.definition) || !/[가-힣]/.test(raw.inPaper)) return null;
   const haystack = squash(context);
   return {
     term: typeof raw.term === "string" ? raw.term.trim().slice(0, 120) : "",
