@@ -437,3 +437,76 @@ html[data-pf-theme] .pf-collection-controls>label { background:var(--surface); }
 .pf-reader-shell[data-focus] .pf-focus-controls { margin-left:8px; padding-left:8px; border-left:1px solid var(--line); }
 @keyframes pf-focus-in { from { opacity:0; transform:translateY(-8px) scale(.98); } to { opacity:1; transform:none; } }
 @media (prefers-reduced-motion: reduce) { .pf-reader-shell[data-focus] .pf-annotation-tools { animation:none; } }
+
+/* Research map (연구맵) */
+.pf-mapview { display:grid; gap:18px; }
+.pf-mapview-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; }
+.pf-mapview-totals { display:flex; flex-wrap:wrap; gap:6px; }
+.pf-mapview-totals span { display:inline-flex; align-items:baseline; gap:5px; padding:7px 12px; border:1px solid var(--line); border-radius:12px; background:var(--surface); font-size:11.5px; color:var(--muted); }
+.pf-mapview-totals strong { font-size:17px; font-weight:700; color:var(--foreground); font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+.pf-mapview-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.pf-mapview-actions > :first-child { min-width:220px; }
+.pf-layer { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--line); border-radius:99px; font-size:12px; cursor:pointer; user-select:none; background:var(--surface); }
+.pf-layer input { accent-color:var(--accent); }
+.pf-mapview-stage { position:relative; display:grid; grid-template-columns:1fr; min-height:min(68vh,680px); border:1px solid var(--line); border-radius:22px; overflow:hidden; background:radial-gradient(ellipse at 20% 10%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 55%),radial-gradient(ellipse at 85% 90%,rgba(168,85,247,.08),transparent 50%),var(--surface-strong); box-shadow:var(--shadow-soft); }
+.pf-graph-wrap { position:relative; min-height:inherit; }
+.pf-graph-canvas { position:absolute; inset:0; }
+.pf-graph-reset { position:absolute; left:14px; bottom:14px; padding:6px 12px; border:1px solid var(--line); border-radius:99px; background:var(--surface-strong); color:var(--foreground); font-size:11.5px; cursor:pointer; box-shadow:var(--shadow-soft); }
+.pf-graph-reset:active { transform:scale(.96); }
+.pf-mapview-empty { display:grid; place-items:center; color:var(--muted); }
+.pf-map-inspector { position:absolute; top:14px; right:14px; bottom:14px; width:min(340px,calc(100% - 28px)); padding:16px; border:1px solid var(--line); border-radius:18px; background:color-mix(in srgb,var(--surface-strong) 90%,transparent); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%); box-shadow:var(--shadow-float); overflow:auto; transform:translateX(calc(100% + 20px)); opacity:0; transition:transform .38s cubic-bezier(.2,.9,.25,1), opacity .25s ease; pointer-events:none; }
+.pf-map-inspector[data-open] { transform:none; opacity:1; pointer-events:auto; }
+.pf-map-inspector:not([data-open]) .pf-map-hint { display:none; }
+.pf-map-inspector h3 { margin:4px 0 6px; font-size:17px; line-height:1.3; letter-spacing:-.015em; }
+.pf-map-weight { display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--muted); }
+.pf-map-weight i { width:9px; height:9px; border-radius:50%; }
+.pf-map-papers { display:grid; gap:8px; margin:14px 0; padding:0; list-style:none; }
+.pf-map-papers li { display:grid; gap:2px; padding:8px 10px; border-radius:11px; background:color-mix(in srgb,var(--foreground) 4%,transparent); }
+.pf-map-papers a { font-size:12.5px; line-height:1.4; color:var(--foreground); text-decoration:none; }
+.pf-map-papers a:hover { color:var(--accent); }
+.pf-map-papers small { font-size:10.5px; color:var(--muted); }
+@media (prefers-reduced-motion: reduce) { .pf-map-inspector { transition:none; } }
+
+/* Research identity cards */
+.pf-identity { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:16px; }
+.pf-identity-card { padding:18px; border:1px solid var(--line); border-radius:20px; background:var(--surface-strong); box-shadow:var(--shadow-soft); min-width:0; }
+.pf-identity-card header { display:grid; gap:2px; margin-bottom:14px; }
+.pf-identity-card h3 { margin:0; font-size:15px; letter-spacing:-.015em; }
+.pf-identity-card header small { font-size:10.5px; color:var(--muted); }
+.pf-identity-empty { font-size:12px; color:var(--muted); }
+.pf-domain-bar { display:flex; height:10px; border-radius:99px; overflow:hidden; background:var(--line); }
+.pf-domain-bar i { display:block; height:100%; }
+.pf-domain-legend { display:flex; flex-wrap:wrap; gap:10px; margin:8px 0 14px; font-size:11px; color:var(--muted); }
+.pf-domain-legend span { display:inline-flex; align-items:center; gap:5px; }
+.pf-domain-legend i { width:8px; height:8px; border-radius:50%; }
+.pf-field-bars { display:grid; gap:7px; margin:0; padding:0; list-style:none; }
+.pf-field-bars li { display:grid; grid-template-columns:minmax(110px,38%) 1fr auto; align-items:center; gap:10px; font-size:12px; }
+.pf-field-bars span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-field-bars b { display:block; height:8px; border-radius:99px; min-width:4px; opacity:.85; }
+.pf-field-bars small { font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.pf-journal-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.pf-journal { display:grid; gap:8px; color:inherit; text-decoration:none; }
+.pf-journal-cover { display:block; aspect-ratio:.77; border-radius:10px; overflow:hidden; border:1px solid var(--line); box-shadow:0 10px 24px rgba(15,23,42,.10); transition:transform .25s cubic-bezier(.2,.9,.25,1), box-shadow .25s ease; }
+.pf-journal-cover > * { width:100%; height:100%; }
+@media (hover:hover) and (pointer:fine) { .pf-journal:hover .pf-journal-cover { transform:translateY(-3px) rotate(-.6deg); box-shadow:0 16px 34px rgba(15,23,42,.16); } }
+.pf-journal-meta { display:grid; gap:2px; }
+.pf-journal-meta b { font-size:12.5px; line-height:1.3; }
+.pf-journal-meta small { font-size:10.5px; color:var(--muted); }
+.pf-journal-stats, .pf-author-stats { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
+.pf-journal-stats em, .pf-author-stats em { padding:1px 7px; border-radius:99px; background:color-mix(in srgb,var(--accent) 10%,transparent); color:var(--accent); font-size:10px; font-style:normal; font-weight:600; font-variant-numeric:tabular-nums; }
+.pf-author-list { display:grid; gap:10px; margin:0; padding:0; list-style:none; }
+.pf-author-list li { display:grid; grid-template-columns:44px 1fr; gap:12px; align-items:center; }
+.pf-author-list li > span { display:grid; gap:1px; min-width:0; }
+.pf-author-list b { font-size:13px; }
+.pf-author-list small { font-size:10.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-portrait { width:44px; height:44px; border-radius:50%; object-fit:cover; display:grid; place-items:center; color:#fff; font-size:14px; font-weight:700; letter-spacing:.02em; box-shadow:0 4px 12px rgba(15,23,42,.14); }
+.pf-author-topics { margin-top:2px; }
+.pf-institutions { display:grid; gap:6px; margin:0 0 14px; padding:0; list-style:none; font-size:12px; }
+.pf-institutions li { display:flex; justify-content:space-between; gap:10px; }
+.pf-institutions small { color:var(--muted); }
+.pf-keyword-cloud { display:flex; flex-wrap:wrap; gap:6px 10px; margin-bottom:16px; line-height:1.4; }
+.pf-keyword-cloud span { color:color-mix(in srgb,var(--foreground) 78%,var(--accent)); }
+.pf-years { display:flex; align-items:flex-end; gap:4px; height:70px; }
+.pf-years span { flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:3px; height:100%; min-width:10px; }
+.pf-years i { display:block; width:100%; max-width:22px; border-radius:5px 5px 2px 2px; background:linear-gradient(180deg,var(--accent),color-mix(in srgb,var(--accent) 45%,transparent)); }
+.pf-years small { font-size:9px; color:var(--muted); }

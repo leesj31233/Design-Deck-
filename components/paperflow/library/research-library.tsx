@@ -1,5 +1,8 @@
 "use client";
-import { CollectionInsights, ResearchMap } from "./collection-insights";
+import { CollectionInsights } from "./collection-insights";
+import dynamic from "next/dynamic";
+// The research map pulls in WebGL graph code: load it only when the map is opened.
+const ResearchMapView = dynamic(() => import("../map/research-map-view").then(module => module.ResearchMapView), { ssr: false, loading: () => <div className="pf-empty" role="status">연구맵을 준비하는 중…</div> });
 import { lookupDoi } from "@/lib/paperflow/pdf/metadata";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -60,7 +63,7 @@ export function ResearchLibrary() {
           {filtered.length > limit && <Button onClick={() => setLimit(number => number + 30)}>30개 더 보기</Button>}
         </section>}
         {view === "notes" && <section className="pf-notebook">{(annotations.data ?? []).map(a => <GlassPanel className="pf-note-card" key={a.id}><Badge>{a.type === "ink" ? "손글씨 메모" : a.note ? "사용자 메모" : "마킹"}</Badge><blockquote>{a.anchor.textQuote}</blockquote>{a.note && <p>{a.note}</p>}<Link href={`/reader/${a.documentId}?page=${a.pageIndex + 1}&annotation=${a.id}`}>원문 {a.pageIndex + 1}페이지로 <ArrowUpRight size={14}/></Link></GlassPanel>)}{!annotations.data?.length && <div className="pf-empty"><h3>원문에서 시작하는 메모</h3><p>Reader에서 마킹·펜·텍스트 메모를 남기면 이곳에 모인다.</p></div>}</section>}
-        {view === "map" && <ResearchMap docs={docs.data ?? []} annotations={annotations.data ?? []}/>}
+        {view === "map" && <ResearchMapView docs={docs.data ?? []} annotations={annotations.data ?? []}/>}
         <footer className="pf-library-footer"><span>원문은 그대로, 생각은 더 깊게.</span><span>PRIVATE LIBRARY · LOCAL STORAGE</span></footer>
       </div>
     </main>

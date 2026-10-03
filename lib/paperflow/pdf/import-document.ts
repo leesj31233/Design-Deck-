@@ -6,6 +6,8 @@ export async function importDocument(file: File) {
   const bytes = await file.arrayBuffer();
   if (!new TextDecoder().decode(bytes.slice(0, 1024)).includes("%PDF-")) throw new Error("올바른 PDF 파일이 아닙니다.");
   const pdf = await pdfAdapter.open(bytes.slice(0));
-  try { const record = await documentRepository.saveDocument({ blob: file, filename: file.name, pageCount: pdf.pageCount, fingerprint: pdf.fingerprint }); if (!record.metadataSource) { const metadata = await pdf.readMetadata(); await documentRepository.updateDocument(record.id, detectMetadata(metadata.text, metadata.info)); } return record; }
+  try { const record = await documentRepository.saveDocument({ blob: file, filename: file.name, pageCount: pdf.pageCount, fingerprint: pdf.fingerprint }); if (!record.metadataSource) { const metadata = await pdf.readMetadata(); await documentRepository.updateDocument(record.id, detectMetadata(metadata.text, metadata.info)); }
+    // Authors, journal and topics from OpenAlex, in the background (the research map uses them).
+    void documentRepository.getDocument(record.id).then(doc => doc && import("../scholar/enrich").then(({ enrichDocument }) => enrichDocument(doc))).catch(() => undefined); return record; }
   finally { await pdf.destroy(); }
 }

@@ -1,4 +1,5 @@
 import type { Annotation } from "../anchors/types";
+import type { ScholarWork } from "../scholar/openalex";
 export type StoredDocument = {
   id: string; filename: string; title: string; mimeType: "application/pdf"; byteLength: number;
   createdAt: string; updatedAt: string; pageCount: number; fingerprint?: string; blobKey: string;
@@ -8,6 +9,8 @@ export type StoredDocument = {
   /** local: PDF only here. cloud: PDF also in the account's cloud storage. remote: listed by the account, PDF on another device. */
   sourceStatus: "local" | "cloud" | "remote";
   storagePath?: string;
+  /** OpenAlex record: authors, institutions, journal, topic hierarchy, related works. */
+  scholar?: ScholarWork;
 };
 export type StoredDocumentInput = { blob: Blob; filename: string; pageCount: number; fingerprint?: string };
 export interface DocumentRepository {
