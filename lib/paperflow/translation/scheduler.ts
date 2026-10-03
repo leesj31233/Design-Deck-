@@ -3,14 +3,19 @@ import type { TranslationBatchResult, TranslationPassage, TranslationResult } fr
 
 export interface TranslationBatch { passages: TranslationPassage[]; attempts: number }
 export interface SchedulerState { concurrency: number; requests: number; rateLimitHits: number; completed: number; failed: number; retried: number; inputTokens: number; outputTokens: number }
-export interface SchedulerOptions { maxPassages: number; maxChars: number; concurrency: number; maxConcurrency: number }
-export const DEFAULT_SCHEDULER: SchedulerOptions = { maxPassages: 6, maxChars: 4200, concurrency: 6, maxConcurrency: 8 };
+export interface SchedulerOptions { maxPassages: number; maxChars: number; concurrency: number; maxConcurrency: number; firstChars?: number }
+/**
+ * Larger batches repeat the instructions fewer times (they are most of the input tokens); the first
+ * batch stays small so the page being read shows Korean within a few seconds.
+ */
+export const DEFAULT_SCHEDULER: SchedulerOptions = { maxPassages: 16, maxChars: 9000, concurrency: 6, maxConcurrency: 8, firstChars: 3000 };
 
-export function makeTranslationBatches(passages: TranslationPassage[], maxPassages = DEFAULT_SCHEDULER.maxPassages, maxChars = DEFAULT_SCHEDULER.maxChars): TranslationBatch[] {
+export function makeTranslationBatches(passages: TranslationPassage[], maxPassages = DEFAULT_SCHEDULER.maxPassages, maxChars = DEFAULT_SCHEDULER.maxChars, firstChars = maxChars): TranslationBatch[] {
   const batches: TranslationBatch[] = [];
   let current: TranslationPassage[] = [], chars = 0;
   for (const passage of passages) {
-    if (current.length && (current.length >= maxPassages || chars + passage.text.length > maxChars)) {
+    const limit = batches.length ? maxChars : firstChars;
+    if (current.length && (current.length >= maxPassages || chars + passage.text.length > limit)) {
       batches.push({ passages: current, attempts: 0 }); current = []; chars = 0;
     }
     current.push(passage); chars += passage.text.length;
@@ -37,9 +42,12 @@ type Translate = (group: TranslationPassage[], signal: AbortSignal) => Promise<T
  * - 429 halves concurrency and pauses the queue; successes slowly restore it.
  */
 export async function runTranslationScheduler(passages: TranslationPassage[], signal: AbortSignal, translate: Translate, onResults: (results: TranslationResult[]) => Promise<void>, onFailed: (passage: TranslationPassage, error: Error) => void, onState?: (state: SchedulerState) => void, options: SchedulerOptions = DEFAULT_SCHEDULER): Promise<SchedulerState> {
-  const queue = makeTranslationBatches(passages, options.maxPassages, options.maxChars);
+  const queue = makeTranslationBatches(passages, options.maxPassages, options.maxChars, options.firstChars);
   const state: SchedulerState = { concurrency: options.concurrency, requests: 0, rateLimitHits: 0, completed: 0, failed: 0, retried: 0, inputTokens: 0, outputTokens: 0 };
   let pauseUntil = 0, streak = 0, fatal: Error | null = null, active = 0;
+  // The first request goes alone: once it returns, OpenAI has cached the shared prompt prefix and
+  // every parallel request after it pays a quarter of the price for those tokens.
+  let warm = queue.length <= 1;
   const publish = () => onState?.({ ...state });
   const fail = (batch: TranslationBatch, error: Error) => {
     if (batch.passages.length > 1) { queue.unshift(...batch.passages.map(passage => ({ passages: [passage], attempts: batch.attempts + 1 }))); state.retried += batch.passages.length; return; }
@@ -49,6 +57,7 @@ export async function runTranslationScheduler(passages: TranslationPassage[], si
   const worker = async (slot: number) => {
     while (!signal.aborted && !fatal) {
       if (slot >= state.concurrency) { if (!queue.length && !active) return; await wait(400, signal); continue; }
+      if (!warm && slot > 0) { if (!queue.length && !active) return; await wait(100, signal); continue; }
       const pause = pauseUntil - Date.now();
       if (pause > 0) { await wait(Math.min(pause, 1000), signal); continue; }
       const batch = queue.shift();
@@ -76,7 +85,7 @@ export async function runTranslationScheduler(passages: TranslationPassage[], si
         else if (batch.attempts < 3) { queue.unshift({ ...batch, attempts: batch.attempts + 1 }); pauseUntil = Math.max(pauseUntil, Date.now() + Math.min(20_000, 1000 * 2 ** batch.attempts)); }
         else fail({ ...batch, attempts: 2 }, error);
         publish();
-      } finally { active--; }
+      } finally { active--; warm = true; }
     }
   };
   await Promise.all(Array.from({ length: options.maxConcurrency }, (_, slot) => worker(slot)));

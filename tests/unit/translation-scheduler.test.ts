@@ -28,6 +28,21 @@ describe("scheduler", () => {
   it("batches by passage count and character budget", () => {
     expect(makeTranslationBatches(passages, 6, 4200).map(batch => batch.passages.length)).toEqual([6, 6, 1]);
   });
+  it("keeps the first batch small so the page being read appears quickly", () => {
+    expect(makeTranslationBatches(passages, 16, 9000, 140).map(batch => batch.passages.length)).toEqual([2, 11]);
+  });
+  it("sends the first request alone, then the rest in parallel (the prompt prefix is cached by then)", async () => {
+    const events: string[] = [];
+    await runTranslationScheduler(passages, new AbortController().signal, async group => {
+      events.push(`start ${group[0].id}`);
+      await new Promise(resolve => setTimeout(resolve, 250));
+      events.push(`end ${group[0].id}`);
+      return ok(group);
+    }, async () => {}, () => {}, undefined, { maxPassages: 3, maxChars: 4200, concurrency: 4, maxConcurrency: 4 });
+    expect(events.slice(0, 2)).toEqual(["start u0", "end u0"]);
+    // After the warm-up, several requests are in flight at once.
+    expect(events.slice(2, 4).every(event => event.startsWith("start"))).toBe(true);
+  });
   it("saves the valid part of a response and retries only the missing passage", async () => {
     const calls: string[][] = [], saved: string[] = [];
     let first = true;

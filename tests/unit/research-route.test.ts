@@ -15,7 +15,9 @@ it("constrains ids with an enum schema and returns every valid translation", asy
   const body = await response.json();
   expect(body.translations).toHaveLength(2); expect(body.missing).toEqual([]); expect(body.usage).toEqual({ input: 120, output: 90, cached: 0 });
   const sent = JSON.parse(upstream.mock.calls[0][1].body);
-  expect(sent.text.format.schema.properties.translations.items.properties.id.enum).toEqual(["p0", "p1"]);
+  // A fixed id enum keeps the schema byte-identical across requests, so the prompt prefix caches.
+  expect(sent.text.format.schema.properties.translations.items.properties.id.enum).toEqual(Array.from({ length: 16 }, (_, index) => `p${index}`));
+  expect(sent.prompt_cache_key).toBe("paperflow-translate");
   expect(sent.input).toContain("heading");
 });
 
@@ -49,12 +51,14 @@ it("rejects cross-site use and missing configuration", async () => {
   expect(response.status).toBe(403);
 });
 
-it("passes paper keywords to the model as terms to keep in English", async () => {
+it("passes paper keywords as input data and keeps the instructions identical for caching", async () => {
   vi.stubEnv("OPENAI_API_KEY", "test-key");
   const upstream = upstreamText(JSON.stringify({ translations: [{ id: "p0", text: "Alkali chloride는 cofiring 시 slagging을 일으킨다." }, { id: "p1", text: "2.1. 연료 특성" }] }));
   vi.stubGlobal("fetch", upstream);
   await post({ task: "translate_blocks", passages, glossary: ["cofiring", "pulverized-coal", "<script>"] });
-  const instructions: string = JSON.parse(upstream.mock.calls[0][1].body).instructions;
-  expect(instructions).toContain("cofiring, pulverized-coal");
-  expect(instructions).not.toContain("<script>");
+  const sent = JSON.parse(upstream.mock.calls[0][1].body);
+  expect(JSON.parse(sent.input).glossary).toEqual(["cofiring", "pulverized-coal"]);
+  expect(sent.instructions).not.toContain("cofiring, pulverized-coal");
+  await post({ task: "translate_blocks", passages });
+  expect(JSON.parse(upstream.mock.calls[1][1].body).instructions).toBe(sent.instructions);
 });
