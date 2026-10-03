@@ -14,12 +14,17 @@ test("continuous pages keep translated text and allow annotations on Korean text
   await expect(page.getByRole("toolbar", { name: "선택한 원문 작업" })).toBeVisible();
   await page.getByRole("button", { name: "Highlight selection" }).click();
   await expect(page.locator("[data-pdf-page='0'] .pf-translated-marks [data-testid='highlight-rect']")).toHaveCount(1);
-  await page.route("**/api/concept", route => route.fulfill({ json: { concept: { term: "heat flux", definition: "단위 면적을 통과하는 열전달률이다.", inPaper: "이 문단에서 model이 예측하는 대상이다.", evidence: [], quantities: [], related: ["radiation"], questions: ["어떻게 측정하는가?"], needsMoreContext: false } } }));
+  let conceptCalls = 0;
+  await page.route("**/api/concept", route => { conceptCalls++; return route.fulfill({ json: { concept: { term: "heat flux", definition: "단위 면적을 통과하는 열전달률이다.", inPaper: "이 문단에서 model이 예측하는 대상이다.", evidence: [], quantities: [], related: ["radiation"], questions: ["어떻게 측정하는가?"], needsMoreContext: false } } }); });
   await page.getByRole("button", { name: "선택 개념 공부" }).click();
+  // The selection only fills the term in; nothing is asked of the model until 설명 is pressed.
+  await expect(page.getByText("드래그만으로는 AI를 부르지 않는다")).toBeVisible();
+  expect(conceptCalls).toBe(0);
   await page.getByLabel("공부할 개념").fill("heat flux");
   await page.getByRole("button", { name: "설명", exact: true }).click();
   await expect(page.getByText("이 논문에서의 의미")).toBeVisible();
   await expect(page.getByText("이 문단에서 model이 예측하는 대상이다.")).toBeVisible();
+  expect(conceptCalls).toBe(1);
   await page.getByLabel("Next page").click();
   await expect(page.getByLabel("Page number")).toHaveValue("2");
   await page.getByLabel("Previous page").click();

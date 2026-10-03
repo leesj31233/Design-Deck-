@@ -43,12 +43,15 @@ export function ConceptStudy({ source, selected, page, paper }: { source: string
     finally { if (request.current === controller) setPending(false); }
   };
 
-  // A short drag selection is a term to study: explain it right away. A new paragraph starts fresh.
+  // A drag selection only fills the term in: the model is asked only when the reader presses 설명
+  // (or a term chip), so selecting text never spends tokens. An answer already on this device shows at once.
   useEffect(() => {
-    request.current?.abort(); setConcept(null); setError(""); setPending(false);
+    request.current?.abort(); setConcept(null); setError(""); setPending(false); setTerm("");
     const pick = selected.trim();
-    if (pick && pick.length <= 70 && source) void explain(pick); else { setTerm(""); setDraft(""); }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!pick || pick.length > 70 || !source) { setDraft(""); return; }
+    setDraft(pick);
+    const hit = remembered(keyOf(pick, source));
+    if (hit) { setTerm(pick); setConcept(hit); }
   }, [source, selected]);
   useEffect(() => () => request.current?.abort(), []);
   const rise = (index: number) => reduced ? {} : { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, transition: { delay: index * .04, type: "spring" as const, stiffness: 320, damping: 28 } };
@@ -60,6 +63,7 @@ export function ConceptStudy({ source, selected, page, paper }: { source: string
         <Search size={14} aria-hidden="true"/><input aria-label="공부할 개념" placeholder="용어 입력 또는 아래에서 선택" value={draft} onChange={event => setDraft(event.target.value)}/>
         <Button size="sm" variant="primary" type="submit" disabled={pending || !draft.trim()}>설명</Button>
       </form>
+      {!concept && !pending && <p className="pf-concept-hint">‘설명’을 누르면 AI가 이 논문에서의 의미를 설명한다. 드래그만으로는 AI를 부르지 않는다.</p>}
       {terms.length > 0 && <div className="pf-keywords">{terms.map(item => <Button key={item} size="sm" variant="ghost" aria-pressed={term === item} onClick={() => void explain(item)}>{item}</Button>)}</div>}
       {pending && <div className="pf-concept-loading" role="status" aria-label={`${term} 설명을 만드는 중`}><span/><span/><span/><small>{term}의 의미를 이 문단과 대조하는 중…</small></div>}
       {error && <p className="pf-error" role="alert">{error}</p>}
