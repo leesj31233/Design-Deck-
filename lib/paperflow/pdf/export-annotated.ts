@@ -58,8 +58,10 @@ function drawLine(page: PDFPage, book: PdfFontBook, line: SetLine, scripts: Scri
   const space = book.width(" ", size, false, line.sans), natural = widths.reduce((a, b) => a + b, 0) + space * (words.length - 1);
   const justified = line.wordSpacing !== 0 || line.letterSpacing !== 0;
   let gap = space, letter = 0;
-  if (justified && words.length > 1) gap = space + (line.width - natural) / (words.length - 1);
-  else if (justified) letter = (line.width - natural) / Math.max(1, [...words[0].map(piece => piece.text).join("")].length - 1);
+  // A sans heading is measured in the reader's sans face but drawn with Noto Serif KR here, so it
+  // can come out wider than its line: words must never touch, a slightly longer line is fine.
+  if (justified && words.length > 1) gap = Math.max(space * .6, space + (line.width - natural) / (words.length - 1));
+  else if (justified) letter = Math.max(-size * .03, (line.width - natural) / Math.max(1, [...words[0].map(piece => piece.text).join("")].length - 1));
   let x = line.x;
   words.forEach((word, index) => {
     for (const piece of word) {
