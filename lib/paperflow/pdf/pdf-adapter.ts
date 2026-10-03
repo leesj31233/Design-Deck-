@@ -1,4 +1,5 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+import { installStreamIteration } from "./stream-iteration";
 export interface PdfTextItem { text: string; x: number; y: number; width: number; height: number; fontName: string; fontFamily: string; hasEOL: boolean; /** Baseline in pt; ligature glyphs often sit in another font with a different ascent. */ baseline?: number }
 export interface PdfPageHandle {
   width: number; height: number;
@@ -10,6 +11,8 @@ export interface PdfPageHandle {
 export interface PdfDocumentHandle { readMetadata(): Promise<{ text: string; info: Record<string, unknown> }>; pageCount: number; fingerprint?: string; getPage(pageNumber: number): Promise<PdfPageHandle>; destroy(): Promise<void> }
 let library: Promise<typeof import("pdfjs-dist")> | undefined;
 async function getLibrary() {
+  // Older Safari (iPadOS 18) cannot iterate the text streams PDF.js 6 reads: add that first.
+  installStreamIteration();
   library ??= import("pdfjs-dist").then(pdf => { pdf.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs"; return pdf; });
   return library;
 }

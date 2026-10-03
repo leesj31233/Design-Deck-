@@ -753,3 +753,23 @@ a.pf-account-signin { color:inherit; text-decoration:none; }
 .pf-concept-note svg { flex-shrink:0; margin-top:3px; }
 @media (prefers-reduced-motion: reduce) { .pf-concept-loading span { animation:none; } }
 .pf-concept-hint { margin:-2px 0 8px!important; font-size:10.5px; line-height:1.55; color:var(--muted); }
+
+/* ── Phone reader (≤650px) ── the toolbar wraps into clear rows instead of a fixed 54px bar whose
+   wrapped buttons spilled over the marking tools: navigation, then translation, then zoom; the
+   marking tools scroll sideways in one row. */
+@media (max-width:650px) {
+  .pf-reader-top { height:auto; min-height:54px; padding:6px 8px; gap:6px; }
+  .pf-reader-title { gap:4px; }
+  .pf-reader-title .pf-kicker { display:none; }
+  .pf-reader-title h1 { max-width:38vw; margin:0; font-size:13px; }
+  .pf-reader-top .pf-toolbar-group { gap:0; }
+  .pf-reader-top .pf-toolbar-group > button:not([aria-label]) { padding-inline:8px; font-size:11px; }
+  .pf-reader-tools { height:auto; min-height:0; flex-wrap:wrap; gap:6px 4px; padding:6px; }
+  .pf-reader-tools > .pf-toolbar-group:first-child { flex:1; }
+  .pf-reader-tools > .pf-toolbar-group:last-child { order:2; width:100%; }
+  .pf-reader-tools > .pf-toolbar-group:last-child .pf-batch-button { order:0; flex:1; font-size:12px; }
+  .pf-reader-tools .pf-zoom-controls { order:3; width:100%; justify-content:center; }
+  .pf-annotation-tools { flex-wrap:nowrap; overflow-x:auto; padding:6px 8px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .pf-annotation-tools::-webkit-scrollbar { display:none; }
+  .pf-annotation-tools > * { flex-shrink:0; }
+}
