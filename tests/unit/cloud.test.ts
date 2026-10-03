@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { recordOf, rowOf } from "@/lib/paperflow/cloud/records";
 import { BETA_QUOTA_BYTES, isOwnerEmail, paperPath } from "@/lib/paperflow/cloud/config";
+import { adoptEmailSession } from "@/lib/paperflow/cloud/browser";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import type { StoredDocument } from "@/lib/paperflow/persistence/types";
 
@@ -36,5 +37,9 @@ describe("cloud library records", () => {
     expect(a).toBe(b);
     expect(a).toMatch(/^[a-f0-9]{64}$/);
     expect(await sourceHash("Coal is burned.", "other-version")).not.toBe(a);
+  });
+  it("reads the emailed link's result: an expired link is explained, a bare link is not a session", async () => {
+    await expect(adoptEmailSession("#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired")).rejects.toThrow("링크가 만료되었거나");
+    await expect(adoptEmailSession("")).resolves.toBe(false);
   });
 });

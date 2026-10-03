@@ -14,7 +14,8 @@ async function coverFor(id: string) {
       if (active >= 2) await new Promise<void>(resolve => waiting.push(resolve));
       active++;
       try {
-        const blob = await documentRepository.getDocumentBlob(id, { remote: false });
+        // On a new device the PDF comes from the account's cloud copy and stays cached here.
+        const blob = await documentRepository.getDocumentBlob(id);
         if (!blob) throw new Error("Source PDF missing");
         const pdf = await pdfAdapter.open(await blob.arrayBuffer());
         try {
@@ -34,7 +35,14 @@ async function coverFor(id: string) {
 
 export function DocumentCover({ documentId, title }: { documentId: string; title: string }) {
   const root = useRef<HTMLSpanElement>(null);
-  const [src, setSrc] = useState<string>(), [failed, setFailed] = useState(false);
+  const [src, setSrc] = useState<string>(), [failed, setFailed] = useState(false), [attempt, setAttempt] = useState(0);
+  // A cover that failed before the account session was ready tries again after the next sync.
+  useEffect(() => {
+    if (!failed) return;
+    const retry = () => { setFailed(false); setAttempt(value => value + 1); };
+    window.addEventListener("paperflow:library-synced", retry);
+    return () => window.removeEventListener("paperflow:library-synced", retry);
+  }, [failed]);
   useEffect(() => {
     let alive = true;
     const observer = new IntersectionObserver(entries => {
@@ -44,7 +52,7 @@ export function DocumentCover({ documentId, title }: { documentId: string; title
     }, { rootMargin: "250px" });
     if (root.current) observer.observe(root.current);
     return () => { alive = false; observer.disconnect(); };
-  }, [documentId]);
+  }, [documentId, attempt]);
   return <span ref={root} className="pf-book-cover" data-cover-ready={Boolean(src)}>
     {src ? <img src={src} alt={`${title} 첫 페이지`} draggable={false}/> : <span className="pf-cover-placeholder"><FileText size={28}/><span>{failed ? "PDF" : "표지 불러오는 중"}</span></span>}
     <span className="pf-book-spine" aria-hidden="true"/><span className="pf-book-light" aria-hidden="true"/>

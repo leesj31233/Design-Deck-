@@ -9,7 +9,8 @@ export async function GET(request: Request) {
   const next = url.searchParams.get("next") ?? "/library";
   const target = next.startsWith("/") && !next.startsWith("//") ? next : "/library";
   const supabase = await userClient();
-  if (!code || !supabase) return NextResponse.redirect(new URL("/library?auth=unavailable", url.origin));
+  if (!code || !supabase) return NextResponse.redirect(new URL("/login?auth=unavailable", url.origin));
   const { error } = await supabase.auth.exchangeCodeForSession(code);
-  return NextResponse.redirect(new URL(error ? "/library?auth=failed" : target, url.origin));
+  // A link opened in another browser has no PKCE verifier here: the login page offers the email's code instead.
+  return NextResponse.redirect(new URL(error ? `/login?auth=failed&next=${encodeURIComponent(target)}` : target, url.origin));
 }

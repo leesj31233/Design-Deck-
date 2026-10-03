@@ -31,7 +31,7 @@ export async function currentUser(): Promise<User | null> {
   return data.user ?? null;
 }
 
-/** Storage plan of a user: owners keep PDFs locally without a quota; everyone else uploads within the beta quota. */
+/** Storage plan of a user: owners keep PDFs in the cloud without a quota (every device sees the library); everyone else within the beta quota. */
 export async function accountPlan(user: User): Promise<AccountPlan> {
   const owner = isOwnerEmail(user.email);
   const db = adminClient();
@@ -41,5 +41,5 @@ export async function accountPlan(user: User): Promise<AccountPlan> {
     usedBytes = Number(used ?? 0);
     if (profile) { quotaBytes = profile.storage_quota_bytes === null ? null : Number(profile.storage_quota_bytes); mode = profile.storage_mode === "local" ? "local" : "cloud"; }
   }
-  return owner ? { mode: "local", quotaBytes: null, usedBytes, owner } : { mode, quotaBytes, usedBytes, owner };
+  return owner ? { mode: "cloud", quotaBytes: null, usedBytes, owner } : { mode, quotaBytes, usedBytes, owner };
 }

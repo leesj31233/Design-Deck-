@@ -7,6 +7,7 @@ import { documentRepository } from "../persistence/document-repository";
 import { annotationRepository } from "../persistence/annotation-repository";
 import { translationRepository, TRANSLATION_PROMPT_VERSION } from "../persistence/translation-repository";
 import { onLocalChange, setRemoteBlobLoader, type LocalChange } from "../persistence/changes";
+import { openDatabase, transactionDone } from "../persistence/indexeddb";
 import type { StoredDocument } from "../persistence/types";
 import { recordOf, rowOf, type DocumentRow } from "./records";
 import type { Annotation } from "../anchors/types";
@@ -139,11 +140,29 @@ async function downloadPdf(documentId: string): Promise<Blob | null> {
   return error ? null : data;
 }
 
+const ACCOUNT_KEY = "paperflow-account";
+/**
+ * The local library belongs to one account. A first sign-in adopts what is already on this device
+ * (it is uploaded); signing in as someone else clears it first, so libraries never mix.
+ */
+async function adoptDevice(userId: string) {
+  let previous: string | null = null;
+  try { previous = localStorage.getItem(ACCOUNT_KEY); } catch { /* Storage blocked: treat as first use. */ }
+  if (previous && previous !== userId) {
+    const db = await openDatabase(), stores = [...db.objectStoreNames];
+    const tx = db.transaction(stores, "readwrite"), done = transactionDone(tx);
+    for (const store of stores) tx.objectStore(store).clear();
+    await done;
+  }
+  try { localStorage.setItem(ACCOUNT_KEY, userId); } catch { /* Next sign-in adopts again. */ }
+}
+
 async function applySession(next: Session | null) {
   session = next;
   if (!next) { set({ status: "signed-out", email: undefined, name: undefined, avatar: undefined, plan: undefined }); return; }
   const meta = next.user.user_metadata ?? {};
   set({ status: "signed-in", email: next.user.email, name: meta.full_name ?? meta.name, avatar: meta.avatar_url ?? meta.picture });
+  await adoptDevice(next.user.id);
   await refreshPlan();
   // Local-storage accounts keep every PDF on this device: ask the browser not to evict it.
   if (useCloud.getState().plan?.mode === "local") void navigator.storage?.persist?.();
