@@ -60,6 +60,16 @@ const weights = new WeakMap<Uint8Array, number>();
 const weightedFontkit = { create(bytes: Uint8Array, name?: string) { const font = (fontkit as any).create(bytes, name); const weight = weights.get(bytes); if (weight && font.fvar) font.variationCoords = [weight]; return font; } };
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
+/**
+ * Width as drawn: pdf-lib draws a string glyph after glyph without kerning, but its
+ * `widthOfTextAtSize` applies kerning pairs (AT, LA, VO…), which would eat the next word space.
+ */
+export function advance(font: PDFFont, text: string, size: number) {
+  let width = 0;
+  for (const char of text) width += font.widthOfTextAtSize(char, size);
+  return width;
+}
+
 /** The self-hosted Noto Serif KR slices (`next/font`) as declared by the page's @font-face rules. */
 function koreanFaces(): Face[] {
   const faces: Face[] = [];
@@ -153,7 +163,7 @@ export class PdfFontBook {
   }
 
   width(text: string, size: number, bold: boolean, sans = false) {
-    return this.runs(text, bold, sans).reduce((sum, run) => sum + run.font.widthOfTextAtSize(run.text, size), 0);
+    return this.runs(text, bold, sans).reduce((sum, run) => sum + advance(run.font, run.text, size), 0);
   }
 
   /** Base Times for the invisible source-text layer. */

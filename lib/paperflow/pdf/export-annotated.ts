@@ -3,7 +3,7 @@ import { annotationRepository } from "../persistence/annotation-repository";
 import { documentRepository } from "../persistence/document-repository";
 import { translationRepository } from "../persistence/translation-repository";
 import { pdfAdapter, type PdfTextItem } from "./pdf-adapter";
-import { PdfFontBook } from "./pdf-fonts";
+import { PdfFontBook, advance } from "./pdf-fonts";
 import { ensureManifest } from "../translation/manifest";
 import { typesetPage, type PageLayout, type Rect, type SetLine } from "../typeset/page-typesetter";
 import { canvasMeasure, ensurePaperFonts } from "../typeset/measure";
@@ -68,8 +68,8 @@ function drawLine(page: PDFPage, book: PdfFontBook, line: SetLine, scripts: Scri
       const pieceSizeValue = pieceSize(piece), dy = piece.kind === "sub" ? -size * .21 : piece.kind === "sup" ? size * .35 : 0;
       const pieceColor = piece.color ? toRgb(piece.color, color) : color;
       for (const run of book.runs(piece.text, piece.bold, line.sans)) {
-        if (letter) for (const char of run.text) { page.drawText(char, { x, y: baseline + dy, size: pieceSizeValue, font: run.font, color: pieceColor }); x += run.font.widthOfTextAtSize(char, pieceSizeValue) + letter; }
-        else { page.drawText(run.text, { x, y: baseline + dy, size: pieceSizeValue, font: run.font, color: pieceColor }); x += run.font.widthOfTextAtSize(run.text, pieceSizeValue); }
+        if (letter) for (const char of run.text) { page.drawText(char, { x, y: baseline + dy, size: pieceSizeValue, font: run.font, color: pieceColor }); x += advance(run.font, char, pieceSizeValue) + letter; }
+        else { page.drawText(run.text, { x, y: baseline + dy, size: pieceSizeValue, font: run.font, color: pieceColor }); x += advance(run.font, run.text, pieceSizeValue); }
       }
     }
     if (index < words.length - 1) x = line.x + widths.slice(0, index + 1).reduce((a, b) => a + b, 0) + gap * (index + 1);
@@ -82,7 +82,7 @@ function drawSourceLayer(page: PDFPage, book: PdfFontBook, items: PdfTextItem[],
   for (const item of items) {
     const text = [...item.text].filter(char => book.hasLatin(char.codePointAt(0)!)).join("");
     if (!text.trim() || hidden(item)) continue;
-    const natural = book.times.widthOfTextAtSize(text, item.height);
+    const natural = advance(book.times, text, item.height);
     const size = natural > 0 ? item.height * Math.max(.6, Math.min(1.5, item.width / natural)) : item.height;
     page.drawText(text, { x: item.x, y: page.getHeight() - (item.baseline ?? item.y + item.height * .8), size, font: book.times, opacity: 0 });
   }
@@ -95,9 +95,9 @@ function drawMark(page: PDFPage, book: PdfFontBook) {
   const width = brandWidth + gapWidth + labelWidth + 10, height = size + 6, x = page.getWidth() - width - 18, top = page.getHeight() - 9;
   page.drawRectangle({ x, y: top - height, width, height, color: rgb(1, 1, 1), opacity: .92, borderColor: MARK, borderWidth: .6 });
   let cursor = x + 5;
-  for (const run of book.runs(brand, true, true)) { page.drawText(run.text, { x: cursor, y: top - height + 3.6, size, font: run.font, color: MARK }); cursor += run.font.widthOfTextAtSize(run.text, size); }
+  for (const run of book.runs(brand, true, true)) { page.drawText(run.text, { x: cursor, y: top - height + 3.6, size, font: run.font, color: MARK }); cursor += advance(run.font, run.text, size); }
   cursor += gapWidth;
-  for (const run of book.runs(MARK_LABEL, false)) { page.drawText(run.text, { x: cursor, y: top - height + 3.6, size, font: run.font, color: MARK }); cursor += run.font.widthOfTextAtSize(run.text, size); }
+  for (const run of book.runs(MARK_LABEL, false)) { page.drawText(run.text, { x: cursor, y: top - height + 3.6, size, font: run.font, color: MARK }); cursor += advance(run.font, run.text, size); }
 }
 
 function drawInk(page: PDFPage, annotations: Annotation[]) {
@@ -136,7 +136,7 @@ async function memoPages(output: PDFDocument, book: PdfFontBook, notes: { pageIn
   await book.prepare(title, true);
   for (const note of notes) { await book.prepare(note.note, false); await book.prepare(`원문 ${note.pageIndex + 1}페이지`, true); }
   let page: PDFPage | null = null, y = 0;
-  const text = (value: string, x: number, at: number, fontSize: number, bold: boolean, color: RGB) => { let cursor = x; for (const run of book.runs(value, bold)) { page!.drawText(run.text, { x: cursor, y: at, size: fontSize, font: run.font, color }); cursor += run.font.widthOfTextAtSize(run.text, fontSize); } };
+  const text = (value: string, x: number, at: number, fontSize: number, bold: boolean, color: RGB) => { let cursor = x; for (const run of book.runs(value, bold)) { page!.drawText(run.text, { x: cursor, y: at, size: fontSize, font: run.font, color }); cursor += advance(run.font, run.text, fontSize); } };
   const start = () => { page = output.addPage([width, height]); drawMark(page, book); text(title, margin, height - margin - 10, 16, true, rgb(23 / 255, 36 / 255, 59 / 255)); y = height - margin - 46; };
   for (const note of notes) {
     const lines = wrap(book, note.note, size, width - margin * 2);
