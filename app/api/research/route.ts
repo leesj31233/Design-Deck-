@@ -1,6 +1,6 @@
 import { polishKorean, researchTranslationInstructions } from "@/lib/paperflow/translation/research-style";
 import { TRANSLATION_PROMPT_VERSION, sourceHash } from "@/lib/paperflow/translation/prompt-version";
-import { adminClient } from "@/lib/paperflow/cloud/server";
+import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
 import { partitionTranslationResults, type TranslationPassage } from "@/lib/paperflow/translation/block-contract";
 
 export const maxDuration = 120;
@@ -69,6 +69,9 @@ export async function POST(request: Request) {
   const validBlocks = passages.length >= 1 && passages.length <= 16 && passages.every(item => typeof item.id === "string" && /^[a-z0-9_-]{1,40}$/i.test(item.id) && typeof item.text === "string" && item.text.trim() && item.text.length <= 12000) && new Set(passages.map(item => item.id)).size === passages.length && passages.reduce((sum, item) => sum + item.text.length, 0) <= 20000;
   if (!blocks || !validBlocks) return Response.json({ error: "유효한 원문과 작업이 필요합니다.", kind: "configuration" }, { status: 400 });
 
+  // 1 credit per paragraph; refused before the model is asked when the month's credits would run out.
+  const gate = await creditGate(passages.length);
+  if (gate instanceof Response) return gate;
   const chars = passages.reduce((sum, item) => sum + item.text.length, 0);
   // Paper-specific keywords stay in English on every page (passed as data, length-bounded).
   const glossary = Array.isArray(body.glossary) ? body.glossary.filter((term): term is string => typeof term === "string" && /^[\w\s.,+/()-]{2,40}$/.test(term)).slice(0, 30) : [];
@@ -90,7 +93,7 @@ export async function POST(request: Request) {
     try { parsed = JSON.parse(text); } catch { parsed = { translations: [...text.matchAll(/\{"id":"([^"]+)","text":"((?:[^"\\]|\\.)*)"\}/g)].map(match => ({ id: match[1], text: JSON.parse(`"${match[2]}"`) })) }; }
     const { results, missing } = partitionTranslationResults(passages, parsed.translations);
     if (!results.length) return Response.json({ error: "번역 결과를 확인할 수 없어 더 작은 묶음으로 다시 시도합니다.", kind: "malformed", usage }, { status: 502 });
-    await shareTranslations(passages, results);
+    await Promise.all([shareTranslations(passages, results), gate.charge(results.length)]);
     return Response.json({ translations: results, missing, provider: "OpenAI", usage, incomplete: data.status === "incomplete" });
   } catch { return Response.json({ error: "연결 시간이 초과되었거나 요청이 취소되었습니다.", kind: "transient" }, { status: 504 }); }
 }

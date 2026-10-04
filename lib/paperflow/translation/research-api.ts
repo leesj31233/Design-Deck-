@@ -13,7 +13,7 @@ export async function researchTranslateBlocks(passages: TranslationPassage[], si
   const wire = passages.map((passage, index) => ({ id: `p${index}`, text: passage.text, role: passage.role ?? "body" }));
   const response = await fetch("/api/research", { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ task: "translate_blocks", passages: wire, glossary }) });
   const body = await response.json().catch(() => ({ error: "번역 서버 응답을 읽을 수 없습니다.", kind: "malformed" }));
-  if (!response.ok) throw new ResearchHttpError(body.error || "문단 번역을 완료하지 못했습니다.", response.status, Math.max(0, Number(response.headers.get("retry-after")) || 0) * 1000, body.kind);
+  if (!response.ok) throw new ResearchHttpError(body.error || "문단 번역을 완료하지 못했습니다.", response.status, Math.max(0, Number(response.headers.get("retry-after")) || 0) * 1000, body.kind === "quota" || body.kind === "auth" ? "configuration" : body.kind);
   const byWire = new Map(wire.map((item, index) => [item.id, passages[index].id]));
   const results = (Array.isArray(body.translations) ? body.translations : []).flatMap((item: { id?: string; text?: string }) => typeof item?.id === "string" && typeof item.text === "string" && byWire.has(item.id) ? [{ id: byWire.get(item.id)!, text: item.text }] : []);
   const done = new Set(results.map((item: { id: string }) => item.id));

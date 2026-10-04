@@ -1,6 +1,7 @@
 import { GUIDE_INSTRUCTIONS, GUIDE_VERSION, guideSchema, type GuideUnit } from "@/lib/paperflow/guide/guide";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
-import { adminClient } from "@/lib/paperflow/cloud/server";
+import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
+import { CREDIT_COST } from "@/lib/paperflow/cloud/plans";
 
 export const maxDuration = 120;
 
@@ -33,6 +34,9 @@ export async function POST(request: Request) {
     const { data } = await admin.from("shared_translations").select("text").eq("source_hash", key).maybeSingle();
     if (data?.text) { try { return Response.json({ guide: JSON.parse(data.text), cached: true }); } catch { /* Regenerate a damaged entry. */ } }
   }
+  // A cached answer is free; a new one costs 30 credits.
+  const gate = await creditGate(CREDIT_COST.guide);
+  if (gate instanceof Response) return gate;
   if (limited(request)) return Response.json({ error: "가이드 요청이 많습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
@@ -47,6 +51,7 @@ export async function POST(request: Request) {
     try { guide = JSON.parse(text); } catch { return Response.json({ error: "가이드 응답을 읽지 못했습니다. 다시 시도해 주세요." }, { status: 502 }); }
     const usage = { input: data.usage?.input_tokens ?? 0, output: data.usage?.output_tokens ?? 0, cached: data.usage?.input_tokens_details?.cached_tokens ?? 0, model: typeof data.model === "string" ? data.model : undefined };
     if (admin) { try { await admin.from("shared_translations").upsert({ source_hash: key, prompt_version: GUIDE_VERSION, text: JSON.stringify(guide) }, { onConflict: "source_hash" }); } catch { /* The cache is optional. */ } }
+    await gate.charge(CREDIT_COST.guide);
     return Response.json({ guide, usage });
   } catch { return Response.json({ error: "연결 시간이 초과되었거나 요청이 취소되었습니다." }, { status: 504 }); }
 }

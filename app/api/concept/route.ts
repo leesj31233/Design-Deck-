@@ -1,6 +1,7 @@
 import { CONCEPT_INSTRUCTIONS, CONCEPT_VERSION, conceptSchema, validateConcept } from "@/lib/paperflow/concept/concept";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
-import { adminClient } from "@/lib/paperflow/cloud/server";
+import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
+import { CREDIT_COST } from "@/lib/paperflow/cloud/plans";
 
 export const maxDuration = 60;
 
@@ -34,6 +35,9 @@ export async function POST(request: Request) {
     const { data } = await admin.from("shared_translations").select("text").eq("source_hash", key).maybeSingle();
     if (data?.text) { try { const cached = validateConcept(JSON.parse(data.text), context); if (cached) return Response.json({ concept: cached, cached: true }); } catch { /* Regenerate a damaged entry. */ } }
   }
+  // A cached answer is free; a new one costs 3 credits.
+  const gate = await creditGate(CREDIT_COST.concept);
+  if (gate instanceof Response) return gate;
   if (limited(request)) return Response.json({ error: "개념 설명 요청이 많습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
@@ -49,6 +53,7 @@ export async function POST(request: Request) {
     if (!concept) return Response.json({ error: "설명 응답을 읽지 못했습니다. 다시 시도해 주세요." }, { status: 502 });
     const usage = { input: data.usage?.input_tokens ?? 0, output: data.usage?.output_tokens ?? 0, cached: data.usage?.input_tokens_details?.cached_tokens ?? 0, model: typeof data.model === "string" ? data.model : undefined };
     if (admin) { try { await admin.from("shared_translations").upsert({ source_hash: key, prompt_version: CONCEPT_VERSION, text: JSON.stringify(concept) }, { onConflict: "source_hash" }); } catch { /* The cache is optional. */ } }
+    await gate.charge(CREDIT_COST.concept);
     return Response.json({ concept, usage });
   } catch { return Response.json({ error: "연결 시간이 초과되었거나 요청이 취소되었습니다." }, { status: 504 }); }
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { recordOf, rowOf } from "@/lib/paperflow/cloud/records";
-import { BETA_QUOTA_BYTES, isOwnerEmail, paperPath } from "@/lib/paperflow/cloud/config";
+import { isOwnerEmail, paperPath } from "@/lib/paperflow/cloud/config";
+import { CREDIT_COST, PLANS, creditMonth, isPlanTier, papersFor } from "@/lib/paperflow/cloud/plans";
 import { adoptEmailSession } from "@/lib/paperflow/cloud/browser";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import type { StoredDocument } from "@/lib/paperflow/persistence/types";
@@ -29,8 +30,14 @@ describe("cloud library records", () => {
     expect(isOwnerEmail("someone@example.com", "owner@example.com")).toBe(false);
     expect(isOwnerEmail(undefined, "owner@example.com")).toBe(false);
     expect(paperPath("uid", "doc")).toBe("uid/doc.pdf");
-    // Everyone else: 200 MB of cloud PDFs during the beta.
-    expect(BETA_QUOTA_BYTES).toBe(200 * 1024 * 1024);
+    // New accounts are Testers: 100 MB and about 10 papers of translation a month.
+    expect(PLANS.tester).toMatchObject({ storageBytes: 100 * 1024 * 1024, monthlyCredits: 800 });
+    expect(papersFor(PLANS.tester.monthlyCredits!)).toBe(10);
+    expect(PLANS.admin).toMatchObject({ storageBytes: null, monthlyCredits: null });
+    expect(CREDIT_COST).toEqual({ paragraph: 1, guide: 30, concept: 3 });
+    expect(isPlanTier("pro")).toBe(true); expect(isPlanTier("owner")).toBe(false);
+    // Credit months follow Korean time: 23:30 UTC on Oct 31 is already November in Seoul.
+    expect(creditMonth(Date.parse("2026-10-31T15:30:00Z"))).toBe("2026-11");
   });
   it("keys the shared translation cache by prompt version and normalised source text", async () => {
     const a = await sourceHash("Coal  is\nburned."), b = await sourceHash("Coal is burned.");

@@ -208,6 +208,11 @@ export function initCloud() {
   if (!client) { set({ status: "disabled" }); return; }
   setRemoteBlobLoader(downloadPdf);
   onLocalChange(queue);
+  // Credits change with every translation: refresh the plan when a whole-paper job ends or the window returns.
+  let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+  const refreshSoon = () => { if (!session) return; clearTimeout(refreshTimer); refreshTimer = setTimeout(() => void refreshPlan(), 800); };
+  window.addEventListener("paperflow:translation-progress", event => { if (!(event as CustomEvent<{ running?: boolean }>).detail?.running) refreshSoon(); });
+  window.addEventListener("focus", refreshSoon);
   void client.auth.getSession().then(({ data }) => applySession(data.session));
   client.auth.onAuthStateChange((event, next) => { if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") void applySession(next); else session = next; });
 }
