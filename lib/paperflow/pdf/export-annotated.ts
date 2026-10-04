@@ -1,5 +1,6 @@
 import { PDFDocument, rgb, LineCapStyle, type PDFPage, type RGB } from "pdf-lib";
 import { annotationRepository } from "../persistence/annotation-repository";
+import { ocrPage } from "./ocr";
 import { documentRepository } from "../persistence/document-repository";
 import { translationRepository } from "../persistence/translation-repository";
 import { pdfAdapter, type PdfTextItem } from "./pdf-adapter";
@@ -185,7 +186,7 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
   await book.prepare(MARK_LABEL, false);
   let unfit = 0;
   try {
-    const manifest = await ensureManifest(documentId, () => pdfAdapter.open(bytes.slice(0)));
+    const manifest = await ensureManifest(documentId, () => pdfAdapter.open(bytes.slice(0)), undefined, undefined, ocrPage);
     await ensurePaperFonts([...texts.values()].join(""));
     const measure = scriptedMeasure(canvasMeasure(), manifest.scripts);
     // The adapter multiplies by the device pixel ratio; ask for a fixed resolution and read back the real one.

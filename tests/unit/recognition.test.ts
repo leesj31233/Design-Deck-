@@ -1,0 +1,91 @@
+import { describe, expect, it } from "vitest";
+import { ocrLineItems, textHealth, type OcrLine } from "../../lib/paperflow/pdf/ocr";
+import { buildTextLines } from "../../lib/paperflow/layout/text-lines";
+import { buildPageBlocks, isKorean } from "../../lib/paperflow/translation/manifest";
+import type { PdfTextItem } from "../../lib/paperflow/pdf/pdf-adapter";
+
+const W = 600, H = 800;
+function item(text: string, x: number, baseline: number, width = text.length * 4.2, size = 9): PdfTextItem {
+  return { text, x, y: baseline - size * .8, width, height: size, fontName: "f1", fontFamily: "serif", hasEOL: true, baseline };
+}
+const word = (text: string, x0: number, top: number, bottom: number, confidence = 90) => ({ text, confidence, bbox: { x0, y0: top, x1: x0 + text.length * 10, y1: bottom } });
+
+describe("OCR lines", () => {
+  // "CO2 is a gas": per-word boxes differ in height ("is", "a" have no ascenders).
+  const line: OcrLine = {
+    words: [word("CO2", 0, 100, 130), word("is", 40, 108, 130), word("a", 70, 112, 130), word("gas", 90, 112, 137)],
+    bbox: { x0: 0, y0: 100, x1: 120, y1: 137 }, baseline: { x0: 0, y0: 130, x1: 120, y1: 130, has_baseline: true }, rowAttributes: { ascenders: 8, descenders: -7, row_height: 30 }
+  };
+  it("emits one item per line with a shared size, so short words never read as subscripts", () => {
+    const items = ocrLineItems(line, .5);
+    expect(items).toHaveLength(1);
+    expect(items[0].text).toBe("CO2 is a gas");
+    expect(items[0].baseline).toBe(65);
+    expect(buildTextLines(items).map(value => value.text)).toEqual(["CO2 is a gas"]);
+  });
+  it("splits a line at a wide gap (table cells) and drops lines Tesseract is unsure of", () => {
+    expect(ocrLineItems({ ...line, words: [word("Inlet", 0, 100, 130), word("20", 300, 100, 130)] }, 1).map(value => value.text)).toEqual(["Inlet", "20"]);
+    expect(ocrLineItems({ ...line, words: line.words.map(value => ({ ...value, confidence: 40 })) }, 1)).toEqual([]);
+  });
+  it("tells empty, garbled and healthy embedded text apart", () => {
+    expect(textHealth([item("p. 3", 0, 10)])).toBe("empty");
+    expect(textHealth([item("\ue001\ue002\ue003".repeat(40), 0, 10)])).toBe("garbled");
+    expect(textHealth([item("Carbon dioxide is absorbed into propylene carbonate in a packed column at elevated pressure. ".repeat(2), 0, 10)])).toBe("ok");
+  });
+});
+
+describe("reference lists", () => {
+  it("keeps unnumbered author-year entries in the reference list", async () => {
+    const blocks = await buildPageBlocks("doc", 9, [
+      item("References", 40, 100, 60, 11),
+      item("Smith, J., Lee, K., 2019. Absorption of CO2 in amine solvents. Chem. Eng. J. 12, 101–109.", 40, 130, 420),
+      item("Wang, L., Chen, Y., 2021. Packed column design. Ind. Eng. Chem. Res. 60 (4), 33–41.", 40, 160, 420)
+    ], W, H);
+    expect(blocks.every(block => !block.translatable)).toBe(true);
+  });
+  it("ends the reference list where a new chapter and its prose begin (books, theses, patents)", async () => {
+    const prose = "The absorber operates at elevated pressure so that carbon dioxide dissolves readily in the solvent. The rich solvent then flows to a flash drum where most of the dissolved gas is released again and recovered for compression, which keeps the regeneration energy low.";
+    const blocks = await buildPageBlocks("doc", 9, [
+      item("References", 40, 100, 60, 11),
+      item("[1] A. Researcher, Journal of Combustion 12 (2020) 1–9.", 40, 130, 300),
+      item("Chapter 3 Process Description", 40, 220, 220, 14),
+      item(prose.slice(0, 130), 40, 260, 480), item(prose.slice(130), 40, 272, 480)
+    ], W, H);
+    expect(blocks.find(block => block.text.startsWith("[1]"))?.translatable).toBe(false);
+    expect(blocks.find(block => block.text.startsWith("Chapter 3"))?.translatable).toBe(true);
+    expect(blocks.find(block => block.text.startsWith("The absorber"))?.translatable).toBe(true);
+  });
+});
+
+describe("papers in Japanese, Chinese and Korean", () => {
+  const japanese = ["既存石炭火力発電設備を有効活用できる固体燃料として期待", "されている脱炭素燃料の一つに半炭化バイオマスペレットがあ", "る。半炭化バイオマスペレットは，未加熱のバイオマスペレッ", "ト（ホワイトペレット）と比較して，水に濡れても崩壊しない", "ため，屋外貯蔵が可能である。"];
+  const korean = ["흡수탑은 높은 압력에서 운전되므로 이산화탄소가 용매에 쉽게", "용해된다. 이후 농후 용액은 플래시 드럼으로 이동하여 대부분의", "용존 기체가 다시 방출되고, 압축을 위해 회수된다."];
+  it("keeps Japanese prose as translatable body text instead of noise, fragments or table columns", async () => {
+    const blocks = await buildPageBlocks("doc", 2, japanese.map((text, index) => item(text, 60, 300 + index * 12, 230, 8)), W, H);
+    expect(blocks.map(block => [block.role, block.translatable])).toEqual([["BODY", true]]);
+    expect(blocks[0].text.startsWith("既存石炭火力発電設備を有効活用できる固体燃料として期待されている")).toBe(true);
+  });
+  it("recognises Korean prose but never spends credits translating it into Korean", async () => {
+    const blocks = await buildPageBlocks("doc", 2, korean.map((text, index) => item(text, 60, 300 + index * 12, 230, 8)), W, H);
+    expect(blocks.map(block => [block.role, block.exclusionReason])).toEqual([["BODY", "korean-source"]]);
+    expect(isKorean("slagging은 fouling과 함께 boiler의 효율을 낮춘다.")).toBe(true);
+    expect(isKorean("Bituminous coal(역청탄) is blended with torrefied biomass at ratios up to 30% on an energy basis.")).toBe(false);
+  });
+  it("drops the spaces letter-spaced justification puts between Japanese characters, never Korean word spaces", () => {
+    const spaced = "み に お け る 温 度 を 測 定 し た".split(" ").map((char, index) => item(char, 60 + index * 12, 100, 8, 8));
+    expect(buildTextLines(spaced)[0].text).toBe("みにおける温度を測定した");
+    expect(buildTextLines([item("흡수탑은 높은 압력에서", 60, 100, 90, 8)])[0].text).toBe("흡수탑은 높은 압력에서");
+  });
+});
+
+describe("MDPI-style reference lists", () => {
+  it("stays in the list through hanging-indent pieces of entries with journal abbreviations and [CrossRef]", async () => {
+    const blocks = await buildPageBlocks("doc", 28, [
+      item("References", 40, 100, 60, 11),
+      item("1. Ahmad, A.L.; Ismail, S.; Bhatia, S. Water recycling from palm oil mill effluent (POME) using membrane technology.", 40, 130, 480),
+      item("wastewater (OMW): A brief review of the treatment of olive mill effluent and the recovery of value from it. Environ. Technol. Innov. 2019, 15, 100377. [CrossRef]", 40, 160, 480),
+      item("and feasibility of renewable energy generation from palm oil mill effluent in the region: A short review of the options. J. Clean. Prod. 2019, 233, 209–225.", 40, 190, 480)
+    ], W, H);
+    expect(blocks.filter(block => block.translatable)).toEqual([]);
+  });
+});

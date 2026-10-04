@@ -1,4 +1,5 @@
-import type { PdfDocumentHandle, PdfTextItem } from "../pdf/pdf-adapter";
+import type { PdfDocumentHandle, PdfPageHandle, PdfTextItem } from "../pdf/pdf-adapter";
+import { letterCount, textHealth } from "../pdf/ocr";
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
 import { analyzePage } from "../layout/page-blocks";
 import { classifyBlock, extractKeywords, nextSection, pageContext, type BlockRole, type Section } from "../layout/classify";
@@ -6,7 +7,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.16";
+export const EXTRACTOR_VERSION = "layout-v3.17";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -19,7 +20,8 @@ export interface TranslationManifest {
   scripts?: ScriptTable;
 }
 
-export interface OcrProvider { extractPage(documentId: string, pageIndex: number, signal?: AbortSignal): Promise<PdfTextItem[]> }
+/** Reads a page from its pixels (scanned pages, unusable embedded fonts). */
+export type OcrProvider = (page: PdfPageHandle, signal?: AbortSignal) => Promise<PdfTextItem[]>;
 
 async function sha(value: string) {
   const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)));
@@ -33,6 +35,11 @@ export async function stableBlockId(documentId: string, pageIndex: number, role:
 }
 
 const TRANSLATABLE: ReadonlySet<BlockRole> = new Set(["ABSTRACT", "HEADING", "BODY", "CAPTION"]);
+/** Mostly Hangul among the letters (English terms inside Korean prose do not count against it). */
+export function isKorean(text: string) {
+  const hangul = (text.match(/[가-힣]/g) ?? []).length, others = (text.match(/[A-Za-z぀-ヿ一-鿿]/g) ?? []).length;
+  return hangul >= 4 && hangul >= others * .3;
+}
 
 export async function buildPageBlocks(documentId: string, pageIndex: number, raw: PdfTextItem[], width: number, height: number, initialSection: Section = "none"): Promise<ManifestBlock[]> {
   const paragraphs = analyzePage(raw, pageIndex, width, height);
@@ -44,9 +51,11 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     const columnIndex = paragraph.x + paragraph.width / 2 < .5 ? 0 : 1;
     // Rows after a table caption stay data until real prose resumes.
     if (role === "CAPTION" && /^table/i.test(paragraph.text)) { tableUntil = paragraph.y + .45; tableColumn = paragraph.width > .6 || Math.abs(paragraph.x + paragraph.width / 2 - .5) < .08 ? -1 : columnIndex; }
-    else if (role === "BODY" && paragraph.y < tableUntil && (tableColumn === -1 || tableColumn === columnIndex) && !/[a-z]{3,}[.!?]\s/.test(paragraph.text + " ")) { role = "TABLE"; reason = "table-data"; }
+    else if (role === "BODY" && paragraph.y < tableUntil && (tableColumn === -1 || tableColumn === columnIndex) && !/[a-z]{3,}[.!?]\s|[\uac00-\ud7a3\u3040-\u30ff\u4e00-\u9fff][.!?。！？]/.test(paragraph.text + " ")) { role = "TABLE"; reason = "table-data"; }
     else if (role === "BODY") tableUntil = -1;
     section = nextSection(role, reason, paragraph.text, section);
+    // Text already in Korean is shown as printed: never spend a credit translating Korean into Korean.
+    if (reason === null && isKorean(paragraph.text)) reason = "korean-source";
     const translatable = TRANSLATABLE.has(role) && reason === null;
     const id = await stableBlockId(documentId, pageIndex, role, paragraph.text, paragraph);
     blocks.push({ ...paragraph, id, role, readingOrder: blocks.length, columnIndex, translatable, exclusionReason: translatable ? null : reason ?? "not-translated" });
@@ -54,7 +63,7 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
   return blocks;
 }
 
-const SENTENCE_END = /[.!?:](?:["”’)\]]|\[[\d,–−-]+\])*\s*$/;
+const SENTENCE_END = /[.!?:。！？](?:["”’)\]]|\[[\d,–−-]+\])*\s*$/;
 const MAX_UNIT_CHARS = 6000;
 
 /** Join paragraph fragments split by a column or page break; headings and display equations always end a paragraph. */
@@ -95,18 +104,20 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
     const page = await pdf.getPage(pageIndex + 1);
     pages.push({ width: page.width, height: page.height });
     let raw = await page.getTextItems(signal);
-    const printable = raw.reduce((sum, item) => sum + item.text.replace(/\s/g, "").length, 0);
-    const replacement = raw.reduce((sum, item) => sum + (item.text.match(/�/g) ?? []).length, 0);
-    const suspicious = printable < 80 || replacement > printable * .05;
-    if (suspicious && (await page.getRasterImageCount?.() ?? 0) > 0) {
-      if (ocr) { raw = await ocr.extractPage(documentId, pageIndex, signal); ocrPages++; }
-      else ocrCandidates.push(pageIndex);
+    // A scanned page (no text, an image) or text without a usable Unicode map is read from its pixels.
+    const health = textHealth(raw);
+    if (health === "garbled" || (health === "empty" && (await page.getRasterImageCount?.() ?? 0) > 0)) {
+      let read: PdfTextItem[] | null = null;
+      if (ocr) { try { read = await ocr(page, signal); } catch (error) { if (signal?.aborted) throw error; } }
+      if (read && letterCount(read) > letterCount(raw) * 1.2 + 40) { raw = read; ocrPages++; }
+      else if (!read) ocrCandidates.push(pageIndex);
     }
     const pageBlocks = await buildPageBlocks(documentId, pageIndex, raw, page.width, page.height, section);
     for (const block of pageBlocks) {
       section = nextSection(block.role, block.exclusionReason, block.text, section);
       if (block.role === "KEYWORDS" && pageIndex < 2) keywords.push(...extractKeywords(block));
-      if (ids.has(block.id)) throw new Error(`${pageIndex + 1}페이지에 중복된 번역 블록 ID가 있습니다.`);
+      // The same paragraph twice at the same place (text drawn twice): keep the first, never fail the paper.
+      if (ids.has(block.id)) continue;
       ids.add(block.id);
       if (block.translatable) {
         marks.push(...block.marks ?? []); texts.push(block.text);
@@ -144,7 +155,7 @@ export const manifestRepository = {
 
 /** One build per document even when the library, reader and export ask at once. */
 const building = new Map<string, Promise<TranslationManifest>>();
-export function ensureManifest(documentId: string, open: () => Promise<PdfDocumentHandle>, onPage?: (completed: number) => void, signal?: AbortSignal): Promise<TranslationManifest> {
+export function ensureManifest(documentId: string, open: () => Promise<PdfDocumentHandle>, onPage?: (completed: number) => void, signal?: AbortSignal, ocr?: OcrProvider): Promise<TranslationManifest> {
   const running = building.get(documentId);
   if (running) return running;
   const task = (async () => {
@@ -152,7 +163,7 @@ export function ensureManifest(documentId: string, open: () => Promise<PdfDocume
     if (stored) return stored;
     const pdf = await open();
     try {
-      const manifest = await buildTranslationManifest(documentId, pdf, signal, onPage);
+      const manifest = await buildTranslationManifest(documentId, pdf, signal, onPage, ocr);
       await manifestRepository.put(manifest);
       return manifest;
     } finally { await pdf.destroy(); }

@@ -52,14 +52,14 @@ export function buildTextLines(items: PdfTextItem[]): TextLine[] {
       // The smaller face decides the word gap: a 32 pt "■" must not bridge a column gutter.
       if (gap > Math.max(Math.min(piece.size, item.height) * .9, 3.5) || gap < -size * 2) continue;
       const small = item.height < piece.size * .82;
-      const decorative = piece.main.every(main => !/[A-Za-z0-9]/.test(main.text));
+      const decorative = piece.main.every(main => !/[\p{L}\p{N}]/u.test(main.text));
       if (small && decorative && Math.abs(base - piece.base) < piece.size * .5) { target = piece; break; }
       if (small && base > piece.base - piece.size * .75 && base < piece.base + piece.size * .45 && gap < piece.size * .45) { target = piece; script = Math.abs(base - piece.base) > piece.size * .08; break; }
       if (Math.abs(base - piece.base) < size * .3) { target = piece; break; }
     }
     if (!target) { pieces.push({ main: [item], scripts: [], size: item.height, base, x: item.x, right: item.x + item.width }); continue; }
     if (script) target.scripts.push(item);
-    else if (target.main.every(main => main.height < item.height * .82) || /[A-Za-z0-9]/.test(item.text) && target.main.every(main => !/[A-Za-z0-9]/.test(main.text))) {
+    else if (target.main.every(main => main.height < item.height * .82) || /[\p{L}\p{N}]/u.test(item.text) && target.main.every(main => !/[\p{L}\p{N}]/u.test(main.text))) {
       // A line that began with a superscript marker or a decorative "■": promote the real text.
       target.scripts.push(...target.main); target.main = [item]; target.size = item.height; target.base = base;
     } else target.main.push(item);
@@ -106,7 +106,7 @@ export function buildTextLines(items: PdfTextItem[]): TextLine[] {
       previousRight = Math.max(previousRight, item.x + item.width);
     }
     // A missing glyph inside a word ("NO■x") is an artefact of the PDF font, not text.
-    text = text.replace(/(?<=[A-Za-z0-9])[■□](?=[A-Za-z0-9])/g, "");
+    text = text.replace(/(?<=[A-Za-z0-9])[■□](?=[A-Za-z0-9])/g, "").replace(/(?<=[\u3000-\u30ff\u4e00-\u9fff\uff00-\uffef]) +(?=[\u3000-\u30ff\u4e00-\u9fff\uff00-\uffef])/g, "");
     const regular = piece.main.filter(item => Math.abs(item.height - size) < size * .15);
     const top = piece.base - size * .8, bottom = Math.max(piece.base + size * .2, ...regular.map(item => item.y + item.height).filter(value => value < piece.base + size * .5));
     const marks = piece.scripts.length ? markedTokens(marked) : undefined;

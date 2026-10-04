@@ -11,7 +11,7 @@ const CAPTION_LABEL = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate)\s*[A-Z]?\d+[
 const TRAILING_FUNCTION_WORD = /\b(?:the|a|an|of|and|or|in|on|to|for|with|by|from|at|as|is|are|was|were|that|which|this|these)$/i;
 const SENTENCE_END = /[.!?](?:["”’)\]]|\[[\d,–−-]+\])?\s*$/;
 
-const words = (text: string) => text.match(/[A-Za-z]{3,}/g) ?? [];
+const words = (text: string) => text.match(/[A-Za-z]{3,}|[\uac00-\ud7a3]{2,}|[\u3040-\u30ff\u4e00-\u9fff]{2,}/g) ?? [];
 /** "■ APPENDIX 1: DEVOLATILIZATION AND CHAR", "5. CONCLUSIONS": capitalised section titles. */
 export function capsHeading(text: string) {
   const value = text.replace(/^[■●▪\s]+/, "").trim(), letters = value.replace(/[^A-Za-z]/g, "");
@@ -34,11 +34,17 @@ export function isEquationLine(text: string, widthRatio = 0): boolean {
   return symbols >= 3 && prose.length < 3;
 }
 
-/** Number of prose words, sentence ends and capitalised-word ratio. */
+/**
+ * Number of prose words, sentence ends and capitalised-word ratio. Korean words are counted by
+ * their spaces; Japanese and Chinese set none, so about two characters make a word there.
+ */
 export function proseScore(text: string) {
   const tokens = text.match(/[A-Za-z][A-Za-z'’-]*/g) ?? [];
   const capitals = tokens.filter(token => /^[A-Z]/.test(token)).length;
-  return { words: tokens.length, sentences: (text.match(/[a-z)\]]{1}[.!?](?:\s|$)/g) ?? []).length, capitalRatio: tokens.length ? capitals / tokens.length : 1 };
+  const hangul = (text.match(/[\uac00-\ud7a3]+/g) ?? []).length, han = Math.round((text.match(/[\u3040-\u30ff\u4e00-\u9fff]/g) ?? []).length / 2);
+  const words = tokens.length + hangul + han;
+  const sentences = (text.match(/[a-z)\]]{1}[.!?](?:\s|$)/g) ?? []).length + (text.match(/[\uac00-\ud7a3\u3040-\u30ff\u4e00-\u9fff][.!?](?:\s|$)|[。！？]/g) ?? []).length;
+  return { words, sentences, capitalRatio: words ? capitals / words : 1 };
 }
 
 type Group = { lines: TextLine[]; kind: PdfParagraph["kind"]; hint?: PdfParagraph["hint"] };
@@ -72,7 +78,7 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
     const column = bounds.get(line.column)!, columnWidth = column.right - column.left;
     // Operators of inline math are often drawn on their own baseline ("+ + +").
     // They belong to the prose line they sit in and must not split the paragraph.
-    if (!/[A-Za-z0-9]/.test(line.text) && line.right - line.x < columnWidth * .7) { noise.push(line); continue; }
+    if (!/[\p{L}\p{N}]/u.test(line.text) && line.right - line.x < columnWidth * .7) { noise.push(line); continue; }
     const equation = isEquationLine(line.text, (line.right - line.x) / Math.max(1, columnWidth));
     // "3.2. Mathematical model. Gas phase kinetics": an unnumbered title closing a run-in line is a heading too.
     // "In the CFD model, the" is the paragraph's first words, not a title: titles carry no comma and
@@ -196,7 +202,7 @@ function toParagraph(group: Group, index: number, pageIndex: number, width: numb
   const lines = group.lines;
   const x = Math.min(...lines.map(line => line.x)), y = Math.min(...lines.map(line => line.y));
   const right = Math.max(...lines.map(line => line.right)), bottom = Math.max(...lines.map(line => line.bottom));
-  const text = lines.map(line => line.text).join(" ").replace(/([a-z])[-‐]\s+(?=[a-z])/g, "$1").replace(/\s+/g, " ").trim();
+  const text = lines.map(line => line.text).join(" ").replace(/([a-z])[-‐]\s+(?=[a-z])/g, "$1").replace(/\s+/g, " ").replace(/(?<=[\u3000-\u30ff\u4e00-\u9fff\uff00-\uffef]) (?=[\u3000-\u30ff\u4e00-\u9fff\uff00-\uffef])/g, "").trim();
   const size = median(lines.map(line => line.size)) || bodySize;
   const pitch = lines.length > 1 ? median(lines.slice(1).map((line, offset) => line.y - lines[offset].y).filter(value => value > 0)) || size * 1.2 : size * 1.2;
   const columnIndex = lines[0].column, column = bounds.get(columnIndex) ?? { left: x, right };

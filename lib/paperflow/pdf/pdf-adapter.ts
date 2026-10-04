@@ -59,16 +59,24 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
       const forms = clippedFormFonts(operators.fnArray, operators.argsArray, library.OPS as unknown as Record<string, number>);
       // A pasted page also repeats the page's own caption and sentences inside its box: keep the page's copy.
       const pageText = forms.size ? content.items.filter(item => "str" in item && !forms.has(item.fontName)).map(item => "str" in item ? item.str : "").join(" ").replace(/\s+/g, " ") : "";
+      // Some producers draw each glyph run twice, slightly offset, to fake bold: keep one copy.
+      const seen = new Set<string>();
       return content.items.flatMap(item => {
         if (!("str" in item) || !item.str.trim()) return [];
         const boxes = forms.get(item.fontName);
         if (boxes && !boxes.some(([x1, y1, x2, y2]) => item.transform[4] >= x1 - 2 && item.transform[4] <= x2 + 2 && item.transform[5] >= y1 - 2 && item.transform[5] <= y2 + 2)) return [];
         if (boxes && (/^(?:fig(?:ure)?\.?|table|scheme)\s*\d/i.test(item.str.trim()) || item.str.trim().length >= 8 && pageText.includes(item.str.replace(/\s+/g, " ").trim()))) return [];
-        // Rotated text (axis titles, side labels) belongs to figures and would stretch a column.
-        const [m0, m1, m2, m3] = item.transform;
-        if (Math.abs(m1) > Math.abs(m0) * .1 || Math.abs(m2) > Math.abs(m3) * .1) return [];
-        const [x, baseline] = base.convertToViewportPoint(item.transform[4], item.transform[5]);
-        const height = Math.max(1, Math.abs(item.height) || Math.hypot(item.transform[2], item.transform[3]));
+        // Direction on the page as displayed (the page /Rotate included): text that reads upright there is
+        // kept, wherever the producer rotated it in user space; rotated text (axis titles, side labels)
+        // belongs to figures and would stretch a column.
+        const [v0, v1, v2, v3, v4, v5] = base.transform, [t0, t1, t2, t3, t4, t5] = item.transform;
+        const m0 = v0 * t0 + v2 * t1, m1 = v1 * t0 + v3 * t1, m2 = v0 * t2 + v2 * t3, m3 = v1 * t2 + v3 * t3;
+        if (Math.abs(m1) > Math.abs(m0) * .1 || Math.abs(m2) > Math.abs(m3) * .1 || m0 <= 0) return [];
+        const x = v0 * t4 + v2 * t5 + v4, baseline = v1 * t4 + v3 * t5 + v5;
+        const key = `${item.str}|${Math.round(x / 1.5)}|${Math.round(baseline / 1.5)}`;
+        if (seen.has(key)) return [];
+        seen.add(key);
+        const height = Math.max(1, Math.abs(item.height) || Math.abs(m3));
         const style = content.styles[item.fontName];
         const ascent = typeof style?.ascent === "number" ? style.ascent : .8;
         return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL, baseline }];

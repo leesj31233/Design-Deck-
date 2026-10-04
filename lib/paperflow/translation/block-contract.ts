@@ -10,6 +10,8 @@ const WORDS = /[A-Za-z]{2,}/g, GLUE = /\b(the|of|and|is|are|was|were|to|in|with|
  * sentence) may come back unchanged, instead of being retried and reported as failed.
  */
 export function needsHangul(source: string) {
+  // Japanese or Chinese prose handed back untranslated is a failure too.
+  if ((source.match(/[぀-ヿ一-鿿]/g) ?? []).length >= 10) return true;
   const words = source.match(WORDS) ?? [];
   if (words.filter(word => word.length >= 3).length < 5) return false;
   const capitalised = words.filter(word => /^[A-Z]/.test(word)).length / words.length;

@@ -11,6 +11,28 @@ const FRONT_LABELS = /^(?:articleinfo|abstract|graphicalabstract|highlights|keyw
 const STOP_SECTION = /^(?:[^A-Za-z]*)(?:references|bibliography|literature cited|author information|author contributions|declaration of competing interest|conflicts? of interest|credit authorship contribution statement|data availability|acknowledg(?:e)?ments?|funding|abbreviations)\b/i;
 const REFERENCE_SECTION = /^(?:[^A-Za-z]*)(?:references|bibliography|literature cited)\b/i;
 
+const YEAR = /\b(?:19|20)\d{2}[a-z]?\b/;
+/**
+ * A bibliography entry or a piece of one (hanging-indent lists split entries mid-way): numbered,
+ * author initials ("Ng, K.H.; Yuan, L.S."), database links, or journal / DOI / volume-page marks with a year.
+ */
+export function looksLikeReference(text: string) {
+  if (/^\s*(?:\[\d{1,4}\]|\(\d{1,4}\)|\d{1,4}[.)]\s+[A-Z])/.test(text)) return true;
+  if (/\[(?:CrossRef|PubMed|Google Scholar|Green Version|PubMed Central)\]/i.test(text)) return true;
+  if ((text.match(/\b[A-Z]\.(?:\s?-?[A-Z]\.)*[,;]/g) ?? []).length >= 2) return true;
+  if (YEAR.test(text) && /\bdoi\b|doi\.org|\bet al\.|\bpp?\.\s*\d|\bvol\.|\bno\.\s*\d|\bproc\.|\bjournal\b|\bin:\s|\bisbn\b|\bissn\b|retrieved from|accessed|\d+\s*[(:]\s*\d+\)?\s*[,:]\s*\d+\s*[–-]\s*\d+|\b(?:19|20)\d{2}[a-z]?,\s*\d+(?:\s*\(\d+\))?,\s*\d+|\b[A-Z][a-z]{1,9}\.\s+[A-Z][a-z]{1,9}\./i.test(text)) return true;
+  return YEAR.test(text) && text.length < 420 && /^[A-Z][A-Za-z'’-]+,?\s+(?:[A-Z]\.|[A-Z][a-z]+,)/.test(text);
+}
+/** A reference list ends where a new chapter or section begins, or where real prose resumes (books, theses, reports, patents). */
+function endsReferenceList(block: PdfParagraph, value: string, bodySize: number) {
+  if (looksLikeReference(value)) return false;
+  if (value.length < 90 && (/^(?:chapter|part|section|appendix)\s+[\dIVX]+/i.test(value) || /^\d{1,2}(?:\.\d{1,2})*\.?\s+[A-Z][A-Za-z]/.test(value) || (block.fontSize ?? bodySize) >= bodySize * 1.2 && !YEAR.test(value))) return true;
+  // Prose reads in lowercase function words with few numbers; entries are names, abbreviations and volume/page numbers.
+  const score = proseScore(value), years = (value.match(/\b(?:19|20)\d{2}\b/g) ?? []).length;
+  const numbers = (value.match(/\d+/g) ?? []).length, plain = (value.match(/\b(?:the|of|and|is|are|was|were|to|in|that|which|with|for|by|this|as)\b/g) ?? []).length;
+  return score.words >= 30 && score.sentences >= 2 && years <= 1 && numbers <= score.words * .12 && (plain >= score.words * .15 || /[가-힣぀-ヿ一-鿿]{6}/.test(value));
+}
+
 export interface PageContext { pageIndex: number; bodySize: number; titleIndex: number; abstractIndex: number }
 
 /** Page-1 anchors: the paper title is the biggest long block near the top; front matter sits between it and the abstract. */
@@ -36,7 +58,7 @@ function isFrontProse(block: PdfParagraph) {
 export function classifyBlock(block: PdfParagraph, index: number, context: PageContext, section: Section): Classified {
   const value = block.text.trim(), squashed = squash(value), size = block.fontSize ?? context.bodySize;
   if (block.hint === "furniture") return { role: "OTHER", reason: "glyph-noise" };
-  if (section === "references") return { role: "REFERENCE", reason: "reference-section" };
+  if (section === "references" && !endsReferenceList(block, value, context.bodySize)) return { role: "REFERENCE", reason: "reference-section" };
   if (section === "authors") return { role: "AUTHOR", reason: "author-section" };
   if (REFERENCE_SECTION.test(value) && value.length < 40) return { role: "REFERENCE", reason: "reference-section" };
   // Only a heading starts the back matter; a footnote that mentions authors must not.
@@ -98,6 +120,8 @@ export function extractKeywords(block: PdfParagraph): string[] {
 
 export function nextSection(role: BlockRole, reason: string | null, text: string, section: Section): Section {
   if (reason === "reference-section" && REFERENCE_SECTION.test(text)) return "references";
+  // Anything classified on its own merits inside a reference list means the list is over.
+  if (section === "references" && reason !== "reference-section") return "none";
   if (reason === "back-matter" && /author information|corresponding author/i.test(text)) return "authors";
   if (section === "authors" && role === "HEADING") return "none";
   return section;

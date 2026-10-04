@@ -1,5 +1,6 @@
 import { documentRepository } from "../persistence/document-repository";
 import { translationRepository } from "../persistence/translation-repository";
+import { ocrPage, releaseOcr } from "../pdf/ocr";
 import { pdfAdapter } from "../pdf/pdf-adapter";
 import { readableError } from "../errors";
 import { ensureManifest, manifestCounts, type TranslationManifest, type TranslationUnit } from "./manifest";
@@ -52,7 +53,8 @@ async function openManifest(documentId: string, signal: AbortSignal, onPage?: (p
     const blob = await documentRepository.getDocumentBlob(documentId);
     if (!blob) throw new Error("이 브라우저에 저장된 PDF를 찾지 못했습니다.");
     return pdfAdapter.open(await blob.arrayBuffer(), signal);
-  }, onPage, signal);
+  }, onPage, signal, ocrPage);
+  void releaseOcr();
   useTranslationStore.getState().setManifest(manifest);
   return manifest;
 }
