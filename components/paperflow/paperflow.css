@@ -801,3 +801,27 @@ a.pf-account-signin { color:inherit; text-decoration:none; }
   .pf-trash-cover .pf-book-cover { width:44px; }
   .pf-trash-actions { grid-column:1 / -1; justify-content:flex-end; }
 }
+
+/* Phone: the expand button stays pinned at the right end of the sideways-scrolling tool row, and
+   focus mode gives the paper the whole screen (A4 fitted to the width) with the marking tools in
+   a floating bar at thumb height, clear of the home indicator. */
+@media (max-width:650px) {
+  .pf-annotation-tools .pf-focus-controls { position:sticky; right:-8px; margin-left:auto; padding:0 8px 0 18px; background:linear-gradient(to right,transparent,var(--background) 16px); }
+  .pf-reader-shell[data-focus] { height:100dvh; }
+  .pf-reader-shell[data-focus] .pf-reader-body { padding:0; }
+  .pf-pdf-viewport { padding:12px 8px; }
+  .pf-reader-shell[data-focus] .pf-pdf-viewport { padding:6px 4px calc(84px + env(safe-area-inset-bottom)); border-radius:0; }
+  .pf-reader-shell[data-focus] .pf-annotation-tools { position:fixed; top:auto; left:8px; right:8px; bottom:calc(10px + env(safe-area-inset-bottom)); z-index:40; margin:0; width:auto; max-width:none; padding:6px 8px; flex-wrap:nowrap; overflow-x:auto; border-radius:18px; }
+  .pf-reader-shell[data-focus] .pf-annotation-tools .pf-focus-controls { right:-8px; border-left:0; background:linear-gradient(to right,transparent,color-mix(in srgb,var(--surface-strong) 96%,transparent) 16px); }
+}
+@media (max-width:650px) {
+  /* In the floating bar only the page and the exit stay pinned; zoom is fit-to-width and pinch. */
+  .pf-reader-shell[data-focus] .pf-focus-controls > button:not([aria-pressed]), .pf-reader-shell[data-focus] .pf-focus-zoom { display:none; }
+  .pf-reader-shell[data-focus] .pf-annotation-tools .pf-focus-controls { gap:0; padding-left:10px; margin-left:6px; background:var(--surface-strong); box-shadow:-10px 0 12px -6px color-mix(in srgb,var(--foreground) 18%,transparent); border-radius:0 14px 14px 0; }
+  .pf-reader-shell[data-focus] .pf-focus-page { min-width:38px; font-size:11px; }
+}
+@media (max-width:650px) {
+  /* Opaque on a phone: the paper must not show through the tools at thumb height. */
+  .pf-reader-shell[data-focus] .pf-annotation-tools,
+  .pf-reader-shell[data-focus] .pf-annotation-tools .pf-focus-controls { background:linear-gradient(var(--surface-strong),var(--surface-strong)),var(--background); backdrop-filter:none; -webkit-backdrop-filter:none; }
+}

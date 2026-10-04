@@ -37,13 +37,17 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const [exportRunning, setExportRunning] = useState(false);
   const [textNoteOpen, setTextNoteOpen] = useState(false), [textNoteDraft, setTextNoteDraft] = useState("");
   // Focus mode: only the paper and the marking tools, full screen when the browser allows it.
-  const [focus, setFocus] = useState(false), wentFullscreen = useRef(false);
+  const [focus, setFocus] = useState(false), wentFullscreen = useRef(false), beforeFocus = useRef<{ fitMode: "width" | "page" | "custom"; zoom: number } | null>(null);
   const enterFocus = useCallback(() => {
     setFocus(true);
+    // On a phone the A4 page fills the screen width; the previous zoom comes back on exit.
+    if (window.innerWidth <= 650) { const { fitMode, zoom } = useReaderStore.getState(); beforeFocus.current = { fitMode, zoom }; useReaderStore.getState().set({ fitMode: "width", activeSelection: null }); }
+    // iPhone Safari has no element full screen: the focus layout alone takes the screen there.
     void document.documentElement.requestFullscreen?.().then(() => { wentFullscreen.current = true; }).catch(() => { /* Focus mode still works inside the window. */ });
   }, []);
   const exitFocus = useCallback(() => {
     setFocus(false);
+    if (beforeFocus.current) { useReaderStore.getState().set(beforeFocus.current); beforeFocus.current = null; }
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     wentFullscreen.current = false;
   }, []);
@@ -127,7 +131,9 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     observer.observe(viewport.current); return () => observer.disconnect();
   }, [pdf, error]);
   const lastScale = useRef(1);
-  const scale = page ? fit === "custom" ? zoom / 100 : fit === "page" ? Math.min((size.width - 48) / page.width, (size.height - 48) / page.height) : Math.min(1.65, (size.width - 48) / page.width) : lastScale.current;
+  // Breathing room around the page: generous on a desk, almost none on a phone in focus mode.
+  const gutter = size.width < 600 ? (focus ? 8 : 20) : 48;
+  const scale = page ? fit === "custom" ? zoom / 100 : fit === "page" ? Math.min((size.width - gutter) / page.width, (size.height - gutter) / page.height) : Math.min(1.65, (size.width - gutter) / page.width) : lastScale.current;
   useEffect(() => { lastScale.current = scale; }, [scale]);
 
   // Persist the reading position at most once per second; never per scroll event.
