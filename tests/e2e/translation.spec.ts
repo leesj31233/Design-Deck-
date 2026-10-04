@@ -25,8 +25,8 @@ test("paragraph click translates, caches after reload, and real page previews re
   await expect(page.locator(".pf-pdf-page .pf-tx-line").first()).toBeVisible();
   expect(requests).toBe(beforeReload);
   await page.getByRole("button", { name: "논문 전체 일괄 번역" }).click();
-  await expect(page.locator(".pf-inline-bulk progress")).toBeVisible();
-  await expect(page.locator(".pf-inline-bulk")).toContainText(/\d+\/\d+/);
+  await expect(page.locator(".pf-batch .pf-batch-track")).toBeVisible();
+  await expect(page.locator(".pf-batch")).toContainText(/\d+ \/ \d+|\d+문단/);
 });
 
 test("optional live English-to-Korean translation smoke check", async ({ page }) => {
@@ -48,8 +48,8 @@ test("whole-paper translation batches paragraphs with short ids and reports comp
   await page.getByLabel("Import PDF file").setInputFiles({ name: "Batch.pdf", mimeType: "application/pdf", buffer: makePdf() });
   await expect(page.locator("[data-pdf-page][data-ready=true]").first()).toBeVisible();
   await page.getByRole("button", { name: "논문 전체 일괄 번역" }).click();
-  await expect(page.locator(".pf-inline-bulk")).toContainText("논문 전체 번역 완료");
-  await expect(page.locator(".pf-inline-bulk")).not.toContainText("실패");
+  await expect(page.locator(".pf-batch")).toContainText("번역 완료!");
+  await expect(page.locator(".pf-batch")).not.toContainText("실패");
   await expect(page.locator(".pf-pdf-page .pf-tx-line").first()).toBeVisible();
   expect(batches).toBeGreaterThan(0);
   // Short wire ids, never the 32-character hashes models used to mangle.

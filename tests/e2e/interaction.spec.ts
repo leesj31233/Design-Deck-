@@ -27,7 +27,7 @@ test("mouse drag selection, zoom alignment, archive and source-byte fidelity", a
   await expect(page.locator(".pf-paper-row")).toHaveCount(0);
   await page.getByRole("button", { name: "아카이브", exact: true }).click(); await expect(page.locator(".pf-paper-row")).toHaveCount(1);
   await page.getByLabel("아카이브에서 복원").click(); await expect(page.locator(".pf-paper-row")).toHaveCount(0);
-  await page.getByRole("button", { name: "라이브러리", exact: true }).click(); await expect(page.locator(".pf-paper-row")).toHaveCount(1);
+  await page.getByRole("button", { name: "서재", exact: true }).click(); await expect(page.locator(".pf-paper-row")).toHaveCount(1);
 });
 
 test("same-page quote recovery works when stored geometry is damaged", async ({ page }, info) => {

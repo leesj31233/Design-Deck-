@@ -7,7 +7,7 @@ const cache = new Map<string, string | null>();
  * (freely licensed). Most researchers have none; the UI then shows their initials.
  */
 export async function GET(request: Request) {
-  if (foreignOrigin(request)) return Response.json({ error: "이 사이트에서만 사용할 수 있다." }, { status: 403 });
+  if (foreignOrigin(request)) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
   const orcid = new URL(request.url).searchParams.get("orcid")?.replace(/^https?:\/\/orcid\.org\//i, "") ?? "";
   if (!/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(orcid)) return Response.json({ url: null });
   if (cache.has(orcid)) return Response.json({ url: cache.get(orcid) });

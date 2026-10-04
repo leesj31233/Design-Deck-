@@ -23,9 +23,9 @@ function abstractOf(index: Record<string, number[]> | null | undefined) {
 const ago = (months: number) => { const date = new Date(); date.setMonth(date.getMonth() - months); return date.toISOString().slice(0, 10); };
 
 export async function POST(request: Request) {
-  if (foreignOrigin(request)) return Response.json({ error: "이 사이트에서만 사용할 수 있다." }, { status: 403 });
+  if (foreignOrigin(request)) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
   let body: { topics?: unknown; authors?: unknown; owned?: unknown; cited?: unknown; fields?: unknown };
-  try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청이다." }, { status: 400 }); }
+  try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청입니다." }, { status: 400 }); }
   const topics = (Array.isArray(body.topics) ? body.topics : []).filter(isTopic).slice(0, 6);
   const authors = (Array.isArray(body.authors) ? body.authors : []).filter(isAuthor).slice(0, 10);
   // The reader's fields (e.g. fields/22 Engineering): an author's new work counts only inside them,

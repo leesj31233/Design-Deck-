@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { PaperflowMark } from "@/components/paperflow/shell/paperflow-logo";
 import { adoptEmailSession } from "@/lib/paperflow/cloud/browser";
 import { readableError } from "@/lib/paperflow/errors";
 
@@ -14,12 +14,12 @@ export default function ConfirmPage() {
     const value = query.get("next") ?? "/library", next = value.startsWith("/") && !value.startsWith("//") ? value : "/library";
     history.replaceState(null, "", window.location.pathname + window.location.search);
     adoptEmailSession(hash)
-      .then(ok => { if (ok) window.location.replace(next); else setError("로그인 정보가 없는 링크다. 로그인 화면에서 다시 요청해 달라."); })
+      .then(ok => { if (ok) window.location.replace(next); else setError("로그인 정보가 없는 링크입니다. 로그인 화면에서 다시 요청해 주세요."); })
       .catch(cause => setError(readableError(cause)));
   }, []);
   return <main className="pf-login-confirm">
-    <span className="pf-logo"><BookOpen size={20}/></span>
-    {error ? <><h1>로그인하지 못했다</h1><p role="alert">{error}</p><Link href="/login" className="pf-login-primary">로그인 화면으로</Link></>
-      : <><h1>서재를 여는 중…</h1><p>확인되었다. 잠시 후 나의 연구 서재로 이동한다.</p><span className="pf-loader" aria-hidden="true"/></>}
+    <PaperflowMark size={44}/>
+    {error ? <><h1>로그인하지 못했습니다</h1><p role="alert">{error}</p><Link href="/login" className="pf-login-primary">로그인 화면으로</Link></>
+      : <><h1>서재를 여는 중…</h1><span className="pf-loader" aria-hidden="true"/></>}
   </main>;
 }

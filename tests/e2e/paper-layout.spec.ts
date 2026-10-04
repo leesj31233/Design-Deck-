@@ -14,7 +14,7 @@ test("real paper: front matter stays in English, body is typeset in its columns 
   await page.getByLabel("Import PDF file").setInputFiles(sample!);
   await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
   await page.getByRole("button", { name: "논문 전체 일괄 번역" }).click();
-  await expect(page.locator(".pf-inline-bulk")).toContainText("논문 전체 번역 완료", { timeout: 180_000 });
+  await expect(page.locator(".pf-batch")).toContainText("번역 완료!", { timeout: 180_000 });
 
   // Scope: title, authors, journal furniture and references are never sent; abstract, headings and captions are.
   expect(sources.some(source => /^1\. INTRODUCTION$/i.test(source))).toBe(true);

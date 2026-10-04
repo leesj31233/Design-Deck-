@@ -13,7 +13,7 @@ export function cloudClient(): SupabaseClient | null {
 
 export async function signInWithGoogle(next = "/library") {
   const supabase = cloudClient();
-  if (!supabase) throw new Error("클라우드 계정이 아직 설정되지 않았다.");
+  if (!supabase) throw new Error("클라우드 계정이 아직 설정되지 않았습니다.");
   const redirectTo = `${location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
   const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo, queryParams: { prompt: "select_account" } } });
   if (error) throw error;
@@ -25,31 +25,31 @@ export async function signInWithGoogle(next = "/library") {
  * link that only works where it was requested.
  */
 function mailer() {
-  if (!cloudEnabled) throw new Error("클라우드 계정이 아직 설정되지 않았다.");
+  if (!cloudEnabled) throw new Error("클라우드 계정이 아직 설정되지 않았습니다.");
   return createClient(cloudUrl, cloudAnonKey, { auth: { flowType: "implicit", persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
 }
 const confirmUrl = (next: string) => `${location.origin}/auth/confirm?next=${encodeURIComponent(next)}`;
 export const MIN_PASSWORD = 8;
 function checkEmail(email: string) {
   const address = email.trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) throw new Error("이메일 주소를 확인해 달라.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) throw new Error("이메일 주소를 확인해 주세요.");
   return address;
 }
 /** Supabase's English auth errors, in the reader's words. */
 export function authMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error ?? "");
-  if (/invalid login credentials/i.test(message)) return "이메일 또는 비밀번호가 맞지 않다.";
-  if (/email not confirmed/i.test(message)) return "아직 이메일 확인이 끝나지 않았다. 확인 메일의 링크를 눌러 달라.";
-  if (/already registered|already been registered|user already exists/i.test(message)) return "이미 가입된 이메일이다. 로그인하거나 비밀번호 찾기를 이용해 달라.";
-  if (/rate limit|security purposes|too many/i.test(message)) return "메일 발송 한도에 걸렸다. 잠시 뒤에 다시 시도해 달라.";
-  if (/password should be|weak password|at least/i.test(message)) return `비밀번호는 ${MIN_PASSWORD}자 이상으로, 쉽게 추측할 수 없게 정해 달라.`;
-  if (/same.*password|different from the old/i.test(message)) return "이전과 다른 비밀번호를 입력해 달라.";
-  return message || "요청을 처리하지 못했다.";
+  if (/invalid login credentials/i.test(message)) return "이메일 또는 비밀번호가 맞지 않습니다.";
+  if (/email not confirmed/i.test(message)) return "아직 이메일 확인이 끝나지 않았습니다. 확인 메일의 링크를 눌러 주세요.";
+  if (/already registered|already been registered|user already exists/i.test(message)) return "이미 가입된 이메일입니다. 로그인하거나 비밀번호 찾기를 이용해 주세요.";
+  if (/rate limit|security purposes|too many/i.test(message)) return "메일 발송 한도에 걸렸습니다. 잠시 뒤에 다시 시도해 주세요.";
+  if (/password should be|weak password|at least/i.test(message)) return `비밀번호는 ${MIN_PASSWORD}자 이상으로, 쉽게 추측할 수 없게 정해 주세요.`;
+  if (/same.*password|different from the old/i.test(message)) return "이전과 다른 비밀번호를 입력해 주세요.";
+  return message || "요청을 처리하지 못했습니다.";
 }
 
 /** Sign up with email and password; the account opens once the emailed link is confirmed. */
 export async function signUpWithPassword(email: string, password: string, next = "/library") {
-  if (password.length < MIN_PASSWORD) throw new Error(`비밀번호는 ${MIN_PASSWORD}자 이상이어야 한다.`);
+  if (password.length < MIN_PASSWORD) throw new Error(`비밀번호는 ${MIN_PASSWORD}자 이상이어야 합니다.`);
   const { data, error } = await mailer().auth.signUp({ email: checkEmail(email), password, options: { emailRedirectTo: confirmUrl(next) } });
   if (error) throw new Error(authMessage(error));
   // An address that is already registered comes back with no identities (no email is sent).
@@ -59,7 +59,7 @@ export async function signUpWithPassword(email: string, password: string, next =
 /** Sign in on this device; the session lives in cookies so the server sees it too. */
 export async function signInWithPassword(email: string, password: string) {
   const supabase = cloudClient();
-  if (!supabase) throw new Error("클라우드 계정이 아직 설정되지 않았다.");
+  if (!supabase) throw new Error("클라우드 계정이 아직 설정되지 않았습니다.");
   const { error } = await supabase.auth.signInWithPassword({ email: checkEmail(email), password });
   if (error) throw new Error(authMessage(error));
 }
@@ -76,9 +76,9 @@ export async function sendPasswordReset(email: string) {
 }
 
 export async function updatePassword(password: string) {
-  if (password.length < MIN_PASSWORD) throw new Error(`비밀번호는 ${MIN_PASSWORD}자 이상이어야 한다.`);
+  if (password.length < MIN_PASSWORD) throw new Error(`비밀번호는 ${MIN_PASSWORD}자 이상이어야 합니다.`);
   const supabase = cloudClient();
-  if (!supabase) throw new Error("클라우드 계정이 아직 설정되지 않았다.");
+  if (!supabase) throw new Error("클라우드 계정이 아직 설정되지 않았습니다.");
   const { error } = await supabase.auth.updateUser({ password });
   if (error) throw new Error(authMessage(error));
 }
@@ -90,7 +90,7 @@ export async function updatePassword(password: string) {
 export async function adoptEmailSession(hash: string): Promise<boolean> {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const failure = params.get("error_description") ?? params.get("error");
-  if (failure) throw new Error(/expired|invalid/i.test(failure) ? "링크가 만료되었거나 이미 사용되었다. 로그인 화면에서 다시 요청해 달라." : failure.replace(/\+/g, " "));
+  if (failure) throw new Error(/expired|invalid/i.test(failure) ? "링크가 만료되었거나 이미 사용되었습니다. 로그인 화면에서 다시 요청해 주세요." : failure.replace(/\+/g, " "));
   const access_token = params.get("access_token"), refresh_token = params.get("refresh_token");
   const supabase = cloudClient();
   if (!access_token || !refresh_token || !supabase) return false;

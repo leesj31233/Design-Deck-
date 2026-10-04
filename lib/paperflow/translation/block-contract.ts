@@ -23,7 +23,7 @@ export function needsHangul(source: string) {
  */
 export function partitionTranslationResults(passages: TranslationPassage[], value: unknown): TranslationBatchResult {
   const expected = new Map(passages.map(passage => [passage.id, passage]));
-  if (expected.size !== passages.length) throw new Error("요청에 중복된 블록 ID가 있다.");
+  if (expected.size !== passages.length) throw new Error("요청에 중복된 블록 ID가 있습니다.");
   const found = new Map<string, string>();
   for (const item of Array.isArray(value) ? value : []) {
     if (!item || typeof item !== "object" || typeof item.id !== "string" || typeof item.text !== "string") continue;
@@ -40,7 +40,7 @@ export function partitionTranslationResults(passages: TranslationPassage[], valu
 
 /** Strict form kept for callers that need all-or-nothing. */
 export function validateTranslationResults(passages: TranslationPassage[], value: unknown): TranslationResult[] {
-  if (!Array.isArray(value) || value.length !== passages.length) throw new Error("번역 블록 수가 원문과 일치하지 않는다.");
+  if (!Array.isArray(value) || value.length !== passages.length) throw new Error("번역 블록 수가 원문과 일치하지 않습니다.");
   const ids = value.map(item => item?.id);
   if (new Set(ids).size !== ids.length) throw new Error(`중복된 번역 블록 ID: ${ids.find((id, index) => ids.indexOf(id) !== index)}`);
   const unknown = ids.find(id => !passages.some(passage => passage.id === id));

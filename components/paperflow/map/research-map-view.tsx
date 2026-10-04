@@ -55,7 +55,7 @@ export function ResearchMapView({ docs, annotations }: { docs: StoredDocument[];
       </div>
     </div>
     <div className="pf-mapview-stage">
-      {graph.nodes.length ? <ResearchGraph nodes={graph.nodes} edges={graph.edges} selected={selected} onSelect={select} query={query}/> : <div className="pf-mapview-empty">PDF를 가져오면 연구맵이 시작된다.</div>}
+      {graph.nodes.length ? <ResearchGraph nodes={graph.nodes} edges={graph.edges} selected={selected} onSelect={select} query={query}/> : <div className="pf-mapview-empty">PDF를 가져오면 연구맵이 시작됩니다.</div>}
       <aside className="pf-map-inspector" data-open={Boolean(node) || undefined} aria-live="polite">
         {node ? <>
           <span className="pf-kicker">{KIND_LABEL[node.kind]}</span>
@@ -63,7 +63,7 @@ export function ResearchMapView({ docs, annotations }: { docs: StoredDocument[];
           <p className="pf-map-weight"><i style={{ background: node.color }}/>관련 논문 {papers.length}편 · 학습 가중치 {node.weight.toFixed(1)}</p>
           <ol className="pf-map-papers">{papers.slice(0, 12).map(doc => <li key={doc.id}><Link href={`/reader/${doc.id}`}>{doc.title}</Link><small>{[doc.scholar?.source?.name ?? doc.journal, doc.scholar?.year ?? doc.year].filter(Boolean).join(" · ")}</small></li>)}</ol>
           <Button size="sm" variant="ghost" onClick={() => setSelected(null)}>닫기</Button>
-        </> : <p className="pf-map-hint">구를 누르면 그 분야·저자·저널에 속한 내 논문이 보인다. 구의 크기는 실제로 읽은 양(페이지·마킹·메모)이다.</p>}
+        </> : <p className="pf-map-hint">구를 누르면 그 분야·저자·저널에 속한 내 논문이 보입니다. 구의 크기는 실제로 읽은 양(페이지·마킹·메모)입니다.</p>}
       </aside>
     </div>
     <ResearchIdentity profile={profile} docs={library}/>

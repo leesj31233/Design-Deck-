@@ -43,7 +43,7 @@ export function ResearchIdentity({ profile, docs }: { profile: ResearchProfile; 
       <div className="pf-domain-bar" role="img" aria-label="대분야 비중">{domains.map(domain => <i key={domain.id} style={{ width: `${domain.weight / domainTotal * 100}%`, background: domainColor(domain.id) }} title={`${domain.name} ${Math.round(domain.weight / domainTotal * 100)}%`}/>)}</div>
       <div className="pf-domain-legend">{domains.map(domain => <span key={domain.id}><i style={{ background: domainColor(domain.id) }}/>{domain.name} {Math.round(domain.weight / domainTotal * 100)}%</span>)}</div>
       <ol className="pf-field-bars">{fields.map(field => <li key={field.id}><span>{field.name}</span><b style={{ width: `${field.weight / fieldMax * 100}%`, background: domainColor(field.domain) }}/><small>{field.papers.length}편</small></li>)}</ol>
-      {!fields.length && <p className="pf-identity-empty">‘연구 정보 분석’을 실행하면 분야가 채워진다.</p>}
+      {!fields.length && <p className="pf-identity-empty">‘연구 정보 분석’을 실행하면 분야가 채워집니다.</p>}
     </motion.section>
 
     <motion.section className="pf-identity-card pf-identity-journals" {...enter(1)}>
@@ -53,7 +53,7 @@ export function ResearchIdentity({ profile, docs }: { profile: ResearchProfile; 
         <span className="pf-journal-meta"><b>{journal.name}</b><small>{journal.publisher ?? stats?.publisher ?? ""}</small>
           <span className="pf-journal-stats"><em>{journal.papers.length}편</em>{stats?.meanCitedness2y ? <em title="OpenAlex 2년 평균 피인용 — JIF와 같은 방식의 공개 지표">2Y 인용 {stats.meanCitedness2y.toFixed(1)}</em> : null}{stats?.hIndex ? <em>h {stats.hIndex}</em> : null}</span></span>
       </Link>; })}</div>
-      {!topJournals.length && <p className="pf-identity-empty">저널 정보가 아직 없다.</p>}
+      {!topJournals.length && <p className="pf-identity-empty">저널 정보가 아직 없습니다.</p>}
     </motion.section>
 
     <motion.section className="pf-identity-card pf-identity-authors" {...enter(2)}>
@@ -64,7 +64,7 @@ export function ResearchIdentity({ profile, docs }: { profile: ResearchProfile; 
           <span className="pf-author-stats"><em>내 서재 {author.papers.length}편</em>{author.firstAuthor ? <em>1저자 {author.firstAuthor}</em> : null}{stats?.hIndex ? <em>h-index {stats.hIndex}</em> : null}</span>
           {stats?.topics.length ? <small className="pf-author-topics">{stats.topics.slice(0, 3).join(" · ")}</small> : null}</span>
       </li>; })}</ul>
-      {!topAuthors.length && <p className="pf-identity-empty">저자 정보가 아직 없다.</p>}
+      {!topAuthors.length && <p className="pf-identity-empty">저자 정보가 아직 없습니다.</p>}
     </motion.section>
 
     <motion.section className="pf-identity-card pf-identity-side" {...enter(3)}>

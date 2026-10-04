@@ -3,7 +3,7 @@ import { foreignOrigin, openAlex } from "@/lib/paperflow/scholar/server";
 
 /** One paper's OpenAlex record, by DOI or (for PDFs without DOI) by a confident title match. */
 export async function GET(request: Request) {
-  if (foreignOrigin(request)) return Response.json({ error: "이 사이트에서만 사용할 수 있다." }, { status: 403 });
+  if (foreignOrigin(request)) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
   const url = new URL(request.url);
   const doi = url.searchParams.get("doi")?.trim().replace(/^https?:\/\/doi\.org\//i, "");
   const title = url.searchParams.get("title")?.trim();
@@ -17,5 +17,5 @@ export async function GET(request: Request) {
     // Only a near-identical title counts; a wrong paper would poison the research map.
     return Response.json({ work: best && best.score >= .86 ? best.work : null, score: best?.score ?? 0 });
   }
-  return Response.json({ error: "DOI 또는 제목이 필요하다." }, { status: 400 });
+  return Response.json({ error: "DOI 또는 제목이 필요합니다." }, { status: 400 });
 }

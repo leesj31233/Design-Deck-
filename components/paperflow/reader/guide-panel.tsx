@@ -24,7 +24,7 @@ export function GuidePanel() {
   const reduced = useReducedMotion(), client = useQueryClient();
   const guide = useQuery({ queryKey: ["guide", documentId], enabled: Boolean(documentId), queryFn: () => loadGuide(documentId!) });
   const make = useMutation({
-    mutationFn: () => { if (!documentId || !manifest || manifest.documentId !== documentId) throw new Error("논문 구조를 분석하는 중이다. 잠시 후 다시 눌러 달라."); return createGuide(documentId, manifest); },
+    mutationFn: () => { if (!documentId || !manifest || manifest.documentId !== documentId) throw new Error("논문 구조를 분석하는 중입니다. 잠시 후 다시 눌러 주세요."); return createGuide(documentId, manifest); },
     onSuccess: value => { client.setQueryData(["guide", documentId], value); void client.invalidateQueries({ queryKey: ["documents"] }); }
   });
   // Leaving the paper or the tab clears the temporary mark.
@@ -34,10 +34,9 @@ export function GuidePanel() {
 
   if (!data) return <div className="pf-inspector-section pf-guide-intro">
     <h3><Sparkles size={16}/> AI 논문 가이드</h3>
-    <p>논문 전체를 읽고 개요, 핵심 기여, 방법, 핵심 결과, 용어, 한계, 공부할 질문을 정리한다. 핵심 결과를 누르면 근거 문단이 PDF에 표시되고 화살표로 연결된다.</p>
-    <p className="pf-guide-note">원문 근거 문장은 PDF 본문과 대조해 확인된 것만 보여 준다. 가이드는 읽기를 돕는 도구이며, 수치와 주장은 원문에서 확인한다. 한 편당 한 번 만들고 저장한다(약 $0.01–0.02, 같은 논문을 먼저 만든 사람이 있으면 무료).</p>
+    <p>개요, 핵심 결과, 용어, 공부할 질문을 정리하고 결과마다 원문 근거를 연결합니다.</p>
     {make.error && <p className="pf-error" role="alert">{readableError(make.error)}</p>}
-    <Button size="sm" variant="primary" disabled={make.isPending || guide.isPending} onClick={() => make.mutate()}><Sparkles size={14}/>{make.isPending ? "논문을 읽고 정리하는 중… (20–40초)" : "가이드 만들기"}</Button>
+    <Button size="sm" variant="primary" disabled={make.isPending || guide.isPending} onClick={() => make.mutate()}><Sparkles size={14}/>{make.isPending ? "정리하는 중… (20–40초)" : "가이드 만들기"}</Button>
   </div>;
 
   return <div className="pf-guide">

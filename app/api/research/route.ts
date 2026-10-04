@@ -58,16 +58,16 @@ async function shareTranslations(passages: TranslationPassage[], results: { id: 
 export async function GET() { return Response.json({ available: Boolean(process.env.OPENAI_API_KEY), provider: "OpenAI" }); }
 
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았다.", kind: "configuration" }, { status: 503 });
+  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다.", kind: "configuration" }, { status: 503 });
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있다.", kind: "configuration" }, { status: 403 });
-  if (rateLimited(request)) return Response.json({ error: "번역 요청이 일시적으로 많다. 잠시 후 다시 시도해 달라.", kind: "rate_limit" }, { status: 429, headers: { "Retry-After": "20" } });
+  if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다.", kind: "configuration" }, { status: 403 });
+  if (rateLimited(request)) return Response.json({ error: "번역 요청이 일시적으로 많습니다. 잠시 후 다시 시도해 주세요.", kind: "rate_limit" }, { status: 429, headers: { "Retry-After": "20" } });
   let body: { passages?: unknown; task?: unknown; glossary?: unknown };
-  try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청이다.", kind: "configuration" }, { status: 400 }); }
+  try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청입니다.", kind: "configuration" }, { status: 400 }); }
   const blocks = body.task === "translate_blocks";
   const passages = blocks && Array.isArray(body.passages) ? (body.passages as TranslationPassage[]).map(item => ({ id: item?.id, text: item?.text, role: item?.role === "heading" || item?.role === "caption" ? item.role : "body" })) as TranslationPassage[] : [];
   const validBlocks = passages.length >= 1 && passages.length <= 16 && passages.every(item => typeof item.id === "string" && /^[a-z0-9_-]{1,40}$/i.test(item.id) && typeof item.text === "string" && item.text.trim() && item.text.length <= 12000) && new Set(passages.map(item => item.id)).size === passages.length && passages.reduce((sum, item) => sum + item.text.length, 0) <= 20000;
-  if (!blocks || !validBlocks) return Response.json({ error: "유효한 원문과 작업이 필요하다.", kind: "configuration" }, { status: 400 });
+  if (!blocks || !validBlocks) return Response.json({ error: "유효한 원문과 작업이 필요합니다.", kind: "configuration" }, { status: 400 });
 
   const chars = passages.reduce((sum, item) => sum + item.text.length, 0);
   // Paper-specific keywords stay in English on every page (passed as data, length-bounded).
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(100_000)]),
       body: JSON.stringify({ model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, instructions, prompt_cache_key: PROMPT_CACHE_KEY, input: JSON.stringify(glossary.length ? { glossary, passages } : { passages }), text: schema, max_output_tokens: Math.min(16000, Math.ceil(chars * 1.4) + 600) })
     });
-    if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 또는 요청 한도에 도달했다. 잠시 후 자동으로 다시 시도한다." : "OpenAI 요청을 완료하지 못했다.", kind: upstream.status === 429 ? "rate_limit" : upstream.status >= 500 ? "transient" : "configuration" }, { status: upstream.status === 429 ? 429 : upstream.status >= 500 ? 503 : 502, headers: { "Retry-After": upstream.headers.get("retry-after") || "20" } });
+    if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 또는 요청 한도에 도달했습니다. 잠시 후 자동으로 다시 시도합니다." : "OpenAI 요청을 완료하지 못했습니다.", kind: upstream.status === 429 ? "rate_limit" : upstream.status >= 500 ? "transient" : "configuration" }, { status: upstream.status === 429 ? 429 : upstream.status >= 500 ? 503 : 502, headers: { "Retry-After": upstream.headers.get("retry-after") || "20" } });
     const data = await upstream.json();
     const text = outputText(data);
     // Cached prompt tokens are billed at a discount; the model name lets cost reports use the right price.
@@ -89,8 +89,8 @@ export async function POST(request: Request) {
     // An incomplete response can still carry complete items; keep those and report the rest.
     try { parsed = JSON.parse(text); } catch { parsed = { translations: [...text.matchAll(/\{"id":"([^"]+)","text":"((?:[^"\\]|\\.)*)"\}/g)].map(match => ({ id: match[1], text: JSON.parse(`"${match[2]}"`) })) }; }
     const { results, missing } = partitionTranslationResults(passages, parsed.translations);
-    if (!results.length) return Response.json({ error: "번역 결과를 확인할 수 없어 더 작은 묶음으로 다시 시도한다.", kind: "malformed", usage }, { status: 502 });
+    if (!results.length) return Response.json({ error: "번역 결과를 확인할 수 없어 더 작은 묶음으로 다시 시도합니다.", kind: "malformed", usage }, { status: 502 });
     await shareTranslations(passages, results);
     return Response.json({ translations: results, missing, provider: "OpenAI", usage, incomplete: data.status === "incomplete" });
-  } catch { return Response.json({ error: "연결 시간이 초과되었거나 요청이 취소되었다.", kind: "transient" }, { status: 504 }); }
+  } catch { return Response.json({ error: "연결 시간이 초과되었거나 요청이 취소되었습니다.", kind: "transient" }, { status: 504 }); }
 }

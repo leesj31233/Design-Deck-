@@ -18,7 +18,7 @@ test("continuous pages keep translated text and allow annotations on Korean text
   await page.route("**/api/concept", route => { conceptCalls++; return route.fulfill({ json: { concept: { term: "heat flux", definition: "단위 면적을 통과하는 열전달률이다.", inPaper: "이 문단에서 model이 예측하는 대상이다.", evidence: [], quantities: [], related: ["radiation"], questions: ["어떻게 측정하는가?"], needsMoreContext: false } } }); });
   await page.getByRole("button", { name: "선택 개념 공부" }).click();
   // The selection only fills the term in; nothing is asked of the model until 설명 is pressed.
-  await expect(page.getByText("드래그만으로는 AI를 부르지 않는다")).toBeVisible();
+  await expect(page.getByText("‘설명’을 누르면 AI가 설명합니다.")).toBeVisible();
   expect(conceptCalls).toBe(0);
   await page.getByLabel("공부할 개념").fill("heat flux");
   await page.getByRole("button", { name: "설명", exact: true }).click();
@@ -55,6 +55,6 @@ test("page notes and pen strokes stay in the reader and appear in the notebook",
   await page.reload();
   await expect(page.locator("[data-pdf-page='0'] .pf-ink-layer polyline")).toHaveCount(2);
   await page.goto("/library");
-  await page.getByRole("button", { name: "노트 모아보기" }).click();
+  await page.getByRole("button", { name: "노트", exact: true }).click();
   await expect(page.getByText("실험 조건을 다시 확인한다.")).toBeVisible();
 });

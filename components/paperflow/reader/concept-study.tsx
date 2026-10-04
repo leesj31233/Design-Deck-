@@ -36,10 +36,10 @@ export function ConceptStudy({ source, selected, page, paper }: { source: string
     setPending(true); setConcept(null);
     try {
       const response = await fetch("/api/concept", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ term: name, passage: source, paper }) });
-      const body = await response.json().catch(() => ({ error: "설명 응답을 읽지 못했다." }));
-      if (!response.ok || !body.concept) throw new Error(body.error || "개념 설명을 만들지 못했다.");
+      const body = await response.json().catch(() => ({ error: "설명 응답을 읽지 못했습니다." }));
+      if (!response.ok || !body.concept) throw new Error(body.error || "개념 설명을 만들지 못했습니다.");
       remember(key, body.concept); setConcept(body.concept);
-    } catch (cause) { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "개념 설명을 만들지 못했다."); }
+    } catch (cause) { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "개념 설명을 만들지 못했습니다."); }
     finally { if (request.current === controller) setPending(false); }
   };
 
@@ -58,12 +58,12 @@ export function ConceptStudy({ source, selected, page, paper }: { source: string
 
   return <section className="pf-inspector-section pf-concept-study">
     <h3><Sparkles size={15}/> 개념 공부 <small>p. {page ?? "—"}</small></h3>
-    {!source ? <p>문단을 클릭하거나 원문·번역문에서 용어를 드래그하면, 이 논문에서의 의미를 AI가 설명한다.</p> : <>
+    {!source ? <p>문단을 누르거나 용어를 드래그하세요.</p> : <>
       <form className="pf-concept-ask" onSubmit={event => { event.preventDefault(); void explain(draft); }}>
         <Search size={14} aria-hidden="true"/><input aria-label="공부할 개념" placeholder="용어 입력 또는 아래에서 선택" value={draft} onChange={event => setDraft(event.target.value)}/>
         <Button size="sm" variant="primary" type="submit" disabled={pending || !draft.trim()}>설명</Button>
       </form>
-      {!concept && !pending && <p className="pf-concept-hint">‘설명’을 누르면 AI가 이 논문에서의 의미를 설명한다. 드래그만으로는 AI를 부르지 않는다.</p>}
+      {!concept && !pending && <p className="pf-concept-hint">‘설명’을 누르면 AI가 설명합니다.</p>}
       {terms.length > 0 && <div className="pf-keywords">{terms.map(item => <Button key={item} size="sm" variant="ghost" aria-pressed={term === item} onClick={() => void explain(item)}>{item}</Button>)}</div>}
       {pending && <div className="pf-concept-loading" role="status" aria-label={`${term} 설명을 만드는 중`}><span/><span/><span/><small>{term}의 의미를 이 문단과 대조하는 중…</small></div>}
       {error && <p className="pf-error" role="alert">{error}</p>}
@@ -75,7 +75,7 @@ export function ConceptStudy({ source, selected, page, paper }: { source: string
         {concept.quantities.length > 0 && <motion.div className="pf-concept-block" {...rise(4)}><small>수치 · 조건</small><dl className="pf-concept-values">{concept.quantities.map(item => <div key={item.label + item.value}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl></motion.div>}
         {concept.related.length > 0 && <motion.div className="pf-concept-block" {...rise(5)}><small>다음에 볼 개념</small><div className="pf-keywords">{concept.related.map(item => <Button key={item} size="sm" variant="ghost" onClick={() => void explain(item)}>{item}</Button>)}</div></motion.div>}
         {concept.questions.length > 0 && <motion.div className="pf-concept-block" {...rise(6)}><small>공부할 질문</small><ol>{concept.questions.map(item => <li key={item}>{item}</li>)}</ol></motion.div>}
-        {concept.needsMoreContext && <p className="pf-concept-note"><AlertTriangle size={12}/> 이 문단만으로는 역할을 다 설명하기 어렵다. 앞뒤 문단이나 방법 절을 함께 확인한다.</p>}
+        {concept.needsMoreContext && <p className="pf-concept-note"><AlertTriangle size={12}/> 이 문단만으로는 역할을 다 설명하기 어렵습니다. 앞뒤 문단이나 방법 절을 함께 확인합니다.</p>}
       </div>}
     </>}
   </section>;

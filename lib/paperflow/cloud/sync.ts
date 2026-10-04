@@ -134,7 +134,7 @@ export async function syncAll() {
     set({ lastSyncedAt: new Date().toISOString() });
     await refreshPlan();
     window.dispatchEvent(new CustomEvent("paperflow:library-synced"));
-  } catch (error) { set({ error: error instanceof Error ? error.message : "동기화하지 못했다." }); }
+  } catch (error) { set({ error: error instanceof Error ? error.message : "동기화하지 못했습니다." }); }
   finally { set({ syncing: false }); }
 }
 
@@ -157,7 +157,7 @@ async function flush() {
       if (change.kind === "document") { const doc = await documentRepository.getDocument(change.id); if (doc) await pushDocument(doc); }
       else if (change.kind === "annotation") await pushAnnotation(change.id, change.documentId, Boolean(change.deleted));
       else if (change.kind === "translation") await pushTranslations(change.documentId, change.unitIds);
-    } catch { set({ error: "일부 변경을 계정에 저장하지 못했다. 다음 동기화 때 다시 시도한다." }); }
+    } catch { set({ error: "일부 변경을 계정에 저장하지 못했습니다. 다음 동기화 때 다시 시도합니다." }); }
   }
   set({ lastSyncedAt: new Date().toISOString() });
 }

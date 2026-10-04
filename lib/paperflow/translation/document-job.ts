@@ -50,7 +50,7 @@ const roleOf = (unit: TranslationUnit): PassageRole => unit.role === "HEADING" ?
 async function openManifest(documentId: string, signal: AbortSignal, onPage?: (page: number) => void): Promise<TranslationManifest> {
   const manifest = await ensureManifest(documentId, async () => {
     const blob = await documentRepository.getDocumentBlob(documentId);
-    if (!blob) throw new Error("이 브라우저에 저장된 PDF를 찾지 못했다.");
+    if (!blob) throw new Error("이 브라우저에 저장된 PDF를 찾지 못했습니다.");
     return pdfAdapter.open(await blob.arrayBuffer(), signal);
   }, onPage, signal);
   useTranslationStore.getState().setManifest(manifest);
@@ -73,7 +73,7 @@ export async function startTranslationJob(documentId: string, options: { fromPag
   if (existing?.status.running) return existing.status;
   const controller = new AbortController();
   const record = await documentRepository.getDocument(documentId);
-  if (!record) throw new Error("이 브라우저에 저장된 PDF를 찾지 못했다.");
+  if (!record) throw new Error("이 브라우저에 저장된 PDF를 찾지 못했습니다.");
   const status: TranslationJobStatus = { documentId, done: 0, total: record.pageCount, translated: 0, failed: 0, pendingBlocks: 0, cancelledBlocks: 0, totalBlocks: 0, translatableBlocks: 0, excludedBlocks: 0, extractedPages: 0, ocrPages: 0, ocrCandidatePages: 0, requests: 0, concurrency: 0, rateLimitHits: 0, retried: 0, inputTokens: 0, outputTokens: 0, extractionMs: 0, translationMs: 0, firstResultMs: null, failedUnits: [], running: true, complete: false };
   jobs.set(documentId, { status, controller, listeners: existing?.listeners ?? new Set() });
   update(documentId, status, true);
@@ -130,9 +130,9 @@ export async function startTranslationJob(documentId: string, options: { fromPag
     update(documentId, { translationMs: Math.round(performance.now() - translationStarted) });
     refresh();
     const final = jobs.get(documentId)!.status;
-    if (!final.complete && !controller.signal.aborted && !only) update(documentId, { error: final.ocrCandidatePages ? `${final.ocrCandidatePages}개 이미지 페이지는 OCR이 필요하다. 나머지 번역은 저장됐다.` : final.failed ? `${final.failed}개 문단을 번역하지 못했다. ‘실패 문단 재시도’로 그 문단만 다시 요청한다.` : `${final.pendingBlocks}개 문단이 남았다. 다시 시작하면 저장된 번역은 재사용한다.` });
+    if (!final.complete && !controller.signal.aborted && !only) update(documentId, { error: final.ocrCandidatePages ? `${final.ocrCandidatePages}개 이미지 페이지는 OCR이 필요합니다. 나머지 번역은 저장됐습니다.` : final.failed ? `${final.failed}개 문단을 번역하지 못했습니다. ‘실패 문단 재시도’로 그 문단만 다시 요청합니다.` : `${final.pendingBlocks}개 문단이 남았습니다. 다시 시작하면 저장된 번역은 재사용합니다.` });
   } catch (error) {
-    if (!controller.signal.aborted) update(documentId, { error: error instanceof ResearchHttpError && error.status === 429 ? "번역 서비스 사용량 제한으로 멈췄다. 완료된 문단은 저장됐고, 다시 시작하면 남은 문단부터 진행한다." : readableError(error) });
+    if (!controller.signal.aborted) update(documentId, { error: error instanceof ResearchHttpError && error.status === 429 ? "번역 서비스 사용량 제한으로 멈췄습니다. 완료된 문단은 저장됐고, 다시 시작하면 남은 문단부터 진행합니다." : readableError(error) });
   } finally {
     store().setPending(documentId, target.map(unit => unit.id), false);
     update(documentId, { running: false }, true);
@@ -163,7 +163,7 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
     const entries = results.map(result => ({ id: result.id, text: polishKorean(result.text) }));
     await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.find(item => item.id === entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
     store().addTexts(documentId, entries);
-    for (const id of missing) store().setFailed(documentId, id, "모델 응답에서 이 문단의 번역이 누락되었다.");
+    for (const id of missing) store().setFailed(documentId, id, "모델 응답에서 이 문단의 번역이 누락되었습니다.");
   } catch (error) {
     for (const unit of units) store().setFailed(documentId, unit.id, readableError(error));
     throw error;

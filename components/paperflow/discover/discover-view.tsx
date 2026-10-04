@@ -33,17 +33,17 @@ export function DiscoverView({ docs, annotations }: { docs: StoredDocument[]; an
   const ready = request.topics.length > 0 || request.authors.length > 0;
   const recommendations = useQuery({
     queryKey: ["recommendations", request], enabled: ready, staleTime: 6 * 3600_000,
-    queryFn: async () => { const response = await fetch("/api/scholar/recommend", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }); if (!response.ok) throw new Error("추천을 불러오지 못했다."); return (await response.json()).sections as Section[]; }
+    queryFn: async () => { const response = await fetch("/api/scholar/recommend", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }); if (!response.ok) throw new Error("추천을 불러오지 못했습니다."); return (await response.json()).sections as Section[]; }
   });
   const [tab, setTab] = useState("all"), [hidden, setHidden] = useState(hiddenIds);
   const hide = (id: string) => setHidden(current => { const next = new Set(current).add(id); try { localStorage.setItem(HIDDEN_KEY, JSON.stringify([...next])); } catch { /* Hiding still works for this visit. */ } return next; });
   const sections = (recommendations.data ?? []).map(section => ({ ...section, items: section.items.filter(item => !hidden.has(item.openalexId)) })).filter(section => section.items.length);
   const shown = tab === "all" ? sections : sections.filter(section => section.id === tab);
 
-  if (!ready) return <section className="pf-discover-empty"><h2>추천을 준비하려면 연구 정보가 필요하다</h2><p>연구맵에서 ‘연구 정보 분석’을 실행하면 관심 주제와 저자가 정리되고, 그에 맞는 논문을 추천한다.</p></section>;
+  if (!ready) return <section className="pf-discover-empty"><h2>추천을 준비하려면 연구 정보가 필요합니다</h2><p>연구맵에서 ‘연구 정보 분석’을 실행하면 관심 주제와 저자가 정리되고, 그에 맞는 논문을 추천합니다.</p></section>;
   return <section className="pf-discover">
     <div className="pf-discover-head">
-      <p>관심 주제 {request.topics.length}개 · 저자 {request.authors.length}명 · 내 서재가 인용한 문헌 {request.cited.length}편을 바탕으로 OpenAlex에서 고른 논문이다. 서재에 이미 있는 논문은 제외한다.</p>
+      <p>관심 주제 {request.topics.length}개 · 저자 {request.authors.length}명 · 내 서재가 인용한 문헌 {request.cited.length}편을 바탕으로 OpenAlex에서 고른 논문입니다. 서재에 이미 있는 논문은 제외합니다.</p>
       {sections.length > 1 && <SegmentedControl value={tab} onValueChange={setTab} items={[{ value: "all", label: "전체" }, ...sections.map(section => ({ value: section.id, label: section.title }))]}/>}
     </div>
     {recommendations.isPending && <div className="pf-discover-loading" role="status">{Array.from({ length: 6 }, (_, index) => <span key={index}/>)}</div>}
@@ -65,6 +65,6 @@ export function DiscoverView({ docs, annotations }: { docs: StoredDocument[]; an
         </footer>
       </motion.article>)}</div>
     </div>)}
-    {recommendations.isSuccess && !sections.length && <p className="pf-discover-empty">지금은 추천할 새 논문이 없다. 논문이 더 쌓이면 다시 확인한다.</p>}
+    {recommendations.isSuccess && !sections.length && <p className="pf-discover-empty">지금은 추천할 새 논문이 없습니다. 논문이 더 쌓이면 다시 확인합니다.</p>}
   </section>;
 }

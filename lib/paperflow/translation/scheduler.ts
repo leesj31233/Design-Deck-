@@ -71,7 +71,7 @@ export async function runTranslationScheduler(passages: TranslationPassage[], si
         state.inputTokens += response.usage?.input ?? 0; state.outputTokens += response.usage?.output ?? 0;
         // A storage failure is fatal. Re-translating a valid response would waste quota.
         if (response.results.length) { await onResults(response.results); state.completed += response.results.length; }
-        if (response.missing.length) fail({ passages: batch.passages.filter(passage => response.missing.includes(passage.id)), attempts: batch.attempts }, new Error("모델 응답에서 이 문단의 번역이 누락되었다."));
+        if (response.missing.length) fail({ passages: batch.passages.filter(passage => response.missing.includes(passage.id)), attempts: batch.attempts }, new Error("모델 응답에서 이 문단의 번역이 누락되었습니다."));
         if (state.concurrency < options.maxConcurrency && ++streak >= 4) { state.concurrency++; streak = 0; }
         publish();
       } catch (reason) {

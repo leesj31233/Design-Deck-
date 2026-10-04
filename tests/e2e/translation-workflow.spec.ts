@@ -24,6 +24,6 @@ test("library pretranslation, page memo, and annotated PDF export", async ({ pag
   const bytes = await readFile(await download.path());
   expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
   await page.getByLabel("Open Library").click();
-  await page.getByRole("button", { name: "노트 모아보기" }).click();
+  await page.getByRole("button", { name: "노트", exact: true }).click();
   await expect(page.getByText("열전달 조건을 재검토할 것")).toBeVisible();
 });

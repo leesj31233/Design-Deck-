@@ -54,7 +54,7 @@ export function ResearchGraph({ nodes, edges, selected, onSelect, query }: { nod
         edgeReducer: (edge, data) => {
           const { hovered, selected: picked } = state.current, focus = hovered ?? picked, result = { ...data } as Record<string, unknown>;
           if (focus && !graph.extremities(edge).includes(focus)) result.hidden = true;
-          else if (focus) { result.color = "rgba(10,132,255,.55)"; result.size = Number(data.size ?? 1) + .6; }
+          else if (focus) { result.color = "rgba(31,122,90,.55)"; result.size = Number(data.size ?? 1) + .6; }
           return result;
         }
       });

@@ -20,7 +20,7 @@ export const ContinuousPage = memo(function ContinuousPage({ pdf, index, scale, 
   useEffect(() => {
     if (!near) { setPage(undefined); return; }
     let alive = true;
-    void pdf.getPage(index + 1).then(result => { if (alive) setPage(result); }).catch(() => { if (alive) setError("페이지를 불러오지 못했다."); });
+    void pdf.getPage(index + 1).then(result => { if (alive) setPage(result); }).catch(() => { if (alive) setError("페이지를 불러오지 못했습니다."); });
     return () => { alive = false; };
   }, [near, pdf, index]);
   return <div ref={node} data-continuous-page={index + 1} className="pf-continuous-page" style={{ width: size.width * scale, height: size.height * scale }}>

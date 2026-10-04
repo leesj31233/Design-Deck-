@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { GuideArrow } from "./guide-arrow";
+import { BatchProgress } from "./batch-progress";
 import { Maximize2, Minimize2, Minus, Plus } from "lucide-react";
 import { SearchField } from "@/components/ui/search-field";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
@@ -89,7 +90,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
       const [record, blob] = await Promise.all([documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId)]);
       if (!record) throw new Error("이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
       // Listed by the account but kept on another device: the same file imported here links automatically.
-      if (!blob) throw new Error(record.sourceStatus === "remote" ? "이 논문의 PDF는 다른 기기에 저장되어 있다. 같은 PDF 파일을 이 기기에서 가져오면 메모·번역과 자동으로 연결된다." : "이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
+      if (!blob) throw new Error(record.sourceStatus === "remote" ? "이 논문의 PDF는 다른 기기에 저장되어 있습니다. 같은 PDF 파일을 이 기기에서 가져오면 메모·번역과 자동으로 연결됩니다." : "이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
       if (controller.signal.aborted) return;
       const params = new URLSearchParams(window.location.search), requestedPage = Number(params.get("page"));
       const initialPage = requestedPage >= 1 && requestedPage <= record.pageCount ? requestedPage : record.currentPage;
@@ -187,7 +188,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     const now = new Date().toISOString(), pageIndex = currentPage - 1;
     try {
       await annotationRepository.create({ id: crypto.randomUUID(), type: "note", documentId, pageIndex, color: "yellow", note: text.trim(), anchor: { version: 1, documentId, pageIndex, textQuote: `페이지 ${currentPage} 메모`, rects: [], normalizedRects: [], createdAt: now }, createdAt: now, updatedAt: now, resolutionStatus: "resolved" });
-      await client.invalidateQueries({ queryKey: ["annotations"] }); notify("페이지 메모를 저장했다.");
+      await client.invalidateQueries({ queryKey: ["annotations"] }); notify("페이지 메모를 저장했습니다.");
     } catch (reason) { notify(`메모 저장 실패: ${readableError(reason)}`); }
   }, [annotations, selected, save, currentPage, documentId, client, notify]);
 
@@ -228,7 +229,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   }), [currentPage, pdf, navigate, save, showNote, showShell, focusSearch, translateSelection]);
   useEffect(() => { registerReader(commands); return () => registerReader(null); }, [commands, registerReader]);
   const download = async () => { try { const blob = await documentRepository.getDocumentBlob(documentId); if (!blob) throw new Error("원본 PDF가 없습니다."); const url = URL.createObjectURL(blob), link = document.createElement("a"); link.href = url; link.download = doc.data?.filename ?? "paper.pdf"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); } catch (reason) { notify(readableError(reason)); } };
-  const exportPdf = async () => { if (exportRunning) return; setExportRunning(true); try { const result = await exportAnnotatedPdf(documentId, (done, total) => notify(`번역·마킹 PDF 생성 중 · ${done}/${total}페이지`)); notify(result.unfit ? `PDF를 저장했다. ${result.unfit}개 문단은 최소 글자 크기로도 원래 영역을 넘쳐 아래 여백까지 이어진다.` : "번역·마킹과 메모를 PDF로 저장했다."); } catch (reason) { notify(`PDF 저장 실패: ${readableError(reason)}`); } finally { setExportRunning(false); } };
+  const exportPdf = async () => { if (exportRunning) return; setExportRunning(true); try { const result = await exportAnnotatedPdf(documentId, (done, total) => notify(`번역·마킹 PDF 생성 중 · ${done}/${total}페이지`)); notify(result.unfit ? `PDF를 저장했습니다. ${result.unfit}개 문단은 최소 글자 크기로도 원래 영역을 넘쳐 아래 여백까지 이어집니다.` : "번역·마킹과 메모를 PDF로 저장했습니다."); } catch (reason) { notify(`PDF 저장 실패: ${readableError(reason)}`); } finally { setExportRunning(false); } };
   const inspect = (annotation: Annotation) => { dismiss(); setSelected(annotation.id); setTab("context"); navigate(annotation.pageIndex + 1); useReaderStore.getState().set({ inspectorOpen: true }); setTimeout(() => document.querySelector(`[data-annotation-id="${annotation.id}"]`)?.scrollIntoView({ block: "center" }), 200); };
   const remove = async (id: string) => { try { await annotationRepository.remove(id); await client.invalidateQueries({ queryKey: ["annotations"] }); if (selected === id) setSelected(undefined); } catch (reason) { notify(readableError(reason)); } };
 
@@ -259,20 +260,15 @@ export function ReaderShell({ documentId }: { documentId: string }) {
         <IconButton label={focus ? "확장 종료 (Esc)" : "확장: PDF와 마킹 도구만 전체화면으로"} size="sm" variant="ghost" aria-pressed={focus} onClick={focus ? exitFocus : enterFocus}>{focus ? <Minimize2 size={15}/> : <Maximize2 size={15}/>}</IconButton>
       </span>
     </div>
-    {bulk && <div className="pf-inline-bulk" role="status" data-state={bulk.running ? "running" : bulk.complete ? "complete" : "partial"}>
-      <span>{bulk.running ? (bulk.translatableBlocks ? "논문 번역 중" : `문단 구조 분석 중 · ${bulk.extractedPages}/${bulk.total}쪽`) : bulk.complete ? "논문 전체 번역 완료" : "번역 미완료"}{bulk.translatableBlocks ? ` · ${bulk.translated}/${bulk.translatableBlocks}문단` : ""}{bulk.failed ? ` · 실패 ${bulk.failed}` : ""}{!bulk.running && bulk.translationMs ? ` · ${elapsed}초` : ""}{bulk.rateLimitHits ? ` · 한도 대기 ${bulk.rateLimitHits}회` : ""}</span>
-      {bulk.translatableBlocks > 0 && <progress value={bulk.translated} max={Math.max(1, bulk.translatableBlocks)} aria-label="논문 전체 번역 진행"/>}
-      {bulk.running && <Button size="sm" variant="ghost" onClick={() => cancelTranslationJob(documentId)}>중지</Button>}
-      {!bulk.running && !bulk.complete && <Button size="sm" variant="ghost" onClick={batchTranslate}>{bulk.failed ? "실패 문단 재시도" : "이어서 번역"}</Button>}
-    </div>}
+    {bulk && <BatchProgress bulk={bulk} onCancel={() => cancelTranslationJob(documentId)} onResume={batchTranslate}/>}
     {searchOpen && <div className="pf-search-strip"><SearchField ref={searchInput} aria-label="현재 페이지 검색" value={search} onChange={e => setSearch(e.target.value)} placeholder="검색 UI · Phase 2"/><span>전체 논문 검색은 후속 단계에서 제공됩니다.</span><Button size="sm" onClick={() => setSearchOpen(false)}>닫기</Button></div>}
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}
-      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}>{translatedCount === 0 && <div className="pf-reader-hint">문단 클릭 → 그 자리에서 한국어로 · 공학 용어는 영어 유지</div>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
+      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}>{translatedCount === 0 && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
       {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={saveNote} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} keywords={manifest?.keywords ?? doc.data?.keywords ?? []} onTranslate={translateSelection} onBatchTranslate={batchTranslate} onCancelBatch={() => cancelTranslationJob(documentId)}/>}
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>H 마킹 · N 메모 · Ctrl K 명령</span></footer>
-    {textNoteOpen && <div className="pf-note-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTextNoteOpen(false); }}><section className="pf-note-dialog" role="dialog" aria-modal="true" aria-label="텍스트 메모"><h2>텍스트 메모</h2><p>{useReaderStore.getState().activeSelection ? "선택한 문장에 메모를 연결한다." : `${currentPage}페이지에 메모를 저장한다.`}</p><textarea autoFocus aria-label="텍스트 메모 입력" value={textNoteDraft} onChange={event => setTextNoteDraft(event.target.value)} onKeyDown={event => { if (event.key === "Escape") setTextNoteOpen(false); }} placeholder="읽으며 떠오른 생각이나 질문을 기록하세요."/><div><Button variant="ghost" onClick={() => setTextNoteOpen(false)}>취소</Button><Button disabled={!textNoteDraft.trim() || saving} onClick={() => void saveNote(textNoteDraft).then(() => setTextNoteOpen(false))}>메모 저장</Button></div></section></div>}
+    {textNoteOpen && <div className="pf-note-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTextNoteOpen(false); }}><section className="pf-note-dialog" role="dialog" aria-modal="true" aria-label="텍스트 메모"><h2>텍스트 메모</h2><p>{useReaderStore.getState().activeSelection ? "선택한 문장에 메모를 연결합니다." : `${currentPage}페이지에 메모를 저장합니다.`}</p><textarea autoFocus aria-label="텍스트 메모 입력" value={textNoteDraft} onChange={event => setTextNoteDraft(event.target.value)} onKeyDown={event => { if (event.key === "Escape") setTextNoteOpen(false); }} placeholder="읽으며 떠오른 생각이나 질문을 기록하세요."/><div><Button variant="ghost" onClick={() => setTextNoteOpen(false)}>취소</Button><Button disabled={!textNoteDraft.trim() || saving} onClick={() => void saveNote(textNoteDraft).then(() => setTextNoteOpen(false))}>메모 저장</Button></div></section></div>}
     {inspector && !focus && <GuideArrow/>}
     <ReaderSelectionTools documentId={documentId} onHighlight={color => void save(color)} onNote={showNote} onTranslate={translateSelection} onShell={showShell} onDismiss={dismiss} saving={saving}/>
   </div>;

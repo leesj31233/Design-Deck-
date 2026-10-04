@@ -106,7 +106,7 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
     for (const block of pageBlocks) {
       section = nextSection(block.role, block.exclusionReason, block.text, section);
       if (block.role === "KEYWORDS" && pageIndex < 2) keywords.push(...extractKeywords(block));
-      if (ids.has(block.id)) throw new Error(`${pageIndex + 1}페이지에 중복된 번역 블록 ID가 있다.`);
+      if (ids.has(block.id)) throw new Error(`${pageIndex + 1}페이지에 중복된 번역 블록 ID가 있습니다.`);
       ids.add(block.id);
       if (block.translatable) {
         marks.push(...block.marks ?? []); texts.push(block.text);
@@ -165,7 +165,7 @@ export function manifestCounts(manifest: TranslationManifest, translatedIds: Set
   const targets = manifest.units ?? [];
   for (const unit of targets) {
     const states = Number(translatedIds.has(unit.id)) + Number(failedIds.has(unit.id)) + Number(cancelledIds.has(unit.id));
-    if (states > 1) throw new Error(`번역 단위 ${unit.id}에 중복 상태가 있다.`);
+    if (states > 1) throw new Error(`번역 단위 ${unit.id}에 중복 상태가 있습니다.`);
   }
   const translated = targets.filter(unit => translatedIds.has(unit.id)).length;
   const failed = targets.filter(unit => failedIds.has(unit.id)).length;

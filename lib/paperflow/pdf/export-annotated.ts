@@ -157,12 +157,12 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
   const [record, blob, texts, annotations] = await Promise.all([
     documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId), translationRepository.unitTexts(documentId), annotationRepository.listByDocument(documentId)
   ]);
-  if (!record || !blob) throw new Error("저장된 원본 PDF를 찾지 못했다.");
+  if (!record || !blob) throw new Error("저장된 원본 PDF를 찾지 못했습니다.");
   const bytes = await blob.arrayBuffer();
   const pdf = await pdfAdapter.open(bytes.slice(0));
   const output = await PDFDocument.create();
   output.setTitle(`${record.title || record.filename.replace(/\.pdf$/i, "")} — Paperflow 한국어 번역본`);
-  output.setSubject("Paperflow 기계 번역본(개인 학습용). 원문의 저작권은 저자와 출판사에 있다.");
+  output.setSubject("Paperflow 기계 번역본(개인 학습용). 원문의 저작권은 저자와 출판사에 있습니다.");
   output.setProducer("Paperflow"); output.setCreator("Paperflow");
   const book = await PdfFontBook.create(output);
   await book.prepare(MARK_LABEL, false);
