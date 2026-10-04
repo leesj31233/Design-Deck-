@@ -11,7 +11,7 @@ describe("AI paper guide", () => {
     const { wire, byWire } = guideUnits(manifest);
     expect(wire.map(item => [item.id, item.role, item.page])).toEqual([["u0", "abstract", 1], ["u1", "heading", 1], ["u2", "body", 2]]);
     expect(byWire.get("u2")?.unitId).toBe("b");
-    expect(guideSchema(["u0", "u1"]).format.schema.properties.findings.items.properties.unit.enum).toEqual(["u0", "u1"]);
+    expect(guideSchema(["u0", "u1"]).format.schema.properties.pages.items.properties.points.items.properties.unit.enum).toEqual(["u0", "u1"]);
   });
   it("keeps only quotes that occur in their paragraph and maps findings back to units", () => {
     const { byWire } = guideUnits(manifest);

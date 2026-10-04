@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
@@ -17,7 +17,8 @@ export const KIND_INK: Record<GuideKind, { ink: string; marker: string; label: s
   limitation: { ink: "#862e9c", marker: "rgba(218,119,242,.26)", label: "한계" },
   definition: { ink: "#0b7285", marker: "rgba(59,201,219,.26)", label: "정의" }
 };
-export const NOTE_GUTTER = 176;
+/** Width of each side column beside the page while the guide is on. */
+export const NOTE_GUTTER = 214;
 
 type Placed = { key: string; index: number; kind: GuideKind; note: string; lines: ParagraphLine[]; side: "left" | "right"; anchorX: number; anchorY: number; noteY: number };
 
@@ -29,7 +30,7 @@ function tail(x0: number, y0: number, x1: number, y1: number) {
   const left: string[] = [], right: string[] = [], steps = 28;
   for (let i = 0; i <= steps; i++) {
     const t = i / steps * .92, p = at(t), q = at(Math.min(1, t + .01)), dx = q.x - p.x, dy = q.y - p.y, length = Math.hypot(dx, dy) || 1;
-    const width = .6 + 3.2 * Math.sin(Math.PI * Math.min(1, t * 1.05)) ** .7;
+    const width = .6 + 3 * Math.sin(Math.PI * Math.min(1, t * 1.05)) ** .7;
     left.push(`${(p.x - dy / length * width / 2).toFixed(1)},${(p.y + dx / length * width / 2).toFixed(1)}`);
     right.unshift(`${(p.x + dy / length * width / 2).toFixed(1)},${(p.y - dx / length * width / 2).toFixed(1)}`);
   }
@@ -39,16 +40,29 @@ function tail(x0: number, y0: number, x1: number, y1: number) {
 }
 
 /**
- * The AI guide written on the paper like a careful reader's notes: the key sentence gets a soft
- * marker stroke, a tapered arrow swings out to the margin, and a short handwritten note in the
- * colour of its kind sits beside the page. Page 1 also carries the paper's storyline.
+ * The AI guide laid out like the side columns of a study book. Left of each page: what the page
+ * establishes and the basic concepts it relies on (page 1 also carries the paper's storyline).
+ * The sentences worth marking get a soft marker stroke and a tapered arrow to a short handwritten
+ * note in the colour of its kind, in the column on their side of the page.
  */
 export function GuideNotes({ documentId, pageIndex, width, height, room }: { documentId: string; pageIndex: number; width: number; height: number; room: number }) {
   const on = useReaderStore(s => s.guideOverlay), reduced = useReducedMotion();
   const manifest = useTranslationStore(s => s.manifest?.documentId === documentId ? s.manifest : null);
   const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId), enabled: on });
-  const [open, setOpen] = useState<string | null>(null);
-  const compact = room < 120;
+  const [open, setOpen] = useState<string | null>(null), [columnHeight, setColumnHeight] = useState(0);
+  const column = useRef<HTMLDivElement>(null);
+  const compact = room < 150;
+  const pageGuide = guide.data?.pages?.find(item => item.page === pageIndex + 1);
+  const flow = pageIndex === 0 && Boolean(guide.data?.flow.length);
+
+  // Notes in the left column start below the page summary card, whatever its measured height.
+  useLayoutEffect(() => {
+    const node = column.current;
+    if (!node) { setColumnHeight(0); return; }
+    const observer = new ResizeObserver(() => setColumnHeight(node.offsetHeight));
+    observer.observe(node); setColumnHeight(node.offsetHeight);
+    return () => observer.disconnect();
+  }, [pageGuide, flow, on, compact]);
 
   const placed = useMemo<Placed[]>(() => {
     if (!guide.data || !manifest) return [];
@@ -64,37 +78,46 @@ export function GuideNotes({ documentId, pageIndex, width, height, room }: { doc
       const side = (minX + maxX) / 2 < .5 ? "left" : "right";
       items.push({ key: `${finding.unitId}-${index}`, index, kind: finding.kind, note: finding.note, lines, side, anchorX: (side === "left" ? minX : maxX) * width, anchorY: (top + bottom) / 2 * height, noteY: (top + bottom) / 2 * height });
     });
-    // Notes on one side never overlap: each starts below the one before it.
+    // Notes in one column never overlap: each starts below the one before it.
     for (const side of ["left", "right"] as const) {
-      let floor = side === "left" && pageIndex === 0 && guide.data.flow.length ? 40 + guide.data.flow.length * 26 + 70 : 8;
-      for (const item of items.filter(entry => entry.side === side).sort((a, b) => a.anchorY - b.anchorY)) { item.noteY = Math.max(item.noteY - 14, floor); floor = item.noteY + 22 + Math.ceil(item.note.length / 9) * 22; }
+      let floor = side === "left" && columnHeight ? columnHeight + 22 : 8;
+      for (const item of items.filter(entry => entry.side === side).sort((a, b) => a.anchorY - b.anchorY)) { item.noteY = Math.max(item.noteY - 16, floor); floor = item.noteY + 30 + Math.ceil(item.note.length / 11) * 21; }
     }
     return items;
-  }, [guide.data, manifest, pageIndex, width, height]);
+  }, [guide.data, manifest, pageIndex, width, height, columnHeight]);
 
   if (!on || !guide.data) return null;
-  const noteWidth = Math.min(NOTE_GUTTER - 24, Math.max(100, room - 20));
-  const noteLeft = (side: "left" | "right") => side === "left" ? -noteWidth - 14 : width + 14;
-  const flow = pageIndex === 0 && guide.data.flow.length > 0;
+  const noteWidth = Math.min(NOTE_GUTTER - 26, Math.max(120, room - 22));
+  const noteLeft = (side: "left" | "right") => side === "left" ? -noteWidth - 16 : width + 16;
 
-  return <div className="pf-guide-notes" style={{ width, height }} aria-label="AI 가이드 필기">
+  return <div className="pf-guide-notes" style={{ width, height }} aria-label="AI 가이드 정리">
     <svg className="pf-guide-ink" width={width} height={height} style={{ overflow: "visible" }} aria-hidden="true">
       {placed.map((item, order) => <g key={item.key}>
-        {item.lines.map((line, index) => <motion.rect key={index} x={line.x * width - 2} y={line.y * height + line.height * height * .08} height={line.height * height * .86} rx={3} fill={KIND_INK[item.kind].marker} style={{ mixBlendMode: "multiply", transformOrigin: `${line.x * width}px 0px` }}
+        {item.lines.map((line, index) => <motion.rect key={index} x={line.x * width - 2} y={line.y * height + line.height * height * .08} height={line.height * height * .86} rx={3} fill={KIND_INK[item.kind].marker} style={{ mixBlendMode: "multiply" }}
           initial={reduced ? false : { width: 0 }} animate={{ width: line.width * width + 4 }} transition={{ delay: .08 * order + index * .06, duration: .35, ease: "easeOut" }}/>)}
-        {!compact && (() => { const target = item.side === "left" ? noteLeft("left") + noteWidth + 4 : noteLeft("right") - 4, path = tail(item.anchorX + (item.side === "left" ? -3 : 3), item.anchorY, target, item.noteY + 12);
+        {!compact && (() => { const target = item.side === "left" ? noteLeft("left") + noteWidth + 4 : noteLeft("right") - 4, path = tail(item.anchorX + (item.side === "left" ? -3 : 3), item.anchorY, target, item.noteY + 22);
           return <motion.g initial={reduced ? false : { opacity: 0 }} animate={{ opacity: .9 }} transition={{ delay: .08 * order + .25 }}><path d={path.body} fill={KIND_INK[item.kind].ink}/><polygon points={path.head} fill={KIND_INK[item.kind].ink}/></motion.g>; })()}
       </g>)}
     </svg>
-    {!compact && flow && <motion.div className="pf-guide-flow" style={{ left: noteLeft("left"), width: noteWidth }} initial={reduced ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-      <b>논문 흐름</b>
-      {guide.data.flow.map((step, index) => <span key={step + index}>{index > 0 && <i>↓</i>}{step}</span>)}
-      {guide.data.takeaway && <em>★ {guide.data.takeaway}</em>}
+    {!compact && (flow || pageGuide) && <motion.div ref={column} className="pf-guide-column" style={{ left: noteLeft("left"), width: noteWidth }} initial={reduced ? false : { opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 240, damping: 26 }}>
+      {flow && <section className="pf-guide-flow">
+        <h4>논문 흐름</h4>
+        <ol>{guide.data.flow.map((step, index) => <li key={step + index}>{step}</li>)}</ol>
+        {guide.data.takeaway && <p className="pf-guide-flow-take">★ {guide.data.takeaway}</p>}
+      </section>}
+      {pageGuide && <section className="pf-guide-page">
+        <h4><span>p.{pageGuide.page}</span> 핵심 정리</h4>
+        <p className="pf-guide-page-summary">{pageGuide.summary}</p>
+        {pageGuide.concepts.length > 0 && <dl className="pf-guide-concepts">
+          <dt className="pf-guide-concepts-title">기본 개념</dt>
+          {pageGuide.concepts.map(concept => <div key={concept.term}><dt>{concept.term}</dt><dd>{concept.explanation}</dd></div>)}
+        </dl>}
+      </section>}
     </motion.div>}
     {placed.map((item, order) => compact
       ? <button key={item.key} type="button" className="pf-guide-pin" style={{ top: item.anchorY - 11, left: item.side === "left" ? 4 : width - 26, background: KIND_INK[item.kind].ink }} onClick={() => setOpen(open === item.key ? null : item.key)} aria-label={`가이드 메모 ${item.index + 1}`}>{item.index + 1}
           {open === item.key && <span className="pf-guide-pin-note" style={{ color: KIND_INK[item.kind].ink, [item.side === "left" ? "left" : "right"]: 0 }}>{item.note}</span>}</button>
-      : <motion.p key={item.key} className="pf-guide-note-hand" data-side={item.side} style={{ top: item.noteY, left: noteLeft(item.side), width: noteWidth, color: KIND_INK[item.kind].ink }}
+      : <motion.p key={item.key} className="pf-guide-note-hand" data-side={item.side} style={{ top: item.noteY, left: noteLeft(item.side), width: noteWidth, color: KIND_INK[item.kind].ink, borderColor: KIND_INK[item.kind].ink }}
           initial={reduced ? false : { opacity: 0, x: item.side === "left" ? 8 : -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .08 * order + .32, type: "spring", stiffness: 260, damping: 26 }}>
           <small>{KIND_INK[item.kind].label}</small>{item.note}
         </motion.p>)}

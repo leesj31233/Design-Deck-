@@ -27,15 +27,20 @@ describe("credits by real usage", () => {
   });
 });
 
-describe("AI guide v2", () => {
-  it("keeps margin notes, kinds, the storyline and key numbers", () => {
-    const byWire = new Map([["u0", { unitId: "a", page: 1, text: "Methane cofiring reduced NOx by 69.8% at a 40% cofiring rate." }]]);
+describe("AI guide v3: study-book side columns", () => {
+  it("keeps per-page summaries and concepts, page notes with kinds, the storyline and key numbers", () => {
+    const byWire = new Map([["u0", { unitId: "a", page: 1, text: "Methane cofiring reduced NOx by 69.8% at a 40% cofiring rate." }], ["u1", { unitId: "b", page: 2, text: "The realizable k-epsilon model was used." }]]);
     const guide = validateGuide({ overview: "개요", flow: ["석탄 NOx 문제", "메탄 혼소", "70%↓"], takeaway: "40% 혼소가 핵심", contributions: [], method: "",
-      findings: [{ point: "NOx 69.8% 감소", unit: "u0", quote: "reduced NOx by 69.8% at a 40% cofiring rate", why: "", note: "40% → NOx 70%↓", kind: "number" }, { point: "x", unit: "u0", quote: "", why: "", note: "", kind: "weird" }],
+      pages: [
+        { page: 1, summary: "메탄 혼소로 NOx가 크게 준다.", concepts: [{ term: "cofiring", explanation: "두 연료를 함께 태운다." }], points: [{ point: "NOx 69.8% 감소", unit: "u0", quote: "reduced NOx by 69.8% at a 40% cofiring rate", why: "", note: "40% → NOx 70%↓", kind: "number" }] },
+        { page: 2, summary: "난류 모델을 정한다.", concepts: [], points: [{ point: "k-ε", unit: "u1", quote: "", why: "", note: "", kind: "weird" }] },
+        { page: 99, summary: "없는 페이지", concepts: [], points: [] }],
       metrics: [{ label: "NOx 저감", value: "69.8%", unit: "u0" }], terms: [], limitations: [], questions: [] }, byWire)!;
     expect(guide.flow).toEqual(["석탄 NOx 문제", "메탄 혼소", "70%↓"]);
-    expect(guide.findings[0]).toMatchObject({ note: "40% → NOx 70%↓", kind: "number" });
-    expect(guide.findings[1].kind).toBe("result");
+    expect(guide.pages.map(page => page.page)).toEqual([1, 2]);
+    expect(guide.pages[0].concepts[0]).toEqual({ term: "cofiring", explanation: "두 연료를 함께 태운다." });
+    expect(guide.findings[0]).toMatchObject({ note: "40% → NOx 70%↓", kind: "number", page: 1 });
+    expect(guide.findings[1]).toMatchObject({ kind: "result", page: 2 });
     expect(guide.metrics[0]).toMatchObject({ label: "NOx 저감", value: "69.8%", page: 1 });
   });
 });

@@ -931,11 +931,11 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 .pf-memo-layer[data-active] { pointer-events:auto; cursor:text; }
 .pf-memo { position:absolute; pointer-events:auto; line-height:1.35; white-space:pre-wrap; word-break:keep-all; overflow-wrap:anywhere; padding:2px 4px; border-radius:4px; cursor:text; }
 .pf-memo[data-font="serif"] { font-family:var(--font-paper-serif-kr),"Noto Serif KR",serif; }
-.pf-memo[data-font="hand"] { font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:1.5em; line-height:1.1; }
+.pf-memo[data-font="hand"] { font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:1.5em; line-height:1.1; }
 .pf-memo:not(.pf-memo-editing):hover { outline:1px dashed color-mix(in srgb,currentColor 40%,transparent); }
 .pf-memo-editing { z-index:2; padding:0; background:color-mix(in srgb,var(--surface-strong) 70%,transparent); outline:1.5px solid color-mix(in srgb,var(--accent) 60%,transparent); box-shadow:0 6px 18px rgba(0,0,0,.08); }
 .pf-memo-editing textarea { display:block; width:100%; min-height:1.4em; padding:2px 4px; border:0; outline:none; resize:none; overflow:hidden; background:transparent; color:inherit; font:inherit; line-height:inherit; }
-.pf-memo-editing[data-font="hand"] textarea { font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; }
+.pf-memo-editing[data-font="hand"] textarea { font-family:var(--font-hand-kr),"Gaegu",cursive; }
 .pf-memo-bar { position:absolute; left:0; bottom:calc(100% + 6px); display:flex; align-items:center; gap:2px; padding:4px; border:1px solid var(--line); border-radius:12px; background:var(--surface-strong); box-shadow:var(--shadow-float); font-size:12px; font-family:inherit; font-weight:400; line-height:1; color:var(--foreground); white-space:nowrap; }
 .pf-reader-shell .pf-memo-bar { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
 .pf-memo-bar button { display:grid; place-items:center; width:26px; height:26px; border-radius:8px; color:var(--muted); }
@@ -952,15 +952,15 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 .pf-page-wrap { position:relative; }
 .pf-guide-notes { position:absolute; left:0; top:0; z-index:7; pointer-events:none; }
 .pf-guide-ink { position:absolute; inset:0; }
-.pf-guide-note-hand { position:absolute; margin:0; font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:22px; line-height:1.08; letter-spacing:-.01em; word-break:keep-all; pointer-events:auto; }
+.pf-guide-note-hand { position:absolute; margin:0; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:22px; line-height:1.08; letter-spacing:-.01em; word-break:keep-all; pointer-events:auto; }
 .pf-guide-note-hand[data-side="left"] { text-align:right; }
 .pf-guide-note-hand small { display:block; margin-bottom:1px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif; font-size:9px; font-weight:700; letter-spacing:.06em; opacity:.7; }
-.pf-guide-flow { position:absolute; top:8px; display:grid; gap:2px; padding:10px 12px; border-radius:4px 14px 14px 14px; background:color-mix(in srgb,#fff3bf 88%,transparent); box-shadow:0 6px 16px rgba(120,90,0,.12); color:#5c3d00; font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:18px; line-height:1.15; rotate:-1.2deg; pointer-events:auto; }
+.pf-guide-flow { position:absolute; top:8px; display:grid; gap:2px; padding:10px 12px; border-radius:4px 14px 14px 14px; background:color-mix(in srgb,#fff3bf 88%,transparent); box-shadow:0 6px 16px rgba(120,90,0,.12); color:#5c3d00; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:18px; line-height:1.15; rotate:-1.2deg; pointer-events:auto; }
 .pf-guide-flow b { font-size:20px; color:#a8550a; }
 .pf-guide-flow i { display:block; font-style:normal; font-size:14px; opacity:.6; }
 .pf-guide-flow em { margin-top:6px; font-style:normal; color:#c92a2a; }
 .pf-guide-pin { position:absolute; display:grid; place-items:center; width:22px; height:22px; border-radius:50%; color:#fff; font-size:11px; font-weight:700; pointer-events:auto; box-shadow:0 2px 6px rgba(0,0,0,.2); }
-.pf-guide-pin-note { position:absolute; top:26px; width:max-content; max-width:180px; padding:6px 9px; border-radius:10px; background:#fff; box-shadow:var(--shadow-float); font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:18px; font-weight:400; line-height:1.15; text-align:left; white-space:normal; }
+.pf-guide-pin-note { position:absolute; top:26px; width:max-content; max-width:180px; padding:6px 9px; border-radius:10px; background:#fff; box-shadow:var(--shadow-float); font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:18px; font-weight:400; line-height:1.15; text-align:left; white-space:normal; }
 .pf-guide-button[aria-pressed="true"] { background:var(--accent-soft)!important; color:var(--accent)!important; box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent); }
 .pf-guide-button[data-busy] svg { animation:pf-spin 1.4s linear infinite; }
 .pf-guide-toggle { padding:4px 16px 0; }
@@ -972,3 +972,25 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 html[data-pf-theme="dark"] .pf-guide-note-hand { filter:brightness(1.35) saturate(1.1); }
 @media (max-width:900px) { .pf-guide-button { padding-inline:8px; } }
 @media (prefers-reduced-motion: reduce) { .pf-guide-button[data-busy] svg { animation:none; } }
+
+/* AI guide v3: study-book side columns (later rules override the v2 margin notes) */
+.pf-guide-column { position:absolute; top:6px; display:grid; gap:10px; pointer-events:auto; }
+.pf-guide-column h4 { display:flex; align-items:center; gap:6px; margin:0 0 6px; font-size:11.5px; font-weight:750; letter-spacing:-.01em; color:var(--foreground); }
+.pf-guide-flow { position:static; display:block; padding:11px 12px 10px; border-radius:6px 14px 14px 14px; background:#fff8db; box-shadow:0 4px 14px rgba(120,90,0,.10); color:#5c3d00; rotate:0deg; font-family:inherit; }
+.pf-guide-flow h4 { color:#a8550a; }
+.pf-guide-flow ol { margin:0; padding-left:18px; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:16.5px; line-height:1.3; color:#5c3d00; }
+.pf-guide-flow li::marker { font-family:-apple-system,"Segoe UI",sans-serif; font-size:11px; font-weight:700; color:#c77a1d; }
+.pf-guide-flow-take { margin:7px 0 0!important; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:16px; font-weight:700; line-height:1.25; color:#c92a2a; }
+.pf-guide-page { padding:10px 12px 11px; border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line)); border-top:3px solid var(--accent); border-radius:10px; background:var(--surface-strong); box-shadow:0 4px 14px rgba(20,40,30,.07); }
+.pf-guide-page h4 span { padding:1px 7px; border-radius:999px; background:var(--accent); color:var(--accent-ink); font-size:10px; }
+.pf-guide-page-summary { margin:0!important; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:17px; line-height:1.3; color:var(--foreground); word-break:keep-all; }
+.pf-guide-concepts { display:grid; gap:6px; margin:9px 0 0; padding-top:8px; border-top:1px dashed color-mix(in srgb,var(--accent) 30%,var(--line)); }
+.pf-guide-concepts-title { font-size:10px; font-weight:750; letter-spacing:.06em; color:var(--accent); }
+.pf-guide-concepts dt:not(.pf-guide-concepts-title) { font-size:11.5px; font-weight:700; color:var(--accent); }
+.pf-guide-concepts dd { margin:1px 0 0; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:15.5px; line-height:1.25; color:var(--foreground); word-break:keep-all; }
+.pf-guide-note-hand { padding:2px 0 2px 9px; border-left:2.5px solid; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:17px; font-weight:700; line-height:1.22; word-break:keep-all; }
+.pf-guide-note-hand[data-side="left"] { padding:2px 9px 2px 0; border-left:0; border-right:2.5px solid; }
+.pf-guide-note-hand small { font-size:9.5px; margin-bottom:2px; }
+.pf-guide-pin-note { font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:16px; font-weight:700; }
+html[data-pf-theme="dark"] .pf-guide-page { background:var(--surface-strong); }
+html[data-pf-theme="dark"] .pf-guide-page-summary, html[data-pf-theme="dark"] .pf-guide-concepts dd { color:var(--foreground); }

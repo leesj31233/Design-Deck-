@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
       method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(110_000)]),
-      body: JSON.stringify({ model, store: false, instructions: GUIDE_INSTRUCTIONS, prompt_cache_key: "paperflow-guide", input: JSON.stringify({ passages: units }), text: guideSchema(units.map(unit => unit.id)), max_output_tokens: 8000 })
+      body: JSON.stringify({ model, store: false, instructions: GUIDE_INSTRUCTIONS, prompt_cache_key: "paperflow-guide", input: JSON.stringify({ passages: units }), text: guideSchema(units.map(unit => unit.id)), max_output_tokens: 12000 })
     });
     if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 한도에 도달했습니다. 잠시 후 다시 시도해 주세요." : "가이드를 만들지 못했습니다." }, { status: upstream.status === 429 ? 429 : 502 });
     const data = await upstream.json();
