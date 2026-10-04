@@ -1,7 +1,8 @@
 import { GUIDE_INSTRUCTIONS, GUIDE_VERSION, guideSchema, type GuideUnit } from "@/lib/paperflow/guide/guide";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
-import { CREDIT_COST } from "@/lib/paperflow/cloud/plans";
+import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
+import { guideCreditEstimate, GUIDE_MODEL } from "@/lib/paperflow/guide/cost";
 
 export const maxDuration = 120;
 
@@ -32,17 +33,18 @@ export async function POST(request: Request) {
   const key = await sourceHash(units.map(unit => unit.text).join("\n"), GUIDE_VERSION), admin = adminClient();
   if (admin) {
     const { data } = await admin.from("shared_translations").select("text").eq("source_hash", key).maybeSingle();
-    if (data?.text) { try { return Response.json({ guide: JSON.parse(data.text), cached: true }); } catch { /* Regenerate a damaged entry. */ } }
+    if (data?.text) { try { return Response.json({ guide: JSON.parse(data.text), cached: true, credits: 0 }); } catch { /* Regenerate a damaged entry. */ } }
   }
-  // A cached answer is free; a new one costs 30 credits.
-  const gate = await creditGate(CREDIT_COST.guide);
+  // A cached answer is free. A new one is checked against an estimate, then charged by what it really used.
+  const model = GUIDE_MODEL();
+  const gate = await creditGate(guideCreditEstimate(chars, model));
   if (gate instanceof Response) return gate;
   if (limited(request)) return Response.json({ error: "가이드 요청이 많습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
       method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(110_000)]),
-      body: JSON.stringify({ model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, instructions: GUIDE_INSTRUCTIONS, prompt_cache_key: "paperflow-guide", input: JSON.stringify({ passages: units }), text: guideSchema(units.map(unit => unit.id)), max_output_tokens: 5000 })
+      body: JSON.stringify({ model, store: false, instructions: GUIDE_INSTRUCTIONS, prompt_cache_key: "paperflow-guide", input: JSON.stringify({ passages: units }), text: guideSchema(units.map(unit => unit.id)), max_output_tokens: 8000 })
     });
     if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 한도에 도달했습니다. 잠시 후 다시 시도해 주세요." : "가이드를 만들지 못했습니다." }, { status: upstream.status === 429 ? 429 : 502 });
     const data = await upstream.json();
@@ -51,7 +53,8 @@ export async function POST(request: Request) {
     try { guide = JSON.parse(text); } catch { return Response.json({ error: "가이드 응답을 읽지 못했습니다. 다시 시도해 주세요." }, { status: 502 }); }
     const usage = { input: data.usage?.input_tokens ?? 0, output: data.usage?.output_tokens ?? 0, cached: data.usage?.input_tokens_details?.cached_tokens ?? 0, model: typeof data.model === "string" ? data.model : undefined };
     if (admin) { try { await admin.from("shared_translations").upsert({ source_hash: key, prompt_version: GUIDE_VERSION, text: JSON.stringify(guide) }, { onConflict: "source_hash" }); } catch { /* The cache is optional. */ } }
-    await gate.charge(CREDIT_COST.guide);
-    return Response.json({ guide, usage });
+    const credits = creditsForUsage(usage.model ?? model, usage);
+    await gate.charge(credits);
+    return Response.json({ guide, usage, credits });
   } catch { return Response.json({ error: "연결 시간이 초과되었거나 요청이 취소되었습니다." }, { status: 504 }); }
 }

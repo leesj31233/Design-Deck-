@@ -13,10 +13,13 @@ test("library pretranslation, page memo, and annotated PDF export", async ({ pag
   await expect(page.getByRole("button", { name: "번역 재시도" })).toBeVisible({ timeout: 30_000 });
   await page.getByRole("link", { name: /Workflow/ }).first().click();
   await expect(page.locator("[data-pdf-page='0'] .pf-tx-line").first()).toBeVisible();
-  await page.getByRole("button", { name: "텍스트 메모" }).click();
-  await page.getByLabel("텍스트 메모 입력").fill("열전달 조건을 재검토할 것");
-  await page.getByRole("dialog", { name: "텍스트 메모" }).getByRole("button", { name: "메모 저장" }).click();
-  await expect(page.getByRole("dialog", { name: "텍스트 메모" })).toHaveCount(0);
+  await page.getByRole("button", { name: "텍스트 메모", exact: true }).click();
+  { const surface = page.locator("[data-pdf-page='0']"), at = (await surface.boundingBox())!;
+    await page.mouse.move(at.x + at.width * .5, at.y + at.height * .08); await page.mouse.down(); await page.mouse.up();
+    await page.getByLabel("텍스트 메모", { exact: true }).fill("열전달 조건을 재검토할 것");
+    await page.mouse.move(at.x + at.width * .1, at.y + at.height * .5); await page.mouse.down(); await page.mouse.up(); }
+  await page.getByRole("button", { name: "선택", exact: true }).click();
+  await expect(page.locator(".pf-memo", { hasText: "열전달 조건을 재검토할 것" })).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "번역·마킹 PDF 저장" }).click();
   const download = await downloadPromise;
@@ -25,5 +28,5 @@ test("library pretranslation, page memo, and annotated PDF export", async ({ pag
   expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
   await page.getByLabel("Open Library").click();
   await page.getByRole("button", { name: "노트", exact: true }).click();
-  await expect(page.getByText("열전달 조건을 재검토할 것")).toBeVisible();
+  await expect(page.getByText("열전달 조건을 재검토할 것").first()).toBeVisible();
 });

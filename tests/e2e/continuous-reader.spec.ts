@@ -38,10 +38,13 @@ test("page notes and pen strokes stay in the reader and appear in the notebook",
   await page.goto("/library");
   await page.getByLabel("Import PDF file").setInputFiles({ name: "Research notes.pdf", mimeType: "application/pdf", buffer: makePdf() });
   await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
-  await page.getByRole("button", { name: "텍스트 메모" }).click();
-  await page.getByLabel("텍스트 메모 입력").fill("실험 조건을 다시 확인한다.");
-  await page.getByRole("button", { name: "메모 저장" }).click();
-  await expect(page.getByText("실험 조건을 다시 확인한다.")).toBeVisible();
+  await page.getByRole("button", { name: "텍스트 메모", exact: true }).click();
+  { const surface = page.locator("[data-pdf-page='0']"), at = (await surface.boundingBox())!;
+    await page.mouse.move(at.x + at.width * .5, at.y + at.height * .08); await page.mouse.down(); await page.mouse.up();
+    await page.getByLabel("텍스트 메모", { exact: true }).fill("실험 조건을 다시 확인한다.");
+    await page.mouse.move(at.x + at.width * .1, at.y + at.height * .5); await page.mouse.down(); await page.mouse.up(); }
+  await page.getByRole("button", { name: "선택", exact: true }).click();
+  await expect(page.getByText("실험 조건을 다시 확인한다.").first()).toBeVisible();
   await page.getByRole("button", { name: "메모 펜" }).click();
   const ink = page.locator("[data-pdf-page='0'] .pf-ink-layer");
   const box = await ink.boundingBox();
@@ -56,5 +59,5 @@ test("page notes and pen strokes stay in the reader and appear in the notebook",
   await expect(page.locator("[data-pdf-page='0'] .pf-ink-layer polyline")).toHaveCount(2);
   await page.goto("/library");
   await page.getByRole("button", { name: "노트", exact: true }).click();
-  await expect(page.getByText("실험 조건을 다시 확인한다.")).toBeVisible();
+  await expect(page.getByText("실험 조건을 다시 확인한다.").first()).toBeVisible();
 });

@@ -1,12 +1,14 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createGuide, estimateGuideCredits, loadGuide } from "@/lib/paperflow/guide/client";
+import { NOTE_GUTTER } from "./guide-notes";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
-import { GuideArrow } from "./guide-arrow";
 import { BatchProgress } from "./batch-progress";
-import { Maximize2, Minimize2, Minus, Plus } from "lucide-react";
+import { Maximize2, Minimize2, Minus, Plus, Redo2, Undo2 } from "lucide-react";
+import { clearHistory, createAnnotation, onHistoryChange, recordStep, redo, removeAnnotation, undo, updateAnnotation } from "@/lib/paperflow/state/history";
 import { SearchField } from "@/components/ui/search-field";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
 import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
@@ -71,6 +73,23 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     return () => { document.removeEventListener("fullscreenchange", onChange); window.removeEventListener("keydown", onKey); };
   }, [focus, exitFocus]);
   const [activeUnit, setActiveUnit] = useState<string | null>(null);
+  useEffect(() => { clearHistory(); onHistoryChange(() => void client.invalidateQueries({ queryKey: ["annotations"] })); }, [documentId, client]);
+  const runHistory = useCallback(async (direction: "undo" | "redo") => {
+    try { const label = direction === "undo" ? await undo() : await redo(); notify(label ? `${direction === "undo" ? "되돌렸습니다" : "다시 실행했습니다"}: ${label}` : direction === "undo" ? "되돌릴 작업이 없습니다." : "다시 실행할 작업이 없습니다."); }
+    catch (reason) { notify(readableError(reason)); }
+  }, [notify]);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable=true]")) return; // native undo while typing
+      const key = event.key.toLowerCase();
+      if (key === "z" && !event.shiftKey) { event.preventDefault(); void runHistory("undo"); }
+      else if (key === "y" || (key === "z" && event.shiftKey)) { event.preventDefault(); void runHistory("redo"); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [runHistory]);
   const [bulk, setBulk] = useState<TranslationJobStatus | null>(null);
   const viewport = useRef<HTMLDivElement>(null), searchInput = useRef<HTMLInputElement>(null), writing = useRef(false);
   const [size, setSize] = useState({ width: 700, height: 800 });
@@ -131,9 +150,27 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     const observer = new ResizeObserver(entries => { const { width, height } = entries[0].contentRect; setSize(previous => Math.abs(previous.width - width) < 1 && Math.abs(previous.height - height) < 1 ? previous : { width, height }); });
     observer.observe(viewport.current); return () => observer.disconnect();
   }, [pdf, error]);
+  // The AI guide: made once per paper (credits), then written on the paper or hidden with one button.
+  const guideOverlay = useReaderStore(s => s.guideOverlay);
+  const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId) });
+  const makeGuide = useMutation({
+    mutationFn: () => { const current = useTranslationStore.getState().manifest; if (!current || current.documentId !== documentId) throw new Error("논문 구조를 분석하는 중입니다. 잠시 후 다시 눌러 주세요."); return createGuide(documentId, current); },
+    onSuccess: value => { client.setQueryData(["guide", documentId], value); void client.invalidateQueries({ queryKey: ["documents"] }); useReaderStore.getState().set({ guideOverlay: true }); notify("AI 가이드를 논문 위에 정리했습니다."); },
+    onError: reason => notify(readableError(reason))
+  });
+  const guideCredits = manifest ? estimateGuideCredits(manifest) : null;
+  const onGuide = useCallback(() => {
+    if (guide.data) { useReaderStore.getState().set({ guideOverlay: !useReaderStore.getState().guideOverlay }); return; }
+    if (makeGuide.isPending) return;
+    if (!window.confirm(`AI 가이드를 만듭니다. 논문 전체를 분석해 핵심 문장과 필기를 논문 위에 정리합니다.\n약 ${guideCredits ?? "–"} 크레딧이 사용됩니다(실제 사용량 기준 차감).`)) return;
+    makeGuide.mutate();
+  }, [guide.data, makeGuide, guideCredits]);
+  const guideButton = { label: makeGuide.isPending ? "가이드 작성 중…" : guide.data ? (guideOverlay ? "가이드 숨기기" : "AI 가이드") : "AI 가이드", title: guide.data ? "논문 위의 AI 가이드 필기를 켜거나 끕니다" : `AI 가이드 만들기 · 약 ${guideCredits ?? "–"} 크레딧`, active: Boolean(guide.data && guideOverlay), busy: makeGuide.isPending, disabled: !manifest || makeGuide.isPending };
   const lastScale = useRef(1);
   // Breathing room around the page: generous on a desk, almost none on a phone in focus mode.
-  const gutter = size.width < 600 ? (focus ? 8 : 20) : 48;
+  const baseGutter = size.width < 600 ? (focus ? 8 : 20) : 48;
+  // With the guide on, the page gives way to margins for the handwritten notes when the screen allows it.
+  const gutter = guideOverlay && guide.data && size.width - 2 * NOTE_GUTTER - baseGutter >= 460 ? baseGutter + 2 * NOTE_GUTTER : baseGutter;
   const scale = page ? fit === "custom" ? zoom / 100 : fit === "page" ? Math.min((size.width - gutter) / page.width, (size.height - gutter) / page.height) : Math.min(1.65, (size.width - gutter) / page.width) : lastScale.current;
   useEffect(() => { lastScale.current = scale; }, [scale]);
 
@@ -174,7 +211,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     try {
       const now = new Date().toISOString(), start = performance.now();
       const annotation: Annotation = !anchor && existing ? { ...existing, note, updatedAt: now } : { id: crypto.randomUUID(), type: "highlight", documentId, pageIndex: anchor!.pageIndex, color, anchor: anchor!, note, createdAt: now, updatedAt: now, resolutionStatus: "resolved" };
-      if (!anchor && existing) await annotationRepository.update(annotation); else await annotationRepository.create(annotation);
+      if (!anchor && existing) await updateAnnotation(existing, annotation, "메모 수정"); else await createAnnotation(annotation, note !== undefined ? "메모" : "형광펜");
       performance.measure("paperflow:annotation-persist", { start });
       await client.invalidateQueries({ queryKey: ["annotations"] }); setSelected(annotation.id); dismiss(); notify(note !== undefined ? "메모와 원문 위치를 저장했습니다." : "하이라이트를 저장했습니다.");
     } catch (reason) { notify(`저장하지 못했습니다. ${readableError(reason)}`); }
@@ -187,7 +224,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     if (!text.trim()) return;
     const now = new Date().toISOString(), pageIndex = currentPage - 1;
     try {
-      await annotationRepository.create({ id: crypto.randomUUID(), type: "note", documentId, pageIndex, color: "yellow", note: text.trim(), anchor: { version: 1, documentId, pageIndex, textQuote: `페이지 ${currentPage} 메모`, rects: [], normalizedRects: [], createdAt: now }, createdAt: now, updatedAt: now, resolutionStatus: "resolved" });
+      await createAnnotation({ id: crypto.randomUUID(), type: "note", documentId, pageIndex, color: "yellow", note: text.trim(), anchor: { version: 1, documentId, pageIndex, textQuote: `페이지 ${currentPage} 메모`, rects: [], normalizedRects: [], createdAt: now }, createdAt: now, updatedAt: now, resolutionStatus: "resolved" }, "페이지 메모");
       await client.invalidateQueries({ queryKey: ["annotations"] }); notify("페이지 메모를 저장했습니다.");
     } catch (reason) { notify(`메모 저장 실패: ${readableError(reason)}`); }
   }, [annotations, selected, save, currentPage, documentId, client, notify]);
@@ -196,10 +233,11 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const openUnit = useCallback((unitId: string) => {
     setActiveUnit(unitId); dismiss();
     const store = useTranslationStore.getState();
-    if (store.texts.has(unitId)) { store.show(unitId); return; }
-    void translateUnitsNow(documentId, [unitId]).catch(reason => notify(`문단 번역 실패: ${readableError(reason)}`));
+    const step = { label: "문단 번역", undo: () => useTranslationStore.getState().hide(unitId), redo: () => useTranslationStore.getState().show(unitId) };
+    if (store.texts.has(unitId)) { if (store.hidden.has(unitId)) recordStep(step); store.show(unitId); return; }
+    void translateUnitsNow(documentId, [unitId]).then(() => { if (useTranslationStore.getState().texts.has(unitId)) recordStep(step); }).catch(reason => notify(`문단 번역 실패: ${readableError(reason)}`));
   }, [documentId, dismiss, notify]);
-  const showOriginal = useCallback((unitId: string) => { dismiss(); setActiveUnit(unitId); useTranslationStore.getState().hide(unitId); }, [dismiss]);
+  const showOriginal = useCallback((unitId: string) => { dismiss(); setActiveUnit(unitId); useTranslationStore.getState().hide(unitId); recordStep({ label: "원문 보기", undo: () => useTranslationStore.getState().show(unitId), redo: () => useTranslationStore.getState().hide(unitId) }); }, [dismiss]);
   const retryUnit = useCallback((unitId: string) => { useTranslationStore.getState().setFailed(documentId, unitId, null); void translateUnitsNow(documentId, [unitId]).catch(reason => notify(`문단 번역 실패: ${readableError(reason)}`)); }, [documentId, notify]);
 
   const translateSelection = useCallback(() => {
@@ -231,7 +269,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const download = async () => { try { const blob = await documentRepository.getDocumentBlob(documentId); if (!blob) throw new Error("원본 PDF가 없습니다."); const url = URL.createObjectURL(blob), link = document.createElement("a"); link.href = url; link.download = doc.data?.filename ?? "paper.pdf"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); } catch (reason) { notify(readableError(reason)); } };
   const exportPdf = async () => { if (exportRunning) return; setExportRunning(true); try { const result = await exportAnnotatedPdf(documentId, (done, total) => notify(`번역·마킹 PDF 생성 중 · ${done}/${total}페이지`)); notify(result.unfit ? `PDF를 저장했습니다. ${result.unfit}개 문단은 최소 글자 크기로도 원래 영역을 넘쳐 아래 여백까지 이어집니다.` : "번역·마킹과 메모를 PDF로 저장했습니다."); } catch (reason) { notify(`PDF 저장 실패: ${readableError(reason)}`); } finally { setExportRunning(false); } };
   const inspect = (annotation: Annotation) => { dismiss(); setSelected(annotation.id); setTab("context"); navigate(annotation.pageIndex + 1); useReaderStore.getState().set({ inspectorOpen: true }); setTimeout(() => document.querySelector(`[data-annotation-id="${annotation.id}"]`)?.scrollIntoView({ block: "center" }), 200); };
-  const remove = async (id: string) => { try { await annotationRepository.remove(id); await client.invalidateQueries({ queryKey: ["annotations"] }); if (selected === id) setSelected(undefined); } catch (reason) { notify(readableError(reason)); } };
+  const remove = async (id: string) => { try { const target = annotations.find(item => item.id === id); if (target) await removeAnnotation(target, "마킹 삭제"); await client.invalidateQueries({ queryKey: ["annotations"] }); if (selected === id) setSelected(undefined); } catch (reason) { notify(readableError(reason)); } };
 
   const activeParagraph = useMemo<PdfParagraph | null>(() => {
     const unit = manifest?.units.find(item => item.id === activeUnit), block = unit && manifest?.blocks.find(item => item.id === unit.blockIds[0]);
@@ -242,14 +280,16 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const pageSizes = manifest?.pages;
   const fallbackSize = useMemo(() => ({ width: page?.width ?? 612, height: page?.height ?? 792 }), [page]);
   const pageScale = Math.max(.1, scale);
+  const noteRoom = guideOverlay ? Math.max(0, (size.width - (page?.width ?? 612) * pageScale) / 2 - 12) : 0;
 
   if (error || doc.error || marks.error) return <main className="pf-empty pf-reader-error"><h1>PDF를 열지 못했습니다</h1><p role="alert">{error || readableError(doc.error ?? marks.error)}</p><Button asChild><Link href="/library">라이브러리로</Link></Button><Button onClick={openImport}>PDF 다시 가져오기</Button></main>;
   const elapsed = bulk ? Math.round(((bulk.running ? 0 : bulk.translationMs) || 0) / 1000) : 0;
   return <div className="pf-reader-shell" data-focus={focus || undefined}>
-    <ReaderToolbar title={doc.data?.filename ?? "PDF 불러오는 중…"} pages={pdf?.pageCount ?? 1} page={currentPage} effectiveZoom={Math.round(scale * 100)} onPage={navigate} onSearch={focusSearch} onDownload={() => void download()} onExport={() => void exportPdf()} exportRunning={exportRunning} onBatchTranslate={batchTranslate} batchRunning={bulk?.running ?? false} canTranslate={Boolean(pdf)} translated={showTranslations} hasTranslations={translatedCount > 0} onToggleTranslation={() => { dismiss(); useTranslationStore.getState().setShowTranslations(!showTranslations); }}/>
+    <ReaderToolbar title={doc.data?.filename ?? "PDF 불러오는 중…"} pages={pdf?.pageCount ?? 1} page={currentPage} effectiveZoom={Math.round(scale * 100)} onPage={navigate} onSearch={focusSearch} onDownload={() => void download()} onExport={() => void exportPdf()} exportRunning={exportRunning} onBatchTranslate={batchTranslate} batchRunning={bulk?.running ?? false} canTranslate={Boolean(pdf)} translated={showTranslations} hasTranslations={translatedCount > 0} onToggleTranslation={() => { dismiss(); useTranslationStore.getState().setShowTranslations(!showTranslations); }} guide={guideButton} onGuide={onGuide}/>
     <div className="pf-annotation-tools" data-selection-ui onPointerDown={event => event.preventDefault()}>
       {([['select','선택'],['highlight','형광펜'],['pen','메모 펜'],['eraser','지우개']] as const).map(([value,label]) => <Button key={value} size="sm" variant="ghost" aria-pressed={tool === value} onClick={() => { useReaderStore.getState().set({ tool: value }); if (value === 'highlight' && useReaderStore.getState().activeSelection) void save(); }}>{label}</Button>)}
-      <Button size="sm" variant="ghost" onClick={showNote}>텍스트 메모</Button><Button size="sm" variant="ghost" onClick={() => showShell("개념 설명")}>선택 개념 공부</Button>
+      <Button size="sm" variant="ghost" aria-pressed={tool === "text"} onClick={() => useReaderStore.getState().set({ tool: tool === "text" ? "select" : "text" })}>텍스트 메모</Button><Button size="sm" variant="ghost" onClick={() => showShell("개념 설명")}>선택 개념 공부</Button>
+      <span className="pf-history-controls"><IconButton label="되돌리기 (Ctrl+Z)" size="sm" variant="ghost" onClick={() => void runHistory("undo")}><Undo2 size={15}/></IconButton><IconButton label="다시 실행 (Ctrl+Y)" size="sm" variant="ghost" onClick={() => void runHistory("redo")}><Redo2 size={15}/></IconButton></span>
       <span className="pf-focus-controls">
         {focus && <>
           <IconButton label="축소" size="sm" variant="ghost" disabled={Math.round(scale * 100) <= 25} onClick={() => useReaderStore.getState().set({ zoom: Math.max(25, Math.round(scale * 100) - 10), fitMode: "custom", activeSelection: null })}><Minus size={15}/></IconButton>
@@ -264,12 +304,11 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     {searchOpen && <div className="pf-search-strip"><SearchField ref={searchInput} aria-label="현재 페이지 검색" value={search} onChange={e => setSearch(e.target.value)} placeholder="검색 UI · Phase 2"/><span>전체 논문 검색은 후속 단계에서 제공됩니다.</span><Button size="sm" onClick={() => setSearchOpen(false)}>닫기</Button></div>}
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}
-      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}>{translatedCount === 0 && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
+      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}>{translatedCount === 0 && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
       {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={saveNote} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} keywords={manifest?.keywords ?? doc.data?.keywords ?? []} onTranslate={translateSelection} onBatchTranslate={batchTranslate} onCancelBatch={() => cancelTranslationJob(documentId)}/>}
     </div>
-    <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>H 마킹 · N 메모 · Ctrl K 명령</span></footer>
+    <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>Ctrl Z 되돌리기 · H 마킹 · N 메모 · Ctrl K 명령</span></footer>
     {textNoteOpen && <div className="pf-note-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTextNoteOpen(false); }}><section className="pf-note-dialog" role="dialog" aria-modal="true" aria-label="텍스트 메모"><h2>텍스트 메모</h2><p>{useReaderStore.getState().activeSelection ? "선택한 문장에 메모를 연결합니다." : `${currentPage}페이지에 메모를 저장합니다.`}</p><textarea autoFocus aria-label="텍스트 메모 입력" value={textNoteDraft} onChange={event => setTextNoteDraft(event.target.value)} onKeyDown={event => { if (event.key === "Escape") setTextNoteOpen(false); }} placeholder="읽으며 떠오른 생각이나 질문을 기록하세요."/><div><Button variant="ghost" onClick={() => setTextNoteOpen(false)}>취소</Button><Button disabled={!textNoteDraft.trim() || saving} onClick={() => void saveNote(textNoteDraft).then(() => setTextNoteOpen(false))}>메모 저장</Button></div></section></div>}
-    {inspector && !focus && <GuideArrow/>}
     <ReaderSelectionTools documentId={documentId} onHighlight={color => void save(color)} onNote={showNote} onTranslate={translateSelection} onShell={showShell} onDismiss={dismiss} saving={saving}/>
   </div>;
 }

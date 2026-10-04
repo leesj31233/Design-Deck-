@@ -58,7 +58,7 @@ export function AdminView() {
               {PLAN_TIERS.map(tier => <option key={tier} value={tier}>{PLANS[tier].label}</option>)}
             </select></span>
             <span>{mb(user.usedBytes)} / {user.quotaBytes === null ? "무제한" : mb(user.quotaBytes)}</span>
-            <span>{user.creditsUsed.toLocaleString()} / {user.creditsLimit === null ? "무제한" : `${user.creditsLimit.toLocaleString()}문단 (약 ${papersFor(user.creditsLimit)}편)`}</span>
+            <span>{user.creditsUsed.toLocaleString()} / {user.creditsLimit === null ? "무제한" : `${user.creditsLimit.toLocaleString()} (번역 약 ${papersFor(user.creditsLimit)}편)`}</span>
           </motion.div>)}
           {list.length === 0 && <p className="pf-admin-empty">일치하는 계정이 없습니다.</p>}
         </div>}

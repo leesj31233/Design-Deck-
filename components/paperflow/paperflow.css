@@ -925,3 +925,50 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
   .pf-admin-row { grid-template-columns:1fr 1fr; }
   .pf-admin-email { grid-column:1 / -1; }
 }
+
+/* Text memos (Edge-style, on the page) */
+.pf-memo-layer { position:absolute; inset:0; z-index:6; pointer-events:none; }
+.pf-memo-layer[data-active] { pointer-events:auto; cursor:text; }
+.pf-memo { position:absolute; pointer-events:auto; line-height:1.35; white-space:pre-wrap; word-break:keep-all; overflow-wrap:anywhere; padding:2px 4px; border-radius:4px; cursor:text; }
+.pf-memo[data-font="serif"] { font-family:var(--font-paper-serif-kr),"Noto Serif KR",serif; }
+.pf-memo[data-font="hand"] { font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:1.5em; line-height:1.1; }
+.pf-memo:not(.pf-memo-editing):hover { outline:1px dashed color-mix(in srgb,currentColor 40%,transparent); }
+.pf-memo-editing { z-index:2; padding:0; background:color-mix(in srgb,var(--surface-strong) 70%,transparent); outline:1.5px solid color-mix(in srgb,var(--accent) 60%,transparent); box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.pf-memo-editing textarea { display:block; width:100%; min-height:1.4em; padding:2px 4px; border:0; outline:none; resize:none; overflow:hidden; background:transparent; color:inherit; font:inherit; line-height:inherit; }
+.pf-memo-editing[data-font="hand"] textarea { font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; }
+.pf-memo-bar { position:absolute; left:0; bottom:calc(100% + 6px); display:flex; align-items:center; gap:2px; padding:4px; border:1px solid var(--line); border-radius:12px; background:var(--surface-strong); box-shadow:var(--shadow-float); font-size:12px; font-family:inherit; font-weight:400; line-height:1; color:var(--foreground); white-space:nowrap; }
+.pf-reader-shell .pf-memo-bar { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
+.pf-memo-bar button { display:grid; place-items:center; width:26px; height:26px; border-radius:8px; color:var(--muted); }
+.pf-memo-bar button:hover, .pf-memo-bar button[aria-pressed="true"] { background:var(--line); color:var(--foreground); }
+.pf-memo-bar .pf-memo-swatch { width:18px; height:18px; margin:0 2px; border-radius:50%; box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7); }
+.pf-memo-bar .pf-memo-swatch[aria-pressed="true"] { box-shadow:0 0 0 2px var(--surface-strong),0 0 0 3.5px var(--accent); background-clip:padding-box; }
+.pf-memo-bar select { height:26px; padding:0 4px; border:1px solid var(--line); border-radius:8px; background:var(--background); color:var(--foreground); font-size:11.5px; }
+.pf-memo-grip { cursor:grab!important; }
+.pf-memo-sep { width:1px; height:16px; margin:0 3px; background:var(--line); }
+.pf-memo-resize { position:absolute; right:-5px; top:50%; width:10px; height:22px; translate:0 -50%; border-radius:4px; background:var(--accent); cursor:ew-resize; touch-action:none; }
+.pf-history-controls { display:inline-flex; gap:0; margin-left:6px; padding-left:6px; border-left:1px solid var(--line); }
+
+/* AI guide written on the paper */
+.pf-page-wrap { position:relative; }
+.pf-guide-notes { position:absolute; left:0; top:0; z-index:7; pointer-events:none; }
+.pf-guide-ink { position:absolute; inset:0; }
+.pf-guide-note-hand { position:absolute; margin:0; font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:22px; line-height:1.08; letter-spacing:-.01em; word-break:keep-all; pointer-events:auto; }
+.pf-guide-note-hand[data-side="left"] { text-align:right; }
+.pf-guide-note-hand small { display:block; margin-bottom:1px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif; font-size:9px; font-weight:700; letter-spacing:.06em; opacity:.7; }
+.pf-guide-flow { position:absolute; top:8px; display:grid; gap:2px; padding:10px 12px; border-radius:4px 14px 14px 14px; background:color-mix(in srgb,#fff3bf 88%,transparent); box-shadow:0 6px 16px rgba(120,90,0,.12); color:#5c3d00; font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:18px; line-height:1.15; rotate:-1.2deg; pointer-events:auto; }
+.pf-guide-flow b { font-size:20px; color:#a8550a; }
+.pf-guide-flow i { display:block; font-style:normal; font-size:14px; opacity:.6; }
+.pf-guide-flow em { margin-top:6px; font-style:normal; color:#c92a2a; }
+.pf-guide-pin { position:absolute; display:grid; place-items:center; width:22px; height:22px; border-radius:50%; color:#fff; font-size:11px; font-weight:700; pointer-events:auto; box-shadow:0 2px 6px rgba(0,0,0,.2); }
+.pf-guide-pin-note { position:absolute; top:26px; width:max-content; max-width:180px; padding:6px 9px; border-radius:10px; background:#fff; box-shadow:var(--shadow-float); font-family:var(--font-hand-kr),"Nanum Pen Script",cursive; font-size:18px; font-weight:400; line-height:1.15; text-align:left; white-space:normal; }
+.pf-guide-button[aria-pressed="true"] { background:var(--accent-soft)!important; color:var(--accent)!important; box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent); }
+.pf-guide-button[data-busy] svg { animation:pf-spin 1.4s linear infinite; }
+.pf-guide-toggle { padding:4px 16px 0; }
+.pf-guide-flow-card ol { margin:6px 0 0; padding-left:18px; font-size:12.5px; line-height:1.8; }
+.pf-guide-takeaway { margin-top:8px!important; font-weight:600; color:var(--accent); font-size:12.5px; }
+.pf-guide-metrics { display:grid; gap:4px; margin:6px 0 0; }
+.pf-guide-metrics div { display:flex; justify-content:space-between; gap:10px; padding:6px 9px; border-radius:9px; background:var(--surface); font-size:12px; }
+.pf-guide-metrics dt { color:var(--muted); } .pf-guide-metrics dd { margin:0; font-weight:650; text-align:right; }
+html[data-pf-theme="dark"] .pf-guide-note-hand { filter:brightness(1.35) saturate(1.1); }
+@media (max-width:900px) { .pf-guide-button { padding-inline:8px; } }
+@media (prefers-reduced-motion: reduce) { .pf-guide-button[data-busy] svg { animation:none; } }

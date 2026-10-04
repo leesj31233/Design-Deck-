@@ -71,6 +71,6 @@ export async function creditGate(amount: number): Promise<Response | { charge: (
   const user = await currentUser();
   if (!user) return Response.json({ error: "로그인이 필요합니다. 다시 로그인해 주세요.", kind: "auth" }, { status: 401 });
   const plan = await accountPlan(user), { used, limit, month } = plan.credits;
-  if (limit !== null && used + amount > limit) return Response.json({ error: `이번 달 번역 크레딧을 모두 사용했습니다 (${used.toLocaleString()} / ${limit.toLocaleString()}문단). 다음 달 1일에 다시 채워집니다.`, kind: "quota", credits: plan.credits }, { status: 402 });
+  if (limit !== null && used + amount > limit) return Response.json({ error: `이번 달 크레딧을 모두 사용했습니다 (${used.toLocaleString()} / ${limit.toLocaleString()}). 필요한 크레딧: ${amount.toLocaleString()}. 다음 달 1일에 다시 채워집니다.`, kind: "quota", credits: plan.credits }, { status: 402 });
   return { charge: async spent => { if (spent > 0) await adminClient()!.rpc("consume_credits", { uid: user.id, period: month, amount: spent }); } };
 }

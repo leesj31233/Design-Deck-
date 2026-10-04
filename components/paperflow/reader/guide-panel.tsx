@@ -8,6 +8,7 @@ import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import { useTranslationStore } from "@/lib/paperflow/translation/translation-store";
 import { createGuide, loadGuide } from "@/lib/paperflow/guide/client";
 import { readableError } from "@/lib/paperflow/errors";
+import { KIND_INK } from "./guide-notes";
 
 /** Mark a guide item's source paragraph on its page, bring it into view, and link it with an arrow. */
 function focusSource(item: string, unitId: string, page: number, quote?: string) {
@@ -19,13 +20,13 @@ function focusSource(item: string, unitId: string, page: number, quote?: string)
 
 /** AI 가이드 tab: the study guide of this paper, each finding tied to its source paragraph. */
 export function GuidePanel() {
-  const documentId = useReaderStore(s => s.documentId), focus = useReaderStore(s => s.guideFocus);
+  const documentId = useReaderStore(s => s.documentId), focus = useReaderStore(s => s.guideFocus), overlay = useReaderStore(s => s.guideOverlay);
   const manifest = useTranslationStore(s => s.manifest);
   const reduced = useReducedMotion(), client = useQueryClient();
   const guide = useQuery({ queryKey: ["guide", documentId], enabled: Boolean(documentId), queryFn: () => loadGuide(documentId!) });
   const make = useMutation({
     mutationFn: () => { if (!documentId || !manifest || manifest.documentId !== documentId) throw new Error("논문 구조를 분석하는 중입니다. 잠시 후 다시 눌러 주세요."); return createGuide(documentId, manifest); },
-    onSuccess: value => { client.setQueryData(["guide", documentId], value); void client.invalidateQueries({ queryKey: ["documents"] }); }
+    onSuccess: value => { client.setQueryData(["guide", documentId], value); useReaderStore.getState().set({ guideOverlay: true }); void client.invalidateQueries({ queryKey: ["documents"] }); }
   });
   // Leaving the paper or the tab clears the temporary mark.
   useEffect(() => () => useReaderStore.getState().set({ guideFocus: null }), []);
@@ -34,20 +35,23 @@ export function GuidePanel() {
 
   if (!data) return <div className="pf-inspector-section pf-guide-intro">
     <h3><Sparkles size={16}/> AI 논문 가이드</h3>
-    <p>개요, 핵심 결과, 용어, 공부할 질문을 정리하고 결과마다 원문 근거를 연결합니다.</p>
+    <p>핵심 문장에 형광 표시를 하고, 여백에 손글씨 메모로 정리합니다.</p>
     {make.error && <p className="pf-error" role="alert">{readableError(make.error)}</p>}
     <Button size="sm" variant="primary" disabled={make.isPending || guide.isPending} onClick={() => make.mutate()}><Sparkles size={14}/>{make.isPending ? "정리하는 중… (20–40초)" : "가이드 만들기"}</Button>
   </div>;
 
   return <div className="pf-guide">
+    <div className="pf-guide-toggle"><Button size="sm" variant={overlay ? "primary" : "secondary"} onClick={() => useReaderStore.getState().set({ guideOverlay: !overlay })}><Sparkles size={13}/>{overlay ? "논문 위 필기 숨기기" : "논문 위에 필기로 보기"}</Button></div>
+    {data.flow?.length > 0 && <motion.section className="pf-inspector-section pf-guide-flow-card" {...enter(0)}><h3>논문 흐름</h3><ol>{data.flow.map((step, index) => <li key={step + index}>{step}</li>)}</ol>{data.takeaway && <p className="pf-guide-takeaway">★ {data.takeaway}</p>}</motion.section>}
     <motion.section className="pf-inspector-section" {...enter(0)}><h3><BookOpenCheck size={15}/> 개요</h3><p className="pf-guide-overview">{data.overview}</p></motion.section>
+    {data.metrics?.length > 0 && <motion.section className="pf-inspector-section" {...enter(1)}><h3>핵심 수치</h3><dl className="pf-guide-metrics">{data.metrics.map(metric => <div key={metric.label + metric.value}><dt>{metric.label}</dt><dd>{metric.value}</dd></div>)}</dl></motion.section>}
     {data.contributions.length > 0 && <motion.section className="pf-inspector-section" {...enter(1)}><h3><Target size={15}/> 핵심 기여</h3><ul className="pf-guide-list">{data.contributions.map(item => <li key={item}>{item}</li>)}</ul></motion.section>}
     {data.method && <motion.section className="pf-inspector-section" {...enter(2)}><h3><FlaskConical size={15}/> 방법</h3><p>{data.method}</p></motion.section>}
     {data.findings.length > 0 && <motion.section className="pf-inspector-section" {...enter(3)}>
       <h3>핵심 결과 <small>누르면 원문 근거로 이동</small></h3>
       <ol className="pf-guide-findings">{data.findings.map((item, index) => <li key={item.unitId + index}>
         <button type="button" data-guide-item={`finding-${index}`} data-active={focus?.item === `finding-${index}` || undefined} onClick={() => focusSource(`finding-${index}`, item.unitId, item.page, item.quote)}>
-          <span className="pf-guide-index">{index + 1}</span>
+          <span className="pf-guide-index" style={{ background: KIND_INK[item.kind ?? "result"].ink }}>{index + 1}</span>
           <span className="pf-guide-body"><b>{item.point}</b>{item.quote && <q>{item.quote}</q>}{item.why && <small>{item.why}</small>}<em>p. {item.page}</em></span>
         </button>
       </li>)}</ol>

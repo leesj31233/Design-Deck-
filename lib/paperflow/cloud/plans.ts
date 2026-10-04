@@ -16,7 +16,16 @@ export const PLANS: Record<PlanTier, PlanSpec> = {
   admin: { label: "관리자", storageBytes: null, monthlyCredits: null }
 };
 
-/** What each AI feature costs, in paragraph credits. */
+/** USD per 1M tokens: input, cached input, output. Unknown models are priced like gpt-4.1. */
+export const MODEL_PRICES: Record<string, [number, number, number]> = { "gpt-4.1-mini": [.4, .1, 1.6], "gpt-4.1": [2, .5, 8], "gpt-4.1-nano": [.1, .025, .4], "gpt-4o-mini": [.15, .075, .6], "gpt-4o": [2.5, 1.25, 10] };
+/** One credit is worth one translated paragraph: about $0.0003. */
+export const CREDIT_USD = .0003;
+export function creditsForUsage(model: string | undefined, usage: { input: number; output: number; cached?: number }) {
+  const key = Object.keys(MODEL_PRICES).sort((a, b) => b.length - a.length).find(name => model?.startsWith(name)) ?? "gpt-4.1";
+  const [input, cached, output] = MODEL_PRICES[key], hit = Math.min(usage.cached ?? 0, usage.input);
+  return Math.max(1, Math.ceil(((usage.input - hit) * input + hit * cached + usage.output * output) / 1e6 / CREDIT_USD));
+}
+/** What each AI feature costs, in paragraph credits (the guide's real cost is charged by usage). */
 export const CREDIT_COST = { paragraph: 1, guide: 30, concept: 3 } as const;
 
 export const isPlanTier = (value: unknown): value is PlanTier => typeof value === "string" && (PLAN_TIERS as string[]).includes(value);

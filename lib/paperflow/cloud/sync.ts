@@ -213,6 +213,7 @@ export function initCloud() {
   const refreshSoon = () => { if (!session) return; clearTimeout(refreshTimer); refreshTimer = setTimeout(() => void refreshPlan(), 800); };
   window.addEventListener("paperflow:translation-progress", event => { if (!(event as CustomEvent<{ running?: boolean }>).detail?.running) refreshSoon(); });
   window.addEventListener("focus", refreshSoon);
+  window.addEventListener("paperflow:credits-changed", refreshSoon);
   void client.auth.getSession().then(({ data }) => applySession(data.session));
   client.auth.onAuthStateChange((event, next) => { if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") void applySession(next); else session = next; });
 }

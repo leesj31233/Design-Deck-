@@ -24,8 +24,8 @@ export function AccountCard() {
       {local ? <><HardDrive size={12}/> 기기 저장 · 용량 무제한</> : <><Cloud size={12}/> 클라우드 {plan ? `${mb(plan.usedBytes)} / ${plan.quotaBytes ? mb(plan.quotaBytes) : "무제한"}` : ""}</>}
     </div>
     {!local && plan?.quotaBytes ? <div className="pf-account-meter" role="meter" aria-valuemin={0} aria-valuemax={plan.quotaBytes} aria-valuenow={plan.usedBytes} aria-label="클라우드 저장 사용량"><i style={{ width: `${ratio * 100}%` }} data-full={ratio > .9 || undefined}/></div> : null}
-    {credits && <div className="pf-account-plan pf-account-credits"><Languages size={12}/> {credits.limit === null ? "번역 크레딧 무제한" : <>번역 {credits.used.toLocaleString()} / {credits.limit.toLocaleString()}문단 <small>약 {papersFor(Math.max(0, credits.limit - credits.used))}편 남음</small></>}</div>}
-    {credits?.limit ? <div className="pf-account-meter" role="meter" aria-valuemin={0} aria-valuemax={credits.limit} aria-valuenow={credits.used} aria-label="이번 달 번역 크레딧 사용량"><i style={{ width: `${creditRatio * 100}%` }} data-full={creditRatio > .9 || undefined}/></div> : null}
+    {credits && <div className="pf-account-plan pf-account-credits"><Languages size={12}/> {credits.limit === null ? "크레딧 무제한" : <>크레딧 {credits.used.toLocaleString()} / {credits.limit.toLocaleString()} <small>번역 약 {papersFor(Math.max(0, credits.limit - credits.used))}편 남음</small></>}</div>}
+    {credits?.limit ? <div className="pf-account-meter" role="meter" aria-valuemin={0} aria-valuemax={credits.limit} aria-valuenow={credits.used} aria-label="이번 달 크레딧 사용량"><i style={{ width: `${creditRatio * 100}%` }} data-full={creditRatio > .9 || undefined}/></div> : null}
     {plan?.owner && <a className="pf-account-admin" href="/admin"><ShieldCheck size={12}/> 관리자 · 가입자와 등급</a>}
     <div className="pf-account-actions">
       <button type="button" onClick={() => void syncAll()} disabled={cloud.syncing} aria-label="지금 동기화"><RefreshCw size={12} className={cloud.syncing ? "pf-spin" : undefined}/>{cloud.syncing ? "동기화 중" : cloud.lastSyncedAt ? `동기화 ${new Date(cloud.lastSyncedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}` : "동기화"}</button>

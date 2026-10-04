@@ -100,6 +100,23 @@ function drawMark(page: PDFPage, book: PdfFontBook) {
   for (const run of book.runs(MARK_LABEL, false)) { page.drawText(run.text, { x: cursor, y: top - height + 3.6, size, font: run.font, color: MARK }); cursor += advance(run.font, run.text, size); }
 }
 
+/** Text memos placed on the page: same position, colour, weight and size (handwriting falls back to the serif). */
+async function drawTextMemos(page: PDFPage, book: PdfFontBook, annotations: Annotation[]) {
+  const width = page.getWidth(), height = page.getHeight();
+  for (const annotation of annotations) {
+    const box = annotation.type === "text" ? annotation.box : undefined;
+    if (!box?.text.trim()) continue;
+    const size = box.size * width * (box.font === "hand" ? 1.15 : 1), hex = /^#([0-9a-f]{6})$/i.exec(box.color)?.[1] ?? "d9480f";
+    const color = rgb(parseInt(hex.slice(0, 2), 16) / 255, parseInt(hex.slice(2, 4), 16) / 255, parseInt(hex.slice(4, 6), 16) / 255);
+    await book.prepare(box.text, box.bold);
+    wrap(book, box.text, size, box.width * width - 6).forEach((line, index) => {
+      let cursor = box.x * width + 4;
+      const y = height - box.y * height - 2 - size * (1.05 + index * 1.35);
+      for (const run of book.runs(line, box.bold)) { page.drawText(run.text, { x: cursor, y, size, font: run.font, color }); cursor += advance(run.font, run.text, size); }
+    });
+  }
+}
+
 function drawInk(page: PDFPage, annotations: Annotation[]) {
   const width = page.getWidth(), height = page.getHeight();
   for (const annotation of annotations) {
@@ -206,12 +223,13 @@ export async function exportAnnotatedPdf(documentId: string, onProgress?: (done:
       for (const line of layout.lines) await book.prepare(line.runs.map(run => run.text).join(""), line.bold || line.runs.some(run => run.bold));
       for (const line of layout.lines) drawLine(out, book, line, manifest.scripts, line.kind === "heading" ? toRgb(headingInk.get(line.unitId), TEXT) : TEXT, links.reference, links.citation);
       drawInk(out, pageNotes);
+      await drawTextMemos(out, book, pageNotes);
       drawMark(out, book);
       canvas.width = canvas.height = 0;
       onProgress?.(index + 1, pdf.pageCount);
     }
     // User memos are the only appended pages; translated text always stays on its own page.
-    const notes = annotations.filter(item => item.note?.trim()).map(item => ({ pageIndex: item.pageIndex, note: item.note! }));
+    const notes = annotations.filter(item => item.type !== "text" && item.note?.trim()).map(item => ({ pageIndex: item.pageIndex, note: item.note! }));
     if (notes.length) await memoPages(output, book, notes);
     const saved = await output.save();
     const file = new Blob([new Uint8Array(saved)], { type: "application/pdf" });

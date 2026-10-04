@@ -9,8 +9,10 @@ import { readableError } from "@/lib/paperflow/errors";
 import { useTranslationStore } from "@/lib/paperflow/translation/translation-store";
 import { HighlightLayer, type ResolvedAnnotation } from "./highlight-layer";
 import { InkLayer } from "./ink-layer";
+import { TextMemoLayer } from "./text-memo-layer";
 import { TranslationOverlay, type OverlayState } from "./translation-overlay";
 import { GuideMarks } from "./guide-marks";
+import { GuideNotes } from "./guide-notes";
 import { linkInk } from "@/lib/paperflow/typeset/ink";
 import { usePaperflow } from "../shell/paperflow-context";
 
@@ -22,9 +24,11 @@ export interface PdfPageProps {
   onUnit: (unitId: string) => void;
   onOriginal: (unitId: string) => void;
   onRetry: (unitId: string) => void;
+  /** Free space beside the page for the AI guide margin notes, in px. */
+  noteRoom?: number;
 }
 
-export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageIndex, annotations, selected, onResolved, onUnit, onOriginal, onRetry }: PdfPageProps) {
+export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageIndex, annotations, selected, onResolved, onUnit, onOriginal, onRetry, noteRoom = 0 }: PdfPageProps) {
   const canvas = useRef<HTMLCanvasElement>(null), layer = useRef<HTMLDivElement>(null), surface = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false), [textReady, setTextReady] = useState(false), [error, setError] = useState("");
   const [canvasVersion, setCanvasVersion] = useState(0), [overlay, setOverlay] = useState<OverlayState>("none"), [patience, setPatience] = useState(true);
@@ -127,5 +131,6 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
     {textReady && translationMarks.length > 0 && <div className="pf-translated-marks"><HighlightLayer annotations={translationMarks} selected={selected}/></div>}
     <GuideMarks pageIndex={pageIndex}/>
     <InkLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations}/>
-  </div>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
+    <TextMemoLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations} pageWidth={page.width * scale}/>
+  </div><GuideNotes documentId={documentId} pageIndex={pageIndex} width={page.width * scale} height={page.height * scale} room={noteRoom}/>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
 });

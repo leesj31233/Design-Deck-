@@ -2,6 +2,10 @@
 import { documentRepository } from "../persistence/document-repository";
 import type { TranslationManifest } from "../translation/manifest";
 import { GUIDE_VERSION, guideUnits, validateGuide, type PaperGuide } from "./guide";
+import { guideCreditEstimate } from "./cost";
+
+/** Credits a new guide of this paper will cost, about (charged by real usage). */
+export function estimateGuideCredits(manifest: TranslationManifest) { return guideCreditEstimate(guideUnits(manifest).wire.reduce((sum, unit) => sum + unit.text.length, 0)); }
 
 /** The paper's study guide: stored with the paper once made (and synced with the account). */
 export async function loadGuide(documentId: string): Promise<PaperGuide | null> {
@@ -17,5 +21,6 @@ export async function createGuide(documentId: string, manifest: TranslationManif
   const guide = validateGuide(body.guide, byWire);
   if (!guide) throw new Error("가이드 내용을 확인하지 못했습니다. 다시 시도해 주세요.");
   await documentRepository.updateDocument(documentId, { guide });
+  window.dispatchEvent(new Event("paperflow:credits-changed"));
   return guide;
 }

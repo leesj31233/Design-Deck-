@@ -9,9 +9,12 @@ export type AnchorRecoveryResult =
   | { status: "unresolved"; reason: string };
 export type AnnotationColor = "yellow" | "green" | "blue" | "pink" | "purple";
 export const annotationColors: AnnotationColor[] = ["yellow", "green", "blue", "pink", "purple"];
+/** A free text memo placed anywhere on the page (Edge-style). Geometry and size are fractions of the page width. */
+export type TextBox = { x: number; y: number; width: number; text: string; color: string; size: number; bold: boolean; font: "sans" | "serif" | "hand" };
 export type Annotation = {
   points?: { x: number; y: number }[];
-  id: string; type: "highlight" | "ink" | "note"; documentId: string; pageIndex: number; color: AnnotationColor;
+  box?: TextBox;
+  id: string; type: "highlight" | "ink" | "note" | "text"; documentId: string; pageIndex: number; color: AnnotationColor;
   anchor: TextAnchor; note?: string; createdAt: string; updatedAt: string;
   resolutionStatus: "resolved" | "unresolved";
 };
