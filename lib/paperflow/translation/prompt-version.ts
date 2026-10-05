@@ -6,3 +6,7 @@ export async function sourceHash(text: string, version = TRANSLATION_PROMPT_VERS
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${version}\n${text.replace(/\s+/g, " ").trim()}`));
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
 }
+
+/** Table cells are written in a terse table style (since cell-3): they do not share entries with prose. */
+export const CELL_PROMPT_VERSION = `${TRANSLATION_PROMPT_VERSION}-cell3`;
+export const passageHash = (text: string, cell: boolean) => sourceHash(text, cell ? CELL_PROMPT_VERSION : TRANSLATION_PROMPT_VERSION);

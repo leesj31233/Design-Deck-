@@ -6,6 +6,7 @@ import { paperFontStack } from "@/lib/paperflow/typeset/measure";
 import type { PageLayout, Rect } from "@/lib/paperflow/typeset/page-typesetter";
 import type { ScriptTable } from "@/lib/paperflow/typeset/scripts";
 import { inkColor, styledPieces } from "@/lib/paperflow/typeset/ink";
+import { manualTargets } from "@/lib/paperflow/translation/manual-targets";
 
 export { inkColor };
 
@@ -101,11 +102,14 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
 
   // A primitive selector: the page re-renders only when its own pending/failed set changes.
   const status = useTranslationStore(state => {
-    if (!state.manifest) return "0|";
+    if (!state.manifest) return "0||";
     const units = state.manifest.units.filter(unit => unit.pages.includes(pageIndex));
-    return `${units.filter(unit => state.pending.has(unit.id)).length}|${units.filter(unit => state.failed.has(unit.id)).map(unit => unit.id).join(",")}`;
+    // A table being translated is named ("Table 2 번역 중"), not counted as paragraphs.
+    const tables = manualTargets(state.manifest, pageIndex).filter(target => target.kind === "table" && target.units.some(id => state.pending.has(id)));
+    const inTables = new Set(tables.flatMap(target => target.units));
+    return `${units.filter(unit => state.pending.has(unit.id) && !inTables.has(unit.id)).length}|${units.filter(unit => state.failed.has(unit.id)).map(unit => unit.id).join(",")}|${tables.map(target => target.label).join(", ")}`;
   });
-  const [pendingCount, failedList] = status.split("|"), pending = Number(pendingCount), failed = failedList ? failedList.split(",") : [];
+  const [pendingCount, failedList, pendingTables] = status.split("|"), pending = Number(pendingCount), failed = failedList ? failedList.split(",") : [];
 
   const headingInk = useMemo(() => {
     if (!layout || !canvas || !canvasVersion) return new Map<string, string>();
@@ -147,7 +151,8 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
         {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08) * K, fontSize: line.fontSize * K, lineHeight: `${line.fontSize * 1.15 * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: line.kind === "heading" ? headingInk.get(unitId) : undefined }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{paint(run.text, line.kind === "body")}</b> : <span key={part}>{paint(run.text, line.kind !== "heading")}</span>)}</span>)}
       </div>)}
     </div>}
-    {(pending > 0 || failed.length > 0) && <div className="pf-tx-page-status" role="status">
+    {(pending > 0 || pendingTables || failed.length > 0) && <div className="pf-tx-page-status" role="status">
+      {pendingTables && <span><i className="pf-loader" aria-hidden="true"/>{pendingTables} 번역 중</span>}
       {pending > 0 && <span><i className="pf-loader" aria-hidden="true"/>이 페이지 {pending}문단 번역 중</span>}
       {failed.length > 0 && <button type="button" onClick={() => failed.forEach(onRetry)}>{failed.length}문단 실패 · 다시 시도</button>}
     </div>}

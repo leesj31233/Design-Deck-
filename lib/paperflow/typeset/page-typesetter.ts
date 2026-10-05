@@ -69,7 +69,20 @@ function px(block: ManifestBlock, page: { width: number; height: number }) {
 }
 
 /** Text regions of a block: a paragraph that wraps a figure is not one rectangle. */
+/** How a table cell sat in its box: centred cells (headers, short labels) stay centred in Korean. */
+function cellAlignment(block: ManifestBlock) {
+  const cell = block.cell!;
+  const across = Math.abs(block.x + block.width / 2 - cell.x - cell.width / 2) < cell.width * .08 && block.width < cell.width * .85 && block.x - cell.x > cell.width * .04;
+  const down = Math.abs(block.y + block.height / 2 - cell.y - cell.height / 2) < cell.height * .15 && block.height < cell.height * .75;
+  return { across, down };
+}
+
 function blockRegions(block: ManifestBlock, page: { width: number; height: number }): Rect[] {
+  // A table cell may use its whole box between the rules, and nothing outside it.
+  if (block.role === "TABLE" && block.cell) {
+    const cell = block.cell, top = cellAlignment(block).down ? cell.y : Math.min(block.y, cell.y + cell.height * .5);
+    return [{ x: cell.x * page.width, y: top * page.height, width: cell.width * page.width, height: (cell.y + cell.height - top) * page.height }];
+  }
   const lines = px(block, page), regions: Rect[] = [];
   const columnLeft = (block.column?.left ?? block.x) * page.width;
   // A full-width table can pull the detected gutter off the real one: a paragraph of three or more
@@ -311,18 +324,43 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
     if (result.overflow) unfit.push(...flow.paragraphs.map(paragraph => paragraph.unitId));
   });
 
+  // A table reads in one type size: the largest every cell takes, but never below 75% because of one
+  // long cell; a cell that cannot fit at that size gets its own smaller one.
+  const cellFlows = flows.filter(flow => flow.kind === "cell");
+  cellFlows.forEach(flow => { flow.extended = false; });
+  const ownFit = new Map(cellFlows.map(flow => [flow, fit(flow, ...SIZE_RANGE.cell) ?? fit(flow, .45, SIZE_RANGE.cell[0]) ?? .45]));
+  const tableScale = Math.max(.75, Math.min(SIZE_RANGE.cell[1], ...ownFit.values()));
   for (const flow of flows.filter(flow => flow.kind === "caption" || flow.kind === "cell")) {
-    if (flow.kind === "cell") flow.extended = false;
     const range = SIZE_RANGE[flow.kind];
-    const scale = fit(flow, ...range) ?? fit(flow, .45, range[0]) ?? .45;
+    const scale = flow.kind === "cell" ? Math.min(ownFit.get(flow)!, tableScale) : fit(flow, ...range) ?? fit(flow, .45, range[0]) ?? .45;
     const result = setFlow(flow, scale, 1, true);
+    const block = flow.blocks[0];
+    if (flow.kind === "cell" && block.cell && result.lines.length) {
+      const { across, down } = cellAlignment(block), cell = block.cell;
+      if (across) for (const line of result.lines) {
+        const natural = line.runs.reduce((sum, run) => sum + measure(run.text, run.bold || line.bold, flow.sans) * line.fontSize, 0);
+        if (natural < line.width) { line.x += (line.width - natural) / 2; line.width = natural + .5; }
+      }
+      if (down) {
+        const first = result.lines[0], last = result.lines.at(-1)!;
+        const middle = (first.y + last.y + last.fontSize) / 2, target = (cell.y + cell.height / 2) * page.height;
+        const shift = Math.max(cell.y * page.height - first.y, Math.min((cell.y + cell.height) * page.height - last.y - last.fontSize, target - middle));
+        for (const line of result.lines) line.y += shift;
+      }
+    }
     lines.push(...result.lines);
-    if (result.overflow) unfit.push(flow.blocks[0].unitId!);
+    if (result.overflow) unfit.push(block.unitId!);
   }
 
   // Masks hide only the source lines that now carry Korean text, never artwork.
   const artwork = blocks.filter(block => !shown(block) && block.exclusionReason !== "glyph-noise").flatMap(block => px(block, page));
-  const masks = blocks.filter(shown).flatMap(block => [...px(block, page), ...(block.extraMasks ?? []).map(box => ({ x: box.x * page.width, y: box.y * page.height + box.height * page.height * .1, width: box.width * page.width, height: box.height * page.height * .8 }))]).map(line => ({ x: line.x - 1, y: line.y - line.height * .22, width: line.width + 2, height: line.height * 1.5 }))
+  // A table cell's mask stays inside its box: the table's own rules are never painted over.
+  const clip = (rect: Rect, block: ManifestBlock): Rect => {
+    if (block.role !== "TABLE" || !block.cell) return rect;
+    const x0 = Math.max(rect.x, block.cell.x * page.width), y0 = Math.max(rect.y, block.cell.y * page.height), x1 = Math.min(rect.x + rect.width, (block.cell.x + block.cell.width) * page.width), y1 = Math.min(rect.y + rect.height, (block.cell.y + block.cell.height) * page.height);
+    return { x: x0, y: y0, width: Math.max(0, x1 - x0), height: Math.max(0, y1 - y0) };
+  };
+  const masks = blocks.filter(shown).flatMap(block => [...px(block, page), ...(block.extraMasks ?? []).map(box => ({ x: box.x * page.width, y: box.y * page.height + box.height * page.height * .1, width: box.width * page.width, height: box.height * page.height * .8 }))].map(line => clip({ x: line.x - 1, y: line.y - line.height * .22, width: line.width + 2, height: line.height * 1.5 }, block)))
     .flatMap(mask => artwork.reduce<Rect[]>((parts, art) => parts.flatMap(part => subtract(part, art)), [mask]));
   const unitBoxes = new Map<string, Rect>();
   for (const block of blocks.filter(shown)) {

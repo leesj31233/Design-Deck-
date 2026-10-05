@@ -155,7 +155,7 @@ const isMatrix = (value: unknown): value is Matrix => !!value && typeof value ==
  * transform; a path's straight segments that run long and axis-aligned are rules. Everything is
  * mapped through the page viewport, so boxes are in the same top-left points as the text items.
  */
-async function readGraphics(page: PDFPageProxy, viewport: { transform: number[]; width: number; height: number }): Promise<PageGraphics> {
+export async function readGraphics(page: PDFPageProxy, viewport: { transform: number[]; width: number; height: number }): Promise<PageGraphics> {
   const pdf = await getLibrary(), operators = await page.getOperatorList(), ops = pdf.OPS;
   const imageOps = new Set([ops.paintImageXObject, ops.paintInlineImageXObject, ops.paintImageMaskXObject]);
   const view = viewport.transform as Matrix, images: Box[] = [], rules: Box[] = [];

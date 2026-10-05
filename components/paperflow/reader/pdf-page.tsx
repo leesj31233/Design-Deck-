@@ -2,6 +2,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PdfPageHandle } from "@/lib/paperflow/pdf/pdf-adapter";
 import { captureSelection, textIndex } from "@/lib/paperflow/pdf/selection-geometry";
+import { installSelectionGuard } from "@/lib/paperflow/pdf/selection-guard";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import { recoverAnchor } from "@/lib/paperflow/anchors/recover-anchor";
 import type { Annotation } from "@/lib/paperflow/anchors/types";
@@ -81,6 +82,7 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
 
   useEffect(() => {
     if (!textReady) return;
+    installSelectionGuard();
     const handle = () => {
       const selection = window.getSelection();
       if (!selection || !surface.current || !layer.current) return;

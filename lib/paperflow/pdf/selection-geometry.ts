@@ -2,6 +2,7 @@ import { createTextAnchor } from "../anchors/create-anchor";
 import { clientRectToPageRect } from "../anchors/geometry";
 import { mergeLineRects } from "../anchors/merge-line-rects";
 import type { Rect, TextAnchor } from "../anchors/types";
+import { textRectsOf } from "./selection-guard";
 function rangeText(range: Range): string {
   const fragment = range.cloneContents();
   fragment.querySelectorAll("br").forEach(br => br.replaceWith("\n"));
@@ -9,7 +10,8 @@ function rangeText(range: Range): string {
 }
 export function rangeRects(range: Range, page: HTMLElement): Rect[] {
   const bounds = page.getBoundingClientRect();
-  return mergeLineRects(Array.from(range.getClientRects()).filter(r => r.width > 0.5 && r.height > 0.5).map(r => {
+  // Only the selected glyphs count: a fully covered span or layer element would add its whole box.
+  return mergeLineRects(textRectsOf(range).filter(r => r.width > 0.5 && r.height > 0.5).map(r => {
     const x = Math.max(bounds.left, r.left), y = Math.max(bounds.top, r.top);
     return clientRectToPageRect({ x, y, width: Math.max(0, Math.min(bounds.right, r.right) - x), height: Math.max(0, Math.min(bounds.bottom, r.bottom) - y) }, bounds);
   }).filter(r => r.width > 0.5 && r.height > 0.5));

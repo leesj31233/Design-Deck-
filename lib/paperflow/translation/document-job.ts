@@ -166,7 +166,12 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
   store().setPending(documentId, units.map(unit => unit.id), true);
   try {
     const shared = await sharedTranslations(units);
-    const missingUnits = units.filter(unit => !shared.has(unit.id));
+    // A table repeats the same entry ("Surveillance", "CMOS or CCD sensors"): translate it once and
+    // reuse it, so equal cells read the same and cost one passage.
+    const key = (unit: TranslationUnit) => `${unit.role}|${unit.text.replace(/\s+/g, " ").trim().toLowerCase()}`;
+    const first = new Map<string, TranslationUnit>();
+    for (const unit of units) if (!shared.has(unit.id) && !first.has(key(unit))) first.set(key(unit), unit);
+    const missingUnits = [...first.values()];
     // A table can hold dozens of cells: send them as the whole-paper run does (≤ 12 passages per request,
     // three requests at a time), then give whatever came back missing one more try on its own.
     const glossary = paperGlossary(manifest), passage = (unit: TranslationUnit) => ({ id: unit.id, text: unit.text, role: roleOf(unit) });
@@ -186,13 +191,15 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
       const retry = await researchTranslateBlocks([passage(unit)], undefined, glossary).catch(() => ({ results: [], missing: [id] }));
       if (retry.results.length) translatedNow.push(...retry.results); else missing.push(id);
     }
-    const results = [...[...shared].map(([id, text]) => ({ id, text })), ...translatedNow];
+    const byKey = new Map(translatedNow.map(result => [key(missingUnits.find(unit => unit.id === result.id)!), result.text]));
+    const copies = units.filter(unit => !shared.has(unit.id) && first.get(key(unit)) !== unit && byKey.has(key(unit))).map(unit => ({ id: unit.id, text: byKey.get(key(unit))! }));
+    const results = [...[...shared].map(([id, text]) => ({ id, text })), ...translatedNow, ...copies];
     // A table entry keeps its own punctuation: the model likes to end a short label with a comma.
     const tidy = (id: string, text: string) => { const unit = units.find(item => item.id === id); return unit?.role === "TABLE" && !/[.,;:]$/.test(unit.text.trim()) ? text.replace(/[.,;:]+$/, "") : text; };
     const entries = results.map(result => ({ id: result.id, text: tidy(result.id, polishKorean(result.text)) }));
     await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.find(item => item.id === entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
     store().addTexts(documentId, entries);
-    for (const id of missing) store().setFailed(documentId, id, "모델 응답에서 이 문단의 번역이 누락되었습니다.");
+    for (const id of missing) for (const unit of units.filter(item => key(item) === key(missingUnits.find(other => other.id === id)!))) store().setFailed(documentId, unit.id, "모델 응답에서 이 문단의 번역이 누락되었습니다.");
   } catch (error) {
     for (const unit of units) store().setFailed(documentId, unit.id, readableError(error));
     throw error;

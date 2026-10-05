@@ -1,5 +1,5 @@
 import type { TranslationBatchResult, TranslationPassage } from "./block-contract";
-import { sourceHash } from "./prompt-version";
+import { passageHash } from "./prompt-version";
 
 export class ResearchHttpError extends Error {
   constructor(message: string, readonly status: number, readonly retryAfterMs = 0, readonly kind: "rate_limit" | "transient" | "malformed" | "configuration" = status === 429 ? "rate_limit" : status >= 500 ? "transient" : "configuration") { super(message); this.name = "ResearchHttpError"; }
@@ -24,11 +24,11 @@ export async function researchTranslateBlocks(passages: TranslationPassage[], si
  * Paragraphs someone already translated (same source text, same prompt) come from the shared
  * cache instead of the model. Any failure simply means "nothing cached".
  */
-export async function sharedTranslations(passages: { id: string; text: string }[], signal?: AbortSignal): Promise<Map<string, string>> {
+export async function sharedTranslations(passages: { id: string; text: string; role?: string }[], signal?: AbortSignal): Promise<Map<string, string>> {
   const found = new Map<string, string>();
   if (!passages.length) return found;
   try {
-    const hashes = await Promise.all(passages.map(passage => sourceHash(passage.text)));
+    const hashes = await Promise.all(passages.map(passage => passageHash(passage.text, passage.role === "TABLE")));
     for (let start = 0; start < hashes.length; start += 500) {
       const slice = hashes.slice(start, start + 500);
       const response = await fetch("/api/translations/shared", { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hashes: slice }) });

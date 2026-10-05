@@ -10,7 +10,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.29";
+export const EXTRACTOR_VERSION = "layout-v3.30";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -71,7 +71,10 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
   const captionNear = (table: Region, pattern: RegExp) => paragraphs.some((paragraph, index) => classified[index].role === "CAPTION" && pattern.test(paragraph.text.trim()) && paragraph.x < table.x + table.width && paragraph.x + paragraph.width > table.x && (Math.abs(paragraph.y + paragraph.height - table.y) < .06 || Math.abs(paragraph.y - (table.y + table.height)) < .06 || centerInside(paragraph, table)));
   const TABLE_CAPTION = /^(?:table|tabel|tabla|tab(?:elle)?\.?|표|表)\s*[\dA-Z]/i, FIGURE_CAPTION = /^(?:fig(?:ure)?\.?|gambar|abb(?:ildung)?\.?|figura|그림|図|scheme|chart)\s*[\dA-Z]/i;
   found.tables = found.tables.filter(table => {
-    if (captionNear(table, TABLE_CAPTION) || !captionNear(table, FIGURE_CAPTION)) return true;
+    if (captionNear(table, TABLE_CAPTION)) return true;
+    // A frame around one paragraph (an author box, a highlighted note) is a panel, not a table.
+    if (buildTableCells(raw, table, rules, width, height, pageIndex, []).length <= 1) return false;
+    if (!captionNear(table, FIGURE_CAPTION)) return true;
     paragraphs.forEach((paragraph, index) => { if (classified[index].role !== "CAPTION" && centerInside(paragraph, table)) classified[index] = { ...classified[index], role: "FIGURE_TEXT", reason: "figure-label" }; });
     return false;
   });
@@ -207,13 +210,36 @@ function buildTableCells(raw: PdfTextItem[], table: Region, rules: Box[], width:
     if (host) { host.lines.push(line); host.x = Math.min(host.x, line.x); host.right = Math.max(host.right, line.right); host.bottom = Math.max(host.bottom, line.bottom); }
     else cells.push({ lines: [line], x: line.x, right: line.right, y: line.y, bottom: line.bottom, size: line.size });
   }
+  // Each cell may use its whole box: up to the nearest rule, or halfway to the next cell where there is none.
+  const vOverlap = (a: { y: number; bottom: number }, b: { y: number; bottom: number }) => Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y);
+  const hOverlap = (a: { x: number; right: number }, b: { x: number; right: number }) => Math.min(a.right, b.right) - Math.max(a.x, b.x);
+  const boxOf = (cell: Cell) => {
+    const pad = Math.max(1.5, cell.size * .2);
+    let left = x0, right = x1, top = y0, bottom = y1;
+    for (const rule of down) if (rule.y < cell.bottom && rule.y + rule.height > cell.y) {
+      if (rule.x <= cell.x + 1) left = Math.max(left, rule.x + pad); else if (rule.x >= cell.right - 1) right = Math.min(right, rule.x - pad);
+    }
+    for (const rule of across) if (rule.x < cell.right && rule.x + rule.width > cell.x) {
+      if (rule.y <= cell.y + 1) top = Math.max(top, rule.y + pad); else if (rule.y >= cell.bottom - 1) bottom = Math.min(bottom, rule.y - pad);
+    }
+    for (const other of cells) if (other !== cell) {
+      if (vOverlap(cell, other) > 0) {
+        if (other.right <= cell.x + 1) left = Math.max(left, (other.right + cell.x) / 2); else if (other.x >= cell.right - 1) right = Math.min(right, (other.x + cell.right) / 2);
+      }
+      if (hOverlap(cell, other) > 0) {
+        if (other.bottom <= cell.y + 1) top = Math.max(top, (other.bottom + cell.y) / 2); else if (other.y >= cell.bottom - 1) bottom = Math.min(bottom, (other.y + cell.bottom) / 2);
+      }
+    }
+    left = Math.min(left, cell.x); right = Math.max(right, cell.right); top = Math.min(top, cell.y); bottom = Math.max(bottom, cell.bottom);
+    return { x: left / width, y: top / height, width: (right - left) / width, height: (bottom - top) / height };
+  };
   return cells.map((cell, index): PdfParagraph => {
     const text = cell.lines.map(line => line.text).join(" ").replace(/([a-z])[-‐]\s+(?=[a-z])/g, "$1").replace(/\s+/g, " ").trim();
     const pitch = cell.lines.length > 1 ? (cell.lines.at(-1)!.y - cell.lines[0].y) / (cell.lines.length - 1) : cell.size * 1.2;
     return { id: `cell-${pageIndex}-${index}`, pageIndex, text, kind: "body", x: cell.x / width, y: cell.y / height, width: (cell.right - cell.x) / width, height: (cell.bottom - cell.y) / height,
       lines: cell.lines.map(line => ({ x: line.x / width, y: line.y / height, width: (line.right - line.x) / width, height: (line.bottom - line.y) / height })),
       fontFamily: cell.lines.some(line => line.sans) ? "sans-serif" : "serif", fontWeight: 400, fontStyle: "normal", fontSize: cell.size, pitch, indent: 0,
-      column: { left: cell.x / width, right: cell.right / width }, lineTexts: cell.lines.map(line => line.text) };
+      column: { left: cell.x / width, right: cell.right / width }, cell: boxOf(cell), lineTexts: cell.lines.map(line => line.text) };
   }).filter(cell => cell.text);
 }
 

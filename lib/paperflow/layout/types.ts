@@ -20,6 +20,8 @@ export interface PdfParagraph {
   mono?: number;
   /** Page areas to hide with the translation (a drop cap beside the first lines), normalized. */
   extraMasks?: ParagraphLine[];
+  /** A table cell's whole box between its rules (or its neighbours), normalized: the translation stays inside it. */
+  cell?: { x: number; y: number; width: number; height: number };
   /** Raw visual lines, used for keyword extraction only. */
   lineTexts?: string[];
   /** Tokens printed with sub/superscripts and the count of raised citations; folded into the manifest. */

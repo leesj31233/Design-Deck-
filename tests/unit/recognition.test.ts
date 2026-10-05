@@ -197,6 +197,18 @@ describe("ruled tables from the page's own strokes", () => {
     const { buildUnits } = await import("../../lib/paperflow/translation/manifest");
     const units = await buildUnits("doc", blocks);
     expect(units.filter(unit => unit.role === "TABLE").every(unit => unit.manual)).toBe(true);
+    // Every cell carries the box it may fill, inside the table.
+    expect(cells.every(block => block.cell && block.cell.x >= 95 / W - .001 && block.cell.x + block.cell.width <= 495 / W + .001 && block.cell.y >= 412 / H - .001)).toBe(true);
+  });
+  it("names a table after its caption, and a captionless table on the next page as its continuation", async () => {
+    const { manualTargets } = await import("../../lib/paperflow/translation/manual-targets");
+    const cell = (id: string, pageIndex: number, y: number) => ({ id, pageIndex, text: "Image sensor", role: "TABLE", translatable: true, unitId: `u-${id}`, x: .2, y, width: .2, height: .02, lines: [] });
+    const manifest = {
+      units: [], pages: [{ width: W, height: H, tables: [{ x: .1, y: .2, width: .8, height: .5 }] }, { width: W, height: H, tables: [{ x: .1, y: .1, width: .8, height: .4 }] }],
+      blocks: [{ id: "c", pageIndex: 0, text: "Table 1: Comparison of camera components", role: "CAPTION", translatable: true, x: .2, y: .16, width: .6, height: .02, lines: [] }, cell("a", 0, .3), cell("b", 1, .2)]
+    } as unknown as import("../../lib/paperflow/translation/manifest").TranslationManifest;
+    expect(manualTargets(manifest, 0).map(target => target.label)).toEqual(["Table 1"]);
+    expect(manualTargets(manifest, 1).map(target => target.label)).toEqual(["Table 1 (계속)"]);
   });
   it("keeps a running-head rule, a table and a footer rule apart when body text lies between them", async () => {
     const { tableRegions } = await import("../../lib/paperflow/layout/graphics");
@@ -215,5 +227,16 @@ describe("initials-first reference lists", () => {
     const blocks = [block("[43] C. Maes, “Frenesy: Time-symmetric dynamical activity in nonequilibria,” Phys. Rep. 850, 1–33 (2020)."), block("[44] A. Strang, “A theoretical review of area production rates,” J. Stat. Phys. 180 (2020)."), block("16. M. J. Silvapulle, P. K. Sen, Constrained statistical inference (Wiley, 2005)."), block("M. C. Kelley, The Earth’s ionosphere: Plasma physics and electrodynamics (Academic Press, 2009).")];
     markReferenceRuns(blocks);
     expect(blocks.every(item => !item.translatable)).toBe(true);
+  });
+});
+
+describe("justified numbered headings", () => {
+  it("reads a wrapped, letter-spaced numbered capital heading as a heading, not table data", async () => {
+    const { classifyBlock } = await import("../../lib/paperflow/layout/classify");
+    const paragraph = (text: string, size: number) => ({ id: "p", pageIndex: 3, text, kind: "body", x: .24, y: .56, width: .64, height: .05, lines: [{ x: .24, y: .56, width: .64, height: .02 }, { x: .24, y: .59, width: .3, height: .02 }], fontFamily: "sans-serif", fontWeight: 700, fontStyle: "normal", fontSize: size, hint: "table", column: { left: .12, right: .88 } }) as import("../../lib/paperflow/layout/types").PdfParagraph;
+    const context = { pageIndex: 3, bodySize: 10, titleIndex: -1, abstractIndex: -1 };
+    expect(classifyBlock(paragraph("4. UNRAVEL THE ATMOSPHERE AND PHENOMENA OF PHOTOGRAPHY", 12), 5, context, "none").role).toBe("HEADING");
+    // A numbered table row with figures stays a table row.
+    expect(classifyBlock(paragraph("4 Panchromatic 12 MP 35 mm 1.8", 10), 5, context, "none").role).toBe("TABLE");
   });
 });

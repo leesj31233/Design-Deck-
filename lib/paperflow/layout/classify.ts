@@ -108,6 +108,13 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
   // Loosely justified prose has word gaps as wide as table columns: sentences with few numbers stay body text.
   // One justified line of body text ("hardwoods   caused   temperature   instability   at") is prose too.
   const proseLine = block.lines.length <= 2 && size >= context.bodySize * .95 && !/\d/.test(value) && (value.match(/\b[a-z]{2,}\b/g) ?? []).length >= 3;
+  // A numbered heading set justified across the column ("4.  UNRAVEL  THE  ATMOSPHERE …") wraps with
+  // the same wide gaps: a section number, then large or all-capital words with no other figures.
+  const words = value.replace(/^\d{1,2}(?:\.\d{1,2})*\.?\s+/, "");
+  // Formula pieces ("1 X", "2 Z") and tiny figure labels are not headings: it needs a real word.
+  const numberedHeading = block.lines.length <= 3 && value.length < 180 && size >= context.bodySize * .9 && /\p{L}{3,}/u.test(words) && words.replace(/[^\p{L}]/gu, "").length >= 5 && /^\d{1,2}(?:\.\d{1,2})*\.?\s+\p{Lu}/u.test(value) && !/\d/.test(words) && !/[.;]\s+\S/.test(words)
+    && (size >= context.bodySize * 1.1 || (words.match(/\p{Lu}/gu) ?? []).length > (words.match(/\p{L}/gu) ?? []).length * .8);
+  if (numberedHeading) return { role: "HEADING", reason: null };
   if (block.hint === "table" && !readsAsProse(value) && !proseLine) return { role: "TABLE", reason: "table-data" };
   // A "heading" that runs for many lines is prose that happens to start with a number.
   if (block.kind === "title" && block.lines.length <= 3) return size > context.bodySize * 1.6 && context.pageIndex === 0 ? { role: "TITLE", reason: "paper-title" } : { role: "HEADING", reason: null };
