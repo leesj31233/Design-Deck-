@@ -138,7 +138,8 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
     // React leaves an unchanged style prop alone, so undo an earlier correction before measuring.
     nodes.forEach(node => { node.style.letterSpacing = `${node.dataset.ls}px`; node.style.wordSpacing = `${node.dataset.ws}px`; });
     const ratio = root.current.getBoundingClientRect().width / Math.max(1, root.current.offsetWidth);
-    const widths = Array.from(nodes, node => node.getBoundingClientRect().width / ratio);
+    // The line box is as wide as its measure (so a press beside short text still lands on it): read the text's own width.
+    const widths = Array.from(nodes, node => { const range = document.createRange(); range.selectNodeContents(node); return range.getBoundingClientRect().width / ratio; });
     nodes.forEach((node, index) => {
       const target = Number(node.dataset.w), text = node.textContent ?? "", chars = [...text].length;
       const error = target - widths[index] + Number(node.dataset.ls ?? 0), size = Number(node.style.fontSize.replace("px", ""));
@@ -159,7 +160,7 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
     {layout && <div ref={root} className="pf-tx-layer" data-unfit={layout.unfit.length || undefined} data-body-scale={layout.bodyScale} style={{ width: layout.width * K, height: layout.height * K, transform: K === scale ? undefined : `scale(${scale / K})`, fontFamily: paperFontStack() }}>
       {layout.masks.map((mask, index) => <div key={index} className="pf-tx-mask" style={{ left: mask.x * K, top: mask.y * K, width: mask.width * K, height: mask.height * K, background: colors?.[index] ?? "#fff" }}/>)}
       {[...byUnit].map(([unitId, lines]) => <div key={unitId} className="pf-tx-unit" data-paragraph-id={unitId} data-kind={lines[0].kind}>
-        {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08) * K, fontSize: line.fontSize * K, lineHeight: `${line.fontSize * 1.15 * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: line.kind === "heading" ? headingInk.get(unitId) : undefined }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{paint(run.text, line.kind === "body")}</b> : <span key={part}>{paint(run.text, line.kind !== "heading")}</span>)}</span>)}
+        {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08 - Math.max(0, line.lineHeight - line.fontSize * 1.15) / 2) * K, width: line.width * K, fontSize: line.fontSize * K, lineHeight: `${Math.max(line.lineHeight, line.fontSize * 1.15) * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: line.kind === "heading" ? headingInk.get(unitId) : undefined }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{paint(run.text, line.kind === "body")}</b> : <span key={part}>{paint(run.text, line.kind !== "heading")}</span>)}</span>)}
       </div>)}
     </div>}
     {(pending > 0 || pendingTables || failed.length > 0) && <div className="pf-tx-page-status" role="status">

@@ -23,9 +23,14 @@ test("mouse drag selection, zoom alignment, archive and source-byte fidelity", a
     const bytes = Array.from(new Uint8Array(await blobs[0].arrayBuffer())); db.close(); return bytes;
   });
   expect(Buffer.from(saved).equals(original)).toBe(true);
-  await page.getByLabel("Open Library", { exact: true }).click(); await page.getByLabel("논문 보관", { exact: true }).click();
+  await page.getByLabel("Open Library", { exact: true }).click(); await page.getByLabel("폴더를 골라 보관", { exact: true }).click();
+  // Archiving asks for a folder first: make one, file the paper there.
+  await page.getByRole("button", { name: /새 폴더/ }).click(); await page.getByLabel("폴더 이름").fill("Biochar"); await page.getByRole("button", { name: "만들고 여기에 보관" }).click();
   await expect(page.locator(".pf-paper-row")).toHaveCount(0);
   await page.getByRole("button", { name: "아카이브", exact: true }).click(); await expect(page.locator(".pf-paper-row")).toHaveCount(1);
+  await page.getByRole("button", { name: /Biochar/ }).first().click(); await expect(page.locator(".pf-paper-row")).toHaveCount(1);
+  await page.getByRole("button", { name: /미분류/ }).click(); await expect(page.locator(".pf-paper-row")).toHaveCount(0);
+  await page.getByRole("button", { name: /전체/ }).click();
   await page.getByLabel("아카이브에서 복원").click(); await expect(page.locator(".pf-paper-row")).toHaveCount(0);
   await page.getByRole("button", { name: "서재", exact: true }).click(); await expect(page.locator(".pf-paper-row")).toHaveCount(1);
 });

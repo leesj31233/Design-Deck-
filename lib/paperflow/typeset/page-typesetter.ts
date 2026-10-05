@@ -254,7 +254,9 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
         const broken = feeder.next(width, size), last = feeder.done;
         // Table cells and headings are set flush left: justifying a short cell line spreads its letters apart.
         const spacing = justify(broken, width, size, last || flow.kind === "heading" || flow.kind === "cell");
-        if (commit && broken.runs.length) out.push({ unitId: paragraph.unitId, kind: flow.kind, x, y: place.y, width, fontSize: size, lineHeight: pitch, runs: broken.runs, bold: flow.bold, sans: flow.sans, ...spacing });
+        // A line the spacing limits could not fill keeps its own width, so the reader does not stretch it again.
+        const setWidth = broken.natural + spacing.wordSpacing * broken.spaces + spacing.letterSpacing * Math.max(0, broken.chars - 1);
+        if (commit && broken.runs.length) out.push({ unitId: paragraph.unitId, kind: flow.kind, x, y: place.y, width: (spacing.wordSpacing > 0 || spacing.letterSpacing > 0) && setWidth < width - .5 ? setWidth : width, fontSize: size, lineHeight: pitch, runs: broken.runs, bold: flow.bold, sans: flow.sans, ...spacing });
         placed = { x, width, y: place.y };
         y = place.y + pitch; first = false;
       }

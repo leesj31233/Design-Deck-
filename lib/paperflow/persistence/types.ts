@@ -1,6 +1,8 @@
 import type { Annotation } from "../anchors/types";
 import type { ScholarWork } from "../scholar/openalex";
 import type { PaperGuide } from "../guide/guide";
+/** An archive folder: a name, a lucide icon and a tint. `removed` marks a deleted folder. */
+export type ArchiveFolder = { id: string; name: string; icon: string; color: string; createdAt: string; updatedAt?: string; removed?: boolean };
 export type StoredDocument = {
   id: string; filename: string; title: string; mimeType: "application/pdf"; byteLength: number;
   createdAt: string; updatedAt: string; pageCount: number; fingerprint?: string; blobKey: string;
@@ -9,6 +11,8 @@ export type StoredDocument = {
   impact?: { value: number; journal?: string; checkedAt: string };
   currentPage: number; lastOpenedAt?: string; authors: string[]; journal?: string; year?: number; doi?: string;
   researchPoolIds: string[]; archived: boolean;
+  /** The archive folder the paper is filed in (null or absent: unfiled). */
+  archiveFolder?: ArchiveFolder | null;
   /** In the trash since then (purged for good after 30 days); null when restored, so the restore syncs too. */
   deletedAt?: string | null;
   /** local: PDF only here. cloud: PDF also in the account's cloud storage. remote: listed by the account, PDF on another device. */

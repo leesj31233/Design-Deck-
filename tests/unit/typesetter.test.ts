@@ -38,7 +38,7 @@ describe("translation units", () => {
 });
 
 describe("line breaker", () => {
-  it("never breaks an English term and fills justified lines to the edge", () => {
+  it("never breaks an English term, and justifies without wide gaps or tracked-out syllables", () => {
     const feeder = new LineFeeder(tokenize("silicate melt-induced slagging 현상은 고온 영역에서 alkali chloride와 함께 빠르게 성장하는 경향을 보인다", measure), measure);
     const lines = [];
     while (!feeder.done) lines.push(feeder.next(60, 4));
@@ -47,7 +47,9 @@ describe("line breaker", () => {
       const spacing = justify(line, 60, 4, false);
       const filled = line.natural + spacing.wordSpacing * line.spaces + spacing.letterSpacing * (line.chars - 1);
       expect(filled).toBeLessThanOrEqual(60.01);
-      expect(filled).toBeGreaterThan(60 * .93);
+      expect(filled).toBeGreaterThan(60 * .85);
+      expect(spacing.wordSpacing).toBeLessThanOrEqual(4 * .22 + 1e-9);
+      expect(spacing.letterSpacing).toBeLessThanOrEqual(4 * .02 + 1e-9);
     }
   });
 });

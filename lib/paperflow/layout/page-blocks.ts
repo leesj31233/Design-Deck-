@@ -9,6 +9,8 @@ export const CAPTION_START = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate|gambar
 /** Elsevier sets the label alone on its own line: "Table 2" / "Investigated global reaction mechanisms." */
 const CAPTION_LABEL = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate|gambar|tabel|grafik|abb(?:ildung)?\.?|tab(?:elle)?\.?|figura|tabla|그림|표|図|表)\s*[A-Z]?\d+(?:\.\d+)?[a-z]?\s*$/i;
 const TRAILING_FUNCTION_WORD = /\b(?:the|a|an|of|and|or|in|on|to|for|with|by|from|at|as|is|are|was|were|that|which|this|these)$/i;
+/** A list item's marker: "1.", "a)", "(iv)", "•". */
+const LIST_MARKER = /^(?:\d{1,2}[.)]|[a-zA-Z][.)]|\((?:\d{1,2}|[a-zA-Z]|[ivx]{1,4})\)|[•▪◦●■‣–-])\s+/;
 const SENTENCE_END = /[.!?](?:["”’)\]]|\[[\d,–−-]+\])?\s*$/;
 
 const words = (text: string) => text.match(/[A-Za-z]{3,}|[\uac00-\ud7a3]{2,}|[\u3040-\u30ff\u4e00-\u9fff]{2,}/g) ?? [];
@@ -54,6 +56,10 @@ function headingLine(line: TextLine, columnWidth: number, bodySize: number) {
   if (line.size < bodySize * .9 || text.length > 120) return false;
   if (SECTION_NAMES.test(text)) return true;
   if (capsHeading(text) && line.right - line.x < columnWidth * 1.03) return true;
+  // "1. Photography and Videography: DCs are widely" is a list item with a run-in label (one-level number,
+  // a sentence after the colon); "2.4.1. Alkali metals: potassium and sodium" is a heading.
+  const label = /^\d{1,2}[.)]?\s+[^:]{2,70}:\s+(.+)$/.exec(text);
+  if (label && !capsHeading(text)) { const after = label[1].match(/[A-Za-z]{3,}/g) ?? [], lower = after.filter(word => /^[a-z]/.test(word)).length; if (lower >= 2 && lower > after.length / 2) return false; }
   if (!NUMBERED_HEADING.test(text) || SENTENCE_END.test(text) && !/^\d+(?:\.\d+)*\.?\s+[A-Z][^.]{2,90}\.$/.test(text)) return false;
   return line.right - line.x < columnWidth * .92 && (text.match(/\s/g) ?? []).length <= 16;
 }
@@ -105,7 +111,13 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
     // do not stop on a function word.
     const runInTitle = (line as TextLine & { runInTail?: boolean }).runInTail && line.text.length < 70 && !SENTENCE_END.test(line.text) && words(line.text).length >= 2 && /^[A-Z]/.test(line.text) && !/,/.test(line.text) && !TRAILING_FUNCTION_WORD.test(line.text.trim()) && !continuesSentence(line, ordered[lineIndex + 1]);
     const heading = !equation && (headingLine(line, columnWidth, bodySize) || Boolean(runInTitle) || Boolean((line as TextLine & { forceHeading?: boolean }).forceHeading));
-    const group = groups.at(-1), previous = group?.lines.at(-1);
+    let group = groups.at(-1), previous = group?.lines.at(-1);
+    // A line set under a paragraph that a figure caption interrupted (the caption sat beside its last line)
+    // continues that paragraph, not the caption.
+    if (previous && group && (line.right < previous.x - 2 || line.x > previous.right + 2) && !heading) {
+      const host = groups.slice(-4).reverse().find(other => other !== group && other.kind === "body" && (() => { const last = other.lines.at(-1)!; return Math.min(last.right, line.right) - Math.max(last.x, line.x) > 0 && line.y - last.y > 0 && line.y - last.y < Math.max(bodyPitch, last.size * 1.15) * 1.45 && Math.abs(line.size - last.size) < last.size * .14; })());
+      if (host) { group = host; previous = host.lines.at(-1); }
+    }
     // "Figure 5a shows…" can open a line in the middle of a paragraph; a caption starts after a
     // finished sentence or a gap, or is set smaller than the body.
     const caption = (CAPTION_START.test(line.text) || CAPTION_LABEL.test(line.text.trim())) && (!previous || line.size < bodySize * .97 || SENTENCE_END.test(previous.text) || line.y - previous.bottom > previous.size * .8 || line.column !== previous.column);
@@ -117,11 +129,24 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
     let split = !group || !previous || equation || heading && !headingWrap || caption || group.kind === "title" && !headingWrap || group.hint === "equation";
     if (!split && previous && group && !headingWrap) {
       const pitch = line.y - previous.y;
-      const indented = line.x > left + Math.max(line.size * .6, 3) && line.x < left + line.size * 4 && previous.x <= left + line.size * .6;
-      const previousShort = previous.right < right - line.size * 1.6 && SENTENCE_END.test(previous.text);
+      // A list item's lines hang under its text, past the marker: they continue the item.
+      const itemStart = group.lines.find(item => LIST_MARKER.test(item.text.trim()) && item.x <= line.x - line.size * .6);
+      const hanging = Boolean(itemStart) && line.x - itemStart!.x >= line.size * .6 && line.x - itemStart!.x <= line.size * 4.5 && !LIST_MARKER.test(line.text.trim());
+      const indented = !hanging && line.x > left + Math.max(line.size * .6, 3) && line.x < left + line.size * 4 && previous.x <= left + line.size * .6;
+      // The next item's marker stands out to the left of the previous item's text.
+      const nextItem = LIST_MARKER.test(line.text.trim()) && (line.x < previous.x - line.size * .6 || /[.:!?]\s*$|\]\.?\s*$/.test(previous.text.trim()));
+      // A short first line with no full stop, then a wider gap: a title above its paragraph.
+      // Not a line that leads into a formula ("…we can write", "…is given by"), a formula itself, or a caption.
+      const capitalised = (text: string) => { const list = text.match(/\p{L}{3,}/gu) ?? []; return list.length > 0 && list.filter(word => /^\p{Lu}/u.test(word)).length >= list.length / 2; };
+      const titleLike = (text: string) => (/^(?:\d+(?:\.\d+)*\.?\s+|[A-Z]\.\d*\s+)?\p{Lu}/u.test(text) || capitalised(text)) && !/[=+÷<>∂∅|⋆→≤≥∑∫;*]|\b(?:by|write|given|equivalently|is|are|be|follows?|as|where|that|then|to|of|with|and|or|the|for|if|let|gives|yielding|becomes|reads|holds|obtain|expansion)$/i.test(text) && !/,/.test(text) && words(text).length <= 10 && !CAPTION_START.test(text) && !/^fig(?:ure)?\.?\s/i.test(text) && !TRAILING_FUNCTION_WORD.test(text);
+      const titleAbove = group.lines.length === 1 && titleLike(previous.text.trim()) && previous.right < right - line.size * 4 && !SENTENCE_END.test(previous.text) && !/[,;:]$/.test(previous.text.trim()) && /^[A-Z\p{Lu}]/u.test(line.text) && words(previous.text).length >= 2 && words(previous.text).length <= 12 && (line.y - previous.y > Math.max(bodyPitch, previous.size * 1.15) * 1.25 || Boolean(previous.bold) && !line.bold);
+      if (titleAbove) group.kind = "title";
+      // Short against its own paragraph's measure (a list beside a figure is narrower than the page's usual line).
+      const measure = group.lines.length > 1 ? Math.max(...group.lines.map(item => item.right)) : right;
+      const previousShort = previous.right < measure - line.size * 1.6 && SENTENCE_END.test(previous.text);
       split = line.column !== previous.column || pitch < -line.size * .5 || pitch > Math.max(bodyPitch, previous.size * 1.15) * 1.45
         || Math.abs(line.size - previous.size) > Math.max(line.size, previous.size) * .14
-        || indented || previousShort || line.tabular !== previous.tabular && line.text.length < 60
+        || indented || previousShort || nextItem || titleAbove || line.tabular !== previous.tabular && line.text.length < 60
         // Code listing against prose: a fixed-width block never runs on into a sentence.
         || Math.max(line.mono ?? 0, previous.mono ?? 0) >= .8 && Math.min(line.mono ?? 0, previous.mono ?? 0) <= .2;
     }

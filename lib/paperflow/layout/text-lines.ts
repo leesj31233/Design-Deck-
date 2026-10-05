@@ -234,6 +234,9 @@ export function orderLines(lines: TextLine[], gutter: Gutter | null, width = 612
     if (!host) { merged.push({ ...line }); continue; }
     const [first, second] = host.x <= line.x ? [host, line] : [line, host];
     const gap = second.x - first.right;
+    // A caption printed beside the last line of a paragraph ("…historical places,      Fig. 3: One Million Pixels")
+    // shares its baseline but is another block: a wide gap with another type size or a caption label keeps them apart.
+    if (gap > Math.max(host.size, line.size) * 2.5 && (Math.abs(host.size - line.size) > Math.max(host.size, line.size) * .06 || /^(?:fig(?:ure)?\.?|table|tab\.|scheme|chart|plate)\s*\d/i.test(second.text.trim()))) { merged.push({ ...line }); continue; }
     host.tabular = host.tabular || line.tabular || gap > Math.max(host.size, line.size) * 1.2;
     host.mono = ((host.mono ?? 0) * host.text.length + (line.mono ?? 0) * line.text.length) / Math.max(1, host.text.length + line.text.length);
     host.text = `${first.text} ${second.text}`; host.items = [...first.items, ...second.items];

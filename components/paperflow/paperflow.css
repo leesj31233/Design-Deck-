@@ -1044,3 +1044,47 @@ html[data-pf-theme="dark"] .pf-guide-page-summary, html[data-pf-theme="dark"] .p
 .pf-tx-line { z-index:1; }
 .pf-pdf-page[data-selecting="source"] .pf-tx-line, .pf-pdf-page[data-selecting] .pf-manual-chip { pointer-events:none; }
 .pf-pdf-page[data-selecting="translation"] .textLayer { pointer-events:none; }
+
+/* Archive folders: tinted folder tiles with a tab, an icon on the front, the paper count below. */
+.pf-folder-shelf { margin:4px 0 22px; }
+.pf-folder-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:14px; }
+.pf-folder-grid[data-compact] { grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:10px; margin-top:14px; max-height:min(52vh,420px); overflow:auto; padding:4px; }
+.pf-folder-tile-wrap { position:relative; border-radius:18px; transition:background .18s ease, box-shadow .18s ease; }
+.pf-folder-tile-wrap[data-over] { background:color-mix(in srgb,var(--accent) 10%,transparent); box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 45%,transparent); }
+.pf-folder-tile { display:flex; flex-direction:column; align-items:center; gap:7px; width:100%; padding:14px 8px 12px; border-radius:18px; background:none; border:0; color:var(--foreground); cursor:pointer; text-align:center; transition:background .18s ease, transform .25s var(--ease-spring,cubic-bezier(.2,.9,.3,1.2)); }
+.pf-folder-tile:hover { background:color-mix(in srgb,var(--foreground) 5%,transparent); }
+.pf-folder-tile:hover .pf-folder-art { transform:translateY(-3px) rotate(-1.5deg); }
+.pf-folder-tile[data-active], .pf-folder-tile[data-current] { background:color-mix(in srgb,var(--accent) 11%,transparent); box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 50%,transparent); }
+.pf-folder-tile strong { font-size:13px; font-weight:600; letter-spacing:-.01em; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-folder-tile small { font-size:11.5px; color:var(--muted); margin-top:-4px; }
+.pf-folder-art { --folder:#1f7a5a; position:relative; display:grid; place-items:center; width:68px; height:52px; margin-top:6px; transition:transform .3s var(--ease-spring,cubic-bezier(.2,.9,.3,1.2)); color:var(--muted); }
+.pf-folder-tab { position:absolute; left:4px; top:-6px; width:28px; height:12px; border-radius:6px 9px 0 0; background:color-mix(in srgb,var(--folder) 78%,#000 8%); }
+.pf-folder-front { position:absolute; inset:0; display:grid; place-items:center; border-radius:4px 11px 11px 11px; color:#fff; background:linear-gradient(160deg,color-mix(in srgb,var(--folder) 82%,#fff 18%),var(--folder)); box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 18px -10px color-mix(in srgb,var(--folder) 80%,#000); }
+.pf-folder-art[data-ghost] .pf-folder-front { background:transparent; border:1.5px dashed color-mix(in srgb,var(--foreground) 28%,transparent); box-shadow:none; }
+.pf-folder-art[data-ghost] .pf-folder-tab { background:color-mix(in srgb,var(--foreground) 22%,transparent); }
+.pf-folder-art[data-all] { border-radius:14px; background:color-mix(in srgb,var(--foreground) 6%,transparent); }
+.pf-folder-art[data-new] { border-radius:14px; border:1.5px dashed color-mix(in srgb,var(--accent) 55%,transparent); color:var(--accent); }
+.pf-folder-new strong { color:var(--accent); }
+.pf-folder-tools { position:absolute; top:6px; right:6px; display:flex; gap:2px; opacity:0; transition:opacity .15s ease; }
+.pf-folder-tile-wrap:hover .pf-folder-tools, .pf-folder-tile-wrap:focus-within .pf-folder-tools { opacity:1; }
+.pf-folder-tools button { display:grid; place-items:center; width:22px; height:22px; border-radius:7px; border:0; background:var(--surface-strong); color:var(--muted); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.12); }
+.pf-folder-tools button:hover { color:var(--foreground); }
+.pf-folder-editor-wrap { margin-top:14px; max-width:520px; }
+.pf-folder-editor { display:grid; gap:12px; margin-top:14px; padding:14px; border-radius:16px; background:color-mix(in srgb,var(--foreground) 4%,transparent); }
+.pf-folder-editor-preview { display:flex; align-items:center; gap:14px; }
+.pf-folder-editor-preview .pf-folder-art { margin-top:6px; flex-shrink:0; }
+.pf-folder-editor-preview input { flex:1; min-width:0; height:38px; padding:0 12px; border-radius:11px; border:1px solid var(--line); background:var(--surface-strong); color:var(--foreground); font-size:14px; }
+.pf-folder-choices { display:flex; flex-wrap:wrap; gap:6px; }
+.pf-folder-choices button { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:var(--surface-strong); color:var(--muted); cursor:pointer; }
+.pf-folder-choices button[data-on] { color:var(--accent); border-color:var(--accent); background:color-mix(in srgb,var(--accent) 10%,var(--surface-strong)); }
+.pf-folder-swatches { display:flex; flex-wrap:wrap; gap:8px; }
+.pf-folder-swatches button { display:grid; place-items:center; width:24px; height:24px; border-radius:50%; border:0; color:#fff; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); }
+.pf-folder-swatches button[data-on] { box-shadow:0 0 0 2px var(--surface-strong),0 0 0 3.5px var(--foreground); }
+.pf-folder-editor-actions { display:flex; justify-content:flex-end; gap:8px; }
+.pf-folder-dialog { width:min(94vw,560px)!important; }
+.pf-folder-dialog-paper { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-folder-heading { display:inline-flex; align-items:center; gap:7px; }
+@media (max-width:640px) { .pf-folder-grid { grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:8px; } .pf-folder-art { width:58px; height:44px; } }
+
+/* The selection bar waits until the drag ends: under the pointer it would capture the selection. */
+html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { pointer-events:none!important; opacity:0; transition:opacity .12s ease; }

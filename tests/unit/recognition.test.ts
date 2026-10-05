@@ -260,3 +260,25 @@ describe("table entries", () => {
     expect(tableEnding("전용 이미지 처리 칩")).toBe("전용 이미지 처리 칩");
   });
 });
+
+describe("prose after a table", () => {
+  it("translates a paragraph under a table whose sentences end in a bracket", async () => {
+    const prose = [
+      "On the other hand, significant differences in RL and GI across the three plant species were",
+      "consistently driven by biochar concentration (p < 0.0001 for basil and tomato, p < 0.001 for lettuce),",
+      "by the interaction of biochar concentration and washing treatment (p < 0.0001) as well as by the",
+      "interaction between the three factors (p < 0.0001 for basil and lettuce; p < 0.05 for tomato). Further",
+      "differences in these two parameters were also dependent on biochar type in both lettuce and tomato",
+      "(p < 0.0001), while those driven by washing affected RL only in the case of tomato (p < 0.0001)."
+    ];
+    const blocks = await buildPageBlocks("doc", 2, [
+      item("Table 2. Three-way ANOVA of germination number, root length and germination index.", 60, 100, 480, 9),
+      item("C ns 2.47 ns", 60, 130, 300, 9), item("T 7.19 ns 0.012", 60, 145, 300, 9),
+      item("* p < 0.05; ** p < 0.005: *** p < 0.0001.", 150, 170, 200, 8),
+      ...prose.map((text, index) => item(text, 60, 200 + index * 12, 480, 10))
+    ], W, H);
+    const paragraph = blocks.find(block => block.text.startsWith("On the other hand"));
+    expect(paragraph?.role).toBe("BODY");
+    expect(paragraph?.translatable).toBe(true);
+  });
+});

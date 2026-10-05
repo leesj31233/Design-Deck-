@@ -80,8 +80,10 @@ export function justify(line: BrokenLine, available: number, size: number, last:
   const extra = available - line.natural;
   if (last || extra <= 0 && extra > -size * .05) return { wordSpacing: 0, letterSpacing: 0 };
   if (extra < 0) return { wordSpacing: line.spaces ? extra / line.spaces : 0, letterSpacing: line.spaces ? 0 : extra / Math.max(1, line.chars - 1) };
-  const wordSpacing = line.spaces ? Math.min(extra / line.spaces, size * .3) : 0;
+  // Korean reads badly with wide word gaps or tracked-out syllables: a line that cannot be filled within
+  // these limits stays a little short (ragged) rather than spaced out.
+  const wordSpacing = line.spaces ? Math.min(extra / line.spaces, size * .22) : 0;
   const rest = extra - wordSpacing * line.spaces;
-  const letterSpacing = rest > .01 && line.chars > 1 ? Math.min(rest / (line.chars - 1), size * .06) : 0;
+  const letterSpacing = rest > .01 && line.chars > 1 ? Math.min(rest / (line.chars - 1), size * .02) : 0;
   return { wordSpacing, letterSpacing };
 }

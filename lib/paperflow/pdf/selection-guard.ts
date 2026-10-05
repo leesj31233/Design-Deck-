@@ -22,6 +22,7 @@ function release() {
   // Park the catcher at the end of its layer (pdf.js does the same) so the finished selection keeps its ends.
   if (end?.isConnected) { if (active.classList.contains("textLayer")) active.append(end); else end.remove(); }
   active.classList.remove("pf-selecting");
+  delete document.documentElement.dataset.pfSelecting;
   active.closest<HTMLElement>(".pf-pdf-page")?.removeAttribute("data-selecting");
   active = null; previous = null;
 }
@@ -38,6 +39,8 @@ export function installSelectionGuard() {
     const end = endFor(root);
     end.style.width = `${root.offsetWidth}px`; end.style.height = `${root.offsetHeight}px`;
     root.classList.add("pf-selecting");
+    // While the drag lasts, nothing floats over the text (the selection bar would catch the pointer).
+    document.documentElement.dataset.pfSelecting = "true";
     root.closest<HTMLElement>(".pf-pdf-page")?.setAttribute("data-selecting", root.classList.contains("textLayer") ? "source" : "translation");
     if (!end.isConnected) root.append(end);
   }, true);
@@ -49,11 +52,13 @@ export function installSelectionGuard() {
     const selection = document.getSelection();
     if (!selection?.rangeCount) return;
     const range = selection.getRangeAt(0), end = ends.get(active)!;
+    // The press itself (a caret, nothing selected yet) moves nothing: the browser is still starting its drag.
+    if (range.collapsed) { previous = range.cloneRange(); return; }
     // Which end moves: the one that differs from the last range (dragging up moves the start).
     const movesStart = !!previous && (range.compareBoundaryPoints(Range.END_TO_END, previous) === 0 || range.compareBoundaryPoints(Range.START_TO_END, previous) === 0);
     let anchor: Node | null = movesStart ? range.startContainer : range.endContainer;
     if (anchor?.nodeType === Node.TEXT_NODE) anchor = anchor.parentNode;
-    if (!movesStart && range.endOffset === 0 && anchor) {
+    if (!movesStart && range.endOffset === 0 && anchor && active.classList.contains("textLayer")) {
       // The selection ends at the very start of a node: the text it really ends in is the one before.
       for (let guard = 0; anchor && guard < 50; guard++) {
         while (anchor && !anchor.previousSibling && anchor !== active) anchor = anchor.parentNode;
@@ -63,6 +68,9 @@ export function installSelectionGuard() {
       }
     }
     previous = range.cloneRange();
+    // In the Korean layer the text sits in runs inside a line: the catcher goes beside the line, never
+    // inside it (inside, it would be positioned against the line and cover the text it should follow).
+    if (anchor instanceof HTMLElement && !active.classList.contains("textLayer")) anchor = anchor.closest<HTMLElement>(".pf-tx-line") ?? anchor;
     if (!(anchor instanceof HTMLElement) || anchor === end || anchor === active || !active.contains(anchor) || !anchor.parentElement) return;
     anchor.parentElement.insertBefore(end, movesStart ? anchor : anchor.nextSibling);
   });

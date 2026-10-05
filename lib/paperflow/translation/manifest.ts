@@ -10,7 +10,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.34";
+export const EXTRACTOR_VERSION = "layout-v3.37";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -61,7 +61,9 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     const columnIndex = paragraph.x + paragraph.width / 2 < .5 ? 0 : 1;
     // Rows after a table caption stay data until real prose resumes.
     if (role === "CAPTION" && /^(?:table|tabel|tabla|tab(?:elle)?\.?|표|表)/i.test(paragraph.text)) { tableUntil = paragraph.y + .45; tableColumn = paragraph.width > .6 || Math.abs(paragraph.x + paragraph.width / 2 - .5) < .08 ? -1 : columnIndex; }
-    else if (role === "BODY" && paragraph.y < tableUntil && (tableColumn === -1 || tableColumn === columnIndex) && !/[a-z]{3,}[.!?]\s|[\uac00-\ud7a3\u3040-\u30ff\u4e00-\u9fff][.!?。！？]/.test(paragraph.text + " ")) { role = "TABLE"; reason = "table-data"; }
+    // A sentence ends a table's run: "…tomato (p < 0.0001)." ends in a bracket, and a paragraph that reads as
+    // prose is prose even when it carries many p-values.
+    else if (role === "BODY" && paragraph.y < tableUntil && (tableColumn === -1 || tableColumn === columnIndex) && !readsAsProse(paragraph.text) && !/[a-z)\]]{1}[.!?]\s|[\uac00-\ud7a3\u3040-\u30ff\u4e00-\u9fff][.!?。！？]/.test(paragraph.text + " ")) { role = "TABLE"; reason = "table-data"; }
     else if (role === "BODY") tableUntil = -1;
     section = nextSection(role, reason, paragraph.text, section);
     classified.push({ role, reason, columnIndex });
