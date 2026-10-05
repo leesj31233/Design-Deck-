@@ -4,7 +4,8 @@ export interface PdfTextItem { text: string; x: number; y: number; width: number
 export interface PdfPageHandle {
   width: number; height: number;
   getTextItems(signal?: AbortSignal): Promise<PdfTextItem[]>;
-  getRasterImageCount?(): Promise<number>;
+  /** Share of the page covered by its largest raster image (a scanned page is one image of the whole page). */
+  getLargestImageShare?(): Promise<number>;
   render(canvas: HTMLCanvasElement, scale: number, signal: AbortSignal): Promise<void>;
   renderText(container: HTMLElement, scale: number, signal: AbortSignal): Promise<void>;
 }
@@ -82,10 +83,24 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
         return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL, baseline }];
       });
     },
-    async getRasterImageCount() {
-      const pdf = await getLibrary(), operators = await page.getOperatorList();
-      const imageOps = new Set([pdf.OPS.paintImageXObject, pdf.OPS.paintInlineImageXObject, pdf.OPS.paintImageMaskXObject]);
-      return operators.fnArray.filter(operation => imageOps.has(operation)).length;
+    async getLargestImageShare() {
+      const pdf = await getLibrary(), operators = await page.getOperatorList(), ops = pdf.OPS;
+      const imageOps = new Set([ops.paintImageXObject, ops.paintInlineImageXObject, ops.paintImageMaskXObject]);
+      // An image fills the unit square under the current transform: its area is the transform's determinant.
+      type Matrix = [number, number, number, number, number, number];
+      const multiply = ([a, b, c, d, e, f]: Matrix, [g, h, i, j, k, l]: Matrix): Matrix => [g * a + h * c, g * b + h * d, i * a + j * c, i * b + j * d, k * a + l * c + e, k * b + l * d + f];
+      let matrix: Matrix = [1, 0, 0, 1, 0, 0], largest = 0;
+      const stack: Matrix[] = [], [x1, y1, x2, y2] = page.view, area = Math.abs((x2 - x1) * (y2 - y1)) || 1;
+      operators.fnArray.forEach((operation, index) => {
+        const args = operators.argsArray[index] as unknown[];
+        if (operation === ops.save) stack.push(matrix);
+        else if (operation === ops.restore) matrix = stack.pop() ?? matrix;
+        else if (operation === ops.transform) matrix = multiply(matrix, args as Matrix);
+        else if (operation === ops.paintFormXObjectBegin) { stack.push(matrix); if (Array.isArray(args?.[0]) && args[0].length === 6) matrix = multiply(matrix, args[0] as Matrix); }
+        else if (operation === ops.paintFormXObjectEnd) matrix = stack.pop() ?? matrix;
+        else if (imageOps.has(operation)) largest = Math.max(largest, Math.abs(matrix[0] * matrix[3] - matrix[1] * matrix[2]) / area);
+      });
+      return Math.min(1, largest);
     },
     async render(canvas, scale, signal) {
       signal.throwIfAborted();

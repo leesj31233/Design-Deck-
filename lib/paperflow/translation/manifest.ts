@@ -2,7 +2,7 @@ import type { PdfDocumentHandle, PdfPageHandle, PdfTextItem } from "../pdf/pdf-a
 import { letterCount, textHealth } from "../pdf/ocr";
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
 import { analyzePage } from "../layout/page-blocks";
-import { classifyBlock, extractKeywords, nextSection, pageContext, type BlockRole, type Section } from "../layout/classify";
+import { classifyBlock, extractKeywords, looksLikeReference, nextSection, pageContext, type BlockRole, type Section } from "../layout/classify";
 import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
@@ -18,6 +18,8 @@ export interface TranslationManifest {
   extractedPages: number; ocrPages: number; ocrCandidates?: number[];
   /** How the paper prints sub/superscripts and citations, for the translated text. */
   scripts?: ScriptTable;
+  /** Where the extraction time went (ms), to keep long papers fast. */
+  timing?: { text: number; images: number; ocr: number; layout: number; total: number };
 }
 
 /** Reads a page from its pixels (scanned pages, unusable embedded fonts). */
@@ -63,6 +65,41 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
   return blocks;
 }
 
+/** A block that can only be a bibliography entry: a DOI or database link, a numbered "12. Name, X." entry, or dense author initials with a year. */
+function isEntry(text: string) {
+  if (text.length > 1600) return false;
+  if (/\[(?:CrossRef|PubMed|Google Scholar)\]|doi\.org\/|\bdoi:\s*10\./i.test(text)) return true;
+  // "31. Wahidul, K.B. Life cycle …": the year may be on the entry's next line.
+  if (/^\[?\d{1,3}[.\])]\s+[A-Z][A-Za-z'’-]+,?\s+(?:[A-Z]\.|[A-Z][a-z]+,)/.test(text)) return true;
+  // "Dubois, L., and Thomas, D. (2018)": an initial before a comma, "and", "&" or the year.
+  const initials = (text.match(/\b[A-Z]\.(?:\s?-?[A-Z]\.)*(?:[,;&]|\s(?:\(|and\b|&))/g) ?? []).length;
+  return initials >= 2 && initials * 100 >= text.length * .6 && /\b(?:19|20)\d{2}[a-z]?\b/.test(text);
+}
+
+/**
+ * Reference lists the headings missed (no heading, a heading in another language, a list carried over a
+ * page or chapter break): three or more entries in a row, with the short continuation lines between
+ * them, are references and are never sent for translation.
+ */
+export function markReferenceRuns(blocks: ManifestBlock[]) {
+  const candidates = blocks.filter(block => block.translatable);
+  let start = 0;
+  while (start < candidates.length) {
+    if (!isEntry(candidates[start].text)) { start++; continue; }
+    let end = start, entries = 1;
+    for (let next = start + 1; next < candidates.length; next++) {
+      if (isEntry(candidates[next].text)) { entries++; end = next; continue; }
+      // The tail of an entry ("Publ. 2014, 4, 1–24.", "15 October 2018).") belongs to the list.
+      if (candidates[next].text.length < 300 && looksLikeReference(candidates[next].text)) { end = next; continue; }
+      // A wrapped entry's tail ("England, 2004; pp 89-160.") sits between two entries.
+      if (candidates[next].text.length < 220 && next + 1 < candidates.length && isEntry(candidates[next + 1].text)) continue;
+      break;
+    }
+    if (entries >= 3) for (const block of candidates.slice(start, end + 1)) { block.role = "REFERENCE"; block.translatable = false; block.exclusionReason = "reference-section"; }
+    start = end + 1;
+  }
+}
+
 const SENTENCE_END = /[.!?:。！？](?:["”’)\]]|\[[\d,–−-]+\])*\s*$/;
 const MAX_UNIT_CHARS = 6000;
 
@@ -99,18 +136,26 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
   const blocks: ManifestBlock[] = [], ids = new Set<string>(), ocrCandidates: number[] = [], pages: PageSize[] = [], keywords: string[] = [];
   let ocrPages = 0, section: Section = "none";
   const marks: string[] = [], texts: string[] = [], citations = { raised: 0, total: 0 };
+  const timing = { text: 0, images: 0, ocr: 0, layout: 0, total: 0 }, started = performance.now();
+  let mark = started;
+  const lap = (key: keyof typeof timing) => { const now = performance.now(); timing[key] += now - mark; mark = now; };
   for (let pageIndex = 0; pageIndex < pdf.pageCount; pageIndex++) {
     signal?.throwIfAborted();
     const page = await pdf.getPage(pageIndex + 1);
     pages.push({ width: page.width, height: page.height });
     let raw = await page.getTextItems(signal);
+    lap("text");
     // A scanned page (no text, an image) or text without a usable Unicode map is read from its pixels.
     const health = textHealth(raw);
-    if (health === "garbled" || (health === "empty" && (await page.getRasterImageCount?.() ?? 0) > 0)) {
+    // A page that is only a figure keeps its picture: OCR runs for unusable fonts, or an image covering most of the page (a scan).
+    const scanned = health === "garbled" || (health === "empty" && (await page.getLargestImageShare?.() ?? 0) >= .5);
+    lap("images");
+    if (scanned) {
       let read: PdfTextItem[] | null = null;
       if (ocr) { try { read = await ocr(page, signal); } catch (error) { if (signal?.aborted) throw error; } }
       if (read && letterCount(read) > letterCount(raw) * 1.2 + 40) { raw = read; ocrPages++; }
       else if (!read) ocrCandidates.push(pageIndex);
+      lap("ocr");
     }
     const pageBlocks = await buildPageBlocks(documentId, pageIndex, raw, page.width, page.height, section);
     for (const block of pageBlocks) {
@@ -125,12 +170,17 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
       }
       blocks.push({ ...block, readingOrder: blocks.length, lineTexts: undefined, marks: undefined, raised: undefined });
     }
+    lap("layout");
     onPage?.(pageIndex + 1);
     // Yield so a long extraction never freezes the reader.
     await new Promise(resolve => setTimeout(resolve, 0));
+    mark = performance.now();
   }
+  markReferenceRuns(blocks);
   const units = await buildUnits(documentId, blocks);
-  return { documentId, version: EXTRACTOR_VERSION, createdAt: new Date().toISOString(), pageCount: pdf.pageCount, pages, blocks, units, keywords: [...new Set(keywords)], extractedPages: pdf.pageCount, ocrPages, ocrCandidates, scripts: buildScriptTable(marks, texts, citations) };
+  timing.total = performance.now() - started;
+  for (const key of Object.keys(timing) as (keyof typeof timing)[]) timing[key] = Math.round(timing[key]);
+  return { documentId, version: EXTRACTOR_VERSION, createdAt: new Date().toISOString(), pageCount: pdf.pageCount, pages, blocks, units, keywords: [...new Set(keywords)], extractedPages: pdf.pageCount, ocrPages, ocrCandidates, scripts: buildScriptTable(marks, texts, citations), timing };
 }
 
 const memory = new Map<string, TranslationManifest>();
@@ -153,23 +203,47 @@ export const manifestRepository = {
   }
 };
 
-/** One build per document even when the library, reader and export ask at once. */
-const building = new Map<string, Promise<TranslationManifest>>();
-export function ensureManifest(documentId: string, open: () => Promise<PdfDocumentHandle>, onPage?: (completed: number) => void, signal?: AbortSignal, ocr?: OcrProvider): Promise<TranslationManifest> {
-  const running = building.get(documentId);
-  if (running) return running;
-  const task = (async () => {
-    const stored = await manifestRepository.get(documentId);
-    if (stored) return stored;
-    const pdf = await open();
-    try {
-      const manifest = await buildTranslationManifest(documentId, pdf, signal, onPage, ocr);
-      await manifestRepository.put(manifest);
-      return manifest;
-    } finally { await pdf.destroy(); }
-  })().finally(() => building.delete(documentId));
-  building.set(documentId, task);
-  return task;
+/**
+ * One build per document even when the library, reader and export ask at once. The build belongs to
+ * everyone waiting for it: one caller giving up (a re-rendered reader, a stopped job) leaves it running
+ * for the others, and it is cancelled only when nobody is waiting any more.
+ */
+type Build = { task: Promise<TranslationManifest>; controller: AbortController; waiters: number; done: number; listeners: Set<(completed: number) => void> };
+const building = new Map<string, Build>();
+export function ensureManifest(documentId: string, open: (signal: AbortSignal) => Promise<PdfDocumentHandle>, onPage?: (completed: number) => void, signal?: AbortSignal, ocr?: OcrProvider): Promise<TranslationManifest> {
+  let build = building.get(documentId);
+  if (!build) {
+    const controller = new AbortController(), listeners = new Set<(completed: number) => void>();
+    const entry: Build = { controller, listeners, waiters: 0, done: 0, task: null! };
+    entry.task = (async () => {
+      const stored = await manifestRepository.get(documentId);
+      if (stored) return stored;
+      const pdf = await open(controller.signal);
+      try {
+        const manifest = await buildTranslationManifest(documentId, pdf, controller.signal, completed => { entry.done = completed; for (const listener of listeners) listener(completed); }, ocr);
+        await manifestRepository.put(manifest);
+        return manifest;
+      } finally { await pdf.destroy(); }
+    })().finally(() => { if (building.get(documentId) === entry) building.delete(documentId); });
+    building.set(documentId, entry);
+    build = entry;
+  }
+  const current = build;
+  current.waiters++;
+  if (onPage) { current.listeners.add(onPage); if (current.done) onPage(current.done); }
+  return new Promise<TranslationManifest>((resolve, reject) => {
+    let settled = false;
+    const leave = () => { settled = true; current.waiters--; if (onPage) current.listeners.delete(onPage); signal?.removeEventListener("abort", abort); };
+    const abort = () => {
+      if (settled) return;
+      leave();
+      if (current.waiters <= 0) { current.controller.abort(); if (building.get(documentId) === current) building.delete(documentId); }
+      reject(signal?.reason ?? new DOMException("Aborted", "AbortError"));
+    };
+    if (signal?.aborted) return abort();
+    signal?.addEventListener("abort", abort, { once: true });
+    current.task.then(value => { if (settled) return; leave(); resolve(value); }, error => { if (settled) return; leave(); reject(error); });
+  });
 }
 
 export function manifestCounts(manifest: TranslationManifest, translatedIds: Set<string>, failedIds = new Set<string>(), cancelledIds = new Set<string>()) {

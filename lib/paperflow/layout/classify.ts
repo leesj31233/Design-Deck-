@@ -9,7 +9,8 @@ export interface Classified { role: BlockRole; reason: string | null }
 const squash = (text: string) => text.replace(/[\s■●•]+/g, "").toLowerCase();
 const FRONT_LABELS = /^(?:articleinfo|abstract|graphicalabstract|highlights|keywords?|articlehistory|metrics&more|access|articlerecommendations|readonline|supportinginformation|citethis|cite|journalhomepage.*|contentslistsavailable.*|openaccess|researchpaper|reviewarticle|originalarticle|fulllengtharticle|article|review)$/;
 const STOP_SECTION = /^(?:[^A-Za-z]*)(?:references|bibliography|literature cited|author information|author contributions|declaration of competing interest|conflicts? of interest|credit authorship contribution statement|data availability|acknowledg(?:e)?ments?|funding|abbreviations)\b/i;
-const REFERENCE_SECTION = /^(?:[^A-Za-z]*)(?:references|bibliography|literature cited)\b/i;
+/** The heading of a reference list, in the languages papers arrive in (Indonesian, Korean, Japanese/Chinese, German, French, Spanish …). */
+const REFERENCE_SECTION = /^(?:[^A-Za-z\uac00-\ud7a3\u3040-\u30ff\u4e00-\u9fff]*)(?:references|bibliography|literature cited|works cited|daftar pustaka|daftar rujukan|pustaka acuan|referensi|bibliografi|literatur(?:verzeichnis)?|quellenverzeichnis|références(?: bibliographiques)?|bibliographie|referencias(?: bibliográficas)?|bibliografía|riferimenti bibliografici|참고\s*문헌|인용\s*문헌|参考文献|引用文献)(?=$|[\s:.\d\[(])/i;
 
 const YEAR = /\b(?:19|20)\d{2}[a-z]?\b/;
 /**
@@ -26,7 +27,9 @@ export function looksLikeReference(text: string) {
 /** A reference list ends where a new chapter or section begins, or where real prose resumes (books, theses, reports, patents). */
 function endsReferenceList(block: PdfParagraph, value: string, bodySize: number) {
   if (looksLikeReference(value)) return false;
-  if (value.length < 90 && (/^(?:chapter|part|section|appendix)\s+[\dIVX]+/i.test(value) || /^\d{1,2}(?:\.\d{1,2})*\.?\s+[A-Z][A-Za-z]/.test(value) || (block.fontSize ?? bodySize) >= bodySize * 1.2 && !YEAR.test(value))) return true;
+  // Running heads and footers ("Article" set larger than the small reference type) never end the list.
+  if ((block.y < .07 || block.y > .93) && !/^(?:chapter|part)\s+[\dIVX]+/i.test(value)) return false;
+  if (value.length < 90 && (/^(?:chapter|part|section|appendix)\s+[\dIVX]+/i.test(value) || /^\d{1,2}(?:\.\d{1,2})*\.?\s+[A-Z][A-Za-z]/.test(value) && !YEAR.test(value) && !/\)\.?\s*$/.test(value) || (block.fontSize ?? bodySize) >= bodySize * 1.2 && !YEAR.test(value))) return true;
   // Prose reads in lowercase function words with few numbers; entries are names, abbreviations and volume/page numbers.
   const score = proseScore(value), years = (value.match(/\b(?:19|20)\d{2}\b/g) ?? []).length;
   const numbers = (value.match(/\d+/g) ?? []).length, plain = (value.match(/\b(?:the|of|and|is|are|was|were|to|in|that|which|with|for|by|this|as)\b/g) ?? []).length;
@@ -60,7 +63,9 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
   if (block.hint === "furniture") return { role: "OTHER", reason: "glyph-noise" };
   if (section === "references" && !endsReferenceList(block, value, context.bodySize)) return { role: "REFERENCE", reason: "reference-section" };
   if (section === "authors") return { role: "AUTHOR", reason: "author-section" };
-  if (REFERENCE_SECTION.test(value) && value.length < 40) return { role: "REFERENCE", reason: "reference-section" };
+  // "References" alone, or run together with the first entry ("Daftar Pustaka Acharya, B., …").
+  const referenceHead = value.match(REFERENCE_SECTION);
+  if (referenceHead && (value.length < 40 || looksLikeReference(value.slice(referenceHead[0].length).trim()))) return { role: "REFERENCE", reason: "reference-section" };
   // Only a heading starts the back matter; a footnote that mentions authors must not.
   if (STOP_SECTION.test(value) && value.length < 45 && !/@|\.\s+\S/.test(value)) return { role: "OTHER", reason: "back-matter" };
   if (block.hint === "equation" || isEquationLine(value, block.width / Math.max(.05, (block.column?.right ?? 1) - (block.column?.left ?? 0))) && block.lines.length <= 2) return { role: "EQUATION", reason: "equation" };

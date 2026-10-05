@@ -49,10 +49,10 @@ export function cancelTranslationJob(documentId: string) { jobs.get(documentId)?
 const roleOf = (unit: TranslationUnit): PassageRole => unit.role === "HEADING" ? "heading" : unit.role === "CAPTION" ? "caption" : "body";
 
 async function openManifest(documentId: string, signal: AbortSignal, onPage?: (page: number) => void): Promise<TranslationManifest> {
-  const manifest = await ensureManifest(documentId, async () => {
+  const manifest = await ensureManifest(documentId, async buildSignal => {
     const blob = await documentRepository.getDocumentBlob(documentId);
     if (!blob) throw new Error("이 브라우저에 저장된 PDF를 찾지 못했습니다.");
-    return pdfAdapter.open(await blob.arrayBuffer(), signal);
+    return pdfAdapter.open(await blob.arrayBuffer(), buildSignal);
   }, onPage, signal, ocrPage);
   void releaseOcr();
   useTranslationStore.getState().setManifest(manifest);

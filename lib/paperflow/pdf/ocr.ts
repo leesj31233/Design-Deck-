@@ -23,7 +23,8 @@ export async function ocrPage(page: PdfPageHandle, signal?: AbortSignal): Promis
   const canvas = document.createElement("canvas"), controller = new AbortController();
   signal?.addEventListener("abort", () => controller.abort(), { once: true });
   try {
-    await page.render(canvas, SCALE, controller.signal);
+    // render() multiplies by the screen's pixel ratio; OCR needs a fixed ~170 dpi, not a 4x phone canvas.
+    await page.render(canvas, SCALE / Math.min(window.devicePixelRatio || 1, 2), controller.signal);
     const recogniser = await getWorker();
     signal?.throwIfAborted();
     const { data } = await recogniser.recognize(canvas, {}, { blocks: true });
@@ -63,6 +64,10 @@ export function textHealth(items: PdfTextItem[]) {
   const text = items.map(item => item.text).join("").replace(/\s/g, "");
   const odd = (text.match(/[-�]/g) ?? []).length, letters = (text.match(LETTER) ?? []).length;
   if (text.length < 80) return "empty" as const;
-  return odd > text.length * .05 || letters < text.length * .35 ? "garbled" as const : "ok" as const;
+  // Numbers, punctuation and symbols are text too (a page of tables is not garbled); fonts without a
+  // Unicode map show up as private-use / replacement glyphs or control characters instead.
+  const readable = letters + (text.match(/[\d\p{P}\p{S}]/gu) ?? []).length;
+  const control = (text.match(/\p{Cc}/gu) ?? []).length;
+  return odd > text.length * .05 || control > text.length * .05 || readable < text.length * .6 ? "garbled" as const : "ok" as const;
 }
 export const letterCount = (items: PdfTextItem[]) => items.reduce((sum, item) => sum + (item.text.match(LETTER) ?? []).length, 0);

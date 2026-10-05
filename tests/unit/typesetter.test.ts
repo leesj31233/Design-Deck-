@@ -100,4 +100,7 @@ it("builds a glossary from keywords and the technical words of the title", async
   expect(glossary).toEqual(expect.arrayContaining(["biomass ash", "slagging", "methane", "cofiring", "combustion", "NOx", "MW", "pulverized-coal", "boiler"]));
   expect(glossary).not.toContain("effects");
   expect(glossary).not.toContain("550");
+  const plain = paperGlossary({ keywords: [], blocks: [{ role: "TITLE", text: "The viability of co-firing biomass waste to mitigate coal plant emissions in Indonesia" }] } as unknown as TranslationManifest);
+  expect(plain).toEqual(expect.arrayContaining(["co-firing", "biomass"]));
+  for (const word of ["viability", "waste", "mitigate", "plant", "emissions"]) expect(plain).not.toContain(word);
 });

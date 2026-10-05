@@ -30,6 +30,7 @@ describe("OCR lines", () => {
   it("tells empty, garbled and healthy embedded text apart", () => {
     expect(textHealth([item("p. 3", 0, 10)])).toBe("empty");
     expect(textHealth([item("\ue001\ue002\ue003".repeat(40), 0, 10)])).toBe("garbled");
+    expect(textHealth([item("Table 3 12.5 0.84 1,250 (±3.2%) 98.1 – 47.0 15.3 0.62 2,100 (±1.9%) 97.4 – 51.2 18.0 0.71 3,050 (±2.4%) 96.8 – 55.9", 0, 10)])).toBe("ok");
     expect(textHealth([item("Carbon dioxide is absorbed into propylene carbonate in a packed column at elevated pressure. ".repeat(2), 0, 10)])).toBe("ok");
   });
 });
@@ -87,5 +88,46 @@ describe("MDPI-style reference lists", () => {
       item("and feasibility of renewable energy generation from palm oil mill effluent in the region: A short review of the options. J. Clean. Prod. 2019, 233, 209–225.", 40, 190, 480)
     ], W, H);
     expect(blocks.filter(block => block.translatable)).toEqual([]);
+  });
+});
+
+describe("reference lists across pages", () => {
+  it("is not ended by a running head set larger than the reference type (Nature 'Article')", async () => {
+    const blocks = await buildPageBlocks("doc", 11, [
+      item("Article", 40, 24, 40, 10),
+      item("37. Casson, A., Muliastra, Y. I. K. D. & Obidzinski, K. Large-Scale Plantations, Bioenergy Developments and Land Use Change in Indonesia. (CIFOR, 2014).", 40, 60, 480, 8),
+      item("38. Abdullah, K. Biomass energy potentials and utilization in Indonesia. Lab. Energy Agric. Electrif. 2, 1–12 (2002).", 40, 80, 480, 8)
+    ], W, H, "references");
+    expect(blocks.filter(block => block.translatable)).toEqual([]);
+  });
+});
+
+describe("reference lists without a usable heading", () => {
+  const block = (text: string) => ({ text, translatable: true, role: "BODY", exclusionReason: null }) as unknown as import("../../lib/paperflow/translation/manifest").ManifestBlock;
+  it("marks a run of author-year entries (Frontiers, no heading) and their wrapped tails as references", async () => {
+    const { markReferenceRuns } = await import("../../lib/paperflow/translation/manifest");
+    const blocks = [
+      block("The Supplementary Material for this article can be found online at the journal website."),
+      block("Dave, N., Do, T., Palfreyman, D., and Feron, P. (2011). Impact of post combustion capture of CO2 on existing and new Australian coal-fired power plants."),
+      block("Duan, L., Zhao, M., and Yang, Y. (2012). Integration and optimization study on the coal-fired power plant with CO2 capture."),
+      block("England, 2004; pp 89-160."),
+      block("Dubois, L., and Thomas, D. (2018). Comparison of various configurations of the absorption-regeneration process. Int. J. Greenh. Gas Control 69, 20–35.")
+    ];
+    markReferenceRuns(blocks);
+    expect(blocks.map(item => item.translatable)).toEqual([true, false, false, false, false]);
+  });
+  it("leaves body paragraphs that cite a few authors alone", async () => {
+    const { markReferenceRuns } = await import("../../lib/paperflow/translation/manifest");
+    const prose = "Torrefaction raises the heating value of empty fruit bunch pellets and lowers their moisture uptake, which makes outdoor storage feasible for longer periods than for untreated biomass (Acharya, B., 2015; Chen, W.H., 2012). The mass yield falls as the temperature increases, so the operating window is narrow and must be chosen with the downstream boiler in mind.";
+    const blocks = [block(prose), block(prose + " A second paragraph."), block(prose + " A third paragraph.")];
+    markReferenceRuns(blocks);
+    expect(blocks.every(item => item.translatable)).toBe(true);
+  });
+  it("recognises reference headings in other languages, also run together with the first entry", async () => {
+    const blocks = await buildPageBlocks("doc", 9, [
+      item("Daftar Pustaka Acharya, B., Dutta, A. and Minaret, J., 2015, Review on comparative study of dry and wet torrefaction.", 40, 100, 480, 11),
+      item("Akbar, A., Paidoman, R., and dan Coniwanti, P. 2013. Pengaruh Variabel Waktu dan Temperatur. Jurnal Teknik Kimia 19, 1–8.", 40, 130, 480, 11)
+    ], W, H);
+    expect(blocks.filter(item => item.translatable)).toEqual([]);
   });
 });
