@@ -66,7 +66,9 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
   }
   keepTablesTogether(paragraphs, classified, context.bodySize);
   keepRuledTables(paragraphs, classified, context.bodySize, found.tables);
+  adoptEquationPieces(paragraphs, classified, height);
   adoptOrphanLines(paragraphs, classified, height, found.tables);
+  continueCaptions(paragraphs, classified);
   const blocks: ManifestBlock[] = [];
   for (const [index, paragraph] of paragraphs.entries()) {
     const { role, columnIndex } = classified[index];
@@ -90,7 +92,11 @@ function keepRuledTables(paragraphs: PdfParagraph[], classified: { role: BlockRo
     const chars = inside.reduce((sum, { paragraph }) => sum + paragraph.text.length, 0);
     // A framed text box holds paragraphs (two or more sentences over several lines); a column of row labels does not.
     const prose = inside.filter(({ paragraph }) => (paragraph.fontSize ?? bodySize) >= bodySize * .95 && paragraph.lines.length >= 2 && readsAsProse(paragraph.text) && (paragraph.text.match(/[a-z)\]][.!?](?:\s|$)/g) ?? []).length >= 2).reduce((sum, { paragraph }) => sum + paragraph.text.length, 0);
-    if (!inside.length || prose > chars * .6) continue;
+    // A "Table n" caption right above or below makes it a table even when its cells are sentences.
+    const captioned = paragraphs.some((paragraph, index) => classified[index].role === "CAPTION" && /^(?:table|tabel|tabla|tab(?:elle)?\.?|표|表)\s*[\dA-Z]/i.test(paragraph.text.trim())
+      && paragraph.x < table.x + table.width && paragraph.x + paragraph.width > table.x
+      && (Math.abs(paragraph.y + paragraph.height - table.y) < .06 || Math.abs(paragraph.y - (table.y + table.height)) < .06));
+    if (!inside.length || prose > chars * .6 && !captioned) continue;
     for (const { index } of inside) if (classified[index].role !== "CAPTION") classified[index] = { ...classified[index], role: "TABLE", reason: "table-data" };
   }
 }
@@ -111,6 +117,38 @@ function splitAtTables(paragraphs: PdfParagraph[], tables: Region[]): PdfParagra
       return { ...paragraph, id: paragraph.id + suffix, lines, lineTexts, text: lineTexts.join(" ").replace(/\s+/g, " ").trim(), x, y, width: Math.max(...lines.map(line => line.x + line.width)) - x, height: Math.max(...lines.map(line => line.y + line.height)) - y, indent: keep ? 0 : paragraph.indent, kind: keep ? "body" : paragraph.kind };
     };
     return [part(false, ""), part(true, "-cells")].filter((value): value is PdfParagraph => value !== null).sort((a, b) => a.y - b.y);
+  });
+}
+
+/**
+ * A display equation's fraction parts ("dCg" over "dx", "2γ cos θ" over "Pmax =") are separate text
+ * lines: short math fragments right above or below an equation, overlapping it, belong to it.
+ */
+function adoptEquationPieces(paragraphs: PdfParagraph[], classified: { role: BlockRole; reason: string | null }[], height: number) {
+  const equations = paragraphs.filter((_, index) => classified[index].role === "EQUATION");
+  if (!equations.length) return;
+  paragraphs.forEach((paragraph, index) => {
+    const { role } = classified[index], text = paragraph.text.trim();
+    if (!["BODY", "FIGURE_TEXT"].includes(role) || paragraph.lines.length > 2 || text.length > 16 || /[a-z]{4,}/.test(text)) return;
+    const near = equations.some(equation => {
+      const size = equation.fontSize ?? 9, overlapX = Math.min(paragraph.x + paragraph.width, equation.x + equation.width) - Math.max(paragraph.x, equation.x);
+      const gap = (paragraph.y > equation.y ? paragraph.y - (equation.y + equation.height) : equation.y - (paragraph.y + paragraph.height)) * height;
+      return overlapX > 0 && gap < size * 1.3;
+    });
+    if (near) classified[index] = { ...classified[index], role: "EQUATION", reason: "equation" };
+  });
+}
+
+/** A figure caption set across both columns: the right-hand half starts at the caption's height in its type size. */
+function continueCaptions(paragraphs: PdfParagraph[], classified: { role: BlockRole; reason: string | null }[]) {
+  paragraphs.forEach((caption, index) => {
+    if (classified[index].role !== "CAPTION") return;
+    paragraphs.forEach((other, otherIndex) => {
+      if (otherIndex === index || classified[otherIndex].role === "CAPTION" || other.text.length < 40) return;
+      const sameStart = Math.abs(other.y - caption.y) < .008, sameSize = Math.abs((other.fontSize ?? 0) - (caption.fontSize ?? 0)) < (caption.fontSize ?? 1) * .06;
+      const besides = other.x > caption.x + caption.width - .02 || other.x + other.width < caption.x + .02;
+      if (sameStart && sameSize && besides) classified[otherIndex] = { ...classified[otherIndex], role: "CAPTION", reason: null };
+    });
   });
 }
 
@@ -178,6 +216,12 @@ function isEntry(text: string) {
   if (/\[(?:CrossRef|PubMed|Google Scholar)\]|doi\.org\/|\bdoi:\s*10\./i.test(text)) return true;
   // "31. Wahidul, K.B. Life cycle …": the year may be on the entry's next line.
   if (/^\[?\d{1,3}[.\])]\s+[A-Z][A-Za-z'’-]+,?\s+(?:[A-Z]\.|[A-Z][a-z]+,)/.test(text)) return true;
+  // Initials first ("[43] C. Maes, …", "16. M. J. Silvapulle, …", "M. C. Kelley, The Earth's …") and BibTeX.
+  if (/^\[?\d{1,3}[.\])]\s+(?:[A-Z]\.\s?-?){1,3}\s?[A-Z][A-Za-z'’-]+/.test(text) || /^@\w+\{/.test(text)) return true;
+  // Vancouver (PLOS, medicine): "33. Silverstein JT, Shearer KD, …", "41. Mayer J (1991) …".
+  if (/^\[?\d{1,3}[.\])]?\s+[A-Z][A-Za-z'’-]+\s+[A-Z]{1,3}(?:[,.]|\s+\()/.test(text)) return true;
+  if ((text.match(/\b[A-Z][a-z'’-]+\s+[A-Z]{1,3}(?=,|\s\(|\.)/g) ?? []).length >= 2 && /\b(?:19|20)\d{2}[a-z]?\b/.test(text)) return true;
+  if (/^(?:[A-Z]\.\s?-?){1,3}\s?[A-Z][A-Za-z'’-]+,/.test(text) && /\b(?:19|20)\d{2}[a-z]?\b/.test(text)) return true;
   // "Dubois, L., and Thomas, D. (2018)": an initial before a comma, "and", "&" or the year.
   const initials = (text.match(/\b[A-Z]\.(?:\s?-?[A-Z]\.)*(?:[,;&]|\s(?:\(|and\b|&))/g) ?? []).length;
   return initials >= 2 && initials * 100 >= text.length * .6 && /\b(?:19|20)\d{2}[a-z]?\b/.test(text);

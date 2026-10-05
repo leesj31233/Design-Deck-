@@ -257,7 +257,8 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
   // Headings first: their real width decides where a run-in paragraph starts.
   for (const flow of flows.filter(flow => flow.kind === "heading")) {
     const block = flow.blocks[0];
-    const scale = fit(flow, ...SIZE_RANGE.heading) ?? SIZE_RANGE.heading[0];
+    // A long translated heading shrinks rather than losing its last words.
+    const scale = fit(flow, ...SIZE_RANGE.heading) ?? fit(flow, FALLBACK_MIN, SIZE_RANGE.heading[0]) ?? FALLBACK_MIN;
     const result = setFlow(flow, scale, 1, true);
     lines.push(...result.lines);
     if (result.overflow) unfit.push(block.unitId!);

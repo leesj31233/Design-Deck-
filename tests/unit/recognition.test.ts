@@ -177,3 +177,37 @@ describe("key terms", () => {
     expect(partitionTranslationResults(passages, [{ id: "p0", text: "바이오매스의 torrefaction은 분쇄성과 에너지 밀도를 개선한다." }], ["torrefaction"]).results).toHaveLength(1);
   });
 });
+
+describe("ruled tables from the page's own strokes", () => {
+  const rule = (x: number, y: number, width: number) => ({ x, y, width, height: .5 });
+  it("never lets a caption run on into the rows of a ruled table", async () => {
+    const found = { tables: [] as { x: number; y: number; width: number; height: number }[] };
+    const blocks = await buildPageBlocks("doc", 6, [
+      item("Table 2: Total hits of multiple large models on each abstract concept.", 100, 400, 380, 10),
+      item("Gravity Newton First Law Universal Gravity", 100, 425, 380, 10),
+      item("CDDA 6 almost 5 1 NtM 24 CDDA 3 6 4 almost 4", 100, 440, 380, 10),
+      item("Embed 2 37 2 8 1 1 9 1 NtM 24 Qwen3 VL 2B 38", 100, 455, 380, 10)
+    ], W, H, "none", [rule(95, 412, 400), rule(95, 430, 400), rule(95, 462, 400)], found);
+    expect(found.tables).toHaveLength(1);
+    expect(blocks.find(block => block.text.startsWith("Table 2"))?.translatable).toBe(true);
+    expect(blocks.filter(block => /CDDA|Embed/.test(block.text)).every(block => !block.translatable)).toBe(true);
+  });
+  it("keeps a running-head rule, a table and a footer rule apart when body text lies between them", async () => {
+    const { tableRegions } = await import("../../lib/paperflow/layout/graphics");
+    const prose = (band: { y: number; height: number }) => band.y < .5 && band.y + band.height > .6;
+    const regions = tableRegions([rule(50, 60, 500), rule(50, 120, 500), rule(50, 140, 500), rule(50, 200, 500), rule(50, 760, 500)], 600, 800, prose);
+    expect(regions.length).toBe(1);
+    expect(regions[0].y * 800).toBeGreaterThanOrEqual(59);
+    expect((regions[0].y + regions[0].height) * 800).toBeLessThan(250);
+  });
+});
+
+describe("initials-first reference lists", () => {
+  it("marks [n] C. Name and n. M. J. Name entries as references", async () => {
+    const { markReferenceRuns } = await import("../../lib/paperflow/translation/manifest");
+    const block = (text: string) => ({ text, translatable: true, role: "BODY", exclusionReason: null }) as unknown as import("../../lib/paperflow/translation/manifest").ManifestBlock;
+    const blocks = [block("[43] C. Maes, “Frenesy: Time-symmetric dynamical activity in nonequilibria,” Phys. Rep. 850, 1–33 (2020)."), block("[44] A. Strang, “A theoretical review of area production rates,” J. Stat. Phys. 180 (2020)."), block("16. M. J. Silvapulle, P. K. Sen, Constrained statistical inference (Wiley, 2005)."), block("M. C. Kelley, The Earth’s ionosphere: Plasma physics and electrodynamics (Academic Press, 2009).")];
+    markReferenceRuns(blocks);
+    expect(blocks.every(item => !item.translatable)).toBe(true);
+  });
+});

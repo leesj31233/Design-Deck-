@@ -85,6 +85,11 @@ export async function POST(request: Request) {
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(100_000)]),
       body: JSON.stringify({ model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, temperature: .2, instructions, prompt_cache_key: PROMPT_CACHE_KEY, input: JSON.stringify(glossary.length ? { glossary, passages } : { passages }), text: schema, max_output_tokens: Math.min(16000, Math.ceil(chars * 1.4) + 600) })
     });
+    // An exhausted OpenAI balance is not a passing rate limit: say so instead of promising a retry.
+    if (upstream.status === 429) {
+      const detail = await upstream.clone().json().catch(() => null) as { error?: { type?: string; code?: string } } | null;
+      if (detail?.error?.type === "insufficient_quota") return Response.json({ error: "번역 서비스의 사용 한도가 소진되어 잠시 번역할 수 없습니다. 관리자가 충전하면 이어서 번역할 수 있습니다.", kind: "configuration" }, { status: 503 });
+    }
     if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 또는 요청 한도에 도달했습니다. 잠시 후 자동으로 다시 시도합니다." : "OpenAI 요청을 완료하지 못했습니다.", kind: upstream.status === 429 ? "rate_limit" : upstream.status >= 500 ? "transient" : "configuration" }, { status: upstream.status === 429 ? 429 : upstream.status >= 500 ? 503 : 502, headers: { "Retry-After": upstream.headers.get("retry-after") || "20" } });
     const data = await upstream.json();
     const text = outputText(data);
