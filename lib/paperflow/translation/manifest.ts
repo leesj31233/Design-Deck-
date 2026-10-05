@@ -7,7 +7,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.17";
+export const EXTRACTOR_VERSION = "layout-v3.18";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
