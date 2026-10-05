@@ -164,14 +164,14 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const onGuide = useCallback(() => {
     if (guide.data) { useReaderStore.getState().set({ guideOverlay: !useReaderStore.getState().guideOverlay }); return; }
     if (makeGuide.isPending) return;
-    if (!window.confirm(`AI 가이드를 만듭니다. 논문 전체를 분석해 핵심 문장과 필기를 논문 위에 정리합니다.\n약 ${guideCredits ?? "–"} 크레딧이 사용됩니다(실제 사용량 기준 차감).`)) return;
+    if (!window.confirm(`AI 가이드를 만듭니다. 논문 전체를 분석해 요약·핵심 결과·페이지별 정리를 만들고, 핵심 문장 표시와 여백 메모를 논문 위에 남깁니다.\n약 ${guideCredits ?? "–"} 크레딧이 사용됩니다(실제 사용량 기준 차감).`)) return;
     makeGuide.mutate();
   }, [guide.data, makeGuide, guideCredits]);
-  const guideButton = { label: makeGuide.isPending ? "가이드 작성 중…" : guide.data ? (guideOverlay ? "가이드 숨기기" : "AI 가이드") : "AI 가이드", title: guide.data ? "논문 위의 AI 가이드 필기를 켜거나 끕니다" : `AI 가이드 만들기 · 약 ${guideCredits ?? "–"} 크레딧`, active: Boolean(guide.data && guideOverlay), busy: makeGuide.isPending, disabled: !manifest || makeGuide.isPending };
+  const guideButton = { label: makeGuide.isPending ? "가이드 작성 중…" : guide.data ? (guideOverlay ? "가이드 숨기기" : "AI 가이드") : "AI 가이드", title: guide.data ? "논문 위의 AI 가이드 표시를 켜거나 끕니다" : `AI 가이드 만들기 · 약 ${guideCredits ?? "–"} 크레딧`, active: Boolean(guide.data && guideOverlay), busy: makeGuide.isPending, disabled: !manifest || makeGuide.isPending };
   const lastScale = useRef(1);
   // Breathing room around the page: generous on a desk, almost none on a phone in focus mode.
   const baseGutter = size.width < 600 ? (focus ? 8 : 20) : 48;
-  // With the guide on, the page gives way to margins for the handwritten notes when the screen allows it.
+  // With the guide on, the page gives way to margins for the margin notes when the screen allows it.
   const gutter = guideOverlay && guide.data && size.width - 2 * NOTE_GUTTER - baseGutter >= 460 ? baseGutter + 2 * NOTE_GUTTER : baseGutter;
   const scale = page ? fit === "custom" ? zoom / 100 : fit === "page" ? Math.min((size.width - gutter) / page.width, (size.height - gutter) / page.height) : Math.min(1.65, (size.width - gutter) / page.width) : lastScale.current;
   useEffect(() => { lastScale.current = scale; }, [scale]);

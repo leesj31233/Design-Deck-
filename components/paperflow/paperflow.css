@@ -951,48 +951,12 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 .pf-page-wrap { position:relative; }
 .pf-guide-notes { position:absolute; left:0; top:0; z-index:7; pointer-events:none; }
 .pf-guide-ink { position:absolute; inset:0; }
-.pf-guide-note-hand { position:absolute; margin:0; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:22px; line-height:1.08; letter-spacing:-.01em; word-break:keep-all; pointer-events:auto; }
-.pf-guide-note-hand[data-side="left"] { text-align:right; }
-.pf-guide-note-hand small { display:block; margin-bottom:1px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif; font-size:9px; font-weight:700; letter-spacing:.06em; opacity:.7; }
-.pf-guide-flow { position:absolute; top:8px; display:grid; gap:2px; padding:10px 12px; border-radius:4px 14px 14px 14px; background:color-mix(in srgb,#fff3bf 88%,transparent); box-shadow:0 6px 16px rgba(120,90,0,.12); color:#5c3d00; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:18px; line-height:1.15; rotate:-1.2deg; pointer-events:auto; }
-.pf-guide-flow b { font-size:20px; color:#a8550a; }
-.pf-guide-flow i { display:block; font-style:normal; font-size:14px; opacity:.6; }
-.pf-guide-flow em { margin-top:6px; font-style:normal; color:#c92a2a; }
 .pf-guide-pin { position:absolute; display:grid; place-items:center; width:22px; height:22px; border-radius:50%; color:#fff; font-size:11px; font-weight:700; pointer-events:auto; box-shadow:0 2px 6px rgba(0,0,0,.2); }
-.pf-guide-pin-note { position:absolute; top:26px; width:max-content; max-width:180px; padding:6px 9px; border-radius:10px; background:#fff; box-shadow:var(--shadow-float); font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:18px; font-weight:400; line-height:1.15; text-align:left; white-space:normal; }
 .pf-guide-button[aria-pressed="true"] { background:var(--accent-soft)!important; color:var(--accent)!important; box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent); }
 .pf-guide-button[data-busy] svg { animation:pf-spin 1.4s linear infinite; }
 .pf-guide-toggle { padding:4px 16px 0; }
-.pf-guide-flow-card ol { margin:6px 0 0; padding-left:18px; font-size:12.5px; line-height:1.8; }
-.pf-guide-takeaway { margin-top:8px!important; font-weight:600; color:var(--accent); font-size:12.5px; }
-.pf-guide-metrics { display:grid; gap:4px; margin:6px 0 0; }
-.pf-guide-metrics div { display:flex; justify-content:space-between; gap:10px; padding:6px 9px; border-radius:9px; background:var(--surface); font-size:12px; }
-.pf-guide-metrics dt { color:var(--muted); } .pf-guide-metrics dd { margin:0; font-weight:650; text-align:right; }
-html[data-pf-theme="dark"] .pf-guide-note-hand { filter:brightness(1.35) saturate(1.1); }
 @media (max-width:900px) { .pf-guide-button { padding-inline:8px; } }
 @media (prefers-reduced-motion: reduce) { .pf-guide-button[data-busy] svg { animation:none; } }
-
-/* AI guide v3: study-book side columns (later rules override the v2 margin notes) */
-.pf-guide-column { position:absolute; top:6px; display:grid; gap:10px; pointer-events:auto; }
-.pf-guide-column h4 { display:flex; align-items:center; gap:6px; margin:0 0 6px; font-size:11.5px; font-weight:750; letter-spacing:-.01em; color:var(--foreground); }
-.pf-guide-flow { position:static; display:block; padding:11px 12px 10px; border-radius:6px 14px 14px 14px; background:#fff8db; box-shadow:0 4px 14px rgba(120,90,0,.10); color:#5c3d00; rotate:0deg; font-family:inherit; }
-.pf-guide-flow h4 { color:#a8550a; }
-.pf-guide-flow ol { margin:0; padding-left:18px; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:16.5px; line-height:1.3; color:#5c3d00; }
-.pf-guide-flow li::marker { font-family:-apple-system,"Segoe UI",sans-serif; font-size:11px; font-weight:700; color:#c77a1d; }
-.pf-guide-flow-take { margin:7px 0 0!important; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:16px; font-weight:700; line-height:1.25; color:#c92a2a; }
-.pf-guide-page { padding:10px 12px 11px; border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line)); border-top:3px solid var(--accent); border-radius:10px; background:var(--surface-strong); box-shadow:0 4px 14px rgba(20,40,30,.07); }
-.pf-guide-page h4 span { padding:1px 7px; border-radius:999px; background:var(--accent); color:var(--accent-ink); font-size:10px; }
-.pf-guide-page-summary { margin:0!important; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:17px; line-height:1.3; color:var(--foreground); word-break:keep-all; }
-.pf-guide-concepts { display:grid; gap:6px; margin:9px 0 0; padding-top:8px; border-top:1px dashed color-mix(in srgb,var(--accent) 30%,var(--line)); }
-.pf-guide-concepts-title { font-size:10px; font-weight:750; letter-spacing:.06em; color:var(--accent); }
-.pf-guide-concepts dt:not(.pf-guide-concepts-title) { font-size:11.5px; font-weight:700; color:var(--accent); }
-.pf-guide-concepts dd { margin:1px 0 0; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:15.5px; line-height:1.25; color:var(--foreground); word-break:keep-all; }
-.pf-guide-note-hand { padding:2px 0 2px 9px; border-left:2.5px solid; font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:17px; font-weight:700; line-height:1.22; word-break:keep-all; }
-.pf-guide-note-hand[data-side="left"] { padding:2px 9px 2px 0; border-left:0; border-right:2.5px solid; }
-.pf-guide-note-hand small { font-size:9.5px; margin-bottom:2px; }
-.pf-guide-pin-note { font-family:var(--font-hand-kr),"Gaegu",cursive; font-size:16px; font-weight:700; }
-html[data-pf-theme="dark"] .pf-guide-page { background:var(--surface-strong); }
-html[data-pf-theme="dark"] .pf-guide-page-summary, html[data-pf-theme="dark"] .pf-guide-concepts dd { color:var(--foreground); }
 
 /* Highlighter colour while dragging (Ctrl / 1–5) */
 .pf-hl-chip { position:fixed; z-index:120; display:flex; align-items:center; gap:6px; padding:6px 9px 6px 8px; border-radius:999px; pointer-events:none; box-shadow:0 8px 24px -10px rgba(10,40,30,.35); animation:pf-chip-in .22s var(--ease-spring) both; }
@@ -1088,3 +1052,93 @@ html[data-pf-theme="dark"] .pf-guide-page-summary, html[data-pf-theme="dark"] .p
 
 /* The selection bar waits until the drag ends: under the pointer it would capture the selection. */
 html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { pointer-events:none!important; opacity:0; transition:opacity .12s ease; }
+
+/* AI guide v4: scientific workspace. One sans family, keyword-first notes, colour = type. */
+.pf-guide, .pf-guide-notes { --guide-font:Pretendard,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-family:var(--guide-font); }
+.pf-guide { gap:10px; padding:4px 14px 12px; font-size:13px; font-weight:400; line-height:1.55; }
+.pf-guide b { font-weight:700; }
+.pf-guide-label { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+.pf-guide-hero { padding:14px 14px 13px; border-radius:12px; background:var(--accent-soft); border:1px solid color-mix(in srgb,var(--accent) 22%,transparent); }
+.pf-guide-hero .pf-guide-label { color:var(--accent); }
+.pf-guide-definition { margin:4px 0 0; font-size:14px; font-weight:700; line-height:1.55; word-break:keep-all; }
+.pf-guide-block { display:grid; gap:6px; }
+.pf-guide-summary { display:grid; gap:0; margin:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.pf-guide-summary div { display:grid; grid-template-columns:52px 1fr; gap:8px; padding:7px 10px; border-top:1px solid var(--line); }
+.pf-guide-summary div:first-child { border-top:0; }
+.pf-guide-summary dt { font-size:12px; font-weight:700; color:var(--accent); }
+.pf-guide-summary dd { margin:0; font-size:13px; line-height:1.5; word-break:keep-all; }
+.pf-guide-takeaway { display:grid; gap:2px; margin:0; padding:9px 12px; border-left:3px solid var(--accent); background:var(--surface-strong); font-size:13px; font-weight:700; line-height:1.5; word-break:keep-all; }
+.pf-guide-level { border-top:1px solid var(--line); padding-top:8px; }
+.pf-guide-level > summary { display:flex; align-items:center; gap:8px; padding:2px 0 6px; font-size:14px; font-weight:700; cursor:pointer; list-style:none; }
+.pf-guide-level > summary::-webkit-details-marker { display:none; }
+.pf-guide-level > summary::after { content:"+"; margin-left:auto; color:var(--muted); font-weight:400; }
+.pf-guide-level[open] > summary::after { content:"−"; }
+.pf-guide-level-no { min-width:24px; padding:1px 5px; border-radius:5px; background:color-mix(in srgb,var(--foreground) 7%,transparent); font-size:10px; font-weight:700; color:var(--muted); text-align:center; }
+.pf-guide-flowchart { display:grid; gap:0; margin:0; padding:0; list-style:none; counter-reset:step; }
+.pf-guide-flowchart li { position:relative; display:grid; gap:1px; padding:6px 10px 6px 34px; counter-increment:step; }
+.pf-guide-flowchart li::before { content:counter(step); position:absolute; left:4px; top:7px; display:grid; place-items:center; width:20px; height:20px; border-radius:50%; background:var(--accent); color:var(--accent-ink); font-size:10.5px; font-weight:700; }
+.pf-guide-flowchart li:not(:last-child)::after { content:""; position:absolute; left:13.5px; top:28px; bottom:-6px; width:1px; background:color-mix(in srgb,var(--accent) 45%,transparent); }
+.pf-guide-flowchart b { font-size:13px; }
+.pf-guide-flowchart span { font-size:12px; color:var(--muted); }
+.pf-guide-facts { display:grid; gap:0; margin:0; }
+.pf-guide-facts div { display:grid; grid-template-columns:84px 1fr; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); }
+.pf-guide-facts dt { font-size:12px; font-weight:700; color:var(--muted); }
+.pf-guide-facts dd { margin:0; font-size:13px; font-variant-numeric:tabular-nums; }
+.pf-guide-facts[data-kind="condition"] dt { color:#1864ab; }
+.pf-guide-cite { margin-left:6px; padding:0 5px; border:1px solid var(--line); border-radius:5px; background:none; color:var(--muted); font:inherit; font-size:10.5px; font-weight:700; cursor:pointer; vertical-align:1px; }
+.pf-guide-cite[data-active] { border-color:#f5a400; color:#b08800; }
+.pf-guide-results { display:grid; gap:6px; margin:0; padding:0; list-style:none; }
+.pf-guide-results button { display:grid; grid-template-columns:22px 1fr; gap:9px; width:100%; padding:9px 11px; border:1px solid var(--line); border-left:3px solid #f2c200; border-radius:10px; background:var(--surface-strong); color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.pf-guide-results button:disabled { cursor:default; }
+.pf-guide-results button[data-active] { border-color:#f5a400; box-shadow:0 0 0 3px rgba(245,164,0,.16); }
+.pf-guide-results .pf-guide-index { width:22px; height:22px; background:rgba(242,194,0,.2); color:#8a6d00; font-size:11px; }
+.pf-guide-results .pf-guide-body b { font-size:13px; font-weight:700; }
+.pf-guide-results .pf-guide-body small { font-size:12px; }
+.pf-guide-body q { font-family:inherit; font-style:normal; font-size:11.5px; }
+.pf-guide-claims, .pf-guide-details { display:grid; gap:6px; margin:0; padding:0; list-style:none; }
+.pf-guide-claims li { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; font-size:13px; word-break:keep-all; }
+.pf-guide-claims li > span:not(.pf-guide-who) { flex:1 1 180px; }
+.pf-guide-who { padding:1px 6px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:.04em; background:rgba(112,72,232,.12); color:#7048e8; }
+.pf-guide-who[data-source="ai"] { background:color-mix(in srgb,var(--foreground) 7%,transparent); color:var(--muted); }
+.pf-guide-figures { display:grid; gap:8px; margin:0; padding:0; list-style:none; }
+.pf-guide-figures > li { padding:8px 10px; border:1px solid var(--line); border-radius:10px; }
+.pf-guide-figure-head { display:flex; align-items:center; gap:8px; }
+.pf-guide-figure-head b { font-size:13px; }
+.pf-guide-stars { font-size:11px; letter-spacing:1px; color:#e8a400; } .pf-guide-stars i { font-style:normal; color:var(--line); }
+.pf-guide-figures p { margin:3px 0 0; font-size:12.5px; }
+.pf-guide-figures ul { display:grid; gap:2px; margin:5px 0 0; padding:0; list-style:none; font-size:12.5px; }
+.pf-guide-figures ul .pf-guide-label { margin-right:6px; color:var(--accent); }
+.pf-guide-pages { display:grid; gap:6px; }
+.pf-guide-pagecard { padding:7px 10px; border:1px solid var(--line); border-radius:10px; }
+.pf-guide-pagecard[open] { border-color:color-mix(in srgb,var(--accent) 30%,var(--line)); }
+.pf-guide-pagecard summary { display:flex; align-items:baseline; gap:7px; cursor:pointer; list-style:none; }
+.pf-guide-pagecard summary::-webkit-details-marker { display:none; }
+.pf-guide-page-no { font-size:12px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+.pf-guide-page-about { flex:1; min-width:0; font-size:13px; font-weight:700; word-break:keep-all; }
+.pf-guide-page-key { display:flex; gap:8px; margin:6px 0 0!important; font-size:13px; line-height:1.5; word-break:keep-all; }
+.pf-guide-page-key b { flex:none; font-size:10.5px; letter-spacing:.06em; color:var(--accent); padding-top:2px; }
+.pf-guide-page-numbers { display:flex; flex-wrap:wrap; gap:4px; margin:6px 0 0; padding:0; list-style:none; }
+.pf-guide-page-numbers li { padding:1px 7px; border-radius:5px; background:color-mix(in srgb,var(--foreground) 6%,transparent); font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; }
+.pf-guide-details { margin-top:6px; }
+.pf-guide-details li { font-size:12.5px; line-height:1.5; }
+.pf-guide-details .pf-guide-label { margin-right:6px; }
+.pf-guide-marklist { display:grid; gap:4px; margin:7px 0 0; padding:0; list-style:none; }
+.pf-guide-marklist button { display:flex; gap:7px; align-items:baseline; width:100%; padding:3px 8px; border:0; border-left:3px solid; border-radius:0 6px 6px 0; background:color-mix(in srgb,var(--foreground) 4%,transparent); color:inherit; font:inherit; font-size:12.5px; font-weight:700; text-align:left; cursor:pointer; }
+.pf-guide-marklist button[data-active] { background:rgba(245,164,0,.14); }
+.pf-guide-terms dt, .pf-guide-terms dd { font-family:inherit; }
+
+/* On the paper: margin column and keyword notes (no handwriting). */
+.pf-guide-column { position:absolute; top:6px; display:grid; gap:8px; pointer-events:auto; font-size:13px; line-height:1.5; }
+.pf-guide-column h4 { display:flex; align-items:center; gap:6px; margin:0 0 4px; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+.pf-guide-flow { padding:10px 11px; border-radius:10px; background:var(--accent-soft); border:1px solid color-mix(in srgb,var(--accent) 22%,transparent); }
+.pf-guide-flow h4 { color:var(--accent); }
+.pf-guide-flow p { margin:0; font-size:13px; font-weight:700; word-break:keep-all; }
+.pf-guide-flow-take { margin-top:6px!important; padding-top:6px; border-top:1px solid color-mix(in srgb,var(--accent) 20%,transparent); font-weight:400!important; }
+.pf-guide-page { padding:10px 11px; border:1px solid var(--line); border-top:2px solid var(--accent); border-radius:8px; background:var(--surface-strong); box-shadow:0 2px 10px rgba(20,40,30,.05); }
+.pf-guide-page h4 span { padding:1px 6px; border-radius:5px; background:var(--accent); color:var(--accent-ink); font-size:10px; letter-spacing:0; }
+.pf-guide-page-summary { margin:0!important; font-size:14px; font-weight:700; line-height:1.45; word-break:keep-all; }
+.pf-guide-margin { position:absolute; margin:0; padding:1px 0 1px 8px; border-left:2px solid; font-size:12.5px; font-weight:700; line-height:1.4; word-break:keep-all; pointer-events:auto; color:var(--foreground); }
+.pf-guide-margin[data-side="left"] { padding:1px 8px 1px 0; border-left:0; border-right:2px solid; text-align:right; }
+.pf-guide-margin small { display:block; margin-bottom:1px; font-size:10px; font-weight:700; letter-spacing:.07em; }
+.pf-guide-pin-note { position:absolute; top:26px; width:max-content; max-width:200px; padding:6px 9px; border-radius:8px; background:var(--surface-strong); box-shadow:var(--shadow-float); font-size:12.5px; font-weight:700; line-height:1.4; text-align:left; white-space:normal; }
+html[data-pf-theme="dark"] .pf-guide-margin small { filter:brightness(1.4); }

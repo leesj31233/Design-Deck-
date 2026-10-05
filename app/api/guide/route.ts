@@ -2,9 +2,9 @@ import { GUIDE_INSTRUCTIONS, GUIDE_VERSION, guideSchema, type GuideUnit } from "
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
 import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
-import { guideCreditEstimate, GUIDE_MODEL } from "@/lib/paperflow/guide/cost";
+import { guideCreditEstimate, GUIDE_FALLBACK_MODEL, GUIDE_MODEL, isReasoningModel } from "@/lib/paperflow/guide/cost";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const recent = new Map<string, number[]>();
 /** Guides read a whole paper: a tighter per-address budget than paragraph translation. */
@@ -40,14 +40,20 @@ export async function POST(request: Request) {
   const gate = await creditGate(guideCreditEstimate(chars, model));
   if (gate instanceof Response) return gate;
   if (limited(request)) return Response.json({ error: "가이드 요청이 많습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
+  // One request to OpenAI. A reasoning model thinks briefly and gets room for that in its output budget.
+  const ask = (name: string) => fetch("https://api.openai.com/v1/responses", {
+    method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+    signal: AbortSignal.any([request.signal, AbortSignal.timeout(280_000)]),
+    body: JSON.stringify({ model: name, store: false, instructions: GUIDE_INSTRUCTIONS, prompt_cache_key: "paperflow-guide", input: JSON.stringify({ passages: units }), text: guideSchema(units.map(unit => unit.id)),
+      ...(isReasoningModel(name) ? { reasoning: { effort: "low" }, max_output_tokens: 32000 } : { max_output_tokens: 16000 }) })
+  });
   try {
-    const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
-      signal: AbortSignal.any([request.signal, AbortSignal.timeout(110_000)]),
-      body: JSON.stringify({ model, store: false, instructions: GUIDE_INSTRUCTIONS, prompt_cache_key: "paperflow-guide", input: JSON.stringify({ passages: units }), text: guideSchema(units.map(unit => unit.id)), max_output_tokens: 12000 })
-    });
+    let upstream = await ask(model);
+    // The stronger model may not be enabled for this OpenAI project: fall back instead of failing.
+    if ((upstream.status === 400 || upstream.status === 403 || upstream.status === 404) && model !== GUIDE_FALLBACK_MODEL) upstream = await ask(GUIDE_FALLBACK_MODEL);
     if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 한도에 도달했습니다. 잠시 후 다시 시도해 주세요." : "가이드를 만들지 못했습니다." }, { status: upstream.status === 429 ? 429 : 502 });
     const data = await upstream.json();
+    if (data.status === "incomplete") return Response.json({ error: "가이드가 너무 길어 끝까지 쓰지 못했습니다. 다시 시도해 주세요." }, { status: 502 });
     const text = (data.output ?? []).flatMap((item: { content?: { type: string; text?: string }[] }) => item.content ?? []).filter((item: { type: string }) => item.type === "output_text").map((item: { text?: string }) => item.text ?? "").join("");
     let guide: unknown;
     try { guide = JSON.parse(text); } catch { return Response.json({ error: "가이드 응답을 읽지 못했습니다. 다시 시도해 주세요." }, { status: 502 }); }
