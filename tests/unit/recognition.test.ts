@@ -167,3 +167,13 @@ describe("line breaking", () => {
     expect(feeder.next(200, 10).text).toBe("burner tip");
   });
 });
+
+describe("key terms", () => {
+  it("retries a translation that transliterated a glossary term", async () => {
+    const { partitionTranslationResults, droppedTerms } = await import("../../lib/paperflow/translation/block-contract");
+    const passages = [{ id: "p0", text: "Torrefaction of the biomass improves its grindability and the energy density of the fuel.", role: "body" as const }];
+    expect(droppedTerms(passages[0].text, "토리팩션은 바이오매스의 분쇄성을 개선한다.", ["torrefaction"])).toEqual(["torrefaction"]);
+    expect(partitionTranslationResults(passages, [{ id: "p0", text: "바이오매스의 토리팩션은 분쇄성과 에너지 밀도를 개선한다." }], ["torrefaction"]).missing).toEqual(["p0"]);
+    expect(partitionTranslationResults(passages, [{ id: "p0", text: "바이오매스의 torrefaction은 분쇄성과 에너지 밀도를 개선한다." }], ["torrefaction"]).results).toHaveLength(1);
+  });
+});

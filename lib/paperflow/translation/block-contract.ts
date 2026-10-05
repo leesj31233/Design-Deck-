@@ -19,11 +19,21 @@ export function needsHangul(source: string) {
   return (glue >= 2 || (glue >= 1 && sentence)) && capitalised < .6;
 }
 
+/** Glossary terms of the source that the translation dropped (transliterated "토리팩션" or translated away). */
+export function droppedTerms(source: string, translated: string, glossary: string[]) {
+  const lowerSource = source.toLowerCase(), lower = translated.toLowerCase();
+  return glossary.filter(term => {
+    const key = term.toLowerCase(), at = lowerSource.indexOf(key);
+    // Whole-word occurrence only ("process" inside "processing" is not the term).
+    return term.length >= 5 && at >= 0 && !/[a-z]/.test(lowerSource[at - 1] ?? "") && !lower.includes(key);
+  });
+}
+
 /**
  * Keep every valid item and report the rest. A model that drops one passage
  * must not throw away the other nine.
  */
-export function partitionTranslationResults(passages: TranslationPassage[], value: unknown): TranslationBatchResult {
+export function partitionTranslationResults(passages: TranslationPassage[], value: unknown, glossary: string[] = []): TranslationBatchResult {
   const expected = new Map(passages.map(passage => [passage.id, passage]));
   if (expected.size !== passages.length) throw new Error("요청에 중복된 블록 ID가 있습니다.");
   const found = new Map<string, string>();
@@ -35,6 +45,11 @@ export function partitionTranslationResults(passages: TranslationPassage[], valu
     if (passage.role !== "heading" && needsHangul(passage.text) && !/[가-힣]/.test(text)) continue;
     // A truncated answer for a long paragraph is a failure, not a translation.
     if (passage.text.length > 240 && text.length < passage.text.length * .22) continue;
+    // Korean runs shorter than English: a translation far longer than its source has borrowed the
+    // next passage (finishing a sentence cut at a column), which would then appear twice.
+    if (passage.text.length >= 60 && [...text].length > passage.text.length * 1.7) continue;
+    // A paper's key term must read the same on every page: a translation that dropped it is retried.
+    if (glossary.length && droppedTerms(passage.text, text, glossary).length) continue;
     found.set(item.id, text);
   }
   return { results: passages.filter(passage => found.has(passage.id)).map(passage => ({ id: passage.id, text: found.get(passage.id)! })), missing: passages.filter(passage => !found.has(passage.id)).map(passage => passage.id) };

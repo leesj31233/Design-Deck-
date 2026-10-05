@@ -2,12 +2,14 @@ import type { PdfDocumentHandle, PdfPageHandle, PdfTextItem } from "../pdf/pdf-a
 import { letterCount, textHealth } from "../pdf/ocr";
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
 import { analyzePage, proseScore } from "../layout/page-blocks";
-import { classifyBlock, extractKeywords, looksLikeReference, nextSection, pageContext, type BlockRole, type Section } from "../layout/classify";
+import { classifyBlock, extractKeywords, looksLikeReference, nextSection, pageContext, readsAsProse, type BlockRole, type Section } from "../layout/classify";
+import { centerInside, figureRegions, tableRegions, type Region } from "../layout/graphics";
+import type { Box } from "../pdf/pdf-adapter";
 import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.19";
+export const EXTRACTOR_VERSION = "layout-v3.21";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -43,7 +45,7 @@ export function isKorean(text: string) {
   return hangul >= 4 && hangul >= others * .3;
 }
 
-export async function buildPageBlocks(documentId: string, pageIndex: number, raw: PdfTextItem[], width: number, height: number, initialSection: Section = "none"): Promise<ManifestBlock[]> {
+export async function buildPageBlocks(documentId: string, pageIndex: number, raw: PdfTextItem[], width: number, height: number, initialSection: Section = "none", rules: Box[] = [], found: { tables: Region[] } = { tables: [] }): Promise<ManifestBlock[]> {
   const paragraphs = analyzePage(raw, pageIndex, width, height);
   const context = pageContext(paragraphs, pageIndex);
   const classified: { role: BlockRole; reason: string | null; columnIndex: number }[] = [];
@@ -59,6 +61,9 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     classified.push({ role, reason, columnIndex });
   }
   keepTablesTogether(paragraphs, classified, context.bodySize);
+  const proseBand = (band: Region) => paragraphs.some(paragraph => centerInside(paragraph, band, 0) && (paragraph.fontSize ?? context.bodySize) >= context.bodySize * .95 && readsAsProse(paragraph.text));
+  found.tables = tableRegions(rules, width, height, proseBand);
+  keepRuledTables(paragraphs, classified, context.bodySize, found.tables);
   const blocks: ManifestBlock[] = [];
   for (const [index, paragraph] of paragraphs.entries()) {
     const { role, columnIndex } = classified[index];
@@ -70,6 +75,20 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     blocks.push({ ...paragraph, id, role, readingOrder: blocks.length, columnIndex, translatable, exclusionReason: translatable ? null : reason ?? "not-translated" });
   }
   return blocks;
+}
+
+/**
+ * Text inside a table the page draws with rules stays as printed, every cell alike (no table half in
+ * Korean, half in English). A ruled box whose text is body-size prose is a framed text box instead.
+ */
+function keepRuledTables(paragraphs: PdfParagraph[], classified: { role: BlockRole; reason: string | null }[], bodySize: number, tables: Region[]) {
+  for (const table of tables) {
+    const inside = paragraphs.map((paragraph, index) => ({ paragraph, index })).filter(({ paragraph }) => centerInside(paragraph, table));
+    const chars = inside.reduce((sum, { paragraph }) => sum + paragraph.text.length, 0);
+    const prose = inside.filter(({ paragraph }) => (paragraph.fontSize ?? bodySize) >= bodySize * .95 && readsAsProse(paragraph.text)).reduce((sum, { paragraph }) => sum + paragraph.text.length, 0);
+    if (!inside.length || prose > chars * .6) continue;
+    for (const { index } of inside) if (classified[index].role !== "CAPTION") classified[index] = { ...classified[index], role: "TABLE", reason: "table-data" };
+  }
 }
 
 const TABLE_REASONS = new Set(["table-data", "table-column", "numeric-cells"]);
@@ -157,7 +176,10 @@ export async function buildUnits(documentId: string, blocks: ManifestBlock[]): P
       continue;
     }
     const prose = block.role === "BODY" || block.role === "ABSTRACT";
-    if (prose && open && !SENTENCE_END.test(open.last.text) && !(block.indent && block.indent > 0) && open.unit.text.length + block.text.length < MAX_UNIT_CHARS && (open.last.pageIndex !== block.pageIndex || open.last.columnIndex !== block.columnIndex || /^[a-z(\d]/.test(block.text))) {
+    // A block that opens in lowercase ("of memory cards used …") continues the sentence above even when a
+    // hanging indent makes it look like a new paragraph; sent apart, the translator completes the first
+    // half with the second and the second half is then translated twice.
+    if (prose && open && !SENTENCE_END.test(open.last.text) && (!(block.indent && block.indent > 0) || /^[a-z]/.test(block.text)) && open.unit.text.length + block.text.length < MAX_UNIT_CHARS && (open.last.pageIndex !== block.pageIndex || open.last.columnIndex !== block.columnIndex || /^[a-z(\d]/.test(block.text))) {
       const hyphen = /[a-z][-‐]$/.test(open.unit.text) && /^[a-z]/.test(block.text);
       open.unit.text = hyphen ? open.unit.text.replace(/[-‐]$/, "") + block.text : `${open.unit.text} ${block.text}`;
       open.unit.blockIds.push(block.id);
@@ -186,7 +208,6 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
   for (let pageIndex = 0; pageIndex < pdf.pageCount; pageIndex++) {
     signal?.throwIfAborted();
     const page = await pdf.getPage(pageIndex + 1);
-    pages.push({ width: page.width, height: page.height });
     let raw = await page.getTextItems(signal);
     lap("text");
     // A scanned page (no text, an image) or text without a usable Unicode map is read from its pixels.
@@ -201,7 +222,13 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
       else if (!read) ocrCandidates.push(pageIndex);
       lap("ocr");
     }
-    const pageBlocks = await buildPageBlocks(documentId, pageIndex, raw, page.width, page.height, section);
+    // The page's own drawing: ruled tables keep their cells, pictures are kept clear of translated text.
+    const graphics = await page.getGraphics?.().catch(() => undefined);
+    const found = { tables: [] as Region[] };
+    const pageBlocks = await buildPageBlocks(documentId, pageIndex, raw, page.width, page.height, section, graphics?.rules ?? [], found);
+    const tables = found.tables;
+    const images = graphics ? figureRegions(graphics.images, page.width, page.height, pageBlocks) : [];
+    pages.push({ width: page.width, height: page.height, ...(images.length ? { images } : {}), ...(tables.length ? { tables } : {}) });
     for (const block of pageBlocks) {
       section = nextSection(block.role, block.exclusionReason, block.text, section);
       if (block.role === "KEYWORDS" && pageIndex < 2) keywords.push(...extractKeywords(block));

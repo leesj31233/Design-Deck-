@@ -31,7 +31,7 @@ interface Flow { kind: FlowKind; blocks: ManifestBlock[]; paragraphs: Paragraph[
 // Korean is set at most at the source size (so pages look alike) and down to 80%; spare room becomes leading.
 // Hangul reads larger than Latin at the same point size; .97 keeps the original's breathing room.
 const SIZE_RANGE: Record<FlowKind, [number, number]> = { body: [.8, .97], heading: [.85, 1], caption: [.76, .97] };
-const FALLBACK_MIN = .62;
+const FALLBACK_MIN = .5;
 
 /** Korean text that belongs to this page when one logical paragraph spans pages. */
 export function unitTextForPage(unit: TranslationUnit, translated: string, pageIndex: number): string {
@@ -131,6 +131,8 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
   // Fixed artwork: equations, tables, figure labels, and any text left in English.
   const obstacles = blocks.filter(block => !shown(block) && block.exclusionReason !== "glyph-noise" && block.role !== "HEADER" && block.role !== "FOOTER")
     .flatMap(block => px(block, page).map(line => ({ x: line.x - 1.5, y: line.y - line.height * .2, width: line.width + 3, height: line.height * 1.35 })));
+  // Pictures the page draws (photos, figure bitmaps) are fixed artwork too: translated text never covers them.
+  for (const image of page.images ?? []) obstacles.push({ x: image.x * page.width - 2, y: image.y * page.height - 2, width: image.width * page.width + 4, height: image.height * page.height + 4 });
 
   // 1. Flows: headings and captions stand alone; prose flows until a heading or an equation.
   const flows: Flow[] = [];

@@ -6,9 +6,14 @@ export interface PdfPageHandle {
   getTextItems(signal?: AbortSignal): Promise<PdfTextItem[]>;
   /** Share of the page covered by its largest raster image (a scanned page is one image of the whole page). */
   getLargestImageShare?(): Promise<number>;
+  /** Pictures and ruled lines the text layer cannot see, in page points from the top left. */
+  getGraphics?(): Promise<PageGraphics>;
   render(canvas: HTMLCanvasElement, scale: number, signal: AbortSignal): Promise<void>;
   renderText(container: HTMLElement, scale: number, signal: AbortSignal): Promise<void>;
 }
+export interface Box { x: number; y: number; width: number; height: number }
+/** Raster images, and long horizontal / vertical strokes (table rules, frames). */
+export interface PageGraphics { images: Box[]; rules: Box[] }
 export interface PdfDocumentHandle { readMetadata(): Promise<{ text: string; info: Record<string, unknown> }>; pageCount: number; fingerprint?: string; getPage(pageNumber: number): Promise<PdfPageHandle>; destroy(): Promise<void> }
 let library: Promise<typeof import("pdfjs-dist")> | undefined;
 async function getLibrary() {
@@ -17,17 +22,17 @@ async function getLibrary() {
   library ??= import("pdfjs-dist").then(pdf => { pdf.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs"; return pdf; });
   return library;
 }
-type Box = [number, number, number, number];
+type Quad = [number, number, number, number];
 /**
  * Figures are sometimes a whole PDF page pasted in as a form XObject and clipped to the figure
  * (MDPI does this): the text layer then carries the entire pasted manuscript although only the
  * part inside the figure is painted. Returns, for fonts used only inside such forms, the form
  * boxes (PDF space) their text is visible in.
  */
-export function clippedFormFonts(fnArray: number[], argsArray: unknown[][], ops: Record<string, number>): Map<string, Box[]> {
-  const inside = new Map<string, Box[]>(), outside = new Set<string>(), stack: (Box | null)[] = [];
-  let pendingGroup: Box | null = null;
-  const toBox = (bbox: unknown, matrix: unknown): Box | null => {
+export function clippedFormFonts(fnArray: number[], argsArray: unknown[][], ops: Record<string, number>): Map<string, Quad[]> {
+  const inside = new Map<string, Quad[]>(), outside = new Set<string>(), stack: (Quad | null)[] = [];
+  let pendingGroup: Quad | null = null;
+  const toBox = (bbox: unknown, matrix: unknown): Quad | null => {
     const b = bbox && typeof bbox === "object" ? Object.values(bbox as Record<string, number>).map(Number) : null;
     if (!b || b.length < 4 || b.some(value => !Number.isFinite(value))) return null;
     const m = Array.isArray(matrix) && matrix.length === 6 ? matrix.map(Number) : [1, 0, 0, 1, 0, 0];
@@ -52,6 +57,7 @@ export function clippedFormFonts(fnArray: number[], argsArray: unknown[][], ops:
 
 function pageHandle(page: PDFPageProxy): PdfPageHandle {
   const base = page.getViewport({ scale: 1 });
+  let graphics: Promise<PageGraphics> | undefined;
   return {
     width: base.width, height: base.height,
     async getTextItems(signal) {
@@ -83,24 +89,13 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
         return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL, baseline }];
       });
     },
+    async getGraphics() {
+      graphics ??= readGraphics(page, base);
+      return graphics;
+    },
     async getLargestImageShare() {
-      const pdf = await getLibrary(), operators = await page.getOperatorList(), ops = pdf.OPS;
-      const imageOps = new Set([ops.paintImageXObject, ops.paintInlineImageXObject, ops.paintImageMaskXObject]);
-      // An image fills the unit square under the current transform: its area is the transform's determinant.
-      type Matrix = [number, number, number, number, number, number];
-      const multiply = ([a, b, c, d, e, f]: Matrix, [g, h, i, j, k, l]: Matrix): Matrix => [g * a + h * c, g * b + h * d, i * a + j * c, i * b + j * d, k * a + l * c + e, k * b + l * d + f];
-      let matrix: Matrix = [1, 0, 0, 1, 0, 0], largest = 0;
-      const stack: Matrix[] = [], [x1, y1, x2, y2] = page.view, area = Math.abs((x2 - x1) * (y2 - y1)) || 1;
-      operators.fnArray.forEach((operation, index) => {
-        const args = operators.argsArray[index] as unknown[];
-        if (operation === ops.save) stack.push(matrix);
-        else if (operation === ops.restore) matrix = stack.pop() ?? matrix;
-        else if (operation === ops.transform) matrix = multiply(matrix, args as Matrix);
-        else if (operation === ops.paintFormXObjectBegin) { stack.push(matrix); if (Array.isArray(args?.[0]) && args[0].length === 6) matrix = multiply(matrix, args[0] as Matrix); }
-        else if (operation === ops.paintFormXObjectEnd) matrix = stack.pop() ?? matrix;
-        else if (imageOps.has(operation)) largest = Math.max(largest, Math.abs(matrix[0] * matrix[3] - matrix[1] * matrix[2]) / area);
-      });
-      return Math.min(1, largest);
+      const { images } = await this.getGraphics!(), area = base.width * base.height || 1;
+      return Math.min(1, Math.max(0, ...images.map(image => image.width * image.height / area)));
     },
     async render(canvas, scale, signal) {
       signal.throwIfAborted();
@@ -150,3 +145,53 @@ export const pdfAdapter = {
     finally { signal?.removeEventListener("abort", cancel); }
   }
 };
+
+type Matrix = [number, number, number, number, number, number];
+const multiply = ([a, b, c, d, e, f]: Matrix, [g, h, i, j, k, l]: Matrix): Matrix => [g * a + h * c, g * b + h * d, i * a + j * c, i * b + j * d, k * a + l * c + e, k * b + l * d + f];
+const isMatrix = (value: unknown): value is Matrix => !!value && typeof value === "object" && (value as ArrayLike<number>).length === 6;
+
+/**
+ * Walk the page's drawing operators once: an image fills the unit square under the current
+ * transform; a path's straight segments that run long and axis-aligned are rules. Everything is
+ * mapped through the page viewport, so boxes are in the same top-left points as the text items.
+ */
+async function readGraphics(page: PDFPageProxy, viewport: { transform: number[]; width: number; height: number }): Promise<PageGraphics> {
+  const pdf = await getLibrary(), operators = await page.getOperatorList(), ops = pdf.OPS;
+  const imageOps = new Set([ops.paintImageXObject, ops.paintInlineImageXObject, ops.paintImageMaskXObject]);
+  const view = viewport.transform as Matrix, images: Box[] = [], rules: Box[] = [];
+  let matrix: Matrix = [1, 0, 0, 1, 0, 0];
+  const stack: Matrix[] = [];
+  const point = (m: Matrix, x: number, y: number) => { const t = multiply(view, m); return [t[0] * x + t[2] * y + t[4], t[1] * x + t[3] * y + t[5]] as const; };
+  const boxOf = (corners: (readonly [number, number])[]): Box => { const xs = corners.map(c => c[0]), ys = corners.map(c => c[1]); return { x: Math.min(...xs), y: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) }; };
+  const segment = (a: readonly [number, number], b: readonly [number, number]) => {
+    const box = boxOf([a, b]);
+    if (box.width >= 12 && box.height <= 1.5 || box.height >= 12 && box.width <= 1.5) rules.push(box);
+  };
+  operators.fnArray.forEach((operation, index) => {
+    const args = operators.argsArray[index] as unknown[];
+    if (operation === ops.save) stack.push(matrix);
+    else if (operation === ops.restore) matrix = stack.pop() ?? matrix;
+    else if (operation === ops.transform && isMatrix(args)) matrix = multiply(matrix, [...(args as unknown as number[])] as Matrix);
+    else if (operation === ops.paintFormXObjectBegin) { stack.push(matrix); if (isMatrix(args?.[0])) matrix = multiply(matrix, [...(args[0] as number[])] as Matrix); }
+    else if (operation === ops.paintFormXObjectEnd) matrix = stack.pop() ?? matrix;
+    else if (imageOps.has(operation)) {
+      const box = boxOf([point(matrix, 0, 0), point(matrix, 1, 0), point(matrix, 0, 1), point(matrix, 1, 1)]);
+      if (box.width > 4 && box.height > 4) images.push(box);
+    } else if (operation === ops.constructPath) {
+      const data = (args?.[1] as unknown[] | undefined)?.[0];
+      if (!data || typeof data !== "object" || typeof (data as ArrayLike<number>).length !== "number") return;
+      const path = data as ArrayLike<number>;
+      let current: readonly [number, number] | null = null, start: readonly [number, number] | null = null;
+      for (let i = 0; i < path.length;) {
+        const command = path[i++];
+        if (command === 0) { current = start = point(matrix, path[i], path[i + 1]); i += 2; }
+        else if (command === 1) { const next = point(matrix, path[i], path[i + 1]); if (current) segment(current, next); current = next; i += 2; }
+        else if (command === 2) { current = point(matrix, path[i + 4], path[i + 5]); i += 6; }
+        else if (command === 3) { current = point(matrix, path[i + 2], path[i + 3]); i += 4; }
+        else if (command === 4) { if (current && start) segment(current, start); current = start; }
+        else break;
+      }
+    }
+  });
+  return { images, rules };
+}

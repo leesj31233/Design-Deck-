@@ -22,4 +22,10 @@ export interface PdfParagraph {
   marks?: string[]; raised?: number;
 }
 
-export interface PageSize { width: number; height: number }
+export interface PageSize {
+  width: number; height: number;
+  /** Pictures (normalized) the translated text must not cover. */
+  images?: { x: number; y: number; width: number; height: number }[];
+  /** Ruled tables (normalized): their cells stay as printed. */
+  tables?: { x: number; y: number; width: number; height: number }[];
+}
