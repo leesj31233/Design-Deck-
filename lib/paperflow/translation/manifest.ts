@@ -1,13 +1,13 @@
 import type { PdfDocumentHandle, PdfPageHandle, PdfTextItem } from "../pdf/pdf-adapter";
 import { letterCount, textHealth } from "../pdf/ocr";
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
-import { analyzePage } from "../layout/page-blocks";
+import { analyzePage, proseScore } from "../layout/page-blocks";
 import { classifyBlock, extractKeywords, looksLikeReference, nextSection, pageContext, type BlockRole, type Section } from "../layout/classify";
 import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.18";
+export const EXTRACTOR_VERSION = "layout-v3.19";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -46,16 +46,23 @@ export function isKorean(text: string) {
 export async function buildPageBlocks(documentId: string, pageIndex: number, raw: PdfTextItem[], width: number, height: number, initialSection: Section = "none"): Promise<ManifestBlock[]> {
   const paragraphs = analyzePage(raw, pageIndex, width, height);
   const context = pageContext(paragraphs, pageIndex);
-  const blocks: ManifestBlock[] = [];
+  const classified: { role: BlockRole; reason: string | null; columnIndex: number }[] = [];
   let section = initialSection, tableUntil = -1, tableColumn = -2;
   for (const [index, paragraph] of paragraphs.entries()) {
     let { role, reason } = classifyBlock(paragraph, index, context, section);
     const columnIndex = paragraph.x + paragraph.width / 2 < .5 ? 0 : 1;
     // Rows after a table caption stay data until real prose resumes.
-    if (role === "CAPTION" && /^table/i.test(paragraph.text)) { tableUntil = paragraph.y + .45; tableColumn = paragraph.width > .6 || Math.abs(paragraph.x + paragraph.width / 2 - .5) < .08 ? -1 : columnIndex; }
+    if (role === "CAPTION" && /^(?:table|tabel|tabla|tab(?:elle)?\.?|표|表)/i.test(paragraph.text)) { tableUntil = paragraph.y + .45; tableColumn = paragraph.width > .6 || Math.abs(paragraph.x + paragraph.width / 2 - .5) < .08 ? -1 : columnIndex; }
     else if (role === "BODY" && paragraph.y < tableUntil && (tableColumn === -1 || tableColumn === columnIndex) && !/[a-z]{3,}[.!?]\s|[\uac00-\ud7a3\u3040-\u30ff\u4e00-\u9fff][.!?。！？]/.test(paragraph.text + " ")) { role = "TABLE"; reason = "table-data"; }
     else if (role === "BODY") tableUntil = -1;
     section = nextSection(role, reason, paragraph.text, section);
+    classified.push({ role, reason, columnIndex });
+  }
+  keepTablesTogether(paragraphs, classified, context.bodySize);
+  const blocks: ManifestBlock[] = [];
+  for (const [index, paragraph] of paragraphs.entries()) {
+    const { role, columnIndex } = classified[index];
+    let { reason } = classified[index];
     // Text already in Korean is shown as printed: never spend a credit translating Korean into Korean.
     if (reason === null && isKorean(paragraph.text)) reason = "korean-source";
     const translatable = TRANSLATABLE.has(role) && reason === null;
@@ -63,6 +70,43 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     blocks.push({ ...paragraph, id, role, readingOrder: blocks.length, columnIndex, translatable, exclusionReason: translatable ? null : reason ?? "not-translated" });
   }
   return blocks;
+}
+
+const TABLE_REASONS = new Set(["table-data", "table-column", "numeric-cells"]);
+/**
+ * A table keeps its cells as printed. Cell text that reads like a sentence ("ash remains in the
+ * solid product.") is otherwise taken for body text, merged into the next paragraph and typeset
+ * across the table and the column beside it. The area the recognised cells cover is the table:
+ * small type inside it is table data. A bare "Table 1" label keeps the title line under it as its caption.
+ */
+function keepTablesTogether(paragraphs: PdfParagraph[], classified: { role: BlockRole; reason: string | null }[], bodySize: number) {
+  const cells = paragraphs.map((paragraph, index) => ({ paragraph, index })).filter(({ index }) => classified[index].role === "TABLE" && TABLE_REASONS.has(classified[index].reason ?? ""));
+  if (cells.length < 2) return;
+  const titles = new Set<number>();
+  paragraphs.forEach((label, index) => {
+    if (classified[index].role !== "CAPTION" || !/^(?:table|tabel|tabla|tabelle|표|表)\s*[\dA-Z]+[a-z]?\.?$/i.test(label.text.trim())) return;
+    const title = paragraphs.findIndex((other, otherIndex) => otherIndex !== index && other.y > label.y - .005 && other.y - (label.y + label.height) < .02 && other.x < label.x + .05 && other.x + other.width > label.x);
+    if (title >= 0 && classified[title].role !== "TABLE") { classified[title] = { ...classified[title], role: "CAPTION", reason: null }; titles.add(title); }
+  });
+  const areas: { x0: number; y0: number; x1: number; y1: number; size: number; cells: number }[] = [];
+  for (const { paragraph } of [...cells].sort((a, b) => a.paragraph.y - b.paragraph.y)) {
+    const box = { x0: paragraph.x, y0: paragraph.y, x1: paragraph.x + paragraph.width, y1: paragraph.y + paragraph.height, size: paragraph.fontSize ?? 0, cells: 1 };
+    const area = areas.find(other => box.y0 <= other.y1 + .04 && box.y1 >= other.y0 - .04);
+    if (area) { area.x0 = Math.min(area.x0, box.x0); area.y0 = Math.min(area.y0, box.y0); area.x1 = Math.max(area.x1, box.x1); area.y1 = Math.max(area.y1, box.y1); area.size = Math.max(area.size, box.size); area.cells++; }
+    else areas.push(box);
+  }
+  // A real table has several cells and is set smaller than the body; a stray numeric line in a paragraph is not a table.
+  const tables = areas.filter(area => area.cells >= 3 && area.size < bodySize * .95);
+  if (!tables.length) return;
+  paragraphs.forEach((paragraph, index) => {
+    const { role } = classified[index];
+    if (titles.has(index) || !["BODY", "FIGURE_TEXT", "HEADING"].includes(role)) return;
+    const size = paragraph.fontSize ?? bodySize, prose = proseScore(paragraph.text);
+    if (size >= bodySize * .95 || prose.sentences >= 2 && prose.words >= 20) return;
+    const cx = paragraph.x + paragraph.width / 2, cy = paragraph.y + paragraph.height / 2;
+    const inside = tables.some(area => cx > area.x0 - .01 && cx < area.x1 + .01 && cy > area.y0 - .005 && cy < area.y1 + .005 && size <= area.size * 1.08);
+    if (inside) classified[index] = { ...classified[index], role: "TABLE", reason: "table-data" };
+  });
 }
 
 /** A block that can only be a bibliography entry: a DOI or database link, a numbered "12. Name, X." entry, or dense author initials with a year. */

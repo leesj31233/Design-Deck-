@@ -53,6 +53,11 @@ export function pageContext(blocks: PdfParagraph[], pageIndex: number): PageCont
   return { pageIndex, bodySize, titleIndex, abstractIndex };
 }
 
+function readsAsProse(text: string) {
+  const score = proseScore(text), numbers = (text.match(/\d+(?:[.,]\d+)?/g) ?? []).length;
+  return score.words >= 15 && score.sentences >= 1 && numbers <= score.words * .15 && score.capitalRatio < .4;
+}
+
 function isFrontProse(block: PdfParagraph) {
   const score = proseScore(block.text);
   return score.words >= 25 && score.sentences >= 1 && score.capitalRatio < .45;
@@ -87,7 +92,8 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
     if (beforeAbstract && !isFrontProse(block)) return { role: /universit|institut|department|school|laborator|college|academy|centre|center/i.test(value) ? "AFFILIATION" : "AUTHOR", reason: "front-matter" };
   }
   if (block.kind === "caption" || CAPTION_START.test(value)) return { role: "CAPTION", reason: null };
-  if (block.hint === "table") return { role: "TABLE", reason: "table-data" };
+  // Loosely justified prose has word gaps as wide as table columns: sentences with few numbers stay body text.
+  if (block.hint === "table" && !readsAsProse(value)) return { role: "TABLE", reason: "table-data" };
   // A "heading" that runs for many lines is prose that happens to start with a number.
   if (block.kind === "title" && block.lines.length <= 3) return size > context.bodySize * 1.6 && context.pageIndex === 0 ? { role: "TITLE", reason: "paper-title" } : { role: "HEADING", reason: null };
   const score = proseScore(value);

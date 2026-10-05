@@ -1,13 +1,13 @@
 import type { PdfTextItem } from "../pdf/pdf-adapter";
 import type { PdfParagraph } from "./types";
-import { buildTextLines, dropLineNumbers, findGutter, median, orderLines, type Gutter, type TextLine } from "./text-lines";
+import { buildTextLines, dropGutterNumbers, dropLineNumbers, findGutter, median, orderLines, type Gutter, type TextLine } from "./text-lines";
 
 const SECTION_NAMES = /^(?:■\s*)?(?:abstract|introduction|background|literature review|methods?|methodology|materials and methods|experimental(?: section| setup| methods)?|results(?: and discussion)?|discussion|conclusions?|concluding remarks|summary|acknowledg(?:e)?ments?|references|nomenclature|appendix(?: [a-z0-9]+)?|supporting information|author information|notes|abbreviations)\.?$/i;
 const NUMBERED_HEADING = /^(?:■\s*)?(?:\d+(?:\.\d+){0,4}\.?|[IVX]{1,5}\.|[A-H]\.)\s+[A-Z(]/;
 const RUN_IN_HEADING = /^(\d+(?:\.\d+)+\.?\s+[A-Z][^.]{2,90}?[.:])\s+([A-Z(\[\d].*)$/;
-export const CAPTION_START = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate)\s*[A-Z]?\d+[a-z]?\s*[.:|]/i;
+export const CAPTION_START = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate|gambar|tabel|grafik|abb(?:ildung)?\.?|tab(?:elle)?\.?|figura|tabla|그림|표|図|表)\s*[A-Z]?\d+(?:\.\d+)?[a-z]?\s*[.:|]/i;
 /** Elsevier sets the label alone on its own line: "Table 2" / "Investigated global reaction mechanisms." */
-const CAPTION_LABEL = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate)\s*[A-Z]?\d+[a-z]?\s*$/i;
+const CAPTION_LABEL = /^(?:fig(?:ure)?\.?|table|scheme|chart|plate|gambar|tabel|grafik|abb(?:ildung)?\.?|tab(?:elle)?\.?|figura|tabla|그림|표|図|表)\s*[A-Z]?\d+(?:\.\d+)?[a-z]?\s*$/i;
 const TRAILING_FUNCTION_WORD = /\b(?:the|a|an|of|and|or|in|on|to|for|with|by|from|at|as|is|are|was|were|that|which|this|these)$/i;
 const SENTENCE_END = /[.!?](?:["”’)\]]|\[[\d,–−-]+\])?\s*$/;
 
@@ -60,7 +60,7 @@ function headingLine(line: TextLine, columnWidth: number, bodySize: number) {
 
 /** Deterministic page analysis from PDF text objects: no DOM, zoom, or canvas state. */
 export function analyzePage(items: PdfTextItem[], pageIndex: number, width: number, height: number): PdfParagraph[] {
-  const raw = dropLineNumbers(buildTextLines(items), width);
+  const raw = dropLineNumbers(buildTextLines(dropGutterNumbers(items, width)), width);
   if (!raw.length) return [];
   // A page whose table is set smaller than the body can have more table lines than prose lines,
   // and a table column may start inside the body gutter: look for the gutter among body lines.

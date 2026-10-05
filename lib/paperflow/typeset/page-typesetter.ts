@@ -71,7 +71,11 @@ function px(block: ManifestBlock, page: { width: number; height: number }) {
 /** Text regions of a block: a paragraph that wraps a figure is not one rectangle. */
 function blockRegions(block: ManifestBlock, page: { width: number; height: number }): Rect[] {
   const lines = px(block, page), regions: Rect[] = [];
-  const columnLeft = (block.column?.left ?? block.x) * page.width, columnRight = (block.column?.right ?? block.x + block.width) * page.width;
+  const columnLeft = (block.column?.left ?? block.x) * page.width;
+  // A full-width table can pull the detected gutter off the real one: a paragraph of three or more
+  // justified lines, or one that ends left of the page middle, already shows where its column ends.
+  const ownRight = Math.max(...lines.map(line => line.x + line.width)), detectedRight = (block.column?.right ?? block.x + block.width) * page.width;
+  const columnRight = (lines.length >= 3 || ownRight < page.width * .52) && detectedRight > ownRight + page.width * .015 ? ownRight + page.width * .005 : detectedRight;
   for (const [index, line] of lines.entries()) {
     const left = index === 0 && lines.length > 1 ? Math.min(line.x, lines[1].x) : line.x;
     const previous = regions.at(-1);
@@ -232,7 +236,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
         }
         const broken = feeder.next(width, size), last = feeder.done;
         const spacing = justify(broken, width, size, last || flow.kind === "heading");
-        if (commit) out.push({ unitId: paragraph.unitId, kind: flow.kind, x, y: place.y, width, fontSize: size, lineHeight: pitch, runs: broken.runs, bold: flow.bold, sans: flow.sans, ...spacing });
+        if (commit && broken.runs.length) out.push({ unitId: paragraph.unitId, kind: flow.kind, x, y: place.y, width, fontSize: size, lineHeight: pitch, runs: broken.runs, bold: flow.bold, sans: flow.sans, ...spacing });
         placed = { x, width, y: place.y };
         y = place.y + pitch; first = false;
       }

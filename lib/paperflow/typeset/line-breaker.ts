@@ -33,6 +33,9 @@ export class LineFeeder {
       const token = this.tokens[this.index], width = token.width * size, add = (taken.length ? space : 0) + width;
       if (used + add <= available + .01) { taken.push(token); used += add; this.index++; continue; }
       const room = available - used - (taken.length ? space : 0);
+      // A short English word or number never breaks ("bur" / "ner tip"): leave a sliver of space empty
+      // and let the word start the next line. Only long tokens (URLs, formulas) may still be cut.
+      if (!taken.length && !HANGUL.test(token.text) && [...token.text].length <= 20 && available < width && available < size * 8) break;
       const loose = !taken.length || available - used > available * .04;
       if (loose && room > size * 1.4) {
         const split = this.split(token, room / size, !taken.length);

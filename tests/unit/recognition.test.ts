@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ocrLineItems, textHealth, type OcrLine } from "../../lib/paperflow/pdf/ocr";
 import { buildTextLines } from "../../lib/paperflow/layout/text-lines";
+import { analyzePage } from "../../lib/paperflow/layout/page-blocks";
 import { buildPageBlocks, isKorean } from "../../lib/paperflow/translation/manifest";
 import type { PdfTextItem } from "../../lib/paperflow/pdf/pdf-adapter";
 
@@ -129,5 +130,40 @@ describe("reference lists without a usable heading", () => {
       item("Akbar, A., Paidoman, R., and dan Coniwanti, P. 2013. Pengaruh Variabel Waktu dan Temperatur. Jurnal Teknik Kimia 19, 1–8.", 40, 130, 480, 11)
     ], W, H);
     expect(blocks.filter(item => item.translatable)).toEqual([]);
+  });
+});
+
+describe("patent line numbers in the gutter", () => {
+  it("never fuse a left-column line with the right-column line beside it", () => {
+    const rows = [5, 10, 15].flatMap((number, index) => {
+      const baseline = 100 + index * 60;
+      return [item("the amount of nitrogen removed from the combustion air rises", 50, baseline, 240, 10), item(String(number), 296, baseline, 8, 8), item("air guide. The outside surface of the guide tapers", 310, baseline, 240, 10)];
+    });
+    const lines = buildTextLines(rows.filter(row => row.text.length > 2));
+    expect(lines.length).toBe(6);
+    const analyzed = analyzePage(rows, 7, W, H).map(block => block.text);
+    expect(analyzed.some(text => /removed.*\d.*air guide/.test(text))).toBe(false);
+  });
+});
+
+describe("scanned patents with an OCR text layer", () => {
+  it("split a scan line that runs across both columns at its gutter line number", () => {
+    const line = "perature exceeds 2800F, the amount of nitrogen removed from air rises45 airguide. Approximately the outside surface of the air guide tapers inward.";
+    const left = Array.from({ length: 10 }, (_, index) => item(`left column line ${index} describes the burner tip and the fuel nozzle in detail`, 52, 120 + index * 15, 240, 12));
+    const right = Array.from({ length: 10 }, (_, index) => item(`right column line ${index} explains how the air guide swirls the secondary air`, 320, 120 + index * 15, 240, 12));
+    const blocks = analyzePage([...left, ...right, item(line, 52, 270, 508, 12)], 7, 612, 792);
+    const texts = blocks.map(block => block.text);
+    expect(texts.some(text => text.includes("rises") && text.includes("airguide"))).toBe(false);
+    expect(texts.join(" ")).not.toMatch(/\b45\b/);
+  });
+});
+
+describe("line breaking", () => {
+  it("never cuts a short English word to fill a narrow slot", async () => {
+    const { LineFeeder } = await import("../../lib/paperflow/typeset/line-breaker");
+    const measure = (text: string) => [...text].length * .5;
+    const feeder = new LineFeeder([{ text: "burner", bold: false, width: 3 }, { text: "tip", bold: false, width: 1.5 }], measure);
+    expect(feeder.next(15, 10).text).toBe("");
+    expect(feeder.next(200, 10).text).toBe("burner tip");
   });
 });

@@ -125,6 +125,46 @@ function markedTokens(marked: string) {
 }
 
 /** Manuscript line numbers ("432" down the left margin) are not text of the paper. */
+/**
+ * Patents (and some theses) print line numbers 5, 10, 15 … in the gutter between the columns. They
+ * must go before lines are built, or a number bridges the gutter and fuses a left-column line with
+ * the right-column line beside it ("…nitrogen removed 45 air guide…"). Three or more multiples of
+ * five stacked at one x near the middle of the page are such numbers.
+ */
+export function dropGutterNumbers(items: PdfTextItem[], width: number): PdfTextItem[] {
+  items = items.flatMap(item => splitAtGutterNumber(item, width));
+  const candidates = items.filter(item => /^\d{1,3}$/.test(item.text.trim()) && Number(item.text.trim()) % 5 === 0 && Math.abs(item.x + item.width / 2 - width / 2) < width * .12);
+  if (candidates.length < 3) return items;
+  const drop = new Set<PdfTextItem>();
+  for (const item of candidates) {
+    // OCR text layers place the same column of numbers a few points apart.
+    const center = item.x + item.width / 2, stack = candidates.filter(other => Math.abs(other.x + other.width / 2 - center) < 30);
+    if (stack.length >= 3) for (const other of stack) drop.add(other);
+  }
+  return drop.size ? items.filter(item => !drop.has(item)) : items;
+}
+
+/**
+ * The invisible OCR layer of a scanned patent often stores one scan line as one item across both
+ * columns, the gutter line number inside it ("…nitrogen removed45 air guide…"). Split such an item at
+ * that number into its left- and right-column parts (positions in proportion to the characters).
+ */
+function splitAtGutterNumber(item: PdfTextItem, width: number): PdfTextItem[] {
+  if (item.width < width * .55 || item.text.length < 20) return [item];
+  const perChar = item.width / item.text.length;
+  // A number glued to the words around it ("removed45 air", "08/099, 10 form"), never part of a quantity ("2800F").
+  for (const match of item.text.matchAll(/(?<=[A-Za-z)\].,;:])\s?([1-9]\d?[05])(?=\s?[A-Za-z(])\s?/g)) {
+    const at = match.index!, middle = item.x + (at + match[0].length / 2) * perChar;
+    if (Math.abs(middle - width / 2) > width * .1) continue;
+    const leftText = item.text.slice(0, at).trimEnd(), rightText = item.text.slice(at + match[0].length).trimStart();
+    if (leftText.length < 3 || rightText.length < 3) continue;
+    // Character positions are estimates: keep the gutter visibly open so the halves never rejoin as one line.
+    const rightX = item.x + (item.text.length - rightText.length + .6) * perChar;
+    return [{ ...item, text: leftText, width: (leftText.length - .6) * perChar, hasEOL: false }, { ...item, text: rightText, x: rightX, width: item.x + item.width - rightX }];
+  }
+  return [item];
+}
+
 export function dropLineNumbers(lines: TextLine[], width: number): TextLine[] {
   const numbers = lines.filter(line => /^\d{1,4}$/.test(line.text) && line.right < width * .2);
   return numbers.length >= 6 ? lines.filter(line => !numbers.includes(line)) : lines;
