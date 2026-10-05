@@ -7,3 +7,6 @@ out
 .DS_Store
 *.log
 .vercel
+public/pdfjs
+next-env.d.ts
+*.tsbuildinfo

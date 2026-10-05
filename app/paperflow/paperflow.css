@@ -1,0 +1,90 @@
+/* PAPERFLOW reader surfaces. Plain CSS: the pdf.js text layer needs exact rules. */
+
+.pf-root {
+  /* Quiet neutral workspace — no decorative gradients behind the reader. */
+  --pf-workspace: #eceef1;
+  --pf-page-shadow: 0 1px 2px rgba(16, 17, 20, 0.08), 0 8px 28px rgba(16, 17, 20, 0.08);
+  background: var(--background);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pf-root { --pf-workspace: #111317; --pf-page-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.45); }
+}
+:root[data-theme="dark"] .pf-root { --pf-workspace: #111317; --pf-page-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.45); }
+
+/* Protected paper: always white, never blurred, recoloured or themed. */
+.pf-page {
+  position: relative;
+  background: #fff;
+  color-scheme: only light;
+  box-shadow: var(--pf-page-shadow);
+  border-radius: 2px;
+  overflow: hidden;
+  contain: layout paint;
+}
+.pf-page canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.pf-highlights { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.pf-highlight {
+  position: absolute;
+  mix-blend-mode: multiply;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.pf-highlight[data-status="fuzzy"] { outline: 1.5px dashed rgba(16, 17, 20, 0.55); outline-offset: 1px; }
+.pf-highlight[data-active="true"] { box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.7); }
+.pf-pending { position: absolute; background: rgba(10, 132, 255, 0.18); mix-blend-mode: multiply; border-radius: 2px; }
+
+/* pdf.js text layer (subset of web/pdf_viewer.css). */
+.pf-text-layer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  caret-color: CanvasText;
+  z-index: 2;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+.pf-text-layer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.pf-text-layer > :not(.markedContent),
+.pf-text-layer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+.pf-text-layer .markedContent { display: contents; }
+.pf-text-layer span[role="img"] { user-select: none; cursor: default; }
+.pf-text-layer ::selection { background: rgba(10, 132, 255, 0.28); color: transparent; }
+.pf-text-layer br::selection { background: transparent; }
+.pf-text-layer .endOfContent {
+  display: block;
+  position: absolute;
+  inset: 100% 0 0;
+  z-index: 0;
+  cursor: default;
+  user-select: none;
+}
+.pf-text-layer.selecting .endOfContent { top: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-root *, .pf-root *::before, .pf-root *::after { scroll-behavior: auto !important; }
+}

@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "predev": "node scripts/copy-pdfjs-assets.mjs",
+    "prebuild": "node scripts/copy-pdfjs-assets.mjs"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "latest",
@@ -16,6 +19,8 @@
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-tabs": "latest",
     "@radix-ui/react-tooltip": "latest",
+    "@tanstack/react-query": "^5.104.1",
+    "@tanstack/react-virtual": "^3.14.13",
     "@xyflow/react": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
@@ -23,18 +28,22 @@
     "lucide-react": "latest",
     "motion": "latest",
     "next": "latest",
+    "pdfjs-dist": "^6.4.299",
     "react": "latest",
     "react-dom": "latest",
     "sonner": "latest",
-    "tailwind-merge": "latest"
+    "tailwind-merge": "latest",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "fake-indexeddb": "^6.2.5",
     "postcss": "latest",
     "tailwindcss": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "vitest": "^5.0.3"
   }
 }

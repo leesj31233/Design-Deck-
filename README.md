@@ -28,6 +28,15 @@ It is intentionally not an effects dump. The default language is restrained: str
 
 The product components are deliberately aimed at the Research/PDF/AI application category so Design Deck can function as a real product foundation instead of a generic component screenshot gallery.
 
+## PAPERFLOW (Phase 1)
+
+`/paperflow` hosts the first vertical slice of **PAPERFLOW**, an engineering research reader built on Design Deck: Research Library, Immersive Reader (PDF.js), durable highlight anchors, selection action bar, research inspector, `⌘K` palette and shortcuts. See `docs/paperflow/PHASE1_REPORT.md`.
+
+```bash
+npm test                                   # anchor recovery + persistence tests
+NODE_PATH=$(npm root -g) node scripts/paperflow-verify.mjs   # browser verification (needs a running app + Playwright)
+```
+
 ## Run
 
 ```bash

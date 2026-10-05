@@ -1,6 +1,17 @@
 @import "tailwindcss";
 @import "@xyflow/react/dist/style.css";
 
+/* `dark:` utilities follow the OS by default and an explicit data-theme when set. */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) { @slot; }
+  }
+  &:where(:root[data-theme="dark"] *) { @slot; }
+}
+
+/* Touch-first devices (tablets): use for 44pt targets. */
+@custom-variant coarse (@media (pointer: coarse));
+
 :root {
   --background: #f5f6f8;
   --foreground: #101114;
@@ -17,8 +28,9 @@
   --shadow-float: 0 28px 90px rgba(0, 0, 0, .16), 0 8px 22px rgba(0, 0, 0, .08);
 }
 
+/* Dark tokens follow the OS unless a page pins a theme with <html data-theme="light|dark">. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #090a0c;
     --foreground: #f7f8fa;
     --muted: #9298a4;
@@ -30,6 +42,18 @@
     --shadow-soft: 0 18px 60px rgba(0, 0, 0, .28), 0 2px 8px rgba(0, 0, 0, .18);
     --shadow-float: 0 34px 110px rgba(0, 0, 0, .52), 0 10px 30px rgba(0, 0, 0, .30);
   }
+}
+:root[data-theme="dark"] {
+  --background: #090a0c;
+  --foreground: #f7f8fa;
+  --muted: #9298a4;
+  --line: rgba(255,255,255,0.10);
+  --surface: rgba(22,24,29,0.70);
+  --surface-strong: rgba(25,27,32,0.94);
+  --accent: #4da3ff;
+  --accent-foreground: #06111f;
+  --shadow-soft: 0 18px 60px rgba(0, 0, 0, .28), 0 2px 8px rgba(0, 0, 0, .18);
+  --shadow-float: 0 34px 110px rgba(0, 0, 0, .52), 0 10px 30px rgba(0, 0, 0, .30);
 }
 
 * { box-sizing: border-box; }
@@ -45,7 +69,8 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-button, input, textarea { font: inherit; }
+/* Layered so Tailwind text-* utilities on controls still win. */
+@layer base { button, input, textarea { font: inherit; } }
 ::selection { background: rgba(10,132,255,.22); }
 
 .dd-glass {
