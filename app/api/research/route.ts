@@ -10,6 +10,8 @@ const LIMIT_PER_MINUTE = 120;
 const LIMIT_PER_HOUR = 1200;
 
 function rateLimited(request: Request) {
+  // A local run (development, layout QA) is not a public client.
+  if (/^(?:localhost|127\.0\.0\.1|\[::1\])$/.test(new URL(request.url).hostname)) return false;
   const ip = request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   const now = Date.now();
   if (requestTimes.size > 2000) {
@@ -91,7 +93,9 @@ export async function POST(request: Request) {
     let parsed: { translations?: unknown } = {};
     // An incomplete response can still carry complete items; keep those and report the rest.
     try { parsed = JSON.parse(text); } catch { parsed = { translations: [...text.matchAll(/\{"id":"([^"]+)","text":"((?:[^"\\]|\\.)*)"\}/g)].map(match => ({ id: match[1], text: JSON.parse(`"${match[2]}"`) })) }; }
-    const { results, missing } = partitionTranslationResults(passages, parsed.translations, glossary);
+    // A batch is held to the term and length checks; a passage retried on its own cannot borrow from a
+    // neighbour, and is accepted rather than retried again (no cost spiral, no paragraph left in English).
+    const { results, missing } = partitionTranslationResults(passages, parsed.translations, glossary, passages.length > 1);
     if (!results.length) return Response.json({ error: "번역 결과를 확인할 수 없어 더 작은 묶음으로 다시 시도합니다.", kind: "malformed", usage }, { status: 502 });
     await Promise.all([shareTranslations(passages, results), gate.charge(results.length)]);
     return Response.json({ translations: results, missing, provider: "OpenAI", usage, incomplete: data.status === "incomplete" });

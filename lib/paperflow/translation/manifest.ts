@@ -9,7 +9,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.21";
+export const EXTRACTOR_VERSION = "layout-v3.22";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -46,8 +46,12 @@ export function isKorean(text: string) {
 }
 
 export async function buildPageBlocks(documentId: string, pageIndex: number, raw: PdfTextItem[], width: number, height: number, initialSection: Section = "none", rules: Box[] = [], found: { tables: Region[] } = { tables: [] }): Promise<ManifestBlock[]> {
-  const paragraphs = analyzePage(raw, pageIndex, width, height);
-  const context = pageContext(paragraphs, pageIndex);
+  const analyzed = analyzePage(raw, pageIndex, width, height);
+  const context = pageContext(analyzed, pageIndex);
+  // Ruled tables first: a rule always ends a paragraph, so a caption or a sentence never runs on into the cells.
+  const proseBand = (band: Region) => analyzed.some(paragraph => centerInside(paragraph, band, 0) && (paragraph.fontSize ?? context.bodySize) >= context.bodySize * .95 && readsAsProse(paragraph.text));
+  found.tables = tableRegions(rules, width, height, proseBand);
+  const paragraphs = splitAtTables(analyzed, found.tables);
   const classified: { role: BlockRole; reason: string | null; columnIndex: number }[] = [];
   let section = initialSection, tableUntil = -1, tableColumn = -2;
   for (const [index, paragraph] of paragraphs.entries()) {
@@ -61,9 +65,8 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     classified.push({ role, reason, columnIndex });
   }
   keepTablesTogether(paragraphs, classified, context.bodySize);
-  const proseBand = (band: Region) => paragraphs.some(paragraph => centerInside(paragraph, band, 0) && (paragraph.fontSize ?? context.bodySize) >= context.bodySize * .95 && readsAsProse(paragraph.text));
-  found.tables = tableRegions(rules, width, height, proseBand);
   keepRuledTables(paragraphs, classified, context.bodySize, found.tables);
+  adoptOrphanLines(paragraphs, classified, height, found.tables);
   const blocks: ManifestBlock[] = [];
   for (const [index, paragraph] of paragraphs.entries()) {
     const { role, columnIndex } = classified[index];
@@ -85,10 +88,51 @@ function keepRuledTables(paragraphs: PdfParagraph[], classified: { role: BlockRo
   for (const table of tables) {
     const inside = paragraphs.map((paragraph, index) => ({ paragraph, index })).filter(({ paragraph }) => centerInside(paragraph, table));
     const chars = inside.reduce((sum, { paragraph }) => sum + paragraph.text.length, 0);
-    const prose = inside.filter(({ paragraph }) => (paragraph.fontSize ?? bodySize) >= bodySize * .95 && readsAsProse(paragraph.text)).reduce((sum, { paragraph }) => sum + paragraph.text.length, 0);
+    // A framed text box holds paragraphs (two or more sentences over several lines); a column of row labels does not.
+    const prose = inside.filter(({ paragraph }) => (paragraph.fontSize ?? bodySize) >= bodySize * .95 && paragraph.lines.length >= 2 && readsAsProse(paragraph.text) && (paragraph.text.match(/[a-z)\]][.!?](?:\s|$)/g) ?? []).length >= 2).reduce((sum, { paragraph }) => sum + paragraph.text.length, 0);
     if (!inside.length || prose > chars * .6) continue;
     for (const { index } of inside) if (classified[index].role !== "CAPTION") classified[index] = { ...classified[index], role: "TABLE", reason: "table-data" };
   }
+}
+
+/** Split a paragraph whose lines run across a ruled table's edge: the lines inside are cells. */
+function splitAtTables(paragraphs: PdfParagraph[], tables: Region[]): PdfParagraph[] {
+  if (!tables.length) return paragraphs;
+  return paragraphs.flatMap(paragraph => {
+    const texts = paragraph.lineTexts;
+    if (!texts || texts.length !== paragraph.lines.length || paragraph.lines.length < 2) return [paragraph];
+    const inside = paragraph.lines.map(line => tables.some(table => centerInside(line, table, 0)));
+    if (inside.every(Boolean) || !inside.some(Boolean)) return [paragraph];
+    const part = (keep: boolean, suffix: string): PdfParagraph | null => {
+      const indexes = inside.map((value, index) => value === keep ? index : -1).filter(index => index >= 0);
+      if (!indexes.length) return null;
+      const lines = indexes.map(index => paragraph.lines[index]), lineTexts = indexes.map(index => texts[index]);
+      const x = Math.min(...lines.map(line => line.x)), y = Math.min(...lines.map(line => line.y));
+      return { ...paragraph, id: paragraph.id + suffix, lines, lineTexts, text: lineTexts.join(" ").replace(/\s+/g, " ").trim(), x, y, width: Math.max(...lines.map(line => line.x + line.width)) - x, height: Math.max(...lines.map(line => line.y + line.height)) - y, indent: keep ? 0 : paragraph.indent, kind: keep ? "body" : paragraph.kind };
+    };
+    return [part(false, ""), part(true, "-cells")].filter((value): value is PdfParagraph => value !== null).sort((a, b) => a.y - b.y);
+  });
+}
+
+const ORPHAN_REASONS = new Set(["table-data", "short-fragment", "figure-label", "small-label"]);
+/**
+ * One line of a paragraph split off as its own block ("ence Foundation under grant No. AST-2407709,"
+ * between two lines of the acknowledgements) would stay in English among the Korean. A short
+ * non-prose block in the same column, the same type size and directly against body text is body text.
+ */
+function adoptOrphanLines(paragraphs: PdfParagraph[], classified: { role: BlockRole; reason: string | null }[], height: number, tables: Region[]) {
+  const isBody = (index: number) => classified[index]?.role === "BODY" && classified[index].reason === null;
+  paragraphs.forEach((paragraph, index) => {
+    if (!ORPHAN_REASONS.has(classified[index].reason ?? "") || paragraph.lines.length > 2 || tables.some(table => centerInside(paragraph, table))) return;
+    const size = paragraph.fontSize ?? 0;
+    const touches = (other: PdfParagraph | undefined, otherIndex: number) => {
+      if (!other || !isBody(otherIndex) || Math.abs((other.fontSize ?? 0) - size) > size * .08) return false;
+      if (Math.abs(other.x - paragraph.x) > .03 && !(paragraph.x > other.x - .01 && paragraph.x + paragraph.width < other.x + other.width + .01)) return false;
+      const gap = (paragraph.y > other.y ? paragraph.y - (other.y + other.height) : other.y - (paragraph.y + paragraph.height)) * height;
+      return gap < size * 1.6;
+    };
+    if (touches(paragraphs[index - 1], index - 1) || touches(paragraphs[index + 1], index + 1)) classified[index] = { ...classified[index], role: "BODY", reason: null };
+  });
 }
 
 const TABLE_REASONS = new Set(["table-data", "table-column", "numeric-cells"]);
