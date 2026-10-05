@@ -414,7 +414,8 @@ export async function manifestUnitIds(documentId: string): Promise<string[] | nu
   if (cached) return cached.units.filter(unit => !unit.manual).map(unit => unit.id);
   const db = await openDatabase();
   const value = await requestResult<TranslationManifest | undefined>(db.transaction("translationManifests").objectStore("translationManifests").get(documentId));
-  return value?.version === EXTRACTOR_VERSION ? value.units.filter(unit => !unit.manual).map(unit => unit.id) : null;
+  // An analysis from an older version still matches the translations stored with it: good enough for progress.
+  return value ? value.units.filter(unit => !unit.manual && (value.version === EXTRACTOR_VERSION || !["HEADING", "TABLE"].includes(unit.role))).map(unit => unit.id) : null;
 }
 export const manifestRepository = {
   peek(documentId: string) { return memory.get(documentId) ?? null; },
