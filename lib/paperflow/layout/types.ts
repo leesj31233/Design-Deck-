@@ -16,6 +16,10 @@ export interface PdfParagraph {
   column?: { left: number; right: number };
   /** Analyzer hint that the block reads as the abstract/front matter of page 1. */
   hint?: "title" | "front-matter" | "label" | "keywords" | "figure-text" | "table" | "equation" | "furniture" | "run-in-heading";
+  /** Share of the text set in a fixed-width (code) face. */
+  mono?: number;
+  /** Page areas to hide with the translation (a drop cap beside the first lines), normalized. */
+  extraMasks?: ParagraphLine[];
   /** Raw visual lines, used for keyword extraction only. */
   lineTexts?: string[];
   /** Tokens printed with sub/superscripts and the count of raised citations; folded into the manifest. */

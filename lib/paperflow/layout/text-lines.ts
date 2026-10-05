@@ -13,6 +13,8 @@ export interface TextLine {
   tabular: boolean;
   /** Dominant face is a sans family (pdf.js font classification). */
   sans?: boolean;
+  /** Share of the line's characters set in a fixed-width (code) face. */
+  mono?: number;
   /** Left edge of each main item, for splitting run-in headings. */
   items: { text: string; x: number; right: number }[];
   /** Tokens printed with sub/superscripts, marked "CO_{2}" / "m^{2}". */
@@ -20,6 +22,9 @@ export interface TextLine {
   /** Superscript citation numbers turned into "[n]". */
   raised?: number;
 }
+
+/** Characters set in a fixed-width face (pdf.js classifies Courier, NimbusMono, cmtt … as monospace). */
+const monoShare = (items: PdfTextItem[]) => { const total = items.reduce((sum, item) => sum + item.text.trim().length, 0); return total ? items.filter(item => /mono/i.test(item.fontFamily)).reduce((sum, item) => sum + item.text.trim().length, 0) / total : 0; };
 
 export const median = (values: number[]) => {
   if (!values.length) return 0;
@@ -110,7 +115,7 @@ export function buildTextLines(items: PdfTextItem[]): TextLine[] {
     const regular = piece.main.filter(item => Math.abs(item.height - size) < size * .15);
     const top = piece.base - size * .8, bottom = Math.max(piece.base + size * .2, ...regular.map(item => item.y + item.height).filter(value => value < piece.base + size * .5));
     const marks = piece.scripts.length ? markedTokens(marked) : undefined;
-    return { marks, raised: raised || undefined, text: text.replace(/\s+/g, " ").trim(), x: piece.x, right: piece.right, y: Math.min(top, ...regular.map(item => item.y).filter(value => value > top - size * .3)), bottom, size, column: 0, tabular: false, sans: /sans/i.test(dominant.fontFamily) && !/serif/i.test(dominant.fontFamily.replace(/sans-serif/i, "")), items: piece.main.map(item => ({ text: item.text, x: item.x, right: item.x + item.width })) };
+    return { marks, raised: raised || undefined, text: text.replace(/\s+/g, " ").trim(), x: piece.x, right: piece.right, y: Math.min(top, ...regular.map(item => item.y).filter(value => value > top - size * .3)), bottom, size, column: 0, tabular: false, mono: monoShare(piece.main), sans: /sans/i.test(dominant.fontFamily) && !/serif/i.test(dominant.fontFamily.replace(/sans-serif/i, "")), items: piece.main.map(item => ({ text: item.text, x: item.x, right: item.x + item.width })) };
   }).filter(line => line.text);
 }
 
@@ -227,6 +232,7 @@ export function orderLines(lines: TextLine[], gutter: Gutter | null, width = 612
     const [first, second] = host.x <= line.x ? [host, line] : [line, host];
     const gap = second.x - first.right;
     host.tabular = host.tabular || line.tabular || gap > Math.max(host.size, line.size) * 1.2;
+    host.mono = ((host.mono ?? 0) * host.text.length + (line.mono ?? 0) * line.text.length) / Math.max(1, host.text.length + line.text.length);
     host.text = `${first.text} ${second.text}`; host.items = [...first.items, ...second.items];
     host.x = Math.min(host.x, line.x); host.right = Math.max(host.right, line.right);
     host.y = Math.min(host.y, line.y); host.bottom = Math.max(host.bottom, line.bottom); host.size = Math.max(host.size, line.size);

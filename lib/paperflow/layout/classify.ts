@@ -2,7 +2,19 @@ import type { PdfParagraph } from "./types";
 import { CAPTION_START, isEquationLine, proseScore } from "./page-blocks";
 import { median } from "./text-lines";
 
-export type BlockRole = "TITLE" | "ABSTRACT" | "KEYWORDS" | "HEADING" | "BODY" | "CAPTION" | "TABLE" | "FIGURE_TEXT" | "AUTHOR" | "AFFILIATION" | "CONTACT" | "REFERENCE" | "EQUATION" | "HEADER" | "FOOTER" | "OTHER";
+export type BlockRole = "TITLE" | "ABSTRACT" | "KEYWORDS" | "HEADING" | "BODY" | "CAPTION" | "TABLE" | "FIGURE_TEXT" | "AUTHOR" | "AFFILIATION" | "CONTACT" | "REFERENCE" | "EQUATION" | "CODE" | "HEADER" | "FOOTER" | "OTHER";
+
+/**
+ * Code stays as printed: a listing set in a fixed-width face, or a line made of LaTeX / program
+ * commands ("\IEEEeqnarraydefcol{myp}{\parbox[c]{0.5in}}{}") with almost no words around them.
+ */
+export function isCode(text: string, mono = 0) {
+  if (mono >= .6) return true;
+  const commands = (text.match(/\\[A-Za-z@]+/g) ?? []).length;
+  if (commands < 2) return /^\s*(?:[#@%]|\/\/|\$ |>>> )\S/.test(text) && mono >= .3;
+  const words = (text.replace(/\\[A-Za-z@]+|\{[^}]*\}|\[[^\]]*\]/g, " ").match(/\b[a-z]{3,}\b/g) ?? []).length;
+  return words < commands * 2 + 2;
+}
 export type Section = "none" | "authors" | "references";
 export interface Classified { role: BlockRole; reason: string | null }
 
@@ -66,6 +78,7 @@ function isFrontProse(block: PdfParagraph) {
 export function classifyBlock(block: PdfParagraph, index: number, context: PageContext, section: Section): Classified {
   const value = block.text.trim(), squashed = squash(value), size = block.fontSize ?? context.bodySize;
   if (block.hint === "furniture") return { role: "OTHER", reason: "glyph-noise" };
+  if (isCode(value, block.mono)) return { role: "CODE", reason: "code" };
   if (section === "references" && !endsReferenceList(block, value, context.bodySize)) return { role: "REFERENCE", reason: "reference-section" };
   if (section === "authors") return { role: "AUTHOR", reason: "author-section" };
   // "References" alone, or run together with the first entry ("Daftar Pustaka Acharya, B., …").

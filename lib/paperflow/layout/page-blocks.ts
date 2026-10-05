@@ -59,8 +59,28 @@ function headingLine(line: TextLine, columnWidth: number, bodySize: number) {
 }
 
 /** Deterministic page analysis from PDF text objects: no DOM, zoom, or canvas state. */
+/**
+ * A drop cap ("W" two lines tall, then "ITH a recent …") is the first letter of the first word: it
+ * joins that word, and its box is hidden with the paragraph so the Korean text can use its place.
+ */
+function mergeDropCaps(items: PdfTextItem[]) {
+  const sizes = items.filter(item => item.text.trim().length > 3).map(item => item.height).sort((a, b) => a - b);
+  const body = sizes[Math.floor(sizes.length / 2)] ?? 10, caps: { x: number; y: number; width: number; height: number }[] = [], joined = new Map<PdfTextItem, PdfTextItem>();
+  const kept = items.filter(cap => {
+    if (!/^[A-Z]$/.test(cap.text.trim()) || cap.height < body * 1.8) return true;
+    const partner = items.filter(other => other !== cap && !joined.has(other) && other.height < cap.height * .7 && other.x >= cap.x + cap.width - 3 && other.x <= cap.x + cap.width + body * 2.5 && Math.abs(other.y - cap.y) < body * .9)
+      .sort((a, b) => a.x - b.x)[0];
+    if (!partner) return true;
+    caps.push({ x: cap.x, y: cap.y, width: cap.width, height: cap.height });
+    joined.set(partner, { ...partner, text: cap.text.trim() + partner.text.trimStart(), x: cap.x, width: partner.width + partner.x - cap.x });
+    return false;
+  });
+  return { items: kept.map(item => joined.get(item) ?? item), caps };
+}
+
 export function analyzePage(items: PdfTextItem[], pageIndex: number, width: number, height: number): PdfParagraph[] {
-  const raw = dropLineNumbers(buildTextLines(dropGutterNumbers(items, width)), width);
+  const { items: textItems, caps } = mergeDropCaps(items);
+  const raw = dropLineNumbers(buildTextLines(dropGutterNumbers(textItems, width)), width);
   if (!raw.length) return [];
   // A page whose table is set smaller than the body can have more table lines than prose lines,
   // and a table column may start inside the body gutter: look for the gutter among body lines.
@@ -101,7 +121,9 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
       const previousShort = previous.right < right - line.size * 1.6 && SENTENCE_END.test(previous.text);
       split = line.column !== previous.column || pitch < -line.size * .5 || pitch > Math.max(bodyPitch, previous.size * 1.15) * 1.45
         || Math.abs(line.size - previous.size) > Math.max(line.size, previous.size) * .14
-        || indented || previousShort || line.tabular !== previous.tabular && line.text.length < 60;
+        || indented || previousShort || line.tabular !== previous.tabular && line.text.length < 60
+        // Code listing against prose: a fixed-width block never runs on into a sentence.
+        || Math.max(line.mono ?? 0, previous.mono ?? 0) >= .8 && Math.min(line.mono ?? 0, previous.mono ?? 0) <= .2;
     }
     if (split) groups.push({ lines: [line], kind: heading && !headingWrap ? "title" : caption ? "caption" : equation ? "skip" : "body", hint: equation ? "equation" : undefined });
     else group!.lines.push(line);
@@ -118,6 +140,15 @@ export function analyzePage(items: PdfTextItem[], pageIndex: number, width: numb
     if (host) { host.lines.push(...current.lines); groups.splice(index--, 1); }
   }
   const paragraphs = groups.map((group, index) => toParagraph(group, index, pageIndex, width, height, bodySize, bounds, leftEdge, gutter));
+  for (const cap of caps) {
+    const box = { x: cap.x / width, y: cap.y / height, width: cap.width / width, height: cap.height / height };
+    const host = paragraphs.find(paragraph => paragraph.lines.some(line => Math.abs(line.x - box.x) < .004 && line.y < box.y + box.height && line.y + line.height > box.y));
+    if (!host) continue;
+    host.extraMasks = [...host.extraMasks ?? [], box];
+    // Lines set beside the cap may start where the cap was once it is hidden.
+    host.lines = host.lines.map(line => line.y < box.y + box.height && line.y + line.height > box.y && line.x > box.x ? { ...line, width: line.width + line.x - box.x, x: box.x } : line);
+    host.x = Math.min(host.x, box.x);
+  }
   return [...paragraphs, ...noise.map((line, index) => ({ ...toParagraph({ lines: [line], kind: "skip", hint: "furniture" }, groups.length + index, pageIndex, width, height, bodySize, bounds, leftEdge, gutter), text: line.text }))];
 }
 
@@ -219,6 +250,7 @@ function toParagraph(group: Group, index: number, pageIndex: number, width: numb
     fontSize: size, pitch, indent: indent > size * .5 ? indent : 0,
     column: columnIndex === -1 && gutter ? { left: Math.min(x, column.left) / width, right: Math.max(right, column.right) / width } : { left: Math.min(column.left, x) / width, right: Math.max(column.right, right) / width },
     hint, lineTexts: lines.map(line => line.text),
+    mono: lines.reduce((sum, line) => sum + (line.mono ?? 0) * line.text.length, 0) / Math.max(1, lines.reduce((sum, line) => sum + line.text.length, 0)),
     marks: lines.flatMap(line => line.marks ?? []), raised: lines.reduce((sum, line) => sum + (line.raised ?? 0), 0)
   };
 }

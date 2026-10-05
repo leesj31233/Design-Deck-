@@ -2,6 +2,7 @@ import type { PdfDocumentHandle, PdfPageHandle, PdfTextItem } from "../pdf/pdf-a
 import { letterCount, textHealth } from "../pdf/ocr";
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
 import { analyzePage, proseScore } from "../layout/page-blocks";
+import { buildTextLines, type TextLine } from "../layout/text-lines";
 import { classifyBlock, extractKeywords, looksLikeReference, nextSection, pageContext, readsAsProse, type BlockRole, type Section } from "../layout/classify";
 import { centerInside, figureRegions, tableRegions, type Region } from "../layout/graphics";
 import type { Box } from "../pdf/pdf-adapter";
@@ -9,11 +10,12 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.23";
+export const EXTRACTOR_VERSION = "layout-v3.29";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
-export interface TranslationUnit { id: string; role: BlockRole; blockIds: string[]; pages: number[]; text: string; pageChars: Record<number, number> }
+/** `manual`: headings and table cells are translated only when the reader asks (hover → 번역), never in the whole-paper run. */
+export interface TranslationUnit { id: string; role: BlockRole; blockIds: string[]; pages: number[]; text: string; pageChars: Record<number, number>; manual?: boolean }
 export interface TranslationManifest {
   documentId: string; version: string; createdAt: string; pageCount: number;
   pages: PageSize[]; blocks: ManifestBlock[]; units: TranslationUnit[]; keywords: string[];
@@ -38,7 +40,7 @@ export async function stableBlockId(documentId: string, pageIndex: number, role:
   return sha(`${documentId}|${pageIndex}|${role}|${normalized}|${geometry}`);
 }
 
-const TRANSLATABLE: ReadonlySet<BlockRole> = new Set(["ABSTRACT", "HEADING", "BODY", "CAPTION"]);
+const TRANSLATABLE: ReadonlySet<BlockRole> = new Set(["ABSTRACT", "HEADING", "BODY", "CAPTION", "TABLE"]);
 /** Mostly Hangul among the letters (English terms inside Korean prose do not count against it). */
 export function isKorean(text: string) {
   const hangul = (text.match(/[가-힣]/g) ?? []).length, others = (text.match(/[A-Za-z぀-ヿ一-鿿]/g) ?? []).length;
@@ -65,7 +67,26 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     classified.push({ role, reason, columnIndex });
   }
   keepTablesTogether(paragraphs, classified, context.bodySize);
+  // A ruled drawing with a figure caption and no table caption is a figure (a flow chart, a framed plot): its labels stay as printed.
+  const captionNear = (table: Region, pattern: RegExp) => paragraphs.some((paragraph, index) => classified[index].role === "CAPTION" && pattern.test(paragraph.text.trim()) && paragraph.x < table.x + table.width && paragraph.x + paragraph.width > table.x && (Math.abs(paragraph.y + paragraph.height - table.y) < .06 || Math.abs(paragraph.y - (table.y + table.height)) < .06 || centerInside(paragraph, table)));
+  const TABLE_CAPTION = /^(?:table|tabel|tabla|tab(?:elle)?\.?|표|表)\s*[\dA-Z]/i, FIGURE_CAPTION = /^(?:fig(?:ure)?\.?|gambar|abb(?:ildung)?\.?|figura|그림|図|scheme|chart)\s*[\dA-Z]/i;
+  found.tables = found.tables.filter(table => {
+    if (captionNear(table, TABLE_CAPTION) || !captionNear(table, FIGURE_CAPTION)) return true;
+    paragraphs.forEach((paragraph, index) => { if (classified[index].role !== "CAPTION" && centerInside(paragraph, table)) classified[index] = { ...classified[index], role: "FIGURE_TEXT", reason: "figure-label" }; });
+    return false;
+  });
   keepRuledTables(paragraphs, classified, context.bodySize, found.tables);
+  // A ruled table becomes cells: each can be translated on request inside its own box.
+  for (const table of found.tables) {
+    const inside = paragraphs.map((_, index) => index).filter(index => classified[index].role === "TABLE" && centerInside(paragraphs[index], table));
+    if (!inside.length) continue;
+    const cells = buildTableCells(raw, table, rules, width, height, pageIndex, paragraphs.filter((_, index) => classified[index].role === "CAPTION"));
+    if (!cells.length) continue;
+    const at = inside[0];
+    for (const index of [...inside].reverse()) { paragraphs.splice(index, 1); classified.splice(index, 1); }
+    paragraphs.splice(at, 0, ...cells);
+    classified.splice(at, 0, ...cells.map(cell => ({ role: "TABLE" as BlockRole, reason: /[A-Za-z\u3040-\u30ff\u4e00-\u9fff]{3,}/.test(cell.text) ? null : "table-data", columnIndex: cell.x + cell.width / 2 < .5 ? 0 : 1 })));
+  }
   adoptEquationPieces(paragraphs, classified, height);
   adoptOrphanLines(paragraphs, classified, height, found.tables);
   continueCaptions(paragraphs, classified);
@@ -150,6 +171,50 @@ function continueCaptions(paragraphs: PdfParagraph[], classified: { role: BlockR
       if (sameStart && sameSize && besides) classified[otherIndex] = { ...classified[otherIndex], role: "CAPTION", reason: null };
     });
   });
+}
+
+/**
+ * Cells of a ruled table: its text lines (split at column gaps) stacked into cells while they stay in
+ * one column, the same type size, close together, and no rule runs between or through them.
+ */
+function buildTableCells(raw: PdfTextItem[], table: Region, rules: Box[], width: number, height: number, pageIndex: number, captions: PdfParagraph[]): PdfParagraph[] {
+  const x0 = table.x * width, y0 = table.y * height, x1 = (table.x + table.width) * width, y1 = (table.y + table.height) * height;
+  const inCaption = (x: number, y: number) => captions.some(caption => x > caption.x * width && x < (caption.x + caption.width) * width && y > caption.y * height && y < (caption.y + caption.height) * height);
+  const items = raw.filter(item => { const cx = item.x + item.width / 2, cy = item.y + item.height / 2; return cx > x0 - 2 && cx < x1 + 2 && cy > y0 - 2 && cy < y1 + 2 && !inCaption(cx, cy); });
+  // A text line that runs across a column border is two cells: split it at the vertical rule.
+  const down0 = rules.filter(rule => rule.width <= 1.5);
+  const lines = buildTextLines(items).flatMap(line => {
+    const cuts = down0.filter(rule => rule.x > line.x + 2 && rule.x < line.right - 2 && rule.y < line.bottom && rule.y + rule.height > line.y).map(rule => rule.x).sort((a, b) => a - b);
+    if (!cuts.length) return [line];
+    const parts: TextLine[] = [];
+    for (const [index, edge] of [...cuts, Infinity].entries()) {
+      const from = index ? cuts[index - 1] : -Infinity, pieces = line.items.filter(item => (item.x + item.right) / 2 > from && (item.x + item.right) / 2 < edge);
+      if (pieces.length) parts.push({ ...line, text: pieces.map(item => item.text).join(" ").replace(/\s+/g, " ").trim(), x: Math.min(...pieces.map(item => item.x)), right: Math.max(...pieces.map(item => item.right)), items: pieces });
+    }
+    return parts.filter(part => part.text);
+  }).sort((a, b) => a.y - b.y || a.x - b.x);
+  const across = rules.filter(rule => rule.height <= 1.5), down = rules.filter(rule => rule.width <= 1.5);
+  type Cell = { lines: TextLine[]; x: number; right: number; y: number; bottom: number; size: number };
+  const cells: Cell[] = [];
+  for (const line of lines) {
+    const host = cells.find(cell => {
+      if (Math.abs(cell.size - line.size) > cell.size * .15 || line.y < cell.bottom - cell.size * .4 || line.y - cell.bottom > cell.size * .8) return false;
+      const shared = Math.min(cell.right, line.right) - Math.max(cell.x, line.x);
+      if (shared < Math.min(cell.right - cell.x, line.right - line.x) * .3) return false;
+      if (across.some(rule => rule.y > cell.bottom - 1 && rule.y < line.y + 1 && rule.x < Math.min(cell.right, line.right) && rule.x + rule.width > Math.max(cell.x, line.x))) return false;
+      return !down.some(rule => rule.x > Math.min(cell.x, line.x) + 2 && rule.x < Math.max(cell.right, line.right) - 2 && rule.y < line.bottom && rule.y + rule.height > cell.y);
+    });
+    if (host) { host.lines.push(line); host.x = Math.min(host.x, line.x); host.right = Math.max(host.right, line.right); host.bottom = Math.max(host.bottom, line.bottom); }
+    else cells.push({ lines: [line], x: line.x, right: line.right, y: line.y, bottom: line.bottom, size: line.size });
+  }
+  return cells.map((cell, index): PdfParagraph => {
+    const text = cell.lines.map(line => line.text).join(" ").replace(/([a-z])[-‐]\s+(?=[a-z])/g, "$1").replace(/\s+/g, " ").trim();
+    const pitch = cell.lines.length > 1 ? (cell.lines.at(-1)!.y - cell.lines[0].y) / (cell.lines.length - 1) : cell.size * 1.2;
+    return { id: `cell-${pageIndex}-${index}`, pageIndex, text, kind: "body", x: cell.x / width, y: cell.y / height, width: (cell.right - cell.x) / width, height: (cell.bottom - cell.y) / height,
+      lines: cell.lines.map(line => ({ x: line.x / width, y: line.y / height, width: (line.right - line.x) / width, height: (line.bottom - line.y) / height })),
+      fontFamily: cell.lines.some(line => line.sans) ? "sans-serif" : "serif", fontWeight: 400, fontStyle: "normal", fontSize: cell.size, pitch, indent: 0,
+      column: { left: cell.x / width, right: cell.right / width }, lineTexts: cell.lines.map(line => line.text) };
+  }).filter(cell => cell.text);
 }
 
 const ORPHAN_REASONS = new Set(["table-data", "short-fragment", "figure-label", "small-label"]);
@@ -276,7 +341,7 @@ export async function buildUnits(documentId: string, blocks: ManifestBlock[]): P
       open.last = block;
       continue;
     }
-    const unit: TranslationUnit = { id: "", role: block.role, blockIds: [block.id], pages: [block.pageIndex], text: block.text, pageChars: { [block.pageIndex]: block.text.length } };
+    const unit: TranslationUnit = { id: "", role: block.role, blockIds: [block.id], pages: [block.pageIndex], text: block.text, pageChars: { [block.pageIndex]: block.text.length }, ...(block.role === "HEADING" || block.role === "TABLE" ? { manual: true } : {}) };
     units.push(unit);
     open = prose ? { unit, last: block } : block.role === "CAPTION" ? open : null;
   }
@@ -343,6 +408,14 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
 }
 
 const memory = new Map<string, TranslationManifest>();
+/** Units of a paper and how many the whole-paper run covers, read without keeping the manifest in memory. */
+export async function manifestUnitIds(documentId: string): Promise<string[] | null> {
+  const cached = memory.get(documentId);
+  if (cached) return cached.units.filter(unit => !unit.manual).map(unit => unit.id);
+  const db = await openDatabase();
+  const value = await requestResult<TranslationManifest | undefined>(db.transaction("translationManifests").objectStore("translationManifests").get(documentId));
+  return value?.version === EXTRACTOR_VERSION ? value.units.filter(unit => !unit.manual).map(unit => unit.id) : null;
+}
 export const manifestRepository = {
   peek(documentId: string) { return memory.get(documentId) ?? null; },
   async get(documentId: string): Promise<TranslationManifest | null> {
@@ -406,7 +479,8 @@ export function ensureManifest(documentId: string, open: (signal: AbortSignal) =
 }
 
 export function manifestCounts(manifest: TranslationManifest, translatedIds: Set<string>, failedIds = new Set<string>(), cancelledIds = new Set<string>()) {
-  const targets = manifest.units ?? [];
+  // Headings and table cells are translated on request: the whole-paper progress counts the rest.
+  const targets = (manifest.units ?? []).filter(unit => !unit.manual);
   for (const unit of targets) {
     const states = Number(translatedIds.has(unit.id)) + Number(failedIds.has(unit.id)) + Number(cancelledIds.has(unit.id));
     if (states > 1) throw new Error(`번역 단위 ${unit.id}에 중복 상태가 있습니다.`);

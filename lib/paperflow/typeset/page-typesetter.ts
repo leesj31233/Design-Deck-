@@ -2,7 +2,7 @@ import type { ManifestBlock, TranslationManifest, TranslationUnit } from "../tra
 import { LineFeeder, justify, tokenize, type Measure, type Run } from "./line-breaker";
 
 export interface Rect { x: number; y: number; width: number; height: number }
-export type FlowKind = "body" | "heading" | "caption";
+export type FlowKind = "body" | "heading" | "caption" | "cell";
 export interface SetLine {
   unitId: string; kind: FlowKind; x: number; y: number; width: number; fontSize: number; lineHeight: number;
   runs: Run[]; wordSpacing: number; letterSpacing: number; bold: boolean;
@@ -30,7 +30,7 @@ interface Flow { kind: FlowKind; blocks: ManifestBlock[]; paragraphs: Paragraph[
 
 // Korean is set at most at the source size (so pages look alike) and down to 80%; spare room becomes leading.
 // Hangul reads larger than Latin at the same point size; .97 keeps the original's breathing room.
-const SIZE_RANGE: Record<FlowKind, [number, number]> = { body: [.8, .97], heading: [.85, 1], caption: [.76, .97] };
+const SIZE_RANGE: Record<FlowKind, [number, number]> = { body: [.8, .97], heading: [.85, 1], caption: [.76, .97], cell: [.62, .95] };
 const FALLBACK_MIN = .5;
 
 /** Korean text that belongs to this page when one logical paragraph spans pages. */
@@ -85,6 +85,8 @@ function blockRegions(block: ManifestBlock, page: { width: number; height: numbe
     } else regions.push({ x: left, y: line.y, width: line.x + line.width - left, height: line.height });
   }
   for (const region of regions) {
+    // A table cell keeps exactly its own box.
+    if (block.role === "TABLE") continue;
     if (block.role === "HEADING") { region.width = Math.max(region.width, columnRight - region.x); continue; }
     // Justified columns reach the column edge; a short last line must not shrink the measure.
     if (region.width > (columnRight - columnLeft) * .55 || region.x + region.width > columnRight - (block.fontSize ?? 9) * 8) region.width = Math.max(region.width, columnRight - region.x);
@@ -142,7 +144,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       if (block.role === "EQUATION" || block.role === "HEADING" || block.role === "TITLE" || block.role === "BODY" || block.role === "ABSTRACT") body = null;
       continue;
     }
-    const kind: FlowKind = block.role === "HEADING" ? "heading" : block.role === "CAPTION" ? "caption" : "body";
+    const kind: FlowKind = block.role === "HEADING" ? "heading" : block.role === "CAPTION" ? "caption" : block.role === "TABLE" ? "cell" : "body";
     if (kind !== "body") { flows.push({ kind, blocks: [block], paragraphs: [], areas: [], obstacles: [], size: 0, pitch: 0, bold: kind === "heading", sans: kind === "heading" && block.fontFamily === "sans-serif", extra: [], extended: true }); body = kind === "heading" ? null : body; continue; }
     if (!body) { body = { kind, blocks: [], paragraphs: [], areas: [], obstacles: [], size: 0, pitch: 0, bold: false, extra: [], extended: true }; flows.push(body); }
     body.blocks.push(block);
@@ -177,7 +179,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
 
   // 3. Let the last area of a column segment use the white space below it.
   const occupied = blocks.filter(block => block.exclusionReason !== "glyph-noise").flatMap(block => px(block, page));
-  for (const flow of flows) for (const area of flow.areas) {
+  for (const flow of flows.filter(flow => flow.kind !== "cell")) for (const area of flow.areas) {
     const below = occupied.filter(line => line.y > area.y + area.height + .5 && line.x < area.x + area.width && line.x + line.width > area.x).map(line => line.y);
     const limit = Math.min(page.height * .945, ...below.map(value => value - flow.pitch * .25), area.y + area.height + flow.pitch * (flow.kind === "heading" ? 0 : 1.6));
     // Walk down in half-line steps and stop at the first ink: a figure, a rule or a footer logo.
@@ -237,7 +239,8 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
           if (target >= place.x - size * 4) { width = place.x + place.width - target; x = target; }
         }
         const broken = feeder.next(width, size), last = feeder.done;
-        const spacing = justify(broken, width, size, last || flow.kind === "heading");
+        // Table cells and headings are set flush left: justifying a short cell line spreads its letters apart.
+        const spacing = justify(broken, width, size, last || flow.kind === "heading" || flow.kind === "cell");
         if (commit && broken.runs.length) out.push({ unitId: paragraph.unitId, kind: flow.kind, x, y: place.y, width, fontSize: size, lineHeight: pitch, runs: broken.runs, bold: flow.bold, sans: flow.sans, ...spacing });
         placed = { x, width, y: place.y };
         y = place.y + pitch; first = false;
@@ -308,8 +311,10 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
     if (result.overflow) unfit.push(...flow.paragraphs.map(paragraph => paragraph.unitId));
   });
 
-  for (const flow of flows.filter(flow => flow.kind === "caption")) {
-    const scale = fit(flow, ...SIZE_RANGE.caption) ?? fit(flow, FALLBACK_MIN, SIZE_RANGE.caption[0]) ?? FALLBACK_MIN;
+  for (const flow of flows.filter(flow => flow.kind === "caption" || flow.kind === "cell")) {
+    if (flow.kind === "cell") flow.extended = false;
+    const range = SIZE_RANGE[flow.kind];
+    const scale = fit(flow, ...range) ?? fit(flow, .45, range[0]) ?? .45;
     const result = setFlow(flow, scale, 1, true);
     lines.push(...result.lines);
     if (result.overflow) unfit.push(flow.blocks[0].unitId!);
@@ -317,7 +322,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
 
   // Masks hide only the source lines that now carry Korean text, never artwork.
   const artwork = blocks.filter(block => !shown(block) && block.exclusionReason !== "glyph-noise").flatMap(block => px(block, page));
-  const masks = blocks.filter(shown).flatMap(block => px(block, page)).map(line => ({ x: line.x - 1, y: line.y - line.height * .22, width: line.width + 2, height: line.height * 1.5 }))
+  const masks = blocks.filter(shown).flatMap(block => [...px(block, page), ...(block.extraMasks ?? []).map(box => ({ x: box.x * page.width, y: box.y * page.height + box.height * page.height * .1, width: box.width * page.width, height: box.height * page.height * .8 }))]).map(line => ({ x: line.x - 1, y: line.y - line.height * .22, width: line.width + 2, height: line.height * 1.5 }))
     .flatMap(mask => artwork.reduce<Rect[]>((parts, art) => parts.flatMap(part => subtract(part, art)), [mask]));
   const unitBoxes = new Map<string, Rect>();
   for (const block of blocks.filter(shown)) {

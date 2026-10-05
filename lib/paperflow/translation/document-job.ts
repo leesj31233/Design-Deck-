@@ -3,7 +3,7 @@ import { translationRepository } from "../persistence/translation-repository";
 import { ocrPage, releaseOcr } from "../pdf/ocr";
 import { pdfAdapter } from "../pdf/pdf-adapter";
 import { readableError } from "../errors";
-import { ensureManifest, manifestCounts, type TranslationManifest, type TranslationUnit } from "./manifest";
+import { ensureManifest, manifestCounts, manifestUnitIds, type TranslationManifest, type TranslationUnit } from "./manifest";
 import { researchTranslateBlocks, sharedTranslations, ResearchHttpError } from "./research-api";
 import { runTranslationScheduler, type SchedulerState } from "./scheduler";
 import { polishKorean } from "./research-style";
@@ -44,9 +44,16 @@ function update(documentId: string, patch: Partial<TranslationJobStatus>, immedi
   if (immediate) { if (job.timer) clearTimeout(job.timer); flush(); }
   else job.timer ??= setTimeout(flush, 160);
 }
+/** How much of the whole-paper translation is stored (null until the paper has been analysed once). */
+export async function translationSummary(documentId: string): Promise<{ translated: number; total: number } | null> {
+  const ids = await manifestUnitIds(documentId);
+  if (!ids) return null;
+  const texts = await translationRepository.unitTexts(documentId);
+  return { translated: ids.filter(id => texts.has(id)).length, total: ids.length };
+}
 export function cancelTranslationJob(documentId: string) { jobs.get(documentId)?.controller.abort(); }
 
-const roleOf = (unit: TranslationUnit): PassageRole => unit.role === "HEADING" ? "heading" : unit.role === "CAPTION" ? "caption" : "body";
+const roleOf = (unit: TranslationUnit): PassageRole => unit.role === "HEADING" ? "heading" : unit.role === "CAPTION" ? "caption" : unit.role === "TABLE" ? "cell" : "body";
 
 async function openManifest(documentId: string, signal: AbortSignal, onPage?: (page: number) => void): Promise<TranslationManifest> {
   const manifest = await ensureManifest(documentId, async buildSignal => {
@@ -61,7 +68,7 @@ async function openManifest(documentId: string, signal: AbortSignal, onPage?: (p
 
 function pagesDone(manifest: TranslationManifest, translated: ReadonlySet<string>) {
   let done = 0;
-  for (let page = 0; page < manifest.pageCount; page++) if (!manifest.ocrCandidates?.includes(page) && manifest.units.filter(unit => unit.pages.includes(page)).every(unit => translated.has(unit.id))) done++;
+  for (let page = 0; page < manifest.pageCount; page++) if (!manifest.ocrCandidates?.includes(page) && manifest.units.filter(unit => !unit.manual && unit.pages.includes(page)).every(unit => translated.has(unit.id))) done++;
   return done;
 }
 
@@ -91,7 +98,7 @@ export async function startTranslationJob(documentId: string, options: { fromPag
     const units = new Map(manifest.units.map(unit => [unit.id, unit]));
     const only = options.unitIds ? new Set(options.unitIds) : null;
     const from = Math.max(0, (options.fromPage ?? 1) - 1);
-    target = manifest.units.filter(unit => !translated.has(unit.id) && (!only || only.has(unit.id)))
+    target = manifest.units.filter(unit => !translated.has(unit.id) && (only ? only.has(unit.id) : !unit.manual))
       .sort((a, b) => Number(Math.max(...a.pages) < from) - Number(Math.max(...b.pages) < from) || manifest.units.indexOf(a) - manifest.units.indexOf(b));
     const refresh = (scheduler?: SchedulerState) => {
       const counts = manifestCounts(manifest, translated, new Set(failed.keys()));
@@ -160,9 +167,29 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
   try {
     const shared = await sharedTranslations(units);
     const missingUnits = units.filter(unit => !shared.has(unit.id));
-    const response = missingUnits.length ? await researchTranslateBlocks(missingUnits.map(unit => ({ id: unit.id, text: unit.text, role: roleOf(unit) })), undefined, paperGlossary(manifest)) : { results: [], missing: [] as string[] };
-    const results = [...[...shared].map(([id, text]) => ({ id, text })), ...response.results], missing = response.missing;
-    const entries = results.map(result => ({ id: result.id, text: polishKorean(result.text) }));
+    // A table can hold dozens of cells: send them as the whole-paper run does (≤ 12 passages per request,
+    // three requests at a time), then give whatever came back missing one more try on its own.
+    const glossary = paperGlossary(manifest), passage = (unit: TranslationUnit) => ({ id: unit.id, text: unit.text, role: roleOf(unit) });
+    const groups: TranslationUnit[][] = [];
+    for (const unit of missingUnits) { const last = groups.at(-1); if (last && last.length < 12 && last.reduce((sum, item) => sum + item.text.length, 0) + unit.text.length <= 5000) last.push(unit); else groups.push([unit]); }
+    const translatedNow: { id: string; text: string }[] = [], missingNow: string[] = [];
+    const queue = [...groups];
+    await Promise.all(Array.from({ length: Math.min(3, queue.length) }, async () => {
+      for (let group = queue.shift(); group; group = queue.shift()) {
+        const response = await researchTranslateBlocks(group.map(passage), undefined, glossary).catch(() => ({ results: [], missing: group.map(unit => unit.id) }));
+        translatedNow.push(...response.results); missingNow.push(...response.missing);
+      }
+    }));
+    const missing: string[] = [];
+    for (const id of missingNow) {
+      const unit = missingUnits.find(item => item.id === id)!;
+      const retry = await researchTranslateBlocks([passage(unit)], undefined, glossary).catch(() => ({ results: [], missing: [id] }));
+      if (retry.results.length) translatedNow.push(...retry.results); else missing.push(id);
+    }
+    const results = [...[...shared].map(([id, text]) => ({ id, text })), ...translatedNow];
+    // A table entry keeps its own punctuation: the model likes to end a short label with a comma.
+    const tidy = (id: string, text: string) => { const unit = units.find(item => item.id === id); return unit?.role === "TABLE" && !/[.,;:]$/.test(unit.text.trim()) ? text.replace(/[.,;:]+$/, "") : text; };
+    const entries = results.map(result => ({ id: result.id, text: tidy(result.id, polishKorean(result.text)) }));
     await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.find(item => item.id === entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
     store().addTexts(documentId, entries);
     for (const id of missing) store().setFailed(documentId, id, "모델 응답에서 이 문단의 번역이 누락되었습니다.");

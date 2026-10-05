@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { TextAnchor } from "../anchors/types";
+import type { AnnotationColor, TextAnchor } from "../anchors/types";
 type ReaderUiState = {
   tool: "select" | "highlight" | "pen" | "eraser" | "text"; documentId: string | null; currentPage: number; zoom: number; fitMode: "width" | "page" | "custom";
   inspectorOpen: boolean; pageRailOpen: boolean; activeSelection: TextAnchor | null;
@@ -7,10 +7,12 @@ type ReaderUiState = {
   guideFocus: { unitId: string; page: number; key: number; item: string; quote?: string } | null;
   /** The AI guide written on the paper: highlights, tapered arrows and handwritten margin notes. */
   guideOverlay: boolean;
+  /** Highlighter colour; changed with Ctrl or 1–5 while dragging. */
+  highlightColor: AnnotationColor;
   set: (patch: Partial<Omit<ReaderUiState, "set" | "reset">>) => void;
   reset: (id: string, page: number) => void;
 };
 export const useReaderStore = create<ReaderUiState>(set => ({
-  tool: "select", documentId: null, currentPage: 1, zoom: 100, fitMode: "width", inspectorOpen: true, pageRailOpen: true, activeSelection: null, guideFocus: null, guideOverlay: false,
+  tool: "select", documentId: null, currentPage: 1, zoom: 100, fitMode: "width", inspectorOpen: true, pageRailOpen: true, activeSelection: null, guideFocus: null, guideOverlay: false, highlightColor: "yellow",
   set: patch => set(patch), reset: (documentId, currentPage) => set({ documentId, currentPage, zoom: 100, fitMode: "width", activeSelection: null, guideFocus: null })
 }));

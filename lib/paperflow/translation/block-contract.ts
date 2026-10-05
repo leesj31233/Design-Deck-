@@ -1,4 +1,4 @@
-export type PassageRole = "body" | "heading" | "caption";
+export type PassageRole = "body" | "heading" | "caption" | "cell";
 export interface TranslationPassage { id: string; text: string; role?: PassageRole }
 export interface TranslationResult { id: string; text: string }
 export interface TranslationBatchResult { results: TranslationResult[]; missing: string[] }
@@ -42,7 +42,7 @@ export function partitionTranslationResults(passages: TranslationPassage[], valu
     const passage = expected.get(item.id), text = item.text.trim();
     if (!passage || found.has(item.id) || !text) continue;
     // A heading made only of technical terms legitimately stays English ("2.2. Silicate melt-induced slagging").
-    if (passage.role !== "heading" && needsHangul(passage.text) && !/[가-힣]/.test(text)) continue;
+    if (passage.role !== "heading" && passage.role !== "cell" && needsHangul(passage.text) && !/[가-힣]/.test(text)) continue;
     // A truncated answer for a long paragraph is a failure, not a translation.
     if (passage.text.length > 240 && text.length < passage.text.length * .22) continue;
     // "6. CONCLUSION" → "6.": every word of the source lost.

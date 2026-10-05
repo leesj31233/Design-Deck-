@@ -33,8 +33,24 @@ export async function enrichDocument(doc: StoredDocument, force = false): Promis
   if (looksLikeFilename(doc.title) && work.title) patch.title = work.title;
   if (work.citedBy) patch.citationCount = work.citedBy;
   patch.keywords = [...new Set([...(doc.keywords ?? []), ...work.keywords])].slice(0, 30);
+  if (work.source?.id) { const [stats] = await sourceStats([work.source.id]); if (typeof stats?.meanCitedness2y === "number") patch.impact = { value: Math.round(stats.meanCitedness2y * 10) / 10, journal: stats.name, checkedAt: new Date().toISOString() }; }
   await documentRepository.updateDocument(doc.id, patch);
   return work;
+}
+
+/** Journal impact for papers already matched to OpenAlex but not yet carrying it (one request per 50 journals). */
+export async function backfillImpact(docs: StoredDocument[]) {
+  const pending = docs.filter(doc => !doc.impact && doc.scholar?.source?.id);
+  if (!pending.length) return 0;
+  const stats = new Map((await sourceStats([...new Set(pending.map(doc => doc.scholar!.source!.id))])).map(item => [item.id, item]));
+  let updated = 0;
+  for (const doc of pending) {
+    const item = stats.get(doc.scholar!.source!.id);
+    if (typeof item?.meanCitedness2y !== "number") continue;
+    await documentRepository.updateDocument(doc.id, { impact: { value: Math.round(item.meanCitedness2y * 10) / 10, journal: item.name, checkedAt: new Date().toISOString() } });
+    updated++;
+  }
+  return updated;
 }
 
 /** Enrich every paper that has no (or stale) OpenAlex record, gently (OpenAlex asks for < 10 req/s). */

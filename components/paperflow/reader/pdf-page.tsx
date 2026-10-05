@@ -12,6 +12,7 @@ import { InkLayer } from "./ink-layer";
 import { TextMemoLayer } from "./text-memo-layer";
 import { TranslationOverlay, type OverlayState } from "./translation-overlay";
 import { GuideMarks } from "./guide-marks";
+import { ManualTargets } from "./manual-targets";
 import { GuideNotes } from "./guide-notes";
 import { linkInk } from "@/lib/paperflow/typeset/ink";
 import { usePaperflow } from "../shell/paperflow-context";
@@ -24,11 +25,13 @@ export interface PdfPageProps {
   onUnit: (unitId: string) => void;
   onOriginal: (unitId: string) => void;
   onRetry: (unitId: string) => void;
+  /** Translate these units now (a table's cells, a heading): headings and tables are translated on request. */
+  onUnits?: (unitIds: string[]) => void;
   /** Free space beside the page for the AI guide margin notes, in px. */
   noteRoom?: number;
 }
 
-export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageIndex, annotations, selected, onResolved, onUnit, onOriginal, onRetry, noteRoom = 0 }: PdfPageProps) {
+export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageIndex, annotations, selected, onResolved, onUnit, onOriginal, onRetry, onUnits, noteRoom = 0 }: PdfPageProps) {
   const canvas = useRef<HTMLCanvasElement>(null), layer = useRef<HTMLDivElement>(null), surface = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false), [textReady, setTextReady] = useState(false), [error, setError] = useState("");
   const [canvasVersion, setCanvasVersion] = useState(0), [overlay, setOverlay] = useState<OverlayState>("none"), [patience, setPatience] = useState(true);
@@ -128,6 +131,7 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
     <div ref={layer} className="textLayer" aria-label={`선택 가능한 원문 ${pageIndex + 1}페이지`} onClick={openUnit}/>
     {textReady && <HighlightLayer annotations={resolved} selected={selected}/>}
     {ready && <TranslationOverlay documentId={documentId} pageIndex={pageIndex} scale={scale} canvas={canvas.current} canvasVersion={canvasVersion} referenceColor={linkColors.reference} citationColor={linkColors.citation} onState={setOverlay} onOriginal={onOriginal} onRetry={onRetry}/>}
+    {ready && onUnits && <ManualTargets pageIndex={pageIndex} surface={surface} onTranslate={onUnits}/>}
     {textReady && translationMarks.length > 0 && <div className="pf-translated-marks"><HighlightLayer annotations={translationMarks} selected={selected}/></div>}
     <GuideMarks pageIndex={pageIndex}/>
     <InkLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations}/>

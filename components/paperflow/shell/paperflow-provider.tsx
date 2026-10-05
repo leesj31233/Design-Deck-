@@ -20,6 +20,8 @@ function AppControls({ children, client }: { children: React.ReactNode; client: 
   const [open, setOpen] = useState(false), [dark, setDark] = useState(false), [importing, setImporting] = useState(false), [message, setMessage] = useState("");
   const [commands, setCommands] = useState<ReaderCommands | null>(null);
   const notify = useCallback((text: string) => setMessage(text), []);
+  // A notice steps aside on its own: a few seconds for news, longer for something that went wrong.
+  useEffect(() => { if (!message || /중…$/.test(message)) return; const timer = setTimeout(() => setMessage(""), /실패|못했|오류|없습니다/.test(message) ? 6000 : 3000); return () => clearTimeout(timer); }, [message]);
   useEffect(() => {
     const media = matchMedia("(prefers-color-scheme: dark)");
     const sync = () => { let saved: string | null = null; try { saved = localStorage.getItem("paperflow-theme"); } catch { /* OS preference still works. */ } const isDark = saved ? saved === "dark" : media.matches; setDark(isDark); document.documentElement.dataset.pfTheme = isDark ? "dark" : "light"; };

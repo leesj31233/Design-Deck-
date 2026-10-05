@@ -190,7 +190,13 @@ describe("ruled tables from the page's own strokes", () => {
     ], W, H, "none", [rule(95, 412, 400), rule(95, 430, 400), rule(95, 462, 400)], found);
     expect(found.tables).toHaveLength(1);
     expect(blocks.find(block => block.text.startsWith("Table 2"))?.translatable).toBe(true);
-    expect(blocks.filter(block => /CDDA|Embed/.test(block.text)).every(block => !block.translatable)).toBe(true);
+    // The rows are table cells: kept out of the whole-paper run, translatable on request.
+    const cells = blocks.filter(block => /CDDA|Embed/.test(block.text));
+    expect(cells.length).toBeGreaterThan(0);
+    expect(cells.every(block => block.role === "TABLE")).toBe(true);
+    const { buildUnits } = await import("../../lib/paperflow/translation/manifest");
+    const units = await buildUnits("doc", blocks);
+    expect(units.filter(unit => unit.role === "TABLE").every(unit => unit.manual)).toBe(true);
   });
   it("keeps a running-head rule, a table and a footer rule apart when body text lies between them", async () => {
     const { tableRegions } = await import("../../lib/paperflow/layout/graphics");

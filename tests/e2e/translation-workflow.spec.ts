@@ -10,7 +10,7 @@ test("library pretranslation, page memo, and annotated PDF export", async ({ pag
   await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
   await page.getByLabel("Open Library").click();
   await page.getByRole("button", { name: "전체 번역", exact: true }).click();
-  await expect(page.getByRole("button", { name: "번역 재시도" })).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByRole("button", { name: /번역 완료|번역 \d+%/})).toBeVisible({ timeout: 30_000 });
   await page.getByRole("link", { name: /Workflow/ }).first().click();
   await expect(page.locator("[data-pdf-page='0'] .pf-tx-line").first()).toBeVisible();
   await page.getByRole("button", { name: "텍스트 메모", exact: true }).click();

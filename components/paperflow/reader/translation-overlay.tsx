@@ -67,7 +67,7 @@ function paintText(text: string, scripts: ScriptTable | undefined, referenceColo
   return pieces.map((piece, index) => piece.kind || piece.color ? <span key={index} className={piece.kind === "sub" ? "pf-sub" : piece.kind === "sup" ? "pf-sup" : undefined} style={piece.color ? { color: piece.color } : undefined}>{piece.text}</span> : piece.text);
 }
 
-export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, scale, canvas, canvasVersion, referenceColor, citationColor, onState, onOriginal, onRetry }: Props) {
+export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, scale, canvas, canvasVersion, referenceColor, citationColor, onState, onRetry }: Props) {
   const version = useTranslationStore(state => state.pageVersions[pageIndex] ?? 0);
   const manifest = useTranslationStore(state => state.manifest);
   const paint = (text: string, colored: boolean) => paintText(text, manifest?.scripts, colored ? referenceColor : undefined, colored ? citationColor : undefined);
@@ -145,7 +145,6 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
       {layout.masks.map((mask, index) => <div key={index} className="pf-tx-mask" style={{ left: mask.x * K, top: mask.y * K, width: mask.width * K, height: mask.height * K, background: colors?.[index] ?? "#fff" }}/>)}
       {[...byUnit].map(([unitId, lines]) => <div key={unitId} className="pf-tx-unit" data-paragraph-id={unitId} data-kind={lines[0].kind}>
         {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08) * K, fontSize: line.fontSize * K, lineHeight: `${line.fontSize * 1.15 * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: line.kind === "heading" ? headingInk.get(unitId) : undefined }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{paint(run.text, line.kind === "body")}</b> : <span key={part}>{paint(run.text, line.kind !== "heading")}</span>)}</span>)}
-        <button type="button" className="pf-tx-original" style={{ left: (lines[0].x + lines[0].width) * K - 37.5 * K, top: lines[0].y * K - 19 * K, transform: `scale(${K / 4})`, transformOrigin: "0 0" }} onClick={() => onOriginal(unitId)} aria-label="이 문단 원문 보기">원문</button>
       </div>)}
     </div>}
     {(pending > 0 || failed.length > 0) && <div className="pf-tx-page-status" role="status">

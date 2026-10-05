@@ -5,6 +5,8 @@ export type StoredDocument = {
   id: string; filename: string; title: string; mimeType: "application/pdf"; byteLength: number;
   createdAt: string; updatedAt: string; pageCount: number; fingerprint?: string; blobKey: string;
   visitedPages?: number[]; opens?: string[]; keywords?: string[]; citationCount?: number; metadataSource?: string; metadataCheckedAt?: string; jif?: { value: number; year: number; source: string };
+  /** The journal's two-year mean citedness from OpenAlex (computed like a JIF, not Clarivate's JCR figure). */
+  impact?: { value: number; journal?: string; checkedAt: string };
   currentPage: number; lastOpenedAt?: string; authors: string[]; journal?: string; year?: number; doi?: string;
   researchPoolIds: string[]; archived: boolean;
   /** In the trash since then (purged for good after 30 days); null when restored, so the restore syncs too. */
