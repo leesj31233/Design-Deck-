@@ -1,5 +1,6 @@
 import type { ManifestBlock, TranslationManifest, TranslationUnit } from "../translation/manifest";
 import { LineFeeder, justify, tokenize, type Measure, type Run } from "./line-breaker";
+import { tableEnding } from "../translation/table-style";
 
 export interface Rect { x: number; y: number; width: number; height: number }
 export type FlowKind = "body" | "heading" | "caption" | "cell";
@@ -30,7 +31,7 @@ interface Flow { kind: FlowKind; blocks: ManifestBlock[]; paragraphs: Paragraph[
 
 // Korean is set at most at the source size (so pages look alike) and down to 80%; spare room becomes leading.
 // Hangul reads larger than Latin at the same point size; .97 keeps the original's breathing room.
-const SIZE_RANGE: Record<FlowKind, [number, number]> = { body: [.8, .97], heading: [.85, 1], caption: [.76, .97], cell: [.62, .95] };
+const SIZE_RANGE: Record<FlowKind, [number, number]> = { body: [.8, .97], heading: [.85, 1], caption: [.76, .97], cell: [.62, .9] };
 const FALLBACK_MIN = .5;
 
 /** Korean text that belongs to this page when one logical paragraph spans pages. */
@@ -69,19 +70,18 @@ function px(block: ManifestBlock, page: { width: number; height: number }) {
 }
 
 /** Text regions of a block: a paragraph that wraps a figure is not one rectangle. */
-/** How a table cell sat in its box: centred cells (headers, short labels) stay centred in Korean. */
-function cellAlignment(block: ManifestBlock) {
+/** A centred source cell (a header, a short label) stays centred in Korean; any other starts where the source did. */
+function centredCell(block: ManifestBlock) {
   const cell = block.cell!;
-  const across = Math.abs(block.x + block.width / 2 - cell.x - cell.width / 2) < cell.width * .08 && block.width < cell.width * .85 && block.x - cell.x > cell.width * .04;
-  const down = Math.abs(block.y + block.height / 2 - cell.y - cell.height / 2) < cell.height * .15 && block.height < cell.height * .75;
-  return { across, down };
+  if (cell.align) return cell.align === "center";
+  return Math.abs(block.x + block.width / 2 - cell.x - cell.width / 2) < cell.width * .08 && block.width < cell.width * .85 && block.x - cell.x > cell.width * .04;
 }
 
 function blockRegions(block: ManifestBlock, page: { width: number; height: number }): Rect[] {
   // A table cell may use its whole box between the rules, and nothing outside it.
   if (block.role === "TABLE" && block.cell) {
-    const cell = block.cell, top = cellAlignment(block).down ? cell.y : Math.min(block.y, cell.y + cell.height * .5);
-    return [{ x: cell.x * page.width, y: top * page.height, width: cell.width * page.width, height: (cell.y + cell.height - top) * page.height }];
+    const cell = block.cell, margin = (block.fontSize ?? 9) * .2, left = centredCell(block) ? cell.x * page.width + margin : Math.max(cell.x * page.width + margin, Math.min(block.x, ...block.lines.map(line => line.x)) * page.width);
+    return [{ x: left, y: cell.y * page.height + margin * .5, width: (cell.x + cell.width) * page.width - margin - left, height: cell.height * page.height - margin }];
   }
   const lines = px(block, page), regions: Rect[] = [];
   const columnLeft = (block.column?.left ?? block.x) * page.width;
@@ -158,7 +158,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       continue;
     }
     const kind: FlowKind = block.role === "HEADING" ? "heading" : block.role === "CAPTION" ? "caption" : block.role === "TABLE" ? "cell" : "body";
-    if (kind !== "body") { flows.push({ kind, blocks: [block], paragraphs: [], areas: [], obstacles: [], size: 0, pitch: 0, bold: kind === "heading", sans: kind === "heading" && block.fontFamily === "sans-serif", extra: [], extended: true }); body = kind === "heading" ? null : body; continue; }
+    if (kind !== "body") { flows.push({ kind, blocks: [block], paragraphs: [], areas: [], obstacles: [], size: 0, pitch: 0, bold: kind === "heading" || kind === "cell" && block.fontWeight >= 600, sans: (kind === "heading" || kind === "cell") && block.fontFamily === "sans-serif", extra: [], extended: true }); body = kind === "heading" ? null : body; continue; }
     if (!body) { body = { kind, blocks: [], paragraphs: [], areas: [], obstacles: [], size: 0, pitch: 0, bold: false, extra: [], extended: true }; flows.push(body); }
     body.blocks.push(block);
   }
@@ -176,7 +176,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       const gap = first.y * page.height - previousBottom;
       const firstX = first.lines[0].x * page.width, bodyX = first.lines.length > 1 ? Math.min(...first.lines.slice(1).map(line => line.x)) * page.width : firstX;
       const hang = startsUnit && LIST_MARKER.test(first.text) && bodyX - firstX > flow.size * .6 && bodyX - firstX < flow.size * 4 ? { first: firstX, body: bodyX } : undefined;
-      flow.paragraphs.push({ unitId, text: unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0, hang });
+      flow.paragraphs.push({ unitId, text: flow.kind === "cell" ? tableEnding(unitTextForPage(unit, translations.get(unitId)!, pageIndex)) : unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0, hang });
       previousBottom = Math.max(...unitBlocks.map(block => (block.y + block.height) * page.height));
     }
     const regions = flow.blocks.flatMap(block => blockRegions(block, page));
@@ -336,17 +336,17 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
     const result = setFlow(flow, scale, 1, true);
     const block = flow.blocks[0];
     if (flow.kind === "cell" && block.cell && result.lines.length) {
-      const { across, down } = cellAlignment(block), cell = block.cell;
-      if (across) for (const line of result.lines) {
+      const cell = block.cell;
+      if (centredCell(block)) for (const line of result.lines) {
         const natural = line.runs.reduce((sum, run) => sum + measure(run.text, run.bold || line.bold, flow.sans) * line.fontSize, 0);
         if (natural < line.width) { line.x += (line.width - natural) / 2; line.width = natural + .5; }
       }
-      if (down) {
-        const first = result.lines[0], last = result.lines.at(-1)!;
-        const middle = (first.y + last.y + last.fontSize) / 2, target = (cell.y + cell.height / 2) * page.height;
-        const shift = Math.max(cell.y * page.height - first.y, Math.min((cell.y + cell.height) * page.height - last.y - last.fontSize, target - middle));
-        for (const line of result.lines) line.y += shift;
-      }
+      // The Korean text sits where the source text sat: same vertical centre (top-aligned, centred or
+      // bottom-aligned alike), as far as the cell allows. Neighbouring cells then keep their row line.
+      const first = result.lines[0], last = result.lines.at(-1)!;
+      const middle = (first.y + last.y + last.fontSize) / 2, target = (block.y + block.height / 2) * page.height;
+      const shift = Math.max(cell.y * page.height - first.y, Math.min((cell.y + cell.height) * page.height - last.y - last.fontSize, target - middle));
+      for (const line of result.lines) line.y += shift;
     }
     lines.push(...result.lines);
     if (result.overflow) unfit.push(block.unitId!);
@@ -360,7 +360,10 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
     const x0 = Math.max(rect.x, block.cell.x * page.width), y0 = Math.max(rect.y, block.cell.y * page.height), x1 = Math.min(rect.x + rect.width, (block.cell.x + block.cell.width) * page.width), y1 = Math.min(rect.y + rect.height, (block.cell.y + block.cell.height) * page.height);
     return { x: x0, y: y0, width: Math.max(0, x1 - x0), height: Math.max(0, y1 - y0) };
   };
-  const masks = blocks.filter(shown).flatMap(block => [...px(block, page), ...(block.extraMasks ?? []).map(box => ({ x: box.x * page.width, y: box.y * page.height + box.height * page.height * .1, width: box.width * page.width, height: box.height * page.height * .8 }))].map(line => clip({ x: line.x - 1, y: line.y - line.height * .22, width: line.width + 2, height: line.height * 1.5 }, block)))
+  // A translated table cell hides its whole inside (between its rules): no descender or hyphen of the
+  // source peeks out under the Korean, and the cell's own shading is sampled from all of it.
+  const cellMask = (block: ManifestBlock): Rect[] => [{ x: block.cell!.x * page.width, y: block.cell!.y * page.height, width: block.cell!.width * page.width, height: block.cell!.height * page.height }];
+  const masks = blocks.filter(shown).flatMap(block => block.role === "TABLE" && block.cell ? cellMask(block) : [...px(block, page), ...(block.extraMasks ?? []).map(box => ({ x: box.x * page.width, y: box.y * page.height + box.height * page.height * .1, width: box.width * page.width, height: box.height * page.height * .8 }))].map(line => clip({ x: line.x - 1, y: line.y - line.height * .22, width: line.width + 2, height: line.height * 1.5 }, block)))
     .flatMap(mask => artwork.reduce<Rect[]>((parts, art) => parts.flatMap(part => subtract(part, art)), [mask]));
   const unitBoxes = new Map<string, Rect>();
   for (const block of blocks.filter(shown)) {

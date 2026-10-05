@@ -18,23 +18,34 @@ export { inkColor };
  */
 const MIN_PAINT_SCALE = 1;
 
-/** One small read of the rendered page; every mask takes the paper colour under its own text. */
+/**
+ * One small read of the rendered page; every mask takes the paper colour under its own text: the most
+ * common light colour there (a grey table header stays grey), not the lightest pixel nearby, which
+ * may be the white paper beside a shaded cell.
+ */
 function backgroundSampler(canvas: HTMLCanvasElement, width: number, height: number) {
-  const columns = 120, rows = Math.max(1, Math.round(columns * height / width));
+  const columns = 240, rows = Math.max(1, Math.round(columns * height / width));
   const probe = document.createElement("canvas"); probe.width = columns; probe.height = rows;
   const context = probe.getContext("2d", { willReadFrequently: true });
   if (!context || !canvas.width) return () => "#fff";
   context.drawImage(canvas, 0, 0, columns, rows);
   const data = context.getImageData(0, 0, columns, rows).data;
   return (rect: Rect) => {
-    let best = -1, color = "#fff";
     const x0 = Math.max(0, Math.floor(rect.x / width * columns)), x1 = Math.min(columns - 1, Math.ceil((rect.x + rect.width) / width * columns));
     const y0 = Math.max(0, Math.floor(rect.y / height * rows)), y1 = Math.min(rows - 1, Math.ceil((rect.y + rect.height) / height * rows));
+    let lightest = 0;
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const offset = (y * columns + x) * 4; lightest = Math.max(lightest, data[offset] + data[offset + 1] + data[offset + 2]); }
+    const bins = new Map<number, { count: number; r: number; g: number; b: number }>();
     for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-      const offset = (y * columns + x) * 4, light = data[offset] + data[offset + 1] + data[offset + 2];
-      if (light > best) { best = light; color = `rgb(${data[offset]},${data[offset + 1]},${data[offset + 2]})`; }
+      const offset = (y * columns + x) * 4, r = data[offset], g = data[offset + 1], b = data[offset + 2];
+      // Glyph pixels (and anti-aliased glyph edges) are not paper.
+      if (r + g + b < lightest - 90) continue;
+      const key = (r >> 3) << 10 | (g >> 3) << 5 | b >> 3, bin = bins.get(key) ?? { count: 0, r: 0, g: 0, b: 0 };
+      bin.count++; bin.r += r; bin.g += g; bin.b += b; bins.set(key, bin);
     }
-    return color;
+    let best: { count: number; r: number; g: number; b: number } | null = null;
+    for (const bin of bins.values()) if (!best || bin.count > best.count) best = bin;
+    return best ? `rgb(${Math.round(best.r / best.count)},${Math.round(best.g / best.count)},${Math.round(best.b / best.count)})` : "#fff";
   };
 }
 

@@ -10,7 +10,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.30";
+export const EXTRACTOR_VERSION = "layout-v3.34";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -214,7 +214,8 @@ function buildTableCells(raw: PdfTextItem[], table: Region, rules: Box[], width:
   const vOverlap = (a: { y: number; bottom: number }, b: { y: number; bottom: number }) => Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y);
   const hOverlap = (a: { x: number; right: number }, b: { x: number; right: number }) => Math.min(a.right, b.right) - Math.max(a.x, b.x);
   const boxOf = (cell: Cell) => {
-    const pad = Math.max(1.5, cell.size * .2);
+    // The box reaches to just inside the rules (it is also the mask); the typesetter keeps its own margin.
+    const pad = 1, descent = cell.size * .3;
     let left = x0, right = x1, top = y0, bottom = y1;
     for (const rule of down) if (rule.y < cell.bottom && rule.y + rule.height > cell.y) {
       if (rule.x <= cell.x + 1) left = Math.max(left, rule.x + pad); else if (rule.x >= cell.right - 1) right = Math.min(right, rule.x - pad);
@@ -227,19 +228,30 @@ function buildTableCells(raw: PdfTextItem[], table: Region, rules: Box[], width:
         if (other.right <= cell.x + 1) left = Math.max(left, (other.right + cell.x) / 2); else if (other.x >= cell.right - 1) right = Math.min(right, (other.x + cell.right) / 2);
       }
       if (hOverlap(cell, other) > 0) {
-        if (other.bottom <= cell.y + 1) top = Math.max(top, (other.bottom + cell.y) / 2); else if (other.y >= cell.bottom - 1) bottom = Math.min(bottom, (other.y + cell.bottom) / 2);
+        if (other.bottom <= cell.y + 1) top = Math.max(top, (other.bottom + descent + cell.y) / 2); else if (other.y >= cell.bottom - 1) bottom = Math.min(bottom, (other.y + cell.bottom + descent) / 2);
       }
     }
     left = Math.min(left, cell.x); right = Math.max(right, cell.right); top = Math.min(top, cell.y); bottom = Math.max(bottom, cell.bottom);
     return { x: left / width, y: top / height, width: (right - left) / width, height: (bottom - top) / height };
+  };
+  // Alignment is read per column: a cell that starts where another cell of its column starts is set
+  // flush left (the body of most tables); one that does not, but sits in the middle of its box, is centred
+  // (headers, short labels).
+  const boxes = cells.map(boxOf);
+  const alignOf = (index: number): "left" | "center" => {
+    const cell = cells[index], box = boxes[index];
+    const column = cells.filter((other, at) => at !== index && Math.min(boxes[at].x + boxes[at].width, box.x + box.width) - Math.max(boxes[at].x, box.x) > Math.min(boxes[at].width, box.width) * .6);
+    const matches = column.filter(other => Math.abs(other.x - cell.x) < 2.5).length;
+    if (matches >= Math.min(2, column.length)) return "left";
+    return Math.abs((cell.x + cell.right) / 2 - (box.x + box.width / 2) * width) < Math.max(3, box.width * width * .1) && cell.x - box.x * width > 4 ? "center" : "left";
   };
   return cells.map((cell, index): PdfParagraph => {
     const text = cell.lines.map(line => line.text).join(" ").replace(/([a-z])[-‐]\s+(?=[a-z])/g, "$1").replace(/\s+/g, " ").trim();
     const pitch = cell.lines.length > 1 ? (cell.lines.at(-1)!.y - cell.lines[0].y) / (cell.lines.length - 1) : cell.size * 1.2;
     return { id: `cell-${pageIndex}-${index}`, pageIndex, text, kind: "body", x: cell.x / width, y: cell.y / height, width: (cell.right - cell.x) / width, height: (cell.bottom - cell.y) / height,
       lines: cell.lines.map(line => ({ x: line.x / width, y: line.y / height, width: (line.right - line.x) / width, height: (line.bottom - line.y) / height })),
-      fontFamily: cell.lines.some(line => line.sans) ? "sans-serif" : "serif", fontWeight: 400, fontStyle: "normal", fontSize: cell.size, pitch, indent: 0,
-      column: { left: cell.x / width, right: cell.right / width }, cell: boxOf(cell), lineTexts: cell.lines.map(line => line.text) };
+      fontFamily: cell.lines.some(line => line.sans) ? "sans-serif" : "serif", fontWeight: cell.lines.filter(line => line.bold).length > cell.lines.length / 2 ? 700 : 400, fontStyle: "normal", fontSize: cell.size, pitch, indent: 0,
+      column: { left: cell.x / width, right: cell.right / width }, cell: { ...boxes[index], align: alignOf(index) }, lineTexts: cell.lines.map(line => line.text) };
   }).filter(cell => cell.text);
 }
 
@@ -323,6 +335,22 @@ function isEntry(text: string) {
  * page or chapter break): three or more entries in a row, with the short continuation lines between
  * them, are references and are never sent for translation.
  */
+/**
+ * A running head or foot ("Smart Engineering Technology and Management", a journal line) repeats at
+ * the top or bottom of many pages. Reading it on one page alone it can pass for a sentence; seen on
+ * three or more pages in the same place, it is page furniture and stays as printed.
+ */
+export function markRunningHeads(blocks: ManifestBlock[]) {
+  const key = (block: ManifestBlock) => block.text.toLowerCase().replace(/[^\p{L}]+/gu, "");
+  const edge = (block: ManifestBlock) => block.lines.length <= 2 && block.text.length < 160 && (block.y < .11 || block.y + block.height > .9);
+  const pages = new Map<string, Set<number>>();
+  for (const block of blocks) if (edge(block) && key(block).length >= 6) pages.set(key(block), (pages.get(key(block)) ?? new Set()).add(block.pageIndex));
+  for (const block of blocks) {
+    if (!block.translatable || !edge(block) || (pages.get(key(block))?.size ?? 0) < 3) continue;
+    Object.assign(block, { role: block.y < .5 ? "HEADER" : "FOOTER", translatable: false, exclusionReason: "running-head" });
+  }
+}
+
 export function markReferenceRuns(blocks: ManifestBlock[]) {
   const candidates = blocks.filter(block => block.translatable);
   let start = 0;
@@ -426,6 +454,7 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
     await new Promise(resolve => setTimeout(resolve, 0));
     mark = performance.now();
   }
+  markRunningHeads(blocks);
   markReferenceRuns(blocks);
   const units = await buildUnits(documentId, blocks);
   timing.total = performance.now() - started;

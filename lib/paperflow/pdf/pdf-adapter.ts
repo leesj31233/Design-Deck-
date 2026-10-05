@@ -1,6 +1,6 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 import { installStreamIteration } from "./stream-iteration";
-export interface PdfTextItem { text: string; x: number; y: number; width: number; height: number; fontName: string; fontFamily: string; hasEOL: boolean; /** Baseline in pt; ligature glyphs often sit in another font with a different ascent. */ baseline?: number }
+export interface PdfTextItem { text: string; x: number; y: number; width: number; height: number; fontName: string; fontFamily: string; hasEOL: boolean; /** Set in a bold face (from the embedded font's own name or flags). */ bold?: boolean; /** Baseline in pt; ligature glyphs often sit in another font with a different ascent. */ baseline?: number }
 export interface PdfPageHandle {
   width: number; height: number;
   getTextItems(signal?: AbortSignal): Promise<PdfTextItem[]>;
@@ -55,6 +55,19 @@ export function clippedFormFonts(fnArray: number[], argsArray: unknown[][], ops:
   return inside;
 }
 
+/** Fonts of the page that are bold faces. The operator list has loaded them, with their PDF names. */
+export function boldFonts(page: PDFPageProxy, names: string[]) {
+  const bold = new Set<string>();
+  for (const name of new Set(names)) {
+    try {
+      if (!page.commonObjs.has(name)) continue;
+      const font = page.commonObjs.get(name) as { bold?: boolean; black?: boolean; name?: string };
+      if (font?.bold || font?.black || /bold|black|heavy|demi|[-,]bd\b/i.test(font?.name ?? "")) bold.add(name);
+    } catch { /* not loaded: regular */ }
+  }
+  return bold;
+}
+
 function pageHandle(page: PDFPageProxy): PdfPageHandle {
   const base = page.getViewport({ scale: 1 });
   let graphics: Promise<PageGraphics> | undefined;
@@ -68,6 +81,7 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
       const pageText = forms.size ? content.items.filter(item => "str" in item && !forms.has(item.fontName)).map(item => "str" in item ? item.str : "").join(" ").replace(/\s+/g, " ") : "";
       // Some producers draw each glyph run twice, slightly offset, to fake bold: keep one copy.
       const seen = new Set<string>();
+      const bold = boldFonts(page, content.items.flatMap(item => "str" in item ? [item.fontName] : []));
       return content.items.flatMap(item => {
         if (!("str" in item) || !item.str.trim()) return [];
         const boxes = forms.get(item.fontName);
@@ -86,7 +100,7 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
         const height = Math.max(1, Math.abs(item.height) || Math.abs(m3));
         const style = content.styles[item.fontName];
         const ascent = typeof style?.ascent === "number" ? style.ascent : .8;
-        return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL, baseline }];
+        return [{ text: item.str, x, y: baseline - height * ascent, width: Math.abs(item.width), height, fontName: item.fontName, fontFamily: style?.fontFamily ?? "serif", hasEOL: item.hasEOL, baseline, bold: bold.has(item.fontName) || undefined }];
       });
     },
     async getGraphics() {

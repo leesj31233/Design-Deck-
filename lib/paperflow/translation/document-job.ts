@@ -1,5 +1,7 @@
 import { documentRepository } from "../persistence/document-repository";
 import { translationRepository } from "../persistence/translation-repository";
+import { tableEnding } from "./table-style";
+export { tableEnding };
 import { ocrPage, releaseOcr } from "../pdf/ocr";
 import { pdfAdapter } from "../pdf/pdf-adapter";
 import { readableError } from "../errors";
@@ -195,7 +197,12 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
     const copies = units.filter(unit => !shared.has(unit.id) && first.get(key(unit)) !== unit && byKey.has(key(unit))).map(unit => ({ id: unit.id, text: byKey.get(key(unit))! }));
     const results = [...[...shared].map(([id, text]) => ({ id, text })), ...translatedNow, ...copies];
     // A table entry keeps its own punctuation: the model likes to end a short label with a comma.
-    const tidy = (id: string, text: string) => { const unit = units.find(item => item.id === id); return unit?.role === "TABLE" && !/[.,;:]$/.test(unit.text.trim()) ? text.replace(/[.,;:]+$/, "") : text; };
+    const tidy = (id: string, text: string) => {
+      const unit = units.find(item => item.id === id);
+      if (unit?.role !== "TABLE") return text;
+      const bare = /[.,;:]$/.test(unit.text.trim()) ? text : text.replace(/[.,;:]+$/, "");
+      return tableEnding(bare);
+    };
     const entries = results.map(result => ({ id: result.id, text: tidy(result.id, polishKorean(result.text)) }));
     await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.find(item => item.id === entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
     store().addTexts(documentId, entries);

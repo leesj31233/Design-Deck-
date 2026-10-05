@@ -240,3 +240,23 @@ describe("justified numbered headings", () => {
     expect(classifyBlock(paragraph("4 Panchromatic 12 MP 35 mm 1.8", 10), 5, context, "none").role).toBe("TABLE");
   });
 });
+
+describe("running heads", () => {
+  it("keeps a line repeated at the top of three pages as printed, and a heading used once", async () => {
+    const { markRunningHeads } = await import("../../lib/paperflow/translation/manifest");
+    const block = (pageIndex: number, text: string, y: number) => ({ id: `${pageIndex}-${y}`, pageIndex, text, y, height: .015, lines: [{}], translatable: true, role: "BODY", exclusionReason: null }) as unknown as import("../../lib/paperflow/translation/manifest").ManifestBlock;
+    const blocks = [0, 1, 2].map(page => block(page, "Smart Engineering Technology and Management", .068)).concat(block(1, "Advancement in Digital Cameras", .07));
+    markRunningHeads(blocks);
+    expect(blocks.slice(0, 3).every(item => !item.translatable && item.role === "HEADER")).toBe(true);
+    expect(blocks[3].translatable).toBe(true);
+  });
+});
+
+describe("table entries", () => {
+  it("end in a noun, not a sentence", async () => {
+    const { tableEnding } = await import("../../lib/paperflow/translation/document-job");
+    expect(tableEnding("광원과 결합하여 향상 기술을 제공한다")).toBe("광원과 결합하여 향상 기술을 제공함");
+    expect(tableEnding("최대 256 GB까지 지원할 수 있다")).toBe("최대 256 GB까지 지원할 수 있음");
+    expect(tableEnding("전용 이미지 처리 칩")).toBe("전용 이미지 처리 칩");
+  });
+});
