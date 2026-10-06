@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createGuide, estimateGuideCredits, loadGuide } from "@/lib/paperflow/guide/client";
 import { NOTE_GUTTER } from "../guide/guide-page";
 import { GuideBrief } from "../guide/guide-brief";
+import { GuideConfirm } from "../guide/guide-confirm";
 import { GuideReadingLine } from "../guide/guide-highlights";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -163,14 +164,15 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     onError: reason => { useReaderStore.getState().set({ guideProgress: null }); notify(readableError(reason)); }
   });
   const guideCredits = manifest ? estimateGuideCredits(manifest) : null;
+  // Making a guide (or making it again) always goes through the confirmation sheet: nothing is charged before 만들기.
+  const [confirmGuide, setConfirmGuide] = useState(false);
   const onGuide = useCallback(() => {
     if (guide.data) { const on = !useReaderStore.getState().guideOverlay; useReaderStore.getState().set({ guideOverlay: on }); if (on) setTab("guide"); return; }
     if (makeGuide.isPending) return;
-    if (!window.confirm(`AI 리딩 가이드를 만듭니다.\n논문 정의 · 10초 요약 · 연구 흐름 · 실험조건 · 핵심 결과 · 원인 · 한계 · Figure 가이드와, 페이지마다 핵심과 형광 근거를 정리합니다.\n약 ${guideCredits ?? "–"} 크레딧 (실제 사용량으로 차감, 1–2분 소요)`)) return;
-    makeGuide.mutate();
-  }, [guide.data, makeGuide, guideCredits]);
+    setConfirmGuide(true);
+  }, [guide.data, makeGuide]);
   const guideProgress = useReaderStore(s => s.guideProgress);
-  useEffect(() => { useReaderStore.getState().set({ guideMaker: { make: () => { if (makeGuide.isPending) return; if (!guide.data && !window.confirm(`AI 리딩 가이드를 만듭니다. 약 ${guideCredits ?? "–"} 크레딧 (실제 사용량으로 차감, 1–2분 소요)`)) return; makeGuide.mutate(); }, estimate: guideCredits } }); return () => useReaderStore.getState().set({ guideMaker: null }); }, [makeGuide, guide.data, guideCredits]);
+  useEffect(() => { useReaderStore.getState().set({ guideMaker: { make: () => { if (!makeGuide.isPending) setConfirmGuide(true); }, estimate: guideCredits } }); return () => useReaderStore.getState().set({ guideMaker: null }); }, [makeGuide, guideCredits]);
   const guideButton = { label: makeGuide.isPending ? (guideProgress?.pagesTotal ? `가이드 작성 중 · ${Math.round(((guideProgress.brief === "done" ? 1 : 0) + guideProgress.pagesDone / guideProgress.pagesTotal) * 50)}%` : "가이드 작성 중…") : guide.data ? (guideOverlay ? "가이드 숨기기" : "AI 가이드") : "AI 가이드", title: guide.data ? "논문 위의 AI 리딩 가이드를 켜거나 끕니다" : `AI 가이드 만들기 · 약 ${guideCredits ?? "–"} 크레딧`, active: Boolean(guide.data && guideOverlay), busy: makeGuide.isPending, disabled: !manifest || makeGuide.isPending };
   const lastScale = useRef(1);
   // Breathing room around the page: generous on a desk, almost none on a phone in focus mode.
@@ -314,7 +316,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     {searchOpen && <div className="pf-search-strip"><SearchField ref={searchInput} aria-label="현재 페이지 검색" value={search} onChange={e => setSearch(e.target.value)} placeholder="검색 UI · Phase 2"/><span>전체 논문 검색은 후속 단계에서 제공됩니다.</span><Button size="sm" onClick={() => setSearchOpen(false)}>닫기</Button></div>}
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}
-      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}>{translatedCount === 0 && !guideOverlay && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf && guideOverlay && <><GuideReadingLine/><GuideBrief documentId={documentId} width={briefWidth} scale={pageScale}/></>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} onUnits={translateUnits} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
+      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}><GuideConfirm open={confirmGuide} onOpenChange={setConfirmGuide} estimate={guideCredits} pages={manifest?.pageCount ?? pdf?.pageCount ?? 0} again={Boolean(guide.data)} onConfirm={() => makeGuide.mutate()}/>{translatedCount === 0 && !guideOverlay && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf && guideOverlay && <><GuideReadingLine/><GuideBrief documentId={documentId} width={briefWidth} scale={pageScale}/></>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} onUnits={translateUnits} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
       {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={saveNote} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} keywords={manifest?.keywords ?? doc.data?.keywords ?? []} onTranslate={translateSelection} onBatchTranslate={batchTranslate} onCancelBatch={() => cancelTranslationJob(documentId)}/>}
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>Ctrl Z 되돌리기 · H 마킹 · N 메모 · Ctrl K 명령</span></footer>

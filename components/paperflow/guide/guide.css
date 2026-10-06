@@ -195,3 +195,21 @@ html[data-pf-theme="dark"] :is(.pf-brief, .pf-gpage, .pf-gpanel) { --g-ink: #e6e
 .pf-gpage-leaders path[data-active] { stroke-dasharray:none; stroke-width:1.6; opacity:1; }
 .pf-gpanel-marks button { transition:background-color .25s ease, box-shadow .25s ease; }
 .pf-gpanel-marks button[data-active] { background:color-mix(in srgb,var(--k) 9%,transparent); box-shadow:inset 3px 0 0 var(--k); }
+
+/* The confirmation sheet before a guide is made. */
+.pf-gconfirm { width:min(92vw,500px); padding:24px 24px 20px; font-family:var(--g-font, "Malgun Gothic", sans-serif); }
+.pf-gconfirm-mark { display:inline-flex; align-items:center; gap:6px; margin-bottom:6px; font-size:10.5px; font-weight:700; letter-spacing:.16em; color:var(--accent); }
+.pf-gconfirm h2 { font-size:19px; letter-spacing:-.03em; }
+.pf-gconfirm-steps { list-style:none; margin:18px 0 0; padding:0; display:grid; gap:10px; }
+.pf-gconfirm-steps li { display:grid; grid-template-columns:34px 1fr; gap:12px; align-items:start; padding:11px 12px; border-radius:14px; background:color-mix(in srgb,var(--surface-strong) 70%,transparent); border:1px solid var(--line); }
+.pf-gconfirm-steps li > span { display:grid; place-items:center; width:34px; height:34px; border-radius:11px; background:color-mix(in srgb,var(--accent) 12%,transparent); color:var(--accent); }
+.pf-gconfirm-steps strong { display:block; font-size:13.5px; letter-spacing:-.02em; }
+.pf-gconfirm-steps small { display:block; margin-top:2px; font-size:12px; line-height:1.5; color:var(--muted); }
+.pf-gconfirm-bill { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:16px 0 0; }
+.pf-gconfirm-bill > div { padding:10px 12px; border-radius:12px; border:1px dashed var(--line); }
+.pf-gconfirm-bill > div[data-short] { border-color:color-mix(in srgb,var(--danger) 55%,transparent); background:color-mix(in srgb,var(--danger) 6%,transparent); }
+.pf-gconfirm-bill dt { display:flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; letter-spacing:.04em; color:var(--muted); }
+.pf-gconfirm-bill dd { margin:4px 0 0; font-size:17px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.pf-gconfirm-bill dd small { display:block; margin-top:1px; font-size:10.5px; font-weight:500; letter-spacing:0; color:var(--muted); }
+.pf-gconfirm-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+@media (max-width:520px) { .pf-gconfirm-bill { grid-template-columns:1fr; } }
