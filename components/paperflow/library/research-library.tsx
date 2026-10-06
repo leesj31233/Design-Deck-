@@ -1,5 +1,6 @@
 "use client";
 import { CollectionInsights } from "./collection-insights";
+import { NotesView } from "../notes/notes-view";
 import dynamic from "next/dynamic";
 // The research map pulls in WebGL graph code: load it only when the map is opened.
 const DiscoverView = dynamic(() => import("../discover/discover-view").then(module => module.DiscoverView), { ssr: false, loading: () => <div className="pf-empty" role="status">추천을 준비하는 중…</div> });
@@ -19,7 +20,6 @@ import { IconButton } from "@/components/ui/icon-button";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { SearchField } from "@/components/ui/search-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import { Badge } from "@/components/ui/badge";
 import { PaperflowSidebar } from "../shell/paperflow-sidebar";
 import { usePaperflow } from "../shell/paperflow-context";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
@@ -115,7 +115,7 @@ export function ResearchLibrary() {
           {jifId && <GlassPanel className="pf-jif-form" role="form" aria-label="JIF 출처 기록"><h3>JIF 출처 기록</h3><p>저널의 해당 연도 공식 수치와 출처를 확인한 뒤 기록하세요.</p><label>JIF 수치<input aria-label="JIF 수치" type="number" min="0.001" step="0.001" value={jifValue} onChange={e => setJifValue(e.target.value)}/></label><label>발표 연도<input aria-label="JIF 연도" type="number" value={jifYear} onChange={e => setJifYear(e.target.value)}/></label><label>출처 URL<input aria-label="JIF 출처 URL" type="url" value={jifSource} onChange={e => setJifSource(e.target.value)}/></label><Button onClick={() => void saveJif()}>저장</Button><Button variant="ghost" onClick={() => setJifId(null)}>취소</Button></GlassPanel>}
           {filtered.length > limit && <Button onClick={() => setLimit(number => number + 30)}>30개 더 보기</Button>}
         </section>}
-        {view === "notes" && <section className="pf-notebook">{liveNotes.map(a => <GlassPanel className="pf-note-card" key={a.id}><Badge>{a.type === "ink" ? "손글씨 메모" : a.note ? "사용자 메모" : "마킹"}</Badge><blockquote>{a.anchor.textQuote}</blockquote>{a.note && <p>{a.note}</p>}<Link href={`/reader/${a.documentId}?page=${a.pageIndex + 1}&annotation=${a.id}`}>원문 {a.pageIndex + 1}페이지로 <ArrowUpRight size={14}/></Link></GlassPanel>)}{!annotations.data?.length && <div className="pf-empty"><h3>원문에서 시작하는 메모</h3><p>Reader에서 마킹·펜·텍스트 메모를 남기면 이곳에 모입니다.</p></div>}</section>}
+        {view === "notes" && <NotesView docs={live} annotations={liveNotes}/>}
         {view === "map" && <ResearchMapView docs={live} annotations={liveNotes}/>}
         {view === "discover" && <DiscoverView docs={live} annotations={liveNotes}/>}
         {view === "trash" && <section className="pf-trash">
