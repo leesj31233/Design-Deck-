@@ -61,7 +61,8 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
 
   // Open the most recent note at first; keep the draft in step with the note being edited.
   useEffect(() => { if (!activeId && list.length) setActiveId(list[0].id); }, [activeId, list]);
-  useEffect(() => { const note = (notes.data ?? []).find(item => item.id === activeId) ?? null; setDraft(current => current?.id === note?.id ? current : note); setMention(null); }, [activeId, notes.data]);
+  useEffect(() => { const note = (notes.data ?? []).find(item => item.id === activeId) ?? null; setDraft(current => current?.id === note?.id ? current : note); }, [activeId, notes.data]);
+  useEffect(() => setMention(null), [activeId]);
 
   const store = (note: QuickNote) => { client.setQueryData<QuickNote[]>(["notebook"], current => [...(current ?? []).filter(item => item.id !== note.id), note]); return noteRepository.put(note); };
   const edit = (patch: Partial<QuickNote>) => {
