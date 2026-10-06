@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { makePdf } from "../fixtures/make-pdf";
 test("Library, Reader and command dialog pass automated WCAG AA checks", async ({ page }) => {
+  // Colour contrast is audited on settled pixels: entrance animations (blur, fade) would be measured mid-flight.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/library");
   const audit = () => new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect((await audit()).violations).toEqual([]);

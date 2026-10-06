@@ -1,0 +1,36 @@
+/* Top-right notification stack: glass cards, a tone colour, figures, a credit meter and a countdown. */
+.pf-notice-stack { position:fixed; top:72px; right:20px; z-index:120; display:flex; flex-direction:column; gap:10px; width:min(360px,calc(100vw - 32px)); pointer-events:none; }
+.pf-notice-stack > div { pointer-events:auto; }
+.pf-notice { --tone:var(--accent,#1f7a5a); position:relative; background:color-mix(in srgb,var(--surface-strong,#fff) 94%,transparent)!important; backdrop-filter:blur(18px) saturate(1.4); -webkit-backdrop-filter:blur(18px) saturate(1.4); display:grid; grid-template-columns:30px 1fr 22px; align-items:start; gap:10px; padding:12px 12px 13px; border-radius:18px; overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--tone) 16%,var(--line,rgba(0,0,0,.08))); box-shadow:0 18px 44px -22px rgba(10,30,22,.45),0 2px 6px rgba(10,30,22,.06); font-family:Pretendard,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif; }
+.pf-notice[data-tone="error"] { --tone:#d0533f; }
+.pf-notice[data-tone="info"] { --tone:#4f8cff; }
+.pf-notice[data-tone="progress"] { --tone:#7b5cd6; }
+.pf-notice[data-tone="credit"] { --tone:#d9a21b; }
+.pf-notice-icon { display:grid; place-items:center; width:30px; height:30px; border-radius:10px; color:var(--tone); background:color-mix(in srgb,var(--tone) 14%,transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tone) 22%,transparent); }
+.pf-notice[data-tone="progress"] .pf-notice-icon svg { animation:pf-notice-spin 1s linear infinite; }
+.pf-notice-body { min-width:0; display:grid; gap:4px; padding-top:5px; }
+.pf-notice-body strong { font-size:13px; font-weight:700; letter-spacing:-.01em; color:var(--foreground); line-height:1.35; }
+.pf-notice-body p { margin:0; font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-notice-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(68px,1fr)); gap:6px; margin:6px 0 0; }
+.pf-notice-stats div { padding:6px 8px; border-radius:10px; background:color-mix(in srgb,var(--foreground) 4.5%,transparent); }
+.pf-notice-stats dt { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:.02em; }
+.pf-notice-stats dd { margin:1px 0 0; font-size:13.5px; font-weight:700; color:var(--foreground); font-variant-numeric:tabular-nums; }
+.pf-notice[data-tone="credit"] .pf-notice-stats div:nth-child(2) { background:color-mix(in srgb,var(--tone) 13%,transparent); }
+.pf-notice[data-tone="credit"] .pf-notice-stats div:nth-child(2) dd { color:color-mix(in srgb,var(--tone) 70%,var(--foreground)); }
+.pf-notice-meter { margin-top:8px; display:grid; gap:5px; }
+.pf-notice-meter-head { display:flex; justify-content:space-between; gap:8px; font-size:11px; color:var(--muted); }
+.pf-notice-meter-head b { color:var(--foreground); font-variant-numeric:tabular-nums; }
+.pf-notice-track { height:6px; border-radius:999px; background:color-mix(in srgb,var(--foreground) 8%,transparent); overflow:hidden; }
+.pf-notice-track i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--accent,#1f7a5a),color-mix(in srgb,var(--accent,#1f7a5a) 60%,#7be0b4)); transition:width .8s cubic-bezier(.2,.9,.3,1); }
+.pf-notice-track i[data-level="mid"] { background:linear-gradient(90deg,#d98a1c,#f2b84b); }
+.pf-notice-track i[data-level="high"] { background:linear-gradient(90deg,#d0533f,#ef8a6f); }
+.pf-notice-meter small { font-size:11px; color:var(--muted); }
+.pf-notice-close { display:grid; place-items:center; width:22px; height:22px; border:0; border-radius:50%; background:transparent; color:var(--muted); cursor:pointer; opacity:.7; transition:background .15s ease,opacity .15s ease; }
+.pf-notice-close:hover { opacity:1; background:color-mix(in srgb,var(--foreground) 8%,transparent); }
+.pf-notice-timer { position:absolute; left:0; bottom:0; height:2px; width:100%; background:color-mix(in srgb,var(--tone) 55%,transparent); transform-origin:left; animation:pf-notice-countdown linear forwards; }
+.pf-notice[data-paused] .pf-notice-timer { animation-play-state:paused; }
+@keyframes pf-notice-countdown { from { transform:scaleX(1); } to { transform:scaleX(0); } }
+@keyframes pf-notice-spin { to { transform:rotate(360deg); } }
+@media (max-width:640px) { .pf-notice-stack { top:12px; right:12px; } }
+@media (prefers-reduced-motion: reduce) { .pf-notice-timer, .pf-notice[data-tone="progress"] .pf-notice-icon svg { animation:none; } }

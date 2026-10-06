@@ -302,3 +302,20 @@ describe("ruled front matter", () => {
     expect(blocks.find(block => block.text.startsWith("Low-emission"))?.translatable).toBe(true);
   });
 });
+
+describe("notifications", () => {
+  it("replaces one plain message with the next, keeps richer notices, and reads the tone from the wording", async () => {
+    const { notifyText, useNotices, duration } = await import("../../lib/paperflow/notifications");
+    notifyText("PDF를 확인하고 기기에 저장하는 중…");
+    useNotices.getState().push({ tone: "credit", title: "번역 완료", key: "credit:x" });
+    notifyText("2개 PDF 저장 완료.");
+    const notices = useNotices.getState().notices;
+    expect(notices.filter(notice => notice.key === "message")).toHaveLength(1);
+    expect(notices[0]).toMatchObject({ tone: "success", title: "2개 PDF 저장 완료." });
+    expect(notices.some(notice => notice.tone === "credit")).toBe(true);
+    notifyText("번역 실패: 연결 시간이 초과되었습니다");
+    expect(useNotices.getState().notices[0].tone).toBe("error");
+    expect(duration(7000)).toBe("7초");
+    expect(duration(72000)).toBe("1분 12초");
+  });
+});

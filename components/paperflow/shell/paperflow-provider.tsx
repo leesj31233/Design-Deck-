@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { NotificationStack } from "./notification-stack";
+import { notifyText, useNotices } from "@/lib/paperflow/notifications";
 import { useRouter, usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "motion/react";
@@ -17,11 +19,13 @@ export function PaperflowProvider({ children }: { children: React.ReactNode }) {
 function AppControls({ children, client }: { children: React.ReactNode; client: QueryClient }) {
   const router = useRouter(), pathname = usePathname();
   const input = useRef<HTMLInputElement>(null), returnFocus = useRef<HTMLElement | null>(null), busy = useRef(false);
-  const [open, setOpen] = useState(false), [dark, setDark] = useState(false), [importing, setImporting] = useState(false), [message, setMessage] = useState("");
+  const [open, setOpen] = useState(false), [dark, setDark] = useState(false), [importing, setImporting] = useState(false);
   const [commands, setCommands] = useState<ReaderCommands | null>(null);
-  const notify = useCallback((text: string) => setMessage(text), []);
-  // A notice steps aside on its own: a few seconds for news, longer for something that went wrong.
-  useEffect(() => { if (!message || /중…$/.test(message)) return; const timer = setTimeout(() => setMessage(""), /실패|못했|오류|없습니다/.test(message) ? 6000 : 3000); return () => clearTimeout(timer); }, [message]);
+  // Messages go to the top-right notification stack (plain ones replace each other).
+  const notify = useCallback((text: string) => notifyText(text), []);
+  const setMessage = notify;
+
+
   useEffect(() => {
     const media = matchMedia("(prefers-color-scheme: dark)");
     const sync = () => { let saved: string | null = null; try { saved = localStorage.getItem("paperflow-theme"); } catch { /* OS preference still works. */ } const isDark = saved ? saved === "dark" : media.matches; setDark(isDark); document.documentElement.dataset.pfTheme = isDark ? "dark" : "light"; };
@@ -53,7 +57,7 @@ function AppControls({ children, client }: { children: React.ReactNode; client: 
   }, [client, router]);
   const registerReader = useCallback((value: ReaderCommands | null) => setCommands(value), []);
   const focusSearch = useCallback(() => { if (commands?.search) commands.search(); else document.querySelector<HTMLInputElement>("[data-paper-search]")?.focus(); }, [commands]);
-  useShortcuts({ ...commands, command: () => open ? changeOpen(false) : openCommand(), search: focusSearch, dismiss: () => { useReaderStore.getState().set({ activeSelection: null }); window.getSelection()?.removeAllRanges(); setMessage(""); } }, open);
+  useShortcuts({ ...commands, command: () => open ? changeOpen(false) : openCommand(), search: focusSearch, dismiss: () => { useReaderStore.getState().set({ activeSelection: null }); window.getSelection()?.removeAllRanges(); const top = useNotices.getState().notices[0]; if (top) useNotices.getState().dismiss(top.id); } }, open);
   const readerId = useReaderStore(s => s.documentId);
   const items: CommandItemDef[] = [
     { id: "library", label: "Open Library · 라이브러리", onSelect: () => router.push("/library") },
@@ -72,6 +76,6 @@ function AppControls({ children, client }: { children: React.ReactNode; client: 
     <input ref={input} className="sr-only" type="file" accept=".pdf,application/pdf" multiple aria-label="Import PDF file" onChange={e => void importFiles(Array.from(e.target.files ?? []))} />
     {children}
     <CommandMenu open={open} onOpenChange={changeOpen} items={items} placeholder="명령 검색…" />
-    {message && <div className="pf-notification dd-glass" role="status"><span>{message}</span><button aria-label="알림 닫기" onClick={() => setMessage("")}>×</button></div>}
+    <NotificationStack/>
   </div></PaperflowContext.Provider>;
 }

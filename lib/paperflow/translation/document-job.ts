@@ -24,6 +24,8 @@ export interface TranslationJobStatus {
   extractionMs: number; translationMs: number; firstResultMs: number | null;
   /** Units served by the shared cache (no model call). */
   sharedUnits?: number;
+  /** Units the model translated in this run: one credit each. */
+  modelUnits?: number;
   failedUnits: { unitId: string; page: number; error: string; preview: string }[];
   running: boolean; complete: boolean; error?: string;
 }
@@ -132,6 +134,8 @@ export async function startTranslationJob(documentId: string, options: { fromPag
         await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.get(entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
         for (const entry of entries) { translated.add(entry.id); failed.delete(entry.id); }
         store().addTexts(documentId, entries);
+        // One credit per paragraph the model translated (the shared cache is free).
+        update(documentId, { modelUnits: (jobs.get(documentId)!.status.modelUnits ?? 0) + entries.length });
         if (jobs.get(documentId)!.status.firstResultMs === null) update(documentId, { firstResultMs: Math.round(performance.now() - translationStarted) });
         refresh();
       },
@@ -147,6 +151,9 @@ export async function startTranslationJob(documentId: string, options: { fromPag
   } finally {
     store().setPending(documentId, target.map(unit => unit.id), false);
     update(documentId, { running: false }, true);
+    // The notification stack reports what this run cost and what is left this month.
+    const done = jobs.get(documentId)!.status;
+    if (!controller.signal.aborted && typeof window !== "undefined") window.dispatchEvent(new CustomEvent("paperflow:translation-finished", { detail: { documentId, kind: "paper", model: done.modelUnits ?? 0, shared: done.sharedUnits ?? 0, failed: done.failed, ms: done.translationMs, complete: done.complete } }));
   }
   return jobs.get(documentId)!.status;
 }
@@ -206,6 +213,7 @@ export async function translateUnitsNow(documentId: string, unitIds: string[]) {
     const entries = results.map(result => ({ id: result.id, text: tidy(result.id, polishKorean(result.text)) }));
     await translationRepository.putUnits(documentId, entries.map(entry => { const unit = units.find(item => item.id === entry.id)!; return { unitId: unit.id, pageIndex: unit.pages[0], source: unit.text, text: entry.text }; }));
     store().addTexts(documentId, entries);
+    if (translatedNow.length >= 5 && typeof window !== "undefined") window.dispatchEvent(new CustomEvent("paperflow:translation-finished", { detail: { documentId, kind: "part", model: translatedNow.length, shared: shared.size + copies.length, failed: missing.length, ms: 0, complete: !missing.length } }));
     for (const id of missing) for (const unit of units.filter(item => key(item) === key(missingUnits.find(other => other.id === id)!))) store().setFailed(documentId, unit.id, "모델 응답에서 이 문단의 번역이 누락되었습니다.");
   } catch (error) {
     for (const unit of units) store().setFailed(documentId, unit.id, readableError(error));

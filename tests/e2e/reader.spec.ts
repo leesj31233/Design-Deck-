@@ -64,7 +64,7 @@ test("import → select multiline → highlight → note → reload → inspect 
 test("invalid import, keyboard commands and reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" }); await page.goto("/library");
   await page.getByLabel("Import PDF file").setInputFiles({ name: "invalid.pdf", mimeType: "application/pdf", buffer: Buffer.from("bad") });
-  await expect(page.getByRole("status")).toContainText("올바른 PDF");
+  await expect(page.locator(".pf-notice").first()).toContainText("올바른 PDF");
   await page.keyboard.press("Control+k"); await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("option", { name: /Next Page/ })).toHaveAttribute("aria-disabled", "true");
   await page.keyboard.press("Escape"); await expect(page.getByRole("dialog")).not.toBeVisible();
