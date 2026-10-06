@@ -17,7 +17,7 @@ export const PLANS: Record<PlanTier, PlanSpec> = {
 };
 
 /** USD per 1M tokens: input, cached input, output. Unknown models are priced like gpt-4.1. */
-export const MODEL_PRICES: Record<string, [number, number, number]> = { "gpt-4.1-mini": [.4, .1, 1.6], "gpt-4.1": [2, .5, 8], "gpt-4.1-nano": [.1, .025, .4], "gpt-4o-mini": [.15, .075, .6], "gpt-4o": [2.5, 1.25, 10] };
+export const MODEL_PRICES: Record<string, [number, number, number]> = { "gpt-5.1": [1.25, .125, 10], "gpt-5-mini": [.25, .025, 2], "gpt-5-nano": [.05, .005, .4], "gpt-5": [1.25, .125, 10], "gpt-4.1-mini": [.4, .1, 1.6], "gpt-4.1": [2, .5, 8], "gpt-4.1-nano": [.1, .025, .4], "gpt-4o-mini": [.15, .075, .6], "gpt-4o": [2.5, 1.25, 10] };
 /** One credit is worth one translated paragraph: about $0.0003. */
 export const CREDIT_USD = .0003;
 export function creditsForUsage(model: string | undefined, usage: { input: number; output: number; cached?: number }) {

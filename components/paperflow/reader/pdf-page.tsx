@@ -12,9 +12,9 @@ import { HighlightLayer, type ResolvedAnnotation } from "./highlight-layer";
 import { InkLayer } from "./ink-layer";
 import { TextMemoLayer } from "./text-memo-layer";
 import { TranslationOverlay, type OverlayState } from "./translation-overlay";
-import { GuideMarks } from "./guide-marks";
+import { GuideHighlights } from "../guide/guide-highlights";
 import { ManualTargets } from "./manual-targets";
-import { GuideNotes } from "./guide-notes";
+import { GuidePageColumn } from "../guide/guide-page";
 import { linkInk } from "@/lib/paperflow/typeset/ink";
 import { usePaperflow } from "../shell/paperflow-context";
 
@@ -135,8 +135,8 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
     {ready && <TranslationOverlay documentId={documentId} pageIndex={pageIndex} scale={scale} canvas={canvas.current} canvasVersion={canvasVersion} referenceColor={linkColors.reference} citationColor={linkColors.citation} onState={setOverlay} onOriginal={onOriginal} onRetry={onRetry}/>}
     {ready && onUnits && <ManualTargets pageIndex={pageIndex} surface={surface} onTranslate={onUnits}/>}
     {textReady && translationMarks.length > 0 && <div className="pf-translated-marks"><HighlightLayer annotations={translationMarks} selected={selected}/></div>}
-    <GuideMarks pageIndex={pageIndex}/>
+    <GuideHighlights documentId={documentId} pageIndex={pageIndex} surface={surface} layer={layer} textReady={textReady} overlayReady={overlayReady} scale={scale}/>
     <InkLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations}/>
     <TextMemoLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations} pageWidth={page.width * scale}/>
-  </div><GuideNotes documentId={documentId} pageIndex={pageIndex} width={page.width * scale} height={page.height * scale} room={noteRoom}/>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
+  </div><GuidePageColumn documentId={documentId} pageIndex={pageIndex} width={page.width * scale} height={page.height * scale} room={noteRoom} scale={scale}/>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
 });

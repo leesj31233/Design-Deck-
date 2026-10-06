@@ -1,6 +1,6 @@
 "use client";
 import { ConceptStudy } from "./concept-study";
-import { GuidePanel } from "./guide-panel";
+import { GuidePanel } from "../guide/guide-panel";
 import { useEffect, useState } from "react";
 
 import { BookOpen, Highlighter, ArrowUpRight, Trash2, X, Save, Languages, Sparkles } from "lucide-react";

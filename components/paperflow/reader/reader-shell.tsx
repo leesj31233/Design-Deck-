@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createGuide, estimateGuideCredits, loadGuide } from "@/lib/paperflow/guide/client";
-import { NOTE_GUTTER } from "./guide-notes";
+import { NOTE_GUTTER } from "../guide/guide-page";
+import { GuideBrief } from "../guide/guide-brief";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { BatchProgress } from "./batch-progress";
@@ -156,18 +157,20 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const guideOverlay = useReaderStore(s => s.guideOverlay);
   const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId) });
   const makeGuide = useMutation({
-    mutationFn: () => { const current = useTranslationStore.getState().manifest; if (!current || current.documentId !== documentId) throw new Error("논문 구조를 분석하는 중입니다. 잠시 후 다시 눌러 주세요."); return createGuide(documentId, current); },
-    onSuccess: value => { client.setQueryData(["guide", documentId], value); void client.invalidateQueries({ queryKey: ["documents"] }); useReaderStore.getState().set({ guideOverlay: true }); notify("AI 가이드를 논문 위에 정리했습니다."); },
-    onError: reason => notify(readableError(reason))
+    mutationFn: () => { const current = useTranslationStore.getState().manifest; if (!current || current.documentId !== documentId) throw new Error("논문 구조를 분석하는 중입니다. 잠시 후 다시 눌러 주세요."); useReaderStore.getState().set({ guideProgress: { brief: "pending", pagesDone: 0, pagesTotal: 0 } }); return createGuide(documentId, current, progress => useReaderStore.getState().set({ guideProgress: progress })); },
+    onSuccess: value => { client.setQueryData(["guide", documentId], value); void client.invalidateQueries({ queryKey: ["documents"] }); useReaderStore.getState().set({ guideOverlay: true, guideProgress: null }); document.querySelector("[data-pdf-viewport]")?.scrollTo({ top: 0, behavior: "smooth" }); },
+    onError: reason => { useReaderStore.getState().set({ guideProgress: null }); notify(readableError(reason)); }
   });
   const guideCredits = manifest ? estimateGuideCredits(manifest) : null;
   const onGuide = useCallback(() => {
     if (guide.data) { useReaderStore.getState().set({ guideOverlay: !useReaderStore.getState().guideOverlay }); return; }
     if (makeGuide.isPending) return;
-    if (!window.confirm(`AI 가이드를 만듭니다. 논문 전체를 분석해 핵심 문장과 필기를 논문 위에 정리합니다.\n약 ${guideCredits ?? "–"} 크레딧이 사용됩니다(실제 사용량 기준 차감).`)) return;
+    if (!window.confirm(`AI 리딩 가이드를 만듭니다.\n논문 정의 · 10초 요약 · 연구 흐름 · 실험조건 · 핵심 결과 · 원인 · 한계 · Figure 가이드와, 페이지마다 핵심과 형광 근거를 정리합니다.\n약 ${guideCredits ?? "–"} 크레딧 (실제 사용량으로 차감, 1–2분 소요)`)) return;
     makeGuide.mutate();
   }, [guide.data, makeGuide, guideCredits]);
-  const guideButton = { label: makeGuide.isPending ? "가이드 작성 중…" : guide.data ? (guideOverlay ? "가이드 숨기기" : "AI 가이드") : "AI 가이드", title: guide.data ? "논문 위의 AI 가이드 필기를 켜거나 끕니다" : `AI 가이드 만들기 · 약 ${guideCredits ?? "–"} 크레딧`, active: Boolean(guide.data && guideOverlay), busy: makeGuide.isPending, disabled: !manifest || makeGuide.isPending };
+  const guideProgress = useReaderStore(s => s.guideProgress);
+  useEffect(() => { useReaderStore.getState().set({ guideMaker: { make: () => { if (makeGuide.isPending) return; if (!guide.data && !window.confirm(`AI 리딩 가이드를 만듭니다. 약 ${guideCredits ?? "–"} 크레딧 (실제 사용량으로 차감, 1–2분 소요)`)) return; makeGuide.mutate(); }, estimate: guideCredits } }); return () => useReaderStore.getState().set({ guideMaker: null }); }, [makeGuide, guide.data, guideCredits]);
+  const guideButton = { label: makeGuide.isPending ? (guideProgress?.pagesTotal ? `가이드 작성 중 · ${Math.round(((guideProgress.brief === "done" ? 1 : 0) + guideProgress.pagesDone / guideProgress.pagesTotal) * 50)}%` : "가이드 작성 중…") : guide.data ? (guideOverlay ? "가이드 숨기기" : "AI 가이드") : "AI 가이드", title: guide.data ? "논문 위의 AI 리딩 가이드를 켜거나 끕니다" : `AI 가이드 만들기 · 약 ${guideCredits ?? "–"} 크레딧`, active: Boolean(guide.data && guideOverlay), busy: makeGuide.isPending, disabled: !manifest || makeGuide.isPending };
   const lastScale = useRef(1);
   // Breathing room around the page: generous on a desk, almost none on a phone in focus mode.
   const baseGutter = size.width < 600 ? (focus ? 8 : 20) : 48;
@@ -308,7 +311,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     {searchOpen && <div className="pf-search-strip"><SearchField ref={searchInput} aria-label="현재 페이지 검색" value={search} onChange={e => setSearch(e.target.value)} placeholder="검색 UI · Phase 2"/><span>전체 논문 검색은 후속 단계에서 제공됩니다.</span><Button size="sm" onClick={() => setSearchOpen(false)}>닫기</Button></div>}
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}
-      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}>{translatedCount === 0 && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} onUnits={translateUnits} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
+      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}>{translatedCount === 0 && !guideOverlay && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf && guideOverlay && <GuideBrief documentId={documentId} width={(pageSizes?.[0] ?? fallbackSize).width * pageScale} scale={pageScale}/>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} onUnits={translateUnits} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
       {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={saveNote} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} keywords={manifest?.keywords ?? doc.data?.keywords ?? []} onTranslate={translateSelection} onBatchTranslate={batchTranslate} onCancelBatch={() => cancelTranslationJob(documentId)}/>}
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>Ctrl Z 되돌리기 · H 마킹 · N 메모 · Ctrl K 명령</span></footer>
