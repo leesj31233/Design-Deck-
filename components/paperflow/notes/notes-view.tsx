@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { SearchField } from "@/components/ui/search-field";
 import { DocumentCover } from "../library/document-cover";
+import { ChipEditor, type ChipEditorHandle } from "./chip-editor";
 import type { Annotation, AnnotationColor } from "@/lib/paperflow/anchors/types";
 import type { StoredDocument } from "@/lib/paperflow/persistence/types";
-import { activeMention, groupByPaper, insertMention, mentionCandidates, noteTitle, parseNoteBody, plainNote, sortNotes, type MentionCandidate, type QuickNote } from "@/lib/paperflow/notes/notebook";
+import { groupByPaper, mentionCandidates, noteTitle, plainNote, sortNotes, type MentionCandidate, type QuickNote } from "@/lib/paperflow/notes/notebook";
 import { noteRepository } from "@/lib/paperflow/notes/note-repository";
 
 const SWATCH: Record<AnnotationColor, string> = { yellow: "#f2c200", green: "#40c057", blue: "#4dabf7", pink: "#f06595", purple: "#9775fa" };
@@ -20,10 +21,6 @@ const markHref = (mark: Annotation) => `/reader/${mark.documentId}?page=${mark.p
 const markText = (mark: Annotation) => mark.type === "ink" ? "손글씨 메모" : (mark.anchor?.textQuote || mark.box?.text || "").trim();
 const when = (iso: string) => new Date(iso).toLocaleDateString("ko-KR", { month: "short", day: "numeric" });
 
-/** A note body with its citations as pills that open the cited passage. */
-function NoteText({ body }: { body: string }) {
-  return <>{parseNoteBody(body).map((segment, index) => segment.kind === "text" ? <span key={index}>{segment.text}</span> : <Link key={index} className="pf-cite-pill" href={segment.href}>{segment.label}</Link>)}</>;
-}
 
 /** Left half: every mark and memo, grouped by the paper it belongs to. */
 function MarksByPaper({ docs, annotations }: { docs: StoredDocument[]; annotations: Annotation[] }) {
@@ -55,7 +52,7 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
   const notes = useQuery({ queryKey: ["notebook"], queryFn: () => noteRepository.list() });
   const [activeId, setActiveId] = useState<string | null>(null), [search, setSearch] = useState("");
   const [draft, setDraft] = useState<QuickNote | null>(null), [mention, setMention] = useState<{ start: number; query: string } | null>(null), [pick, setPick] = useState(0);
-  const area = useRef<HTMLTextAreaElement>(null), saving = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const area = useRef<ChipEditorHandle>(null), saving = useRef<ReturnType<typeof setTimeout> | null>(null);
   const list = useMemo(() => sortNotes(notes.data ?? [], search), [notes.data, search]);
   const candidates = useMemo<MentionCandidate[]>(() => mention ? mentionCandidates(mention.query, docs, annotations) : [], [mention, docs, annotations]);
 
@@ -75,13 +72,7 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
   useEffect(() => () => { if (saving.current) clearTimeout(saving.current); }, []);
   const create = async () => { const now = new Date().toISOString(), note: QuickNote = { id: crypto.randomUUID(), title: "", body: "", pinned: false, createdAt: now, updatedAt: now }; await store(note); setActiveId(note.id); setDraft(note); setTimeout(() => area.current?.focus(), 30); };
   const remove = async (note: QuickNote) => { if (!window.confirm(`"${noteTitle(note)}" 노트를 삭제합니다.`)) return; await noteRepository.remove(note.id); client.setQueryData<QuickNote[]>(["notebook"], current => (current ?? []).filter(item => item.id !== note.id)); if (activeId === note.id) setActiveId(null); };
-  const choose = (candidate: MentionCandidate) => {
-    if (!draft || !mention) return;
-    const { text, caret } = insertMention(draft.body, mention, candidate.token);
-    edit({ body: text }); setMention(null);
-    requestAnimationFrame(() => { area.current?.focus(); area.current?.setSelectionRange(caret, caret); });
-  };
-  const track = (text: string, caret: number) => { const next = activeMention(text, caret); setMention(next); setPick(0); };
+  const choose = (candidate: MentionCandidate) => { if (!draft || !mention) return; area.current?.insert(candidate.token); setMention(null); };
 
   return <section className="pf-notes-book" aria-label="노트">
     <header className="pf-notes-head"><h2>노트<span className="pf-count">{notes.data?.length ?? 0}</span></h2><div className="pf-notes-head-tools"><SearchField aria-label="노트 검색" placeholder="노트 찾기" value={search} onChange={event => setSearch(event.target.value)} onClear={() => setSearch("")}/><Button size="sm" variant="primary" onClick={() => void create()}><Plus size={14}/>새 노트</Button></div></header>
@@ -100,9 +91,8 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
           <IconButton label="노트 삭제" size="sm" variant="ghost" onClick={() => void remove(draft)}><Trash2 size={15}/></IconButton>
         </div>
         <div className="pf-note-write">
-          <textarea ref={area} aria-label="노트 내용" placeholder={"생각을 적어 보세요.\n@ 를 입력하면 내 논문, 키워드, 마킹한 문장을 인용할 수 있습니다."} value={draft.body}
-            onChange={event => { edit({ body: event.target.value }); track(event.target.value, event.target.selectionStart); }}
-            onClick={event => track(event.currentTarget.value, event.currentTarget.selectionStart)}
+          <ChipEditor key={draft.id} ref={area} label="노트 내용" body={draft.body} placeholder={"생각을 적어 보세요. @ 를 입력하면 내 논문, 키워드, 마킹한 문장을 인용합니다."}
+            onChange={body => edit({ body })} onMention={next => { setMention(next); setPick(0); }}
             onBlur={() => setTimeout(() => setMention(null), 150)}
             onKeyDown={event => {
               if (!mention || !candidates.length) return;
@@ -119,7 +109,6 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
             </button>) : <p className="pf-mention-none">맞는 논문이나 마킹이 없습니다.</p>}
           </div>}
         </div>
-        {draft.body.includes("[[") && <div className="pf-note-preview" aria-label="인용 미리보기"><span className="pf-notes-label">미리보기</span><p><NoteText body={draft.body}/></p></div>}
         <small className="pf-note-saved">{when(draft.updatedAt)} 저장 · 이 기기에 보관</small>
       </motion.div> : <div className="pf-notes-empty pf-note-editor"><PenLine size={26}/><h3>생각을 적는 노트</h3><p>@ 로 내 논문과 마킹한 문장을 인용하면, 누를 때 원문으로 이동합니다.</p><Button size="sm" variant="primary" onClick={() => void create()}><Plus size={14}/>새 노트</Button></div>}
     </div>

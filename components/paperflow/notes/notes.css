@@ -70,3 +70,10 @@
 
 @media (max-width:1100px) { .pf-notes { grid-template-columns:1fr; } .pf-notes-book { position:static; } }
 @media (max-width:640px) { .pf-notes-split { grid-template-columns:1fr; } .pf-notes-list { max-height:180px; padding:0 0 8px; border-right:0; border-bottom:1px solid var(--line); } }
+
+/* The writing surface: citations are chips inline with the text. */
+.pf-chip-editor { min-height:22em; padding:14px 16px; border-radius:14px; border:1px solid var(--line); background:var(--surface-strong); color:var(--foreground); font:14px/1.75 "Malgun Gothic","Apple SD Gothic Neo",Pretendard,"Noto Sans KR",sans-serif; white-space:pre-wrap; word-break:keep-all; overflow-wrap:anywhere; outline:none; transition:border-color .15s ease,box-shadow .15s ease; }
+.pf-chip-editor:focus { border-color:color-mix(in srgb,var(--accent) 55%,transparent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent); }
+.pf-chip-editor:empty::before { content:attr(data-placeholder); color:var(--muted); pointer-events:none; }
+.pf-cite-chip { display:inline-flex; align-items:center; margin:0 2px; padding:1px 9px; border-radius:999px; background:color-mix(in srgb,var(--accent) 12%,transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent); color:var(--accent); font-size:.88em; font-weight:600; line-height:1.6; white-space:nowrap; cursor:pointer; user-select:all; }
+.pf-cite-chip:hover { background:color-mix(in srgb,var(--accent) 20%,transparent); }
