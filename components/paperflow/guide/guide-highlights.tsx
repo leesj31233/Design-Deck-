@@ -11,6 +11,8 @@ import { useTranslationStore } from "@/lib/paperflow/translation/translation-sto
 import "./guide.css";
 
 type Box = { x: number; y: number; width: number; height: number };
+/** Where a mark ends as read: the right end of its lowest line (text-layer boxes are not always in reading order). */
+const endOf = (boxes: Box[]) => { const bottom = Math.max(...boxes.map(box => box.y)), line = boxes.filter(box => box.y > bottom - box.height * .5); return line.reduce((best, box) => box.x + box.width > best.x + best.width ? box : best, line[0]); };
 interface Placed { key: string; number: number; kind: MarkKind; boxes: Box[]; flash?: boolean }
 
 /** Screen rects of a Korean sentence inside a translated paragraph's lines on this page. */
@@ -99,7 +101,7 @@ export function GuideHighlights({ documentId, pageIndex, surface, layer, textRea
       {placed.map(item => item.boxes.map((box, at) => <span key={`${item.key}-${at}`} data-kind={item.kind} data-focus={isFocus(item) || undefined} style={{ left: `${box.x * 100}%`, top: `${box.y * 100}%`, width: `${box.width * 100}%`, height: `${box.height * 100}%`, animationDelay: `${at * 70}ms` }}/>))}
     </div>
     <div className="pf-gmark-numbers" aria-hidden="true">
-      {placed.filter(item => item.number > 0).map(item => { const last = item.boxes.at(-1)!; return <i key={item.key} data-kind={item.kind} style={{ left: `${(last.x + last.width) * 100}%`, top: `${last.y * 100}%` }}>{item.number}</i>; })}
+      {placed.filter(item => item.number > 0).map(item => { const last = endOf(item.boxes); return <i key={item.key} data-kind={item.kind} style={{ left: `${(last.x + last.width) * 100}%`, top: `${last.y * 100}%` }}>{item.number}</i>; })}
     </div>
   </>;
 }

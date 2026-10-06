@@ -4,10 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowDown, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { loadGuide } from "@/lib/paperflow/guide/client";
-import type { GuideRef } from "@/lib/paperflow/guide/guide";
+import type { GuideRef, PaperType } from "@/lib/paperflow/guide/guide";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import { guideFont } from "./guide-page";
 import "./guide.css";
+
+/** Level 05 and 06 are named for the kind of study. */
+const DESIGN_SUB: Record<PaperType, string> = { experimental: "STUDY DESIGN", computational: "MODEL & DATA", theoretical: "MODEL & ASSUMPTIONS", review: "REVIEW SCOPE" };
+const CONDITIONS_TITLE: Record<PaperType, string> = { experimental: "핵심 실험조건", computational: "핵심 설정 · 파라미터", theoretical: "핵심 가정 · 파라미터", review: "검토 범위 · 기준" };
 
 /** Bring a guide item's source into view and flash it on its page. */
 export function focusSource(item: string, ref: GuideRef | undefined) {
@@ -72,11 +76,11 @@ export function GuideBrief({ documentId, width, scale }: { documentId: string; w
       <ol className="pf-brief-flow">{data.flow.map((step, index) => <li key={step + index}><span>{String(index + 1).padStart(2, "0")}</span>{step}</li>)}</ol>
     </Level>}
 
-    {data.composition.length > 0 && <Level n="05" title="연구 구성" sub="STUDY DESIGN">
+    {data.composition.length > 0 && <Level n="05" title="연구 구성" sub={DESIGN_SUB[data.paperType ?? "experimental"]}>
       <dl className="pf-brief-grid">{data.composition.map(item => <div key={item.label + item.value} data-link={Boolean(item.ref) || undefined} onClick={() => focusSource(`composition-${item.label}`, item.ref)}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>
     </Level>}
 
-    {data.conditions.length > 0 && <Level n="06" title="핵심 실험조건" sub="KEY CONDITIONS">
+    {data.conditions.length > 0 && <Level n="06" title={CONDITIONS_TITLE[data.paperType ?? "experimental"]} sub="KEY CONDITIONS">
       <table className="pf-brief-spec"><tbody>{data.conditions.map(item => <tr key={item.label + item.value} data-link={Boolean(item.ref) || undefined} onClick={() => focusSource(`condition-${item.label}`, item.ref)}><th>{item.label}</th><td>{item.value}</td><td>{item.ref ? `p.${item.ref.page}` : ""}</td></tr>)}</tbody></table>
     </Level>}
 

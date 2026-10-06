@@ -45,7 +45,7 @@ export function GuidePageColumn({ documentId, pageIndex, width, height, room, sc
   const notes = useMemo(() => {
     if (!anchors?.length) return [];
     let floor = 0;
-    return anchors.map(anchor => {
+    return [...anchors].sort((a, b) => a.y - b.y).map(anchor => {
       const mark = marks[anchor.number - 1];
       if (!mark) return null;
       const lines = 2 + Math.ceil(mark.note.length / 14);

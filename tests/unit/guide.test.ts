@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { briefSchema, guideUnits, pageChunks, pagesSchema, reportStyle, tidyGuide, validateBrief, validatePages } from "@/lib/paperflow/guide/guide";
+import { briefSchema, guideUnits, pageChunks, pagesSchema, readsAsSentence, reportStyle, tidyGuide, validateBrief, validatePages } from "@/lib/paperflow/guide/guide";
 import type { TranslationManifest } from "@/lib/paperflow/translation/manifest";
 
 const unit = (id: string, role: string, page: number, text: string) => ({ id, role, blockIds: [], pages: [page], text, pageChars: {} });
@@ -92,5 +92,13 @@ describe("saved guides", () => {
     expect(tidy.definition).toBe("80 °C에서 침출함");
     expect(tidy.pages[0].items[0].text).toBe("900 °C · 30 °C/min");
     expect(tidy.count).toBe(3);
+  });
+});
+
+describe("page highlights are sentences", () => {
+  it("keeps a sentence and drops an equation line", () => {
+    expect(readsAsSentence("we set tJ = 0 to isolate the band asymmetry in the model")).toBe(true);
+    expect(readsAsSentence("Meff(d)(k) ≃ M(0) + Ms(2)k2 + Mp,xkx + Mp,yky")).toBe(false);
+    expect(readsAsSentence("ξ′(k) = 4t0 − μ − 2t0(cos kx + cos ky)")).toBe(false);
   });
 });
