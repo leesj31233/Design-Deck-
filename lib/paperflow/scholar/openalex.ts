@@ -6,7 +6,7 @@
  */
 export interface ScholarRef { id: string; name: string }
 export interface ScholarTopic extends ScholarRef { score: number; subfield: ScholarRef; field: ScholarRef; domain: ScholarRef }
-export interface ScholarAuthor extends ScholarRef { orcid?: string; position: "first" | "middle" | "last"; institutions: (ScholarRef & { country?: string; ror?: string })[] }
+export interface ScholarAuthor extends ScholarRef { orcid?: string; position: "first" | "middle" | "last"; /** Marked as corresponding author on the paper. */ corresponding?: boolean; institutions: (ScholarRef & { country?: string; ror?: string })[] }
 export interface ScholarSource extends ScholarRef { publisher?: string; issn?: string; type?: string }
 export interface ScholarWork {
   openalexId: string; title: string; year?: number; doi?: string; type?: string; citedBy: number;
@@ -27,7 +27,7 @@ export function normalizeWork(work: any): ScholarWork {
     doi: typeof work.doi === "string" ? work.doi.replace(/^https?:\/\/doi\.org\//i, "") : undefined, type: work.type ?? undefined,
     citedBy: Number(work.cited_by_count ?? 0), isOa: Boolean(work.open_access?.is_oa), oaUrl: work.open_access?.oa_url ?? undefined,
     authors: (work.authorships ?? []).filter((item: any) => item.author?.display_name).map((item: any) => ({
-      ...ref(item.author), orcid: item.author.orcid ?? undefined, position: item.author_position === "first" ? "first" : item.author_position === "last" ? "last" : "middle",
+      ...ref(item.author), orcid: item.author.orcid ?? undefined, position: item.author_position === "first" ? "first" : item.author_position === "last" ? "last" : "middle", corresponding: item.is_corresponding === true || undefined,
       institutions: (item.institutions ?? []).map((institution: any) => ({ ...ref(institution), country: institution.country_code ?? undefined, ror: institution.ror ?? undefined }))
     })),
     source: source ? { ...ref(source), publisher: source.host_organization_name ?? undefined, issn: source.issn_l ?? undefined, type: source.type ?? undefined } : undefined,

@@ -10,7 +10,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.37";
+export const EXTRACTOR_VERSION = "layout-v3.38";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -51,7 +51,8 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
   const analyzed = analyzePage(raw, pageIndex, width, height);
   const context = pageContext(analyzed, pageIndex);
   // Ruled tables first: a rule always ends a paragraph, so a caption or a sentence never runs on into the cells.
-  const proseBand = (band: Region) => analyzed.some(paragraph => centerInside(paragraph, band, 0) && (paragraph.fontSize ?? context.bodySize) >= context.bodySize * .95 && readsAsProse(paragraph.text));
+  // An abstract is often set a size smaller than the body: it still separates the rules around it.
+  const proseBand = (band: Region) => analyzed.some(paragraph => centerInside(paragraph, band, 0) && (paragraph.fontSize ?? context.bodySize) >= context.bodySize * .8 && readsAsProse(paragraph.text));
   found.tables = tableRegions(rules, width, height, proseBand);
   const paragraphs = splitAtTables(analyzed, found.tables);
   const classified: { role: BlockRole; reason: string | null; columnIndex: number }[] = [];
@@ -73,6 +74,11 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
   const captionNear = (table: Region, pattern: RegExp) => paragraphs.some((paragraph, index) => classified[index].role === "CAPTION" && pattern.test(paragraph.text.trim()) && paragraph.x < table.x + table.width && paragraph.x + paragraph.width > table.x && (Math.abs(paragraph.y + paragraph.height - table.y) < .06 || Math.abs(paragraph.y - (table.y + table.height)) < .06 || centerInside(paragraph, table)));
   const TABLE_CAPTION = /^(?:table|tabel|tabla|tab(?:elle)?\.?|표|表)\s*[\dA-Z]/i, FIGURE_CAPTION = /^(?:fig(?:ure)?\.?|gambar|abb(?:ildung)?\.?|figura|그림|図|scheme|chart)\s*[\dA-Z]/i;
   found.tables = found.tables.filter(table => {
+    // Rules that frame a paper's front matter (Elsevier: title, HIGHLIGHTS, ARTICLE INFO, ABSTRACT) share their
+    // ends like a booktabs table. A table holds no wide paragraph of prose and no title-size text.
+    const inside = paragraphs.filter(paragraph => centerInside(paragraph, table));
+    if (inside.some(paragraph => paragraph.width > table.width * .45 && proseScore(paragraph.text).words >= 30 && readsAsProse(paragraph.text))) return false;
+    if (inside.some(paragraph => (paragraph.fontSize ?? context.bodySize) >= context.bodySize * 1.45 && paragraph.text.length > 12)) return false;
     if (captionNear(table, TABLE_CAPTION)) return true;
     // A frame around one paragraph (an author box, a highlighted note) is a panel, not a table.
     if (buildTableCells(raw, table, rules, width, height, pageIndex, []).length <= 1) return false;

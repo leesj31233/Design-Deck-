@@ -282,3 +282,23 @@ describe("prose after a table", () => {
     expect(paragraph?.translatable).toBe(true);
   });
 });
+
+describe("ruled front matter", () => {
+  it("keeps an Elsevier title, highlights and abstract framed by rules out of the tables", async () => {
+    const rule = (y: number) => ({ x: 40, y, width: 520, height: .5 });
+    const abstract = "Low-emission combustion contributes to formation of a reducing atmosphere in the furnace, that is accompanied by oxygen depletion and excess of CO in the vicinity of waterwalls. Corrosion of boiler tubes is often caused by reducing atmosphere. System based on the on-line measurement of the O2 and CO concentration in the boundary layer of the industrial scale boiler walls was described in this work.";
+    const lines = abstract.match(/.{1,95}(\s|$)/g)!.map(text => text.trim());
+    const body = "Increasing use of renewable energy sources and the need for higher efficiency of coal power plants lead to a decrease in coal consumption in OECD countries over the last years and decades.";
+    const found = { tables: [] as { x: number; y: number; width: number; height: number }[] };
+    const blocks = await buildPageBlocks("doc", 0, [
+      item("Development of high-temperature corrosion risk monitoring system in pulverized coal boilers", 40, 120, 520, 16),
+      item("H I G H L I G H T S", 40, 200, 120, 8),
+      item("Corrosion risk monitoring system was demonstrated based on CO and O2 measurements.", 40, 220, 400, 9),
+      item("A B S T R A C T", 220, 260, 120, 8),
+      ...lines.map((text, index) => item(text, 220, 280 + index * 11, 340, 8.5)),
+      item(body.slice(0, 95), 40, 420, 250, 9), item(body.slice(95), 40, 431, 250, 9), item(body, 310, 420, 250, 9)
+    ], W, H, "none", [rule(100), rule(185), rule(240), rule(395)], found);
+    expect(found.tables).toHaveLength(0);
+    expect(blocks.find(block => block.text.startsWith("Low-emission"))?.translatable).toBe(true);
+  });
+});

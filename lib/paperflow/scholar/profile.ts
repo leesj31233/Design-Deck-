@@ -8,7 +8,9 @@ import type { Annotation } from "../anchors/types";
  */
 export interface Weighted { id: string; name: string; weight: number; papers: string[] }
 export interface ProfileTopic extends Weighted { level: "domain" | "field" | "subfield" | "topic"; parent?: string; domain: string }
-export interface ProfileAuthor extends Weighted { orcid?: string; institution?: string; country?: string; firstAuthor: number }
+/** An author's part in one of my papers: first author, corresponding author, last (senior) author or co-author. */
+export type AuthorRole = "first" | "corresponding" | "last" | "co";
+export interface ProfileAuthor extends Weighted { orcid?: string; institution?: string; country?: string; firstAuthor: number; corresponding: number; roles: { paper: string; roles: AuthorRole[] }[] }
 export interface ProfileJournal extends Weighted { publisher?: string; coverDocumentId: string }
 export interface ResearchProfile {
   totals: { papers: number; analyzed: number; pagesRead: number; highlights: number; notes: number };
@@ -60,8 +62,11 @@ export function researchProfile(docs: StoredDocument[], annotations: Annotation[
       add(topics, topic.id, () => ({ id: topic.id, name: topic.name, level: "topic" as const, parent: topic.subfield.id, domain: topic.domain.id, weight: 0, papers: [] }), share, doc.id);
     }
     for (const author of work.authors) {
-      const item = add(authors, author.id || author.name, () => ({ id: author.id || author.name, name: author.name, orcid: author.orcid, institution: author.institutions[0]?.name, country: author.institutions[0]?.country, firstAuthor: 0, weight: 0, papers: [] }), weight, doc.id);
+      const item = add(authors, author.id || author.name, () => ({ id: author.id || author.name, name: author.name, orcid: author.orcid, institution: author.institutions[0]?.name, country: author.institutions[0]?.country, firstAuthor: 0, corresponding: 0, roles: [], weight: 0, papers: [] }), weight, doc.id);
       if (author.position === "first") item.firstAuthor++;
+      if (author.corresponding) item.corresponding++;
+      const roles: AuthorRole[] = [...(author.position === "first" ? ["first" as const] : []), ...(author.corresponding ? ["corresponding" as const] : []), ...(author.position === "last" && work.authors.length > 1 ? ["last" as const] : [])];
+      if (!item.roles.some(entry => entry.paper === doc.id)) item.roles.push({ paper: doc.id, roles: roles.length ? roles : ["co"] });
       for (const institution of author.institutions) add(institutions, institution.id || institution.name, () => ({ id: institution.id || institution.name, name: institution.name, country: institution.country, weight: 0, papers: [] }), weight / Math.max(1, work.authors.length), doc.id);
     }
     if (work.source) {

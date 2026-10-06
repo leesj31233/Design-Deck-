@@ -23,9 +23,11 @@ function AuthorPortrait({ name, orcid }: { name: string; orcid?: string }) {
   return url ? <img className="pf-portrait" src={url} alt={`${name} (Wikimedia Commons)`} loading="lazy"/> : <span className="pf-portrait" style={{ background: `linear-gradient(135deg, hsl(${hue(name)} 70% 58%), hsl(${(hue(name) + 40) % 360} 70% 46%))` }} aria-hidden="true">{initials(name)}</span>;
 }
 
+const ROLE_LABEL = { first: "1저자", corresponding: "교신", last: "책임", co: "공저" } as const;
+
 /** Who and what this reader actually studies: fields, journals, authors, institutions, keywords, years. */
 export function ResearchIdentity({ profile, docs }: { profile: ResearchProfile; docs: StoredDocument[] }) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotion(), byId = new Map(docs.map(doc => [doc.id, doc]));
   const [journals, setJournals] = useState<Map<string, ScholarSourceStats>>(new Map()), [authors, setAuthors] = useState<Map<string, ScholarAuthorStats>>(new Map());
   const topJournals = profile.journals.slice(0, 6), topAuthors = profile.authors.filter(author => /^A\d+/.test(author.id)).slice(0, 8);
   const journalKey = topJournals.map(item => item.id).join(","), authorKey = topAuthors.map(item => item.id).join(",");
@@ -57,12 +59,15 @@ export function ResearchIdentity({ profile, docs }: { profile: ResearchProfile; 
     </motion.section>
 
     <motion.section className="pf-identity-card pf-identity-authors" {...enter(2)}>
-      <header><h3>자주 읽는 저자</h3><small>사진은 Wikidata에 공개된 경우만 · h-index는 OpenAlex</small></header>
+      <header><h3>자주 읽는 저자</h3><small>이름을 누르면 ScienceDirect에서 그 저자의 논문 · 논문별 역할은 OpenAlex 기준</small></header>
       <ul className="pf-author-list">{topAuthors.map(author => { const stats = authors.get(author.id); return <li key={author.id}>
         <AuthorPortrait name={author.name} orcid={author.orcid ?? stats?.orcid}/>
-        <span><b>{author.name}</b><small>{flag(stats?.institution?.country ?? author.country)} {stats?.institution?.name ?? author.institution ?? "소속 미확인"}</small>
-          <span className="pf-author-stats"><em>내 서재 {author.papers.length}편</em>{author.firstAuthor ? <em>1저자 {author.firstAuthor}</em> : null}{stats?.hIndex ? <em>h-index {stats.hIndex}</em> : null}</span>
-          {stats?.topics.length ? <small className="pf-author-topics">{stats.topics.slice(0, 3).join(" · ")}</small> : null}</span>
+        <span><a className="pf-author-name" href={`https://www.sciencedirect.com/search?authors=${encodeURIComponent(author.name)}`} target="_blank" rel="noopener noreferrer" title="ScienceDirect에서 이 저자의 논문 보기">{author.name}</a><small>{flag(stats?.institution?.country ?? author.country)} {stats?.institution?.name ?? author.institution ?? "소속 미확인"}</small>
+          <span className="pf-author-stats"><em>내 서재 {author.papers.length}편</em>{author.firstAuthor ? <em data-role="first">1저자 {author.firstAuthor}</em> : null}{author.corresponding ? <em data-role="corresponding">교신 {author.corresponding}</em> : null}{stats?.hIndex ? <em>h-index {stats.hIndex}</em> : null}</span>
+          {stats?.topics.length ? <small className="pf-author-topics">{stats.topics.slice(0, 3).join(" · ")}</small> : null}
+          {/* Which of my papers, and in what role: first, corresponding, last (senior) or co-author. */}
+          <ul className="pf-author-roles">{author.roles.slice(0, 4).map(entry => { const doc = byId.get(entry.paper); return doc ? <li key={entry.paper}>{entry.roles.map(role => <i key={role} data-role={role}>{ROLE_LABEL[role]}</i>)}<Link href={`/reader/${doc.id}`}>{doc.title.replace(/\.pdf$/i, "")}</Link></li> : null; })}</ul>
+          <span className="pf-author-links"><a href={`https://www.sciencedirect.com/search?authors=${encodeURIComponent(author.name)}`} target="_blank" rel="noopener noreferrer">ScienceDirect</a>{(author.orcid ?? stats?.orcid) && <a href={String(author.orcid ?? stats?.orcid).startsWith("http") ? String(author.orcid ?? stats?.orcid) : `https://orcid.org/${author.orcid ?? stats?.orcid}`} target="_blank" rel="noopener noreferrer">ORCID</a>}{/^A\d+/.test(author.id) && <a href={`https://openalex.org/${author.id}`} target="_blank" rel="noopener noreferrer">OpenAlex</a>}<a href={`https://scholar.google.com/scholar?q=${encodeURIComponent(`author:"${author.name}"`)}`} target="_blank" rel="noopener noreferrer">Google Scholar</a></span></span>
       </li>; })}</ul>
       {!topAuthors.length && <p className="pf-identity-empty">저자 정보가 아직 없습니다.</p>}
     </motion.section>
