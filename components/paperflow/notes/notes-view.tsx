@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
-import { AtSign, FileText, PenLine, Pin, PinOff, Plus, Trash2 } from "lucide-react";
+import { AtSign, Download, FileText, PenLine, Pin, PinOff, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { SearchField } from "@/components/ui/search-field";
@@ -15,6 +15,7 @@ import type { Annotation, AnnotationColor } from "@/lib/paperflow/anchors/types"
 import type { StoredDocument } from "@/lib/paperflow/persistence/types";
 import { groupByPaper, mentionCandidates, noteTitle, plainNote, sortNotes, type MentionCandidate, type QuickNote } from "@/lib/paperflow/notes/notebook";
 import { noteRepository } from "@/lib/paperflow/notes/note-repository";
+import { notesMarkdown } from "@/lib/paperflow/notes/notes-export";
 
 const SWATCH: Record<AnnotationColor, string> = { yellow: "#f2c200", green: "#40c057", blue: "#4dabf7", pink: "#f06595", purple: "#9775fa" };
 const KIND_LABEL = { paper: "논문", keyword: "키워드", mark: "마킹" } as const;
@@ -47,6 +48,16 @@ function MarksByPaper({ docs, annotations }: { docs: StoredDocument[]; annotatio
   </section>;
 }
 
+/** Everything in the notes view as one Markdown file: the notebook, then each paper's marks and memos. */
+function exportNotes(notes: QuickNote[], docs: StoredDocument[], annotations: Annotation[]) {
+  const papers = docs.map(doc => ({ id: doc.id, title: doc.title.replace(/.pdf$/i, ""), authors: doc.authors, year: doc.year, marks: annotations.filter(mark => mark.documentId === doc.id && mark.type !== "ink").map(mark => ({ page: mark.pageIndex + 1, quote: markText(mark), note: mark.note, color: mark.color, createdAt: mark.createdAt })) })).filter(paper => paper.marks.length);
+  const text = notesMarkdown({ notes: notes.map(note => ({ ...note, title: note.title.trim() || noteTitle(note) })), papers, exportedAt: new Date().toISOString() });
+  const url = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
+  const link = Object.assign(document.createElement("a"), { href: url, download: `PAPERFLOW 노트 ${new Date().toISOString().slice(0, 10)}.md` });
+  document.body.append(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 /** Right half: a notebook of quick notes that cite my papers with "@". */
 function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: Annotation[] }) {
   const client = useQueryClient(), reduced = useReducedMotion();
@@ -76,7 +87,7 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
   const choose = (candidate: MentionCandidate) => { if (!draft || !mention) return; area.current?.insert(candidate.token); setMention(null); };
 
   return <section className="pf-notes-book" aria-label="노트">
-    <header className="pf-notes-head"><h2>노트<span className="pf-count">{notes.data?.length ?? 0}</span></h2><div className="pf-notes-head-tools"><SearchField aria-label="노트 검색" placeholder="노트 찾기" value={search} onChange={event => setSearch(event.target.value)} onClear={() => setSearch("")}/><Button size="sm" variant="primary" onClick={() => void create()}><Plus size={14}/>새 노트</Button></div></header>
+    <header className="pf-notes-head"><h2>노트<span className="pf-count">{notes.data?.length ?? 0}</span></h2><div className="pf-notes-head-tools"><SearchField aria-label="노트 검색" placeholder="노트 찾기" value={search} onChange={event => setSearch(event.target.value)} onClear={() => setSearch("")}/><IconButton label="노트와 마킹을 Markdown으로 내보내기" variant="ghost" size="sm" onClick={() => exportNotes(notes.data ?? [], docs, annotations)}><Download size={15}/></IconButton><Button size="sm" variant="primary" onClick={() => void create()}><Plus size={14}/>새 노트</Button></div></header>
     <div className="pf-notes-split">
       <ul className="pf-notes-list" role="listbox" aria-label="노트 목록">
         {list.map(note => <li key={note.id}><button type="button" role="option" aria-selected={note.id === activeId} onClick={() => setActiveId(note.id)}>
