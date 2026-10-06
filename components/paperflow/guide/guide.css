@@ -213,3 +213,6 @@ html[data-pf-theme="dark"] :is(.pf-brief, .pf-gpage, .pf-gpanel) { --g-ink: #e6e
 .pf-gconfirm-bill dd small { display:block; margin-top:1px; font-size:10.5px; font-weight:500; letter-spacing:0; color:var(--muted); }
 .pf-gconfirm-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
 @media (max-width:520px) { .pf-gconfirm-bill { grid-template-columns:1fr; } }
+.pf-gpanel-steps { list-style:none; padding:0; gap:6px; counter-reset:gstep; }
+.pf-gpanel-steps li { display:flex; align-items:center; gap:8px; counter-increment:gstep; }
+.pf-gpanel-steps li::before { content:counter(gstep); display:grid; place-items:center; flex:none; width:18px; height:18px; border-radius:50%; background:color-mix(in srgb,var(--g-accent) 14%,transparent); color:var(--g-accent); font-size:10px; font-weight:700; }
