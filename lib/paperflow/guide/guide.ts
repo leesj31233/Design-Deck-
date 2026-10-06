@@ -8,6 +8,8 @@ import type { TranslationManifest } from "../translation/manifest";
  * Every number comes from the paper; every highlight is an exact quote checked against its paragraph.
  */
 export const GUIDE_VERSION = "paperflow-guide-v4";
+/** Revision of the instructions: the server's shared cache of guide parts follows it (saved guides stay valid). */
+export const GUIDE_PROMPT_REVISION = "r2";
 const MAX_CHARS = 110_000;
 /** Pages per request for the page guides (requests run in parallel). */
 export const PAGES_PER_CALL = 6;
@@ -69,7 +71,14 @@ export function pageChunks(wire: GuideUnit[], size = PAGES_PER_CALL) {
 
 const squash = (text: string) => text.toLowerCase().replace(/[\s ]+/g, " ").replace(/[‐-―]/g, "-").replace(/[“”]/g, "\"").replace(/[‘’]/g, "'").trim();
 /** PDFs often print the degree sign as a ring operator ("80 ◦ C"): shown as °C. */
-const degrees = (text: string) => text.replace(/(\d)\s*[◦∘˚]\s*C\b/g, "$1 °C").replace(/(\d)\s*°\s*C\b/g, "$1 °C");
+const degrees = (text: string) => text.replace(/(\d)\s*[◦∘˚º]\s*C\b/g, "$1 °C").replace(/(\d)\s*°\s*C\b/g, "$1 °C");
+/** A saved guide with its text tidied the way new guides are (guides made before a tidy rule existed). */
+export function tidyGuide<T>(value: T): T {
+  if (typeof value === "string") return degrees(value) as T;
+  if (Array.isArray(value)) return value.map(tidyGuide) as T;
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, tidyGuide(item)])) as T;
+  return value;
+}
 const clip = (value: unknown, max: number) => typeof value === "string" ? degrees(value.replace(/\s+/g, " ").trim()).slice(0, max) : "";
 const strings = (value: unknown, limit: number, max: number) => Array.isArray(value) ? value.map(item => clip(item, max)).filter(Boolean).slice(0, limit) : [];
 /** Korean report style: a polite ending slipped in by the model is turned into the noun ending. */
@@ -147,7 +156,7 @@ conclusion_parts: finding, meaning (practical meaning), limitation, next (next s
 
 export const PAGES_INSTRUCTIONS = `You are PAPERFLOW's research reading guide. You receive the passages of some pages of a paper (id, role, page, text) and write the guide that sits beside each page while the reader scrolls. ${STYLE}
 For every page given, in order: page (its number), section (INTRO, METHOD, RESULT, DISCUSSION, CONCLUSION or OTHER), title (what this page says, at most 40 characters),
-items: 1-4 points in priority order, each with label (PROBLEM, GAP, WHY, OBJECTIVE, METHOD, CONDITION, RESULT, MECHANISM, LIMITATION, MEANING, NEXT or DEFINITION), keyword (at most 18 characters) and text (at most 45 characters, numbers verbatim; for results prefer "A → B 대비 +x%").
+items: 1-4 points in priority order, each with label (PROBLEM, GAP, WHY, OBJECTIVE, METHOD, CONDITION, RESULT, MECHANISM, LIMITATION, MEANING, NEXT or DEFINITION), keyword (at most 18 characters) and text (at most 45 characters, numbers verbatim; for results prefer "A → B 대비 +x%"; for conditions a compact spec joined by " · " like "80 °C · 6 h · 50 rpm"). Write keyword and text in Korean, keeping English technical terms; never copy an English sentence from the paper.
 Rules by section: introduction pages give only PROBLEM, GAP, WHY, OBJECTIVE (skip general background); method pages give reproducible facts (material, preparation, equipment, temperature, pressure, time, dosage, concentration, flow rate, sample amount, test matrix, analytical method, standard); result pages compare (increase, decrease, maximum, optimum, significant or not); discussion pages answer why (mechanism, cause, comparison with literature, unexpected results); conclusion pages give final finding, practical meaning, limitation, next step.
 next: what the following page continues with (at most 30 characters), or "".
 marks: the 1-3 sentences on this page that are worth highlighting (up to 4 on a key result page; about 10-15% of the page at most; none on reference, front-matter or figure-only pages): kind (result, condition, method, mechanism, limitation), keyword (at most 16 characters), note (a compressed margin note of at most 24 characters, keyword first, never a translation, e.g. "2% → GI +175%", "400–550 °C · 30 min", "pH ↑ → Al3+ 독성 ↓"), unit (id of the passage on this page), quote (an exact contiguous English substring of that passage, 6-25 words, copied character for character).

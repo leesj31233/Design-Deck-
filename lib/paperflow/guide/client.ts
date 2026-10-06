@@ -1,7 +1,7 @@
 "use client";
 import { documentRepository } from "../persistence/document-repository";
 import type { TranslationManifest } from "../translation/manifest";
-import { GUIDE_VERSION, guideUnits, pageChunks, validateBrief, validatePages, type GuidePage, type GuideUnit, type PaperGuide } from "./guide";
+import { GUIDE_VERSION, guideUnits, tidyGuide, pageChunks, validateBrief, validatePages, type GuidePage, type GuideUnit, type PaperGuide } from "./guide";
 import { guideCreditEstimate } from "./cost";
 
 /** Credits a new guide of this paper will cost, about (charged by real usage). */
@@ -13,7 +13,7 @@ export function estimateGuideCredits(manifest: TranslationManifest) {
 /** The paper's guide: stored with the paper once made (and synced with the account). */
 export async function loadGuide(documentId: string): Promise<PaperGuide | null> {
   const doc = await documentRepository.getDocument(documentId);
-  return doc?.guide?.version === GUIDE_VERSION ? doc.guide as PaperGuide : null;
+  return doc?.guide?.version === GUIDE_VERSION ? tidyGuide(doc.guide as PaperGuide) : null;
 }
 
 export interface GuideProgress { brief: "pending" | "done" | "failed"; pagesDone: number; pagesTotal: number }
@@ -34,7 +34,7 @@ async function call(mode: "brief" | "pages", units: GuideUnit[], pages?: number[
  * parallel, three requests at a time. A page group that fails twice is left out; the rest is kept.
  */
 export async function createGuide(documentId: string, manifest: TranslationManifest, onProgress?: (progress: GuideProgress) => void): Promise<PaperGuide> {
-  const { wire, byWire } = guideUnits(manifest), chunks = pageChunks(wire);
+  const { wire, byWire } = guideUnits(manifest), chunks = pageChunks(wire), started = Date.now();
   const progress: GuideProgress = { brief: "pending", pagesDone: 0, pagesTotal: chunks.reduce((sum, chunk) => sum + chunk.length, 0) };
   onProgress?.({ ...progress });
   let credits = 0, model: string | undefined;
@@ -61,6 +61,6 @@ export async function createGuide(documentId: string, manifest: TranslationManif
   const guide: PaperGuide = { ...state.brief, version: GUIDE_VERSION, createdAt: new Date().toISOString(), model, pages: pages.sort((a, b) => a.page - b.page) };
   await documentRepository.updateDocument(documentId, { guide });
   window.dispatchEvent(new Event("paperflow:credits-changed"));
-  window.dispatchEvent(new CustomEvent("paperflow:guide-finished", { detail: { documentId, credits, pages: guide.pages.length, marks: guide.pages.reduce((sum, page) => sum + page.marks.length, 0) } }));
+  window.dispatchEvent(new CustomEvent("paperflow:guide-finished", { detail: { documentId, credits, model, ms: Date.now() - started, pages: guide.pages.length, pagesTotal: progress.pagesTotal, marks: guide.pages.reduce((sum, page) => sum + page.marks.length, 0) } }));
   return guide;
 }

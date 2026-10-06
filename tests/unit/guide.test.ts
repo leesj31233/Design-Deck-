@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { briefSchema, guideUnits, pageChunks, pagesSchema, reportStyle, validateBrief, validatePages } from "@/lib/paperflow/guide/guide";
+import { briefSchema, guideUnits, pageChunks, pagesSchema, reportStyle, tidyGuide, validateBrief, validatePages } from "@/lib/paperflow/guide/guide";
 import type { TranslationManifest } from "@/lib/paperflow/translation/manifest";
 
 const unit = (id: string, role: string, page: number, text: string) => ({ id, role, blockIds: [], pages: [page], text, pageChars: {} });
@@ -82,5 +82,15 @@ describe("guide text clean-up", () => {
     const { validateBrief } = await import("@/lib/paperflow/guide/guide");
     const brief = validateBrief({ definition: "정의임.", conditions: [{ label: "Leaching", value: "80 mL · 80 ◦ C · 6 h", unit: "u0" }] }, new Map());
     expect(brief!.conditions[0].value).toBe("80 mL · 80 °C · 6 h");
+  });
+});
+
+describe("saved guides", () => {
+  it("tidies degree signs in a guide saved before the rule existed, at any depth", () => {
+    const saved = { definition: "80 ◦ C에서 침출함", pages: [{ items: [{ text: "900 ◦C · 30 º C/min" }], marks: [] }], count: 3 };
+    const tidy = tidyGuide(saved);
+    expect(tidy.definition).toBe("80 °C에서 침출함");
+    expect(tidy.pages[0].items[0].text).toBe("900 °C · 30 °C/min");
+    expect(tidy.count).toBe(3);
   });
 });

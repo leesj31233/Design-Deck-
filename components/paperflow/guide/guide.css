@@ -170,3 +170,16 @@ html[data-pf-theme="dark"] :is(.pf-brief, .pf-gpage, .pf-gpanel) { --g-ink: #e6e
 .pf-gpanel-marks strong { font-size:12.5px; } .pf-gpanel-marks em { font-style:normal; font-size:12px; color:var(--g-muted); font-variant-numeric:tabular-nums; }
 .pf-gpanel-foot { display:grid; gap:4px; justify-items:start; } .pf-gpanel-foot small { color:var(--g-muted); font-size:11px; }
 @media (prefers-reduced-motion: reduce) { .pf-gmarks span, .pf-gmark-numbers i, .pf-brief-foot svg { animation:none !important; } }
+
+/* Narrow window: the page guide folds into a chip in the page's top-right corner. */
+.pf-gpage-compact { position:absolute; top:10px; right:10px; display:grid; justify-items:end; gap:8px; pointer-events:auto; z-index:6; }
+.pf-gpage-chip { display:inline-flex; align-items:center; gap:.4em; padding:.42em .8em; border:1px solid var(--g-line); border-radius:999px; background:color-mix(in srgb,var(--g-card) 92%,transparent); backdrop-filter:blur(8px); color:var(--g-ink); font:inherit; font-size:.86em; font-weight:700; box-shadow:0 6px 18px -10px rgba(15,30,25,.45); cursor:pointer; }
+.pf-gpage-chip:hover, .pf-gpage-compact[data-open] .pf-gpage-chip { border-color:color-mix(in srgb,var(--g-accent) 45%,transparent); color:var(--g-accent); }
+.pf-gpage-chip:focus-visible { outline:2px solid var(--g-accent); outline-offset:2px; }
+.pf-gpage-pop { position:static; overflow:auto; overscroll-behavior:contain; }
+.pf-gpage-notes { list-style:none; margin:.9em 0 0; padding:.75em 0 0; border-top:1px dashed var(--g-line); display:grid; gap:.65em; }
+.pf-gpage-notes li { display:grid; grid-template-columns:1.55em 1fr; gap:.5em; align-items:start; }
+.pf-gpage-notes i { display:grid; place-items:center; width:1.55em; height:1.55em; border-radius:50%; background:var(--k); color:#fff; font-style:normal; font-size:.78em; font-weight:700; }
+.pf-gpage-notes small { display:block; font-size:.66em; font-weight:700; letter-spacing:.08em; color:var(--k); }
+.pf-gpage-notes strong { display:block; font-size:.96em; }
+.pf-gpage-notes p { margin:.1em 0 0; font-size:.92em; color:var(--g-muted); }

@@ -9,6 +9,21 @@ import "./notifications.css";
 
 const ICON = { info: Info, success: Check, error: AlertTriangle, progress: Loader2, credit: Coins } as const;
 
+type Credits = { used: number; limit: number | null; month: string };
+/** The paper's title and this month's credits, for a finished-job notice. */
+async function billOf(documentId: string) {
+  const [doc, account] = await Promise.all([
+    documentRepository.getDocument(documentId).catch(() => null),
+    fetch("/api/cloud/account").then(response => response.ok ? response.json() : null).catch(() => null) as Promise<{ plan?: { credits: Credits } } | null>
+  ]);
+  return { title: doc?.title.replace(/\.pdf$/i, "") ?? "논문", credits: account?.plan?.credits };
+}
+function creditMeter(credits: Credits | undefined): Notice["meter"] {
+  if (!credits) return undefined;
+  const remaining = credits.limit !== null ? Math.max(0, credits.limit - credits.used) : null;
+  return { used: credits.used, limit: credits.limit, label: `이번 달 크레딧 (${credits.month})`, caption: remaining === null ? "관리자 계정은 크레딧 제한이 없습니다" : `남은 크레딧 ${remaining.toLocaleString()} · 논문 약 ${Math.floor(remaining / PARAGRAPHS_PER_PAPER)}편 분량` };
+}
+
 /** One notice: icon, title, optional figures and a meter; a thin bar counts down and stops while pointed at. */
 function NoticeCard({ notice }: { notice: Notice }) {
   const dismiss = useNotices(state => state.dismiss), [paused, setPaused] = useState(false), left = useRef(notice.timeout), started = useRef(Date.now());
@@ -47,12 +62,7 @@ export function NotificationStack() {
       const detail = (event as CustomEvent<{ documentId: string; kind: "paper" | "part"; model: number; shared: number; failed: number; ms: number; complete: boolean }>).detail;
       if (!detail.model && !detail.shared) return;
       void (async () => {
-        const [doc, account] = await Promise.all([
-          documentRepository.getDocument(detail.documentId).catch(() => null),
-          fetch("/api/cloud/account").then(response => response.ok ? response.json() : null).catch(() => null) as Promise<{ plan?: { credits: { used: number; limit: number | null; month: string } } } | null>
-        ]);
-        const credits = account?.plan?.credits, title = doc?.title.replace(/\.pdf$/i, "") ?? "논문";
-        const remaining = credits && credits.limit !== null ? Math.max(0, credits.limit - credits.used) : null;
+        const { title, credits } = await billOf(detail.documentId);
         useNotices.getState().push({
           tone: "credit", key: `credit:${detail.documentId}`,
           title: detail.kind === "paper" ? (detail.complete ? "번역 완료" : "번역을 마쳤습니다 (일부 남음)") : "선택 번역 완료",
@@ -64,12 +74,33 @@ export function NotificationStack() {
             ...(detail.ms ? [{ label: "시간", value: duration(detail.ms) }] : []),
             ...(detail.failed ? [{ label: "실패", value: `${detail.failed}문단` }] : [])
           ],
-          meter: credits ? { used: credits.used, limit: credits.limit, label: `이번 달 크레딧 (${credits.month})`, caption: remaining === null ? "관리자 계정은 크레딧 제한이 없습니다" : `남은 크레딧 ${remaining.toLocaleString()} · 논문 약 ${Math.floor(remaining / PARAGRAPHS_PER_PAPER)}편 분량` } : undefined
+          meter: creditMeter(credits)
+        });
+      })();
+    };
+    // The AI guide reports the same way: its credits (charged by model usage), pages covered, highlights.
+    const guided = (event: Event) => {
+      const detail = (event as CustomEvent<{ documentId: string; credits: number; model?: string; ms: number; pages: number; pagesTotal: number; marks: number }>).detail;
+      void (async () => {
+        const { title, credits } = await billOf(detail.documentId);
+        const missed = Math.max(0, detail.pagesTotal - detail.pages);
+        useNotices.getState().push({
+          tone: "credit", key: `guide:${detail.documentId}`,
+          title: missed ? "AI 가이드 완성 (일부 페이지 제외)" : "AI 가이드 완성",
+          body: title,
+          stats: [
+            { label: "가이드", value: `${detail.pages}/${detail.pagesTotal}쪽` },
+            { label: "하이라이트", value: `${detail.marks}곳` },
+            { label: "사용 크레딧", value: detail.credits.toLocaleString(), hint: detail.model ? `${detail.model} 사용량 기준으로 청구` : "모델 사용량 기준으로 청구" },
+            ...(detail.ms ? [{ label: "시간", value: duration(detail.ms) }] : [])
+          ],
+          meter: creditMeter(credits)
         });
       })();
     };
     window.addEventListener("paperflow:translation-finished", finished);
-    return () => window.removeEventListener("paperflow:translation-finished", finished);
+    window.addEventListener("paperflow:guide-finished", guided);
+    return () => { window.removeEventListener("paperflow:translation-finished", finished); window.removeEventListener("paperflow:guide-finished", guided); };
   }, []);
   return <div className="pf-notice-stack" aria-live="polite">
     <AnimatePresence initial={false}>

@@ -1,4 +1,4 @@
-import { BRIEF_INSTRUCTIONS, GUIDE_VERSION, PAGES_INSTRUCTIONS, briefSchema, pagesSchema, type GuideUnit } from "@/lib/paperflow/guide/guide";
+import { BRIEF_INSTRUCTIONS, GUIDE_PROMPT_REVISION, GUIDE_VERSION, PAGES_INSTRUCTIONS, briefSchema, pagesSchema, type GuideUnit } from "@/lib/paperflow/guide/guide";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
 import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   const chars = units.reduce((sum, unit) => sum + unit.text.length, 0);
   if (!units.length || units.length > 1500 || chars > 140_000 || mode === "brief" && units.length < 3 || mode === "pages" && !pages.length) return Response.json({ error: "가이드를 만들 본문이 올바르지 않습니다." }, { status: 400 });
 
-  const key = await sourceHash(`${mode}|${pages.join(",")}\n${units.map(unit => `${unit.id}:${unit.text}`).join("\n")}`, GUIDE_VERSION), admin = adminClient();
+  const key = await sourceHash(`${mode}|${pages.join(",")}\n${units.map(unit => `${unit.id}:${unit.text}`).join("\n")}`, `${GUIDE_VERSION}.${GUIDE_PROMPT_REVISION}`), admin = adminClient();
   if (admin) {
     const { data } = await admin.from("shared_translations").select("text").eq("source_hash", key).maybeSingle();
     if (data?.text) { try { return Response.json({ part: JSON.parse(data.text), cached: true, credits: 0 }); } catch { /* Regenerate a damaged entry. */ } }
