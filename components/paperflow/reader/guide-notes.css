@@ -1,0 +1,48 @@
+/* AI guide on the paper: margin columns and keyword notes, sized with the page (--g ≈ PDF body text at this zoom). */
+.pf-guide-notes { --g:12px; font-family:"Malgun Gothic","Apple SD Gothic Neo",Pretendard,"Noto Sans KR",sans-serif; font-size:var(--g); line-height:1.5; }
+.pf-guide-column { position:absolute; top:4px; display:grid; align-content:start; gap:8px; overflow:auto; scrollbar-width:thin; pointer-events:auto; }
+.pf-gm-card { display:grid; gap:4px; padding:calc(var(--g) * .75); border:1px solid var(--line); border-radius:8px; background:var(--surface-strong); box-shadow:0 1px 6px rgba(20,30,25,.05); color:var(--foreground); }
+.pf-gm-card h4 { display:flex; align-items:center; gap:6px; margin:calc(var(--g) * .35) 0 0; font-size:calc(var(--g) * .8); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.pf-gm-card h4:first-child { margin-top:0; }
+.pf-gm-card p, .pf-gm-card ol, .pf-gm-card ul, .pf-gm-card dl { margin:0; padding:0; list-style:none; }
+.pf-gm-card b { font-weight:700; }
+.pf-gm-overview { border-top:2px solid var(--accent); }
+.pf-gm-overview h4:first-child { color:var(--accent); }
+.pf-gm-definition { font-size:calc(var(--g) * 1.06); font-weight:700; line-height:1.45; word-break:keep-all; }
+.pf-gm-summary div { display:grid; grid-template-columns:3.4em 1fr; gap:4px; padding:2px 0; border-top:1px dashed var(--line); }
+.pf-gm-summary div:first-child { border-top:0; }
+.pf-gm-summary dt { font-weight:700; color:var(--accent); }
+.pf-gm-summary dd, .pf-gm-facts dd { margin:0; word-break:keep-all; }
+.pf-gm-takeaway { margin-top:2px!important; padding:4px 7px!important; border-left:2px solid var(--accent); background:var(--accent-soft); font-weight:700; word-break:keep-all; }
+.pf-gm-flow { counter-reset:step; }
+.pf-gm-flow li { position:relative; display:grid; padding:1px 0 1px 1.7em; counter-increment:step; }
+.pf-gm-flow li::before { content:counter(step); position:absolute; left:0; top:.2em; display:grid; place-items:center; width:1.25em; height:1.25em; border-radius:50%; background:var(--accent); color:var(--accent-ink); font-size:.8em; font-weight:700; }
+.pf-gm-flow span, .pf-gm-results span, .pf-gm-figures span { color:var(--muted); font-size:.92em; }
+.pf-gm-facts div { display:grid; grid-template-columns:5em 1fr; gap:4px; padding:1px 0; }
+.pf-gm-facts dt { font-weight:700; color:#1864ab; }
+.pf-gm-results { display:grid; gap:4px; counter-reset:result; }
+.pf-gm-results li { display:grid; padding-left:7px; border-left:2px solid #f2c200; }
+.pf-gm-results em, .pf-gm-figures small { font-style:normal; font-size:.85em; color:var(--muted); }
+.pf-gm-claims li, .pf-gm-list li { display:block; padding:1px 0; word-break:keep-all; }
+.pf-gm-list li::before { content:"→ "; color:var(--accent); font-weight:700; }
+.pf-gm-claims i { display:inline-block; margin-right:5px; padding:0 4px; border-radius:4px; background:rgba(103,65,217,.12); color:#6741d9; font-size:.8em; font-style:normal; font-weight:700; }
+.pf-gm-claims i[data-source="ai"] { background:color-mix(in srgb,var(--foreground) 7%,transparent); color:var(--muted); }
+.pf-gm-figures li { display:grid; padding:2px 0; border-top:1px dashed var(--line); }
+.pf-gm-figures li:first-child { border-top:0; }
+.pf-gm-stars { color:#e8a400; font-size:.8em; letter-spacing:1px; } .pf-gm-stars i { font-style:normal; color:var(--line); }
+.pf-gm-page { border-top:2px solid var(--accent); }
+.pf-gm-page h4 span { padding:0 5px; border-radius:4px; background:var(--accent); color:var(--accent-ink); letter-spacing:0; }
+.pf-gm-about { font-size:calc(var(--g) * 1.06); font-weight:700; line-height:1.4; word-break:keep-all; }
+.pf-gm-key { display:flex; gap:6px; word-break:keep-all; }
+.pf-gm-key b { flex:none; font-size:.8em; color:var(--accent); padding-top:.15em; }
+.pf-gm-numbers { display:flex; flex-wrap:wrap; gap:3px; }
+.pf-gm-numbers li { padding:0 5px; border-radius:4px; background:color-mix(in srgb,var(--foreground) 6%,transparent); font-weight:700; font-variant-numeric:tabular-nums; }
+.pf-gm-details li { word-break:keep-all; }
+.pf-gm-details i { margin-right:5px; font-size:.78em; font-style:normal; font-weight:700; letter-spacing:.05em; color:var(--muted); }
+.pf-guide-margin { position:absolute; margin:0; padding:1px 0 1px 7px; border-left:2px solid; font-size:var(--g); font-weight:700; line-height:1.4; word-break:keep-all; pointer-events:auto; color:var(--foreground); }
+.pf-guide-margin[data-side="left"] { padding:1px 7px 1px 0; border-left:0; border-right:2px solid; text-align:right; }
+.pf-guide-margin small, .pf-guide-pin-note small { display:block; font-size:calc(var(--g) * .78); font-weight:700; letter-spacing:.07em; }
+.pf-guide-pin-note { position:absolute; top:26px; width:max-content; max-width:200px; padding:6px 9px; border-radius:8px; background:var(--surface-strong); box-shadow:var(--shadow-float); font-size:var(--g); font-weight:700; line-height:1.4; text-align:left; white-space:normal; color:var(--foreground); }
+html[data-pf-theme="dark"] .pf-guide-margin small { filter:brightness(1.4); }
+/* Highlights sit under the glyphs like the reader's own highlighter (the layer multiplies with the page). */
+.pf-guide-highlight { position:absolute; pointer-events:none; border-radius:2px; }

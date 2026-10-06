@@ -553,15 +553,8 @@ html[data-pf-theme="dark"] .pf-guide-marks span { mix-blend-mode:normal; backgro
 .pf-guide { display:grid; gap:2px; }
 .pf-guide h3 { display:flex; align-items:center; gap:6px; }
 .pf-guide h3 small { margin-left:auto; font-size:10px; font-weight:500; color:var(--muted); }
-.pf-guide-overview { font-size:13px; line-height:1.7; }
 .pf-guide-list { display:grid; gap:6px; margin:0; padding-left:18px; font-size:12.5px; line-height:1.6; }
-.pf-guide-findings { display:grid; gap:8px; margin:0; padding:0; list-style:none; }
-.pf-guide-findings button { display:grid; grid-template-columns:24px 1fr; gap:10px; width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:var(--surface-strong); color:inherit; text-align:left; cursor:pointer; transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease; }
-.pf-guide-findings button:active { transform:scale(.99); }
-.pf-guide-findings button[data-active] { border-color:#f5a400; box-shadow:0 0 0 3px rgba(245,164,0,.16); }
-@media (hover:hover) and (pointer:fine) { .pf-guide-findings button:hover { box-shadow:var(--shadow-soft); } }
 .pf-guide-index { display:grid; place-items:center; width:24px; height:24px; border-radius:50%; background:color-mix(in srgb,var(--accent) 14%,transparent); color:var(--accent); font-size:11.5px; font-weight:700; }
-.pf-guide-findings button[data-active] .pf-guide-index { background:#f5a400; color:#fff; }
 .pf-guide-body { display:grid; gap:5px; min-width:0; }
 .pf-guide-body b { font-size:12.8px; line-height:1.55; font-weight:600; }
 .pf-guide-body q { font-family:"Times New Roman",Times,serif; font-size:12px; line-height:1.5; color:var(--muted); font-style:italic; quotes:"“" "”"; padding-left:8px; border-left:2px solid color-mix(in srgb,#f5a400 55%,transparent); }
@@ -576,7 +569,6 @@ html[data-pf-theme="dark"] .pf-guide-marks span { mix-blend-mode:normal; backgro
 .pf-guide-footer { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:12px 4px 4px; }
 .pf-guide-footer small { width:100%; font-size:10px; color:var(--muted); }
 .pf-guide-intro p { font-size:12.5px; line-height:1.65; }
-.pf-guide-note { font-size:11px !important; color:var(--muted); }
 
 /* ── Motion system (V4) ─────────────────────────────────────────────────────────────────────────
    One vocabulary everywhere: surfaces settle with --ease-out, pressed things spring with --ease-spring,
@@ -624,12 +616,12 @@ html[data-pf-theme="dark"] .pf-guide-marks span { mix-blend-mode:normal; backgro
 .paperflow progress::-webkit-progress-value { transition:width .6s var(--ease-out); }
 
 /* Page tiles, guide cards, recommendation cards and journal covers share the press spring. */
-.pf-page-tile,.pf-guide-findings button,.pf-rec,.pf-journal-cover { transition:transform var(--dur-med) var(--ease-spring),box-shadow var(--dur-med) var(--ease-out),background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out); }
-.pf-page-tile:active,.pf-guide-findings button:active { transform:scale(.97); transition-duration:.07s; }
+.pf-page-tile,.pf-rec,.pf-journal-cover { transition:transform var(--dur-med) var(--ease-spring),box-shadow var(--dur-med) var(--ease-out),background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out); }
+.pf-page-tile:active:active { transform:scale(.97); transition-duration:.07s; }
 
 @media (prefers-reduced-motion: reduce) {
   .pf-inspector,.pf-page-rail,.pf-notification { animation:none; }
-  .pf-continue-card,.pf-paper-list .pf-book-card,.pf-paper-link .pf-book-cover,.pf-page-tile,.pf-guide-findings button,.pf-rec,.pf-journal-cover { transition:none; }
+  .pf-continue-card,.pf-paper-list .pf-book-card,.pf-paper-link .pf-book-cover,.pf-page-tile,.pf-rec,.pf-journal-cover { transition:none; }
 }
 
 /* Email sign-in under the Google button. */
@@ -1054,7 +1046,7 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { pointer-events:none!important; opacity:0; transition:opacity .12s ease; }
 
 /* AI guide v4: scientific workspace. One sans family, keyword-first notes, colour = type. */
-.pf-guide, .pf-guide-notes { --guide-font:Pretendard,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-family:var(--guide-font); }
+.pf-guide, .pf-guide-notes { --guide-font:"Malgun Gothic","Apple SD Gothic Neo",Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-family:var(--guide-font); }
 .pf-guide { gap:10px; padding:4px 14px 12px; font-size:13px; font-weight:400; line-height:1.55; }
 .pf-guide b { font-weight:700; }
 .pf-guide-label { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
@@ -1074,12 +1066,6 @@ html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { 
 .pf-guide-level > summary::after { content:"+"; margin-left:auto; color:var(--muted); font-weight:400; }
 .pf-guide-level[open] > summary::after { content:"−"; }
 .pf-guide-level-no { min-width:24px; padding:1px 5px; border-radius:5px; background:color-mix(in srgb,var(--foreground) 7%,transparent); font-size:10px; font-weight:700; color:var(--muted); text-align:center; }
-.pf-guide-flowchart { display:grid; gap:0; margin:0; padding:0; list-style:none; counter-reset:step; }
-.pf-guide-flowchart li { position:relative; display:grid; gap:1px; padding:6px 10px 6px 34px; counter-increment:step; }
-.pf-guide-flowchart li::before { content:counter(step); position:absolute; left:4px; top:7px; display:grid; place-items:center; width:20px; height:20px; border-radius:50%; background:var(--accent); color:var(--accent-ink); font-size:10.5px; font-weight:700; }
-.pf-guide-flowchart li:not(:last-child)::after { content:""; position:absolute; left:13.5px; top:28px; bottom:-6px; width:1px; background:color-mix(in srgb,var(--accent) 45%,transparent); }
-.pf-guide-flowchart b { font-size:13px; }
-.pf-guide-flowchart span { font-size:12px; color:var(--muted); }
 .pf-guide-facts { display:grid; gap:0; margin:0; }
 .pf-guide-facts div { display:grid; grid-template-columns:84px 1fr; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); }
 .pf-guide-facts dt { font-size:12px; font-weight:700; color:var(--muted); }
@@ -1127,18 +1113,3 @@ html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { 
 .pf-guide-marklist button[data-active] { background:rgba(245,164,0,.14); }
 .pf-guide-terms dt, .pf-guide-terms dd { font-family:inherit; }
 
-/* On the paper: margin column and keyword notes (no handwriting). */
-.pf-guide-column { position:absolute; top:6px; display:grid; gap:8px; pointer-events:auto; font-size:13px; line-height:1.5; }
-.pf-guide-column h4 { display:flex; align-items:center; gap:6px; margin:0 0 4px; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
-.pf-guide-flow { padding:10px 11px; border-radius:10px; background:var(--accent-soft); border:1px solid color-mix(in srgb,var(--accent) 22%,transparent); }
-.pf-guide-flow h4 { color:var(--accent); }
-.pf-guide-flow p { margin:0; font-size:13px; font-weight:700; word-break:keep-all; }
-.pf-guide-flow-take { margin-top:6px!important; padding-top:6px; border-top:1px solid color-mix(in srgb,var(--accent) 20%,transparent); font-weight:400!important; }
-.pf-guide-page { padding:10px 11px; border:1px solid var(--line); border-top:2px solid var(--accent); border-radius:8px; background:var(--surface-strong); box-shadow:0 2px 10px rgba(20,40,30,.05); }
-.pf-guide-page h4 span { padding:1px 6px; border-radius:5px; background:var(--accent); color:var(--accent-ink); font-size:10px; letter-spacing:0; }
-.pf-guide-page-summary { margin:0!important; font-size:14px; font-weight:700; line-height:1.45; word-break:keep-all; }
-.pf-guide-margin { position:absolute; margin:0; padding:1px 0 1px 8px; border-left:2px solid; font-size:12.5px; font-weight:700; line-height:1.4; word-break:keep-all; pointer-events:auto; color:var(--foreground); }
-.pf-guide-margin[data-side="left"] { padding:1px 8px 1px 0; border-left:0; border-right:2px solid; text-align:right; }
-.pf-guide-margin small { display:block; margin-bottom:1px; font-size:10px; font-weight:700; letter-spacing:.07em; }
-.pf-guide-pin-note { position:absolute; top:26px; width:max-content; max-width:200px; padding:6px 9px; border-radius:8px; background:var(--surface-strong); box-shadow:var(--shadow-float); font-size:12.5px; font-weight:700; line-height:1.4; text-align:left; white-space:normal; }
-html[data-pf-theme="dark"] .pf-guide-margin small { filter:brightness(1.4); }

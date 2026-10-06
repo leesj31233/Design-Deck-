@@ -14,7 +14,7 @@ import { TextMemoLayer } from "./text-memo-layer";
 import { TranslationOverlay, type OverlayState } from "./translation-overlay";
 import { GuideMarks } from "./guide-marks";
 import { ManualTargets } from "./manual-targets";
-import { GuideNotes } from "./guide-notes";
+import { GuideHighlights, GuideNotes, useGuideMarkRects } from "./guide-notes";
 import { linkInk } from "@/lib/paperflow/typeset/ink";
 import { usePaperflow } from "../shell/paperflow-context";
 
@@ -39,6 +39,7 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
   const [resolved, setResolved] = useState<ResolvedAnnotation[]>([]);
   const [linkColors, setLinkColors] = useState<{ reference?: string; citation?: string }>({});
   const { notify } = usePaperflow();
+  const guideRects = useGuideMarkRects(documentId, pageIndex, textReady, layer, surface, scale);
   const pageAnnotations = useMemo(() => annotations.filter(annotation => annotation.pageIndex === pageIndex), [annotations, pageIndex]);
   // A translated page keeps its paper hidden until the Korean layer is painted: no English flash on revisit.
   const expectsTranslation = useTranslationStore(state => state.showTranslations && Boolean(state.manifest?.units.some(unit => unit.pages.includes(pageIndex) && state.texts.has(unit.id) && !state.hidden.has(unit.id))));
@@ -132,11 +133,12 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
     <canvas ref={canvas} aria-label={`원본 PDF ${pageIndex + 1}페이지`} style={{ width: "100%", height: "100%", visibility: hideSource ? "hidden" : "visible" }}/>
     <div ref={layer} className="textLayer" aria-label={`선택 가능한 원문 ${pageIndex + 1}페이지`} onClick={openUnit}/>
     {textReady && <HighlightLayer annotations={resolved} selected={selected}/>}
+    <GuideHighlights documentId={documentId} pageIndex={pageIndex} rects={guideRects}/>
     {ready && <TranslationOverlay documentId={documentId} pageIndex={pageIndex} scale={scale} canvas={canvas.current} canvasVersion={canvasVersion} referenceColor={linkColors.reference} citationColor={linkColors.citation} onState={setOverlay} onOriginal={onOriginal} onRetry={onRetry}/>}
     {ready && onUnits && <ManualTargets pageIndex={pageIndex} surface={surface} onTranslate={onUnits}/>}
     {textReady && translationMarks.length > 0 && <div className="pf-translated-marks"><HighlightLayer annotations={translationMarks} selected={selected}/></div>}
-    <GuideMarks pageIndex={pageIndex}/>
+    <GuideMarks pageIndex={pageIndex} textReady={textReady} layer={layer} surface={surface}/>
     <InkLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations}/>
     <TextMemoLayer documentId={documentId} pageIndex={pageIndex} annotations={annotations} pageWidth={page.width * scale}/>
-  </div><GuideNotes documentId={documentId} pageIndex={pageIndex} width={page.width * scale} height={page.height * scale} room={noteRoom}/>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
+  </div><GuideNotes documentId={documentId} pageIndex={pageIndex} width={page.width * scale} height={page.height * scale} room={noteRoom} scale={scale} marks={guideRects}/>{error && <p className="pf-error" role="alert">{error}</p>}{textReady && !layer.current?.textContent?.trim() && <p className="pf-page-notice">이미지 기반 페이지입니다. 텍스트 선택에는 OCR이 필요합니다.</p>}</div>;
 });

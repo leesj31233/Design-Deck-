@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { guideSchema, guideUnits, limitMarks, noteStyle, validateGuide, type GuideMark } from "@/lib/paperflow/guide/guide";
 import { isReasoningModel } from "@/lib/paperflow/guide/cost";
-import { quoteLines } from "@/components/paperflow/reader/guide-marks";
 import type { TranslationManifest } from "@/lib/paperflow/translation/manifest";
 
 const unit = (id: string, role: string, page: number, text: string) => ({ id, role, blockIds: [], pages: [page], text, pageChars: {} });
@@ -101,13 +100,23 @@ describe("AI paper guide v4", () => {
     expect(isReasoningModel("gpt-4.1")).toBe(false);
   });
 
-  it("marks only the lines that hold the quoted sentence", () => {
-    const lines = [0, 1, 2, 3].map(index => ({ x: .1, y: .1 + index * .02, width: index === 3 ? .3 : .4, height: .015 }));
-    // Justified prose: full lines carry about the same text; the short last line is narrower.
-    const text = "Boilers burn coal fast. Ash forms on the walls. NOx fell by 40 percent. Air staging helps.";
-    expect(quoteLines(text, lines, "NOx fell by 40 percent")).toEqual([lines[2]]);
-    expect(quoteLines(text, lines, "Ash forms on the walls. NOx fell")).toEqual([lines[1], lines[2]]);
-    expect(quoteLines(text, lines, "not in this block at all")).toBeNull();
-    expect(quoteLines(text, lines, undefined)).toBeNull();
+});
+
+describe("guide highlights on the printed text", () => {
+  it("finds the quote despite line-break hyphens, ligatures, case and spacing", async () => {
+    const { locateQuote } = await import("@/lib/paperflow/guide/locate");
+    const text = "Results. Biochar at 2% raised the ger- mination index of lettuce in the Vertisol by 175% relative to the control. The ﬁnal yield was stable.";
+    const hit = locateQuote(text, "raised the germination index of lettuce in the Vertisol by 175%")!;
+    expect(text.slice(hit.start, hit.start + hit.length)).toBe("raised the ger- mination index of lettuce in the Vertisol by 175%");
+    const lig = locateQuote(text, "The final yield was stable")!;
+    expect(text.slice(lig.start, lig.start + lig.length)).toBe("The ﬁnal yield was stable");
+  });
+  it("bridges an inline citation marker but never a far-away match", async () => {
+    const { locateQuote } = await import("@/lib/paperflow/guide/locate");
+    const text = "Earlier work [12, 14] showed that NOx emissions fell sharply when methane was cofired at a forty percent share in the boiler.";
+    const hit = locateQuote(text, "Earlier work showed that NOx emissions fell sharply when methane was cofired at a forty percent share")!;
+    expect(text.slice(hit.start, hit.start + hit.length)).toBe("Earlier work [12, 14] showed that NOx emissions fell sharply when methane was cofired at a forty percent share");
+    expect(locateQuote(text, "a sentence that is simply not printed on this page")).toBeNull();
+    expect(locateQuote(text, "short")).toBeNull();
   });
 });
