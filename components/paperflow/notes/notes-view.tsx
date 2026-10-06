@@ -1,5 +1,6 @@
 "use client";
 import "./notes.css";
+import { confirmAction } from "@/lib/paperflow/confirm";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -71,7 +72,7 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
   };
   useEffect(() => () => { if (saving.current) clearTimeout(saving.current); }, []);
   const create = async () => { const now = new Date().toISOString(), note: QuickNote = { id: crypto.randomUUID(), title: "", body: "", pinned: false, createdAt: now, updatedAt: now }; await store(note); setActiveId(note.id); setDraft(note); setTimeout(() => area.current?.focus(), 30); };
-  const remove = async (note: QuickNote) => { if (!window.confirm(`"${noteTitle(note)}" 노트를 삭제합니다.`)) return; await noteRepository.remove(note.id); client.setQueryData<QuickNote[]>(["notebook"], current => (current ?? []).filter(item => item.id !== note.id)); if (activeId === note.id) setActiveId(null); };
+  const remove = async (note: QuickNote) => { if (!await confirmAction({ title: `"${noteTitle(note)}" 노트를 삭제할까요?`, body: "이 기기에 저장된 노트가 지워지며 되돌릴 수 없습니다.", confirm: "삭제", tone: "danger" })) return; await noteRepository.remove(note.id); client.setQueryData<QuickNote[]>(["notebook"], current => (current ?? []).filter(item => item.id !== note.id)); if (activeId === note.id) setActiveId(null); };
   const choose = (candidate: MentionCandidate) => { if (!draft || !mention) return; area.current?.insert(candidate.token); setMention(null); };
 
   return <section className="pf-notes-book" aria-label="노트">

@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { NotificationStack } from "./notification-stack";
+import { ConfirmHost } from "./confirm-host";
 import { notifyText, useNotices } from "@/lib/paperflow/notifications";
 import { useRouter, usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -77,5 +78,6 @@ function AppControls({ children, client }: { children: React.ReactNode; client: 
     {children}
     <CommandMenu open={open} onOpenChange={changeOpen} items={items} placeholder="명령 검색…" />
     <NotificationStack/>
+    <ConfirmHost/>
   </div></PaperflowContext.Provider>;
 }

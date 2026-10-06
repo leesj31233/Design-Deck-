@@ -34,3 +34,10 @@
 @keyframes pf-notice-spin { to { transform:rotate(360deg); } }
 @media (max-width:640px) { .pf-notice-stack { top:12px; right:12px; } }
 @media (prefers-reduced-motion: reduce) { .pf-notice-timer, .pf-notice[data-tone="progress"] .pf-notice-icon svg { animation:none; } }
+
+/* The app's confirmation dialog. */
+.pf-confirm { width:min(92vw,420px); padding:22px 22px 18px; }
+.pf-confirm-icon { display:grid; place-items:center; width:38px; height:38px; margin-bottom:12px; border-radius:12px; background:color-mix(in srgb,var(--accent) 12%,transparent); color:var(--accent); }
+.pf-confirm[data-tone="danger"] .pf-confirm-icon { background:color-mix(in srgb,var(--danger) 12%,transparent); color:var(--danger); }
+.pf-confirm h2 { font-size:17px; letter-spacing:-.03em; }
+.pf-confirm-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }

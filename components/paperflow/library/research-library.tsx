@@ -1,5 +1,6 @@
 "use client";
 import "./research-library.css";
+import { confirmAction } from "@/lib/paperflow/confirm";
 import { CollectionInsights } from "./collection-insights";
 import { NotesView } from "../notes/notes-view";
 import dynamic from "next/dynamic";
@@ -73,14 +74,14 @@ export function ResearchLibrary() {
   const editFolder = async (folder: ArchiveFolder) => { const stamped = { ...folder, updatedAt: new Date().toISOString() }; saveFolder(stamped); try { for (const doc of archivedDocs.filter(item => item.archiveFolder?.id === folder.id)) await documentRepository.updateDocument(doc.id, { archiveFolder: stamped }); await refresh(); } catch (error) { notify(readableError(error)); } };
   const deleteFolder = async (folder: ArchiveFolder) => {
     const count = folderCounts.get(folder.id) ?? 0;
-    if (!window.confirm(count ? `"${folder.name}" 폴더를 지웁니다. 안의 논문 ${count}편은 미분류로 옮겨집니다.` : `"${folder.name}" 폴더를 지웁니다.`)) return;
+    if (!await confirmAction({ title: `"${folder.name}" 폴더를 지울까요?`, body: count ? `안의 논문 ${count}편은 지워지지 않고 미분류로 옮겨집니다.` : "빈 폴더입니다.", confirm: "폴더 지우기", tone: "danger" })) return;
     try { for (const doc of archivedDocs.filter(item => item.archiveFolder?.id === folder.id)) await documentRepository.updateDocument(doc.id, { archiveFolder: null }); forgetFolder(folder.id); if (folderView === folder.id) setFolderView("all"); await refresh(); notify("폴더를 지웠습니다"); } catch (error) { notify(readableError(error)); }
   };
   const trash = async (doc: StoredDocument) => { try { await moveToTrash(doc.id); await refresh(); notify(`휴지통으로 옮겼습니다. ${TRASH_DAYS}일 뒤 영구 삭제되며, 그 전에는 휴지통에서 복원할 수 있습니다.`); } catch (error) { notify(readableError(error)); } };
   const restore = async (doc: StoredDocument) => { try { await restoreFromTrash(doc.id); await refresh(); notify("서재로 복원했습니다."); } catch (error) { notify(readableError(error)); } };
   const purge = async (items: StoredDocument[]) => {
     const question = items.length === 1 ? `"${items[0].title}" 을(를) 영구 삭제합니다. PDF, 마킹, 메모, 번역이 모든 기기와 계정에서 지워지며 되돌릴 수 없습니다.` : `휴지통의 논문 ${items.length}편을 영구 삭제합니다. 되돌릴 수 없습니다.`;
-    if (!items.length || !window.confirm(question)) return;
+    if (!items.length || !await confirmAction({ title: items.length === 1 ? "영구 삭제할까요?" : `${items.length}편을 영구 삭제할까요?`, body: question, confirm: "영구 삭제", tone: "danger" })) return;
     try { for (const doc of items) await purgeDocument(doc); await Promise.all([refresh(), client.invalidateQueries({ queryKey: ["annotations"] })]); notify(items.length === 1 ? "영구 삭제했습니다." : `${items.length}편을 영구 삭제했습니다.`); } catch (error) { notify(readableError(error)); }
   };
   // Papers past their 30 days in the trash are purged when the library opens.

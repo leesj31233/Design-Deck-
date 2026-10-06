@@ -25,6 +25,7 @@ test("delete to the trash, restore, and delete for good", async ({ page }) => {
   await page.getByRole("button", { name: "휴지통으로 이동" }).click();
   await page.locator(".pf-sidebar nav button", { hasText: "휴지통" }).click();
   await item.getByRole("button", { name: "영구 삭제" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "영구 삭제" }).click();
   await expect(page.getByText("휴지통이 비어 있습니다")).toBeVisible();
   // Gone for good: not back after a reload.
   await page.reload();
