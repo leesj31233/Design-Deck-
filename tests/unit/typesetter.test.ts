@@ -68,6 +68,19 @@ describe("page typesetter", () => {
       for (const line of own.slice(1)) expect(line.x).toBeCloseTo(56, 0);
     }
   });
+  it("starts each list item on its own source line when the Korean above is shorter", async () => {
+    const listItem = (n: number, top: number) => [item(`(${n}) Item ${n} explains how the furnace stoichiometric ratio changes the NO profile`, 40, top, 240), item("in the burner zone and the upper furnace with methane injection and the", 56, top + 11, 224), item("overfire air ports at the design load of the boiler.", 56, top + 22, 160)];
+    const manifest = await manifestOf([[...listItem(1, 100), ...listItem(2, 135), ...listItem(3, 170)]]);
+    // Item 1 takes one Korean line instead of three: items 2 and 3 must not move up into its space.
+    const translations = new Map(manifest.units.map((unit, index) => [unit.id, `(${index + 1}) ${korean(index === 0 ? 2 : 7)}`]));
+    const layout = typesetPage({ manifest, pageIndex: 0, measure, translations });
+    manifest.units.forEach(unit => {
+      const source = manifest.blocks.find(block => block.id === unit.blockIds[0])!;
+      const first = layout.lines.find(line => line.unitId === unit.id)!;
+      expect(first.y).toBeGreaterThanOrEqual(source.lines[0].y * H - 1);
+    });
+  });
+
   it("sets one body size per page, keeps indents, fits the original columns and masks only translated text", async () => {
     const page = [item("1. Introduction", 40, 90, 80), ...lines(40, 105, 10, "left"), item("Q = h A (T_w − T_g) (3)", 110, 225, 120), ...lines(320, 100, 12, "right")];
     const manifest = await manifestOf([page]);

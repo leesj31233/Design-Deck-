@@ -23,11 +23,14 @@ export interface PageLayout {
 
 interface Paragraph {
   unitId: string; text: string; indent: number; startsUnit: boolean; endsUnit: boolean; gapBefore: number; runInEnd?: string;
+  /** A list item's first source line (pt): the item never starts above where the original did (prose flows on). */
+  top?: number;
   /** A list item set with a hanging indent ("(1) …" out, the rest in): its own first-line and body x in pt. */
   hang?: { first: number; body: number };
 }
 const LIST_MARKER = /^\s*(?:\(?\d{1,2}[).]|\(?[a-z][).]|\(?[ivx]{1,4}\)|[•●▪◦–-])\s/i;
-interface Flow { kind: FlowKind; blocks: ManifestBlock[]; paragraphs: Paragraph[]; areas: Rect[]; obstacles: Rect[]; size: number; pitch: number; bold: boolean; sans?: boolean; /** White space below each area the ink probe cleared. */ extra: number[]; /** May use that white space (only when the source area alone cannot hold the text). */ extended: boolean }
+interface Flow { kind: FlowKind; blocks: ManifestBlock[]; paragraphs: Paragraph[]; areas: Rect[]; obstacles: Rect[]; size: number; pitch: number; bold: boolean; sans?: boolean; /** White space below each area the ink probe cleared. */ extra: number[]; /** May use that white space (only when the source area alone cannot hold the text). */ extended: boolean;
+  /** Paragraphs start no higher than their source (off only when that would force a smaller type size). */ anchored?: boolean }
 
 // Korean is set at most at the source size (so pages look alike) and down to 80%; spare room becomes leading.
 // Hangul reads larger than Latin at the same point size; .97 keeps the original's breathing room.
@@ -176,7 +179,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       const gap = first.y * page.height - previousBottom;
       const firstX = first.lines[0].x * page.width, bodyX = first.lines.length > 1 ? Math.min(...first.lines.slice(1).map(line => line.x)) * page.width : firstX;
       const hang = startsUnit && LIST_MARKER.test(first.text) && bodyX - firstX > flow.size * .6 && bodyX - firstX < flow.size * 4 ? { first: firstX, body: bodyX } : undefined;
-      flow.paragraphs.push({ unitId, text: flow.kind === "cell" ? tableEnding(unitTextForPage(unit, translations.get(unitId)!, pageIndex)) : unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0, hang });
+      flow.paragraphs.push({ unitId, text: flow.kind === "cell" ? tableEnding(unitTextForPage(unit, translations.get(unitId)!, pageIndex)) : unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0, hang, top: startsUnit && LIST_MARKER.test(first.text) ? first.lines[0].y * page.height : undefined });
       previousBottom = Math.max(...unitBlocks.map(block => (block.y + block.height) * page.height));
     }
     const regions = flow.blocks.flatMap(block => blockRegions(block, page));
@@ -235,7 +238,12 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       return null;
     };
     flow.paragraphs.forEach((paragraph, index) => {
-      if (index && paragraph.startsUnit) y += paragraph.gapBefore * scale;
+      // When the Korean above came out shorter, a list item still starts on its own first line instead of
+      // creeping up into the space the item above left free (beside a figure, say). Prose simply flows on.
+      const home = index && paragraph.startsUnit && flow.anchored !== false && paragraph.top !== undefined && y < paragraph.top - pitch * .3
+        ? flow.areas.findIndex((rect, at) => at >= area && paragraph.top! >= rect.y - 1 && paragraph.top! <= rect.y + rect.height) : -1;
+      if (home >= 0) { area = home; y = paragraph.top!; }
+      else if (index && paragraph.startsUnit) y += paragraph.gapBefore * scale;
       const feeder = new LineFeeder(tokenize(paragraph.text, faceMeasure, flow.kind === "caption"), faceMeasure);
       let first = true;
       while (!feeder.done) {
@@ -309,7 +317,18 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
   // A flow that cannot fit even at 80% (usually a cramped fragment) gets its own smaller size
   // instead of shrinking every other paragraph on the page.
   // Fit inside the original text area first; only a flow that cannot fit there may use the white space below.
-  const fits = bodyFlows.map(flow => { flow.extended = false; const tight = fit(flow, .86, SIZE_RANGE.body[1]); if (tight !== null) return tight; flow.extended = true; return fit(flow, ...SIZE_RANGE.body); });
+  const fitBody = (flow: Flow) => { flow.extended = false; const tight = fit(flow, .86, SIZE_RANGE.body[1]); if (tight !== null) return tight; flow.extended = true; return fit(flow, ...SIZE_RANGE.body); };
+  // Anchored paragraphs look like the original; if anchoring costs type size, the flow runs on instead.
+  const fits = bodyFlows.map(flow => {
+    flow.anchored = true;
+    const anchored = fitBody(flow), extended = flow.extended;
+    if (anchored === SIZE_RANGE.body[1]) return anchored;
+    flow.anchored = false;
+    const loose = fitBody(flow);
+    if (loose !== null && (anchored === null || loose > anchored + .005)) return loose;
+    flow.anchored = true; flow.extended = extended;
+    return anchored;
+  });
   const normal = fits.filter((value): value is number => value !== null);
   const bodyScale = normal.length ? Math.floor(Math.min(...normal) * 50) / 50 : SIZE_RANGE.body[0];
   bodyFlows.forEach((flow, index) => {
