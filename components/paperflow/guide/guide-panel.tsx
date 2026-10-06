@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, FileText, Highlighter, Layers, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { Check, Download, FileText, Highlighter, Layers, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { loadGuide } from "@/lib/paperflow/guide/client";
 import { useGuideReading } from "@/lib/paperflow/guide/locate";
+import { guideMarkdown } from "@/lib/paperflow/guide/guide-export";
+import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
 import { MARK_KINDS, type MarkKind } from "@/lib/paperflow/guide/guide";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import { focusSource } from "./guide-brief";
@@ -12,6 +14,17 @@ import { KIND_LABEL } from "./guide-page";
 import "./guide.css";
 
 const KIND_KO: Record<MarkKind, string> = { result: "결과", condition: "조건", method: "방법", mechanism: "원인", limitation: "한계" };
+
+/** The guide as a Markdown file: the brief, then each page's guide with its highlights. */
+async function exportGuide(documentId: string, guide: Parameters<typeof guideMarkdown>[0]) {
+  const doc = await documentRepository.getDocument(documentId);
+  const title = doc?.title.replace(/\.pdf$/i, "") ?? "논문";
+  const text = guideMarkdown(guide, { title, authors: doc?.authors, year: doc?.year, journal: doc?.journal });
+  const url = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
+  const link = Object.assign(document.createElement("a"), { href: url, download: `${title.replace(/[\\/:*?"<>|]+/g, " ").slice(0, 80).trim()} - AI 가이드.md` });
+  document.body.append(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 /**
  * AI 가이드 tab: make the guide (with its cost), follow its progress, choose which layers sit on the
@@ -69,6 +82,7 @@ export function GuidePanel() {
     </section>
     <footer className="pf-gpanel-foot">
       <Button size="sm" variant="ghost" onClick={onMake} disabled={making}><RefreshCw size={13}/>다시 만들기</Button>
+      <Button size="sm" variant="ghost" title="브리프와 페이지별 가이드를 Markdown 파일로 저장합니다" onClick={() => void exportGuide(documentId!, data)}><Download size={13}/>Markdown 내보내기</Button>
       <small>{new Date(data.createdAt).toLocaleDateString("ko-KR")} 생성 · 수치와 인용은 원문과 대조 확인됨</small>
     </footer>
   </div>;
