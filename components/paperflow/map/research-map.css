@@ -68,3 +68,10 @@
 .pf-author-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
 .pf-author-links a { font-size:11px; font-weight:600; color:var(--muted); text-decoration:none; }
 .pf-author-links a:hover { color:var(--accent); }
+/* Universe theme: the inspector's buttons read on the dark glass. */
+.pf-wm-stage[data-theme="universe"] .pf-map-inspector button { color:#dfe5ff; }
+.pf-wm-stage[data-theme="universe"] .pf-map-inspector button:hover { background:rgba(160,180,255,.12); }
+.pf-wm-stage[data-theme="universe"] .pf-map-inspector .pf-kicker, .pf-wm-stage[data-theme="universe"] .pf-map-inspector small, .pf-wm-stage[data-theme="universe"] .pf-map-weight { color:rgba(220,228,255,.7); }
+/* The hint steps aside while the inspector is open. */
+.pf-wm-hint { transition:opacity .2s ease; }
+.pf-wm-stage:has(.pf-map-inspector[data-open]) .pf-wm-hint { opacity:0; }
