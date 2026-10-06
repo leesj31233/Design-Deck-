@@ -137,3 +137,20 @@ describe("highlight quotes and degree signs", () => {
     expect(locateQuote(page, "dried in a vacuum oven at 105 °C to obtain")?.start).toBe(page.indexOf("dried"));
   });
 });
+
+describe("quote matching on real page text", () => {
+  it("matches math-italic letters, line-end hyphens and a quote broken at its start", async () => {
+    const { locateQuote, koreanFor } = await import("@/lib/paperflow/guide/locate");
+    const physics = "The two-frequency field therefore generates the complete 𝑠-𝑝-𝑑-𝑓-𝑔 hierarchy from the parent 𝑔-wave magnetic spin-splitting.";
+    expect(locateQuote(physics, "The two-frequency field therefore generates the complete s-p-d-f-g hierarchy from the parent g-wave magnetic spin-splitting.")?.start).toBe(0);
+    const broken = "A web app capable of delivering automated per- sonalised food-based nutrition advice (eNutri) was developed.";
+    const hit = locateQuote(broken, "A web app capable of delivering automated personalised food-based nutrition advice (eNutri) was developed.");
+    expect(hit?.start).toBe(0);
+    expect(hit!.length).toBe(broken.length);
+    // The quote's first words are interrupted (an inline label): its last eight words still place it.
+    const page = "Results. [Fig 4] In total 43 distinct targets were selected, which included nutrients, food items and eating occasions.";
+    expect(locateQuote(page, "Overall, in total 43 distinct targets were selected, which included nutrients, food items and eating occasions.")).not.toBeNull();
+    // Korean: the sentence that holds the quote, even across a line-end hyphen in the English.
+    expect(koreanFor("First sentence here. The CGE was 73.68, 58.03 and 62.73 % respec- tively for CS-1 to CS-3. Last one.", "첫 문장임. CGE는 각각 73.68, 58.03, 62.73 %였음. 마지막 문장임.", "The CGE was 73.68, 58.03 and 62.73 % respectively")).toBe("CGE는 각각 73.68, 58.03, 62.73 %였음.");
+  });
+});

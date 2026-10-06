@@ -6,25 +6,45 @@ import type { MarkKind } from "./guide";
  * paragraph it is the Korean sentence that translates the quoted English sentence (sentence by
  * sentence when the counts agree, by position otherwise), so the mark always covers real glyphs.
  */
-const fold = (text: string) => text.toLowerCase().replace(/[‐-―]/g, "-").replace(/[“”]/g, "\"").replace(/[‘’]/g, "'").replace(/[◦∘˚º°]/g, "°");
+/** One character as matching sees it: NFKC (math italic 𝑠 → s, ligature ﬁ → fi), lower case, one dash, one quote, one degree sign. */
+const foldChar = (char: string) => char.normalize("NFKC").toLowerCase().replace(/[‐-―−]/g, "-").replace(/[“”″]/g, "\"").replace(/[‘’′]/g, "'").replace(/[◦∘˚º°]/g, "°");
+const fold = (text: string) => [...text].map(foldChar).join("");
+
+/** The text without spaces, each kept character pointing back to where it starts and ends in the original. */
+function compactOf(text: string, dropBreakHyphens: boolean) {
+  let compact = "";
+  const starts: number[] = [], ends: number[] = [];
+  const chars = [...text];
+  let at = 0;
+  chars.forEach((char, index) => {
+    const from = at; at += char.length;
+    if (/\s/.test(char)) return;
+    // "per- sonalised": a hyphen that ends a line joins the word, in the variant that drops it.
+    if (dropBreakHyphens && /[-‐‑]/.test(char) && /\s/.test(chars[index + 1] ?? "") && /\p{L}/u.test(chars[index - 1] ?? "")) return;
+    for (const piece of foldChar(char)) if (!/\s/.test(piece)) { compact += piece; starts.push(from); ends.push(at); }
+  });
+  return { compact, starts, ends };
+}
 
 /**
- * Start and length of the quote in normalised page text, or null. Spaces are ignored while matching
- * (the text layer splits "317 ◦C" or "CO 2" differently from the quote); the span is mapped back onto the
- * page text. Falls back to the quote's first eight words when the full quote is broken by a line-end hyphen.
+ * Start and length of the quote in the text, or null. Spaces are ignored while matching (the text layer
+ * splits "317 ◦C" or "CO 2" differently from the quote), characters are folded (math letters, dashes,
+ * quotes, degree signs), and a line-end hyphen may join a word. Falls back to the quote's first, then
+ * last, eight words when the whole quote is broken by something else (a column break, an inline figure).
  */
-export function locateQuote(pageText: string, quote: string): { start: number; length: number } | null {
-  const positions: number[] = [];
-  let compact = "";
-  const folded = fold(pageText);
-  for (let at = 0; at < folded.length; at++) if (!/\s/.test(folded[at])) { compact += folded[at]; positions.push(at); }
+export function locateQuote(text: string, quote: string): { start: number; length: number } | null {
+  const variants = [compactOf(text, false), compactOf(text, true)];
   const find = (needle: string) => {
     const squeezed = fold(needle).replace(/\s+/g, "");
-    const at = squeezed.length >= 12 ? compact.indexOf(squeezed) : -1;
-    return at < 0 ? null : { start: positions[at], length: positions[Math.min(positions.length - 1, at + squeezed.length - 1)] - positions[at] + 1 };
+    if (squeezed.length < 12) return null;
+    for (const { compact, starts, ends } of variants) {
+      const at = compact.indexOf(squeezed);
+      if (at >= 0) return { start: starts[at], length: ends[at + squeezed.length - 1] - starts[at] };
+    }
+    return null;
   };
   const words = quote.replace(/\s+/g, " ").trim().split(" ");
-  return find(words.join(" ")) ?? (words.length > 8 ? find(words.slice(0, 8).join(" ")) : null);
+  return find(words.join(" ")) ?? (words.length > 8 ? find(words.slice(0, 8).join(" ")) ?? find(words.slice(-8).join(" ")) : null);
 }
 
 const SENTENCE_EN = /(?<=[.!?])\s+(?=[A-Z0-9("[])/;
@@ -35,16 +55,15 @@ export const sentences = (text: string, korean = false) => text.split(korean ? S
 export function koreanFor(english: string, korean: string, quote: string): string | null {
   const en = sentences(english), ko = sentences(korean, true);
   if (!en.length || !ko.length) return null;
-  const flat = fold(english.replace(/\s+/g, " ")), needle = fold(quote.replace(/\s+/g, " ").trim()), at = flat.indexOf(needle);
-  if (at < 0) return null;
+  const found = locateQuote(english, quote);
+  if (!found) return null;
   // Sentence index of the quote's first and last character.
-  let offset = 0, first = -1, last = -1;
+  let cursor = 0, first = -1, last = -1;
   for (const [index, sentence] of en.entries()) {
-    const begin = flat.indexOf(fold(sentence).slice(0, 24), offset), end = begin + sentence.length;
-    if (begin < 0) continue;
-    if (first < 0 && at < end) first = index;
-    if (at + needle.length <= end + 1) { last = index; break; }
-    offset = end;
+    const begin = english.indexOf(sentence, cursor), end = begin < 0 ? cursor : begin + sentence.length;
+    if (begin >= 0) cursor = end;
+    if (first < 0 && found.start < end) first = index;
+    if (found.start + found.length <= end) { last = index; break; }
   }
   if (first < 0) return null;
   if (last < 0) last = en.length - 1;
