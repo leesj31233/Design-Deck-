@@ -81,7 +81,8 @@ const degrees = (text: string) => text.replace(/(\d)\s*[◦∘˚º]\s*C\b/g, "$1
 export function tidyGuide<T>(value: T): T {
   if (typeof value === "string") return degrees(value) as T;
   if (Array.isArray(value)) return value.map(tidyGuide) as T;
-  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, tidyGuide(item)])) as T;
+  // Quotes stay exactly as printed: they are matched against the page's own text.
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, key === "quote" ? item : tidyGuide(item)])) as T;
   return value;
 }
 /** Text cut to a length at a word boundary, with an ellipsis (never mid-word). */

@@ -125,3 +125,15 @@ describe("reading line", () => {
     expect(readingAnchor([{ page: 2, top: 2000, height: 1000, anchors: [anchor("d", .5)] }], 0, 1000)).toBeNull();
   });
 });
+
+describe("highlight quotes and degree signs", () => {
+  it("keeps quotes as printed when tidying, and finds a quote whatever degree glyph either side uses", async () => {
+    const { locateQuote } = await import("@/lib/paperflow/guide/locate");
+    const saved = { definition: "105 ◦C 건조", pages: [{ marks: [{ quote: "dried in a vacuum oven at 105◦C to obtain" }] }] };
+    const tidy = tidyGuide(saved);
+    expect(tidy.definition).toBe("105 °C 건조");
+    expect(tidy.pages[0].marks[0].quote).toBe("dried in a vacuum oven at 105◦C to obtain");
+    const page = "The filtered solid phase was dried in a vacuum oven at 105 ◦C to obtain water leaching sample.";
+    expect(locateQuote(page, "dried in a vacuum oven at 105 °C to obtain")?.start).toBe(page.indexOf("dried"));
+  });
+});

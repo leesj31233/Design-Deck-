@@ -6,7 +6,7 @@ import type { MarkKind } from "./guide";
  * paragraph it is the Korean sentence that translates the quoted English sentence (sentence by
  * sentence when the counts agree, by position otherwise), so the mark always covers real glyphs.
  */
-const fold = (text: string) => text.toLowerCase().replace(/[‐-―]/g, "-").replace(/[“”]/g, "\"").replace(/[‘’]/g, "'");
+const fold = (text: string) => text.toLowerCase().replace(/[‐-―]/g, "-").replace(/[“”]/g, "\"").replace(/[‘’]/g, "'").replace(/[◦∘˚º°]/g, "°");
 
 /**
  * Start and length of the quote in normalised page text, or null. Spaces are ignored while matching
