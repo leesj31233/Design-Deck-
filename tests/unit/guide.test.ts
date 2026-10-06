@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { briefSchema, guideUnits, pageChunks, pagesSchema, readsAsSentence, reportStyle, tidyGuide, validateBrief, validatePages } from "@/lib/paperflow/guide/guide";
+import { briefSchema, guideUnits, pageChunks, pagesSchema, readsAsSentence, reportStyle, tidyGuide, validateBrief, validateBrief as briefOf, validatePages } from "@/lib/paperflow/guide/guide";
 import type { TranslationManifest } from "@/lib/paperflow/translation/manifest";
 
 const unit = (id: string, role: string, page: number, text: string) => ({ id, role, blockIds: [], pages: [page], text, pageChars: {} });
@@ -100,5 +100,17 @@ describe("page highlights are sentences", () => {
     expect(readsAsSentence("we set tJ = 0 to isolate the band asymmetry in the model")).toBe(true);
     expect(readsAsSentence("Meff(d)(k) ≃ M(0) + Ms(2)k2 + Mp,xkx + Mp,yky")).toBe(false);
     expect(readsAsSentence("ξ′(k) = 4t0 − μ − 2t0(cos kx + cos ky)")).toBe(false);
+  });
+});
+
+describe("guide text length", () => {
+  it("cuts a long line at a word boundary with an ellipsis", () => {
+    const long = "Even-ratio bichromatic drive와 lattice higher-gradient 항을 동시에 고려하면, continuum이 주는 q−2차까지에 더해 q−1과 q까지 포함하는 완전한 hierarchy가 나타남을 확인함. 이 결과는 다른 계에도 적용 가능하며 실험적 검증이 필요함을 시사함.";
+    const brief = briefOf({ definition: "정의임.", conclusion_parts: { finding: long } }, new Map());
+    const finding = brief!.conclusionParts.finding;
+    expect(finding.length).toBeLessThanOrEqual(160);
+    expect(finding.endsWith("…")).toBe(true);
+    expect(long.startsWith(finding.slice(0, -1))).toBe(true);
+    expect(long[finding.length - 1]).toMatch(/[\s,·;:]/);
   });
 });

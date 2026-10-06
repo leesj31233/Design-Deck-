@@ -84,7 +84,13 @@ export function tidyGuide<T>(value: T): T {
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, tidyGuide(item)])) as T;
   return value;
 }
-const clip = (value: unknown, max: number) => typeof value === "string" ? degrees(value.replace(/\s+/g, " ").trim()).slice(0, max) : "";
+/** Text cut to a length at a word boundary, with an ellipsis (never mid-word). */
+const cut = (text: string, max: number) => {
+  if (text.length <= max) return text;
+  const room = text.slice(0, max - 1), space = room.lastIndexOf(" ");
+  return `${(space > max * .6 ? room.slice(0, space) : room).replace(/[\s,·;:]+$/, "")}…`;
+};
+const clip = (value: unknown, max: number) => typeof value === "string" ? cut(degrees(value.replace(/\s+/g, " ").trim()), max) : "";
 const strings = (value: unknown, limit: number, max: number) => Array.isArray(value) ? value.map(item => clip(item, max)).filter(Boolean).slice(0, limit) : [];
 /** Korean report style: a polite ending slipped in by the model is turned into the noun ending. */
 export function reportStyle(text: string) {
@@ -117,8 +123,8 @@ export function validateBrief(raw: any, byWire: Wire): Omit<PaperGuide, "version
     limitations: (Array.isArray(raw.limitations) ? raw.limitations : []).flatMap((item: any) => clip(item?.keyword, 30) && clip(item?.text, 110) ? [{ keyword: clip(item.keyword, 30), text: ko(item.text, 110) }] : []).slice(0, 5),
     figures: (Array.isArray(raw.figures) ? raw.figures : []).flatMap((item: any) => clip(item?.label, 24) && clip(item?.what, 120) ? [{ label: clip(item.label, 24), stars: Math.max(1, Math.min(5, Math.round(Number(item.stars) || 3))), what: ko(item.what, 120), look: strings(item.look, 3, 60), conclusion: ko(item.conclusion, 120), ref: refOf(item.unit, undefined, byWire) }] : []).sort((a: GuideFigure, b: GuideFigure) => b.stars - a.stars).slice(0, 6),
     terms: (Array.isArray(raw.terms) ? raw.terms : []).flatMap((item: any) => clip(item?.term, 50) && clip(item?.explanation, 140) ? [{ term: clip(item.term, 50), korean: clip(item.korean, 30), explanation: ko(item.explanation, 140), ref: refOf(item.unit, undefined, byWire) }] : []).slice(0, 10),
-    introParts: { problem: ko(raw.intro_parts?.problem, 110), gap: ko(raw.intro_parts?.gap, 110), why: ko(raw.intro_parts?.why, 110), objective: ko(raw.intro_parts?.objective, 110) },
-    conclusionParts: { finding: ko(raw.conclusion_parts?.finding, 110), meaning: ko(raw.conclusion_parts?.meaning, 110), limitation: ko(raw.conclusion_parts?.limitation, 110), next: ko(raw.conclusion_parts?.next, 110) }
+    introParts: { problem: ko(raw.intro_parts?.problem, 160), gap: ko(raw.intro_parts?.gap, 160), why: ko(raw.intro_parts?.why, 160), objective: ko(raw.intro_parts?.objective, 160) },
+    conclusionParts: { finding: ko(raw.conclusion_parts?.finding, 160), meaning: ko(raw.conclusion_parts?.meaning, 160), limitation: ko(raw.conclusion_parts?.limitation, 160), next: ko(raw.conclusion_parts?.next, 160) }
   };
 }
 
