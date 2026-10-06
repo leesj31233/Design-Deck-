@@ -193,3 +193,5 @@ html[data-pf-theme="dark"] :is(.pf-brief, .pf-gpage, .pf-gpanel) { --g-ink: #e6e
 .pf-gnote[data-active] { transform:translateX(-4px); border-color:color-mix(in srgb,var(--k) 40%,var(--g-line)); box-shadow:0 14px 32px -16px color-mix(in srgb,var(--k) 70%,transparent), 0 1px 3px rgba(0,0,0,.06); }
 .pf-gpage-leaders path { transition:opacity .3s ease, stroke-width .3s ease; }
 .pf-gpage-leaders path[data-active] { stroke-dasharray:none; stroke-width:1.6; opacity:1; }
+.pf-gpanel-marks button { transition:background-color .25s ease, box-shadow .25s ease; }
+.pf-gpanel-marks button[data-active] { background:color-mix(in srgb,var(--k) 9%,transparent); box-shadow:inset 3px 0 0 var(--k); }

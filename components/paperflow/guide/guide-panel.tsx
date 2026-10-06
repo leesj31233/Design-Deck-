@@ -1,9 +1,10 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, FileText, Highlighter, Layers, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { loadGuide } from "@/lib/paperflow/guide/client";
+import { useGuideReading } from "@/lib/paperflow/guide/locate";
 import { MARK_KINDS, type MarkKind } from "@/lib/paperflow/guide/guide";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import { focusSource } from "./guide-brief";
@@ -21,8 +22,13 @@ export function GuidePanel() {
   const documentId = useReaderStore(s => s.documentId), on = useReaderStore(s => s.guideOverlay), layers = useReaderStore(s => s.guideLayers), progress = useReaderStore(s => s.guideProgress);
   const guide = useQuery({ queryKey: ["guide", documentId], enabled: Boolean(documentId), queryFn: () => loadGuide(documentId!) });
   const data = guide.data;
-  const marks = useMemo(() => data?.pages.flatMap(page => page.marks.map((mark, index) => ({ ...mark, number: index + 1 }))) ?? [], [data]);
-  const counts = useMemo(() => Object.fromEntries(MARK_KINDS.map(kind => [kind, marks.filter(mark => mark.kind === kind).length])) as Record<MarkKind, number>, [marks]);
+  const all = useMemo(() => data?.pages.flatMap(page => page.marks) ?? [], [data]);
+  const counts = useMemo(() => Object.fromEntries(MARK_KINDS.map(kind => [kind, all.filter(mark => mark.kind === kind).length])) as Record<MarkKind, number>, [all]);
+  // Numbered per page after the kind filter, exactly as the badges on the paper; the key matches the reading line's.
+  const marks = useMemo(() => data?.pages.flatMap(page => page.marks.filter(mark => layers.kinds.includes(mark.kind)).map((mark, index) => ({ ...mark, number: index + 1, key: `${page.page - 1}:${mark.unitId}:${index}` }))) ?? [], [data, layers.kinds]);
+  const active = useGuideReading(state => state.active), list = useRef<HTMLOListElement>(null);
+  // The list keeps the highlight you are reading in view.
+  useEffect(() => { if (active) list.current?.querySelector<HTMLElement>(`[data-mark-key="${CSS.escape(active)}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [active]);
   const set = useReaderStore.getState().set, setLayers = (patch: Partial<typeof layers>) => set({ guideLayers: { ...layers, ...patch } });
 
   if (making || !data) return <div className="pf-gpanel">
@@ -52,10 +58,10 @@ export function GuidePanel() {
       </div>
     </section>
     <section className="pf-gpanel-card">
-      <header><h3>형광 근거 <small>{marks.length}</small></h3></header>
+      <header><h3>형광 근거 <small>{all.length}</small></h3></header>
       <div className="pf-gpanel-kinds">{MARK_KINDS.map(kind => <button type="button" key={kind} data-kind={kind} aria-pressed={layers.kinds.includes(kind)} onClick={() => setLayers({ kinds: layers.kinds.includes(kind) ? layers.kinds.filter(item => item !== kind) : [...layers.kinds, kind] })}><i/>{KIND_KO[kind]}<small>{counts[kind]}</small></button>)}</div>
-      <ol className="pf-gpanel-marks">{marks.filter(mark => layers.kinds.includes(mark.kind)).map(mark => <li key={`${mark.page}-${mark.number}`}>
-        <button type="button" data-kind={mark.kind} onClick={() => { if (!on) set({ guideOverlay: true }); focusSource(`mark-${mark.page}-${mark.number}`, { unitId: mark.unitId, page: mark.page, quote: mark.quote }); }}>
+      <ol ref={list} className="pf-gpanel-marks">{marks.map(mark => <li key={mark.key} data-mark-key={mark.key}>
+        <button type="button" data-kind={mark.kind} data-active={mark.key === active || undefined} onClick={() => { if (!on) set({ guideOverlay: true }); focusSource(`mark-${mark.page}-${mark.number}`, { unitId: mark.unitId, page: mark.page, quote: mark.quote }); }}>
           <span className="pf-gpanel-num">{mark.number}</span>
           <span><small>p.{mark.page} · {KIND_LABEL[mark.kind]}</small><strong>{mark.keyword}</strong><em>{mark.note}</em></span>
         </button>
