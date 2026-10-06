@@ -76,15 +76,47 @@ export const WikiGraphCanvas = forwardRef<WikiGraphHandle, Props>(function WikiG
     shake: () => { const state = world.current; if (!state) return; for (const node of state.sim.nodes) { node.vx += (Math.random() - .5) * 30; node.vy += (Math.random() - .5) * 30; } state.sim.reheat(.9); wake.current(); }
   }));
 
+  // The panels laid over the map (pool, controls, hint, inspector), in canvas pixels; read at most every 400 ms.
+  const panelCache = useRef<{ at: number; rects: { left: number; right: number; top: number; bottom: number }[] }>({ at: -1e9, rects: [] });
+  function panelRects(fresh = false) {
+    const element = canvas.current, now = performance.now();
+    if (!element || (!fresh && now - panelCache.current.at < 400)) return panelCache.current.rects;
+    const frame = element.getBoundingClientRect();
+    const rects = [...(element.parentElement?.querySelectorAll<HTMLElement>(".pf-wm-pool, .pf-wm-controls, .pf-wm-hint, .pf-map-inspector") ?? [])]
+      .map(panel => panel.getBoundingClientRect()).filter(rect => rect.width && rect.height)
+      .map(rect => ({ left: rect.left - frame.left - 8, right: rect.right - frame.left + 8, top: rect.top - frame.top - 8, bottom: rect.bottom - frame.top + 8 }));
+    panelCache.current = { at: now, rects };
+    return rects;
+  }
+
   function fit() {
     const state = world.current, element = canvas.current;
     if (!state || !element || !state.sim.nodes.length) return;
     const xs = state.sim.nodes.map(node => node.x), ys = state.sim.nodes.map(node => node.y);
     const minX = Math.min(...xs) - 60, maxX = Math.max(...xs) + 60, minY = Math.min(...ys) - 60, maxY = Math.max(...ys) + 60;
     // Leave room for the research-pool panel on the left (wide screens only).
-    const side = element.clientWidth > 900 ? 290 : 0;
-    const k = Math.max(.15, Math.min(2, Math.min((element.clientWidth - side) / (maxX - minX), element.clientHeight / (maxY - minY))));
-    Object.assign(camera.current, { tx: (minX + maxX) / 2 - side / 2 / k, ty: (minY + maxY) / 2, tk: k });
+    const width = element.clientWidth, height = element.clientHeight, side = width > 900 ? 290 : 0;
+    let k = Math.max(.15, Math.min(2, Math.min((width - side) / (maxX - minX), (height - 40) / (maxY - minY))));
+    const tx = (minX + maxX) / 2, ty = (minY + maxY) / 2;
+    // The panels over the map (pool, controls, hint, inspector): zoom out until no sphere sits under one.
+    const panels = panelRects(true);
+    // At each zoom (largest first) try the plain centre, then small pans (nearest first): the first view
+    // where every sphere is on screen and none sits under a panel wins.
+    const fits = (scale: number, dx: number, dy: number) => state.sim.nodes.every(node => {
+      const sx = (node.x - tx) * scale + width / 2 + side / 2 + dx, sy = (node.y - ty) * scale + height / 2 + dy, r = node.r * scale;
+      if (sx - r < 4 || sx + r > width - 4 || sy - r < 4 || sy + r > height - 4) return false;
+      return !panels.some(panel => sx + r > panel.left && sx - r < panel.right && sy + r > panel.top && sy - r < panel.bottom);
+    });
+    const shifts = [0, -1, 1, -2, 2, -3, 3, -4, 4].flatMap(i => [0, 1, -1, 2, -2, 3, -3].map(j => ({ dx: i * width / 24, dy: j * height / 20 })))
+      .sort((p, q) => Math.hypot(p.dx, p.dy) - Math.hypot(q.dx, q.dy));
+    let shift = { dx: 0, dy: 0 };
+    for (let step = 0; step < 14; step++) {
+      const found = shifts.find(candidate => fits(k, candidate.dx, candidate.dy));
+      if (found) { shift = found; break; }
+      if (k <= .15) break;
+      k = Math.max(.15, k * .93);
+    }
+    Object.assign(camera.current, { tx: tx - (side / 2 + shift.dx) / k, ty: ty - shift.dy / k, tk: k });
     wake.current();
   }
 
@@ -170,21 +202,46 @@ export const WikiGraphCanvas = forwardRef<WikiGraphHandle, Props>(function WikiG
       // Labels: fields always; subfields and topics as you zoom in or point at them; papers never.
       context.textAlign = "center"; context.textBaseline = "top";
       const mode = live.current.labels;
-      for (const at of order) {
-        const node = data[at], p = sim.nodes[at];
-        if (node.kind === "paper") continue;
-        const near = focus >= 0 && (at === focus || neighbours[focus].has(at));
-        const show = node.kind === "field" || node.kind === "unsorted" || near || (text && node.label.toLowerCase().includes(text)) || (mode === "all") || (mode === "auto" && (node.kind === "subfield" ? c.k > .75 : node.kind === "topic" ? c.k > 1.25 : c.k > 1));
-        if (!show || fade[at] < .3) continue;
+      // Labels are placed most important first (the pointed-at node and its neighbours, fields, then by
+      // size); each tries below, right, left and above of its sphere and takes the first spot that hits
+      // no placed label and no other sphere or dot. A minor label with no free spot waits for zoom or hover.
+      type Box = { x0: number; y0: number; x1: number; y1: number };
+      // The panels are obstacles too (in world units at the current camera).
+      const placed: Box[] = panelRects().map(rect => { const a = toWorld(rect.left, rect.top), b = toWorld(rect.right, rect.bottom); return { x0: a.x, y0: a.y, x1: b.x, y1: b.y }; }), gap = 4 / c.k;
+      const clear = (box: Box, own: number) => !placed.some(other => box.x0 < other.x1 && box.x1 > other.x0 && box.y0 < other.y1 && box.y1 > other.y0)
+        && !sim.nodes.some((other, index) => index !== own && fade[index] > .3 && other.x + other.r > box.x0 && other.x - other.r < box.x1 && other.y + other.r > box.y0 && other.y - other.r < box.y1);
+      const wanted = order.flatMap(at => {
+        const node = data[at];
+        if (node.kind === "paper" || fade[at] < .3) return [];
+        const near = focus >= 0 && (at === focus || neighbours[focus].has(at)), searched = Boolean(text && node.label.toLowerCase().includes(text));
+        const show = node.kind === "field" || node.kind === "unsorted" || near || searched || (mode === "all") || (mode === "auto" && (node.kind === "subfield" ? c.k > .75 : node.kind === "topic" ? c.k > 1.25 : c.k > 1));
+        if (!show) return [];
+        const rank = (near || searched ? 0 : node.kind === "field" || node.kind === "unsorted" ? 1 : 2) * 1e6 - sim.nodes[at].r;
+        return [{ at, node, near, must: near || searched || node.kind === "field" || node.kind === "unsorted", rank }];
+      }).sort((a, b) => a.rank - b.rank);
+      for (const { at, node, near, must } of wanted) {
+        const p = sim.nodes[at];
         const size = (node.kind === "field" ? 13.5 : node.kind === "subfield" ? 11.5 : 10.5) / Math.max(.75, Math.min(1.6, c.k));
         context.font = `${node.kind === "field" ? 700 : 600} ${size}px ${FONT}`;
-        context.globalAlpha = fade[at];
         const label = node.label.length > 34 ? `${node.label.slice(0, 33)}…` : node.label;
-        if (look.halo) { context.shadowColor = "rgba(0,0,0,.7)"; context.shadowBlur = 6; } else { context.lineWidth = 3 / c.k; context.strokeStyle = look.top; context.strokeText(label, p.x, p.y + node.r + 5 / c.k); }
+        const w = context.measureText(label).width, h = size * 1.25, off = node.r + 5 / c.k;
+        const spots: (Box & { align: CanvasTextAlign; x: number; y: number })[] = [
+          { x0: p.x - w / 2, y0: p.y + off, x1: p.x + w / 2, y1: p.y + off + h, align: "center", x: p.x, y: p.y + off },
+          { x0: p.x + off, y0: p.y - h / 2, x1: p.x + off + w, y1: p.y + h / 2, align: "left", x: p.x + off, y: p.y - h / 2 },
+          { x0: p.x - off - w, y0: p.y - h / 2, x1: p.x - off, y1: p.y + h / 2, align: "right", x: p.x - off, y: p.y - h / 2 },
+          { x0: p.x - w / 2, y0: p.y - off - h, x1: p.x + w / 2, y1: p.y - off, align: "center", x: p.x, y: p.y - off - h }
+        ];
+        const spot = spots.find(candidate => clear({ x0: candidate.x0 - gap, y0: candidate.y0 - gap, x1: candidate.x1 + gap, y1: candidate.y1 + gap }, at)) ?? (must ? spots[0] : null);
+        if (!spot) continue;
+        placed.push(spot);
+        context.textAlign = spot.align;
+        context.globalAlpha = fade[at];
+        if (look.halo) { context.shadowColor = "rgba(0,0,0,.7)"; context.shadowBlur = 6; } else { context.lineWidth = 3 / c.k; context.strokeStyle = look.top; context.strokeText(label, spot.x, spot.y); }
         context.fillStyle = node.kind === "field" || near ? look.label : look.sub;
-        context.fillText(label, p.x, p.y + node.r + 5 / c.k);
+        context.fillText(label, spot.x, spot.y);
         context.shadowBlur = 0;
       }
+      context.textAlign = "center";
       context.globalAlpha = 1;
       // A paper's title appears beside its dot on hover.
       if (hover >= 0 && data[hover].kind === "paper") {
