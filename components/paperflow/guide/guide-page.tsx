@@ -4,7 +4,7 @@ import { BookOpenText, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
 import { loadGuide } from "@/lib/paperflow/guide/client";
-import { useGuideAnchors } from "@/lib/paperflow/guide/locate";
+import { useGuideAnchors, useGuideReading } from "@/lib/paperflow/guide/locate";
 import type { GuidePage, MarkKind, PageSection } from "@/lib/paperflow/guide/guide";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import "./guide.css";
@@ -38,6 +38,7 @@ export function GuidePageColumn({ documentId, pageIndex, width, height, room, sc
   const on = useReaderStore(s => s.guideOverlay), layers = useReaderStore(s => s.guideLayers), reduced = useReducedMotion();
   const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId), enabled: on });
   const anchors = useGuideAnchors(state => state.pages[pageIndex]);
+  const active = useGuideReading(state => state.active);
   const page = guide.data?.pages.find(item => item.page === pageIndex + 1);
   const marks = useMemo(() => (page?.marks ?? []).filter(mark => layers.kinds.includes(mark.kind)), [page, layers.kinds]);
   const column = Math.min(NOTE_GUTTER - 20, Math.max(150, room - 18)), font = guideFont(scale), [open, setOpen] = useState(false);
@@ -85,9 +86,9 @@ export function GuidePageColumn({ documentId, pageIndex, width, height, room, sc
     </div>}
     {layers.marks && notes.length > 0 && <div className="pf-gpage-right" style={{ left: width + 18, width: column }}>
       <svg className="pf-gpage-leaders" width={column + 18} height={height} style={{ left: -18 }} aria-hidden="true">
-        {notes.map(note => { const y0 = note.anchor.y * height, y1 = note.top + font * .9; return <path key={note.anchor.key} data-kind={note.mark.kind} d={`M 0 ${y0.toFixed(1)} C 10 ${y0.toFixed(1)}, 8 ${y1.toFixed(1)}, 18 ${y1.toFixed(1)}`}/>; })}
+        {notes.map(note => { const y0 = note.anchor.y * height, y1 = note.top + font * .9; return <path key={note.anchor.key} data-kind={note.mark.kind} data-active={active === `${pageIndex}:${note.anchor.key}` || undefined} d={`M 0 ${y0.toFixed(1)} C 10 ${y0.toFixed(1)}, 8 ${y1.toFixed(1)}, 18 ${y1.toFixed(1)}`}/>; })}
       </svg>
-      {notes.map((note, order) => <motion.aside key={note.anchor.key} className="pf-gnote" data-kind={note.mark.kind} style={{ top: note.top }} {...enter(.12 + order * .06)}>
+      {notes.map((note, order) => <motion.aside key={note.anchor.key} className="pf-gnote" data-kind={note.mark.kind} data-active={active === `${pageIndex}:${note.anchor.key}` || undefined} style={{ top: note.top }} {...enter(.12 + order * .06)}>
         <header><i>{note.anchor.number}</i><small>{KIND_LABEL[note.mark.kind]}</small></header>
         {note.mark.keyword && <strong>{note.mark.keyword}</strong>}
         <p>{note.mark.note}</p>

@@ -183,3 +183,13 @@ html[data-pf-theme="dark"] :is(.pf-brief, .pf-gpage, .pf-gpanel) { --g-ink: #e6e
 .pf-gpage-notes small { display:block; font-size:.66em; font-weight:700; letter-spacing:.08em; color:var(--k); }
 .pf-gpage-notes strong { display:block; font-size:.96em; }
 .pf-gpage-notes p { margin:.1em 0 0; font-size:.92em; color:var(--g-muted); }
+
+/* The reading line: the highlight you are reading now, its number and its margin note stand out in turn. */
+.pf-gmarks span { transition:opacity .25s ease, box-shadow .25s ease; }
+.pf-gmarks span[data-active] { opacity:1; box-shadow:0 0 0 1.5px color-mix(in srgb,var(--k) 45%,transparent), 0 2px 10px -4px color-mix(in srgb,var(--k) 60%,transparent); }
+.pf-gmark-numbers i { transition:transform .25s ease; }
+.pf-gmark-numbers i[data-active] { transform:scale(1.22); }
+.pf-gnote { transition:transform .3s cubic-bezier(.2,.8,.25,1), box-shadow .3s ease, border-color .3s ease; }
+.pf-gnote[data-active] { transform:translateX(-4px); border-color:color-mix(in srgb,var(--k) 40%,var(--g-line)); box-shadow:0 14px 32px -16px color-mix(in srgb,var(--k) 70%,transparent), 0 1px 3px rgba(0,0,0,.06); }
+.pf-gpage-leaders path { transition:opacity .3s ease, stroke-width .3s ease; }
+.pf-gpage-leaders path[data-active] { stroke-dasharray:none; stroke-width:1.6; opacity:1; }

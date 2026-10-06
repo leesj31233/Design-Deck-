@@ -114,3 +114,14 @@ describe("guide text length", () => {
     expect(long[finding.length - 1]).toMatch(/[\s,·;:]/);
   });
 });
+
+describe("reading line", () => {
+  it("picks the highlight nearest 42% down the view, and none when all are far", async () => {
+    const { readingAnchor } = await import("@/lib/paperflow/guide/locate");
+    const anchor = (key: string, y: number) => ({ key, number: 1, kind: "result" as const, y, top: y - .01, bottom: y + .01 });
+    const pages = [{ page: 0, top: -600, height: 1000, anchors: [anchor("a", .2), anchor("b", .9)] }, { page: 1, top: 420, height: 1000, anchors: [anchor("c", .1)] }];
+    // View 0..1000: line at 420. a → -400, b → 300 (gap 120), c → 520 (gap 100).
+    expect(readingAnchor(pages, 0, 1000)).toBe("1:c");
+    expect(readingAnchor([{ page: 2, top: 2000, height: 1000, anchors: [anchor("d", .5)] }], 0, 1000)).toBeNull();
+  });
+});

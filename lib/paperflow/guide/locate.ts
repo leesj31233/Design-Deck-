@@ -63,3 +63,23 @@ export const useGuideAnchors = create<AnchorState>(set => ({
     return same ? state : { pages: { ...state.pages, [page]: anchors } };
   })
 }));
+
+/** The highlight at the reader's reading line ("page:key"), so its mark and margin note stand out as you scroll. */
+export const useGuideReading = create<{ active: string | null; set: (active: string | null) => void }>(set => ({
+  active: null,
+  set: active => set(state => state.active === active ? state : { active })
+}));
+
+/**
+ * The anchor nearest the reading line (42% down the viewport), within a third of the viewport height.
+ * `pages` gives each page's anchors with the page's on-screen top and height.
+ */
+export function readingAnchor(pages: { page: number; top: number; height: number; anchors: MarkAnchor[] }[], viewTop: number, viewHeight: number): string | null {
+  const line = viewTop + viewHeight * .42;
+  let best: string | null = null, distance = viewHeight / 3;
+  for (const page of pages) for (const anchor of page.anchors) {
+    const gap = Math.abs(page.top + anchor.y * page.height - line);
+    if (gap < distance) { distance = gap; best = `${page.page}:${anchor.key}`; }
+  }
+  return best;
+}

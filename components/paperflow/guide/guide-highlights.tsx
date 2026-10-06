@@ -1,8 +1,8 @@
 "use client";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadGuide } from "@/lib/paperflow/guide/client";
-import { koreanFor, locateQuote, useGuideAnchors, type MarkAnchor } from "@/lib/paperflow/guide/locate";
+import { koreanFor, locateQuote, useGuideAnchors, type MarkAnchor, readingAnchor, useGuideReading } from "@/lib/paperflow/guide/locate";
 import type { GuideMark, MarkKind } from "@/lib/paperflow/guide/guide";
 import { textIndex } from "@/lib/paperflow/pdf/selection-geometry";
 import { textRectsOf } from "@/lib/paperflow/pdf/selection-guard";
@@ -57,6 +57,7 @@ function bands(rects: Box[]): Box[] {
  * that its margin note repeats.
  */
 export function GuideHighlights({ documentId, pageIndex, surface, layer, textReady, overlayReady, scale }: { documentId: string; pageIndex: number; surface: React.RefObject<HTMLDivElement | null>; layer: React.RefObject<HTMLDivElement | null>; textReady: boolean; overlayReady: boolean; scale: number }) {
+  const active = useGuideReading(state => state.active);
   const on = useReaderStore(s => s.guideOverlay), layers = useReaderStore(s => s.guideLayers), focus = useReaderStore(s => s.guideFocus);
   const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId), enabled: on });
   const marks = useMemo(() => (guide.data?.pages.find(page => page.page === pageIndex + 1)?.marks ?? []).filter(mark => layers.kinds.includes(mark.kind)), [guide.data, pageIndex, layers.kinds]);
@@ -95,13 +96,44 @@ export function GuideHighlights({ documentId, pageIndex, surface, layer, textRea
   }, [on, layers.marks, marks, focused, textReady, overlayReady, scale, shownKey, pageIndex, surface, layer]);
 
   if (!on || !layers.marks || !placed.length) return null;
+  const isActive = (item: Placed) => active === `${pageIndex}:${item.key}`;
   const isFocus = (item: Placed) => item.flash || (focused && item.key.startsWith(`${focused.unitId}:`));
   return <>
     <div className="pf-gmarks" aria-hidden="true">
-      {placed.map(item => item.boxes.map((box, at) => <span key={`${item.key}-${at}`} data-kind={item.kind} data-focus={isFocus(item) || undefined} style={{ left: `${box.x * 100}%`, top: `${box.y * 100}%`, width: `${box.width * 100}%`, height: `${box.height * 100}%`, animationDelay: `${at * 70}ms` }}/>))}
+      {placed.map(item => item.boxes.map((box, at) => <span key={`${item.key}-${at}`} data-kind={item.kind} data-focus={isFocus(item) || undefined} data-active={isActive(item) || undefined} style={{ left: `${box.x * 100}%`, top: `${box.y * 100}%`, width: `${box.width * 100}%`, height: `${box.height * 100}%`, animationDelay: `${at * 70}ms` }}/>))}
     </div>
     <div className="pf-gmark-numbers" aria-hidden="true">
-      {placed.filter(item => item.number > 0).map(item => { const last = endOf(item.boxes); return <i key={item.key} data-kind={item.kind} style={{ left: `${(last.x + last.width) * 100}%`, top: `${last.y * 100}%` }}>{item.number}</i>; })}
+      {placed.filter(item => item.number > 0).map(item => { const last = endOf(item.boxes); return <i key={item.key} data-kind={item.kind} data-active={isActive(item) || undefined} style={{ left: `${(last.x + last.width) * 100}%`, top: `${last.y * 100}%` }}>{item.number}</i>; })}
     </div>
   </>;
+}
+
+/**
+ * Follows the reader down the paper: on scroll, the highlight nearest the reading line becomes active,
+ * so its mark and its margin note stand out in turn. Renders nothing.
+ */
+export function GuideReadingLine() {
+  const on = useReaderStore(s => s.guideOverlay);
+  useEffect(() => {
+    if (!on) { useGuideReading.getState().set(null); return; }
+    const viewport = document.querySelector<HTMLElement>("[data-pdf-viewport]");
+    if (!viewport) return;
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const view = viewport.getBoundingClientRect(), pages = useGuideAnchors.getState().pages;
+      const placed = Object.entries(pages).flatMap(([page, anchors]) => {
+        if (!anchors.length) return [];
+        const rect = document.querySelector(`[data-pdf-page="${page}"]`)?.getBoundingClientRect();
+        return rect && rect.bottom > view.top && rect.top < view.bottom ? [{ page: Number(page), top: rect.top, height: rect.height, anchors }] : [];
+      });
+      useGuideReading.getState().set(readingAnchor(placed, view.top, view.height));
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(measure); };
+    viewport.addEventListener("scroll", schedule, { passive: true });
+    const stop = useGuideAnchors.subscribe(schedule);
+    schedule();
+    return () => { viewport.removeEventListener("scroll", schedule); stop(); if (frame) cancelAnimationFrame(frame); useGuideReading.getState().set(null); };
+  }, [on]);
+  return null;
 }
