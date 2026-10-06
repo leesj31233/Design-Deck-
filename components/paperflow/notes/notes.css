@@ -40,9 +40,9 @@
 .pf-notes-list { display:grid; align-content:start; gap:2px; margin:0; padding:0 10px 0 0; border-right:1px solid var(--line); list-style:none; max-height:620px; overflow:auto; }
 .pf-notes-list button { display:grid; gap:2px; width:100%; padding:8px 9px; border:0; border-radius:8px; background:none; color:inherit; font:inherit; text-align:left; cursor:pointer; }
 .pf-notes-list button[aria-selected="true"] { background:var(--accent-soft); }
-.pf-notes-list-title { display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.pf-notes-list-title svg { flex:none; color:var(--accent); }
-.pf-notes-list small { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pf-notes-list-title { display:block; min-width:0; font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pf-notes-list-title svg { display:inline; margin-right:4px; vertical-align:-1px; color:var(--accent); }
+.pf-notes-list small { min-width:0; font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .pf-notes-list-empty { padding:10px; font-size:12px; color:var(--muted); }
 .pf-note-editor { display:grid; align-content:start; gap:10px; min-width:0; }
 .pf-note-editor-top { display:flex; align-items:center; gap:4px; }
