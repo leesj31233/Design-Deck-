@@ -1013,3 +1013,5 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 
 /* The selection bar waits until the drag ends: under the pointer it would capture the selection. */
 html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { pointer-events:none!important; opacity:0; transition:opacity .12s ease; }
+/* A card's icon actions (move, archive or restore, trash) stay together at the row's end. */
+.pf-book-icons { display:inline-flex; align-items:center; gap:2px; margin-left:auto; white-space:nowrap; }
