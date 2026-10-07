@@ -18,7 +18,10 @@ export function AnswerText({ text, onQuote, onSource }: { text: string; onQuote?
   });
   // Lines into paragraphs and lists.
   const blocks: { list: boolean; lines: string[] }[] = [];
-  for (const raw of text.split("\n")) {
+  // While streaming, a bold mark whose closing ** has not arrived yet is not shown raw.
+  const open = (text.split("**").length - 1) % 2 === 1, last = text.lastIndexOf("**");
+  const shown = open ? text.slice(0, last) + text.slice(last + 2) : text;
+  for (const raw of shown.split("\n")) {
     const line = raw.trim();
     if (!line) continue;
     const item = /^[-•·]\s+/.test(line);
