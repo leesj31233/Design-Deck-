@@ -4,7 +4,8 @@ import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
 import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
 import { guideCreditEstimate, GUIDE_MODEL, GUIDE_PAGE_MODEL } from "@/lib/paperflow/guide/cost";
 
-export const maxDuration = 120;
+// A long paper's brief on the strong model can take a few minutes; the client retries on the fast model.
+export const maxDuration = 300;
 
 const recent = new Map<string, number[]>();
 /** A guide is a handful of calls per paper: a per-address budget well above that, well below abuse. */
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
   const origin = request.headers.get("origin");
   if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
-  let body: { units?: unknown; mode?: unknown; pages?: unknown };
+  let body: { units?: unknown; mode?: unknown; pages?: unknown; fast?: unknown };
   try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청입니다." }, { status: 400 }); }
   const mode = body.mode === "pages" ? "pages" : "brief";
   const pages = Array.isArray(body.pages) ? body.pages.filter((page): page is number => Number.isInteger(page) && page > 0 && page < 2000).slice(0, 12) : [];
@@ -40,7 +41,8 @@ export async function POST(request: Request) {
     const { data } = await admin.from("shared_translations").select("text").eq("source_hash", key).maybeSingle();
     if (data?.text) { try { return Response.json({ part: JSON.parse(data.text), cached: true, credits: 0 }); } catch { /* Regenerate a damaged entry. */ } }
   }
-  const model = mode === "brief" ? GUIDE_MODEL() : GUIDE_PAGE_MODEL();
+  // fast: the brief again on the page model, after the strong model timed out on a long paper.
+  const model = mode === "brief" && body.fast !== true ? GUIDE_MODEL() : GUIDE_PAGE_MODEL();
   const gate = await creditGate(guideCreditEstimate(chars, mode));
   if (gate instanceof Response) return gate;
   if (limited(request)) return Response.json({ error: "가이드 요청이 많습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
@@ -49,7 +51,7 @@ export async function POST(request: Request) {
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
       method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
-      signal: AbortSignal.any([request.signal, AbortSignal.timeout(115_000)]),
+      signal: AbortSignal.any([request.signal, AbortSignal.timeout(285_000)]),
       body: JSON.stringify({
         model, store: false, ...reasoning, prompt_cache_key: `paperflow-guide-${mode}`,
         instructions: mode === "brief" ? BRIEF_INSTRUCTIONS : PAGES_INSTRUCTIONS,

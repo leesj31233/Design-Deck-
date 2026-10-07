@@ -16,11 +16,15 @@ export async function loadGuide(documentId: string): Promise<PaperGuide | null> 
   return doc?.guide?.version === GUIDE_VERSION ? tidyGuide(doc.guide as PaperGuide) : null;
 }
 
-export interface GuideProgress { brief: "pending" | "done" | "failed"; pagesDone: number; pagesTotal: number }
+export interface GuideProgress { brief: "pending" | "done" | "failed"; pagesDone: number; pagesTotal: number; /** The brief is being made again on the fast model. */ briefRetry?: boolean }
 
-async function call(mode: "brief" | "pages", units: GuideUnit[], pages?: number[]) {
+/** One part of the guide. A brief that times out on the strong model is asked again on the fast one. */
+async function call(mode: "brief" | "pages", units: GuideUnit[], pages?: number[], onRetry?: () => void) {
   for (let attempt = 0; attempt < 2; attempt++) {
-    const response = await fetch("/api/guide", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode, units, pages }) });
+    if (attempt) onRetry?.();
+    const fast = mode === "brief" && attempt > 0;
+    const response = await fetch("/api/guide", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode, units, pages, fast }), signal: AbortSignal.timeout(300_000) })
+      .catch(() => new Response(JSON.stringify({ error: "가이드 연결 시간이 초과되었습니다." }), { status: 504 }));
     const body = await response.json().catch(() => ({ error: "가이드 응답을 읽지 못했습니다." }));
     if (response.ok) return body as { part: unknown; credits: number; model?: string };
     // A refused request (credits, configuration) is not retried; a timeout or a malformed answer is, once.
@@ -42,7 +46,7 @@ export async function createGuide(documentId: string, manifest: TranslationManif
   const state: { brief: ReturnType<typeof validateBrief>; error: unknown } = { brief: null, error: null };
   const tasks: (() => Promise<void>)[] = [
     async () => {
-      try { const result = await call("brief", wire); credits += result.credits; model = result.model ?? model; state.brief = validateBrief(result.part, byWire); progress.brief = state.brief ? "done" : "failed"; }
+      try { const result = await call("brief", wire, undefined, () => { progress.briefRetry = true; onProgress?.({ ...progress }); }); credits += result.credits; model = result.model ?? model; state.brief = validateBrief(result.part, byWire); progress.brief = state.brief ? "done" : "failed"; }
       catch (error) { state.error = error; progress.brief = "failed"; }
       onProgress?.({ ...progress });
     },

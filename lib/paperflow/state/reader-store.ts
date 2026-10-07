@@ -10,7 +10,7 @@ type ReaderUiState = {
   /** Which guide layers are shown, and the highlight kinds filtered in. */
   guideLayers: { brief: boolean; pages: boolean; marks: boolean; kinds: string[] };
   /** While a guide is being written: the brief and how many pages are done. */
-  guideProgress: { brief: "pending" | "done" | "failed"; pagesDone: number; pagesTotal: number } | null;
+  guideProgress: { brief: "pending" | "done" | "failed"; pagesDone: number; pagesTotal: number; briefRetry?: boolean } | null;
   /** Make (or remake) the guide, with its estimated credits; set by the reader. */
   guideMaker: { make: () => void; estimate: number | null } | null;
   /** Highlighter colour; changed with Ctrl or 1–5 while dragging. */
