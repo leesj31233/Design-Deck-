@@ -20,7 +20,6 @@ import { SearchField } from "@/components/ui/search-field";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
 import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
 import { pdfAdapter, type PdfDocumentHandle, type PdfPageHandle } from "@/lib/paperflow/pdf/pdf-adapter";
-import { exportAnnotatedPdf } from "@/lib/paperflow/pdf/export-annotated";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import { readableError } from "@/lib/paperflow/errors";
 import type { Annotation, AnnotationColor } from "@/lib/paperflow/anchors/types";
@@ -291,7 +290,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   useEffect(() => { registerReader(commands); return () => registerReader(null); }, [commands, registerReader]);
   const download = async () => { try { const blob = await documentRepository.getDocumentBlob(documentId); if (!blob) throw new Error("원본 PDF가 없습니다."); const url = URL.createObjectURL(blob), link = document.createElement("a"); link.href = url; link.download = doc.data?.filename ?? "paper.pdf"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); } catch (reason) { notify(readableError(reason)); } };
   // Like a download: progress lives in the button itself, and one notice says when the file is saved.
-  const exportPdf = async () => { if (exportRunning) return; setExportRunning(true); setExportProgress(0); try { const result = await exportAnnotatedPdf(documentId, (done, total) => setExportProgress(total ? done / total : 0)); notify(result.unfit ? `PDF 다운로드 완료 · ${result.unfit}개 문단은 원래 영역을 넘쳐 아래 여백까지 이어집니다.` : "번역·마킹 PDF 다운로드 완료"); } catch (reason) { notify(`PDF 저장 실패: ${readableError(reason)}`); } finally { setExportRunning(false); setExportProgress(0); } };
+  const exportPdf = async () => { if (exportRunning) return; setExportRunning(true); setExportProgress(0); try { const { exportAnnotatedPdf } = await import("@/lib/paperflow/pdf/export-annotated"); const result = await exportAnnotatedPdf(documentId, (done, total) => setExportProgress(total ? done / total : 0)); notify(result.unfit ? `PDF 다운로드 완료 · ${result.unfit}개 문단은 원래 영역을 넘쳐 아래 여백까지 이어집니다.` : "번역·마킹 PDF 다운로드 완료"); } catch (reason) { notify(`PDF 저장 실패: ${readableError(reason)}`); } finally { setExportRunning(false); setExportProgress(0); } };
   const inspect = (annotation: Annotation) => { dismiss(); setSelected(annotation.id); setTab("context"); navigate(annotation.pageIndex + 1); useReaderStore.getState().set({ inspectorOpen: true }); setTimeout(() => document.querySelector(`[data-annotation-id="${annotation.id}"]`)?.scrollIntoView({ block: "center" }), 200); };
   const remove = async (id: string) => { try { const target = annotations.find(item => item.id === id); if (target) await removeAnnotation(target, "마킹 삭제"); await client.invalidateQueries({ queryKey: ["annotations"] }); if (selected === id) setSelected(undefined); } catch (reason) { notify(readableError(reason)); } };
 

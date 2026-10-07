@@ -57,7 +57,7 @@ export function AskDock() {
   const manifest = useTranslationStore(s => s.manifest);
   const guide = useQuery({ queryKey: ["guide", documentId], enabled: Boolean(documentId), queryFn: () => loadGuide(documentId!) });
   const doc = useQuery({ queryKey: ["document", documentId, "ask"], enabled: Boolean(documentId), queryFn: () => documentRepository.getDocument(documentId!) });
-  const status = useQuery({ queryKey: ["ask-status", documentId, manifest?.version], enabled: Boolean(documentId && manifest), queryFn: () => askStatus(documentId!, manifest) });
+  const status = useQuery({ queryKey: ["ask-status", documentId, manifest?.version], enabled: Boolean(open && documentId && manifest), queryFn: () => askStatus(documentId!, manifest) });
   const [thread, setThread] = useState<AskResult[]>([]), [draft, setDraft] = useState("");
   const [live, setLive] = useState<{ question: string; focus?: { text: string; page: number }; stage: AskStage; text: string } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);

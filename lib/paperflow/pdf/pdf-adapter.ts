@@ -1,4 +1,5 @@
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+import { canvasRatio, maxCanvasPixels } from "../device";
 import { installStreamIteration } from "./stream-iteration";
 export interface PdfTextItem { text: string; x: number; y: number; width: number; height: number; fontName: string; fontFamily: string; hasEOL: boolean; /** Set in a bold face (from the embedded font's own name or flags). */ bold?: boolean; /** Baseline in pt; ligature glyphs often sit in another font with a different ascent. */ baseline?: number }
 export interface PdfPageHandle {
@@ -113,7 +114,8 @@ function pageHandle(page: PDFPageProxy): PdfPageHandle {
     },
     async render(canvas, scale, signal) {
       signal.throwIfAborted();
-      const viewport = page.getViewport({ scale }), ratio = Math.min(window.devicePixelRatio || 1, 2);
+      // Pixel ratio capped by the device, then by a pixel budget per canvas (a zoomed page on a dense screen).
+      const viewport = page.getViewport({ scale }), budget = Math.sqrt(maxCanvasPixels() / Math.max(1, viewport.width * viewport.height)), ratio = Math.max(.75, Math.min(canvasRatio(), budget));
       canvas.width = Math.floor(viewport.width * ratio); canvas.height = Math.floor(viewport.height * ratio);
       const task = page.render({ canvas, viewport, transform: ratio === 1 ? undefined : [ratio, 0, 0, ratio, 0, 0] });
       const cancel = () => task.cancel(); signal.addEventListener("abort", cancel, { once: true });

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { scheduleRender } from "@/lib/paperflow/pdf/render-queue";
 import { motion, useReducedMotion } from "motion/react";
 import type { PdfDocumentHandle } from "@/lib/paperflow/pdf/pdf-adapter";
 
@@ -15,7 +16,9 @@ function PagePreview({ pdf, number, current, onPage }: { pdf: PdfDocumentHandle;
   useEffect(() => {
     if (!visible || !canvas.current) return;
     const controller = new AbortController();
-    void pdf.getPage(number).then(page => page.render(canvas.current!, Math.min(104 / page.width, 138 / page.height), controller.signal)).then(() => { if (!controller.signal.aborted) setReady(true); }).catch(() => {});
+    // Thumbnails draw after the pages being read (same queue, lowest priority).
+    const node = canvas.current;
+    void scheduleRender(node, () => pdf.getPage(number).then(page => page.render(node, Math.min(104 / page.width, 138 / page.height), controller.signal)).then(() => { if (!controller.signal.aborted) setReady(true); }), controller.signal, true).catch(() => {});
     return () => { controller.abort(); };
   }, [pdf, number, visible]);
   return <motion.button ref={tile} className="pf-page-tile" aria-label={`Go to page ${number}`} aria-current={current ? "page" : undefined} onClick={() => onPage(number)} whileHover={reduced ? undefined : { y: -3, scale: 1.025 }} whileTap={reduced ? undefined : { scale: .96 }} transition={{ type: "spring", stiffness: 450, damping: 31 }}>

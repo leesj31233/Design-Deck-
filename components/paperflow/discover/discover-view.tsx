@@ -137,7 +137,10 @@ export function DiscoverView({ docs, annotations }: { docs: StoredDocument[]; an
   const ready = request.topics.length > 0 || request.authors.length > 0;
   const recommendations = useQuery({
     queryKey: ["recommendations", request.topics, request.authors, request.fields, request.owned, request.cited], enabled: ready, staleTime: 6 * 3600_000,
-    queryFn: async () => { const response = await fetch("/api/scholar/recommend", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }); if (!response.ok) throw new Error("추천을 불러오지 못했습니다."); return (await response.json()).sections as Section[]; }
+    // The last list is kept in this browser for 6 hours, so revisiting the page needs no server round trip.
+    initialData: () => { const saved = read<{ key: string; at: number; sections: Section[] } | null>("pf-rec-cache", null); return saved && saved.key === JSON.stringify(request) ? saved.sections : undefined; },
+    initialDataUpdatedAt: () => read<{ at: number } | null>("pf-rec-cache", null)?.at,
+    queryFn: async () => { const response = await fetch("/api/scholar/recommend", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }); if (!response.ok) throw new Error("추천을 불러오지 못했습니다."); const sections = (await response.json()).sections as Section[]; write("pf-rec-cache", { key: JSON.stringify(request), at: Date.now(), sections }); return sections; }
   });
   const [hidden, setHidden] = useState<Set<string>>(new Set()), [saved, setSaved] = useState<Card[]>([]), [view, setView] = useState<View>("shelves");
   const [detail, setDetail] = useState<Card | null>(null), [filters, setFilters] = useState({ oa: false, review: false });

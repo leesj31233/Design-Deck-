@@ -1,5 +1,6 @@
 "use client";
 import { memo, useEffect, useRef, useState } from "react";
+import { pageWindow } from "@/lib/paperflow/device";
 import type { PdfDocumentHandle, PdfPageHandle } from "@/lib/paperflow/pdf/pdf-adapter";
 import { PdfPage, type PdfPageProps } from "./pdf-page";
 
@@ -12,8 +13,10 @@ export const ContinuousPage = memo(function ContinuousPage({ pdf, index, scale, 
   const node = useRef<HTMLDivElement>(null), [near, setNear] = useState(false), [page, setPage] = useState<PdfPageHandle>(), [error, setError] = useState("");
   useEffect(() => {
     const root = node.current?.closest("[data-pdf-viewport]") ?? null;
-    const enter = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setNear(true); }, { root, rootMargin: "1500px 0px" });
-    const leave = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) setNear(false); }, { root, rootMargin: "4500px 0px" });
+    // Pages are prepared a little ahead and released when far away; a low-memory device keeps fewer.
+    const range = pageWindow();
+    const enter = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setNear(true); }, { root, rootMargin: `${range.load}px 0px` });
+    const leave = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) setNear(false); }, { root, rootMargin: `${range.keep}px 0px` });
     enter.observe(node.current!); leave.observe(node.current!);
     return () => { enter.disconnect(); leave.disconnect(); };
   }, []);

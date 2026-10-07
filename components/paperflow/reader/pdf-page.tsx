@@ -1,5 +1,6 @@
 "use client";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { scheduleRender } from "@/lib/paperflow/pdf/render-queue";
 import type { PdfPageHandle } from "@/lib/paperflow/pdf/pdf-adapter";
 import { captureSelection, textIndex } from "@/lib/paperflow/pdf/selection-geometry";
 import { installSelectionGuard } from "@/lib/paperflow/pdf/selection-guard";
@@ -50,12 +51,16 @@ export const PdfPage = memo(function PdfPage({ page, scale, documentId, pageInde
     const controller = new AbortController(), canvasNode = canvas.current!, layerNode = layer.current!;
     setReady(false); setTextReady(false); setError("");
     const started = performance.now();
-    void page.render(canvasNode, scale, controller.signal).then(async () => {
-      if (controller.signal.aborted) return;
-      setReady(true); setCanvasVersion(version => version + 1); performance.measure("paperflow:page-render", { start: started });
+    // Drawing waits its turn in the page queue (nearest page first); the text layer follows.
+    void scheduleRender(canvasNode, async () => {
+      try {
+        await page.render(canvasNode, scale, controller.signal);
+        if (controller.signal.aborted) return;
+        setReady(true); setCanvasVersion(version => version + 1); performance.measure("paperflow:page-render", { start: started });
+      } catch (reason) { if (!controller.signal.aborted) setError(`페이지를 표시하지 못했습니다: ${readableError(reason)}`); return; }
       try { await page.renderText(layerNode, scale, controller.signal); if (!controller.signal.aborted) setTextReady(true); }
       catch (reason) { if (!controller.signal.aborted) setError(`원문은 표시되지만 텍스트 레이어를 불러오지 못했습니다: ${readableError(reason)}`); }
-    }).catch(reason => { if (!controller.signal.aborted) setError(`페이지를 표시하지 못했습니다: ${readableError(reason)}`); });
+    }, controller.signal);
     return () => { controller.abort(); layerNode.replaceChildren(); canvasNode.width = 0; canvasNode.height = 0; };
   }, [page, scale]);
 

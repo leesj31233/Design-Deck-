@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lowMemoryDevice } from "@/lib/paperflow/device";
 import { NotificationStack } from "./notification-stack";
 import { ConfirmHost } from "./confirm-host";
 import { notifyText, useNotices } from "@/lib/paperflow/notifications";
@@ -27,6 +28,8 @@ function AppControls({ children, client }: { children: React.ReactNode; client: 
   const setMessage = notify;
 
 
+  // A low-memory device gets the lite look: no glass blur, lighter shadows (both cost GPU memory every frame).
+  useEffect(() => { if (lowMemoryDevice()) document.documentElement.dataset.pfLite = "true"; }, []);
   useEffect(() => {
     const media = matchMedia("(prefers-color-scheme: dark)");
     const sync = () => { let saved: string | null = null; try { saved = localStorage.getItem("paperflow-theme"); } catch { /* OS preference still works. */ } const isDark = saved ? saved === "dark" : media.matches; setDark(isDark); document.documentElement.dataset.pfTheme = isDark ? "dark" : "light"; };

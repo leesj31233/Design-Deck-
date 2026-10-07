@@ -1026,3 +1026,8 @@ html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { 
 [data-present-pointer="laser"], [data-present-pointer="laser"] * { cursor:none !important; }
 [data-present-pointer="chalk"], [data-present-pointer="chalk"] * { cursor:crosshair !important; }
 [data-present-draw], [data-present-draw] * { user-select:none !important; -webkit-user-select:none !important; }
+
+/* Lite look for low-memory devices: panels are solid, not blurred glass. */
+html[data-pf-lite] *, html[data-pf-lite] *::before, html[data-pf-lite] *::after { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+html[data-pf-lite] .dd-glass, html[data-pf-lite] .pf-inspector, html[data-pf-lite] .pf-askdock-panel, html[data-pf-lite] .pf-discover-search { background:var(--surface-strong) !important; }
+html[data-pf-lite] .pf-shelf-loading span, html[data-pf-lite] .pf-paper-card-wait span { animation:none; }
