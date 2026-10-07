@@ -31,6 +31,7 @@ import { ResearchInspector } from "./research-inspector";
 import { ReaderSelectionTools } from "./reader-selection-tools";
 import { HighlightColorChip } from "./highlight-color-chip";
 import { LiquidCursor } from "./liquid-cursor";
+import { PencilMarker } from "./pencil-marker";
 import { POINTER_MODES, PresentPointer, readPointerMode, writePointerMode, type PointerMode } from "./present-pointer";
 import type { ResolvedAnnotation } from "./highlight-layer";
 import type { PdfParagraph } from "@/lib/paperflow/layout/types";
@@ -339,6 +340,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     {textNoteOpen && <div className="pf-note-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTextNoteOpen(false); }}><section className="pf-note-dialog" role="dialog" aria-modal="true" aria-label="텍스트 메모"><h2>텍스트 메모</h2><p>{useReaderStore.getState().activeSelection ? "선택한 문장에 메모를 연결합니다." : `${currentPage}페이지에 메모를 저장합니다.`}</p><textarea autoFocus aria-label="텍스트 메모 입력" value={textNoteDraft} onChange={event => setTextNoteDraft(event.target.value)} onKeyDown={event => { if (event.key === "Escape") setTextNoteOpen(false); }} placeholder="읽으며 떠오른 생각이나 질문을 기록하세요."/><div><Button variant="ghost" onClick={() => setTextNoteOpen(false)}>취소</Button><Button disabled={!textNoteDraft.trim() || saving} onClick={() => void saveNote(textNoteDraft).then(() => setTextNoteOpen(false))}>메모 저장</Button></div></section></div>}
     <HighlightColorChip/>
     {focus && pointerMode === "liquid" && <LiquidCursor root={viewport}/>}
+    <PencilMarker root={viewport} color={highlightColor} enabled={(tool === "select" || tool === "highlight") && !(focus && (pointerMode === "laser" || pointerMode === "chalk"))} onMark={() => { if (useReaderStore.getState().activeSelection) void save(useReaderStore.getState().highlightColor); }}/>
     {focus && (pointerMode === "laser" || pointerMode === "chalk" || pointerMode === "spotlight") && <PresentPointer root={viewport} mode={pointerMode}/>}
     <ReaderSelectionTools documentId={documentId} onHighlight={color => void save(color)} onNote={showNote} onTranslate={translateSelection} onShell={showShell} onDismiss={dismiss} saving={saving}/>
   </div>;

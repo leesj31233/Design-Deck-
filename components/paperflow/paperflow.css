@@ -929,16 +929,32 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 @keyframes pf-chip-in { from { opacity:0; transform:translateY(4px) scale(.9); } to { opacity:1; transform:none; } }
 @keyframes pf-chip-pulse { from { box-shadow:0 0 0 0 var(--swatch); } to { box-shadow:0 0 0 7px transparent; } }
 
-/* Focus mode: a drop of liquid glass for a pointer (Chromium refracts through an SVG lens) */
+/* Focus mode: a drop of liquid glass for a pointer. It carries a live, magnified copy of the page
+   under it (works in every browser); Chromium and Firefox also bend the copy at the rim. */
 [data-liquid-cursor], [data-liquid-cursor] * { cursor:none !important; }
-.pf-liquid-drop { position:fixed; left:0; top:0; width:52px; height:52px; border-radius:50%; pointer-events:none; z-index:90; opacity:0; transition:opacity .22s ease;
-  -webkit-backdrop-filter:blur(1.5px) saturate(1.5) brightness(1.04); backdrop-filter:url(#pf-liquid-lens) saturate(1.4) brightness(1.04);
-  background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.62),rgba(255,255,255,.08) 38%,rgba(255,255,255,0) 58%),radial-gradient(circle at 68% 82%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 62%);
-  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -3px 8px rgba(0,30,20,.10),inset 0 0 0 .5px rgba(255,255,255,.7),0 8px 20px -8px rgba(8,40,28,.38),0 1px 3px rgba(8,40,28,.12); }
+@media (pointer: coarse) { [data-liquid-cursor], [data-liquid-cursor] * { cursor:auto !important; } }
+.pf-liquid-drop { position:fixed; left:0; top:0; width:60px; height:60px; border-radius:50%; pointer-events:none; z-index:90; opacity:0; transition:opacity .22s ease; will-change:transform; contain:layout style;
+  box-shadow:0 10px 24px -10px rgba(8,40,28,.42),0 1px 3px rgba(8,40,28,.14); }
 .pf-liquid-drop[data-visible="true"] { opacity:1; }
-.pf-liquid-drop[data-text="true"] { box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -3px 8px rgba(0,30,20,.10),inset 0 0 0 1px color-mix(in srgb,var(--accent) 45%,transparent),0 10px 24px -8px rgba(8,40,28,.42); }
-.pf-liquid-drop i { position:absolute; left:50%; top:50%; width:4px; height:4px; margin:-2px 0 0 -2px; border-radius:50%; background:color-mix(in srgb,var(--accent) 70%,#10201a); opacity:.75; transition:transform .25s var(--ease-spring); }
-.pf-liquid-drop[data-pressed="true"] i { transform:scale(1.8); }
+.pf-lens { position:absolute; inset:0; border-radius:50%; overflow:hidden; background:#fff; isolation:isolate; }
+.pf-liquid-drop[data-bend="true"] .pf-lens { filter:url(#pf-liquid-lens); }
+.pf-liquid-drop[data-page="false"] .pf-lens { opacity:0; }
+.pf-lens-paper { position:absolute; inset:0; width:100%; height:100%; }
+.pf-lens-stage { position:absolute; inset:0; }
+.pf-lens-stage > * { background:transparent !important; box-shadow:none !important; pointer-events:none !important; animation:none !important; transition:none !important; }
+.pf-lens-stage * { animation:none !important; transition:none !important; }
+/* The glass: a bright meniscus at the top, a soft caustic at the bottom, a darker rim where light bends. */
+.pf-lens-glass { position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(ellipse 58% 34% at 38% 16%,rgba(255,255,255,.72),rgba(255,255,255,0) 72%),radial-gradient(circle at 62% 88%,rgba(255,255,255,.34),rgba(255,255,255,0) 34%),radial-gradient(circle,rgba(255,255,255,0) 62%,rgba(20,50,40,.10) 86%,rgba(255,255,255,.28) 97%);
+  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -2px 6px rgba(0,30,20,.12),inset 0 0 0 .5px rgba(255,255,255,.75),inset 0 0 10px 1px rgba(20,60,45,.10); }
+.pf-liquid-drop[data-text="true"] { box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 38%,transparent),0 12px 26px -10px rgba(8,40,28,.46),0 1px 3px rgba(8,40,28,.14); }
+.pf-liquid-drop[data-pressed="true"] .pf-lens-glass { box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -2px 6px rgba(0,30,20,.12),inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 55%,transparent); }
+html[data-pf-theme="dark"] .pf-lens-glass { background:radial-gradient(ellipse 58% 34% at 38% 16%,rgba(255,255,255,.28),rgba(255,255,255,0) 72%),radial-gradient(circle,rgba(0,0,0,0) 62%,rgba(0,0,0,.22) 88%,rgba(255,255,255,.14) 97%); }
+
+/* Apple Pencil (or any pen) strokes as a highlighter: the stroke being drawn, and no text selection meanwhile. */
+[data-pen-mark], [data-pen-mark] * { user-select:none !important; -webkit-user-select:none !important; -webkit-touch-callout:none !important; }
+.pf-pen-trail { position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:88; mix-blend-mode:multiply; }
+html[data-pf-theme="dark"] .pf-pen-trail { mix-blend-mode:screen; opacity:.8; }
 
 /* Headings and tables: translated on request (hover → chip) */
 .pf-manual { position:absolute; z-index:6; pointer-events:none; border-radius:14px; animation:pf-frame-in .26s var(--ease-spring) both; }
@@ -1023,8 +1039,18 @@ html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { 
 .pf-pointer-modes button span { display:none; }
 .pf-pointer-modes button[aria-checked="true"] span { display:inline; }
 .pf-present-canvas { position:fixed; inset:0; width:100vw; height:100vh; z-index:85; pointer-events:none; }
-[data-present-pointer="laser"], [data-present-pointer="laser"] * { cursor:none !important; }
-[data-present-pointer="chalk"], [data-present-pointer="chalk"] * { cursor:crosshair !important; }
+/* The presentation pointer replaces the system cursor over the paper (one pointer on screen, never two). */
+[data-present-pointer], [data-present-pointer] * { cursor:none !important; }
+@media (pointer: coarse) { [data-present-pointer], [data-present-pointer] * { cursor:auto !important; } }
+.pf-present-tip { position:fixed; left:0; top:0; z-index:86; pointer-events:none; opacity:0; will-change:transform; transition:opacity .15s ease; }
+.pf-present-tip[data-visible="true"] { opacity:1; }
+.pf-present-tip::before { content:""; position:absolute; border-radius:50%; }
+.pf-present-tip[data-mode="laser"]::before { left:-5px; top:-5px; width:10px; height:10px; background:radial-gradient(circle,#fff 0 18%,#ff3b30 40%); box-shadow:0 0 0 3px rgba(255,59,48,.22),0 0 14px 3px rgba(255,59,48,.6); }
+.pf-present-tip[data-mode="laser"][data-pressed="true"]::before { transform:scale(1.25); }
+.pf-present-tip[data-mode="chalk"]::before { left:-4px; top:-4px; width:8px; height:8px; background:rgba(232,163,40,.9); box-shadow:0 0 0 1.5px rgba(255,255,255,.85),0 1px 3px rgba(0,0,0,.25); }
+/* Spotlight: a huge dimmed sheet with a clear hole, moved by transform only (the GPU slides it, nothing repaints). */
+.pf-present-tip[data-mode="spotlight"]::before { left:-2400px; top:-2400px; width:4800px; height:4800px; background:radial-gradient(circle at center,rgba(10,14,20,0) 0 110px,rgba(10,14,20,.12) 140px,rgba(10,14,20,.52) 210px); }
+.pf-present-tip[data-mode="spotlight"]::after { content:""; position:absolute; left:-111px; top:-111px; width:222px; height:222px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(255,255,255,.35); }
 [data-present-draw], [data-present-draw] * { user-select:none !important; -webkit-user-select:none !important; }
 
 /* Lite look for low-memory devices: panels are solid, not blurred glass. */
