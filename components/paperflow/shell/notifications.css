@@ -41,3 +41,8 @@
 .pf-confirm[data-tone="danger"] .pf-confirm-icon { background:color-mix(in srgb,var(--danger) 12%,transparent); color:var(--danger); }
 .pf-confirm h2 { font-size:17px; letter-spacing:-.03em; }
 .pf-confirm-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
+
+/* The annotated-PDF export reads like a download: its progress fills the button. */
+.pf-export-button[aria-busy] { position:relative; overflow:hidden; opacity:1 !important; color:var(--accent); }
+.pf-export-button[aria-busy]::before { content:""; position:absolute; inset:0; width:var(--export,0%); background:color-mix(in srgb,var(--accent) 14%,transparent); transition:width .3s ease; }
+.pf-export-button[aria-busy] > * { position:relative; }
