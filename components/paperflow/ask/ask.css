@@ -105,3 +105,7 @@ html[data-pf-theme="dark"] .pf-askdock { --ask:#8f98ff; --ask-soft:color-mix(in 
 .pf-askdock-launcher i { position:absolute; top:-3px; right:-3px; }
 .pf-ask-toggle[aria-pressed="true"] { color:#4f5bd5; background:color-mix(in srgb,#4f5bd5 10%,transparent); }
 html[data-pf-theme="dark"] .pf-ask-toggle[aria-pressed="true"] { color:#8f98ff; }
+/* Dark theme: the light violet chips carry dark text (contrast ≥ 4.5:1). */
+html[data-pf-theme="dark"] .pf-ask-cite:not([data-source]), html[data-pf-theme="dark"] .pf-ask-block ol i, html[data-pf-theme="dark"] .pf-askdock-launcher i, html[data-pf-theme="dark"] .pf-ask-send:not([data-stop]) { color:#14183a; }
+html[data-pf-theme="dark"] .pf-ask-sources i, html[data-pf-theme="dark"] .pf-ask-cite[data-source] { background:#3fc9a4 !important; color:#06261d; }
+html[data-pf-theme="dark"] .pf-ask-sources small { color:#3fc9a4 !important; }
