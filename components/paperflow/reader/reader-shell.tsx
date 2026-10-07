@@ -7,6 +7,7 @@ import { noteGutter } from "../guide/guide-page";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { GuideBrief } from "../guide/guide-brief";
 import { GuideConfirm } from "../guide/guide-confirm";
+import { AskDock } from "../ask/ask-dock";
 import { GuideKeys } from "../guide/guide-keys";
 import { useGuideAnchors } from "@/lib/paperflow/guide/locate";
 import { GuideReadingLine } from "../guide/guide-highlights";
@@ -322,6 +323,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}
       <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}><Dialog open={guideBriefOpen} onOpenChange={value => useReaderStore.getState().set({ guideBriefOpen: value })}><DialogContent className="pf-brief-sheet dd-scrollbar" aria-describedby={undefined}><DialogTitle className="sr-only">논문 브리프</DialogTitle><GuideBrief documentId={documentId} width={0} scale={1} standalone/></DialogContent></Dialog><GuideKeys enabled={guideOverlay && Boolean(guide.data)} toggle={onGuide} anchors={() => useGuideAnchors.getState().pages}/><GuideConfirm open={confirmGuide} onOpenChange={setConfirmGuide} estimate={guideCredits} pages={manifest?.pageCount ?? pdf?.pageCount ?? 0} again={Boolean(guide.data)} onConfirm={() => makeGuide.mutate()}/>{translatedCount === 0 && !guideOverlay && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf && guideOverlay && <GuideReadingLine/>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} onUnits={translateUnits} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
+      <AskDock/>
       {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={saveNote} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} keywords={manifest?.keywords ?? doc.data?.keywords ?? []} onTranslate={translateSelection} onBatchTranslate={batchTranslate} onCancelBatch={() => cancelTranslationJob(documentId)}/>}
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>{guideOverlay && guide.data ? "J·K 다음·이전 형광 · G 가이드 · Ctrl K 명령" : "Ctrl Z 되돌리기 · H 마킹 · N 메모 · G 가이드 · Ctrl K 명령"}</span></footer>

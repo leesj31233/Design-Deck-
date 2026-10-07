@@ -42,3 +42,41 @@ describe("질문 answers", () => {
     expect(answer?.answer).toBe("근거로 SOC를 포함해야 한다고 제안함. [Q1] 미생물을 다룸.");
   });
 });
+
+describe("질문 expert answers", () => {
+  it("keeps real http sources and follow-ups, drops invented links", async () => {
+    const { validateAnswer } = await import("@/lib/paperflow/ask/ask");
+    const answer = validateAnswer({ found: true, answer: "EBC는 인증 제도임 [S1].", points: [], followups: ["EBC 등급 차이는?", ""], sources: [
+      { title: "EBC", url: "https://www.european-biochar.org/en/?utm_source=openai", note: "공식 기준" },
+      { title: "가짜", url: "L3", note: "" }
+    ] }, []);
+    expect(answer?.sources).toEqual([{ title: "EBC", url: "https://www.european-biochar.org/en/", note: "공식 기준" }]);
+    expect(answer?.followups).toEqual(["EBC 등급 차이는?"]);
+  });
+
+  it("reads the answer out of a half-streamed JSON", async () => {
+    const { partialAnswer } = await import("@/lib/paperflow/ask/ask");
+    expect(partialAnswer('{"answer":"SOC가 **32%** 증가함.\\n- 근거 [Q1')).toBe("SOC가 **32%** 증가함.\n- 근거 [Q1");
+    expect(partialAnswer('{"answer":"온도 \\u00')).toBe("온도");
+    expect(partialAnswer('{"found":true')).toBe("");
+  });
+
+  it("finds the passage of a numbered equation the question names", async () => {
+    const { pickPassages } = await import("@/lib/paperflow/ask/ask");
+    const passages = [{ id: "p0", page: 1, text: "Biochar improves soil." }, { id: "p1", page: 4, text: "The C2 selectivity is computed as [Equation] S = 2n/(n0) (2) where n is moles." }, { id: "p2", page: 5, text: "Results show yield." }];
+    const picked = pickPassages("식 (2)의 의미는?", [1, 0], { passages, vectors: [[.6, .8], [.5, .866], [.55, .835]] }, 2);
+    expect(picked.map(passage => passage.id)).toContain("p1");
+  });
+});
+
+describe("질문 citations", () => {
+  it("turns bracketed passage ids into evidence numbers and drops empty leftovers", async () => {
+    const { validateAnswer } = await import("@/lib/paperflow/ask/ask");
+    const passages = [{ id: "p4", page: 2, text: "The Paris Agreement came into action after years of negotiation among parties." }, { id: "p9", page: 3, text: "Biochar MRV systems have been designed to measure and verify captured carbon." }];
+    const answer = validateAnswer({ found: true, answer: "MRV 재설계를 제안함(근거: [p4], [p9], [p30]).", points: [
+      { text: "파리협정", unit: "p4", quote: "The Paris Agreement came into action after years" },
+      { text: "MRV 목적", unit: "p9", quote: "designed to measure and verify captured carbon" }
+    ], sources: [], followups: [] }, passages);
+    expect(answer?.answer).toBe("MRV 재설계를 제안함(근거: [Q1], [Q2]).");
+  });
+});

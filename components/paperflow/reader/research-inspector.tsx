@@ -1,7 +1,6 @@
 "use client";
 import { ConceptStudy } from "./concept-study";
 import { GuidePanel } from "../guide/guide-panel";
-import { AskPanel } from "../ask/ask-panel";
 import { useEffect, useState } from "react";
 
 import { BookOpen, Highlighter, ArrowUpRight, Trash2, X, Save, Languages, Sparkles } from "lucide-react";
@@ -32,9 +31,8 @@ export function ResearchInspector({ annotations, resolved, selected, onSelect, o
   const [draft, setDraft] = useState("");
   useEffect(() => { setDraft(active?.note ?? ""); }, [active?.id, active?.note, selection?.textQuote]);
   return <GlassPanel className="pf-inspector dd-scrollbar" data-inspector><header><div><h2>읽기 도구</h2></div><IconButton label="Close inspector" variant="ghost" size="sm" onClick={() => useReaderStore.getState().set({ inspectorOpen: false })}><X size={16}/></IconButton></header>
-    <Tabs value={tab} onValueChange={setTab}><TabsList className="pf-inspector-tabs"><TabsTrigger value="guide">가이드</TabsTrigger><TabsTrigger value="ask">질문</TabsTrigger><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="notes">Notes</TabsTrigger><TabsTrigger value="evidence">Evidence</TabsTrigger></TabsList>
+    <Tabs value={tab} onValueChange={setTab}><TabsList className="pf-inspector-tabs"><TabsTrigger value="guide">가이드</TabsTrigger><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="notes">Notes</TabsTrigger><TabsTrigger value="evidence">Evidence</TabsTrigger></TabsList>
       <TabsContent value="guide"><GuidePanel/></TabsContent>
-      <TabsContent value="ask"><AskPanel/></TabsContent>
       <TabsContent value="context">
         <ConceptStudy source={sourceText ?? ""} selected={selection?.textQuote ?? ""} page={selection ? selection.pageIndex + 1 : sourcePage}/>
         <div className="pf-inspector-section">{sourceText ? <><Badge>원문 · p. {sourcePage}</Badge><blockquote>{sourceText}</blockquote></> : <div className="pf-inspector-empty"><BookOpen size={27}/><h3>문단을 눌러 보세요</h3></div>}</div>

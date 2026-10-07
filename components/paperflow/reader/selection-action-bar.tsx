@@ -1,13 +1,13 @@
 "use client";
 import { useLayoutEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { Copy, Highlighter, Languages, NotebookPen, X, BookOpen, Ellipsis, Quote } from "lucide-react";
+import { Copy, Highlighter, Languages, NotebookPen, X, BookOpen, Ellipsis, Quote, MessageCircleQuestion } from "lucide-react";
 import { ActionBar } from "@/components/ui/action-bar";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { annotationColors, type AnnotationColor, type TextAnchor } from "@/lib/paperflow/anchors/types";
 import { unionRects } from "@/lib/paperflow/anchors/geometry";
-export function SelectionActionBar({ anchor, onHighlight, onNote, onCite, onCopy, onTranslate, onShell, onDismiss, saving }: { anchor: TextAnchor; onHighlight: (color: AnnotationColor) => void; onNote: () => void; /** 노트에 인용: the passage goes into the notebook. */ onCite?: () => void; onCopy: () => void; onTranslate: () => void; onShell: (name: string) => void; onDismiss: () => void; saving: boolean }) {
+export function SelectionActionBar({ anchor, onHighlight, onNote, onCite, onAsk, onCopy, onTranslate, onShell, onDismiss, saving }: { anchor: TextAnchor; onHighlight: (color: AnnotationColor) => void; onNote: () => void; /** 노트에 인용: the passage goes into the notebook. */ onCite?: () => void; /** 질문: ask the paper about the selected sentence. */ onAsk?: () => void; onCopy: () => void; onTranslate: () => void; onShell: (name: string) => void; onDismiss: () => void; saving: boolean }) {
   const root = useRef<HTMLDivElement>(null), reduced = useReducedMotion();
   const [position, setPosition] = useState({ left: 0, top: 0, visible: false }), [more, setMore] = useState(false);
   useLayoutEffect(() => {
@@ -30,7 +30,7 @@ export function SelectionActionBar({ anchor, onHighlight, onNote, onCite, onCopy
   }, [anchor]);
   return <motion.div ref={root} data-selection-ui className="pf-selection-bar" style={{ left: position.left, top: position.top, visibility: position.visible ? "visible" : "hidden" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduced ? 0 : .12 }} onPointerDown={event => { if (event.pointerType === "mouse") event.preventDefault(); }}>
     <ActionBar label="선택한 원문 작업" className="pf-selection-actions"><Button size="sm" variant="ghost" aria-label="Highlight selection" disabled={saving} onClick={() => onHighlight("yellow")}><Highlighter size={15}/> 마킹</Button>
-      <Button size="sm" variant="ghost" onClick={onNote}><NotebookPen size={15}/> 메모</Button>{onCite && <Button size="sm" variant="ghost" title="선택한 문장을 최근 노트에 인용으로 넣습니다" onClick={onCite}><Quote size={15}/> 노트에 인용</Button>}<Button size="sm" variant="ghost" onClick={onTranslate}><Languages size={15}/> 문단 번역</Button><IconButton size="sm" label="개념 설명" variant="ghost" onClick={() => onShell("개념 설명")}><BookOpen size={15}/></IconButton><IconButton size="sm" label="Copy selected text" variant="ghost" onClick={onCopy}><Copy size={15}/></IconButton><IconButton size="sm" label="추가 작업" aria-expanded={more} variant="ghost" onClick={() => setMore(v => !v)}><Ellipsis size={15}/></IconButton><IconButton size="sm" label="Dismiss selection" variant="ghost" onClick={onDismiss}><X size={15}/></IconButton>
+      {onAsk && <Button size="sm" variant="ghost" title="선택한 문장에 대해 질문합니다 (Ctrl+J)" onClick={onAsk}><MessageCircleQuestion size={15}/> 질문</Button>}<Button size="sm" variant="ghost" onClick={onNote}><NotebookPen size={15}/> 메모</Button>{onCite && <Button size="sm" variant="ghost" title="선택한 문장을 최근 노트에 인용으로 넣습니다" onClick={onCite}><Quote size={15}/> 노트에 인용</Button>}<Button size="sm" variant="ghost" onClick={onTranslate}><Languages size={15}/> 문단 번역</Button><IconButton size="sm" label="개념 설명" variant="ghost" onClick={() => onShell("개념 설명")}><BookOpen size={15}/></IconButton><IconButton size="sm" label="Copy selected text" variant="ghost" onClick={onCopy}><Copy size={15}/></IconButton><IconButton size="sm" label="추가 작업" aria-expanded={more} variant="ghost" onClick={() => setMore(v => !v)}><Ellipsis size={15}/></IconButton><IconButton size="sm" label="Dismiss selection" variant="ghost" onClick={onDismiss}><X size={15}/></IconButton>
       <div className="pf-color-row" aria-label="마킹 색상">{annotationColors.map(color => <button disabled={saving} key={color} data-color={color} className="pf-color-choice" aria-label={`${color[0].toUpperCase() + color.slice(1)} highlight`} onClick={() => onHighlight(color)}><span/></button>)}</div>
       {more && <div className="pf-more-actions">{["Search papers", "Formula", "Compare", "Copy citation"].map(name => <Button key={name} size="sm" variant="ghost" onClick={() => onShell(name)}>{name}</Button>)}</div>}
     </ActionBar>
