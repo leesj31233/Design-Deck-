@@ -26,6 +26,7 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 import { SearchField } from "@/components/ui/search-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { PaperflowSidebar } from "../shell/paperflow-sidebar";
+import { MobileNav } from "../shell/mobile-nav";
 import { usePaperflow } from "../shell/paperflow-context";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
 import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
@@ -103,6 +104,7 @@ export function ResearchLibrary() {
   useEffect(() => { void purgeExpired().then(count => { if (count) { void refresh(); notify(`휴지통에서 ${TRASH_DAYS}일이 지난 논문 ${count}편을 영구 삭제했습니다.`); } }).catch(() => undefined); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return <div className="pf-library-shell" onDragOver={event => { if (!event.dataTransfer.types.includes("Files")) return; event.preventDefault(); setDragging(true); }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false); }} onDrop={event => { if (!event.dataTransfer.files.length) return; event.preventDefault(); setDragging(false); void importFiles(Array.from(event.dataTransfer.files)); }}>
     <PaperflowSidebar view={view} onView={setView} trashCount={trashed.length}/>
+    <MobileNav view={view} onView={setView} trashCount={trashed.length}/>
     <main className="pf-library-main">
       <header className="pf-library-top"><span className="pf-breadcrumb">Workspace <span>/</span> {heading}</span><div className="pf-toolbar-group"><IconButton label="Toggle theme" variant="ghost" onClick={toggleTheme}>{dark ? <Sun size={18}/> : <Moon size={18}/>}</IconButton><Button variant="ghost" onClick={openCommand}><Command size={15}/><span className="pf-command-label">명령</span><kbd>Ctrl K</kbd></Button></div></header>
       <div className="pf-library-content">

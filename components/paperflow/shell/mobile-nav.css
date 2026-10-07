@@ -1,0 +1,33 @@
+/* Phone navigation: a tab bar at the bottom and an account sheet. Hidden where the sidebar shows. */
+.paperflow-mobile { font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif; font-size:14px; color:var(--foreground); }
+.pf-mobile-tabs, .pf-mobile-sheet, .pf-mobile-scrim { display:none; }
+@media (max-width:650px) {
+  .pf-mobile-tabs { position:fixed; left:10px; right:10px; bottom:calc(10px + env(safe-area-inset-bottom)); z-index:60; display:grid; grid-template-columns:repeat(6,1fr); padding:6px; border-radius:22px; background:color-mix(in srgb,var(--surface-strong) 90%,transparent); backdrop-filter:blur(20px) saturate(170%); -webkit-backdrop-filter:blur(20px) saturate(170%); border:1px solid color-mix(in srgb,var(--line) 80%,transparent); box-shadow:0 14px 34px -16px rgba(10,30,25,.4); }
+  .pf-mobile-tabs button { display:grid; justify-items:center; gap:3px; min-height:50px; padding:6px 0 4px; border:0; border-radius:16px; background:transparent; color:var(--muted); font:inherit; font-size:10.5px; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .pf-mobile-tabs button[aria-current="page"] { background:color-mix(in srgb,var(--accent) 12%,transparent); color:var(--accent); }
+  .pf-mobile-tabs button:active { transform:scale(.94); }
+  .pf-mobile-avatar { width:20px; height:20px; border-radius:50%; object-fit:cover; }
+  /* Room for the tab bar under the last item. */
+  .pf-library-content { padding-bottom:calc(96px + env(safe-area-inset-bottom)) !important; }
+  .pf-mobile-scrim { display:block; position:fixed; inset:0; z-index:70; background:rgba(8,14,12,.38); }
+  .pf-mobile-sheet { display:grid; gap:14px; position:fixed; left:0; right:0; bottom:0; z-index:71; max-height:86dvh; overflow:auto; padding:8px 18px calc(22px + env(safe-area-inset-bottom)); border-radius:24px 24px 0 0; background:var(--background); box-shadow:0 -20px 50px -20px rgba(0,0,0,.35); touch-action:pan-y; }
+  html[data-pf-lite] .pf-mobile-tabs { background:var(--surface-strong); }
+  .pf-mobile-grabber { justify-self:center; width:40px; height:5px; border-radius:999px; background:color-mix(in srgb,var(--foreground) 18%,transparent); }
+  .pf-mobile-sheet header { display:flex; align-items:center; justify-content:space-between; }
+  .pf-mobile-sheet header button { display:grid; place-items:center; width:36px; height:36px; border:0; border-radius:50%; background:color-mix(in srgb,var(--foreground) 6%,transparent); color:var(--foreground); cursor:pointer; }
+  .pf-mobile-credits { margin:0; padding:12px 14px; border-radius:14px; background:color-mix(in srgb,var(--accent) 9%,transparent); font-size:13.5px; color:var(--foreground); }
+  .pf-mobile-credits b { font-size:16px; color:var(--accent); }
+  .pf-mobile-account .pf-account { box-shadow:none; }
+  .pf-mobile-links { display:grid; gap:6px; }
+  .pf-mobile-links button { display:flex; align-items:center; gap:12px; min-height:50px; padding:0 14px; border:1px solid var(--line); border-radius:14px; background:transparent; color:var(--foreground); font:inherit; font-size:15px; font-weight:600; text-align:left; cursor:pointer; }
+  .pf-mobile-links button[aria-current="page"] { border-color:var(--accent); color:var(--accent); }
+  .pf-mobile-links i { margin-left:auto; padding:1px 8px; border-radius:999px; background:color-mix(in srgb,var(--foreground) 8%,transparent); font-style:normal; font-size:12px; }
+}
+/* Phone: nothing is wider than the screen. The collection controls wrap; side panels never push the page. */
+@media (max-width:650px) {
+  html, body { overflow-x:hidden; }
+  .pf-collection-controls { display:flex; flex-wrap:wrap; gap:8px; width:100%; }
+  .pf-collection-controls > :first-child { flex:1 1 100%; min-width:0; }
+  .pf-library-top { flex-wrap:wrap; gap:8px; }
+  .pf-wm-stage, .pf-mapview { overflow:hidden; }
+}
