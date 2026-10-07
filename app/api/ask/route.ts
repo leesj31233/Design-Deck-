@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   let body: { question?: unknown; passages?: unknown; overview?: unknown; history?: unknown; focus?: unknown; title?: unknown; keywords?: unknown; options?: { speed?: unknown; web?: unknown; literature?: unknown } };
   try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청입니다." }, { status: 400 }); }
   const question = typeof body.question === "string" ? body.question.trim().slice(0, 600) : "";
-  const passages: AskPassage[] = (Array.isArray(body.passages) ? body.passages : []).filter((item): item is AskPassage => typeof item?.id === "string" && /^p\d{1,4}$/.test(item.id) && typeof item.text === "string" && Number.isFinite(item.page)).slice(0, 14).map(item => ({ id: item.id, page: item.page, text: item.text.slice(0, 1500) }));
+  const passages: AskPassage[] = (Array.isArray(body.passages) ? body.passages : []).filter((item): item is AskPassage => typeof item?.id === "string" && /^p\d{1,4}$/.test(item.id) && typeof item.text === "string" && Number.isFinite(item.page)).slice(0, 14).map(item => ({ id: item.id, page: item.page, text: item.text.slice(0, 1800) }));
   const overview = typeof body.overview === "string" ? body.overview.slice(0, 1400) : "";
   const focus = typeof body.focus === "string" ? body.focus.slice(0, 1200) : "";
   const title = typeof body.title === "string" ? body.title.slice(0, 300) : "";
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
           signal: AbortSignal.any([request.signal, AbortSignal.timeout(110_000)]),
           body: JSON.stringify({
             model, store: false, stream: true, prompt_cache_key: "paperflow-ask",
-            ...(/^(?:gpt-5|o\d)/.test(model) ? { reasoning: { effort: options.web || options.speed === "deep" ? "low" : "minimal" } } : { temperature: .2 }),
+            ...(/^(?:gpt-5|o\d)/.test(model) ? { reasoning: { effort: "low" } } : { temperature: .2 }),
             // Web search on: at least one search is made (the reader asked for outside sources and pays for it).
             ...(options.web ? { tools: [{ type: "web_search" }], tool_choice: "required" } : {}),
             instructions: ASK_INSTRUCTIONS,

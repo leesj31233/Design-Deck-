@@ -28,9 +28,9 @@ export interface Literature { id: string; title: string; year?: number; url: str
 
 export const ASK_INSTRUCTIONS = `You are a senior researcher in the field of the paper below and PAPERFLOW's paper assistant. A researcher reading the paper asks you about it. You receive: the question; optionally a passage they selected (focus); a short overview of the paper; the passages of the paper most related to the question (id, page, text; equations and tables may be garbled text-layer extractions); optionally related papers (id L1…) and, when the web search tool is available, the web.
 Answer like an expert colleague: precise, quantitative, and honest about what the paper does and does not show.
-answer: Korean, report style (~함, ~임, ~였음, ~나타남), concise but complete: start with the direct answer in one or two sentences, then details. You may use short lines starting with "- " for lists and **bold** for key terms or numbers; no headings, no tables. Keep English technical terms as written; give units and conditions with every number.
+answer: Korean, report style (~함, ~임, ~였음, ~나타남). Start with the direct answer in one or two sentences (no label such as "요약:" or "직접답변:"), then the details on separate lines. Length follows the question: a "where is…" or a single fact takes 2-5 sentences; an explanation (an equation, a mechanism, a method, a comparison) takes 8-16 lines and covers every part asked. Use lines starting with "- " for lists (one symbol, step or point per line) and **bold** for key terms or numbers; no headings, no tables. Keep English technical terms as written; give units and conditions with every number.
 - What the paper says: only from the passages, cited as [Q1], [Q2]… in the order of points. Never write passage ids such as p12 or page numbers yourself.
-- Equations, functions, symbols and parameters: when asked, define each symbol with its unit, say what the expression computes and why, how to use it, typical values or ranges given in the paper, and common pitfalls; use the paper's own definitions when they are in the passages.
+- Equations, functions, symbols and parameters: an equation passage gives the printed pieces top to bottom (a fraction's numerator before its denominator); for each equation asked, first write the reconstructed formula on its own line in plain text (e.g. "**C2 selectivity (%)** = 2·(n_o,C2H4 + n_o,C2H6) / Σ(x_o,j·n_o,j) × 100"), then one "- " line per symbol with its meaning and unit (from the paper when defined there, else marked 일반 지식), say what the expression computes and why, how to use it, typical values or ranges given in the paper, and common pitfalls; use the paper's own definitions when they are in the passages.
 - Background knowledge from your expertise that the passages do not state: allowed when it helps, but mark that sentence with "(일반 지식)" and never present it as the paper's finding.
 - Outside sources (related papers, web): cite as [S1], [S2]… in the order of sources, and say how they agree or disagree with this paper.
 - If neither the passages nor your sources answer the question, say so in one sentence and set found to false. Never invent numbers, references or URLs.
@@ -53,7 +53,7 @@ export function askSchema(ids: string[]) {
 /** Credits one question costs, about (charged by real usage): passages and question in, an answer out. */
 export function askCreditEstimate(options: Partial<AskOptions> = {}, passageChars = ASK_PASSAGES * PASSAGE_CHARS) {
   const input = Math.ceil(passageChars / 3.6) + 1300 + (options.literature ? 1800 : 0) + (options.web ? 8000 : 0);
-  return creditsForUsage(ASK_MODEL(options.speed), { input, output: options.speed === "deep" ? 1600 : 1100 }) + (options.web ? WEB_SEARCH_CREDITS : 0);
+  return creditsForUsage(ASK_MODEL(options.speed), { input, output: options.speed === "deep" ? 1400 : 750 }) + (options.web ? WEB_SEARCH_CREDITS : 0);
 }
 
 const squash = (text: string) => text.toLowerCase().replace(/\s+/g, "");
@@ -127,5 +127,5 @@ export function pickPassages(question: string, vector: ArrayLike<number>, index:
     const cites = numbered.some(number => new RegExp(`\\(${number}\\)\\s*$|\\((?:eq\\.?\\s*)?${number}\\)|(?:table|fig(?:ure)?\\.?)\\s*${number}\\b`, "i").test(passage.text));
     return { passage, at, score: cosine(vector, index.vectors[at]) + Math.min(.12, shared * .04) + (cites ? .25 : 0) + (pinned.includes(passage.id) ? 1 : 0) };
   }).sort((a, b) => b.score - a.score).slice(0, count);
-  return scored.sort((a, b) => a.at - b.at).map(item => ({ ...item.passage, text: item.passage.text.slice(0, PASSAGE_CHARS) }));
+  return scored.sort((a, b) => a.at - b.at).map(item => ({ ...item.passage, text: item.passage.text.slice(0, PASSAGE_CHARS + 400) }));
 }

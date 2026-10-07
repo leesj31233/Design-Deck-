@@ -83,8 +83,15 @@ export function GuideHighlights({ documentId, pageIndex, surface, layer, textRea
         if (korean) {
           const english = store.manifest?.units.find(unit => unit.id === mark.unitId)?.text ?? "";
           const sentence = koreanFor(english, korean, mark.quote);
-          return sentence ? bands(koreanRects(page, mark.unitId, sentence).map(toBox)) : [];
+          if (sentence) return bands(koreanRects(page, mark.unitId, sentence).map(toBox));
+          // The quote may sit in a neighbouring paragraph of this page (an answer's evidence around an equation).
+          for (const unit of store.manifest?.units ?? []) {
+            if (unit.id === mark.unitId || !unit.pages.includes(pageIndex) || !store.texts.has(unit.id) || store.hidden.has(unit.id)) continue;
+            const other = koreanFor(unit.text, store.texts.get(unit.id)!, mark.quote);
+            if (other) return bands(koreanRects(page, unit.id, other).map(toBox));
+          }
         }
+        // English page, or a paragraph not shown in Korean.
         const found = locateQuote(index.text, mark.quote);
         return found ? bands(index.rectsFor(found.start, found.length)) : [];
       };

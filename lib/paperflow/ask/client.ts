@@ -5,7 +5,7 @@ import { askCreditEstimate, partialAnswer, pickPassages, PASSAGE_CHARS, type Ask
 export interface PaperPassage { unitId: string; page: number; text: string; kind?: "text" | "equation" | "table" }
 interface StoredIndex { documentId: string; version: string; passages: PaperPassage[]; vectors: Float32Array[] }
 
-const INDEX_VERSION = "ask-v2";
+const INDEX_VERSION = "ask-v3";
 const ROLES = new Set(["ABSTRACT", "BODY", "CAPTION", "KEYWORDS"]);
 
 /**
@@ -30,12 +30,22 @@ export function passagesOf(manifest: TranslationManifest): PaperPassage[] {
     if (chunk) out.push({ unitId: unit.id, page: pageAt(start) + 1, text: chunk });
   }
   const blocks = [...(manifest.blocks ?? [])].sort((a, b) => a.pageIndex - b.pageIndex || a.readingOrder - b.readingOrder);
-  blocks.forEach((block, at) => {
-    if (block.role !== "EQUATION" || block.text.trim().length < 3) return;
-    const before = blocks.slice(0, at).reverse().find(item => item.pageIndex === block.pageIndex && ROLES.has(item.role)), after = blocks.slice(at + 1).find(item => item.pageIndex === block.pageIndex && ROLES.has(item.role));
-    const lead = before ? before.text.slice(-260) : "", follow = after ? after.text.slice(0, 340) : "";
-    out.push({ unitId: before?.unitId ?? block.id, page: block.pageIndex + 1, kind: "equation", text: `${lead} [Equation] ${block.text.trim()} ${follow}`.trim().slice(0, PASSAGE_CHARS) });
-  });
+  // An equation is printed in pieces (a fraction's numerator often reads as figure text, its
+  // denominator as another equation line): every run of equation pieces between two paragraphs on a
+  // page is one passage, its pieces top to bottom, with the sentences around it (where symbols are defined).
+  for (let at = 0; at < blocks.length; at++) {
+    if (blocks[at].role !== "EQUATION") continue;
+    let from = at, to = at;
+    const piece = (index: number) => blocks[index] && blocks[index].pageIndex === blocks[at].pageIndex && (blocks[index].role === "EQUATION" || blocks[index].role === "FIGURE_TEXT" && blocks[index].text.trim().length < 80);
+    while (piece(from - 1)) from--;
+    while (piece(to + 1)) to++;
+    const pieces = blocks.slice(from, to + 1).sort((a, b) => a.y - b.y || a.x - b.x).map(item => item.text.trim()).filter(Boolean);
+    const page = blocks[at].pageIndex;
+    const before = blocks.slice(0, from).reverse().find(item => item.pageIndex === page && ROLES.has(item.role)), after = blocks.slice(to + 1).find(item => item.pageIndex === page && ROLES.has(item.role));
+    const lead = before ? before.text.slice(-280) : "", follow = after ? after.text.slice(0, 420) : "";
+    out.push({ unitId: before?.unitId ?? after?.unitId ?? blocks[at].id, page: page + 1, kind: "equation", text: `${lead} [Equation pieces, top to bottom; a fraction's numerator comes before its denominator] ${pieces.join(" ⏐ ")} [/Equation] ${follow}`.trim().slice(0, PASSAGE_CHARS + 300) });
+    at = to;
+  }
   // Table cells on a page, row by row as printed, joined into one passage per table.
   let table: { page: number; cells: string[]; unitId: string } | null = null;
   const flush = () => { if (table && table.cells.length >= 4) out.push({ unitId: table.unitId, page: table.page + 1, kind: "table", text: `[Table] ${table.cells.join(" | ")}`.slice(0, PASSAGE_CHARS) }); table = null; };
