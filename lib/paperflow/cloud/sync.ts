@@ -11,6 +11,14 @@ import { openDatabase, transactionDone } from "../persistence/indexeddb";
 import type { StoredDocument } from "../persistence/types";
 import { recordOf, rowOf, type DocumentRow } from "./records";
 import type { Annotation } from "../anchors/types";
+import { forgetTombstone, noteRepository, noteTombstones } from "../notes/note-repository";
+import type { QuickNote } from "../notes/notebook";
+
+/**
+ * Notebook notes travel in the annotations table under this document id (rows "note:<id>"), so they
+ * sync with the account without a schema change; the annotation merge skips them.
+ */
+const NOTEBOOK = "__notebook__";
 
 export type CloudStatus = "disabled" | "loading" | "signed-out" | "signed-in";
 interface CloudState {
@@ -52,6 +60,13 @@ async function pushAnnotation(id: string, documentId: string, deleted: boolean) 
   if (!session) return;
   const local = deleted ? null : (await annotationRepository.listByDocument(documentId)).find(item => item.id === id);
   await supabase().from("annotations").upsert({ user_id: session.user.id, id, document_id: documentId, data: local ?? {}, deleted: deleted || !local, updated_at: local?.updatedAt ?? new Date().toISOString() }, { onConflict: "user_id,id" });
+}
+
+async function pushNote(id: string, deleted: boolean) {
+  if (!session) return;
+  const local = deleted ? null : (await noteRepository.list()).find(note => note.id === id) ?? null;
+  await supabase().from("annotations").upsert({ user_id: session.user.id, id: `note:${id}`, document_id: NOTEBOOK, data: local ?? {}, deleted: !local, updated_at: local?.updatedAt ?? noteTombstones()[id] ?? new Date().toISOString() }, { onConflict: "user_id,id" });
+  if (!local) forgetTombstone(id);
 }
 
 async function pushTranslations(documentId: string, unitIds?: string[]) {
@@ -108,13 +123,28 @@ export async function syncAll() {
     for (const doc of local) { if (purged.has(doc.id)) continue; const row = remote.get(doc.id); if (!row || doc.updatedAt > row.updated_at || (uploads && !row.storage_path && doc.sourceStatus !== "remote")) await pushDocument(doc, row); }
 
     const [{ data: notes }, localNotes] = await Promise.all([db.from("annotations").select("id, document_id, data, deleted, updated_at"), annotationRepository.listAll()]);
-    const remoteNotes = new Map((notes ?? []).map(row => [row.id as string, row])), localById = new Map(localNotes.map(note => [note.id, note]));
+    // A device on an older version may have stored a notebook note as a mark (it has no document): drop it.
+    for (const stray of localNotes.filter(note => !note.documentId)) await annotationRepository.removeRaw(stray.id);
+    const remoteNotes = new Map((notes ?? []).filter(row => row.document_id !== NOTEBOOK).map(row => [row.id as string, row])), localById = new Map(localNotes.map(note => [note.id, note]));
     for (const row of remoteNotes.values()) {
       const note = localById.get(row.id);
       if (row.deleted) { if (note && note.updatedAt <= row.updated_at) await annotationRepository.removeRaw(row.id); continue; }
       if (!note || row.updated_at > note.updatedAt) await annotationRepository.putRaw(row.data as Annotation);
     }
-    for (const note of localNotes) { const row = remoteNotes.get(note.id); if (!row || note.updatedAt > row.updated_at) await pushAnnotation(note.id, note.documentId, false); }
+    for (const note of localNotes.filter(item => item.documentId)) { const row = remoteNotes.get(note.id); if (!row || note.updatedAt > row.updated_at) await pushAnnotation(note.id, note.documentId, false); }
+
+    // Notebook: newest wins; a note deleted anywhere is deleted everywhere.
+    const notebookRows = (notes ?? []).filter(row => row.document_id === NOTEBOOK);
+    const localNotebook = new Map((await noteRepository.list()).map(note => [note.id, note])), tombstones = noteTombstones();
+    for (const row of notebookRows) {
+      const id = String(row.id).slice(5), mine = localNotebook.get(id);
+      if (row.deleted) { if (mine && mine.updatedAt <= row.updated_at) { await noteRepository.removeRaw(id); localNotebook.delete(id); } continue; }
+      if (tombstones[id]) continue;
+      if (!mine || row.updated_at > mine.updatedAt) { await noteRepository.putRaw(row.data as QuickNote); localNotebook.set(id, row.data as QuickNote); }
+    }
+    const notebookRemote = new Map(notebookRows.map(row => [String(row.id).slice(5), row]));
+    for (const note of localNotebook.values()) { const row = notebookRemote.get(note.id); if (!row || note.updatedAt > row.updated_at) await pushNote(note.id, false); }
+    for (const id of Object.keys(tombstones)) await pushNote(id, true);
 
     // Translations: pull what this device lacks, push what the account lacks.
     const { data: keys } = await db.from("translations").select("document_id, unit_id").eq("prompt_version", TRANSLATION_PROMPT_VERSION);
@@ -144,7 +174,7 @@ let timer: ReturnType<typeof setTimeout> | undefined;
 function queue(change: LocalChange) {
   if (change.kind === "purge") { setPendingPurges([...pendingPurges().filter(item => item.id !== change.id), change]); if (session) void flushPurges(); return; }
   if (!session) return;
-  const key = change.kind === "document" ? `d:${change.id}` : change.kind === "annotation" ? `a:${change.id}` : `t:${change.documentId}`;
+  const key = change.kind === "document" ? `d:${change.id}` : change.kind === "annotation" ? `a:${change.id}` : change.kind === "note" ? `n:${change.id}` : `t:${change.documentId}`;
   const previous = queued.get(key);
   queued.set(key, change.kind === "translation" && previous?.kind === "translation" ? { ...change, unitIds: [...new Set([...previous.unitIds, ...change.unitIds])] } : change);
   clearTimeout(timer);
@@ -157,6 +187,7 @@ async function flush() {
       if (change.kind === "document") { const doc = await documentRepository.getDocument(change.id); if (doc) await pushDocument(doc); }
       else if (change.kind === "annotation") await pushAnnotation(change.id, change.documentId, Boolean(change.deleted));
       else if (change.kind === "translation") await pushTranslations(change.documentId, change.unitIds);
+      else if (change.kind === "note") await pushNote(change.id, Boolean(change.deleted));
     } catch { set({ error: "일부 변경을 계정에 저장하지 못했습니다. 다음 동기화 때 다시 시도합니다." }); }
   }
   set({ lastSyncedAt: new Date().toISOString() });
@@ -213,6 +244,9 @@ export function initCloud() {
   const refreshSoon = () => { if (!session) return; clearTimeout(refreshTimer); refreshTimer = setTimeout(() => void refreshPlan(), 800); };
   window.addEventListener("paperflow:translation-progress", event => { if (!(event as CustomEvent<{ running?: boolean }>).detail?.running) refreshSoon(); });
   window.addEventListener("focus", refreshSoon);
+  let lastFocusSync = Date.now();
+  const syncOnReturn = () => { if (!session || document.visibilityState === "hidden" || Date.now() - lastFocusSync < 60_000) return; lastFocusSync = Date.now(); void syncAll(); };
+  window.addEventListener("focus", syncOnReturn); document.addEventListener("visibilitychange", syncOnReturn);
   window.addEventListener("paperflow:credits-changed", refreshSoon);
   void client.auth.getSession().then(({ data }) => applySession(data.session));
   client.auth.onAuthStateChange((event, next) => { if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") void applySession(next); else session = next; });

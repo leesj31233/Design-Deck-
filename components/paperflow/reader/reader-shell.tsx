@@ -19,7 +19,7 @@ import { clearHistory, createAnnotation, onHistoryChange, recordStep, redo, remo
 import { SearchField } from "@/components/ui/search-field";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
 import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
-import { pdfAdapter, type PdfDocumentHandle, type PdfPageHandle } from "@/lib/paperflow/pdf/pdf-adapter";
+import { pdfAdapter, warmPdf, type PdfDocumentHandle, type PdfPageHandle } from "@/lib/paperflow/pdf/pdf-adapter";
 import { useReaderStore } from "@/lib/paperflow/state/reader-store";
 import { readableError } from "@/lib/paperflow/errors";
 import type { Annotation, AnnotationColor } from "@/lib/paperflow/anchors/types";
@@ -120,6 +120,8 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     const controller = new AbortController(); let handle: PdfDocumentHandle | undefined;
     setPdf(null); setPage(null); setError(""); setSelected(undefined); setActiveUnit(null);
     useTranslationStore.getState().open(documentId);
+    // PDF.js and its worker start while the file is read from storage.
+    warmPdf();
     void (async () => {
       const [record, blob] = await Promise.all([documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId)]);
       if (!record) throw new Error("이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");

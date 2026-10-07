@@ -6,6 +6,7 @@ export type LocalChange =
   | { kind: "document"; id: string }
   | { kind: "annotation"; id: string; documentId: string; deleted?: boolean }
   | { kind: "translation"; documentId: string; unitIds: string[] }
+  | { kind: "note"; id: string; deleted?: boolean }
   | { kind: "purge"; id: string; title: string; filename: string; byteLength: number; pageCount: number };
 
 const listeners = new Set<(change: LocalChange) => void>();

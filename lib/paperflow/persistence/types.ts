@@ -13,6 +13,8 @@ export type StoredDocument = {
   researchPoolIds: string[]; archived: boolean;
   /** The archive folder the paper is filed in (null or absent: unfiled). */
   archiveFolder?: ArchiveFolder | null;
+  /** The first page as a small webp data URL, made once and synced with the paper (like a notebook cover). */
+  cover?: string;
   /** In the trash since then (purged for good after 30 days); null when restored, so the restore syncs too. */
   deletedAt?: string | null;
   /** local: PDF only here. cloud: PDF also in the account's cloud storage. remote: listed by the account, PDF on another device. */

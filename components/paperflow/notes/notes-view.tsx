@@ -34,7 +34,7 @@ function MarksByPaper({ docs, annotations }: { docs: StoredDocument[]; annotatio
     {!groups.length && <div className="pf-notes-empty"><FileText size={26}/><h3>{needle ? "찾는 마킹이 없습니다" : "원문에서 시작하는 메모"}</h3><p>{needle ? "다른 단어로 찾아보세요." : "Reader에서 마킹·펜·텍스트 메모를 남기면 논문별로 이곳에 모입니다."}</p></div>}
     <div className="pf-paper-groups">{groups.map(({ doc, shown, highlights, memos }) => { const open = !closed.has(doc.id); return <article key={doc.id} className="pf-paper-group" data-open={open || undefined}>
       <button type="button" className="pf-paper-group-head" aria-expanded={open} onClick={() => setClosed(current => { const next = new Set(current); if (next.has(doc.id)) next.delete(doc.id); else next.add(doc.id); return next; })}>
-        <span className="pf-paper-group-cover"><DocumentCover documentId={doc.id} title={doc.title}/></span>
+        <span className="pf-paper-group-cover"><DocumentCover documentId={doc.id} title={doc.title} cover={doc.cover}/></span>
         <span className="pf-paper-group-meta"><b>{doc.title.replace(/\.pdf$/i, "")}</b><small>{[doc.authors?.[0], doc.journal, doc.year].filter(Boolean).join(" · ") || `${doc.pageCount}p`}</small><span className="pf-paper-group-counts"><em>마킹 {highlights}</em><em>메모 {memos}</em></span></span>
       </button>
       {open && <ol className="pf-mark-list">{shown.map(mark => <li key={mark.id}>
@@ -83,7 +83,7 @@ function Notebook({ docs, annotations }: { docs: StoredDocument[]; annotations: 
   };
   useEffect(() => () => { if (saving.current) clearTimeout(saving.current); }, []);
   const create = async () => { const now = new Date().toISOString(), note: QuickNote = { id: crypto.randomUUID(), title: "", body: "", pinned: false, createdAt: now, updatedAt: now }; await store(note); setActiveId(note.id); setDraft(note); setTimeout(() => area.current?.focus(), 30); };
-  const remove = async (note: QuickNote) => { if (!await confirmAction({ title: `"${noteTitle(note)}" 노트를 삭제할까요?`, body: "이 기기에 저장된 노트가 지워지며 되돌릴 수 없습니다.", confirm: "삭제", tone: "danger" })) return; await noteRepository.remove(note.id); client.setQueryData<QuickNote[]>(["notebook"], current => (current ?? []).filter(item => item.id !== note.id)); if (activeId === note.id) setActiveId(null); };
+  const remove = async (note: QuickNote) => { if (!await confirmAction({ title: `"${noteTitle(note)}" 노트를 삭제할까요?`, body: "로그인한 모든 기기에서 지워지며 되돌릴 수 없습니다.", confirm: "삭제", tone: "danger" })) return; await noteRepository.remove(note.id); client.setQueryData<QuickNote[]>(["notebook"], current => (current ?? []).filter(item => item.id !== note.id)); if (activeId === note.id) setActiveId(null); };
   const choose = (candidate: MentionCandidate) => { if (!draft || !mention) return; area.current?.insert(candidate.token); setMention(null); };
 
   return <section className="pf-notes-book" aria-label="노트">

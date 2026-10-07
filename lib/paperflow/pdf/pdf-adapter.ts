@@ -23,6 +23,19 @@ async function getLibrary() {
   library ??= import("pdfjs-dist").then(pdf => { pdf.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs"; return pdf; });
   return library;
 }
+/**
+ * One PDF.js worker for every document this tab opens: starting a worker (and parsing its 1 MB
+ * script) for each paper was a good part of the wait before the first page. Destroying a document
+ * leaves a shared worker running.
+ */
+let sharedWorker: Promise<InstanceType<typeof import("pdfjs-dist").PDFWorker>> | undefined;
+function getWorker() {
+  sharedWorker ??= getLibrary().then(pdf => new pdf.PDFWorker());
+  sharedWorker.catch(() => { sharedWorker = undefined; });
+  return sharedWorker;
+}
+/** Start PDF.js and its worker ahead of time (the library calls this when idle, the reader at once). */
+export function warmPdf() { if (typeof window !== "undefined") void getWorker().catch(() => undefined); }
 type Quad = [number, number, number, number];
 /**
  * Figures are sometimes a whole PDF page pasted in as a form XObject and clipped to the figure
@@ -153,8 +166,8 @@ function documentHandle(document: PDFDocumentProxy, destroy: () => Promise<void>
 }
 export const pdfAdapter = {
   async open(source: ArrayBuffer | Uint8Array, signal?: AbortSignal): Promise<PdfDocumentHandle> {
-    const pdf = await getLibrary(); signal?.throwIfAborted();
-    const task = pdf.getDocument({ data: new Uint8Array(source), cMapUrl: "/pdfjs/cmaps/", cMapPacked: true, standardFontDataUrl: "/pdfjs/standard_fonts/", wasmUrl: "/pdfjs/wasm/" });
+    const [pdf, worker] = await Promise.all([getLibrary(), getWorker().catch(() => undefined)]); signal?.throwIfAborted();
+    const task = pdf.getDocument({ data: new Uint8Array(source), worker, cMapUrl: "/pdfjs/cmaps/", cMapPacked: true, standardFontDataUrl: "/pdfjs/standard_fonts/", wasmUrl: "/pdfjs/wasm/" });
     const cancel = () => { void task.destroy(); }; signal?.addEventListener("abort", cancel, { once: true });
     try { return documentHandle(await task.promise, () => task.destroy()); }
     catch (error) { await task.destroy(); throw error; }
