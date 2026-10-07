@@ -1015,3 +1015,14 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { pointer-events:none!important; opacity:0; transition:opacity .12s ease; }
 /* A card's icon actions (move, archive or restore, trash) stay together at the row's end. */
 .pf-book-icons { display:inline-flex; align-items:center; gap:2px; margin-left:auto; white-space:nowrap; }
+
+/* Focus mode pointer choice, and the presentation pointers' canvas. */
+.pf-pointer-modes { display:inline-flex; gap:2px; margin-left:6px; padding:2px; border-radius:10px; background:color-mix(in srgb,var(--foreground) 5%,transparent); }
+.pf-pointer-modes button { display:inline-flex; align-items:center; gap:4px; height:28px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--muted); font:inherit; font-size:12px; cursor:pointer; }
+.pf-pointer-modes button[aria-checked="true"] { background:var(--surface-strong); color:var(--foreground); box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.pf-pointer-modes button span { display:none; }
+.pf-pointer-modes button[aria-checked="true"] span { display:inline; }
+.pf-present-canvas { position:fixed; inset:0; width:100vw; height:100vh; z-index:85; pointer-events:none; }
+[data-present-pointer="laser"], [data-present-pointer="laser"] * { cursor:none !important; }
+[data-present-pointer="chalk"], [data-present-pointer="chalk"] * { cursor:crosshair !important; }
+[data-present-draw], [data-present-draw] * { user-select:none !important; -webkit-user-select:none !important; }

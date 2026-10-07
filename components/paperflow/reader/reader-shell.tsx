@@ -14,7 +14,7 @@ import { GuideReadingLine } from "../guide/guide-highlights";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { BatchProgress } from "./batch-progress";
-import { Maximize2, Minimize2, Minus, Plus, Redo2, Undo2 } from "lucide-react";
+import { Maximize2, Minimize2, Minus, Plus, Redo2, Undo2, Brush, Droplet, Flashlight, MousePointer2, Zap } from "lucide-react";
 import { clearHistory, createAnnotation, onHistoryChange, recordStep, redo, removeAnnotation, undo, updateAnnotation } from "@/lib/paperflow/state/history";
 import { SearchField } from "@/components/ui/search-field";
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
@@ -32,11 +32,14 @@ import { ResearchInspector } from "./research-inspector";
 import { ReaderSelectionTools } from "./reader-selection-tools";
 import { HighlightColorChip } from "./highlight-color-chip";
 import { LiquidCursor } from "./liquid-cursor";
+import { POINTER_MODES, PresentPointer, readPointerMode, writePointerMode, type PointerMode } from "./present-pointer";
 import type { ResolvedAnnotation } from "./highlight-layer";
 import type { PdfParagraph } from "@/lib/paperflow/layout/types";
 import { startTranslationJob, cancelTranslationJob, translationJobStatus, prepareReader, translateUnitsNow, type TranslationJobStatus } from "@/lib/paperflow/translation/document-job";
 import { useTranslationStore } from "@/lib/paperflow/translation/translation-store";
 const emptyAnnotations: Annotation[] = [];
+
+const POINTER_ICON: Record<PointerMode, typeof Zap> = { default: MousePointer2, liquid: Droplet, laser: Zap, chalk: Brush, spotlight: Flashlight };
 
 export function ReaderShell({ documentId }: { documentId: string }) {
   const { notify, registerReader, openImport } = usePaperflow(), client = useQueryClient();
@@ -49,6 +52,10 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const [exportRunning, setExportRunning] = useState(false), [exportProgress, setExportProgress] = useState(0);
   const [textNoteOpen, setTextNoteOpen] = useState(false), [textNoteDraft, setTextNoteDraft] = useState("");
   // Focus mode: only the paper and the marking tools, full screen when the browser allows it.
+  // Focus mode's pointer: the system pointer by default (easiest to read past), or a presentation pointer.
+  const [pointerMode, setPointerMode] = useState<PointerMode>("default");
+  useEffect(() => { setPointerMode(readPointerMode()); }, []);
+  const choosePointer = (mode: PointerMode) => { setPointerMode(mode); writePointerMode(mode); };
   const [focus, setFocus] = useState(false), wentFullscreen = useRef(false), beforeFocus = useRef<{ fitMode: "width" | "page" | "custom"; zoom: number } | null>(null);
   const enterFocus = useCallback(() => {
     setFocus(true);
@@ -314,6 +321,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
           <span className="pf-focus-zoom">{Math.round(scale * 100)}%</span>
           <IconButton label="확대" size="sm" variant="ghost" disabled={Math.round(scale * 100) >= 250} onClick={() => useReaderStore.getState().set({ zoom: Math.min(250, Math.round(scale * 100) + 10), fitMode: "custom", activeSelection: null })}><Plus size={15}/></IconButton>
           <span className="pf-focus-page">{currentPage} / {pdf?.pageCount ?? 1}</span>
+          <span className="pf-pointer-modes" role="radiogroup" aria-label="포인터">{POINTER_MODES.map(mode => { const Icon = POINTER_ICON[mode.value]; return <button key={mode.value} type="button" role="radio" aria-checked={pointerMode === mode.value} title={`${mode.label} — ${mode.hint}`} aria-label={mode.label} onClick={() => choosePointer(mode.value)}><Icon size={14}/><span>{mode.label}</span></button>; })}</span>
         </>}
         <IconButton label={focus ? "확장 종료 (Esc)" : "확장: PDF와 마킹 도구만 전체화면으로"} size="sm" variant="ghost" aria-pressed={focus} onClick={focus ? exitFocus : enterFocus}>{focus ? <Minimize2 size={15}/> : <Maximize2 size={15}/>}</IconButton>
       </span>
@@ -329,7 +337,8 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>{guideOverlay && guide.data ? "J·K 다음·이전 형광 · G 가이드 · Ctrl K 명령" : "Ctrl Z 되돌리기 · H 마킹 · N 메모 · G 가이드 · Ctrl K 명령"}</span></footer>
     {textNoteOpen && <div className="pf-note-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setTextNoteOpen(false); }}><section className="pf-note-dialog" role="dialog" aria-modal="true" aria-label="텍스트 메모"><h2>텍스트 메모</h2><p>{useReaderStore.getState().activeSelection ? "선택한 문장에 메모를 연결합니다." : `${currentPage}페이지에 메모를 저장합니다.`}</p><textarea autoFocus aria-label="텍스트 메모 입력" value={textNoteDraft} onChange={event => setTextNoteDraft(event.target.value)} onKeyDown={event => { if (event.key === "Escape") setTextNoteOpen(false); }} placeholder="읽으며 떠오른 생각이나 질문을 기록하세요."/><div><Button variant="ghost" onClick={() => setTextNoteOpen(false)}>취소</Button><Button disabled={!textNoteDraft.trim() || saving} onClick={() => void saveNote(textNoteDraft).then(() => setTextNoteOpen(false))}>메모 저장</Button></div></section></div>}
     <HighlightColorChip/>
-    {focus && <LiquidCursor root={viewport}/>}
+    {focus && pointerMode === "liquid" && <LiquidCursor root={viewport}/>}
+    {focus && (pointerMode === "laser" || pointerMode === "chalk" || pointerMode === "spotlight") && <PresentPointer root={viewport} mode={pointerMode}/>}
     <ReaderSelectionTools documentId={documentId} onHighlight={color => void save(color)} onNote={showNote} onTranslate={translateSelection} onShell={showShell} onDismiss={dismiss} saving={saving}/>
   </div>;
 }
