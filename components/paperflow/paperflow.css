@@ -1031,3 +1031,6 @@ html[data-pf-selecting] .pf-selection-bar, html[data-pf-selecting] .pf-manual { 
 html[data-pf-lite] *, html[data-pf-lite] *::before, html[data-pf-lite] *::after { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
 html[data-pf-lite] .dd-glass, html[data-pf-lite] .pf-inspector, html[data-pf-lite] .pf-askdock-panel, html[data-pf-lite] .pf-discover-search { background:var(--surface-strong) !important; }
 html[data-pf-lite] .pf-shelf-loading span, html[data-pf-lite] .pf-paper-card-wait span { animation:none; }
+/* When the paper was last opened, at the start of the card's action row. */
+.pf-book-opened { display:inline-flex; align-items:center; gap:4px; font-size:11.5px; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.pf-book-opened[data-new] { opacity:.75; }
