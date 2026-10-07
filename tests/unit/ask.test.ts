@@ -39,7 +39,7 @@ describe("질문 answers", () => {
   it("drops passage ids that slip into the answer text", () => {
     const passages = [{ id: "p7", page: 2, text: "The framework should include soil organic carbon stock and nutrient dynamics." }];
     const answer = validateAnswer({ found: true, answer: "근거로 p7에서는 SOC를 포함해야 한다고 제안함(p7). [Q1] p65~67은 미생물을 다룸.", points: [] }, passages);
-    expect(answer?.answer).toBe("근거로 SOC를 포함해야 한다고 제안함. [Q1] 미생물을 다룸.");
+    expect(answer?.answer).toBe("근거로 SOC를 포함해야 한다고 제안함. 미생물을 다룸.");
   });
 });
 
@@ -78,5 +78,19 @@ describe("질문 citations", () => {
       { text: "MRV 목적", unit: "p9", quote: "designed to measure and verify captured carbon" }
     ], sources: [], followups: [] }, passages);
     expect(answer?.answer).toBe("MRV 재설계를 제안함(근거: [Q1], [Q2]).");
+  });
+});
+
+describe("질문 citation numbers", () => {
+  it("renumbers [Qn] when a point is dropped and removes citations of dropped points", async () => {
+    const { validateAnswer } = await import("@/lib/paperflow/ask/ask");
+    const passages = [{ id: "p1", page: 1, text: "Biochar raised soil pH in acidic soils over two seasons." }, { id: "p2", page: 2, text: "Microbial biomass increased after the second application." }];
+    const answer = validateAnswer({ found: true, answer: "pH 상승 [Q1], 근거 없음 [Q2], 미생물 증가 [Q3]. 웹 [S1].", sources: [], followups: [], points: [
+      { text: "pH", unit: "p1", quote: "Biochar raised soil pH in acidic soils" },
+      { text: "가짜", unit: "p1", quote: "this sentence is not in the passage at all" },
+      { text: "미생물", unit: "p2", quote: "Microbial biomass increased after the second application" }
+    ] }, passages);
+    expect(answer?.answer).toBe("pH 상승 [Q1], 근거 없음, 미생물 증가 [Q2]. 웹.");
+    expect(answer?.points.map(point => point.text)).toEqual(["pH", "미생물"]);
   });
 });

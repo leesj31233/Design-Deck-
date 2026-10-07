@@ -83,7 +83,7 @@ export async function POST(request: Request) {
             instructions: ASK_INSTRUCTIONS,
             input: JSON.stringify({ question, focus, paper: { title, keywords, overview }, earlier: history, passages, related_papers: literature }),
             text: askSchema(passages.map(passage => passage.id)),
-            max_output_tokens: options.speed === "deep" ? 5000 : 3500
+            max_output_tokens: options.speed === "deep" ? 7000 : 4000
           })
         });
         if (!upstream.ok || !upstream.body) {

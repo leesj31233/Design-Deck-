@@ -100,3 +100,8 @@ html[data-pf-theme="dark"] .pf-askdock { --ask:#8f98ff; --ask-soft:color-mix(in 
 .pf-askdock-composer > *, .pf-askdock-thread > * { min-width:0; }
 .pf-ask-quick button { max-width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .pf-askdock-thread { grid-template-columns:minmax(0,1fr); }
+/* Closed: a small round button in the corner (the toolbar's 질문 does the same), so the page stays clear. */
+.pf-askdock-launcher { position:relative; width:46px; height:46px; padding:0; justify-content:center; border-radius:50%; }
+.pf-askdock-launcher i { position:absolute; top:-3px; right:-3px; }
+.pf-ask-toggle[aria-pressed="true"] { color:#4f5bd5; background:color-mix(in srgb,#4f5bd5 10%,transparent); }
+html[data-pf-theme="dark"] .pf-ask-toggle[aria-pressed="true"] { color:#8f98ff; }

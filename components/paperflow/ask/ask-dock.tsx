@@ -66,7 +66,9 @@ export function AskDock() {
 
   useEffect(() => { restoreAskDock(); }, []);
   useEffect(() => { if (documentId) { setThread(readThread(documentId)); useAskMarks.getState().set(documentId, []); } }, [documentId]);
-  useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [thread.length, live?.text, live?.stage, open]);
+  // While an answer is written the window follows it; once done, it shows the answer from its question down.
+  useEffect(() => { if (live) end.current?.scrollIntoView({ block: "end" }); }, [live?.text, live?.stage]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { const turns = end.current?.parentElement?.querySelectorAll(".pf-ask-turn"); turns?.[turns.length - 1]?.scrollIntoView({ block: "start" }); }, [thread.length, open]);
   useEffect(() => { if (open) setTimeout(() => input.current?.focus(), 80); }, [open, focus]);
   // Ctrl/⌘ + J opens and closes the window from anywhere in the reader.
   useEffect(() => {
@@ -173,13 +175,13 @@ export function AskDock() {
           <div className="pf-ask-options">
             <button type="button" aria-pressed={options.literature} title="OpenAlex에서 관련 논문을 찾아 함께 비교합니다 (무료)" onClick={() => set({ options: { ...options, literature: !options.literature } })}><BookMarked size={12}/>관련 논문</button>
             <button type="button" aria-pressed={options.web} title="웹을 검색해 최신 자료·표준·정의를 함께 봅니다 (검색 1회 약 34 크레딧)" onClick={() => set({ options: { ...options, web: !options.web } })}><Globe size={12}/>웹 검색</button>
-            <button type="button" aria-pressed={options.speed === "deep"} title="더 강한 모델로 깊게 추론합니다 (크레딧 약 5배)" onClick={() => set({ options: { ...options, speed: options.speed === "deep" ? "fast" : "deep" } })}><Gauge size={12}/>정밀</button>
+            <button type="button" aria-pressed={options.speed === "deep"} title="더 강한 모델(gpt-5.1)로 비판적 검토·긴 설명을 합니다 (질문당 약 80–100 크레딧)" onClick={() => set({ options: { ...options, speed: options.speed === "deep" ? "fast" : "deep" } })}><Gauge size={12}/>정밀</button>
             <span className="pf-ask-estimate" title="실제 사용량으로 차감됩니다"><Coins size={11}/>약 {estimate}{status.data && !status.data.indexed ? ` + 색인 ${status.data.indexCredits}` : ""} 크레딧</span>
           </div>
         </form>
       </motion.section>
       : <motion.button key="launcher" type="button" className="pf-askdock-launcher" {...motionProps} onClick={() => set({ open: true })} aria-label="논문 질문 열기 (Ctrl+J)">
-        <MessageCircleQuestion size={17}/><span>논문에 질문</span><kbd>Ctrl J</kbd>{thread.length > 0 && <i>{thread.length}</i>}
+        <MessageCircleQuestion size={19}/>{thread.length > 0 && <i>{thread.length}</i>}
       </motion.button>}
     </AnimatePresence>
   </div>;
