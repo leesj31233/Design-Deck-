@@ -109,3 +109,9 @@ html[data-pf-theme="dark"] .pf-ask-toggle[aria-pressed="true"] { color:#8f98ff; 
 html[data-pf-theme="dark"] .pf-ask-cite:not([data-source]), html[data-pf-theme="dark"] .pf-ask-block ol i, html[data-pf-theme="dark"] .pf-askdock-launcher i, html[data-pf-theme="dark"] .pf-ask-send:not([data-stop]) { color:#14183a; }
 html[data-pf-theme="dark"] .pf-ask-sources i, html[data-pf-theme="dark"] .pf-ask-cite[data-source] { background:#3fc9a4 !important; color:#06261d; }
 html[data-pf-theme="dark"] .pf-ask-sources small { color:#3fc9a4 !important; }
+/* Inline chips are part of the text, not touch targets: they keep their size on a phone. */
+.paperflow .pf-askdock button.pf-ask-cite { min-height:0; min-width:0; }
+.paperflow .pf-askdock .pf-ask-follow button, .paperflow .pf-askdock .pf-ask-options button, .paperflow .pf-askdock .pf-ask-quick button { min-height:32px; }
+@media (max-width:900px) { .pf-ask-toggle { padding-inline:8px; } .pf-ask-toggle-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); } }
+/* A phone-width toolbar: its text buttons never wrap into a column of letters. */
+@media (max-width:650px) { .pf-batch-button, .pf-guide-button, .pf-ask-toggle { white-space:nowrap; flex-shrink:0; } .pf-reader-tools .pf-toolbar-group:last-child { flex-wrap:wrap; justify-content:flex-end; row-gap:4px; } }
