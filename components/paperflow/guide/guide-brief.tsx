@@ -39,22 +39,22 @@ function Level({ n, title, sub, children, delay = 0 }: { n: string; title: strin
  * conditions → with what results → why → what to take → its limits → which figures to look at.
  * Scrolling on, the page guides, highlights and the original text continue the same story in detail.
  */
-export function GuideBrief({ documentId, width, scale }: { documentId: string; width: number; scale: number }) {
+export function GuideBrief({ documentId, width, scale, standalone = false }: { documentId: string; width: number; scale: number; /** In the brief sheet: always shown, full width, not collapsible. */ standalone?: boolean }) {
   const on = useReaderStore(s => s.guideOverlay), show = useReaderStore(s => s.guideLayers.brief);
-  const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId), enabled: on });
+  const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId), enabled: on || standalone });
   const [open, setOpen] = useState(true);
   useEffect(() => { try { setOpen(localStorage.getItem(`pf-brief-open:${documentId}`) !== "0"); } catch { /* default open */ } }, [documentId]);
   const toggle = () => setOpen(value => { try { localStorage.setItem(`pf-brief-open:${documentId}`, value ? "0" : "1"); } catch { /* fine */ } return !value; });
   const data = guide.data;
-  if (!on || !show || !data) return null;
-  const font = guideFont(scale);
+  if (!data || !standalone && (!on || !show)) return null;
+  const font = standalone ? 13.5 : guideFont(scale);
   const marks = data.pages.reduce((sum, page) => sum + page.marks.length, 0);
 
-  if (!open) return <div className="pf-brief pf-brief-closed" style={{ width, fontSize: font }}>
+  if (!open && !standalone) return <div className="pf-brief pf-brief-closed" style={{ width, fontSize: font }}>
     <button type="button" onClick={toggle}><Sparkles size={14}/><span><b>Research Brief</b>{data.definition}</span><ChevronDown size={16}/></button>
   </div>;
 
-  return <article className="pf-brief" style={{ width, fontSize: font }} aria-label="AI 리딩 가이드: 논문 브리프">
+  return <article className="pf-brief" data-standalone={standalone || undefined} style={{ width: standalone ? "100%" : width, fontSize: font }} aria-label="AI 리딩 가이드: 논문 브리프">
     <header className="pf-brief-head">
       <span className="pf-brief-mark"><Sparkles size={14}/>Research Brief</span>
       <small>AI 리딩 가이드 · 페이지 가이드 {data.pages.length}쪽 · 형광 근거 {marks}개{data.model ? ` · ${data.model.replace(/-\d{4}-\d{2}-\d{2}$/, "")}` : ""}</small>

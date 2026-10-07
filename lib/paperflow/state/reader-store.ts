@@ -13,12 +13,14 @@ type ReaderUiState = {
   guideProgress: { brief: "pending" | "done" | "failed"; pagesDone: number; pagesTotal: number; briefRetry?: boolean } | null;
   /** Make (or remake) the guide, with its estimated credits; set by the reader. */
   guideMaker: { make: () => void; estimate: number | null } | null;
+  /** The full brief (results, conditions, limitations, figures, terms) opened as a sheet over the reader. */
+  guideBriefOpen: boolean;
   /** Highlighter colour; changed with Ctrl or 1–5 while dragging. */
   highlightColor: AnnotationColor;
   set: (patch: Partial<Omit<ReaderUiState, "set" | "reset">>) => void;
   reset: (id: string, page: number) => void;
 };
 export const useReaderStore = create<ReaderUiState>(set => ({
-  tool: "select", documentId: null, currentPage: 1, zoom: 100, fitMode: "width", inspectorOpen: true, pageRailOpen: true, activeSelection: null, guideFocus: null, guideOverlay: false, guideLayers: { brief: true, pages: true, marks: true, kinds: ["result", "condition", "method", "mechanism", "limitation"] }, guideProgress: null, guideMaker: null, highlightColor: "yellow",
+  tool: "select", documentId: null, currentPage: 1, zoom: 100, fitMode: "width", inspectorOpen: true, pageRailOpen: true, activeSelection: null, guideFocus: null, guideOverlay: false, guideLayers: { brief: true, pages: true, marks: true, kinds: ["result", "condition", "method", "mechanism", "limitation"] }, guideProgress: null, guideMaker: null, guideBriefOpen: false, highlightColor: "yellow",
   set: patch => set(patch), reset: (documentId, currentPage) => set({ documentId, currentPage, zoom: 100, fitMode: "width", activeSelection: null, guideFocus: null })
 }));

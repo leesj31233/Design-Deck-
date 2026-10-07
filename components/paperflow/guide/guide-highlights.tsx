@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadGuide } from "@/lib/paperflow/guide/client";
-import { koreanFor, locateQuote, useGuideAnchors, type MarkAnchor, readingAnchor, useGuideReading } from "@/lib/paperflow/guide/locate";
+import { koreanFor, locateQuote, useGuideAnchors, type MarkAnchor, readingAnchor, useGuideReading, useAskMarks } from "@/lib/paperflow/guide/locate";
 import type { GuideMark, MarkKind } from "@/lib/paperflow/guide/guide";
 import { textIndex } from "@/lib/paperflow/pdf/selection-geometry";
 import { textRectsOf } from "@/lib/paperflow/pdf/selection-guard";
@@ -13,7 +13,7 @@ import "./guide.css";
 type Box = { x: number; y: number; width: number; height: number };
 /** Where a mark ends as read: the right end of its lowest line (text-layer boxes are not always in reading order). */
 const endOf = (boxes: Box[]) => { const bottom = Math.max(...boxes.map(box => box.y)), line = boxes.filter(box => box.y > bottom - box.height * .5); return line.reduce((best, box) => box.x + box.width > best.x + best.width ? box : best, line[0]); };
-interface Placed { key: string; number: number; kind: MarkKind; boxes: Box[]; flash?: boolean }
+interface Placed { key: string; number: number; kind: MarkKind | "ask"; boxes: Box[]; flash?: boolean; /** Badge text when it is not the guide number (an answer's "Q1"). */ label?: string }
 
 /** Screen rects of a Korean sentence inside a translated paragraph's lines on this page. */
 function koreanRects(surface: HTMLElement, unitId: string, sentence: string): DOMRect[] {
@@ -62,13 +62,17 @@ export function GuideHighlights({ documentId, pageIndex, surface, layer, textRea
   const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId), enabled: on });
   const marks = useMemo(() => (guide.data?.pages.find(page => page.page === pageIndex + 1)?.marks ?? []).filter(mark => layers.kinds.includes(mark.kind)), [guide.data, pageIndex, layers.kinds]);
   const focused = focus && focus.page === pageIndex + 1 && focus.quote ? focus : null;
+  // An answer's evidence shows whether or not the guide is on.
+  const askAll = useAskMarks(state => state.documentId === documentId ? state.marks : null);
+  const asks = useMemo(() => (askAll ?? []).filter(mark => mark.page === pageIndex + 1), [askAll, pageIndex]);
+  const guideMarks = useMemo(() => on && layers.marks ? marks : [], [on, layers.marks, marks]);
   // Which marked paragraphs show Korean right now: the highlight follows the visible text.
-  const shownKey = useTranslationStore(state => [...marks.map(mark => mark.unitId), focused?.unitId ?? ""].map(id => state.showTranslations && state.texts.has(id) && !state.hidden.has(id) ? "k" : "e").join(""));
+  const shownKey = useTranslationStore(state => [...marks.map(mark => mark.unitId), ...asks.map(mark => mark.unitId), focused?.unitId ?? ""].map(id => state.showTranslations && state.texts.has(id) && !state.hidden.has(id) ? "k" : "e").join(""));
   const [placed, setPlaced] = useState<Placed[]>([]);
 
   useLayoutEffect(() => {
     const page = surface.current, text = layer.current;
-    if (!on || !layers.marks || !page || !text || !textReady || (!marks.length && !focused)) { setPlaced([]); useGuideAnchors.getState().set(pageIndex, []); return; }
+    if (!page || !text || !textReady || (!guideMarks.length && !focused && !asks.length)) { setPlaced([]); useGuideAnchors.getState().set(pageIndex, []); return; }
     let frame = 0;
     // Two frames: the Korean layer settles its letter spacing after its first paint.
     frame = requestAnimationFrame(() => { frame = requestAnimationFrame(() => {
@@ -84,18 +88,19 @@ export function GuideHighlights({ documentId, pageIndex, surface, layer, textRea
         const found = locateQuote(index.text, mark.quote);
         return found ? bands(index.rectsFor(found.start, found.length)) : [];
       };
-      const result: Placed[] = marks.map((mark, at) => ({ key: `${mark.unitId}:${at}`, number: at + 1, kind: mark.kind, boxes: place(mark) })).filter(item => item.boxes.length);
-      if (focused && !marks.some(mark => mark.unitId === focused.unitId && mark.quote === focused.quote)) {
+      const result: Placed[] = guideMarks.map((mark, at): Placed => ({ key: `${mark.unitId}:${at}`, number: at + 1, kind: mark.kind, boxes: place(mark) })).filter(item => item.boxes.length);
+      for (const ask of asks) { const boxes = place(ask); if (boxes.length) result.push({ key: `ask:${ask.number}:${ask.unitId}`, number: 0, kind: "ask", boxes, label: `Q${ask.number}`, flash: focused?.quote === ask.quote }); }
+      if (focused && !asks.some(ask => ask.unitId === focused.unitId && ask.quote === focused.quote) && !guideMarks.some(mark => mark.unitId === focused.unitId && mark.quote === focused.quote)) {
         const boxes = place({ unitId: focused.unitId, quote: focused.quote! });
         if (boxes.length) result.push({ key: `focus:${focused.key}`, number: 0, kind: "result", boxes, flash: true });
       }
       setPlaced(result);
-      useGuideAnchors.getState().set(pageIndex, result.filter(item => item.number > 0).map((item): MarkAnchor => { const top = Math.min(...item.boxes.map(box => box.y)), bottom = Math.max(...item.boxes.map(box => box.y + box.height)); return { key: item.key, number: item.number, kind: item.kind, y: (top + bottom) / 2, top, bottom }; }));
+      useGuideAnchors.getState().set(pageIndex, result.filter((item): item is Placed & { kind: MarkKind } => item.number > 0 && item.kind !== "ask").map((item): MarkAnchor => { const top = Math.min(...item.boxes.map(box => box.y)), bottom = Math.max(...item.boxes.map(box => box.y + box.height)); return { key: item.key, number: item.number, kind: item.kind, y: (top + bottom) / 2, top, bottom }; }));
     }); });
     return () => cancelAnimationFrame(frame);
-  }, [on, layers.marks, marks, focused, textReady, overlayReady, scale, shownKey, pageIndex, surface, layer]);
+  }, [guideMarks, asks, focused, textReady, overlayReady, scale, shownKey, pageIndex, surface, layer]);
 
-  if (!on || !layers.marks || !placed.length) return null;
+  if (!placed.length) return null;
   const isActive = (item: Placed) => active === `${pageIndex}:${item.key}`;
   const isFocus = (item: Placed) => item.flash || (focused && item.key.startsWith(`${focused.unitId}:`));
   return <>
@@ -103,7 +108,7 @@ export function GuideHighlights({ documentId, pageIndex, surface, layer, textRea
       {placed.map(item => item.boxes.map((box, at) => <span key={`${item.key}-${at}`} data-kind={item.kind} data-focus={isFocus(item) || undefined} data-active={isActive(item) || undefined} style={{ left: `${box.x * 100}%`, top: `${box.y * 100}%`, width: `${box.width * 100}%`, height: `${box.height * 100}%`, animationDelay: `${at * 70}ms` }}/>))}
     </div>
     <div className="pf-gmark-numbers" aria-hidden="true">
-      {placed.filter(item => item.number > 0).map(item => { const last = endOf(item.boxes); return <i key={item.key} data-kind={item.kind} data-active={isActive(item) || undefined} style={{ left: `${(last.x + last.width) * 100}%`, top: `${last.y * 100}%` }}>{item.number}</i>; })}
+      {placed.filter(item => item.number > 0 || item.label).map(item => { const last = endOf(item.boxes); return <i key={item.key} data-kind={item.kind} data-active={isActive(item) || undefined} style={{ left: `${(last.x + last.width) * 100}%`, top: `${last.y * 100}%` }}>{item.label ?? item.number}</i>; })}
     </div>
   </>;
 }

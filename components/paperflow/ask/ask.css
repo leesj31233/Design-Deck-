@@ -1,0 +1,28 @@
+/* 질문 tab: ask the paper, answers with Q1·Q2 evidence and their cost. */
+.pf-ask { display:grid; gap:10px; font-family:"Malgun Gothic","Apple SD Gothic Neo",Pretendard,"Noto Sans KR",sans-serif; font-size:13px; line-height:1.6; }
+.pf-ask-head { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:start; }
+.pf-ask-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:11px; background:color-mix(in srgb,#4f5bd5 14%,transparent); color:#4f5bd5; }
+.pf-ask-head h3 { margin:0; font-size:14.5px; letter-spacing:-.02em; }
+.pf-ask-head p { margin:2px 0 0; font-size:12px; color:var(--muted); }
+.pf-ask-head b { color:#4f5bd5; }
+.pf-ask-cost { display:flex; align-items:center; gap:5px; margin:0; padding:6px 10px; border-radius:9px; background:var(--surface-strong); border:1px dashed var(--line); font-size:11.5px; color:var(--muted); }
+.pf-ask-thread { display:grid; gap:14px; max-height:min(58vh,620px); overflow:auto; padding-right:2px; }
+.pf-ask-empty { display:grid; gap:6px; }
+.pf-ask-empty small { font-size:10.5px; font-weight:700; letter-spacing:.08em; color:var(--muted); }
+.pf-ask-empty button { justify-self:start; padding:6px 11px; border:1px solid var(--line); border-radius:999px; background:var(--surface-strong); color:var(--foreground); font:inherit; font-size:12.5px; cursor:pointer; text-align:left; }
+.pf-ask-empty button:hover { border-color:#4f5bd5; color:#4f5bd5; }
+.pf-ask-turn { display:grid; gap:6px; }
+.pf-ask-q { justify-self:end; max-width:88%; margin:0; padding:7px 12px; border-radius:14px 14px 4px 14px; background:var(--foreground); color:var(--background); font-size:12.5px; }
+.pf-ask-a { padding:11px 13px; border-radius:4px 14px 14px 14px; background:var(--surface-strong); border:1px solid var(--line); }
+.pf-ask-a > p { margin:0 0 8px; white-space:pre-wrap; }
+.pf-ask-a ol { list-style:none; margin:0 0 8px; padding:0; display:grid; gap:5px; }
+.pf-ask-a ol button { display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:start; width:100%; padding:6px 8px; border:1px solid color-mix(in srgb,#4f5bd5 22%,transparent); border-radius:10px; background:color-mix(in srgb,#4f5bd5 6%,transparent); color:var(--foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer; }
+.pf-ask-a ol button:hover { background:color-mix(in srgb,#4f5bd5 12%,transparent); }
+.pf-ask-a ol i { padding:1px 6px; border-radius:999px; background:#4f5bd5; color:#fff; font-style:normal; font-size:10.5px; font-weight:700; }
+.pf-ask-a ol small { display:block; font-size:10.5px; font-weight:700; color:#4f5bd5; }
+.pf-ask-a footer { display:flex; align-items:center; gap:4px; font-size:10.5px; color:var(--muted); }
+.pf-ask-wait { display:flex; align-items:center; gap:8px; color:var(--muted); }
+.pf-ask-input { display:grid; grid-template-columns:1fr auto; gap:6px; align-items:end; padding:6px; border-radius:14px; border:1px solid var(--line); background:var(--surface-strong); }
+.pf-ask-input:focus-within { border-color:color-mix(in srgb,#4f5bd5 55%,transparent); box-shadow:0 0 0 3px color-mix(in srgb,#4f5bd5 14%,transparent); }
+.pf-ask-input textarea { resize:none; border:0; outline:none; background:transparent; color:var(--foreground); font:inherit; font-size:13px; padding:4px 6px; }
+.pf-ask-cite { display:inline-block; margin:0 2px; padding:0 6px; border:0; border-radius:999px; background:#4f5bd5; color:#fff; font:inherit; font-size:10.5px; font-weight:700; line-height:1.6; vertical-align:1px; cursor:pointer; }

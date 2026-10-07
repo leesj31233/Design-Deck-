@@ -65,7 +65,7 @@ export function GuidePanel() {
       <header><h3><Sparkles size={15}/>AI 리딩 가이드</h3><Button size="sm" variant={on ? "primary" : "secondary"} onClick={() => set({ guideOverlay: !on })}>{on ? "논문 위 가이드 끄기" : "논문 위에 보기"}</Button></header>
       <p className="pf-gpanel-definition">{data.definition}</p>
       <div className="pf-gpanel-layers">
-        <button type="button" aria-pressed={layers.brief} onClick={() => setLayers({ brief: !layers.brief })}><FileText size={13}/>브리프</button>
+        <button type="button" onClick={() => set({ guideBriefOpen: true, ...(on ? {} : { guideOverlay: true }) })}><FileText size={13}/>브리프 전체</button>
         <button type="button" aria-pressed={layers.pages} onClick={() => setLayers({ pages: !layers.pages })}><Layers size={13}/>페이지 가이드</button>
         <button type="button" aria-pressed={layers.marks} onClick={() => setLayers({ marks: !layers.marks })}><Highlighter size={13}/>형광 · 메모</button>
       </div>

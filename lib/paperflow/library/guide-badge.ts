@@ -1,10 +1,11 @@
-/** Library badge for papers that already have an AI reading guide (the current guide format only). */
-export const GUIDE_BADGE_VERSION = "paperflow-guide-v4";
+import { READABLE_GUIDE_VERSIONS } from "../guide/guide";
+
+/** Library badge for papers that already have an AI reading guide the reader can show. */
 const PAPER_TYPE: Record<string, string> = { experimental: "실험", computational: "계산", theoretical: "이론", review: "리뷰" };
 
 /** "AI 가이드", or "AI 가이드 · 실험" when the guide knows the paper type; null without a current guide. */
 export function guideBadge(guide: unknown): string | null {
-  if (!guide || typeof guide !== "object" || (guide as { version?: unknown }).version !== GUIDE_BADGE_VERSION) return null;
+  if (!guide || typeof guide !== "object" || !READABLE_GUIDE_VERSIONS.includes(String((guide as { version?: unknown }).version))) return null;
   const type = PAPER_TYPE[String((guide as { paperType?: unknown }).paperType)];
   return type ? `AI 가이드 · ${type}` : "AI 가이드";
 }

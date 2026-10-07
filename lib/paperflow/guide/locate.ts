@@ -102,3 +102,10 @@ export function readingAnchor(pages: { page: number; top: number; height: number
   }
   return best;
 }
+
+/** The passages an answer from 질문 points to: shown on the paper with their numbers until the next answer. */
+export interface AskMark { unitId: string; page: number; quote: string; number: number }
+export const useAskMarks = create<{ documentId: string | null; marks: AskMark[]; set: (documentId: string | null, marks: AskMark[]) => void }>(set => ({
+  documentId: null, marks: [],
+  set: (documentId, marks) => set({ documentId, marks })
+}));

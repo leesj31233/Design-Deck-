@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createGuide, estimateGuideCredits, loadGuide } from "@/lib/paperflow/guide/client";
-import { NOTE_GUTTER } from "../guide/guide-page";
+import { noteGutter } from "../guide/guide-page";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { GuideBrief } from "../guide/guide-brief";
 import { GuideConfirm } from "../guide/guide-confirm";
 import { GuideKeys } from "../guide/guide-keys";
@@ -158,7 +159,9 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     observer.observe(viewport.current); return () => observer.disconnect();
   }, [pdf, error]);
   // The AI guide: made once per paper (credits), then written on the paper or hidden with one button.
-  const guideOverlay = useReaderStore(s => s.guideOverlay);
+  const guideOverlay = useReaderStore(s => s.guideOverlay), guideBriefOpen = useReaderStore(s => s.guideBriefOpen), guideFocusKey = useReaderStore(s => s.guideFocus?.key);
+  // Jumping to a source from the brief sheet closes it so the page is in view.
+  useEffect(() => { if (guideFocusKey) useReaderStore.getState().set({ guideBriefOpen: false }); }, [guideFocusKey]);
   const guide = useQuery({ queryKey: ["guide", documentId], queryFn: () => loadGuide(documentId) });
   const makeGuide = useMutation({
     mutationFn: () => { const current = useTranslationStore.getState().manifest; if (!current || current.documentId !== documentId) throw new Error("논문 구조를 분석하는 중입니다. 잠시 후 다시 눌러 주세요."); useReaderStore.getState().set({ guideProgress: { brief: "pending", pagesDone: 0, pagesTotal: 0 } }); return createGuide(documentId, current, progress => useReaderStore.getState().set({ guideProgress: progress })); },
@@ -180,7 +183,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   // Breathing room around the page: generous on a desk, almost none on a phone in focus mode.
   const baseGutter = size.width < 600 ? (focus ? 8 : 20) : 48;
   // With the guide on, the page gives way to margins for the handwritten notes when the screen allows it.
-  const gutter = guideOverlay && guide.data && size.width - 2 * NOTE_GUTTER - baseGutter >= 460 ? baseGutter + 2 * NOTE_GUTTER : baseGutter;
+  const notes = noteGutter(size.width), gutter = guideOverlay && guide.data && size.width - 2 * notes - baseGutter >= 460 ? baseGutter + 2 * notes : baseGutter;
   const scale = page ? fit === "custom" ? zoom / 100 : fit === "page" ? Math.min((size.width - gutter) / page.width, (size.height - gutter) / page.height) : Math.min(1.65, (size.width - gutter) / page.width) : lastScale.current;
   useEffect(() => { lastScale.current = scale; }, [scale]);
 
@@ -295,7 +298,6 @@ export function ReaderShell({ documentId }: { documentId: string }) {
   const pageScale = Math.max(.1, scale);
   const noteRoom = guideOverlay ? Math.max(0, (size.width - (page?.width ?? 612) * pageScale) / 2 - 12) : 0;
   // Nothing sits beside the brief (page guides start at page 1): it spreads into the margins, up to a reading width.
-  const firstWidth = (pageSizes?.[0] ?? fallbackSize).width * pageScale, briefWidth = Math.max(firstWidth, Math.min(firstWidth + 2 * Math.max(0, noteRoom - 24), 920));
 
   if (error || doc.error || marks.error) return <main className="pf-empty pf-reader-error"><h1>PDF를 열지 못했습니다</h1><p role="alert">{error || readableError(doc.error ?? marks.error)}</p><Button asChild><Link href="/library">라이브러리로</Link></Button><Button onClick={openImport}>PDF 다시 가져오기</Button></main>;
   const elapsed = bulk ? Math.round(((bulk.running ? 0 : bulk.translationMs) || 0) / 1000) : 0;
@@ -319,7 +321,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
     {searchOpen && <div className="pf-search-strip"><SearchField ref={searchInput} aria-label="현재 페이지 검색" value={search} onChange={e => setSearch(e.target.value)} placeholder="검색 UI · Phase 2"/><span>전체 논문 검색은 후속 단계에서 제공됩니다.</span><Button size="sm" onClick={() => setSearchOpen(false)}>닫기</Button></div>}
     <div className="pf-reader-body" data-rail={rail} data-inspector-open={inspector}>
       {rail && pdf && <PageRail pdf={pdf} current={currentPage} onPage={navigate}/>}
-      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}><GuideKeys enabled={guideOverlay && Boolean(guide.data)} toggle={onGuide} anchors={() => useGuideAnchors.getState().pages}/><GuideConfirm open={confirmGuide} onOpenChange={setConfirmGuide} estimate={guideCredits} pages={manifest?.pageCount ?? pdf?.pageCount ?? 0} again={Boolean(guide.data)} onConfirm={() => makeGuide.mutate()}/>{translatedCount === 0 && !guideOverlay && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf && guideOverlay && <><GuideReadingLine/><GuideBrief documentId={documentId} width={briefWidth} scale={pageScale}/></>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} onUnits={translateUnits} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
+      <div className="pf-pdf-viewport dd-scrollbar" role="region" aria-label="PDF 원문 읽기 영역" tabIndex={0} data-pdf-viewport ref={viewport} onScroll={onScroll}><Dialog open={guideBriefOpen} onOpenChange={value => useReaderStore.getState().set({ guideBriefOpen: value })}><DialogContent className="pf-brief-sheet dd-scrollbar" aria-describedby={undefined}><DialogTitle className="sr-only">논문 브리프</DialogTitle><GuideBrief documentId={documentId} width={0} scale={1} standalone/></DialogContent></Dialog><GuideKeys enabled={guideOverlay && Boolean(guide.data)} toggle={onGuide} anchors={() => useGuideAnchors.getState().pages}/><GuideConfirm open={confirmGuide} onOpenChange={setConfirmGuide} estimate={guideCredits} pages={manifest?.pageCount ?? pdf?.pageCount ?? 0} again={Boolean(guide.data)} onConfirm={() => makeGuide.mutate()}/>{translatedCount === 0 && !guideOverlay && <div className="pf-reader-hint">문단을 누르면 한국어로 바뀝니다</div>}{pdf && guideOverlay && <GuideReadingLine/>}{pdf ? Array.from({ length: pdf.pageCount }, (_, index) => <ContinuousPage key={documentId + index} pdf={pdf} index={index} scale={pageScale} size={pageSizes?.[index] ?? fallbackSize} documentId={documentId} annotations={annotations} selected={selected} onResolved={collectResolved} onUnit={openUnit} onOriginal={showOriginal} onRetry={retryUnit} onUnits={translateUnits} noteRoom={noteRoom}/>) : <div className="pf-empty" role="status">PDF 원문을 불러오는 중…</div>}</div>
       {inspector && <ResearchInspector annotations={annotations} resolved={resolved} selected={selected} onSelect={inspect} onSaveNote={saveNote} onRemove={id => void remove(id)} saving={saving} tab={tab} setTab={setTab} shell={shell} paragraph={activeParagraph} translation={translation} bulk={bulk} keywords={manifest?.keywords ?? doc.data?.keywords ?? []} onTranslate={translateSelection} onBatchTranslate={batchTranslate} onCancelBatch={() => cancelTranslationJob(documentId)}/>}
     </div>
     <footer className="pf-reader-status"><span>원본 PDF 보존 · 로컬 저장</span><span>{annotations.filter(a => a.type === "highlight").length} 마킹 · {annotations.filter(a => a.type === "ink" || a.type === "note" || Boolean(a.note)).length} 메모</span><span>{guideOverlay && guide.data ? "J·K 다음·이전 형광 · G 가이드 · Ctrl K 명령" : "Ctrl Z 되돌리기 · H 마킹 · N 메모 · G 가이드 · Ctrl K 명령"}</span></footer>

@@ -1,7 +1,7 @@
 "use client";
 import { documentRepository } from "../persistence/document-repository";
 import type { TranslationManifest } from "../translation/manifest";
-import { GUIDE_VERSION, guideUnits, tidyGuide, pageChunks, validateBrief, validatePages, type GuidePage, type GuideUnit, type PaperGuide } from "./guide";
+import { GUIDE_VERSION, READABLE_GUIDE_VERSIONS, guideUnits, tidyGuide, pageChunks, validateBrief, validatePages, type GuidePage, type GuideUnit, type PaperGuide } from "./guide";
 import { guideCreditEstimate } from "./cost";
 
 /** Credits a new guide of this paper will cost, about (charged by real usage). */
@@ -13,7 +13,7 @@ export function estimateGuideCredits(manifest: TranslationManifest) {
 /** The paper's guide: stored with the paper once made (and synced with the account). */
 export async function loadGuide(documentId: string): Promise<PaperGuide | null> {
   const doc = await documentRepository.getDocument(documentId);
-  return doc?.guide?.version === GUIDE_VERSION ? tidyGuide(doc.guide as PaperGuide) : null;
+  return doc?.guide && READABLE_GUIDE_VERSIONS.includes(doc.guide.version) ? tidyGuide(doc.guide as PaperGuide) : null;
 }
 
 export interface GuideProgress { brief: "pending" | "done" | "failed"; pagesDone: number; pagesTotal: number; /** The brief is being made again on the fast model. */ briefRetry?: boolean }

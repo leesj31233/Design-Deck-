@@ -7,7 +7,9 @@ import type { TranslationManifest } from "../translation/manifest";
  * at → a guide beside every page → highlights with keyword-first margin notes → the original text.
  * Every number comes from the paper; every highlight is an exact quote checked against its paragraph.
  */
-export const GUIDE_VERSION = "paperflow-guide-v4";
+export const GUIDE_VERSION = "paperflow-guide-v5";
+/** Saved guides the reader still shows (v4 had shorter margin notes and no page context). */
+export const READABLE_GUIDE_VERSIONS = ["paperflow-guide-v4", "paperflow-guide-v5"];
 /** Revision of the instructions: the server's shared cache of guide parts follows it (saved guides stay valid). */
 export const GUIDE_PROMPT_REVISION = "r3";
 const MAX_CHARS = 110_000;
@@ -30,7 +32,7 @@ export interface GuideFigure { label: string; stars: number; what: string; look:
 export interface GuideTerm { term: string; korean: string; explanation: string; ref?: GuideRef }
 export interface GuideMark { kind: MarkKind; keyword: string; note: string; unitId: string; page: number; quote: string }
 export interface GuidePageItem { label: ItemLabel; keyword: string; text: string }
-export interface GuidePage { page: number; section: PageSection; title: string; items: GuidePageItem[]; next: string; marks: GuideMark[] }
+export interface GuidePage { page: number; section: PageSection; title: string; /** Where the page sits in the paper's argument (v5). */ context?: string; items: GuidePageItem[]; next: string; marks: GuideMark[] }
 /** What kind of study the paper is: the brief names its design and conditions to match. */
 export const PAPER_TYPES = ["experimental", "computational", "theoretical", "review"] as const;
 export type PaperType = typeof PAPER_TYPES[number];
@@ -79,7 +81,7 @@ const squash = (text: string) => text.toLowerCase().replace(/[\s ]+/g, " ").rep
 const degrees = (text: string) => text.replace(/(\d)\s*[◦∘˚º]\s*C\b/g, "$1 °C").replace(/(\d)\s*°\s*C\b/g, "$1 °C");
 /** A saved guide with its text tidied the way new guides are (guides made before a tidy rule existed). */
 export function tidyGuide<T>(value: T): T {
-  if (typeof value === "string") return degrees(value) as T;
+  if (typeof value === "string") return degrees(stray(value)) as T;
   if (Array.isArray(value)) return value.map(tidyGuide) as T;
   // Quotes stay exactly as printed: they are matched against the page's own text.
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, key === "quote" ? item : tidyGuide(item)])) as T;
@@ -91,7 +93,9 @@ const cut = (text: string, max: number) => {
   const room = text.slice(0, max - 1), space = room.lastIndexOf(" ");
   return `${(space > max * .6 ? room.slice(0, space) : room).replace(/[\s,·;:]+$/, "")}…`;
 };
-const clip = (value: unknown, max: number) => typeof value === "string" ? cut(degrees(value.replace(/\s+/g, " ").trim()), max) : "";
+/** A model sometimes slips a word of another script into Korean ("영양염 удерж…"): Cyrillic and Han ideographs are dropped. */
+const stray = (text: string) => text.replace(/[\u0400-\u04FF\u4E00-\u9FFF\u3400-\u4DBF]+/g, "").replace(/ {2,}/g, " ");
+const clip = (value: unknown, max: number) => typeof value === "string" ? cut(degrees(stray(value.replace(/\s+/g, " ")).trim()), max) : "";
 const strings = (value: unknown, limit: number, max: number) => Array.isArray(value) ? value.map(item => clip(item, max)).filter(Boolean).slice(0, limit) : [];
 /** Korean report style: a polite ending slipped in by the model is turned into the noun ending. */
 export function reportStyle(text: string) {
@@ -142,13 +146,13 @@ export function validatePages(raw: any, byWire: Wire, allowed: number[]): GuideP
     const number = Number(page?.page);
     if (!allowed.includes(number) || !clip(page.title, 80)) return [];
     const section = PAGE_SECTIONS.includes(page.section) ? page.section : "OTHER";
-    const items = (Array.isArray(page.items) ? page.items : []).flatMap((item: any) => (ITEM_LABELS as readonly string[]).includes(item?.label) && clip(item.keyword, 30) && clip(item.text, 120) ? [{ label: item.label as ItemLabel, keyword: clip(item.keyword, 30), text: ko(item.text, 120) }] : []).slice(0, 4);
+    const items = (Array.isArray(page.items) ? page.items : []).flatMap((item: any) => (ITEM_LABELS as readonly string[]).includes(item?.label) && clip(item.keyword, 30) && clip(item.text, 260) ? [{ label: item.label as ItemLabel, keyword: clip(item.keyword, 30), text: ko(item.text, 260) }] : []).slice(0, 5);
     const marks = (Array.isArray(page.marks) ? page.marks : []).flatMap((mark: any): GuideMark[] => {
       const ref = refOf(mark?.unit, mark?.quote, byWire);
       if (!ref?.quote || ref.page !== number || !MARK_KINDS.includes(mark.kind) || !readsAsSentence(ref.quote)) return [];
-      return [{ kind: mark.kind, keyword: clip(mark.keyword, 30), note: clip(mark.note, 48), unitId: ref.unitId, page: number, quote: ref.quote }];
-    }).slice(0, section === "RESULT" ? 4 : 3);
-    return [{ page: number, section, title: ko(page.title, 80), items, next: clip(page.next, 60), marks }];
+      return [{ kind: mark.kind, keyword: clip(mark.keyword, 30), note: ko(mark.note, 240), unitId: ref.unitId, page: number, quote: ref.quote }];
+    }).slice(0, 4);
+    return [{ page: number, section, title: ko(page.title, 80), context: ko(page.context, 320) || undefined, items, next: clip(page.next, 60), marks }];
   }).filter((page: GuidePage, index: number, all: GuidePage[]) => all.findIndex(other => other.page === page.page) === index);
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -174,13 +178,14 @@ terms: 5-10 key terms: term in English, korean (short Korean name or ""), explan
 intro_parts: problem, gap, why, objective of the introduction, one line each.
 conclusion_parts: finding, meaning (practical meaning), limitation, next (next step), one line each.`;
 
-export const PAGES_INSTRUCTIONS = `You are PAPERFLOW's research reading guide. You receive the passages of some pages of a paper (id, role, page, text) and write the guide that sits beside each page while the reader scrolls. ${STYLE}
-For every page given, in order: page (its number), section (INTRO, METHOD, RESULT, DISCUSSION, CONCLUSION or OTHER), title (what this page says, at most 40 characters),
-items: 1-4 points in priority order, each with label (PROBLEM, GAP, WHY, OBJECTIVE, METHOD, CONDITION, RESULT, MECHANISM, LIMITATION, MEANING, NEXT or DEFINITION), keyword (at most 18 characters) and text (at most 45 characters, numbers verbatim; for results prefer "A → B 대비 +x%"; for conditions a compact spec joined by " · " like "80 °C · 6 h · 50 rpm"). Write keyword and text in Korean, keeping English technical terms; never copy an English sentence from the paper.
-Rules by section: introduction pages give only PROBLEM, GAP, WHY, OBJECTIVE (skip general background); method pages give reproducible facts (material, preparation, equipment, temperature, pressure, time, dosage, concentration, flow rate, sample amount, test matrix, analytical method, standard); result pages compare (increase, decrease, maximum, optimum, significant or not); discussion pages answer why (mechanism, cause, comparison with literature, unexpected results); conclusion pages give final finding, practical meaning, limitation, next step.
+export const PAGES_INSTRUCTIONS = `You are PAPERFLOW's research reading guide. You receive the passages of some pages of a paper (id, role, page, text) and write the study notes that fill both margins beside each page while the reader scrolls. The reader reads the page and your notes side by side, so the notes explain and discuss what the page means; they never just label it or translate it. ${STYLE}
+For every page given, in order: page (its number), section (INTRO, METHOD, RESULT, DISCUSSION, CONCLUSION or OTHER), title (what this page does, at most 40 characters),
+context: 2-3 sentences (at most 260 characters) on where this page sits in the paper's argument: the question it answers, what it builds on from earlier pages, and why the reader needs it to follow what comes next.
+items: 2-5 points in priority order, each with label (PROBLEM, GAP, WHY, OBJECTIVE, METHOD, CONDITION, RESULT, MECHANISM, LIMITATION, MEANING, NEXT or DEFINITION), keyword (at most 18 characters) and text: 2-3 sentences (at most 230 characters) that first state the point with the paper's own numbers and conditions, then discuss it: what it means, why it happens or matters, how it compares with a baseline, an earlier page or the work the page cites, and any caveat. A condition point is a compact spec ("80 °C · 6 h · 50 rpm") followed by why that choice matters.
+Rules by section: introduction pages give PROBLEM, GAP, WHY, OBJECTIVE and the background a newcomer needs (skip textbook generalities); method pages give reproducible facts (material, preparation, equipment, temperature, pressure, time, dosage, concentration, flow rate, sample amount, test matrix, analytical method, standard) and why each matters; result pages compare (increase, decrease, maximum, optimum, significant or not) and say what the numbers mean; discussion pages answer why (mechanism, cause, comparison with literature, unexpected results); conclusion pages give the final finding, its practical meaning, the limitation and the next step.
 next: what the following page continues with (at most 30 characters), or "".
-marks: the 1-3 sentences on this page that are worth highlighting (up to 4 on a key result page; about 10-15% of the page at most; none on reference, front-matter or figure-only pages): kind (result, condition, method, mechanism, limitation), keyword (at most 16 characters), note (a compressed margin note of at most 24 characters, keyword first, never a translation, e.g. "2% → GI +175%", "400–550 °C · 30 min", "pH ↑ → Al3+ 독성 ↓"), unit (id of the passage on this page), quote (an exact contiguous English substring of that passage, 6-25 words, copied character for character; a sentence in words, never an equation or a formula line).
-Do not repeat the same point on several pages. Pages that hold only references or front matter still get a title and may have no items.`;
+marks: the 2-4 sentences on this page most worth highlighting (none on reference, front-matter or figure-only pages; never more than about 15% of the page): kind (result, condition, method, mechanism, limitation), keyword (at most 16 characters), note: 2-3 sentences (at most 200 characters): the point in plain words with its number, then what it implies for the study's question or for practice, never a translation of the sentence; unit (id of the passage on this page), quote (an exact contiguous English substring of that passage, 6-25 words, copied character for character; a sentence in words, never an equation or a formula line).
+Write keyword and every text in Korean, keeping English technical terms; never copy an English sentence from the paper into a note. Do not repeat the same point on several pages, nor between a page's items and its marks.`;
 
 const ref = (ids: string[]) => ({ type: "string", enum: ids });
 const object = (properties: Record<string, unknown>) => ({ type: "object", additionalProperties: false, required: Object.keys(properties), properties });
@@ -204,7 +209,7 @@ export function briefSchema(ids: string[]) {
 export function pagesSchema(ids: string[]) {
   const unit = ref(ids);
   return { format: { type: "json_schema", name: "page_guides", strict: true, schema: object({
-    pages: list(object({ page: { type: "integer" }, section: { type: "string", enum: PAGE_SECTIONS }, title: text,
+    pages: list(object({ page: { type: "integer" }, section: { type: "string", enum: PAGE_SECTIONS }, title: text, context: text,
       items: list(object({ label: { type: "string", enum: [...ITEM_LABELS] }, keyword: text, text })), next: text,
       marks: list(object({ kind: { type: "string", enum: MARK_KINDS }, keyword: text, note: text, unit, quote: text })) }))
   }) } };
