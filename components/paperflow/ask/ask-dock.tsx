@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowUp, BookMarked, Check, Coins, Copy, ExternalLink, Gauge, Globe, Loader2, Maximize2, MessageCircleQuestion, Minimize2, NotebookPen, Quote, RotateCcw, Sparkles, Square, Trash2, X } from "lucide-react";
+import { ArrowUp, BookMarked, Check, Coins, Copy, ExternalLink, Eye, EyeOff, Gauge, Globe, Highlighter, Loader2, Maximize2, MessageCircleQuestion, Minimize2, NotebookPen, Quote, RotateCcw, Sparkles, Square, Trash2, X } from "lucide-react";
 import { askPaper, askStatus, estimateQuestion, type AskResult, type AskStage } from "@/lib/paperflow/ask/client";
 import { restoreAskDock, useAskDock } from "@/lib/paperflow/ask/dock";
 import { loadGuide } from "@/lib/paperflow/guide/client";
@@ -33,7 +33,7 @@ const writeThread = (documentId: string, thread: AskResult[]) => { try { localSt
 
 /** Show an answer's evidence on the paper (Q1, Q2…) and go to one of them. */
 function showEvidence(documentId: string, result: AskResult, at = 0) {
-  useAskMarks.getState().set(documentId, result.points.map((point, index) => ({ unitId: point.unitId, page: point.page, quote: point.quote, number: index + 1 })));
+  useAskMarks.getState().set(documentId, result.points.map((point, index) => ({ unitId: point.unitId, page: point.page, quote: point.quote, number: index + 1 })), result.at);
   const point = result.points[at];
   if (point) focusSource(`ask-${result.at}-${at}`, { unitId: point.unitId, page: point.page, quote: point.quote });
 }
@@ -63,6 +63,10 @@ export function AskDock() {
   const [copied, setCopied] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null), end = useRef<HTMLDivElement>(null), input = useRef<HTMLTextAreaElement>(null);
   const reduced = useReducedMotion();
+  // Evidence on the paper: which answer's, and whether it is switched off.
+  const shownAnswer = useAskMarks(state => state.documentId === documentId ? state.answer : null), evidenceHidden = useAskMarks(state => state.hidden);
+  const evidenceOn = (item: AskResult) => shownAnswer === item.at && !evidenceHidden;
+  const toggleEvidence = (item: AskResult) => { if (!documentId) return; if (evidenceOn(item)) useAskMarks.getState().setHidden(true); else showEvidence(documentId, item); };
 
   useEffect(() => { restoreAskDock(); }, []);
   useEffect(() => { if (documentId) { setThread(readThread(documentId)); useAskMarks.getState().set(documentId, []); } }, [documentId]);
@@ -121,6 +125,7 @@ export function AskDock() {
         <header className="pf-askdock-head">
           <span className="pf-ask-icon"><MessageCircleQuestion size={16}/></span>
           <div><h3>논문 질문</h3><p title={doc.data?.title}>{doc.data ? shortTitle(doc.data.title) : "논문"} · 분야 전문가 시점으로 답함</p></div>
+          {shownAnswer && <button type="button" className="pf-askdock-tool" aria-pressed={!evidenceHidden} aria-label={evidenceHidden ? "근거 형광 다시 켜기" : "근거 형광 끄기"} title={evidenceHidden ? "근거 형광 다시 켜기" : "근거 형광 끄기"} onClick={() => useAskMarks.getState().setHidden(!evidenceHidden)}>{evidenceHidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>}
           {thread.length > 0 && <button type="button" className="pf-askdock-tool" aria-label="대화 지우기" title="대화 지우기" onClick={clear}><Trash2 size={14}/></button>}
           <button type="button" className="pf-askdock-tool" aria-label={wide ? "좁게 보기" : "넓게 보기"} title={wide ? "좁게 보기" : "넓게 보기"} onClick={() => set({ wide: !wide })}>{wide ? <Minimize2 size={14}/> : <Maximize2 size={14}/>}</button>
           <button type="button" className="pf-askdock-tool" aria-label="질문 창 닫기" title="닫기 (Esc)" onClick={() => set({ open: false })}><X size={15}/></button>
@@ -144,6 +149,7 @@ export function AskDock() {
               <footer>
                 <span><Coins size={11}/>{item.credits + item.indexCredits} 크레딧{item.indexCredits ? ` (색인 ${item.indexCredits})` : ""}{item.model ? ` · ${item.model.replace(/-\d{4}-\d{2}-\d{2}$/, "")}` : ""}{item.searches ? ` · 웹 검색 ${item.searches}회` : ""}</span>
                 <span className="pf-ask-actions">
+                  {item.points.length > 0 && <button type="button" className="pf-ask-evidence" aria-pressed={evidenceOn(item)} title={evidenceOn(item) ? "이 답의 근거 형광 끄기" : "이 답의 근거 형광 켜기"} onClick={() => toggleEvidence(item)}><Highlighter size={13}/><span>{evidenceOn(item) ? "형광 끄기" : "형광 켜기"}</span></button>}
                   <button type="button" title="복사" aria-label="답변 복사" onClick={() => void copy(item)}>{copied === item.at ? <Check size={13}/> : <Copy size={13}/>}</button>
                   <button type="button" title="노트에 저장" aria-label="답변을 노트에 저장" onClick={() => void save(item)}><NotebookPen size={13}/></button>
                   <button type="button" title="다시 묻기" aria-label="같은 질문 다시 묻기" onClick={() => void ask(item.question)}><RotateCcw size={13}/></button>

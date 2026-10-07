@@ -17,7 +17,7 @@ import "./research-map.css";
 
 const KIND_LABEL = { field: "분야", subfield: "세부 분야", topic: "주제", paper: "논문", author: "저자", journal: "저널", unsorted: "분석 전" } as const;
 type Prefs = { theme: MapTheme; arrange: Arrange; depth: WikiOptions["depth"]; papers: boolean; authors: boolean; journals: boolean; labels: "auto" | "all" | "fields"; hidden: string[]; forces: Forces; pool: boolean };
-const DEFAULT_PREFS: Prefs = { theme: "universe", arrange: "free", depth: "subfield", papers: true, authors: false, journals: false, labels: "auto", hidden: [], forces: DEFAULT_FORCES, pool: true };
+const DEFAULT_PREFS: Prefs = { theme: "paper", arrange: "free", depth: "subfield", papers: true, authors: false, journals: false, labels: "auto", hidden: [], forces: DEFAULT_FORCES, pool: true };
 const KEY = "pf-map-prefs";
 
 function Segmented<T extends string>({ value, items, onChange, label }: { value: T; items: { value: T; label: string }[]; onChange: (value: T) => void; label: string }) {
@@ -35,7 +35,7 @@ export function ResearchMapView({ docs, annotations }: { docs: StoredDocument[];
   const library = docs;
   const profile = useMemo(() => researchProfile(library, annotations), [library, annotations]);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
-  useEffect(() => { try { const saved = JSON.parse(localStorage.getItem(KEY) ?? "null"); if (saved) setPrefs({ ...DEFAULT_PREFS, ...saved, forces: { ...DEFAULT_FORCES, ...saved.forces } }); } catch { /* defaults */ } }, []);
+  useEffect(() => { try { const saved = JSON.parse(localStorage.getItem(KEY) ?? "null"); if (saved) setPrefs({ ...DEFAULT_PREFS, ...saved, theme: "paper", forces: { ...DEFAULT_FORCES, ...saved.forces } }); } catch { /* defaults */ } }, []);
   const update = useCallback((patch: Partial<Prefs>) => setPrefs(current => { const next = { ...current, ...patch }; try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* private mode */ } return next; }), []);
   const hidden = useMemo(() => new Set(prefs.hidden), [prefs.hidden]);
   const graph = useMemo(() => wikiGraph(profile, library, { depth: prefs.depth, papers: prefs.papers, authors: prefs.authors, journals: prefs.journals, hidden }), [profile, library, prefs.depth, prefs.papers, prefs.authors, prefs.journals, hidden]);
@@ -94,7 +94,6 @@ export function ResearchMapView({ docs, annotations }: { docs: StoredDocument[];
 
       {/* Controls: look, arrangement, depth, layers, physics. */}
       <div className="pf-wm-controls">
-        <Segmented label="배경" value={prefs.theme} onChange={theme => update({ theme })} items={[{ value: "universe", label: "우주" }, { value: "ivory", label: "아이보리" }, { value: "paper", label: "라이트" }]}/>
         <Segmented label="정렬" value={prefs.arrange} onChange={arrange => update({ arrange })} items={[{ value: "free", label: "자유" }, { value: "fields", label: "분야별" }, { value: "ring", label: "많이 읽은 순" }, { value: "years", label: "연도" }]}/>
         <Segmented label="깊이" value={prefs.depth} onChange={depth => update({ depth })} items={[{ value: "field", label: "분야" }, { value: "subfield", label: "세부" }, { value: "topic", label: "주제" }]}/>
         <div className="pf-wm-row">

@@ -63,7 +63,7 @@ export function GuideHighlights({ documentId, pageIndex, surface, layer, textRea
   const marks = useMemo(() => (guide.data?.pages.find(page => page.page === pageIndex + 1)?.marks ?? []).filter(mark => layers.kinds.includes(mark.kind)), [guide.data, pageIndex, layers.kinds]);
   const focused = focus && focus.page === pageIndex + 1 && focus.quote ? focus : null;
   // An answer's evidence shows whether or not the guide is on.
-  const askAll = useAskMarks(state => state.documentId === documentId ? state.marks : null);
+  const askAll = useAskMarks(state => state.documentId === documentId && !state.hidden ? state.marks : null);
   const asks = useMemo(() => (askAll ?? []).filter(mark => mark.page === pageIndex + 1), [askAll, pageIndex]);
   const guideMarks = useMemo(() => on && layers.marks ? marks : [], [on, layers.marks, marks]);
   // Which marked paragraphs show Korean right now: the highlight follows the visible text.

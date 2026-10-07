@@ -11,8 +11,22 @@ import "./guide.css";
 
 /** Width of each margin beside the page while the guide is on: a wide screen gives the notes more room. */
 export const noteGutter = (viewport: number) => Math.round(Math.max(240, Math.min(400, viewport * .21)));
-export const KIND_LABEL: Record<MarkKind, string> = { result: "RESULT", condition: "CONDITION", method: "METHOD", mechanism: "MECHANISM", limitation: "LIMITATION" };
-const SECTION_LABEL: Record<PageSection, string> = { INTRO: "INTRODUCTION", METHOD: "METHOD", RESULT: "RESULTS", DISCUSSION: "DISCUSSION", CONCLUSION: "CONCLUSION", OTHER: "PAGE" };
+export const KIND_LABEL: Record<MarkKind, string> = { result: "결과", condition: "조건", method: "방법", mechanism: "원리", limitation: "한계" };
+const SECTION_LABEL: Record<PageSection, string> = { INTRO: "서론", METHOD: "방법", RESULT: "결과", DISCUSSION: "논의", CONCLUSION: "결론", OTHER: "본문" };
+/** Point labels as a reader says them. */
+const ITEM_LABEL: Record<string, string> = { PROBLEM: "문제", GAP: "공백", WHY: "왜", OBJECTIVE: "목표", METHOD: "방법", CONDITION: "조건", RESULT: "결과", MECHANISM: "원리", LIMITATION: "한계", MEANING: "의미", NEXT: "다음", DEFINITION: "정의" };
+
+/** The first sentence, and the rest behind 더 읽기 (opened with a soft height transition). */
+function Lede({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  // Only punctuation ends a sentence ("다음 절에서…" must not split after 음).
+  const cut = text.search(/(?<=[.!?。;])\s+(?=\S)/);
+  const head = cut > 0 ? text.slice(0, cut).trim() : text, rest = cut > 0 ? text.slice(cut).trim() : "";
+  return <p className="pf-lede">{head}{rest && <>
+    <span className="pf-lede-rest" data-open={open || undefined}><span>{" "}{rest}</span></span>
+    <button type="button" className="pf-lede-more" aria-expanded={open} onClick={() => setOpen(value => !value)}>{open ? "접기" : "더 읽기"}</button>
+  </>}</p>;
+}
 
 /** Points that interpret the page go to the right margin with the highlight notes; the rest stay left. */
 const RIGHT_LABELS = new Set(["RESULT", "MEANING", "MECHANISM", "LIMITATION"]);
@@ -26,23 +40,23 @@ function PageCard({ page }: { page: GuidePage }) {
     <header><b>p.{page.page}</b><span>{SECTION_LABEL[page.section]}</span></header>
     <h4>{page.title}</h4>
     {page.items.length > 0 && <ul>{page.items.map(item => <li key={item.label + item.keyword} data-label={item.label}>
-      <small>{item.label}</small><strong>{item.keyword}</strong><p>{item.text}</p>
+      <small>{ITEM_LABEL[item.label] ?? item.label}</small><strong>{item.keyword}</strong><p>{item.text}</p>
     </li>)}</ul>}
-    {page.next && <footer><small>NEXT</small>{page.next}</footer>}
+    {page.next && <footer><small>다음</small>{page.next}</footer>}
   </>;
 }
 
 /** Page 1's margin opens with the paper itself: what it is, its background, how it was done, what to remember. */
 function Overview({ guide }: { guide: PaperGuide }) {
   const ten = guide.tenSeconds;
-  const rows: [string, string][] = ([["왜", ten.why], ["무엇을", ten.what], ["어떻게", ten.how], ["결과", ten.found], ["결론", ten.conclusion]] as [string, string][]).filter(([, text]) => text);
+  const rows: [string, string][] = ([["왜", ten.why], ["무엇이 나왔나", ten.found]] as [string, string][]).filter(([, text]) => text);
   return <section className="pf-goverview">
     <span className="pf-gmemo-kicker">이 논문은</span>
     <p className="pf-goverview-def">{guide.definition}</p>
-    {guide.intro && <p>{guide.intro}</p>}
+    {guide.intro && <Lede text={guide.intro}/>}
     {rows.length > 0 && <dl>{rows.map(([label, text]) => <div key={label}><dt>{label}</dt><dd>{text}</dd></div>)}</dl>}
     {guide.takeaway && <blockquote>{guide.takeaway}</blockquote>}
-    <button type="button" className="pf-goverview-more" onClick={() => useReaderStore.getState().set({ guideBriefOpen: true })}><FileText size={13}/>브리프 전체 · 결과 · 조건 · 한계 · Figure · 용어</button>
+    <button type="button" className="pf-goverview-more" onClick={() => useReaderStore.getState().set({ guideBriefOpen: true })}><FileText size={13}/>브리프 펼쳐 보기</button>
   </section>;
 }
 
@@ -126,16 +140,16 @@ export function GuidePageColumn({ documentId, pageIndex, width, height, room, sc
           <h4>{page.title}</h4>
           {page.context && <p className="pf-gmemo-context">{page.context}</p>}
           {leftItems.map(item => <section key={item.label + item.keyword} className="pf-gmemo-item" data-label={item.label}>
-            <small>{item.label}</small><strong>{item.keyword}</strong><p>{item.text}</p>
+            <small>{ITEM_LABEL[item.label] ?? item.label}</small><strong>{item.keyword}</strong><Lede text={item.text}/>
           </section>)}
-          {page.next && <footer><small>NEXT</small>{page.next}</footer>}
+          {page.next && <footer><small>다음</small>{page.next}</footer>}
         </>}
       </motion.article>
     </div>}
     {(layers.marks && notes.length > 0 || layers.pages && rightItems.length > 0) && <div className="pf-gpage-right" style={{ left: width + 18, width: column }}>
       {layers.pages && rightItems.length > 0 && <motion.article ref={(element: HTMLElement | null) => { if (element) noteRefs.current.set(memoKey, element); else noteRefs.current.delete(memoKey); }} className="pf-gmemo pf-gmemo-right dd-scrollbar" data-section={page?.section ?? "OTHER"} style={{ top: Math.min(memoTop, Math.max(0, height - 160)), maxHeight: Math.max(160, height - memoTop) }} {...enter(.2)}>
-        <span className="pf-gmemo-kicker">이 페이지가 말하는 것</span>
-        {rightItems.map(item => <section key={item.label + item.keyword} className="pf-gmemo-item" data-label={item.label}><small>{item.label}</small><strong>{item.keyword}</strong><p>{item.text}</p></section>)}
+        <span className="pf-gmemo-kicker">읽고 나면</span>
+        {rightItems.map(item => <section key={item.label + item.keyword} className="pf-gmemo-item" data-label={item.label}><small>{ITEM_LABEL[item.label] ?? item.label}</small><strong>{item.keyword}</strong><Lede text={item.text}/></section>)}
       </motion.article>}
       {layers.marks && <svg className="pf-gpage-leaders" width={column + 18} height={height} style={{ left: -18 }} aria-hidden="true">
         {notes.map(note => { const y0 = note.anchor.y * height, y1 = note.top + font * .9; return <path key={note.anchor.key} data-kind={note.mark.kind} data-active={active === `${pageIndex}:${note.anchor.key}` || undefined} d={`M 0 ${y0.toFixed(1)} C 10 ${y0.toFixed(1)}, 8 ${y1.toFixed(1)}, 18 ${y1.toFixed(1)}`}/>; })}

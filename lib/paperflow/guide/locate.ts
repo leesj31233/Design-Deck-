@@ -105,7 +105,9 @@ export function readingAnchor(pages: { page: number; top: number; height: number
 
 /** The passages an answer from 질문 points to: shown on the paper with their numbers until the next answer. */
 export interface AskMark { unitId: string; page: number; quote: string; number: number }
-export const useAskMarks = create<{ documentId: string | null; marks: AskMark[]; set: (documentId: string | null, marks: AskMark[]) => void }>(set => ({
-  documentId: null, marks: [],
-  set: (documentId, marks) => set({ documentId, marks })
+/** Which answer's evidence is on the paper (answer: its time stamp), and whether it is switched off. */
+export const useAskMarks = create<{ documentId: string | null; answer: string | null; hidden: boolean; marks: AskMark[]; set: (documentId: string | null, marks: AskMark[], answer?: string | null) => void; setHidden: (hidden: boolean) => void }>(set => ({
+  documentId: null, answer: null, hidden: false, marks: [],
+  set: (documentId, marks, answer = null) => set({ documentId, marks, answer, hidden: false }),
+  setHidden: hidden => set({ hidden })
 }));

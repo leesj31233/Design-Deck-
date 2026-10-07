@@ -267,3 +267,97 @@ html[data-pf-theme="dark"] :is(.pf-brief, .pf-gpage, .pf-gpanel) { --g-ink: #e6e
 .pf-gmarks span[data-kind="ask"], .pf-gmark-numbers i[data-kind="ask"] { --k:var(--k-ask); --kb:var(--k-ask-bg); }
 .pf-gmark-numbers i[data-kind="ask"] { width:auto; min-width:1.35em; padding:0 .35em; border-radius:999px; }
 .pf-brief[data-standalone] .pf-brief-head > button { display:none; }
+
+/* ══ Editorial (design A) ══════════════════════════════════════════════════════════════════════════
+   The guide reads like a scholar's marginalia: serif headings, a calm Korean sans for text, hairlines
+   instead of boxes, colour only as a small mark of kind. Every block wraps inside its column. */
+.pf-brief, .pf-gpage, .pf-gpanel {
+  --g-serif: var(--font-paper-serif-kr), "Noto Serif KR", "Batang", serif;
+  --g-font: var(--font-guide-sans), "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --g-ink: #1f2328; --g-muted: #6b7178; --g-line: rgba(31,35,40,.12); --g-card: transparent; --g-soft: rgba(31,35,40,.035);
+  letter-spacing: -.005em;
+}
+html[data-pf-theme="dark"] :is(.pf-brief, .pf-gpage, .pf-gpanel) { --g-ink: #e7e3dc; --g-muted: #a29d94; --g-line: rgba(231,227,220,.14); --g-soft: rgba(231,227,220,.05); }
+.pf-gpage *, .pf-brief * { min-width:0; overflow-wrap:anywhere; word-break:keep-all; }
+
+/* Left margin: a memo without a box. */
+.pf-gmemo { padding:.2em .2em .4em 0; border:0; border-top:1px solid var(--g-ink); border-radius:0; background:transparent; box-shadow:none; line-height:1.72; }
+.pf-gmemo-head { margin:.7em 0 .2em; gap:.45em; }
+.pf-gmemo-head b { padding:0; background:none; color:var(--g-muted); font-weight:500; font-size:.78em; letter-spacing:.02em; font-variant-numeric:tabular-nums; }
+.pf-gmemo-head span { color:var(--sec); font-weight:500; font-size:.78em; letter-spacing:.02em; }
+.pf-gmemo-head span::before { content:"·"; margin-right:.45em; color:var(--g-muted); }
+.pf-gmemo h4 { margin:0 0 .55em; font-family:var(--g-serif); font-size:1.22em; font-weight:700; line-height:1.38; letter-spacing:-.02em; }
+.pf-gmemo-context { margin:0 0 1.1em; padding:0; background:none; border-radius:0; color:var(--g-muted); font-size:.94em; }
+.pf-gmemo-item { margin:0 0 1em; padding:0; border:0; }
+.pf-gmemo-item small { display:inline-flex; align-items:center; gap:.4em; font-size:.74em; font-weight:500; letter-spacing:.02em; color:var(--g-muted); }
+.pf-gmemo-item small::before { content:""; width:.42em; height:.42em; border-radius:50%; background:var(--line-k,var(--g-muted)); }
+.pf-gmemo-item strong { margin:.1em 0 .15em; font-family:var(--g-serif); font-size:1.04em; font-weight:700; }
+.pf-gmemo-item p, .pf-gmemo .pf-lede { margin:0; font-size:.94em; color:var(--g-ink); opacity:1; }
+.pf-gmemo footer { margin-top:.6em; padding-top:.6em; border-top:1px solid var(--g-line); font-size:.86em; }
+.pf-gmemo footer small { font-size:.8em; font-weight:500; letter-spacing:.02em; color:var(--g-muted); }
+.pf-gmemo-kicker { font-size:.74em; font-weight:500; letter-spacing:.04em; color:var(--g-muted); }
+
+/* Page 1: the paper in a few lines. */
+.pf-goverview { margin:0 0 1.2em; padding:.7em 0 1.1em; border-bottom:1px solid var(--g-line); }
+.pf-goverview-def { margin:.25em 0 .6em; padding:0; border:0; font-family:var(--g-serif); font-size:1.24em; font-weight:700; line-height:1.48; }
+.pf-goverview .pf-lede { margin:0 0 .8em; color:var(--g-muted); font-size:.94em; }
+.pf-goverview dl > div { grid-template-columns:5.4em minmax(0,1fr); padding:.3em 0; border-top:1px solid var(--g-line); }
+.pf-goverview dt { font-weight:500; color:var(--g-muted); font-size:.9em; }
+.pf-goverview blockquote { margin:.7em 0 .9em; padding:0 0 0 .8em; border-left:2px solid var(--g-ink); border-radius:0; background:none; font-family:var(--g-serif); font-weight:700; font-size:1em; line-height:1.55; }
+.pf-goverview-more { padding:.35em 0; border:0; border-radius:0; background:none; color:var(--g-muted); font-size:.82em; font-weight:500; text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--g-line); }
+.pf-goverview-more:hover { color:var(--g-ink); text-decoration-color:currentColor; }
+
+/* 더 읽기: the rest of a point opens softly. */
+.pf-lede-rest { display:none; }
+.pf-lede-rest[data-open] { display:inline; animation:pf-lede-in .35s ease both; }
+@keyframes pf-lede-in { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .pf-lede-rest[data-open] { animation:none; } }
+.pf-lede-more { margin-left:.45em; padding:0; border:0; background:none; color:var(--g-muted); font:inherit; font-size:.82em; text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--g-line); cursor:pointer; }
+.pf-lede-more:hover { color:var(--g-ink); }
+
+/* Right margin: notes set against a hairline, no cards. */
+.pf-gnote { padding:.1em 0 .2em .85em; border:0; border-left:1px solid var(--g-line); border-radius:0; background:transparent; box-shadow:none; line-height:1.64; transition:border-color .3s ease, transform .3s cubic-bezier(.2,.8,.25,1), opacity .3s ease; }
+.pf-gnote header { gap:.4em; margin-bottom:.1em; }
+.pf-gnote header i { width:1.45em; height:1.45em; background:transparent; border:1px solid var(--k); color:var(--k); font-size:.7em; }
+.pf-gnote header small { font-size:.74em; font-weight:500; letter-spacing:.02em; color:var(--g-muted); }
+.pf-gnote header strong { margin:.15em 0 0; font-family:var(--g-serif); font-size:1.04em; font-weight:700; color:var(--g-ink); }
+.pf-gnote p { margin:.15em 0 0; font-size:.93em; font-weight:400; color:var(--g-ink); }
+.pf-gnote[data-active] { transform:none; border-left-color:var(--k); box-shadow:none; }
+.pf-gpage-leaders path { stroke:var(--g-muted); stroke-width:.8; stroke-dasharray:1 3; opacity:.55; }
+.pf-gpage-leaders path[data-active] { stroke:var(--k); opacity:.9; stroke-dasharray:none; }
+.pf-gmemo-right { border-top-color:var(--g-line); }
+
+/* The brief sheet, set like an article. */
+.pf-brief { font-family:var(--g-font); line-height:1.72; }
+.pf-brief[data-standalone] { padding:2.4em 3em 2em; background:var(--surface-strong,#fff); }
+.pf-brief-head { border-bottom:1px solid var(--g-ink); }
+.pf-brief-mark { font-weight:500; letter-spacing:.06em; text-transform:none; color:var(--g-muted); }
+.pf-brief-level { padding:1.5em 0 1.4em; }
+.pf-brief-level > header b { font-weight:500; color:var(--g-muted); }
+.pf-brief-level > header h3 { font-family:var(--g-serif); font-size:1.3em; font-weight:700; }
+.pf-brief-level > header small { font-weight:500; letter-spacing:.06em; }
+.pf-brief-definition { padding:0; border:0; font-family:var(--g-serif); font-size:1.45em; line-height:1.45; }
+.pf-brief-ten div { grid-template-columns:8em minmax(0,1fr); border-bottom:1px solid var(--g-line); }
+.pf-brief-ten dt small { color:var(--g-muted); font-weight:500; letter-spacing:.06em; }
+.pf-brief-takeaway { padding:0 0 0 1em; border-left:2px solid var(--g-ink); border-radius:0; background:none; font-family:var(--g-serif); }
+.pf-brief-takeaway::before { content:none; }
+.pf-brief-flow { gap:.3em .1em; }
+.pf-brief-flow li { padding:0; border:0; border-radius:0; background:none; font-weight:500; }
+.pf-brief-flow li span { min-width:auto; height:auto; background:none; color:var(--g-muted); font-size:.78em; font-weight:500; }
+.pf-brief-grid div, .pf-brief-bookends section, .pf-brief-chain, .pf-brief-chain[data-source="ai"] { padding:.6em 0; border:0; border-top:1px solid var(--g-line); border-radius:0; background:none; }
+.pf-brief-grid dt, .pf-brief-bookends dt { font-weight:500; letter-spacing:.04em; text-transform:none; }
+.pf-brief-results button, .pf-brief-figures button { border:0; border-top:1px solid var(--g-line); border-radius:0; background:none; box-shadow:none; transform:none !important; }
+.pf-brief-results button { border-left:0; grid-template-columns:auto minmax(0,1fr) auto; padding:.8em 0; }
+.pf-brief-results button:not(:disabled):hover, .pf-brief-figures button:not(:disabled):hover { background:var(--g-soft); box-shadow:none; }
+.pf-brief-rank { font-family:var(--g-serif); font-weight:700; color:var(--g-muted); }
+.pf-brief-result em { padding:0; background:none; font-weight:500; color:var(--g-muted); }
+.pf-brief-source { padding:0; background:none !important; color:var(--g-muted) !important; font-weight:500; }
+.pf-brief-figures { grid-template-columns:repeat(auto-fill,minmax(min(100%,17em),1fr)); }
+.pf-brief-figures li[data-stars="5"] button { border-color:var(--g-line); background:none; }
+.pf-brief-figures header span { color:var(--g-ink); }
+.pf-brief-figures button { padding:.8em 0; }
+.pf-brief-mechanisms, .pf-brief-bookends { grid-template-columns:repeat(auto-fit,minmax(min(100%,16em),1fr)); }
+.pf-brief-terms { grid-template-columns:repeat(auto-fill,minmax(min(100%,15em),1fr)); }
+.pf-brief-terms dt, .pf-brief-figures header strong, .pf-brief-bookends h4 { font-family:var(--g-serif); }
+.pf-brief-checks li::before { color:var(--g-muted); font-weight:500; }
+.pf-brief-limits li::before { content:"—"; color:var(--g-muted); font-weight:500; }

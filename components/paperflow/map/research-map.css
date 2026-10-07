@@ -1,8 +1,6 @@
 /* Research map (wiki graph): stage, research-pool panel, controls. Themes follow the canvas. */
 .pf-wm-stage { --wm-panel:rgba(255,255,255,.82); --wm-ink:#1d232b; --wm-muted:rgba(29,35,43,.6); --wm-line:rgba(20,30,40,.1); --wm-active:rgba(31,122,90,.12);
   position:relative; min-height:min(74vh,760px); border-radius:24px; overflow:hidden; border:1px solid var(--wm-line); isolation:isolate; font-family:Pretendard,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif; }
-.pf-wm-stage[data-theme="universe"] { --wm-panel:rgba(16,21,40,.72); --wm-ink:#e8ecff; --wm-muted:rgba(220,228,255,.62); --wm-line:rgba(160,180,255,.16); --wm-active:rgba(120,150,255,.16); background:#04060c; }
-.pf-wm-stage[data-theme="ivory"] { --wm-panel:rgba(255,251,240,.86); --wm-ink:#3a3226; --wm-muted:rgba(58,50,38,.62); --wm-line:rgba(92,78,52,.14); --wm-active:rgba(150,110,40,.1); background:#f3ecdb; }
 .pf-wm-stage[data-theme="paper"] { background:#f6f7f6; }
 .pf-wiki-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; }
 .pf-wm-stage .pf-mapview-empty { position:absolute; inset:0; color:var(--wm-muted); }
@@ -42,9 +40,6 @@
 .pf-wm-sliders .pf-wm-showall { margin:0; justify-self:end; }
 .pf-wm-hint { position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:1; margin:0; padding:5px 12px; border-radius:999px; font-size:11px; color:var(--wm-muted); background:var(--wm-panel); border:1px solid var(--wm-line); white-space:nowrap; pointer-events:none; }
 .pf-wm-stage .pf-map-inspector { z-index:3; top:auto; bottom:14px; max-height:min(60%,460px); overflow:auto; }
-.pf-wm-stage[data-theme="universe"] .pf-map-inspector { background:rgba(16,21,40,.88); color:#e8ecff; border-color:rgba(160,180,255,.16); }
-.pf-wm-stage[data-theme="universe"] .pf-map-inspector a { color:#e8ecff; }
-.pf-wm-stage[data-theme="universe"] .pf-map-papers li { background:rgba(255,255,255,.05); }
 .pf-wm-inspect-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
 @media (max-width:860px) {
   .pf-wm-controls { top:auto; bottom:44px; right:10px; left:10px; max-width:none; width:auto; }
@@ -69,9 +64,6 @@
 .pf-author-links a { font-size:11px; font-weight:600; color:var(--muted); text-decoration:none; }
 .pf-author-links a:hover { color:var(--accent); }
 /* Universe theme: the inspector's buttons read on the dark glass. */
-.pf-wm-stage[data-theme="universe"] .pf-map-inspector button { color:#dfe5ff; }
-.pf-wm-stage[data-theme="universe"] .pf-map-inspector button:hover { background:rgba(160,180,255,.12); }
-.pf-wm-stage[data-theme="universe"] .pf-map-inspector .pf-kicker, .pf-wm-stage[data-theme="universe"] .pf-map-inspector small, .pf-wm-stage[data-theme="universe"] .pf-map-weight { color:rgba(220,228,255,.7); }
 /* The hint steps aside while the inspector is open. */
 .pf-wm-hint { transition:opacity .2s ease; }
 .pf-wm-stage:has(.pf-map-inspector[data-open]) .pf-wm-hint { opacity:0; }

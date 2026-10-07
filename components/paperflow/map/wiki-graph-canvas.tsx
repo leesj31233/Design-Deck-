@@ -3,13 +3,12 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { arrangeTargets, Simulation, type Arrange, type Forces, type SimLink, type SimNode } from "@/lib/paperflow/map/physics";
 import type { WikiEdge, WikiNode } from "@/lib/paperflow/map/wiki-graph";
 
-export type MapTheme = "universe" | "ivory" | "paper";
+/** The map is drawn on a light ground only (the dark universe and ivory grounds were removed). */
+export type MapTheme = "paper";
 export interface WikiGraphHandle { fit: () => void; flyTo: (id: string) => void; shake: () => void }
 interface Props { nodes: WikiNode[]; edges: WikiEdge[]; theme: MapTheme; arrange: Arrange; forces: Forces; labels: "auto" | "all" | "fields"; selected: string | null; query: string; onSelect: (id: string | null) => void }
 
 const THEMES = {
-  universe: { top: "#111833", bottom: "#04060c", edge: "rgba(150,170,255,", label: "#e8ecff", sub: "rgba(220,228,255,.72)", halo: true, stroke: "rgba(255,255,255,.18)", tip: "rgba(14,18,34,.92)", tipInk: "#eef1ff" },
-  ivory: { top: "#fbf7ec", bottom: "#efe7d2", edge: "rgba(92,78,52,", label: "#3a3226", sub: "rgba(58,50,38,.68)", halo: false, stroke: "rgba(255,255,255,.9)", tip: "rgba(255,252,243,.97)", tipInk: "#2f291f" },
   paper: { top: "#fcfcfb", bottom: "#f1f3f2", edge: "rgba(30,40,50,", label: "#1d232b", sub: "rgba(29,35,43,.62)", halo: false, stroke: "rgba(255,255,255,.95)", tip: "rgba(255,255,255,.97)", tipInk: "#1d232b" }
 } as const;
 const FONT = "Pretendard, 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif";

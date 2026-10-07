@@ -115,3 +115,9 @@ html[data-pf-theme="dark"] .pf-ask-sources small { color:#3fc9a4 !important; }
 @media (max-width:900px) { .pf-ask-toggle { padding-inline:8px; } .pf-ask-toggle-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); } }
 /* A phone-width toolbar: its text buttons never wrap into a column of letters. */
 @media (max-width:650px) { .pf-batch-button, .pf-guide-button, .pf-ask-toggle { white-space:nowrap; flex-shrink:0; } .pf-reader-tools .pf-toolbar-group:last-child { flex-wrap:wrap; justify-content:flex-end; row-gap:4px; } }
+
+/* Evidence on the paper, switched per answer and from the header. */
+.pf-ask-actions .pf-ask-evidence { width:auto; gap:4px; padding:0 8px; display:inline-flex; align-items:center; border-radius:999px; font:inherit; font-size:10.5px; font-weight:700; }
+.pf-ask-actions .pf-ask-evidence[aria-pressed="true"] { background:var(--ask-soft); color:var(--ask); }
+.pf-askdock-tool[aria-pressed="false"] { color:var(--muted); opacity:.7; }
+.pf-askdock-head { grid-template-columns:auto minmax(0,1fr) auto auto auto auto; }
