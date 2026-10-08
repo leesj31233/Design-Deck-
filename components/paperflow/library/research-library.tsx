@@ -1,0 +1,148 @@
+"use client";
+import "./research-library.css";
+import { relativeKo } from "@/lib/paperflow/library/relative-time";
+import { warmPdf } from "@/lib/paperflow/pdf/pdf-adapter";
+import { confirmAction } from "@/lib/paperflow/confirm";
+import { CollectionInsights } from "./collection-insights";
+import { NotesView } from "../notes/notes-view";
+import dynamic from "next/dynamic";
+// The research map pulls in WebGL graph code: load it only when the map is opened.
+const DiscoverView = dynamic(() => import("../discover/discover-view").then(module => module.DiscoverView), { ssr: false, loading: () => <div className="pf-empty" role="status">추천을 준비하는 중…</div> });
+const ResearchMapView = dynamic(() => import("../map/research-map-view").then(module => module.ResearchMapView), { ssr: false, loading: () => <div className="pf-empty" role="status">연구맵을 준비하는 중…</div> });
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowUpRight, BookOpen, Command, Moon, Plus, Sun, Upload, Archive, ArrowLeft, Network, Bookmark, Trash2, RotateCcw, FolderInput, Sparkles, Clock3 } from "lucide-react";
+import { guideBadge, readGuideOnly, writeGuideOnly } from "@/lib/paperflow/library/guide-badge";
+import { FolderPicker, FolderShelf, FolderGlyph } from "./archive-folders";
+import { archiveFolders, forgetFolder, onFoldersChange, saveFolder } from "@/lib/paperflow/library/archive-folders";
+import type { ArchiveFolder } from "@/lib/paperflow/persistence/types";
+import { daysLeft, moveToTrash, purgeDocument, purgeExpired, restoreFromTrash, TRASH_DAYS } from "@/lib/paperflow/library/trash";
+import type { StoredDocument } from "@/lib/paperflow/persistence/types";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { GlassPanel } from "@/components/ui/glass-panel";
+import { SearchField } from "@/components/ui/search-field";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { PaperflowSidebar } from "../shell/paperflow-sidebar";
+import { MobileNav } from "../shell/mobile-nav";
+import { usePaperflow } from "../shell/paperflow-context";
+import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
+import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
+import { readableError } from "@/lib/paperflow/errors";
+import { DocumentCover } from "./document-cover";
+import { type TranslationJobStatus } from "@/lib/paperflow/translation/document-job";
+import { TranslateButton } from "./translate-button";
+import { backfillImpact, enrichDocument } from "@/lib/paperflow/scholar/enrich";
+
+export function ResearchLibrary() {
+  const { openImport, importFiles, importing, openCommand, toggleTheme, dark, notify } = usePaperflow();
+  const [view, setView] = useState("library"), [search, setSearch] = useState(""), [dragging, setDragging] = useState(false), [limit, setLimit] = useState(30), [layout, setLayout] = useState("shelf");
+  const [jifId, setJifId] = useState<string | null>(null), [jifValue, setJifValue] = useState(""), [jifYear, setJifYear] = useState(""), [jifSource, setJifSource] = useState("");
+  const [translationJobs, setTranslationJobs] = useState<Record<string, TranslationJobStatus>>({});
+  // Archive folders: which one is open, and the paper waiting for a folder before it is archived (or moved).
+  const [folderView, setFolderView] = useState("all"), [picker, setPicker] = useState<{ doc: StoredDocument; moving: boolean } | null>(null), [folderTick, setFolderTick] = useState(0);
+  useEffect(() => onFoldersChange(() => setFolderTick(tick => tick + 1)), []);
+  // "가이드 있는 논문만": read after mount so the server render and the first client render agree.
+  const [guideOnly, setGuideOnly] = useState(false);
+  useEffect(() => setGuideOnly(readGuideOnly()), []);
+  // Opening a paper from here should not wait for PDF.js to start: warm it once the library is idle.
+  useEffect(() => { const start = () => warmPdf(); if ("requestIdleCallback" in window) { const id = window.requestIdleCallback(start, { timeout: 3000 }); return () => window.cancelIdleCallback(id); } const timer = setTimeout(start, 1500); return () => clearTimeout(timer); }, []);
+  useEffect(() => {
+    const onProgress = (event: Event) => { const status = (event as CustomEvent<TranslationJobStatus>).detail; setTranslationJobs(current => ({ ...current, [status.documentId]: status })); };
+    window.addEventListener("paperflow:translation-progress", onProgress);
+    return () => window.removeEventListener("paperflow:translation-progress", onProgress);
+  }, []);
+  const reduced = useReducedMotion(), client = useQueryClient();
+  const docs = useQuery({ queryKey: ["documents"], queryFn: () => documentRepository.listDocuments() });
+  const annotations = useQuery({ queryKey: ["annotations"], queryFn: () => annotationRepository.listAll() });
+  const saveJif = async () => { const value = Number(jifValue), year = Number(jifYear); if (!jifId || !Number.isFinite(value) || value <= 0 || !Number.isInteger(year) || year < 1970 || year > new Date().getFullYear() || !/^https:\/\//.test(jifSource)) { notify("양수 JIF, 발표 연도, 확인 가능한 https 출처를 입력해 주세요."); return; } try { await documentRepository.updateDocument(jifId, { jif: { value, year, source: jifSource } }); await client.invalidateQueries({ queryKey: ["documents"] }); setJifId(null); notify("출처가 있는 JIF를 저장했습니다."); } catch (error) { notify(readableError(error)); } };
+  const archive = useMutation({ mutationFn: ({ id, archived }: { id: string; archived: boolean }) => documentRepository.updateDocument(id, { archived }), onSuccess: () => client.invalidateQueries({ queryKey: ["documents"] }), onError: error => notify(readableError(error)) });
+  // Papers in the trash are out of every view except the trash itself.
+  const live = useMemo(() => (docs.data ?? []).filter(d => !d.deletedAt), [docs.data]);
+  const trashed = useMemo(() => (docs.data ?? []).filter(d => d.deletedAt).sort((a, b) => b.deletedAt!.localeCompare(a.deletedAt!)), [docs.data]);
+  const liveNotes = useMemo(() => { const ids = new Set(live.map(d => d.id)); return (annotations.data ?? []).filter(a => ids.has(a.documentId)); }, [live, annotations.data]);
+  const folders = useMemo(() => archiveFolders(live), [live, folderTick]); // eslint-disable-line react-hooks/exhaustive-deps
+  const archivedDocs = useMemo(() => live.filter(d => d.archived), [live]);
+  const folderCounts = useMemo(() => { const counts = new Map<string, number>(); for (const doc of archivedDocs) if (doc.archiveFolder) counts.set(doc.archiveFolder.id, (counts.get(doc.archiveFolder.id) ?? 0) + 1); return counts; }, [archivedDocs]);
+  const openFolder = folders.find(folder => folder.id === folderView);
+  const inFolder = (doc: StoredDocument) => view !== "archive" || folderView === "all" || (folderView === "none" ? !doc.archiveFolder || !folders.some(folder => folder.id === doc.archiveFolder!.id) : doc.archiveFolder?.id === folderView);
+  const filtered = useMemo(() => live.filter(d => d.archived === (view === "archive") && inFolder(d) && (!guideOnly || guideBadge(d.guide)) && `${d.title} ${d.filename}`.toLowerCase().includes(search.toLowerCase())), [live, view, search, folderView, folders, guideOnly]); // eslint-disable-line react-hooks/exhaustive-deps
+  const recent = live.find(d => !d.archived && d.lastOpenedAt);
+  const heading = view === "archive" ? "아카이브" : view === "notes" ? "노트" : view === "map" ? "연구맵" : view === "discover" ? "추천 논문" : view === "trash" ? "휴지통" : "서재";
+  const refresh = () => client.invalidateQueries({ queryKey: ["documents"] });
+  const fileTo = async (doc: StoredDocument, folder: ArchiveFolder | null, moving: boolean) => {
+    try { await documentRepository.updateDocument(doc.id, { archived: true, archiveFolder: folder }); await refresh(); notify(folder ? `${folder.name}에 ${moving ? "옮겼습니다" : "보관했습니다"}` : moving ? "미분류로 옮겼습니다" : "보관했습니다"); } catch (error) { notify(readableError(error)); }
+  };
+  // A renamed or recoloured folder is rewritten into its papers, so every device shows the same folder.
+  const editFolder = async (folder: ArchiveFolder) => { const stamped = { ...folder, updatedAt: new Date().toISOString() }; saveFolder(stamped); try { for (const doc of archivedDocs.filter(item => item.archiveFolder?.id === folder.id)) await documentRepository.updateDocument(doc.id, { archiveFolder: stamped }); await refresh(); } catch (error) { notify(readableError(error)); } };
+  const deleteFolder = async (folder: ArchiveFolder) => {
+    const count = folderCounts.get(folder.id) ?? 0;
+    if (!await confirmAction({ title: `"${folder.name}" 폴더를 지울까요?`, body: count ? `안의 논문 ${count}편은 지워지지 않고 미분류로 옮겨집니다.` : "빈 폴더입니다.", confirm: "폴더 지우기", tone: "danger" })) return;
+    try { for (const doc of archivedDocs.filter(item => item.archiveFolder?.id === folder.id)) await documentRepository.updateDocument(doc.id, { archiveFolder: null }); forgetFolder(folder.id); if (folderView === folder.id) setFolderView("all"); await refresh(); notify("폴더를 지웠습니다"); } catch (error) { notify(readableError(error)); }
+  };
+  const trash = async (doc: StoredDocument) => { try { await moveToTrash(doc.id); await refresh(); notify(`휴지통으로 옮겼습니다. ${TRASH_DAYS}일 뒤 영구 삭제되며, 그 전에는 휴지통에서 복원할 수 있습니다.`); } catch (error) { notify(readableError(error)); } };
+  const restore = async (doc: StoredDocument) => { try { await restoreFromTrash(doc.id); await refresh(); notify("서재로 복원했습니다."); } catch (error) { notify(readableError(error)); } };
+  const purge = async (items: StoredDocument[]) => {
+    const question = items.length === 1 ? `"${items[0].title}" 을(를) 영구 삭제합니다. PDF, 마킹, 메모, 번역이 모든 기기와 계정에서 지워지며 되돌릴 수 없습니다.` : `휴지통의 논문 ${items.length}편을 영구 삭제합니다. 되돌릴 수 없습니다.`;
+    if (!items.length || !await confirmAction({ title: items.length === 1 ? "영구 삭제할까요?" : `${items.length}편을 영구 삭제할까요?`, body: question, confirm: "영구 삭제", tone: "danger" })) return;
+    try { for (const doc of items) await purgeDocument(doc); await Promise.all([refresh(), client.invalidateQueries({ queryKey: ["annotations"] })]); notify(items.length === 1 ? "영구 삭제했습니다." : `${items.length}편을 영구 삭제했습니다.`); } catch (error) { notify(readableError(error)); }
+  };
+  // Papers past their 30 days in the trash are purged when the library opens.
+  // Journal impact for every paper, once per session: match unmatched papers to OpenAlex (a few at a time), then fill in their journals.
+  useEffect(() => {
+    const list = docs.data;
+    if (!list?.length) return;
+    try { if (sessionStorage.getItem("pf-impact-pass")) return; sessionStorage.setItem("pf-impact-pass", "1"); } catch { return; }
+    void (async () => {
+      for (const doc of list.filter(item => !item.deletedAt && !item.scholar).slice(0, 12)) { await enrichDocument(doc).catch(() => null); await new Promise(resolve => setTimeout(resolve, 200)); }
+      await backfillImpact(await documentRepository.listDocuments()).catch(() => 0);
+      await client.invalidateQueries({ queryKey: ["documents"] });
+    })();
+  }, [docs.data, client]);
+  useEffect(() => { void purgeExpired().then(count => { if (count) { void refresh(); notify(`휴지통에서 ${TRASH_DAYS}일이 지난 논문 ${count}편을 영구 삭제했습니다.`); } }).catch(() => undefined); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return <div className="pf-library-shell" onDragOver={event => { if (!event.dataTransfer.types.includes("Files")) return; event.preventDefault(); setDragging(true); }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false); }} onDrop={event => { if (!event.dataTransfer.files.length) return; event.preventDefault(); setDragging(false); void importFiles(Array.from(event.dataTransfer.files)); }}>
+    <PaperflowSidebar view={view} onView={setView} trashCount={trashed.length}/>
+    <MobileNav view={view} onView={setView} trashCount={trashed.length}/>
+    <main className="pf-library-main">
+      <header className="pf-library-top"><span className="pf-breadcrumb">Workspace <span>/</span> {heading}</span><div className="pf-toolbar-group"><IconButton label="Toggle theme" variant="ghost" onClick={toggleTheme}>{dark ? <Sun size={18}/> : <Moon size={18}/>}</IconButton><Button variant="ghost" onClick={openCommand}><Command size={15}/><span className="pf-command-label">명령</span><kbd>Ctrl K</kbd></Button></div></header>
+      <div className="pf-library-content">
+        <div className="pf-heading"><div><motion.h1 key={heading} initial={reduced ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 340, damping: 30 }}>{heading}</motion.h1></div><Button variant="primary" className="pf-import-button" onClick={openImport} disabled={importing}><Plus size={17}/>{importing ? "가져오는 중…" : "PDF 가져오기"}</Button></div>
+        {(docs.error || annotations.error) && <p role="alert" className="pf-error">{readableError(docs.error ?? annotations.error)}</p>}
+        {/* Switching views settles the new one in from just below, like a page turning into place. */}
+        <motion.div key={view} className="pf-view" initial={reduced ? false : { opacity: 0, y: 12, filter: "blur(3px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }} transition={{ type: "spring", stiffness: 260, damping: 30, mass: .8 }}>
+        {view === "library" && <CollectionInsights docs={live} annotations={liveNotes}/>}
+        {view === "library" && recent && <section className="pf-continue">
+          <GlassPanel className="pf-continue-card"><Link className="pf-continue-cover" href={`/reader/${recent.id}`} aria-label="최근 논문 이어 읽기"><DocumentCover documentId={recent.id} title={recent.title}/></Link><div className="pf-continue-copy"><span className="pf-kicker">이어 읽기</span><h3>{recent.title}</h3><p>{recent.currentPage} / {recent.pageCount} 페이지 · 마지막으로 읽던 곳에서</p><progress value={recent.currentPage} max={recent.pageCount} aria-label="Reading progress"/></div><Button asChild variant="primary"><Link href={`/reader/${recent.id}`}>이어 읽기 <ArrowUpRight size={16}/></Link></Button></GlassPanel>
+        </section>}
+        {view === "archive" && <FolderShelf folders={folders} counts={folderCounts} total={archivedDocs.length} unfiled={archivedDocs.filter(doc => !doc.archiveFolder || !folders.some(folder => folder.id === doc.archiveFolder!.id)).length} active={folderView} onSelect={setFolderView} onCreate={folder => { saveFolder(folder); setFolderView(folder.id); }} onEdit={folder => void editFolder(folder)} onDelete={folder => void deleteFolder(folder)} onDropPaper={(id, folder) => { const doc = live.find(item => item.id === id); if (doc) void fileTo(doc, folder, true); }}/>}
+        {(view === "library" || view === "archive") && <section className="pf-collection-section"><div className="pf-collection-toolbar"><div className="pf-section-title"><h2>{view === "archive" ? (openFolder ? <span className="pf-folder-heading" style={{ color: openFolder.color }}><FolderGlyph icon={openFolder.icon} size={18}/>{openFolder.name}</span> : folderView === "none" ? "미분류" : "보관한 논문") : "내 논문"}<span className="pf-count">{filtered.length}</span></h2></div><div className="pf-collection-controls"><SearchField data-paper-search aria-label="논문 검색" placeholder="제목으로 찾기" value={search} onChange={event => { setSearch(event.target.value); setLimit(30); }} onClear={() => setSearch("")}/><Button size="sm" variant="ghost" className="pf-guide-filter" aria-pressed={guideOnly} onClick={() => { const next = !guideOnly; setGuideOnly(next); writeGuideOnly(next); setLimit(30); }}><Sparkles size={14} aria-hidden="true"/>가이드 있는 논문만</Button><SegmentedControl value={layout} onValueChange={setLayout} items={[{ value: "shelf", label: "서가" }, { value: "list", label: "목록" }]}/></div></div>
+          <div className="pf-paper-list" data-layout={layout}>
+          {docs.isPending ? <div className="pf-empty" role="status">저장한 논문을 불러오는 중…</div> : filtered.length === 0 ? <div className="pf-empty pf-collection-empty"><span className="pf-empty-book"><BookOpen size={35}/></span><h3>{search ? "검색 결과가 없습니다" : guideOnly ? "AI 가이드가 있는 논문이 없습니다" : view === "archive" ? "아직 보관한 논문이 없습니다" : "첫 논문을 서재에 놓아보세요"}</h3><p>{view === "archive" ? "서재의 논문 카드에서 보관 버튼을 누르면 여기로 이동합니다." : <>PDF를 이곳에 놓으면 첫 페이지가 표지가 됩니다.<br/>읽은 문장과 메모가 논문 곁에 쌓입니다.</>}</p><Button onClick={view === "archive" ? () => setView("library") : openImport}>{view === "archive" ? "서재에서 논문 고르기" : <><Plus size={15}/> PDF 선택</>}</Button></div> : filtered.slice(0, limit).map((doc, index) => { const marks = (annotations.data ?? []).filter(a => a.documentId === doc.id); return <motion.article className="pf-paper-row pf-book-card" key={doc.id} initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .24, delay: Math.min(index, 7) * .025 }}>
+            <Link className="pf-paper-link" href={`/reader/${doc.id}`}><DocumentCover documentId={doc.id} title={doc.title} cover={doc.cover}/><span className="pf-book-title"><strong>{doc.title.replace(/\.pdf$/i, "")}</strong><small>{doc.authors?.slice(0, 2).join(", ") || "저자 미확인"} · {doc.journal || "저널 미확인"} · {doc.pageCount}p</small>{(doc.sourceStatus !== "local" || guideBadge(doc.guide)) && <span className="pf-book-badges">{guideBadge(doc.guide) && <span className="pf-guide-badge"><Sparkles size={10} aria-hidden="true"/>{guideBadge(doc.guide)}</span>}{doc.sourceStatus !== "local" && <span className="pf-source-badge" data-source={doc.sourceStatus}>{doc.sourceStatus === "cloud" ? "클라우드 보관" : "다른 기기의 PDF"}</span>}</span>}</span></Link>
+            <div className="pf-book-details"><div className="pf-progress"><span>{doc.lastOpenedAt ? `${Math.round((doc.visitedPages?.length ?? doc.currentPage) / doc.pageCount * 100)}% 읽음` : "새로운 논문"}</span><progress aria-label={`${doc.title} 읽기 진행`} value={doc.lastOpenedAt ? (doc.visitedPages?.length ?? doc.currentPage) : 0} max={doc.pageCount}/></div><div className="pf-record-count"><Bookmark size={12}/>{marks.filter(a => a.type === "highlight").length}<span className="sr-only"> 마킹</span></div><span className="pf-book-activity">메모 {marks.filter(a => a.note).length} · Hot {doc.opens?.filter(date => Date.now() - Date.parse(date) < 604800000).length ?? 0}{doc.jif ? ` · JIF ${doc.jif.value} (${doc.jif.year})` : ""}</span>{!doc.jif && <span className="pf-impact" title={doc.impact ? `${doc.impact.journal ?? "저널"} · OpenAlex 2년 평균 피인용 (JIF와 같은 계산, Clarivate JCR 공식값 아님)` : "저널 정보를 찾는 중이거나 찾지 못했습니다"}>{doc.impact ? `IF ${doc.impact.value}` : "IF –"}</span>}<TranslateButton documentId={doc.id} job={translationJobs[doc.id]} notify={notify}/><Button size="sm" variant="ghost" onClick={() => { setJifId(doc.id); setJifValue(doc.jif?.value?.toString() ?? ""); setJifYear(doc.jif?.year?.toString() ?? ""); setJifSource(doc.jif?.source ?? ""); }}>JIF 기록</Button>{doc.lastOpenedAt ? <time className="pf-book-opened" dateTime={doc.lastOpenedAt} title={`마지막 열람 ${new Date(doc.lastOpenedAt).toLocaleString("ko-KR")}`}><Clock3 size={12} aria-hidden="true"/>{relativeKo(doc.lastOpenedAt)} 열람</time> : <span className="pf-book-opened" data-new=""><Clock3 size={12} aria-hidden="true"/>아직 안 읽음</span>}<span className="pf-book-icons">{doc.archived && <IconButton label="다른 폴더로 옮기기" variant="ghost" size="sm" onClick={() => setPicker({ doc, moving: true })}><FolderInput size={15}/></IconButton>}<IconButton label={doc.archived ? "아카이브에서 복원" : "폴더를 골라 보관"} variant="ghost" size="sm" disabled={archive.isPending} onClick={() => doc.archived ? archive.mutate({ id: doc.id, archived: false }) : setPicker({ doc, moving: false })}>{doc.archived ? <ArrowLeft size={15}/> : <Archive size={15}/>}</IconButton><IconButton label="휴지통으로 이동" variant="ghost" size="sm" className="pf-trash-button" onClick={() => void trash(doc)}><Trash2 size={15}/></IconButton></span></div>
+          </motion.article>; })}</div>
+          <FolderPicker open={Boolean(picker)} title={picker?.doc.title.replace(/\.pdf$/i, "") ?? ""} folders={folders} counts={folderCounts} current={picker?.moving ? picker.doc.archiveFolder?.id ?? null : undefined} moving={picker?.moving} onCreate={folder => saveFolder(folder)} onClose={() => setPicker(null)} onPick={folder => { const target = picker; setPicker(null); if (target) void fileTo(target.doc, folder, target.moving); }}/>
+          {jifId && <GlassPanel className="pf-jif-form" role="form" aria-label="JIF 출처 기록"><h3>JIF 출처 기록</h3><p>저널의 해당 연도 공식 수치와 출처를 확인한 뒤 기록하세요.</p><label>JIF 수치<input aria-label="JIF 수치" type="number" min="0.001" step="0.001" value={jifValue} onChange={e => setJifValue(e.target.value)}/></label><label>발표 연도<input aria-label="JIF 연도" type="number" value={jifYear} onChange={e => setJifYear(e.target.value)}/></label><label>출처 URL<input aria-label="JIF 출처 URL" type="url" value={jifSource} onChange={e => setJifSource(e.target.value)}/></label><Button onClick={() => void saveJif()}>저장</Button><Button variant="ghost" onClick={() => setJifId(null)}>취소</Button></GlassPanel>}
+          {filtered.length > limit && <Button onClick={() => setLimit(number => number + 30)}>30개 더 보기</Button>}
+        </section>}
+        {view === "notes" && <NotesView docs={live} annotations={liveNotes}/>}
+        {view === "map" && <ResearchMapView docs={live} annotations={liveNotes}/>}
+        {view === "discover" && <DiscoverView docs={live} annotations={liveNotes}/>}
+        {view === "trash" && <section className="pf-trash">
+          <div className="pf-trash-head"><p>{TRASH_DAYS}일이 지나면 자동으로 영구 삭제됩니다.</p>{trashed.length > 0 && <Button size="sm" variant="danger" onClick={() => void purge(trashed)}><Trash2 size={14}/>휴지통 비우기</Button>}</div>
+          {trashed.length === 0 ? <div className="pf-empty pf-collection-empty"><span className="pf-empty-book"><Trash2 size={32}/></span><h3>휴지통이 비어 있습니다</h3><p>서재나 아카이브의 논문 카드에서 휴지통 버튼을 누르면 여기로 옮겨집니다.</p></div>
+          : <ul className="pf-trash-list">{trashed.map(doc => { const left = daysLeft(doc.deletedAt!); return <motion.li key={doc.id} initial={reduced ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+            <span className="pf-trash-cover"><DocumentCover documentId={doc.id} title={doc.title} cover={doc.cover}/></span>
+            <span className="pf-trash-copy"><strong>{doc.title.replace(/\.pdf$/i, "")}</strong><small>{doc.authors?.slice(0, 2).join(", ") || "저자 미확인"} · {doc.pageCount}p · {new Date(doc.deletedAt!).toLocaleDateString("ko-KR")} 삭제</small><em data-soon={left <= 3 || undefined}>{left > 0 ? `${left}일 뒤 영구 삭제` : "곧 영구 삭제"}</em></span>
+            <span className="pf-trash-actions"><Button size="sm" variant="secondary" onClick={() => void restore(doc)}><RotateCcw size={14}/>복원</Button><Button size="sm" variant="ghost" className="pf-trash-purge" onClick={() => void purge([doc])}><Trash2 size={14}/>영구 삭제</Button></span>
+          </motion.li>; })}</ul>}
+        </section>}
+        </motion.div>
+        
+      </div>
+    </main>
+    {dragging && <div className="pf-drop-overlay"><Upload size={38}/><h2>PDF를 놓아 서재에 추가</h2><p>원본 파일은 변경되지 않습니다.</p></div>}
+  </div>;
+}

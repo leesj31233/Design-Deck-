@@ -7,3 +7,15 @@ out
 .DS_Store
 *.log
 .vercel
+public/pdfjs/
+test-results/
+playwright-report/
+*.tsbuildinfo
+tests/private/
+
+.vercel
+.env*
+
+# Supabase CLI link state
+supabase/.temp/
+supabase/.branches/

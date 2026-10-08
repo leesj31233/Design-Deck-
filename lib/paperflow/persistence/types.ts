@@ -1,0 +1,51 @@
+import type { Annotation } from "../anchors/types";
+import type { ScholarWork } from "../scholar/openalex";
+import type { PaperGuide } from "../guide/guide";
+/** An archive folder: a name, a lucide icon and a tint. `removed` marks a deleted folder. */
+export type ArchiveFolder = { id: string; name: string; icon: string; color: string; createdAt: string; updatedAt?: string; removed?: boolean };
+export type StoredDocument = {
+  id: string; filename: string; title: string; mimeType: "application/pdf"; byteLength: number;
+  createdAt: string; updatedAt: string; pageCount: number; fingerprint?: string; blobKey: string;
+  visitedPages?: number[]; opens?: string[]; keywords?: string[]; citationCount?: number; metadataSource?: string; metadataCheckedAt?: string; jif?: { value: number; year: number; source: string };
+  /** The journal's two-year mean citedness from OpenAlex (computed like a JIF, not Clarivate's JCR figure). */
+  impact?: { value: number; journal?: string; checkedAt: string };
+  currentPage: number; lastOpenedAt?: string; authors: string[]; journal?: string; year?: number; doi?: string;
+  researchPoolIds: string[]; archived: boolean;
+  /** The archive folder the paper is filed in (null or absent: unfiled). */
+  archiveFolder?: ArchiveFolder | null;
+  /** The first page as a small webp data URL, made once and synced with the paper (like a notebook cover). */
+  cover?: string;
+  /** In the trash since then (purged for good after 30 days); null when restored, so the restore syncs too. */
+  deletedAt?: string | null;
+  /** local: PDF only here. cloud: PDF also in the account's cloud storage. remote: listed by the account, PDF on another device. */
+  sourceStatus: "local" | "cloud" | "remote";
+  storagePath?: string;
+  /** OpenAlex record: authors, institutions, journal, topic hierarchy, related works. */
+  scholar?: ScholarWork;
+  /** AI study guide (overview, findings tied to source paragraphs, terms, questions). */
+  guide?: PaperGuide;
+};
+export type StoredDocumentInput = { blob: Blob; filename: string; pageCount: number; fingerprint?: string };
+export interface DocumentRepository {
+  saveDocument(input: StoredDocumentInput): Promise<StoredDocument>;
+  getDocument(id: string): Promise<StoredDocument | null>;
+  /** `remote: false` never downloads (library covers must not pull every PDF from the cloud). */
+  getDocumentBlob(id: string, options?: { remote?: boolean }): Promise<Blob | null>;
+  listDocuments(): Promise<StoredDocument[]>;
+  updateDocument(id: string, patch: Partial<Omit<StoredDocument, "id" | "blobKey" | "mimeType" | "byteLength" | "createdAt">>): Promise<void>;
+  /** Sync only: write a record as received from the account, without announcing a local change. */
+  putRecord(record: StoredDocument): Promise<void>;
+  putBlob(id: string, blob: Blob): Promise<void>;
+  /** Permanent delete on this device: the record, the PDF, its marks, translations and layout manifest. */
+  removeDocument(id: string): Promise<void>;
+}
+export interface AnnotationRepository {
+  create(annotation: Annotation): Promise<void>;
+  update(annotation: Annotation): Promise<void>;
+  listByDocument(documentId: string): Promise<Annotation[]>;
+  listAll(): Promise<Annotation[]>;
+  remove(annotationId: string): Promise<void>;
+  /** Sync only: write or delete without announcing a local change. */
+  putRaw(annotation: Annotation): Promise<void>;
+  removeRaw(annotationId: string): Promise<void>;
+}

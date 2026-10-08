@@ -1,0 +1,7 @@
+/* Library cards: AI guide badge and the "가이드 있는 논문만" filter. */
+.pf-guide-badge { display:inline-flex; align-items:center; gap:3px; width:max-content; margin-top:4px; padding:1px 7px; border-radius:99px; font-size:9.5px; font-weight:600; letter-spacing:.01em; background:var(--accent-soft); color:var(--accent); }
+.pf-guide-badge svg { flex:none; }
+.pf-book-badges { display:flex; flex-wrap:wrap; gap:4px; }
+.pf-book-badges > .pf-source-badge, .pf-book-badges > .pf-guide-badge { margin-top:4px; }
+.pf-guide-filter { display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+.pf-guide-filter[aria-pressed="true"] { background:var(--accent-soft)!important; color:var(--accent)!important; box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent); }
