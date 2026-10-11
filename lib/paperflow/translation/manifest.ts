@@ -10,7 +10,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.38";
+export const EXTRACTOR_VERSION = "layout-v3.39";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -103,8 +103,11 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
   continueCaptions(paragraphs, classified);
   const blocks: ManifestBlock[] = [];
   for (const [index, paragraph] of paragraphs.entries()) {
-    const { role, columnIndex } = classified[index];
-    let { reason } = classified[index];
+    const { columnIndex } = classified[index];
+    let { role, reason } = classified[index];
+    // A safety net for the front page: a real paragraph of prose is the article, whatever position rule
+    // called it masthead or front matter. Left out, it would stay in English under a "번역 완료".
+    if ((reason === "journal-masthead" || reason === "front-matter") && proseScore(paragraph.text).words >= 30 && readsAsProse(paragraph.text)) { role = "BODY"; reason = null; }
     // Text already in Korean is shown as printed: never spend a credit translating Korean into Korean.
     if (reason === null && isKorean(paragraph.text)) reason = "korean-source";
     const translatable = TRANSLATABLE.has(role) && reason === null;

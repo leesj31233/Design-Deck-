@@ -48,7 +48,8 @@ function endsReferenceList(block: PdfParagraph, value: string, bodySize: number)
   return score.words >= 30 && score.sentences >= 2 && years <= 1 && numbers <= score.words * .12 && (plain >= score.words * .15 || /[가-힣぀-ヿ一-鿿]{6}/.test(value));
 }
 
-export interface PageContext { pageIndex: number; bodySize: number; titleIndex: number; abstractIndex: number }
+/** `titleTop`: where the title starts on the page (0–1); only what is printed above it can be the masthead. */
+export interface PageContext { pageIndex: number; bodySize: number; titleIndex: number; abstractIndex: number; titleTop?: number }
 
 /** Page-1 anchors: the paper title is the biggest long block near the top; front matter sits between it and the abstract. */
 export function pageContext(blocks: PdfParagraph[], pageIndex: number): PageContext {
@@ -62,7 +63,7 @@ export function pageContext(blocks: PdfParagraph[], pageIndex: number): PageCont
     if (score > best) { best = score; titleIndex = index; }
   });
   const abstractIndex = blocks.findIndex((block, index) => index > titleIndex && (/^(?:■\s*)?abstract\b/i.test(block.text) || squash(block.text).startsWith("abstract") || isFrontProse(block)));
-  return { pageIndex, bodySize, titleIndex, abstractIndex };
+  return { pageIndex, bodySize, titleIndex, abstractIndex, titleTop: titleIndex >= 0 ? blocks[titleIndex].y : undefined };
 }
 
 export function readsAsProse(text: string) {
@@ -100,8 +101,12 @@ export function classifyBlock(block: PdfParagraph, index: number, context: PageC
   if (/^(?:table of )?contents$/i.test(value) || /\.{4,}\s*\d+\s*$/.test(value) || (value.match(/\.{4,}/g) ?? []).length >= 2) return { role: "OTHER", reason: "contents" };
   if (context.pageIndex === 0 && context.titleIndex >= 0) {
     if (index === context.titleIndex) return { role: "TITLE", reason: "paper-title" };
-    if (index < context.titleIndex) return { role: "HEADER", reason: "journal-masthead" };
-    const beforeAbstract = context.abstractIndex < 0 || index < context.abstractIndex;
+    // The masthead (journal name, logo, issue line) is printed above the title. Reading order alone is not
+    // enough: in a newsletter or a two-column front page the left column is read first although it sits
+    // below a title at the top right, and that column is the article itself. Prose is never a masthead.
+    const aboveTitle = context.titleTop === undefined || block.y + block.height <= context.titleTop + .012;
+    if (index < context.titleIndex && aboveTitle && !isFrontProse(block)) return { role: "HEADER", reason: "journal-masthead" };
+    const beforeAbstract = index > context.titleIndex && (context.abstractIndex < 0 || index < context.abstractIndex);
     if (beforeAbstract && !isFrontProse(block)) return { role: /universit|institut|department|school|laborator|college|academy|centre|center/i.test(value) ? "AFFILIATION" : "AUTHOR", reason: "front-matter" };
   }
   if (block.kind === "caption" || CAPTION_START.test(value)) return { role: "CAPTION", reason: null };

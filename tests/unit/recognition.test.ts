@@ -319,3 +319,16 @@ describe("notifications", () => {
     expect(duration(72000)).toBe("1분 12초");
   });
 });
+
+describe("front page masthead", () => {
+  it("keeps a column read before a top-right title as the article, and only text above the title as masthead", async () => {
+    const { classifyBlock } = await import("../../lib/paperflow/layout/classify");
+    const block = (text: string, x: number, y: number, height: number, size = 10) => ({ id: "p", pageIndex: 0, text, kind: "body", x, y, width: .4, height, lines: [{ x, y, width: .4, height: .015 }, { x, y: y + .02, width: .4, height: .015 }], fontFamily: "serif", fontSize: size }) as never;
+    // A newsletter: the title sits at the top right; the left column (read first) starts below it.
+    const context = { pageIndex: 0, bodySize: 10, titleIndex: 3, abstractIndex: -1, titleTop: .12 };
+    const prose = "The spot price of industrial wood pellet deliveries to northwest Europe firmed up in the week, supported by strong spot trading activity in Poland. The price rose by a little on Wednesday, and one cargo was sold over the past week for delivery to Gdansk.";
+    expect(classifyBlock(block("argusmedia.com", .08, .09, .015), 0, context, "none").reason).toBe("journal-masthead");
+    expect(classifyBlock(block(prose, .08, .27, .08), 1, context, "none").role).toBe("BODY");
+    expect(classifyBlock(block("Atlantic basin: Spot moves higher", .08, .25, .015, 12), 2, context, "none").reason).not.toBe("journal-masthead");
+  });
+});
