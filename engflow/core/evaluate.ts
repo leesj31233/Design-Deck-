@@ -335,9 +335,30 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
     return (solid(prev) || solid(next)) && !rephrased(prev) && !rephrased(next) && !(isPrep && rephrased(governor));
   };
 
+  // "has been limited" for "is limited" (or the other way round): the same passive state, not an error.
+  const samePassiveL = new Set<number>();
+  const samePassiveT = new Set<number>();
+  for (const op of al.ops) {
+    if (op.type !== "inflect" && op.type !== "sub") continue;
+    const l = w[op.li]?.norm ?? "";
+    const t = tw[op.ti]?.norm ?? "";
+    const lp = w[op.li + 1]?.norm;
+    const info = lp ? verbInfo(lp) : null;
+    // The same participle after both ("limited" may be unknown to the lexicon, but it ends in -ed).
+    if (!lp || lp !== tw[op.ti + 1]?.norm || !(info ? info.form === "pp" || info.form === "past" : /[a-z]ed$/.test(lp))) continue;
+    if (l === "been" && /^(is|are|am)$/.test(t) && /^(has|have)$/.test(w[op.li - 1]?.norm ?? "")) {
+      samePassiveL.add(op.li);
+      samePassiveL.add(op.li - 1);
+    } else if (/^(is|are|am)$/.test(l) && t === "been" && /^(has|have)$/.test(tw[op.ti - 1]?.norm ?? "")) {
+      samePassiveL.add(op.li);
+      samePassiveT.add(op.ti - 1);
+    }
+  }
+
   for (let k = 0; k < al.ops.length; k++) {
     const op = al.ops[k];
     if (op.type === "match") continue;
+    if ((op.type !== "ins" && samePassiveL.has(op.li)) || (op.type === "ins" && samePassiveT.has(op.ti))) continue;
     if (!raw && op.type !== "spell" && !anchored(k)) continue;
     if (op.type === "spell") {
       push(
