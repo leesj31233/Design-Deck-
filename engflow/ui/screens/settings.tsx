@@ -17,7 +17,8 @@ function claudeSpeed(): string {
   if (!st) return "";
   const q = claudeLatencyQuantiles();
   const sec = (ms: number) => (Math.round(ms / 100) / 10).toFixed(1);
-  const waits = q ? ` 지금 대기 한도: 비슷한 답 1초 · 조금 다른 답 ${sec(gradeBudgetMs("auto", { confidence: "medium" }, q))}초 · 많이 다른 답 ${sec(gradeBudgetMs("auto", { confidence: "low" }, q))}초.` : "";
+  const close = gradeBudgetMs("auto", { confidence: "high" }, q);
+  const waits = q ? ` 지금 대기 한도: 비슷한 답 ${close ? `${sec(close)}초` : "바로(기다려도 Claude가 늦어서)"} · 조금 다른 답 ${sec(gradeBudgetMs("auto", { confidence: "medium" }, q))}초 · 많이 다른 답 ${sec(gradeBudgetMs("auto", { confidence: "low" }, q))}초.` : "";
   return ` 이 기기에서 Claude 응답: 최근 ${st.n}회 중앙값 ${sec(st.medianMs)}초.${waits}`;
 }
 

@@ -139,8 +139,14 @@ export function createGrader(opts: GraderOptions) {
       const t = text.trim();
       const local = localOf(q, t, hint);
       const key = keyOf(q, t, hint);
-      const p = pending && pending.key === key && !(pending.done && !pending.result) ? pending : start(q, t, hint, local);
-      const budget = opts.budgetMs(local);
+      const inFlight = !!pending && pending.key === key && !(pending.done && !pending.result);
+      // A grade already being prepared for this exact text may be about to arrive: give it up to 1 s.
+      const budget = inFlight ? Math.max(opts.budgetMs(local), 1000) : opts.budgetMs(local);
+      if (budget <= 0) {
+        // Claude cannot answer in time on this device: show the rule-based grade now (no request needed).
+        return { evaluation: local, ms: Math.round(clock() - t0), via: "local-skip", noteKo: null };
+      }
+      const p = inFlight ? pending! : start(q, t, hint, local);
       const winner = await new Promise<"ai" | "timeout" | "error" | "skip">((resolve) => {
         const timer = setTimeout(() => resolve("timeout"), Math.max(0, budget - (clock() - t0)));
         skipWaiting = () => resolve("skip");
@@ -200,7 +206,10 @@ export type Grader = ReturnType<typeof createGrader>;
 export function gradeBudgetMs(mode: "auto" | "fast" | "accurate", local: Pick<Evaluation, "confidence">, recent?: LatencyQuantiles | null): number {
   if (mode === "fast") return 1000;
   if (mode === "accurate") return 9000;
-  if (local.confidence === "high") return 1000;
+  // Close to a known answer: the rule-based findings are reliable. Wait 1 s for Claude only if it can answer that
+  // fast on this device; when even its fastest tenth of replies takes longer, waiting would only delay the same grade
+  // (a grade already being prepared in the background is still awaited, see createGrader).
+  if (local.confidence === "high") return recent && recent.p10 > 1000 ? 0 : 1000;
   const clamp = (x: number, lo: number, hi: number) => Math.round(Math.min(hi, Math.max(lo, x)));
   if (local.confidence === "medium") return recent ? clamp(recent.p90 * 1.2 + 250, 1500, 2500) : 2500;
   return recent ? clamp(recent.p95 * 1.25 + 400, 2500, 8000) : 8000;
@@ -209,6 +218,8 @@ export function gradeBudgetMs(mode: "auto" | "fast" | "accurate", local: Pick<Ev
 /** Claude's recent response times on this device (only when there are enough samples to trust). */
 export interface LatencyQuantiles {
   n: number;
+  /** The fastest tenth of Claude's replies took at least this long. */
+  p10: number;
   p90: number;
   p95: number;
 }
@@ -217,5 +228,5 @@ export function latencyQuantiles(samples: number[], minSamples = 5): LatencyQuan
   const xs = samples.filter((x) => Number.isFinite(x) && x > 0).sort((a, b) => a - b);
   if (xs.length < minSamples) return null;
   const at = (p: number) => xs[Math.min(xs.length - 1, Math.ceil(p * xs.length) - 1)];
-  return { n: xs.length, p90: at(0.9), p95: at(0.95) };
+  return { n: xs.length, p10: at(0.1), p90: at(0.9), p95: at(0.95) };
 }

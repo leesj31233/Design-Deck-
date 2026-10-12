@@ -45,6 +45,26 @@ describe("fast grading", () => {
     expect(out.noteKo).toBeNull();
   });
 
+  it("when Claude cannot answer in time, the rule-based grade is shown at once without a request", async () => {
+    const claude = fakeClaude(200);
+    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 0 });
+    const out = await g.grade(q, WRONG, 0);
+    expect(out.evaluation.evaluator).toBe("local");
+    expect(out.ms).toBeLessThan(100);
+    expect(out.noteKo).toBeNull();
+    expect(claude.calls).toEqual([]);
+  });
+
+  it("…but a grade already being prepared for the same text is still awaited (up to a second)", async () => {
+    const claude = fakeClaude(150);
+    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 0, maxPrefetch: 5 });
+    expect(g.prefetch(q, WRONG, 0)).toBe(true);
+    await sleep(50);
+    const out = await g.grade(q, WRONG, 0);
+    expect(out.via).toBe("ai");
+    expect(claude.calls).toHaveLength(1);
+  });
+
   it("past the budget the rule-based grade is shown; the late reply is only timed, never shown", async () => {
     const claude = fakeClaude(200);
     const latencies: number[] = [];
@@ -76,6 +96,9 @@ describe("fast grading", () => {
     expect(gradeBudgetMs("auto", { confidence: "medium" }, fast)).toBe(1500);
     expect(gradeBudgetMs("auto", { confidence: "low" }, fast)).toBe(2500);
     // Slow connection: never more than the original caps.
+    // Close answers do not wait when Claude never answers within a second here.
+    const slowHigh = latencyQuantiles([1600, 1800, 2100, 2500, 1900, 1700, 2200]);
+    expect(gradeBudgetMs("auto", { confidence: "high" }, slowHigh)).toBe(0);
     const slow = latencyQuantiles([4000, 5200, 6100, 7000, 9000, 4500]);
     expect(gradeBudgetMs("auto", { confidence: "medium" }, slow)).toBe(2500);
     expect(gradeBudgetMs("auto", { confidence: "low" }, slow)).toBe(8000);
