@@ -17,6 +17,13 @@ describe("voice answers", () => {
     expect(appendSpoken("Thanks ", "")).toBe("Thanks ");
   });
 
+  it("dictated questions and suggestions without '?' are not read as negative statements", async () => {
+    const { QUESTION_BY_ID } = await import("@/engflow/content");
+    const { isSuccess } = await import("@/engflow/core/celebration");
+    const q = QUESTION_BY_ID["tk-online2-quick-poll"];
+    expect(isSuccess(evaluateLocal(q, "why don't we do a quick poll to choose the date"), 0)).toBe(true);
+  });
+
   it("a dictated reference (no punctuation, lower case) still scores 100 on every question", () => {
     const missed = QUESTIONS.filter((q) => evaluateLocal(q, q.reference.replace(/[.,!?;:](?!\d)/g, "").toLowerCase()).scores.overall < 100).map((q) => q.id);
     expect(missed).toEqual([]);

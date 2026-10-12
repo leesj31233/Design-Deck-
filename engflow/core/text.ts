@@ -144,6 +144,14 @@ export function tokenize(text: string): Token[] {
     const k = t.punct ? undefined : numberKey(t.norm);
     if (k !== undefined) t.num = k;
   }
+  // "10 am" (as speech recognition writes it) is the time "10 a.m.", not the verb "am".
+  for (let i = 1; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (!t.punct && /^(am|pm)$/.test(t.norm) && tokens[i - 1].num !== undefined && !t.expanded) {
+      t.norm = t.norm === "am" ? "a.m" : "p.m";
+      t.stem = t.norm;
+    }
+  }
   // A noun's "'s" before not / V-ing / a state word is "is", not a possessive: "my camera's not working".
   for (let i = tokens.length - 2; i >= 0; i--) {
     const t = tokens[i];
@@ -182,7 +190,7 @@ export function tokenize(text: string): Token[] {
     const next = tokens.slice(i + 1).find((x) => !x.punct && x.norm !== "not" && x.norm !== "already" && x.norm !== "just" && x.norm !== "never" && x.norm !== "always");
     // A change-of-state verb after "'s" is the present perfect: "the schedule's changed", "the price's gone up".
     const change = next && verbInfo(next.norm)?.form !== "base" && /^(change|increase|decrease|drop|rise|improve|arrive|start|happen|grow|fall|worsen|double|shift|slow|leave|come|move|become)$/.test(verbInfo(next.norm)?.base ?? "");
-    if (next && (/^(been|got|gotten|gone|had|become)$/.test(next.norm) || (change && /^(pp|past)$/.test(verbInfo(next.norm)?.form ?? "")))) {
+    if (next && (/^(been|got|gotten|gone|had|become|come)$/.test(next.norm) || (change && /^(pp|past)$/.test(verbInfo(next.norm)?.form ?? "")))) {
       t.norm = "has";
       t.stem = stem("has");
     }

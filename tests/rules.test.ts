@@ -112,6 +112,8 @@ const WRONG: [string, string, string?][] = [
   ["If there are any questions, I'd be glad to answer it.", "pronoun-agreement", "them"],
   ["It has been really long time since we met.", "missing-article", "a"],
   ["If you can accept 10% increase, we can start on Monday.", "missing-article", "a"],
+  ["Does the shuttle runs every hour?", "do-inflected", "run"],
+  ["I stayed there during a week.", "during-duration", "for"],
 ];
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
@@ -160,6 +162,16 @@ const RIGHT = [
   "We saw a 10% increase.",
   "That's a reason that people like it.",
   "It's too heavy for me to carry.",
+  // Said without punctuation (voice answers): one run of words, still right.
+  "sure jisoo what do you need",
+  "yes i did the match was so exciting that i couldn't sleep at all",
+  "oh you didn't have to do that budi thanks a lot",
+  "why don't we go for a coffee after work my treat",
+  "got it do you know where it is on the shared drive",
+  "would 10 am work for you",
+  "the feed was wetter because of the heavy rain that would explain the lower yield",
+  "I bought a SIM card.",
+  "Nobody's come yet.",
   "We will have to update the PFD.",
   "Would you mind sending me the file?",
   "We have to keep updating the schedule.",

@@ -5,10 +5,11 @@ import { QUESTIONS, DIAGNOSTIC_ITEMS, GUIDE, SKILLS, SEEDS } from "@/engflow/con
 const ctx = { skillIds: new Set(SKILLS.map((s) => s.id)), seedIds: new Set(SEEDS.map((s) => s.id)) };
 
 describe("curated content quality gate", () => {
+  // About 1,000 questions and 3,000 probes through every grammar rule: allow time on a busy machine.
   it("every question passes QC, including all evaluator probes", () => {
     const errors = validateBank(QUESTIONS, ctx).filter((i) => i.level === "error");
     expect(errors.map((e) => `${e.questionId}: ${e.message}`)).toEqual([]);
-  });
+  }, 180_000);
 
   it("diagnostic production items pass the same QC", () => {
     const errors = DIAGNOSTIC_ITEMS.filter((d) => d.question).flatMap((d) => validateQuestion(d.question!, ctx)).filter((i) => i.level === "error");

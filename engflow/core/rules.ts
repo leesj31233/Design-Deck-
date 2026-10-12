@@ -106,6 +106,8 @@ const prepositionBaseVerb: Rule = (w) => {
     }
     const v = w[k];
     if (!v || !isBaseVerb(v.norm)) continue;
+    // "after work", "before lunch": everyday nouns.
+    if (/^(work|school|class|practice|use|lunch|dinner|breakfast|sleep|rest)$/.test(v.norm) && /^(before|after|without)$/.test(p)) continue;
     // "by email the next day": after "by", a word that is also a noun is usually that noun.
     if (p === "by" && !UNAMBIGUOUS_VERBS.has(v.norm)) continue;
     // "before start-up", "before test results" — only fire when an object/determiner or end follows, or the verb is unambiguous.
@@ -316,6 +318,9 @@ const doPast: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 0; i < w.length - 1; i++) {
     if (!/^(do|does|did)$/.test(w[i].norm)) continue;
+    // "to do that", "can do it": the main verb do; "Yes, I did. The match was …" said without punctuation: a short answer.
+    if (i > 0 && /^(to|can|could|will|would|should|must|might|may|please|let's)$/.test(w[i - 1].norm)) continue;
+    if (i > 0 && SUBJECT_PRONOUNS.has(w[i - 1].norm) && w[i + 1]?.norm !== "not" && !SUBJECT_PRONOUNS.has(w[i + 1]?.norm ?? "")) continue;
     let j = i + 1;
     const INDEF = /^(anyone|anybody|everyone|everybody|someone|somebody|nobody|anything|everything|something)$/;
     if (w[j]?.norm === "not") j++;
@@ -326,7 +331,8 @@ const doPast: Rule = (w) => {
     const v = w[j];
     if (!v) continue;
     const info = verbInfo(v.norm);
-    if (!info || (info.form !== "past" && info.form !== "3sg" && info.form !== "ing") || isSameFormParticiple(info.base)) continue;
+    // "Does the shuttle runs?" is clear; only a past form that equals the base ("did put") cannot be told apart.
+    if (!info || (info.form !== "past" && info.form !== "3sg" && info.form !== "ing") || (info.form === "past" && isSameFormParticiple(info.base))) continue;
     if (info.form === "ing" && ING_NOUNS.has(v.norm)) continue;
     out.push({
       rule: "do-inflected", from: j, to: j + 1, replacement: info.base, category: "verb-form", severity: "major", skill: "agreement",
@@ -348,6 +354,8 @@ const agreement: Rule = (w) => {
     if (/^(if|wish|as)$/.test(prev) && v === "were") continue;
     if (/^(he|she|it)$/.test(s) && third[v] && !(prev === "if" || prev === "as")) {
       if (s === "it" && v === "were") continue;
+      // "Got it do you know where …" (said without punctuation): "do you" starts a new question.
+      if (SUBJECT_PRONOUNS.has(w[i + 2]?.norm ?? "") && /^(do|have|are|were)$/.test(v)) continue;
       out.push({
         rule: "agreement-3sg", from: i + 1, to: i + 2, replacement: third[v], category: "agreement", severity: "major", skill: "agreement",
         messageKo: `주어 '${w[i].raw}'는 3인칭 단수라서 '${w[i + 1].raw}' 대신 '${third[v]}'를 씁니다.`,
@@ -737,7 +745,8 @@ const articleSound: Rule = (w) => {
     if (w[i].raw === "A" && i > 0) continue; // a label: "Option A is cheaper"
     if (!/^[a-z]/.test(n)) continue;
     const raw = w[i + 1].raw;
-    const acronym = /^[A-Z][A-Z0-9&]+$/.test(raw.replace(/[^A-Za-z0-9&]/g, ""));
+    // Acronyms are read letter by letter ("an RFQ"), except those read as words ("a SIM card", "a PIN").
+    const acronym = /^[A-Z][A-Z0-9&]+$/.test(raw.replace(/[^A-Za-z0-9&]/g, "")) && !/^(SIM|PIN|NASA|SCADA|LASER|RADAR|COVID|ASAP|LAN|WAN|RAM|ROM|PET)$/.test(raw.replace(/[^A-Za-z]/g, ""));
     const vowelLetter = /^[aeiou]/.test(n);
     // Acronyms are read letter by letter: "an RFQ", "an MOU", "a PFD".
     const vowelSound = acronym ? /^[AEFHILMNORSX]/.test(raw) : (vowelLetter && !CONSONANT_SOUND_VOWEL_START.test(n)) || VOWEL_SOUND_CONSONANT_START.test(n);
@@ -1066,7 +1075,7 @@ const timePreposition: Rule = (w) => {
     const dated = /^\d{1,2}(st|nd|rd|th)?$/.test(w[j + 1]?.norm ?? ""); // "on March 15"
     if ((WEEKDAY.test(n) || (MONTH.test(n) && dated)) && p !== "on") fix = "on";
     else if (((MONTH.test(n) && !dated) || (/^(19|20)\d\d$/.test(n) && p === "on")) && p !== "in") fix = "in";
-    else if (/^\d{1,2}(:\d{2})?$/.test(n) && /^(am|pm|o'clock|oclock)$/.test(w[j + 1]?.norm ?? "") && p !== "at") fix = "at";
+    else if (/^\d{1,2}(:\d{2})?$/.test(n) && /^(am|pm|a\.m|p\.m|o'clock|oclock)$/.test(w[j + 1]?.norm ?? "") && p !== "at") fix = "at";
     if (!fix) continue;
     out.push({
       rule: "time-preposition", from: i, to: i + 1, replacement: fix, category: "preposition", severity: "major", skill: "verb-prep",
@@ -1495,7 +1504,9 @@ const embeddedQuestionOrder: Rule = (w) => {
     let from = Math.max(0, i - 3);
     for (let k = i - 1; k >= from; k--) if (brokenAfter(w, k)) { from = k + 1; break; }
     const before = w.slice(from, i).map((x) => x.norm);
-    if (!before.some((x) => /^(tell|know|wonder|wondering|ask|asking|sure|idea|explain|check|confirm|remember|understand|show|out|find|learn|decide|forget|see)$/.test(x))) continue;
+    // "Sure, what do you need?" said without the comma is a reply and a direct question; "I'm not sure what …" is not.
+    const sureIntro = (k: number) => before[k] === "sure" && /^(not|am|is|are|be|make|was|were|so|really|quite)$/.test(before[k - 1] ?? w[from - 1]?.norm ?? "");
+    if (!before.some((x, k) => (x === "sure" ? sureIntro(k) : /^(tell|know|wonder|wondering|ask|asking|idea|explain|check|confirm|remember|understand|show|out|find|learn|decide|forget|see)$/.test(x)))) continue;
     if (!/^(is|are|was|were|do|does|did|can|could|will|would|has|have)$/.test(w[i + 1].norm) || w[i + 1].expanded) continue;
     if (!(SUBJECT_PRONOUNS.has(w[i + 2].norm) || /^(there|the|this|that|your|our|my|their)$/.test(w[i + 2].norm))) continue;
     out.push({
@@ -1575,6 +1586,8 @@ const smallPhrases: Rule = (w) => {
     if (w[i].norm !== "because" || w[i + 1].norm !== "of") continue;
     for (let k = i + 2; k < Math.min(w.length, i + 7); k++) {
       if (brokenAfter(w, k - 1)) break;
+      // "because of the rain that was …", "because of the rain, which …": the verb belongs to a relative clause.
+      if (/^(that|which|who|where|when|and|but|so)$/.test(w[k].norm)) break;
       if (/^(is|are|was|were|has|have|had|will|can|could|would|should)$/.test(w[k].norm) && !w[k].expanded) {
         out.push({ rule: "because-of-clause", from: i + 1, to: i + 2, replacement: "", category: "sentence-structure", severity: "major", skill: "cause-effect", messageKo: "'because of' 뒤에는 명사만 옵니다. 주어와 동사가 있는 절이 오면 'because'만 씁니다." });
         break;
@@ -1695,6 +1708,10 @@ const durationDeadline: Rule = (w) => {
   for (let i = 0; i < w.length - 1; i++) {
     if (w[i].norm === "during" && /^(two|three|four|five|six|seven|eight|nine|ten|several|many|\d+|a)$/.test(w[i + 1].norm) && /^(few|couple)?$/.test(w[i + 1].norm === "a" ? w[i + 2].norm : "") && /^(minutes|hours|days|weeks|months|years)$/.test(w[i + (w[i + 1].norm === "a" ? 3 : 2)]?.norm ?? "")) {
       out.push({ rule: "during-duration", from: i, to: i + 1, replacement: "for", category: "preposition", severity: "major", skill: "verb-prep", messageKo: "'몇 년/며칠 동안'처럼 기간의 길이는 'for'를 씁니다. 'during'은 'during the meeting'처럼 특정 기간 앞에 씁니다." });
+    }
+    // "I stayed there during a week" → "for a week" (a length of time at the end of the clause).
+    if (w[i].norm === "during" && /^(a|an|one)$/.test(w[i + 1].norm) && /^(minute|hour|day|week|month|year)$/.test(w[i + 2]?.norm ?? "") && (i + 3 >= w.length || brokenAfter(w, i + 2) || /^(or|and|so|but|because)$/.test(w[i + 3]?.norm ?? ""))) {
+      out.push({ rule: "during-duration", from: i, to: i + 1, replacement: "for", category: "preposition", severity: "major", skill: "verb-prep", messageKo: "'일주일 동안'처럼 기간의 길이는 'for a week'입니다. 'during'은 'during the meeting'처럼 특정 기간 앞에 씁니다." });
     }
     if (w[i].norm === "until") {
       const clause = w.slice(Math.max(0, i - 7), i).map((x) => verbInfo(x.norm)?.base ?? x.norm);

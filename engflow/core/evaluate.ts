@@ -1021,9 +1021,15 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
           if (!(t.norm === "never" || (t.norm === "not" && i > 0 && (AUXILIARIES.has(sent[i - 1].norm) || MODALS.has(sent[i - 1].norm) || BE_FORMS.has(sent[i - 1].norm) || /^(need|dare|could|can)$/.test(sent[i - 1].norm))))) continue;
           let c = i - 1;
           while (c > 0 && !brokenAfterW(sent, c - 1)) c--;
-          // "Don't worry", "Don't forget …": a command added to the answer ("Don't think so." is a statement without "I").
-          if (sent[i - 1]?.norm === "do" && c === i - 1 && /^(worry|hesitate|forget|rush|panic|mention|bother|touch|be|get|take|let|go|miss|wait|stress)$/.test(sent[i + 1]?.norm ?? "")) continue;
-          if (sent.slice(c, i).some((x) => /^(if|unless|whether|or|when|before|until)$/.test(x.norm))) continue;
+          // "Don't worry", "Don't forget …": a command added to the answer ("Don't think so." is a statement without "I");
+          // "please don't hesitate …" is one too, even without a comma before it.
+          if (sent[i - 1]?.norm === "do" && (c === i - 1 || /^(please|just|and|so)$/.test(sent[i - 2]?.norm ?? "")) && /^(worry|hesitate|forget|rush|panic|mention|bother|touch|be|get|take|let|go|miss|wait|stress)$/.test(sent[i + 1]?.norm ?? "")) continue;
+          // "Why don't we …", "can't we …", "don't you think …": a suggestion or question, also when said without "?".
+          // ("That's not it." keeps its "not": only a contracted n't before a subject is an inverted question.)
+          if (sent[i - 2]?.norm === "why" || (sent[i].expanded && SUBJECT_PRONOUNS.has(sent[i + 1]?.norm ?? ""))) continue;
+          // A condition close before the negation ("If that doesn't work, …"); far back, the "if" clause has ended
+          // even when no comma marks it ("if we had cleaned the strainer last week the pump wouldn't have tripped").
+          if (sent.slice(Math.max(c, i - 6), i).some((x) => /^(if|unless|whether|or|when|before|until)$/.test(x.norm))) continue;
           n++;
         }
       }
