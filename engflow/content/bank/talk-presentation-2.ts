@@ -774,7 +774,7 @@ export const TALK_PRESENTATION_2: Question[] = [
       { id: "before-decide", en: "before we decide", ko: "결정하기 전에", any: ["before|first"] },
     ],
     pitfalls: [
-      { id: "hasnt-tested", pattern: "has|have not? =tested|=test", category: "verb-form", severity: "major", fix: "has not been tested", messageKo: "건조기는 '시험되는' 대상이라 현재완료 수동태 'hasn't been tested'를 씁니다. 'hasn't tested'는 건조기가 무언가를 시험했다는 뜻이 됩니다.", skill: "passive" },
+      { id: "hasnt-tested", pattern: "it|dryer has|have not? =tested|=test", category: "verb-form", severity: "major", fix: "has not been tested", messageKo: "건조기는 '시험되는' 대상이라 현재완료 수동태 'hasn't been tested'를 씁니다. 'hasn't tested'는 건조기가 무언가를 시험했다는 뜻이 됩니다.", skill: "passive" },
       { id: "ask-to", pattern: "re:(?<=\\bask )to(?= (the |our )?(local|vendor))", category: "preposition", severity: "major", fix: "", messageKo: "'(사람)에게 ~을 요청하다'는 'ask + 사람 + for + 명사'입니다: 'ask to the vendor'가 아니라 'ask the vendor for a trial'입니다." },
     ],
     hints: { pattern: "That's a fair question, and … However, it hasn't been + p.p. …, so if … doesn't …, we might have to … Why don't we …?", skeleton: "… However, it hasn't ____ ______ with EFB yet, so if it doesn't reach the target moisture, we might ____ __ add a second dryer later. …", partial: "That's a fair question, and the local dryer is definitely cheaper to buy. However, it hasn't been tested…" },

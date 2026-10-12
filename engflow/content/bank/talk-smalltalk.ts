@@ -201,7 +201,7 @@ export const TALK_SMALLTALK: Question[] = [
     ],
     pitfalls: [
       { id: "for-base", pattern: "for =help|=helped me", category: "verb-form", severity: "major", fix: "for helping me", messageKo: "for는 전치사라서 뒤에 동사원형이 올 수 없습니다. 'Thank you for helping me'처럼 동사ing를 씁니다." },
-      { id: "help-no-with", pattern: "help me the? hotel|booking|reservation", category: "preposition", severity: "major", fix: "helping me with the hotel", messageKo: "'(일)을 도와주다'는 'help + 사람 + with + 일'입니다: 'helping me with the hotel booking'." , skill: "verb-prep" },
+      { id: "help-no-with", pattern: "help me the? =hotel|=booking|=reservation", category: "preposition", severity: "major", fix: "helping me with the hotel", messageKo: "'(일)을 도와주다'는 'help + 사람 + with + 일'입니다: 'helping me with the hotel booking'." , skill: "verb-prep" },
     ],
     hints: { pattern: "Thank you for + 동사ing + 사람 + with + 일", skeleton: "Yes, I got it. Thank you for ______ me ____ the hotel booking.", partial: "Yes, I got it. Thank you for helping…" },
     explanationKo: "'~해 줘서 고마워요'는 'Thank you for + 동사ing'입니다. for는 전치사라 뒤에 동사원형(help)이 올 수 없고, 도와준 일은 'help + 사람 + with + 일'로 연결합니다.",

@@ -25,6 +25,8 @@ export interface Token {
   breakAfter?: boolean;
   /** A sentence ends after this word (. ! ? …, not an abbreviation such as "Mr." or "a.m."). */
   sentenceEnd?: boolean;
+  /** The sentence ending here is a question (it ends with "?"). */
+  question?: boolean;
 }
 
 /** Words whose trailing dot is an abbreviation, not the end of a sentence. */
@@ -133,10 +135,15 @@ export function tokenize(text: string): Token[] {
     if (t.punct || t.expanded || !/'s$/i.test(t.raw.replace(/’/g, "'")) || t.norm.endsWith("'s")) continue;
     const next = tokens[i + 1];
     if (next.punct) continue;
+    // "anything's wrong", "everything's ready": these pronouns are not possessives.
+    const pronounLike = /^(anything|everything|something|nothing|anyone|someone|everyone|nobody|somebody|everybody)$/.test(t.norm);
     // "Thursday's meeting", "the plant's building": a noun in -ing after a possessive is not a verb.
     const ing = verbInfo(next.norm)?.form === "ing" && !ING_NOUNS.has(next.norm);
     // A possessive is followed by a noun, never by a preposition: "dinner's on me", "the file's in the folder".
-    if (next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away)$/.test(next.norm)) {
+    // "the schedule's confirmed", "the pump's fixed now": a participle that ends the clause makes 's "is".
+    const after = tokens[i + 2];
+    const pp = !!verbInfo(next.norm) && /^(pp|past)$/.test(verbInfo(next.norm)!.form) && /ed$/.test(next.norm) && (!after || after.punct || /^(by|for|yet|now|already|today|tomorrow|and|but|so|at|in|on)$/.test(after.norm));
+    if (pronounLike || pp || next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away)$/.test(next.norm)) {
       t.expanded = true;
       tokens.splice(i + 1, 0, { norm: "is", raw: t.raw, start: t.start, end: t.end, stem: stem("is"), punct: false, expanded: true });
     }
@@ -166,6 +173,7 @@ export function tokenize(text: string): Token[] {
     if (!tokens[i].punct && tokens[i + 1].punct && /^[.,;:!?…—–()]$/.test(tokens[i + 1].norm)) {
       tokens[i].breakAfter = true;
       if (/^[.!?…]$/.test(tokens[i + 1].norm) && !(tokens[i + 1].norm === "." && ABBREVIATIONS.test(tokens[i].norm))) tokens[i].sentenceEnd = true;
+      if (tokens[i + 1].norm === "?") tokens[i].question = true;
     }
   }
   return tokens;

@@ -30,6 +30,7 @@ export const BASE_VERBS = new Set<string>([
   // Plant troubles and everyday verbs the bank uses ("the pump's leaking", "let me recap").
   "leak", "drip", "overheat", "vibrate", "crack", "rust", "slip", "melt", "boil", "spill", "flood", "clog", "jam", "recap",
   "smell", "burn", "taste", "pour", "grill", "toast", "celebrate", "congratulate", "recommend", "order", "book", "pay",
+  "save", "rejoin", "reopen", "swim", "hike", "relax", "enjoy", "invite", "introduce", "welcome", "miss", "pick", "drop", "fill",
   "accept", "adjust", "agree", "allow", "analyze", "analyse", "answer", "apply", "approve", "arrange", "ask", "assign",
   "assume", "attach", "avoid", "calculate", "call", "cancel", "change", "check", "clarify", "clean", "close", "collect",
   "commission", "compare", "complete", "confirm", "consider", "contact", "continue", "control", "correct", "cover",

@@ -126,7 +126,7 @@ export const TALK_ONLINE_2: Question[] = [
       { id: "sorry", en: "sorry", ko: "죄송한데", any: ["sorry|excuse"], weight: 0.5 },
     ],
     pitfalls: [
-      { id: "more-loud", pattern: "more =loud|=loudly", category: "word-choice", severity: "major", fix: "louder", messageKo: "loud의 비교급은 'louder'입니다. 'more loud'라고 하지 않습니다.", skill: "comparative" },
+      { id: "more-loud", pattern: "more =loud", category: "word-choice", severity: "major", fix: "louder", messageKo: "loud의 비교급은 'louder'입니다. 'more loud'라고 하지 않습니다. ('more loudly'는 맞는 표현입니다.)", skill: "comparative" },
       { id: "louder-a-little", pattern: "louder a =little|=bit", category: "word-order", severity: "major", fix: "a little louder", messageKo: "'조금 더 크게'는 'a little louder'처럼 정도 표현(a little)을 비교급 앞에 둡니다. 'louder a little'이라고 하지 않습니다.", skill: "comparative" },
     ],
     hints: { pattern: "Could you + speak up (a little)? / speak + a little + louder", skeleton: "Sorry, could you _____ __ a little?", partial: "Sorry, could you speak…" },

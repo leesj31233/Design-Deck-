@@ -5,7 +5,7 @@ import {
   ARTICLES, AUXILIARIES, BE_FORMS, CONJUNCTIONS, DETERMINERS, MODALS, NEGATIONS, PREPOSITIONS, SUBJECT_PRONOUNS,
   capitalizeSentence, isFunctionWord, joinWords, normalizeForMatch, tokenize, words, type Token,
 } from "./text";
-import { isBaseVerb, verbInfo } from "./lexicon";
+import { isBaseVerb, participleOf, verbInfo } from "./lexicon";
 import type {
   ErrorCategory, ErrorSpan, Evaluation, MeaningCheck, Question, ScoreBucket, Severity,
 } from "./types";
@@ -203,6 +203,18 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       particleT.add(mv.ti);
     }
   }
+  // A tag question at the end (", aren't we?", ", isn't it?") is extra, never an error.
+  const tagStart = (() => {
+    const n = w.length;
+    if (n < 3 || !w[n - 1].question) return n;
+    const a = n - 1;
+    if (!SUBJECT_PRONOUNS.has(w[a].norm)) return n;
+    let b = a - 1;
+    if (w[b]?.norm === "not") b--;
+    if (!/^(am|is|are|was|were|do|does|did|have|has|had|can|could|will|would|should|isn|aren)$/.test(w[b]?.norm ?? "") || !w[b - 1]?.breakAfter) return n;
+    return b;
+  })();
+  const inTag = (li: number) => li >= tagStart;
   // Learner clauses start at the beginning or after clause punctuation.
   const clauseStart = (i: number) => {
     let k = Math.max(0, Math.min(i, w.length - 1));
@@ -213,8 +225,13 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
     !!x && (SUBJECT_PRONOUNS.has(x.norm) || DETERMINERS_NP.has(x.norm) || /^(there|this|that|everything|everyone|anyone|someone|anything|something)$/.test(x.norm) || /^[A-Z0-9]/.test(x.raw));
   const OPENER = /^(am|is|are|was|were|do|does|did|have|has|had|can|could|will|would|should|shall|may|might|must)$/;
   // An inverted question ("Is it possible…?", "Should it be…?") has its finite verb up front.
+  const openerAt = (i: number) => {
+    let c = clauseStart(i);
+    while (c < i && /^(so|and|but|then|well|okay|ok|also)$/.test(w[c].norm)) c++; // "…, so is it possible …?"
+    return c;
+  };
   const inverted = (i: number) => {
-    const c = clauseStart(i);
+    const c = openerAt(i);
     return OPENER.test(w[c]?.norm ?? "") && isSubjectWord(w[c + 1]) && i > c + 1;
   };
   const governorBase = (li: number) => {
@@ -241,7 +258,9 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
     const vt = verbInfo(tw[op.ti].norm);
     const vl = verbInfo(w[op.li].norm);
     if (!vt || !vl || vt.form !== "ing" || !STATE_VERBS.has(vl.base)) continue;
-    const subj = w[op.li - 1]?.norm ?? "";
+    let sj = op.li - 1;
+    while (sj > 0 && /^(really|also|still|just|always|usually|actually|truly|certainly|already)$/.test(w[sj].norm)) sj--;
+    const subj = w[sj]?.norm ?? "";
     if ((/^(i|we|you|they)$/.test(subj) && vl.form === "base") || (/^(he|she|it)$/.test(subj) && vl.form === "3sg") || vl.form === "past") simpleState.add(op.li);
   }
 
@@ -333,6 +352,15 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const isVerb = !!(vt && vl);
       if (simpleState.has(op.li)) continue;
       if ((lt === "thank" && tt === "thanks") || (lt === "thanks" && tt === "thank")) continue;
+      if ((lt === "lots" && tt === "lot") || (lt === "lot" && tt === "lots")) continue; // "lots of" / "a lot of"
+      // A question's opening auxiliary agrees with its own subject ("Do any of you …?" / "Does anyone …?").
+      if (/^(do|does|have|has|is|are|was|were)$/.test(lt) && op.li === clauseStart(op.li)) continue;
+      const lprev = w[op.li - 1]?.norm ?? "";
+      // "start by checking" (-ing after a preposition), "thanks for the call" (a noun after a determiner).
+      if (/ing$/.test(lt) && PREPOSITIONS.has(lprev) && lprev !== "to") continue;
+      if (DETERMINERS_NP.has(lprev) || /^(the|a|an)$/.test(lprev)) continue;
+      // "is pouring" (progressive) vs "pours": the learner's verb group is correct either way.
+      if (/ing$/.test(lt) && !FEELING_ADJ.test(lt) && (BE_FORMS.has(lprev) || BE_FORMS.has(w[op.li - 2]?.norm ?? "") && /^(still|also|just|now|really|not)$/.test(lprev))) continue;
       // Feeling adjectives: "I'm interesting in" means "interested" — a real error, whatever the lexicon knows.
       if (FEELING_ADJ.test(lt) && FEELING_ADJ.test(tt) && lt.replace(/(ed|ing|ied|ying)$/, "") === tt.replace(/(ed|ing|ied|ying)$/, "")) {
         push(
@@ -431,9 +459,10 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       } else if (CONJ_SYNONYMS.some((g) => g.has(tt) && g.has(lt))) {
         continue; // because/since/as, so/therefore: equally correct
       } else if ((tc === "aux" || tc === "modal") && (lc === "aux" || lc === "modal")) {
+        // "haven't received" / "don't receive", "won't work" / "doesn't work": both grammatical, a nuance of time.
         category = "tense";
-        severity = "major";
-        msg = `시제/조동사: '${w[op.li].raw}' → '${tt}'. 의미(가능성·시점)가 달라집니다.`;
+        severity = "minor";
+        msg = `시제/조동사: '${w[op.li].raw}' 대신 '${tt}'가 이 상황에 더 자연스럽습니다.`;
       } else if (lc === "prep" && tc === "article" && VERB_PREPS[governorBase(op.li)]?.includes(lt) && op.li + 1 < w.length) {
         // "decide on date" vs "decide the date": "decide on" is fine — the article after it is what is missing.
         push(
@@ -459,12 +488,30 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const lt = w[op.li].norm;
       const c = wordClass(lt);
       if (c === "content" || c === "conj" || c === "modal" || c === "neg") continue;
+      if (inTag(op.li)) continue; // ", aren't we?"
+      // An extra be is an error only before a verb form it cannot take ("is depends"); "can't be opened",
+      // "isn't working", "That's no problem", "as it is" are all correct groups.
+      if (c === "be") {
+        let n = op.li + 1;
+        while (n < w.length && /^(not|still|also|just|really|always|never|already|now)$/.test(w[n].norm)) n++;
+        const vi = verbInfo(w[n]?.norm ?? "");
+        const participle = !!vi && (vi.form === "pp" || (vi.form === "past" && participleOf(vi.base) === w[n].norm));
+        // "I was received it": a passive with an object after it is wrong, so that extra be stays an error.
+        const objectAfter = /^(it|them|us|me|him|her|the|a|an|this|that|your|our|my|their)$/.test(w[n + 1]?.norm ?? "");
+        const adjectiveToo = /^(free|clear|open|close|clean|dry|ready|complete|correct|separate|secure|empty|busy|right|wrong|fine|sure|calm|quiet|warm|cool|slow|fast|full|tired|late|light|clear|safe|present|due|like)$/.test(w[n]?.norm ?? "");
+        if (op.li === w.length - 1 || w[op.li].breakAfter || !vi || vi.form === "ing" || adjectiveToo || (participle && !objectAfter)) continue;
+      }
+      // "need to make": an infinitive "to", not a preposition.
+      if (lt === "to" && isBaseVerb(w[op.li + 1]?.norm ?? "")) continue;
+      // A clause-final particle ("the meeting is over", "hang up") is not an extra preposition.
+      if (c === "prep" && (op.li === w.length - 1 || w[op.li].breakAfter)) continue;
       if (APPROX.test(lt) && QUANTITY_START.test(w[op.li + 1]?.norm ?? "")) continue; // "about twice as high"
       // Indirect questions end with the verb: "let me know what the design pressure is".
       if (c === "be" && w.slice(0, op.li).some((x) => /^(what|which|how|where|when|why|who|whether|if)$/.test(x.norm)) && (op.li === w.length - 1 || w[op.li + 1]?.punct)) continue;
       // "decide on the date", "wait for a few minutes", "known about it": the verb takes this preposition.
       if (c === "prep" && VERB_PREPS[governorBase(op.li)]?.includes(lt)) continue;
-      const prevIsVerb = op.li > 0 && !!verbInfo(w[op.li - 1].norm);
+      // "any changes to the design": a noun after a determiner, not a verb taking an object.
+      const prevIsVerb = op.li > 0 && !!verbInfo(w[op.li - 1].norm) && !/^(a|an|the|any|some|no|many|few|more|our|your|their|my|this|that|these|those)$/.test(w[op.li - 2]?.norm ?? "");
       const map: Record<string, [ErrorCategory, Severity, string]> = {
         be: ["be-verb", "major", `불필요한 be동사 '${w[op.li].raw}'가 있습니다.`],
         aux: ["tense", "minor", `불필요한 조동사 '${w[op.li].raw}'가 있습니다.`],
@@ -488,15 +535,41 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const tt = tw[op.ti].norm;
       const c = wordClass(tt);
       if (c === "content" || c === "modal") continue;
-      if (c === "be" && simpleState.has(op.at)) continue;
+      if (c === "be") {
+        let a = op.at;
+        while (a < w.length && /^(really|also|still|just|always|usually|actually|truly|certainly|already)$/.test(w[a].norm)) a++;
+        if (simpleState.has(a)) continue; // "I (am) really looking forward" ↔ "I really look forward"
+      }
+      // "when you have a moment" ↔ "when you're free": an inserted have/do followed by a noun is a main verb (rewording).
+      if (c === "aux") {
+        const nt = tw[op.ti + 1]?.norm ?? "";
+        if (!/^(not|been|being)$/.test(nt) && !verbInfo(nt)) continue;
+      }
+      // "because the flow has gone up" vs "because of the higher flow": a clause instead of a noun phrase.
+      if (tt === "of" && w[op.at - 1]?.norm === "because") continue;
+      // "makes the pressure drop too high": a causative verb takes object + adjective, no be.
+      if (c === "be") {
+        const cs = clauseStart(op.at);
+        if (w.slice(cs, op.at).some((x) => /^(make|makes|made|making|keep|keeps|kept|find|finds|found|get|gets|got|let|lets|leave|leaves|left|consider|considers|considered|see|saw|want|wants|need|needs)$/.test(x.norm))) continue;
+      }
+      // "before deciding" ↔ "before we decide": a gerund after a preposition needs no subject.
+      if (c === "pronoun" && /ing$/.test(w[op.at]?.norm ?? "") && PREPOSITIONS.has(w[op.at - 1]?.norm ?? "")) continue;
+      // "the area reopens" ↔ "is reopened": verbs of change work both ways.
+      if (c === "be") {
+        const vi = verbInfo(w[op.at]?.norm ?? "");
+        if (vi && (vi.form === "3sg" || vi.form === "past") && /^(open|reopen|close|start|begin|finish|end|change|increase|decrease|improve|stop|continue|resume|break|melt|dry|move)$/.test(vi.base)) continue;
+      }
       // "…yesterday but (it) won't arrive…": a repeated subject may be left out after and/but/or.
       if (c === "pronoun" && /^(and|but|or|then)$/.test(w[op.at - 1]?.norm ?? "") && (verbInfo(w[op.at]?.norm ?? "") || OPENER.test(w[op.at]?.norm ?? ""))) continue;
       // "(for) this weekend", "(on) next Monday": deictic time words need no preposition.
       if (c === "prep" && /^(this|next|last|today|tomorrow|tonight|yesterday|every)$/.test(w[op.at]?.norm ?? "")) continue;
+      // "My flight is (on) Friday night": on before a weekday is optional in speech.
+      if (tt === "on" && /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/.test(w[op.at]?.norm ?? "")) continue;
       // "To be honest," / "Honestly,", "In fact," / "Actually,": the same discourse marker.
       if (inIdiomSpan.has(op.ti)) continue;
-      // "Is it possible…?" needs no second be: the question already opens with its verb.
-      if ((c === "be" || c === "aux") && inverted(op.at)) continue;
+      // "Is it possible…?" needs no second be: the question already opens with its be.
+      // ("Will we (be) able…?" still needs it: a modal opener takes a verb after the subject.)
+      if ((c === "be" || c === "aux") && inverted(op.at) && BE_FORMS.has(w[openerAt(op.at)]?.norm ?? "")) continue;
       // Casual replies leave out "I (am)": "Hope so.", "Don't think so.", "Sorry, …".
       if ((tt === "i" || tt === "am") && op.at === clauseStart(op.at) && /^(hope|think|guess|don't|do|didn't|wish|bet|suppose|love|appreciate|agree|sorry|afraid|glad|happy|sure|not)$/.test(w[op.at]?.norm ?? "")) continue;
       // "went up (by) 5%": by before the amount of a change is optional.
@@ -514,6 +587,14 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const nextT = tw[op.ti + 1]?.norm ?? "";
       let entry: [ErrorCategory, Severity, string, ScoreBucket?] | null = null;
       if (c === "be") entry = ["be-verb", "major", `'${tt}'(be동사)가 빠졌습니다.`];
+      else if (c === "aux" && tt === "will" && /^(base|3sg)$/.test(verbInfo(w[op.at]?.norm ?? "")?.form ?? "")) {
+        // "You need to sign in" is fine for a rule; "I rejoin as soon as I can" promises an action and needs will.
+        const stative = /^(need|have|want|think|know|like|hope|must|seem|mean|depend|cost|expect|believe|guess|suppose|prefer|plan)$/.test(verbInfo(w[op.at].norm)!.base);
+        entry = stative ? ["tense", "minor", "앞으로의 일이라 'will'을 쓰면 더 자연스럽습니다. 현재형도 뜻은 통합니다."] : ["tense", "major", "앞으로 할 일(약속·계획)은 'will + 동사원형'으로 말합니다."];
+      } else if (c === "aux" && /^(have|has|had)$/.test(tt) && !/present-perfect|cond-3/.test(skill) && /^(past|pp)$/.test(verbInfo(w[op.at]?.norm ?? "")?.form ?? "")) {
+        // "make sure I understood" ↔ "I've understood", "was losing" ↔ "had been losing": a tense nuance here.
+        entry = ["tense", "minor", `'${tt}'를 쓰는 완료형이 더 자연스럽지만 과거형도 뜻은 통합니다.`];
+      }
       else if (c === "aux") entry = ["tense", "major", `시제를 만드는 '${tt}'가 빠졌습니다.`];
       else if (c === "article") entry = ["article", "minor", `명사 앞에 관사 '${tt}'가 필요합니다.`];
       else if (c === "prep" && tt === "to" && isBaseVerb(nextT)) entry = ["verb-form", "major", `'to + 동사원형'이 필요합니다: 'to ${nextT}'.`];
