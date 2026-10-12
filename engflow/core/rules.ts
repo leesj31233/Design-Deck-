@@ -1646,14 +1646,14 @@ const extraPreposition: Rule = (w) => {
     else if (
       /^(on|in|at)$/.test(p) && /^(next|last)$/.test(n) && /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|week|weekend|month|year|time)$/.test(w[i + 2]?.norm ?? "") &&
       !/'s$/i.test(w[i + 2].raw) && // "at next week's meeting"
-      !/^(agree|decide|work|focus|depend|count|rely|plan|vote|comment|insist|put|come|go|log|check|fill|hand|sign|call|turn|bring|take)$/.test(prevBase) // "agreed on last time", "put in last month"
+      !/^(agree|decide|work|focus|depend|count|rely|plan|vote|comment|insist|put|come|go|log|check|fill|hand|sign|call|turn|bring|take|move|settle|join|drop|stop|pop|swing|get|start|kick)$/.test(prevBase) // "agreed on last time", "put in last month", "moved in last week"
     )
       drop(i, `'next/last + 시간' 앞에는 전치사를 쓰지 않습니다: '${n} ${w[i + 2].raw}'.`);
     else if (
       ((p === "in" && /^(week|month|year|quarter|morning|afternoon|evening|weekend)$/.test(w[i + 2]?.norm ?? "")) ||
         (p === "on" && /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/.test(w[i + 2]?.norm ?? ""))) &&
       n === "this" && !/'s$/i.test(w[i + 2].raw) && w[i + 3]?.norm !== "of" && // "in this year's budget", "in this month of"
-      !/^(put|fill|hand|sign|log|check|bring|take|come|go|plug|turn)$/.test(prevBase)
+      !/^(put|fill|hand|sign|log|check|bring|take|come|go|plug|turn|move|settle|join|drop|stop|pop|swing|get|start|kick)$/.test(prevBase)
     )
       drop(i, `'this + 시간' 앞에는 전치사를 쓰지 않습니다: 'this ${w[i + 2].raw}'.`);
   }

@@ -25,6 +25,10 @@ import { ROLEPLAY_SOCIAL } from "./bank/roleplay-social";
 import { TALK_LONG } from "./bank/talk-long";
 import { TALK_PHRASAL } from "./bank/talk-phrasal";
 import { TALK_IDIOMS } from "./bank/talk-idioms";
+import { TALK_DAILY } from "./bank/talk-daily";
+import { TALK_OFFICE } from "./bank/talk-office";
+import { TALK_FEELINGS } from "./bank/talk-feelings";
+import { ROLEPLAY_DAILY } from "./bank/roleplay-daily";
 import { DIALOGUE_OVERLAY } from "./bank/dialogue-overlay";
 
 export { SKILLS, SKILL_BY_ID, SKILL_GROUPS, skillName } from "./skills";
@@ -44,6 +48,9 @@ export const TALK_BANKS: Record<string, Question[]> = {
   "talk-reaction": TALK_REACTION,
   "talk-smalltalk": TALK_SMALLTALK,
   "talk-smalltalk-2": TALK_SMALLTALK_2,
+  "talk-daily": TALK_DAILY,
+  "talk-office": TALK_OFFICE,
+  "talk-feelings": TALK_FEELINGS,
   "talk-meal": TALK_MEAL,
   "talk-meal-2": TALK_MEAL_2,
   "talk-phone": TALK_PHONE,
@@ -57,6 +64,7 @@ export const TALK_BANKS: Record<string, Question[]> = {
 export const MIXED_BANKS: Record<string, Question[]> = {
   "roleplay-work": ROLEPLAY_WORK,
   "roleplay-social": ROLEPLAY_SOCIAL,
+  "roleplay-daily": ROLEPLAY_DAILY,
   "talk-long": TALK_LONG,
   "talk-phrasal": TALK_PHRASAL,
   "talk-idioms": TALK_IDIOMS,
