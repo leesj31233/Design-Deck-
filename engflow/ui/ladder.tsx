@@ -3,7 +3,7 @@ import * as React from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Timer, TrendingUp } from "lucide-react";
 import { buildLadder, buildSpeedRound, ladderRange, ladderSteps } from "../core/ladder";
-import { autoDifficulty } from "../core/situations";
+import { sceneDifficulty } from "../core/situations";
 import type { Situation } from "../core/types";
 import { SITUATION_INFO } from "../content";
 import { useApp } from "./store";
@@ -17,7 +17,7 @@ export function useStartLadder() {
   const app = useApp();
   const nav = useNav();
   return (situation: Situation | "all") => {
-    const target = app.state.settings.difficulty?.[situation] ?? app.state.settings.difficulty?.all ?? autoDifficulty(app.state.profile.startLevel);
+    const target = sceneDifficulty(app.state.settings.difficulty, situation, app.state.profile.startLevel);
     const { from, to } = ladderRange(target);
     const items = buildLadder(app.state, app.questions, { situation, from, to, size: LADDER_SIZE, now: app.now() });
     if (!items.length) return false;
@@ -56,7 +56,7 @@ export function Staircase({ steps, scores, className }: { steps: number[]; score
 export function LadderCard({ situation, compact }: { situation: Situation | "all"; compact?: boolean }) {
   const app = useApp();
   const start = useStartLadder();
-  const target = app.state.settings.difficulty?.[situation] ?? app.state.settings.difficulty?.all ?? autoDifficulty(app.state.profile.startLevel);
+  const target = sceneDifficulty(app.state.settings.difficulty, situation, app.state.profile.startLevel);
   const { from, to } = ladderRange(target);
   const steps = ladderSteps(from, to, LADDER_SIZE);
   const scene = situation === "all" ? "여러 상황" : SITUATION_INFO[situation].ko;

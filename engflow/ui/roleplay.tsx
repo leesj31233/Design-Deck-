@@ -3,7 +3,7 @@ import * as React from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Check, MessagesSquare, Play, Square } from "lucide-react";
 import { listScenarios, recommendScenario, scenarioItems, type ScenarioInfo } from "../core/roleplay";
-import { autoDifficulty } from "../core/situations";
+import { sceneDifficulty } from "../core/situations";
 import type { Evaluation, Question, Situation } from "../core/types";
 import { SITUATION_INFO } from "../content";
 import { useApp } from "./store";
@@ -187,7 +187,7 @@ export function RoleplayShortcut() {
   const app = useApp();
   const start = useStartScenario();
   const list = listScenarios(app.questions, app.state);
-  const target = app.state.settings.difficulty?.all ?? autoDifficulty(app.state.profile.startLevel);
+  const target = sceneDifficulty(app.state.settings.difficulty, "all", app.state.profile.startLevel);
   const s = recommendScenario(list, target);
   if (!s) return null;
   return (

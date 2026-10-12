@@ -7,7 +7,7 @@ import { evaluateLocal } from "@/engflow/core/evaluate";
 import { QUESTIONS, QUESTION_BY_ID } from "@/engflow/content";
 import { similarQuestions, weakGrammar } from "@/engflow/core/weakness";
 import { buildExpressionQuiz, collectExpressions } from "@/engflow/core/expressions";
-import { situationOf } from "@/engflow/core/situations";
+import { situationOf, sceneDifficulty } from "@/engflow/core/situations";
 import { EXPRESSION_TITLES } from "@/engflow/content/expressions";
 import { SKILLS } from "@/engflow/content";
 
@@ -200,9 +200,17 @@ describe("scenes and difficulty", () => {
     const s = { ...createInitialState(T0) };
     s.settings = { ...s.settings, difficulty: { smalltalk: 1, meal: 1, online: 1, presentation: 1, discussion: 1, visit: 1, technical: 1 } };
     const plan = buildSession(s, QUESTIONS, { size: 8, mode: "mixed", now: T0, rng: mulberry32(5) });
+    // Scenes without a choice (added later) follow the learner's other choices, so the whole session stays easy.
     const fresh = plan.items.filter((i) => i.kind === "new").map((i) => QUESTION_BY_ID[i.questionId]);
     const avg = fresh.reduce((n, q) => n + q.difficulty, 0) / fresh.length;
     expect(avg).toBeLessThan(3.5);
+  });
+  it("a scene's difficulty: its own choice, then the mixed choice, then the average of the others, then the level", () => {
+    expect(sceneDifficulty({ meal: 3, all: 6 }, "meal", "B1")).toBe(3);
+    expect(sceneDifficulty({ meal: 3, all: 6 }, "daily", "B1")).toBe(6);
+    expect(sceneDifficulty({ meal: 2, online: 3 }, "daily", "B1")).toBe(3);
+    expect(sceneDifficulty({}, "daily", "B1")).toBe(4);
+    expect(sceneDifficulty(undefined, "all", "A2")).toBe(2);
   });
 });
 

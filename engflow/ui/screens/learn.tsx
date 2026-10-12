@@ -2,7 +2,7 @@
 import * as React from "react";
 import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { buildSession } from "../../core/session";
-import { autoDifficulty, difficultyLevel, situationOf } from "../../core/situations";
+import { difficultyLevel, sceneDifficulty, situationOf } from "../../core/situations";
 import { SITUATIONS, type Category, type QuestionMode, type Situation } from "../../core/types";
 import { DIFFICULTY_INFO, SITUATION_INFO, SKILLS, SKILL_GROUPS, skillName } from "../../content";
 import { AIUnavailableError } from "../../platform/types";
@@ -59,7 +59,8 @@ export function LearnScreen() {
 
   // Difficulty is remembered per scene ("all" = the mixed session's own choice).
   const savedDifficulty = app.state.settings.difficulty?.[situation];
-  const auto = autoDifficulty(app.state.profile.startLevel);
+  // What "자동" means for this scene: the learner's other choices, else their level.
+  const auto = sceneDifficulty({ ...(app.state.settings.difficulty ?? {}), [situation]: undefined }, situation, app.state.profile.startLevel);
   const difficulty = savedDifficulty ?? null;
   const setDifficulty = (d: number | null) => {
     const next = { ...(app.state.settings.difficulty ?? {}) };

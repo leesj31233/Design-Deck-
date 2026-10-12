@@ -1,7 +1,7 @@
 import { DAY_MS } from "./fsrs";
 import { isDue, isOverdue } from "./scheduler";
 import { weakGrammar, weaknessMatch } from "./weakness";
-import { autoDifficulty, situationOf } from "./situations";
+import { sceneDifficulty, situationOf } from "./situations";
 import type { Category, Cefr, LearnerState, Question, QuestionMode, ReviewItem, Situation, SkillState } from "./types";
 
 export interface SessionItem {
@@ -153,8 +153,8 @@ export function buildSession(state: LearnerState, bank: Question[], opts: Sessio
   // New learning: filter, then rank by weak/neglected skills, difficulty fit and scene variety.
   const target = opts.level && opts.level !== "auto" ? opts.level : currentLevel(state);
   const saved = state.settings.difficulty ?? {};
-  // Difficulty target per question: this session's choice, else the saved choice for its scene, else automatic.
-  const targetFor = (q: Question) => opts.difficulty ?? saved[situationOf(q)] ?? saved.all ?? autoDifficulty(target);
+  // Difficulty target per question: this session's choice, else the learner's saved choices (core/situations.ts).
+  const targetFor = (q: Question) => opts.difficulty ?? sceneDifficulty(saved, situationOf(q), target);
   const weak = weakSkills(state, now);
   const weakSet = new Set(weak.map((w) => w.skill));
   const neglected = weak.filter((w) => w.neglected).map((w) => w.skill);

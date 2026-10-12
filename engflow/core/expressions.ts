@@ -2,7 +2,7 @@ import { DAY_MS } from "./fsrs";
 import { evaluateLocal } from "./evaluate";
 import { normalizeForMatch } from "./text";
 import { decayed } from "./weakness";
-import { autoDifficulty } from "./situations";
+import { sceneDifficulty } from "./situations";
 import { EXPRESSION_TITLES } from "../content/expressions";
 import { GUIDE } from "../content/guide";
 import { skillName } from "../content/skills";
@@ -154,7 +154,7 @@ export function buildExpressionQuiz(skill: string, mine: ExpressionEntry | null,
 
 /** Speaking practice for one grammar point: conversation turns near the learner's difficulty, unseen first. */
 export function practiceQuestionsFor(skill: string, bank: Question[], state: Pick<LearnerState, "seen" | "settings" | "profile">, now: number, n = 5): Question[] {
-  const target = state.settings.difficulty?.all ?? autoDifficulty(state.profile.startLevel);
+  const target = sceneDifficulty(state.settings.difficulty, "all", state.profile.startLevel);
   return bank
     .filter((q) => q.skills.includes(skill) && !q.variation)
     .map((q) => {
