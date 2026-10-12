@@ -243,7 +243,9 @@ const beBaseVerb: Rule = (w) => {
     }
     // "If it still is not work", "that is not suit you": a negated be with a verb that is rarely a noun there.
     const subjBefore = /^(still|really|also|just|now|probably)$/.test(w[i - 1]?.norm ?? "") ? w[i - 2]?.norm : w[i - 1]?.norm;
-    const thingNeg = !!v && negated && /^(it|this|that)$/.test(subjBefore ?? "") && /^(work|suit|fit|match|include|cover|mean|matter|help|need|make|take|look|seem|support|affect|change|happen|exist|apply|depend|belong)$/.test(v.norm);
+    // A day or time that "is not work for me" is the verb too ("Thursday doesn't work for me").
+    const timeSubject = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|today|tonight|time|date|day|slot)$/.test(subjBefore ?? "") && v?.norm === "work";
+    const thingNeg = !!v && negated && (/^(it|this|that)$/.test(subjBefore ?? "") || timeSubject) && /^(work|suit|fit|match|include|cover|mean|matter|help|need|make|take|look|seem|support|affect|change|happen|exist|apply|depend|belong|get)$/.test(v.norm);
     // "It's not work, it's fun" uses the noun; a following word or an if/when clause shows the verb.
     const clauseHasConj = w.slice(Math.max(0, i - 4), i).some((x) => /^(if|when|because|unless|once)$/.test(x.norm));
     const verbUse = thingNeg && ((j < w.length - 1 && !brokenAfter(w, j)) || clauseHasConj);
@@ -1634,7 +1636,7 @@ const extraPreposition: Rule = (w) => {
     const prevBase = verbInfo(w[i - 1].norm)?.base ?? w[i - 1].norm;
     const p = w[i].norm;
     const n = w[i + 1].norm;
-    if (p === "to" && /^(go|come|get|head|arrive|return|walk|drive|leave)$/.test(prevBase) && /^(home|here|there|abroad|downtown|upstairs|downstairs|overseas)$/.test(n))
+    if (p === "to" && (/^(go|come|get|head|arrive|return|walk|drive|leave)$/.test(prevBase) || /^(heads|heading|headed|walking|walked|driving|drove|returning|returned|arriving|coming|going|getting)$/.test(w[i - 1].norm)) && /^(home|here|there|abroad|downtown|upstairs|downstairs|overseas)$/.test(n))
       drop(i, `'${n}'는 부사라서 앞에 to를 쓰지 않습니다: '${w[i - 1].raw} ${n}'.`);
     else if (p === "from" && w[i - 1].norm === "near") drop(i, "'near'는 전치사라서 바로 장소를 씁니다: 'near the plant'.");
     else if (p === "to" && /^(call|phone|text|email|contact|meet|tell|ask)$/.test(prevBase) && /^(me|us|him|her|them|you)$/.test(n) && !/^(talk|speak)$/.test(prevBase))
@@ -2556,13 +2558,64 @@ const everydaySlips: Rule = (w) => {
       let j = i + 1;
       while (j < w.length && /^(still|really|just|also)$/.test(w[j].norm)) j++;
       const v = w[j]?.norm === "not" ? w[j + 1] : undefined;
-      const verbHere = v && (v.norm === "work" ? brk(j + 1) || /^(at|with|on|anymore|properly|well|now|again|today)$/.test(w[j + 2]?.norm ?? "") : /^(need|include|require|contain|support|fit|match|charge|connect|respond|load|start|turn)$/.test(v.norm) && !brk(j + 1));
+      const verbHere = v && (v.norm === "work" ? brk(j + 1) || /^(at|with|on|anymore|properly|well|now|again|today)$/.test(w[j + 2]?.norm ?? "") : (/^(need|include|require|contain|support|fit|match|charge|connect|respond|load|start|turn)$/.test(v.norm) && !brk(j + 1)) || (/^(open|close|lock|unlock|accept|read|print|show|display|play|recognize|detect)$/.test(v.norm) && OBJECT_START(w[j + 2]?.norm ?? "")));
       if (verbHere && !v.expanded) {
         const past = /^was/.test(t);
         const fix = `${past ? "did" : "does"} not ${v.norm}`;
         push({
           rule: "be-base-verb", from: i, to: j + 2, replacement: fix, category: "verb-form", severity: "major", skill: "agreement",
           messageKo: `be동사와 일반동사를 함께 쓸 수 없습니다. '${w.slice(i, j + 2).map((x) => x.raw).join(" ")}' → '${fix}' (또는 'isn't working').`,
+        });
+      }
+      continue;
+    }
+
+    // "first thing in morning", "in afternoon" → "in the morning".
+    // ("in morning meetings" uses morning as a modifier and is fine.)
+    if (t === "in" && /^(morning|afternoon|evening)$/.test(n1) && !w[i + 1].expanded && (brk(i + 1) || /^(and|so|but|because|before|after|when|then|i|we|you|they|he|she|it|too|instead)$/.test(n2))) {
+      push({
+        rule: "missing-article", from: i + 1, to: i + 1, replacement: "the", category: "article", severity: "minor", skill: "articles",
+        messageKo: `'오전/오후/저녁에'는 'in the ${w[i + 1].raw}'입니다.`,
+      });
+      continue;
+    }
+
+    // "It's on way" → "on the way"; "the hottest days of year" → "of the year".
+    if ((t === "on" && n1 === "way") || (t === "of" && /^(year|month)$/.test(n1) && brk(i + 1) && /^(end|rest|time|days|day|start|beginning|middle|half)$/.test(w[i - 1]?.norm ?? ""))) {
+      push({
+        rule: "missing-article", from: i + 1, to: i + 1, replacement: "the", category: "article", severity: "minor", skill: "articles",
+        messageKo: t === "on" ? "'가는 길에'는 'on the way' (또는 on my way)입니다." : `'${w[i - 1].raw} of the ${w[i + 1].raw}'처럼 the가 필요합니다.`,
+      });
+      continue;
+    }
+
+    // "a clinic that take walk-ins" → "takes": a singular noun before who/that/which decides the verb.
+    if (/^(a|an|one|each|every)$/.test(t) && i + 3 < w.length) {
+      let k = i + 1;
+      while (k < i + 3 && k < w.length && !/^(that|who|which)$/.test(w[k + 1]?.norm ?? "") && /^[a-z]+$/.test(w[k].norm) && !verbInfo(w[k].norm)) k++;
+      const noun = w[k];
+      const rel = w[k + 1];
+      const v = w[k + 2];
+      const vi = v ? verbInfo(v.norm) : null;
+      if (noun && rel && /^(that|who|which)$/.test(rel.norm) && !noun.norm.endsWith("s") && !/^(people|staff|police|data|media|crew|team|couple|family)$/.test(noun.norm) && v && vi && vi.form === "base" && v.norm === vi.base && !MODALS.has(v.norm) && !brokenAfter(w, k) && !/^(i|you|we|they|he|she|it)$/.test(v.norm)) {
+        const fix = thirdPersonOf(v.norm);
+        if (fix !== v.norm) {
+          push({
+            rule: "relative-agreement", from: k + 2, to: k + 3, replacement: fix, category: "agreement", severity: "major", skill: "agreement",
+            messageKo: `'${noun.raw}'(단수)를 꾸미는 ${rel.raw}절의 동사에는 -s를 붙입니다: '${rel.raw} ${fix}'.`,
+          });
+        }
+      }
+    }
+
+    // "How about put it in an appendix?" → "putting": after "how about" comes a noun or V-ing.
+    if (t === "how" && n1 === "about" && w[i + 2]) {
+      const v = w[i + 2];
+      const vi = verbInfo(v.norm);
+      if (vi && vi.base === v.norm && !ING_NOUNS.has(v.norm) && !COUNTABLE_NOUNS.has(v.norm) && (UNAMBIGUOUS_VERBS.has(v.norm) || OBJECT_START(w[i + 3]?.norm ?? "") || /^(it|them)$/.test(w[i + 3]?.norm ?? ""))) {
+        push({
+          rule: "how-about-ing", from: i + 2, to: i + 3, replacement: ingOf(v.norm), category: "verb-form", severity: "major", skill: "gerund-infinitive",
+          messageKo: `'How about' 뒤에는 동사ing가 옵니다: 'How about ${ingOf(v.norm)} …?'`,
         });
       }
       continue;
