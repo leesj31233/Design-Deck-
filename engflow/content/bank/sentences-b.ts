@@ -24,10 +24,11 @@ export const SENTENCES_B: Question[] = [
       "We are still waiting for the lab test results.",
       "We are still waiting for the test results from the laboratory.",
       "We are still waiting for the results of the lab test.",
+      "We still haven't received the test results from the lab.",
     ],
     meaning: [
       { id: "still", en: "still", ko: "아직", any: ["still", "yet"] },
-      { id: "waiting", en: "waiting for", ko: "기다리고 있다", any: ["wait|await"], critical: true },
+      { id: "waiting", en: "waiting for", ko: "기다리고 있다", any: ["wait|await", "not ... receive|get|have"], critical: true },
       { id: "results", en: "test results", ko: "시험 결과", any: ["result|data|analysis"], term: true, critical: true },
       { id: "lab", en: "the lab", ko: "실험실", any: ["lab|laboratory"] },
     ],
@@ -68,8 +69,8 @@ export const SENTENCES_B: Question[] = [
       "Would it be possible to send me the updated P&ID by Friday?",
     ],
     meaning: [
-      { id: "request", en: "could you (please)", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "would it be possible", "please"] },
-      { id: "send", en: "send", ko: "보내다", any: ["send|share|email|forward|give"], critical: true },
+      { id: "request", en: "could you (please)", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "would it be possible", "please", "could|can|may i|we"] },
+      { id: "send", en: "send", ko: "보내다", any: ["send|share|email|forward|give", "could|can|may i|we get|have|receive"], critical: true },
       { id: "updated", en: "updated", ko: "수정된", any: ["updated|revised|latest|new|modified|current"] },
       { id: "pid", en: "P&ID", ko: "P&ID", any: ["p&id|p&ids|pid|pids", "piping and instrumentation diagram"], term: true, critical: true },
       { id: "by-friday", en: "by Friday", ko: "금요일까지", any: ["by|before friday", "no later than friday"] },
@@ -77,6 +78,7 @@ export const SENTENCES_B: Question[] = [
     pitfalls: [
       { id: "until-deadline", pattern: "until|till friday", category: "preposition", severity: "major", fix: "by Friday", messageKo: "'until'은 그때까지 계속되는 동작에 씁니다. 금요일이 마감 시점이면 'by Friday'를 씁니다.", skill: "polite-request" },
       { id: "send-to-me", pattern: "send to me the|a", category: "word-order", severity: "minor", fix: "send me the", messageKo: "'send + 사람 + 물건'(send me the P&ID) 또는 'send + 물건 + to + 사람' 순서로 씁니다." },
+      { id: "modal-not-base", pattern: "re:(?<=\\b(could|can|would) you (please )?)(sending|sent)\\b", category: "verb-form", severity: "major", fix: "send", messageKo: "'Could you (please)' 뒤에는 동사원형이 옵니다: 'Could you please send me …?' ('sending / sent' ✗)." },
     ],
     hints: {
       pattern: "Could you (please) + 동사원형 + 사람 + 물건 + by + 마감일?",
@@ -110,16 +112,17 @@ export const SENTENCES_B: Question[] = [
       "We haven't got the pump datasheet from the vendor yet, so the pump sizing is delayed.",
     ],
     meaning: [
-      { id: "not-received", en: "haven't received", ko: "받지 못했다", any: ["not ... receive|get|have", "not ... send"], critical: true },
+      { id: "not-received", en: "haven't received", ko: "받지 못했다", any: ["not ... receive|get|have", "not ... send", "not ... arrive|come", "still ... wait|await"], critical: true },
       { id: "yet", en: "yet / still", ko: "아직", any: ["yet|still"] },
       { id: "datasheet", en: "pump datasheet", ko: "펌프 데이터시트", any: ["datasheet", "data sheet", "spec sheet"], term: true, critical: true },
       { id: "vendor", en: "vendor", ko: "벤더", any: ["vendor|supplier|manufacturer"] },
       { id: "so", en: "so / because", ko: "그래서", any: ["so|because|since|therefore|as"] },
       { id: "sizing", en: "sizing work", ko: "사이징 작업", any: ["sizing|size|calculation|design"], term: true },
-      { id: "delayed", en: "is delayed", ko: "지연되었다", any: ["delay|late|behind|hold"], critical: true },
+      { id: "delayed", en: "is delayed", ko: "지연되었다", any: ["delay|late|behind|hold", "can not ... continue|proceed|start|finish|complete"], critical: true },
     ],
     pitfalls: [
       { id: "did-not-receive", pattern: "did not receive|get|=received|=got", category: "tense", severity: "major", fix: "have not received", messageKo: "'아직 ~하지 못했다'는 지금까지 이어지는 상태라서 현재완료 'haven't received (yet)'를 씁니다. 'didn't receive'는 끝난 과거 사건처럼 들립니다." },
+      { id: "not-arrive", pattern: "re:(?<=\\b(has|have) not )arrive\\b", category: "verb-form", severity: "major", fix: "arrived", messageKo: "현재완료는 'have/has + 과거분사'입니다: 'hasn't arrived yet' ('hasn't arrive' ✗).", skill: "present-perfect" },
       { id: "is-delay", pattern: "is|are|was =delay|=delaying", category: "verb-form", severity: "major", fix: "is delayed", messageKo: "작업은 지연'되는' 것이므로 'is delayed'(be + 과거분사)입니다. 'is delay'는 틀린 형태이고 'is delaying'은 '무언가를 지연시키고 있다'는 뜻이 됩니다.", skill: "be-adj" },
     ],
     hints: {
@@ -153,11 +156,11 @@ export const SENTENCES_B: Question[] = [
       "We will start the pressure test right after the contractor finishes the piping installation.",
     ],
     meaning: [
-      { id: "start-test", en: "start the test", ko: "시험을 시작하다", any: ["start|begin|do|run|perform|carry ... test", "start|begin ... hydrotest"], critical: true },
+      { id: "start-test", en: "start the test", ko: "시험을 시작하다", any: ["start|begin|do|run|perform|carry ... test", "start|begin ... hydrotest", "test will|is|can ... start|begin|commence"], critical: true },
       { id: "pressure-test", en: "pressure test", ko: "압력 시험", any: ["pressure|hydro|hydrostatic|leak test", "hydrotest"], term: true },
       { id: "as-soon-as", en: "as soon as", ko: "~하자마자", any: ["as soon as", "right|immediately|just after", "once"], critical: true },
       { id: "contractor", en: "the contractor", ko: "시공사", any: ["contractor|subcontractor|installer"] },
-      { id: "finish", en: "finishes", ko: "끝내다", any: ["finish|complete"], critical: true },
+      { id: "finish", en: "finishes", ko: "끝내다", any: ["finish|complete|=done"], critical: true },
       { id: "piping", en: "piping installation", ko: "배관 설치", any: ["piping|pipe ... installation|install|work", "install ... piping|pipe"], term: true },
     ],
     pitfalls: [
@@ -197,7 +200,7 @@ export const SENTENCES_B: Question[] = [
     advanced: "Pak Budi's team will need to update the equipment list before it goes to the client, since several motor ratings have changed.",
     meaning: [
       { id: "need-to", en: "needs to", ko: "~해야 한다", any: ["need to", "have to", "must", "should"], critical: true },
-      { id: "update", en: "update the list", ko: "리스트를 업데이트하다", any: ["update|revise|modify|change|correct ... list"], critical: true },
+      { id: "update", en: "update the list", ko: "리스트를 업데이트하다", any: ["update|revise|modify|change|correct ... list", "update|revise|modify|correct it"], critical: true },
       { id: "equipment-list", en: "equipment list", ko: "장비 리스트", any: ["equipment list"], term: true, critical: true },
       { id: "before-send", en: "before we send it", ko: "보내기 전에", any: ["before ... send|submit|issue|share|give|go"], critical: true },
       { id: "client", en: "the client", ko: "고객", any: ["client|customer|owner"] },
@@ -242,18 +245,18 @@ export const SENTENCES_B: Question[] = [
     ],
     advanced: "If the vendor fails to confirm the delivery date this week, there is a real risk that commissioning will slip by two weeks.",
     meaning: [
-      { id: "if-not-confirm", en: "if the vendor doesn't confirm", ko: "벤더가 확정해 주지 않으면", any: ["if ... not confirm|fix|finalize|give|provide|tell", "unless ... confirm|fix|finalize|give|provide"], critical: true },
+      { id: "if-not-confirm", en: "if the vendor doesn't confirm", ko: "벤더가 확정해 주지 않으면", any: ["if ... not confirm|fix|finalize|give|provide|tell", "unless ... confirm|fix|finalize|give|provide", "if ... fail ... confirm|fix|finalize|give|provide", "if ... not ... confirm"], critical: true },
       { id: "vendor", en: "vendor", ko: "벤더", any: ["vendor|supplier|manufacturer"] },
       { id: "delivery-date", en: "delivery date", ko: "납기일", any: ["delivery date|schedule|time", "delivery"], term: true, critical: true },
       { id: "this-week", en: "this week", ko: "이번 주에", any: ["this week", "by friday"] },
       { id: "commissioning", en: "commissioning", ko: "시운전", any: ["commissioning|start-up|startup"], term: true, critical: true },
-      { id: "might-delayed", en: "might be delayed", ko: "지연될 수도 있다", any: ["might|may|could be delay|postpone", "might|may|could delay|slip"], critical: true },
+      { id: "might-delayed", en: "might be delayed", ko: "지연될 수도 있다", any: ["might|may|could be delay|postpone", "might|may|could delay|slip|postpone|push", "risk|chance|possible|possibly ... delay|slip|postpone"], critical: true },
       { id: "two-weeks", en: "by two weeks", ko: "2주", any: ["two|2 week"] },
     ],
     pitfalls: [
       { id: "will-not-if", pattern: "vendor will not", category: "tense", severity: "major", fix: "vendor does not", messageKo: "if 조건절에서는 미래 일이라도 현재시제를 씁니다: 'If the vendor doesn't confirm …'.", skill: "cond-1" },
       { id: "active-delay", pattern: "commissioning might|may|could|will delay", category: "verb-form", severity: "major", fix: "commissioning might be delayed", messageKo: "시운전은 스스로 무언가를 지연시키는 것이 아니라 지연'되는' 것이므로 수동태 'might be delayed'를 씁니다.", skill: "passive" },
-      { id: "will-certain", pattern: "will be =delayed", category: "meaning-shift", severity: "major", fix: "might be delayed", messageKo: "'will be delayed'는 '반드시 지연된다'는 확정 의미입니다. '지연될 수도 있다'는 가능성이므로 'might/could be delayed'를 씁니다.", skill: "modal-possibility" },
+      { id: "will-certain", pattern: "re:(?<!\\b(risk|chance|possible|possibility|likely)\\b.*)\\bwill be delayed\\b", category: "meaning-shift", severity: "major", fix: "might be delayed", messageKo: "'will be delayed'는 '반드시 지연된다'는 확정 의미입니다. '지연될 수도 있다'는 가능성이므로 'might/could be delayed'를 씁니다.", skill: "modal-possibility" },
     ],
     hints: {
       pattern: "If + 주어 + doesn't + 동사원형, 주어 + might be + p.p. + by + 기간",
@@ -294,7 +297,7 @@ export const SENTENCES_B: Question[] = [
       { id: "scheduled-may", en: "scheduled to arrive in May", ko: "5월 도착 예정이던", any: ["scheduled|planned|supposed|due|expected|originally ... may"] },
       { id: "not-until-july", en: "not until July", ko: "7월이 되어서야", any: ["not ... until|till ... july", "only ... july", "not ... before ... july"], critical: true },
       { id: "might", en: "might", ko: "~일 수도 있다", any: ["might|may|could"] },
-      { id: "change-schedule", en: "change the schedule", ko: "일정을 변경하다", any: ["change|revise|adjust|update|modify|move|shift ... schedule"], critical: true },
+      { id: "change-schedule", en: "change the schedule", ko: "일정을 변경하다", any: ["change|revise|adjust|update|modify|move|shift ... schedule", "reschedule", "postpone|delay ... commissioning"], critical: true },
       { id: "commissioning", en: "commissioning", ko: "시운전", any: ["commissioning|start-up|startup"], term: true },
       { id: "might-have-to", en: "might have to", ko: "~해야 할 수도 있다", any: ["might|may|could have|need to", "might|may|could ... have|need to"] },
     ],
@@ -302,6 +305,7 @@ export const SENTENCES_B: Question[] = [
       { id: "said-us", pattern: "said me|us", category: "word-choice", severity: "major", fix: "told us", messageKo: "say는 사람을 바로 목적어로 받지 않습니다. 'said us'가 아니라 'told us' 또는 'said (to us) that'을 씁니다." },
       { id: "arrive-until", pattern: "re:(?<!\\bnot )\\b(arrive|come|be delivered) (until|till)\\b", category: "meaning-shift", severity: "major", fix: "not arrive until", messageKo: "'7월이 되어서야 도착한다'는 'not arrive until July'입니다. 'arrive until July'는 '7월까지 계속 도착한다'는 이상한 뜻이 됩니다." },
       { id: "must-change", pattern: "must change|revise|adjust", category: "meaning-shift", severity: "major", fix: "might have to change", messageKo: "'must change'는 '반드시 바꿔야 한다'는 확정 의미입니다. '바꿔야 할 수도 있다'는 'might have to change'입니다.", skill: "modal-possibility" },
+      { id: "to-past", pattern: "re:(?<=\\b(have|has|need|needs) to )(changed|revised|adjusted|modified|moved|updated)\\b", category: "verb-form", severity: "major", fix: "change", messageKo: "'have to / need to' 뒤에는 동사원형이 옵니다: 'might have to change' ('to changed' ✗).", skill: "modal-necessity" },
     ],
     hints: {
       pattern: "The vendor said that + 주어, which was …, might not + 동사 + until …, so + 주어 + might have to + 동사",
@@ -385,6 +389,7 @@ export const SENTENCES_B: Question[] = [
     pitfalls: [
       { id: "direct-order", pattern: "re:(?<=\\b(me|us|know) )what is the\\b", category: "word-order", severity: "major", fix: "the", messageKo: "'Could you tell me' 뒤의 간접의문문은 평서문 어순입니다: 'what the design pressure … is'. 간단히 'tell me the design pressure …'라고 해도 됩니다." },
       { id: "tell-to-me", pattern: "tell to me|us", category: "preposition", severity: "major", fix: "tell me", messageKo: "tell은 사람을 바로 목적어로 받습니다: 'tell me' ('tell to me' ✗)." },
+      { id: "no-verb", pattern: "re:(?<=\\bwhat (the )?design pressure of (the )?steam )header(?=( please)?$)", category: "sentence-structure", severity: "major", fix: "header is", messageKo: "'what + 주어' 뒤에는 동사가 필요합니다: 'what the design pressure of the steam header is'." },
     ],
     hints: {
       pattern: "Could you tell me + what + 주어 + is?  (의문사 뒤 평서문 어순)",
@@ -419,8 +424,8 @@ export const SENTENCES_B: Question[] = [
       "Could you send us the lab results that you mentioned at yesterday's meeting?",
     ],
     meaning: [
-      { id: "polite", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "please"] },
-      { id: "send", en: "send us", ko: "보내 주다", any: ["send|share|email|forward|give"], critical: true },
+      { id: "polite", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "please", "could|can|may we|i"] },
+      { id: "send", en: "send us", ko: "보내 주다", any: ["send|share|email|forward|give", "could|can|may we|i get|have|receive"], critical: true },
       { id: "lab-results", en: "lab results", ko: "실험실 분석 결과", any: ["lab|laboratory|analysis|test result|data", "result"], term: true, critical: true },
       { id: "mentioned", en: "that you mentioned", ko: "말씀하신", any: ["mention|say|tell|discuss", "talk about"], critical: true },
       { id: "yesterday", en: "yesterday", ko: "어제", any: ["yesterday"] },
@@ -428,6 +433,8 @@ export const SENTENCES_B: Question[] = [
     ],
     pitfalls: [
       { id: "resumptive", pattern: "mention|discuss|talk about? it|them", category: "sentence-structure", severity: "major", fix: "mentioned", messageKo: "관계절(that you mentioned) 안에서는 목적어를 다시 쓰지 않습니다. 'that you mentioned them'이 아니라 'that you mentioned'입니다." },
+      { id: "mention-about", pattern: "re:(?<=\\b(mention|mentioned|discuss|discussed) )about\\b", category: "preposition", severity: "major", fix: "", messageKo: "mention은 타동사라서 about 없이 목적어를 바로 씁니다: 'the results that you mentioned' ('mentioned about' ✗).", skill: "verb-object" },
+      { id: "what-relative", pattern: "re:(?<=\\b(results?|data|analysis) )what(?= (you|we|they)\\b)", category: "sentence-structure", severity: "major", fix: "that", messageKo: "명사를 꾸미는 관계대명사는 what이 아니라 that/which입니다: 'the lab results that you mentioned'." },
     ],
     hints: {
       pattern: "Could you send us + 명사 + that + 주어 + 동사 + …?",
@@ -459,10 +466,11 @@ export const SENTENCES_B: Question[] = [
       "We can't increase the dryer capacity since the steam supply at the site is limited to 3 t/h.",
       "The steam supply at the site is limited to 3 t/h, so we can't increase the dryer capacity.",
       "We are not able to increase the capacity of the dryer because the steam supply at the site is only 3 t/h.",
+      "Since the steam supply at the site is limited to 3 t/h, it is not possible to increase the dryer capacity.",
     ],
     meaning: [
-      { id: "cannot", en: "can't", ko: "~할 수 없다", any: ["can not", "not able", "unable", "impossible"], critical: true },
-      { id: "increase", en: "increase", ko: "늘리다", any: ["increase|raise|expand|enlarge|boost|upgrade|extend"], critical: true },
+      { id: "cannot", en: "can't", ko: "~할 수 없다", any: ["can not", "not able", "unable", "=impossible", "not possible"], critical: true },
+      { id: "increase", en: "increase", ko: "늘리다", any: ["increase|raise|expand|enlarge|boost|upgrade|extend", "make ... bigger|larger|higher"], critical: true },
       { id: "dryer-capacity", en: "dryer capacity", ko: "건조기 용량", any: ["dryer|drier capacity", "capacity ... dryer|drier"], term: true, critical: true },
       { id: "because", en: "because / so", ko: "때문에", any: ["because|since|as|so", "due to"] },
       { id: "steam-supply", en: "steam supply", ko: "스팀 공급량", any: ["steam supply|availability|capacity", "steam"], term: true },
@@ -472,6 +480,7 @@ export const SENTENCES_B: Question[] = [
     pitfalls: [
       { id: "because-so", pattern: "re:(?<=\\bbecause\\b.*)\\bso\\b", category: "sentence-structure", severity: "major", fix: "", messageKo: "because와 so를 한 문장에 함께 쓰지 않습니다. 한국어 '~때문에, 그래서'를 그대로 옮긴 형태입니다. 'Because …, we can't …' 또는 '…, so we can't …' 중 하나만 쓰세요." },
       { id: "is-limit", pattern: "is|are =limit|=limiting", category: "verb-form", severity: "major", fix: "is limited", messageKo: "'제한되어 있다'는 상태이므로 'is limited to'(be + 과거분사)입니다. 'is limit'은 틀린 형태입니다.", skill: "be-adj" },
+      { id: "because-of-clause", pattern: "re:\\bbecause of(?= the (site )?steam supply( (at|on) (the )?site)? (is|was)\\b)", category: "sentence-structure", severity: "major", fix: "because", messageKo: "'because of' 뒤에는 명사만 옵니다. '주어 + 동사'(the steam supply is limited)가 오면 because만 씁니다." },
     ],
     hints: {
       pattern: "주어 + can't + 동사원형 + … + because + 주어 + is limited to + 수치",
@@ -505,18 +514,19 @@ export const SENTENCES_B: Question[] = [
     ],
     advanced: "I see your point, but I'm not convinced that one week will be enough for the performance test, given that the feed quality varies from day to day.",
     meaning: [
-      { id: "acknowledge", en: "I see your point", ko: "말씀하신 점은 이해합니다", any: ["see|understand|get ... point", "see|understand ... mean", "i understand|see"], critical: true },
+      { id: "acknowledge", en: "I see your point", ko: "말씀하신 점은 이해합니다", any: ["see|understand|get ... point", "see|understand ... mean", "i understand|see", "fair|good|valid point"], critical: true },
       { id: "not-sure", en: "I'm not sure", ko: "잘 모르겠습니다", any: ["not sure|certain|convinced", "doubt", "not think"], critical: true },
-      { id: "week", en: "one week", ko: "1주일", any: ["week"], critical: true },
+      { id: "week", en: "one week", ko: "1주일", any: ["week", "one-week"], critical: true },
       { id: "enough", en: "enough", ko: "충분한", any: ["enough|sufficient"], critical: true },
       { id: "performance-test", en: "performance test", ko: "성능 시험", any: ["performance test|run|testing", "performance"], term: true },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as", "due to", "given that"] },
-      { id: "feed-changes", en: "the feed quality changes", ko: "원료 품질이 바뀐다", any: ["feed|feedstock|material ... change|vary|differ", "quality ... change|vary|differ"] },
+      { id: "feed-changes", en: "the feed quality changes", ko: "원료 품질이 바뀐다", any: ["feed|feedstock|material ... change|vary|differ", "quality ... change|vary|differ|different"] },
       { id: "daily", en: "every day", ko: "매일", any: ["every day", "daily", "everyday", "day to day", "each day"] },
     ],
     pitfalls: [
       { id: "you-are-wrong", pattern: "you are wrong", category: "word-choice", severity: "major", fix: "I see your point, but", messageKo: "'You are wrong'은 국제 회의에서 너무 직접적이라 상대가 불쾌할 수 있습니다. 먼저 'I see your point, but …'으로 인정한 뒤 'I'm not sure that …'으로 완곡하게 말하세요." },
       { id: "everyday", pattern: "=everyday", category: "spelling", severity: "minor", fix: "every day", messageKo: "'매일'이라는 부사는 띄어 쓴 'every day'입니다. 붙여 쓴 'everyday'는 '일상적인'이라는 형용사입니다." },
+      { id: "dont-sure", pattern: "do not sure", category: "be-verb", severity: "major", fix: "am not sure", messageKo: "'sure'는 형용사라서 be동사로 부정합니다. 'I don't sure'가 아니라 'I'm not sure'입니다.", skill: "be-adj" },
     ],
     hints: {
       pattern: "I see your point, but I'm not sure that + 주어 + 동사, because + 주어 + 동사",
@@ -563,6 +573,7 @@ export const SENTENCES_B: Question[] = [
     pitfalls: [
       { id: "agreed-obj-to", pattern: "agreed the? malaysian? vendor to", category: "sentence-structure", severity: "major", fix: "agreed that the Malaysian vendor will", messageKo: "agree는 'agree + 사람 + to 동사' 구조를 쓰지 않습니다. 'We agreed that the vendor will …' 또는 'The vendor agreed to …'로 말하세요." },
       { id: "until-deadline", pattern: "until|till thursday", category: "preposition", severity: "major", fix: "by Thursday", messageKo: "목요일이 마감 시점이므로 'by Thursday'를 씁니다. 'until'은 그때까지 계속되는 동작에 씁니다." },
+      { id: "will-and-sends", pattern: "re:(?<=\\b(will|would) (revise|update|modify|correct|change) (the |a |its |their )?(revised |updated )?(quotation|quote|offer|proposal) and )sends\\b", category: "agreement", severity: "major", fix: "send", messageKo: "will 뒤의 두 동사는 모두 원형입니다: 'will revise the quotation and send it'.", skill: "future-plan" },
     ],
     hints: {
       pattern: "We agreed that + 주어 + will + 동사 + and + 동사 + by + 요일",
@@ -593,6 +604,7 @@ export const SENTENCES_B: Question[] = [
       "If the client had informed us about the chloride limit earlier, we would have chosen a different material for the tubes, because the current stainless steel may not be suitable.",
       "We would have chosen a different tube material if the client had told us about the chloride limit earlier, because the current stainless steel might not be suitable.",
       "Had the client told us about the chloride limit earlier, we would have chosen a different tube material, since the current stainless steel might not be suitable.",
+      "If the client had told us the chloride limit earlier, we would have chosen a different tube material, because the current stainless steel might not be suitable.",
     ],
     advanced: "Had the client informed us of the chloride limit earlier, we would have specified a different tube material, as the current stainless steel may not be suitable for this cooling water.",
     meaning: [
@@ -600,7 +612,7 @@ export const SENTENCES_B: Question[] = [
       { id: "client", en: "the client", ko: "고객", any: ["client|customer|owner"] },
       { id: "chloride", en: "chloride limit", ko: "염화물 한계치", any: ["chloride"], term: true, critical: true },
       { id: "earlier", en: "earlier", ko: "더 일찍", any: ["earlier|sooner|before|early"] },
-      { id: "would-have-chosen", en: "would have chosen", ko: "선택했을 것이다", any: ["would ... choose|chose|chosen|select|use|pick|specify"], critical: true },
+      { id: "would-have-chosen", en: "would have chosen", ko: "선택했을 것이다", any: ["would ... choose|chose|chosen|select|use|pick|specify", "would ... go with|for"], critical: true },
       { id: "different-material", en: "a different tube material", ko: "다른 튜브 재질", any: ["different|another|other ... material|tube"], term: true, critical: true },
       { id: "stainless", en: "stainless steel", ko: "스테인리스강", any: ["stainless|ss|sus"], term: true },
       { id: "not-suitable", en: "might not be suitable", ko: "적합하지 않을 수도 있다", any: ["not ... suitable|good|acceptable|ok|enough|work", "unsuitable"] },
@@ -609,6 +621,7 @@ export const SENTENCES_B: Question[] = [
       { id: "if-past-simple", pattern: "if the? client =told|=informed|=gave", category: "tense", severity: "major", fix: "if the client had told", messageKo: "과거 사실과 반대되는 가정('~했더라면')은 'If + had + p.p.'입니다. 'If the client told us'는 현재 가정처럼 들립니다.", skill: "cond-3" },
       { id: "would-base", pattern: "would =choose|=select|=use|=pick|=chose", category: "tense", severity: "major", fix: "would have chosen", messageKo: "과거에 대한 가정의 결과는 'would have + p.p.'(would have chosen)입니다. 'would choose'는 지금이나 미래에 대한 가정입니다.", skill: "cond-3" },
       { id: "would-had", pattern: "would =had", category: "verb-form", severity: "major", fix: "would have", messageKo: "조동사 would 뒤에는 동사원형이 오므로 'would had'가 아니라 'would have + p.p.'입니다.", skill: "cond-3" },
+      { id: "if-would-have", pattern: "if the? client|customer would have", category: "tense", severity: "major", fix: "if the client had", messageKo: "if절에는 would를 쓰지 않습니다. 과거 가정의 if절은 'If the client had told us …'이고, would have는 결과절에만 씁니다.", skill: "cond-3" },
     ],
     hints: {
       pattern: "If + 주어 + had + p.p., 주어 + would have + p.p., because + 주어 + might not be + 형용사",
@@ -654,6 +667,7 @@ export const SENTENCES_B: Question[] = [
     pitfalls: [
       { id: "missing-is", pattern: "tank almost|nearly", category: "be-verb", severity: "major", fix: "tank is almost", messageKo: "'full'은 형용사라서 동사가 필요합니다. 'The tank almost full'이 아니라 'The tank is almost full'입니다." },
       { id: "fulled", pattern: "=fulled", category: "verb-form", severity: "major", fix: "full", messageKo: "'fulled'는 영어 단어가 아닙니다. '찼다'는 상태이므로 'is full'이라고 합니다." },
+      { id: "please-ing", pattern: "re:(?<=\\bplease )(opening|opened|opens)\\b", category: "verb-form", severity: "major", fix: "open", messageKo: "please 뒤에는 동사원형이 옵니다: 'please open the drain valve'.", skill: "polite-request" },
     ],
     hints: {
       pattern: "주어 + is + almost + 형용사, so please + 동사원형",
@@ -695,8 +709,12 @@ export const SENTENCES_B: Question[] = [
     ],
     pitfalls: [
       { id: "how-many-steam", pattern: "how many steam|=steams", category: "countability", severity: "major", fix: "how much steam", messageKo: "steam은 셀 수 없는 명사라서 'How many'가 아니라 'How much'로 묻습니다." },
-      { id: "no-do-support", pattern: "re:\\bhow much steam the (new )?dryer (needs|uses|requires)\\b", category: "word-order", severity: "major", fix: "how much steam does the new dryer need", messageKo: "의문문은 'How much steam + does + 주어 + 동사원형'의 어순입니다. does를 빼면 평서문 어순이 되어 질문이 되지 않습니다." },
+      { id: "no-do-support", pattern: "re:(?<!\\b(me|us|know|wonder|wondering|ask|asking|tell|check|confirm|clarify|sure|idea) )\\bhow much steam the (new )?dryer (needs|uses|requires)\\b", category: "word-order", severity: "major", fix: "how much steam does the new dryer need", messageKo: "의문문은 'How much steam + does + 주어 + 동사원형'의 어순입니다. does를 빼면 평서문 어순이 되어 질문이 되지 않습니다." },
       { id: "steams", pattern: "=steams", category: "countability", severity: "minor", fix: "steam", messageKo: "steam은 셀 수 없는 명사라서 -s를 붙이지 않습니다." },
+      { id: "does-3sg", pattern: "re:(?<=\\b(does|did) the (new )?dryer )(needs|uses|requires|consumes)\\b", category: "verb-form", severity: "major", fix: "need", messageKo: "does가 이미 3인칭 단수를 표시하므로 뒤의 동사는 원형입니다: 'does the new dryer need' ('needs' ✗).", skill: "agreement" },
+      { id: "do-dryer", pattern: "re:\\bdo(?= the (new )?dryer (need|use|require|consume)\\b)", category: "agreement", severity: "major", fix: "does", messageKo: "주어 'the new dryer'는 3인칭 단수라서 'do'가 아니라 'does'를 씁니다: 'How much steam does the new dryer need?'", skill: "agreement" },
+      { id: "does-need-order", pattern: "re:\\bdoes need the (new )?dryer\\b", category: "word-order", severity: "major", fix: "does the new dryer need", messageKo: "의문문 어순은 'does + 주어 + 동사원형'입니다: 'How much steam does the new dryer need?'", skill: "word-order" },
+      { id: "be-do", pattern: "re:\\bis(?= the (new )?dryer (need|use|require|consume)\\b)", category: "verb-form", severity: "major", fix: "does", messageKo: "need는 일반동사라서 의문문에 is가 아니라 does를 씁니다: 'How much steam does the new dryer need?'", skill: "question-form" },
     ],
     hints: {
       pattern: "How much + 셀 수 없는 명사 + does + 주어 + 동사원형 + …?",
@@ -732,7 +750,7 @@ export const SENTENCES_B: Question[] = [
     ],
     meaning: [
       { id: "control-valve", en: "control valve", ko: "제어 밸브", any: ["control valve", "valve"], term: true, critical: true },
-      { id: "might-stuck", en: "might be stuck", ko: "고착되어 있을 수도 있다", any: ["might|may|could ... stuck|stick|blocked|jammed|sticking", "maybe|possibly|probably ... stuck"], critical: true },
+      { id: "might-stuck", en: "might be stuck", ko: "고착되어 있을 수도 있다", any: ["might|may|could ... stuck|stick|blocked|jammed|sticking", "maybe|possibly|probably|possible|chance ... stuck"], critical: true },
       { id: "flow", en: "the flow", ko: "유량", any: ["flow|flowrate"], term: true },
       { id: "not-change", en: "doesn't change", ko: "변하지 않는다", any: ["not change|move|respond|react|increase|vary", "no change", "same"], critical: true },
       { id: "adjust-output", en: "adjust the controller output", ko: "컨트롤러 출력을 조정하다", any: ["output"], term: true },
@@ -742,6 +760,7 @@ export const SENTENCES_B: Question[] = [
       { id: "must-be", pattern: "must be stuck", category: "meaning-shift", severity: "major", fix: "might be stuck", messageKo: "'must be stuck'은 '틀림없이 고착됐다'는 강한 확신입니다. '고착되어 있을 수도 있다'는 가능성이므로 'might/may be stuck'을 씁니다." },
       { id: "modal-no-be", pattern: "might|may|could =stuck", category: "verb-form", severity: "major", fix: "might be stuck", messageKo: "stuck은 형용사(과거분사)라서 조동사 뒤에 be가 필요합니다: 'might be stuck'." },
       { id: "be-change", pattern: "is|are not =change", category: "verb-form", severity: "major", fix: "does not change", messageKo: "change는 일반동사라서 부정문은 'does not change'입니다. 'is not change'처럼 be동사와 동사원형을 함께 쓰지 않습니다.", skill: "agreement" },
+      { id: "stucked", pattern: "=stucked", category: "verb-form", severity: "major", fix: "stuck", messageKo: "stick의 과거분사는 'stuck'입니다. 'stucked'는 없는 단어입니다: 'might be stuck'." },
     ],
     hints: {
       pattern: "주어 + might be + 상태, because + 주어 + doesn't + 동사원형 + when …",
@@ -779,15 +798,16 @@ export const SENTENCES_B: Question[] = [
       { id: "outlet", en: "outlet", ko: "출구", any: ["outlet|exit|product"], term: true },
       { id: "dryer", en: "dryer", ko: "건조기", any: ["dryer|drier"], term: true },
       { id: "higher-than", en: "higher than the target", ko: "목표보다 높다", any: ["higher|above|over|more ... target|spec|specification|limit|setpoint"], critical: true },
-      { id: "slightly", en: "slightly", ko: "약간", any: ["slightly|little|bit|somewhat ... higher|above|over"] },
-      { id: "reduce", en: "reduce", ko: "줄이다", any: ["reduce|lower|decrease|cut|slow"], critical: true },
+      { id: "slightly", en: "slightly", ko: "약간", any: ["slightly|little|bit|somewhat|just|marginally ... higher|above|over"] },
+      { id: "reduce", en: "reduce", ko: "줄이다", any: ["reduce|lower|decrease|cut|slow", "turn ... down"], critical: true },
       { id: "feed-rate", en: "feed rate", ko: "공급 속도", any: ["feed rate|flow|flowrate|amount|load", "feed"], term: true, critical: true },
-      { id: "a-little", en: "a little", ko: "조금", any: ["reduce|lower|decrease|cut ... little|slightly|bit", "slightly|little reduce|lower|decrease|cut"] },
+      { id: "a-little", en: "a little", ko: "조금", any: ["reduce|lower|decrease|cut|down ... little|slightly|bit", "slightly|little reduce|lower|decrease|cut"] },
     ],
     pitfalls: [
       { id: "very-comparative", pattern: "very higher", category: "word-choice", severity: "major", fix: "slightly higher", messageKo: "비교급 앞에는 very를 쓸 수 없습니다. '약간 더'는 'slightly / a little higher', '훨씬 더'는 'much higher'입니다.", skill: "degree" },
       { id: "than-prep", pattern: "higher to|from|then", category: "preposition", severity: "major", fix: "higher than", messageKo: "비교 대상 앞에는 'than'을 씁니다: 'higher than the target'.", skill: "comparative" },
       { id: "need-no-to", pattern: "need =reduce|=lower|=decrease|=cut", category: "verb-form", severity: "major", fix: "need to reduce", messageKo: "일반동사 need 뒤에 동사가 올 때는 'need to + 동사원형'입니다: 'need to reduce'.", skill: "modal-necessity" },
+      { id: "more-comparative", pattern: "re:\\bmore(?= (higher|lower)\\b)", category: "word-choice", severity: "major", fix: "", messageKo: "higher는 이미 비교급이라 more를 붙이지 않습니다: 'slightly higher'.", skill: "comparative" },
     ],
     hints: {
       pattern: "주어 + is + slightly + 비교급 + than + 명사, so + 주어 + need to + 동사 + a little",
@@ -825,7 +845,7 @@ export const SENTENCES_B: Question[] = [
     meaning: [
       { id: "seal", en: "mechanical seal", ko: "메커니컬 실", any: ["mechanical seal", "seal"], term: true, critical: true },
       { id: "pump", en: "feed pump", ko: "공급 펌프", any: ["feed pump", "pump"], term: true },
-      { id: "replaced", en: "was replaced", ko: "교체되었다", any: ["replace|change|renew|install"], critical: true },
+      { id: "replaced", en: "was replaced", ko: "교체되었다", any: ["replace|change|renew|install", "get|put ... new ... seal"], critical: true },
       { id: "last-week", en: "last week", ko: "지난주에", any: ["last week"] },
       { id: "but", en: "but", ko: "하지만", any: ["but|although|though|however"] },
       { id: "leak", en: "the leak", ko: "누설", any: ["leak|leakage|leaking"], term: true, critical: true },
@@ -909,6 +929,7 @@ export const SENTENCES_B: Question[] = [
       "If the suction strainer had been cleaned during the last shutdown, the pump would not have tripped this morning, and we would not be losing production now.",
       "The pump would not have tripped this morning if we had cleaned the suction strainer during the last shutdown, and we would not be losing production now.",
       "Had we cleaned the suction strainer during the last shutdown, the pump would not have tripped this morning, and we would not be losing production now.",
+      "Had the suction strainer been cleaned during the last shutdown, the pump would not have tripped this morning, and we would not be losing production now.",
     ],
     advanced: "Had we cleaned the suction strainer during the last shutdown, the pump would not have tripped this morning, and we would not be losing production right now.",
     meaning: [
@@ -925,6 +946,8 @@ export const SENTENCES_B: Question[] = [
       { id: "if-past-simple", pattern: "if we =cleaned", category: "tense", severity: "major", fix: "if we had cleaned", messageKo: "과거 사실과 반대되는 가정('~했더라면')은 'If + had + p.p.'입니다. 'If we cleaned'는 현재에 대한 가정처럼 들립니다." },
       { id: "would-not-trip", pattern: "would not =trip", category: "tense", severity: "major", fix: "would not have tripped", messageKo: "오늘 아침(과거)에 일어난 일의 반대 결과는 'would not have + p.p.'(would not have tripped)입니다." },
       { id: "would-not-lose", pattern: "would not =lose", category: "tense", severity: "minor", fix: "would not be losing", messageKo: "지금 계속되고 있는 상황(생산 손실)에 대한 가정 결과는 진행형 'would not be losing'이 더 정확합니다.", skill: "progressive" },
+      { id: "have-base", pattern: "have =trip", category: "verb-form", severity: "major", fix: "have tripped", messageKo: "would have 뒤에는 과거분사가 옵니다: 'would not have tripped' ('have trip' ✗).", skill: "cond-3" },
+      { id: "if-would", pattern: "if we would have", category: "tense", severity: "major", fix: "if we had", messageKo: "if절에는 would를 쓰지 않습니다. 과거 가정의 if절은 'If we had cleaned …'입니다.", skill: "cond-3" },
     ],
     hints: {
       pattern: "If + had + p.p., 주어 + would not have + p.p. (과거 결과), and 주어 + would not be + V-ing + now (현재 결과)",
@@ -1001,13 +1024,14 @@ export const SENTENCES_B: Question[] = [
       "We plan to submit the technical proposal next Friday after we complete the CAPEX estimate.",
       "After we finish the CAPEX estimate, we are planning to submit the technical proposal next Friday.",
       "We will submit the technical proposal next Friday, after finishing the CAPEX estimate.",
+      "Once the CAPEX estimate is finished, we are going to submit the technical proposal next Friday.",
     ],
     meaning: [
       { id: "plan", en: "are planning to", ko: "~할 계획이다", any: ["plan|planning|going|will|intend"] },
       { id: "submit", en: "submit", ko: "제출하다", any: ["submit|send|issue|deliver"], critical: true },
       { id: "proposal", en: "technical proposal", ko: "기술 제안서", any: ["technical proposal|offer", "proposal"], term: true, critical: true },
       { id: "next-friday", en: "next Friday", ko: "다음 주 금요일", any: ["next friday", "friday"] },
-      { id: "after-finish", en: "after we finish", ko: "마친 후에", any: ["after ... finish|complete|finalize|finalise|prepare", "once ... finish|complete"], critical: true },
+      { id: "after-finish", en: "after we finish", ko: "마친 후에", any: ["after ... finish|complete|finalize|finalise|prepare", "once ... finish|complete", "once|after|when ... =done|ready"], critical: true },
       { id: "capex", en: "CAPEX estimate", ko: "CAPEX 견적", any: ["capex|cost estimate", "estimate"], term: true },
     ],
     pitfalls: [
@@ -1043,15 +1067,16 @@ export const SENTENCES_B: Question[] = [
       "If we burned EFB in the boiler instead of diesel, our OPEX would be around 20 percent lower.",
       "Our OPEX would be about 20% lower if we used EFB as boiler fuel instead of diesel.",
       "If we switched from diesel to EFB as boiler fuel, our OPEX would be about 20% lower.",
+      "Using EFB instead of diesel as boiler fuel would reduce our OPEX by about 20%.",
     ],
     advanced: "If we switched the boiler fuel from diesel to EFB, our OPEX would drop by roughly 20%.",
     meaning: [
-      { id: "if-used", en: "if we used", ko: "쓴다고 가정하면", any: ["if we use|burn|switch|change|replace|choose", "if we were to use"], critical: true },
+      { id: "if-used", en: "if we used", ko: "쓴다고 가정하면", any: ["if we use|burn|switch|change|replace|choose", "if we were to use", "=using|=burning|=switching ... efb ... would"], critical: true },
       { id: "efb", en: "EFB", ko: "EFB", any: ["efb", "empty fruit bunch|bunches"], term: true, critical: true },
       { id: "fuel", en: "boiler fuel", ko: "보일러 연료", any: ["fuel", "boiler"], term: true },
       { id: "diesel", en: "instead of diesel", ko: "디젤 대신", any: ["diesel"] },
       { id: "opex", en: "OPEX", ko: "OPEX(운영비)", any: ["opex", "operating|running cost"], term: true, critical: true },
-      { id: "would-lower", en: "would be lower", ko: "더 낮을 것이다", any: ["would|will ... lower|less|cheaper|reduce|drop|decrease|fall"], critical: true },
+      { id: "would-lower", en: "would be lower", ko: "더 낮을 것이다", any: ["would|will ... lower|less|cheaper|reduce|drop|decrease|fall|cut|save|down"], critical: true },
       { id: "about-20", en: "about 20%", ko: "약 20%", any: ["20"], critical: true },
     ],
     pitfalls: [
@@ -1093,9 +1118,9 @@ export const SENTENCES_B: Question[] = [
     advanced: "Provided that the client approves the layout this month, the detailed design will be completed by the end of March.",
     meaning: [
       { id: "design", en: "detailed design", ko: "상세 설계", any: ["detailed|detail design|engineering", "design"], term: true, critical: true },
-      { id: "completed", en: "will be completed", ko: "완료될 것이다", any: ["complete|finish|ready"], critical: true },
+      { id: "completed", en: "will be completed", ko: "완료될 것이다", any: ["complete|finish|ready|=done"], critical: true },
       { id: "march", en: "by the end of March", ko: "3월 말까지", any: ["march"], critical: true },
-      { id: "if-approve", en: "if the client approves", ko: "고객이 승인하면", any: ["if|once|when|provided ... approve|accept|confirm"], critical: true },
+      { id: "if-approve", en: "if the client approves", ko: "고객이 승인하면", any: ["if|once|when|provided|providing|assuming|long ... approve|accept|confirm|sign"], critical: true },
       { id: "client", en: "the client", ko: "고객", any: ["client|customer|owner"] },
       { id: "layout", en: "layout", ko: "배치도", any: ["layout|arrangement|drawing", "plot plan"], term: true, critical: true },
       { id: "this-month", en: "this month", ko: "이번 달에", any: ["this month"] },
@@ -1104,6 +1129,7 @@ export const SENTENCES_B: Question[] = [
       { id: "active-complete", pattern: "design will =complete|=finish", category: "verb-form", severity: "major", fix: "design will be completed", messageKo: "설계는 스스로 무언가를 끝내는 것이 아니라 '완료되는' 것이므로 미래 수동태 'will be completed'를 씁니다.", skill: "passive" },
       { id: "if-will", pattern: "client will approve", category: "tense", severity: "major", fix: "client approves", messageKo: "if 조건절에서는 미래 일이라도 현재시제를 씁니다: 'if the client approves'.", skill: "cond-1" },
       { id: "until-deadline", pattern: "until|till the? end", category: "preposition", severity: "major", fix: "by the end", messageKo: "완료 마감 시점은 'by the end of March'입니다. 'until'은 그때까지 계속되는 동작에 씁니다." },
+      { id: "in-this-month", pattern: "in|on this month", category: "preposition", severity: "major", fix: "this month", messageKo: "'this / next / last + 시간' 앞에는 전치사를 쓰지 않습니다: 'approves the layout this month'.", skill: "verb-prep" },
     ],
     hints: {
       pattern: "주어 + will be + p.p. + by + 시점 + if + 주어 + 현재동사(-s)",

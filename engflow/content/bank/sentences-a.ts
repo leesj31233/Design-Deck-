@@ -23,18 +23,19 @@ export const SENTENCES_A: Question[] = [
     ],
     advanced: "If we lock in the equipment specifications now, we may have to revise them later, since the actual operating data could differ from our assumptions.",
     meaning: [
-      { id: "if-now", en: "if we decide now", ko: "만약 지금 결정한다면", any: ["if we decide|finalize|fix|confirm|choose|select|lock|set ... now", "if we decide|finalize|fix|confirm|choose|select|lock|set ... them now"], critical: true },
-      { id: "spec", en: "equipment specifications", ko: "장비 사양", any: ["equipment specification|spec|specs", "equipment spec"], term: true, critical: true },
-      { id: "might-change", en: "might have to change", ko: "변경해야 할 수도 있다", any: ["might|may|could have to change|revise|modify|update", "might|may|could need to change|revise|modify|update", "might|may|could change|revise|modify"], critical: true },
+      { id: "if-now", en: "if we decide now", ko: "만약 지금 결정한다면", any: ["if we decide|finalize|fix|confirm|choose|select|lock|set|agree|freeze ... now", "if we decide|finalize|fix|confirm|choose|select|lock|set ... them now", "if we make ... decision ... now"], critical: true },
+      { id: "spec", en: "equipment specifications", ko: "장비 사양", any: ["equipment specification|spec|specs", "equipment spec", "specification|spec|specs ... equipment"], term: true, critical: true },
+      { id: "might-change", en: "might have to change", ko: "변경해야 할 수도 있다", any: ["might|may|could have to change|revise|modify|update", "might|may|could need to change|revise|modify|update", "might|may|could change|revise|modify", "a chance ... change|revise|modify|update"], critical: true },
       { id: "later", en: "later", ko: "나중에", any: ["later", "in the future", "afterwards"] },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as", "due to"] },
       { id: "operating-data", en: "actual operating data", ko: "실제 운전 데이터", any: ["actual|real operating|operation data", "operating|operation data", "actual|real data"], term: true },
-      { id: "different", en: "could be different", ko: "달라질 수도 있다", any: ["could|may|might|can be different", "could|may|might differ", "different"] },
+      { id: "different", en: "could be different", ko: "달라질 수도 있다", any: ["could|may|might|can be different", "could|may|might differ", "different", "not ... same"] },
     ],
     pitfalls: [
       { id: "will-if", pattern: "if we will", category: "tense", severity: "major", fix: "if we", messageKo: "if 조건절에서는 미래 일도 현재시제(decide)로 씁니다. 'if we will decide'가 아니라 'if we decide'입니다.", skill: "cond-1" },
-      { id: "decided-now", pattern: "if we =decided ... now", category: "tense", severity: "major", fix: "if we decide", messageKo: "'If we decided now'는 '(실제로는 아니지만) 지금 결정한다고 가정하면'이라는 가정법 뉘앙스입니다. 실제로 가능한 조건이면 현재시제 'If we decide now'를 씁니다.", skill: "cond-1" },
+      { id: "decided-now", pattern: "re:\\bif we (decided|finalized|finalised|confirmed|fixed|chose|selected|locked|agreed|froze|made)\\b(?=( \\S+){0,6} now\\b)", category: "tense", severity: "major", fix: "if we decide", messageKo: "'If we decided now'는 '(실제로는 아니지만) 지금 결정한다고 가정하면'이라는 가정법 뉘앙스입니다. 실제로 가능한 조건이면 현재시제 'If we decide now'를 씁니다.", skill: "cond-1" },
       { id: "must-change", pattern: "must change", category: "meaning-shift", severity: "major", fix: "might have to change", messageKo: "'must change'는 '반드시 바꿔야 한다'는 확정 의미입니다. '바꿔야 할 수도 있다'는 가능성이므로 'might have to change'를 씁니다.", skill: "modal-possibility" },
+      { id: "be-differ", pattern: "re:(?<=\\bbe )differ\\b", category: "verb-form", severity: "major", fix: "different", messageKo: "be 뒤에는 형용사 'different'를 씁니다: 'could be different'. 동사로 쓰려면 be 없이 'could differ'입니다.", skill: "be-adj" },
     ],
     hints: {
       pattern: "If + 주어 + 현재동사, 주어 + might have to + 동사원형 + because …",
@@ -70,7 +71,7 @@ export const SENTENCES_A: Question[] = [
       "We are running tests on the new dryer at the pilot plant this week.",
     ],
     meaning: [
-      { id: "testing", en: "testing", ko: "테스트하다", any: ["test|trial|try"], critical: true },
+      { id: "testing", en: "testing", ko: "테스트하다", any: ["test|trial|try|evaluate"], critical: true },
       { id: "dryer", en: "dryer", ko: "건조기", any: ["dryer|drier"], term: true, critical: true },
       { id: "new", en: "new", ko: "새", any: ["new"] },
       { id: "pilot-plant", en: "pilot plant", ko: "파일럿 플랜트", any: ["pilot plant|unit|facility", "pilot"], term: true },
@@ -79,6 +80,7 @@ export const SENTENCES_A: Question[] = [
     pitfalls: [
       { id: "simple-present", pattern: "we =test", category: "tense", severity: "major", fix: "we are testing", messageKo: "'We test'는 습관이나 일반적인 사실처럼 들립니다. 이번 주에 진행 중인 일은 'We are testing'(be + 동사ing)으로 씁니다.", skill: "progressive" },
       { id: "be-base", pattern: "are|is|am =test", category: "verb-form", severity: "major", fix: "are testing", messageKo: "be동사 뒤에 동사원형을 쓸 수 없습니다. 진행형은 'are testing'처럼 'be + 동사ing'입니다.", skill: "progressive" },
+      { id: "in-this-week", pattern: "in|on this week", category: "preposition", severity: "major", fix: "this week", messageKo: "'this / next / last + 시간' 앞에는 전치사를 쓰지 않습니다. 'in this week'가 아니라 'this week'입니다.", skill: "verb-prep" },
     ],
     hints: {
       pattern: "주어 + am/is/are + 동사ing (+ 장소 + 시간)",
@@ -113,12 +115,13 @@ export const SENTENCES_A: Question[] = [
     ],
     meaning: [
       { id: "hmb", en: "heat and mass balance", ko: "열물질수지", any: ["heat and? mass|material balance", "hmb|h&mb", "heat balance", "mass balance"], term: true, critical: true },
-      { id: "not-ready", en: "not ready", ko: "준비되지 않았다", any: ["not ... ready|finished|complete|=done|prepare|available"], critical: true },
+      { id: "not-ready", en: "not ready", ko: "준비되지 않았다", any: ["not ... ready|finished|complete|=done|prepare|available", "still ... work|=working", "in progress"], critical: true },
       { id: "yet", en: "yet", ko: "아직", any: ["yet", "still"] },
     ],
     pitfalls: [
       { id: "no-be", pattern: "balance not", category: "be-verb", severity: "major", fix: "balance is not", messageKo: "'ready'는 형용사라서 be동사가 꼭 필요합니다. 'balance not ready'가 아니라 'balance is not ready'입니다.", skill: "be-adj" },
       { id: "do-ready", pattern: "does|do not ready", category: "be-verb", severity: "major", fix: "is not ready", messageKo: "'ready'는 동사가 아니라 형용사이므로 does not이 아니라 'is not ready'로 부정합니다.", skill: "be-adj" },
+      { id: "balance-are", pattern: "re:(?<=\\b(balance|hmb) )are\\b", category: "agreement", severity: "major", fix: "is", messageKo: "'the heat and mass balance'는 문서 하나(단수)라서 'is'를 씁니다: 'The heat and mass balance is not ready yet.'", skill: "agreement" },
     ],
     hints: {
       pattern: "주어 + be동사 + not + 형용사(ready) + yet",
@@ -152,15 +155,17 @@ export const SENTENCES_A: Question[] = [
       "The moisture content in the feed is higher today than yesterday.",
     ],
     meaning: [
-      { id: "moisture", en: "moisture content", ko: "수분 함량", any: ["moisture", "water content"], term: true, critical: true },
+      { id: "moisture", en: "moisture content", ko: "수분 함량", any: ["moisture", "water content", "wetter|wet"], term: true, critical: true },
       { id: "feed", en: "feed", ko: "원료", any: ["feed|feedstock|efb", "raw material"] },
-      { id: "higher", en: "higher", ko: "더 높다", any: ["higher|greater|more"], critical: true },
+      { id: "higher", en: "higher", ko: "더 높다", any: ["higher|greater|more|wetter"], critical: true },
       { id: "today", en: "today", ko: "오늘", any: ["today"] },
       { id: "yesterday", en: "than yesterday", ko: "어제보다", any: ["yesterday"] },
     ],
     pitfalls: [
       { id: "high-than", pattern: "=high than", category: "word-choice", severity: "major", fix: "higher than", messageKo: "비교할 때는 형용사의 비교급을 씁니다. 'high than'이 아니라 'higher than'입니다.", skill: "comparative" },
       { id: "more-high", pattern: "more =high", category: "word-choice", severity: "major", fix: "higher", messageKo: "high처럼 짧은 형용사는 'more high'가 아니라 '-er'을 붙여 'higher'로 씁니다.", skill: "comparative" },
+      { id: "more-higher", pattern: "re:\\bmore(?= (higher|greater)\\b)", category: "word-choice", severity: "major", fix: "", messageKo: "'higher'는 이미 비교급이라 more를 붙이지 않습니다. 'more higher'가 아니라 'higher'입니다.", skill: "comparative" },
+      { id: "content-are", pattern: "re:(?<=\\b(content|moisture)( (of|in) the (feed|efb|feedstock))? )are\\b", category: "agreement", severity: "major", fix: "is", messageKo: "주어 'the moisture content'는 단수(셀 수 없는 명사)라서 'is'를 씁니다: 'The moisture content … is higher'.", skill: "agreement" },
     ],
     hints: {
       pattern: "A is + 형용사-er + than B",
@@ -200,6 +205,7 @@ export const SENTENCES_A: Question[] = [
     ],
     pitfalls: [
       { id: "need-no-to", pattern: "=need|=needs update|revise|modify|change", category: "verb-form", severity: "major", fix: "need to update", messageKo: "'need' 뒤에 동사가 올 때는 'need to + 동사원형'입니다. 'need update'가 아니라 'need to update'입니다.", skill: "modal-necessity" },
+      { id: "to-ing", pattern: "re:(?<=\\b(have|has|need|needs|got) to )(updating|updated|revising|revised|modifying|modified|changing|changed|correcting|corrected)\\b", category: "verb-form", severity: "major", fix: "update", messageKo: "'have to / need to' 뒤에는 동사원형이 옵니다. 'have to updating / need to updated'가 아니라 'have to update'입니다.", skill: "modal-necessity" },
     ],
     hints: {
       pattern: "주어 + need to / have to + 동사원형",
@@ -235,6 +241,7 @@ export const SENTENCES_A: Question[] = [
       "We haven't completed the moisture analysis yet, so we can't confirm the dryer capacity.",
       "The moisture analysis isn't finished yet, so we can't confirm the dryer capacity.",
       "We haven't finished the moisture analysis yet, so we can't finalize the dryer capacity.",
+      "The moisture analysis hasn't been completed yet, so we can't confirm the dryer capacity.",
     ],
     meaning: [
       { id: "not-finished", en: "haven't finished", ko: "끝내지 못했다", any: ["not ... finish|complete|=done", "still ... work|analyze|analyse"], critical: true },
@@ -291,7 +298,7 @@ export const SENTENCES_A: Question[] = [
     ],
     pitfalls: [
       { id: "will-in-clause", pattern: "client|customer will confirm|approve|finalize|accept", category: "tense", severity: "major", fix: "client confirms", messageKo: "'as soon as / when / after' 같은 시간 부사절 안에서는 미래 일이라도 현재시제를 씁니다. 'the client will confirm'이 아니라 'the client confirms'입니다.", skill: "time-clause" },
-      { id: "no-s", pattern: "client|customer =confirm|=approve|=finalize", category: "agreement", severity: "minor", fix: "client confirms", messageKo: "주어 'the client'는 3인칭 단수이므로 현재시제 동사에 -s를 붙입니다(confirms).", skill: "agreement" },
+      { id: "no-s", pattern: "client|customer =confirm|=approve|=finalize", category: "agreement", severity: "major", fix: "client confirms", messageKo: "주어 'the client'는 3인칭 단수이므로 현재시제 동사에 -s를 붙입니다(confirms).", skill: "agreement" },
     ],
     hints: {
       pattern: "주어 + will + 동사 + as soon as + 주어 + 현재동사",
@@ -326,8 +333,8 @@ export const SENTENCES_A: Question[] = [
       "We should check the moisture content of the feed before increasing the feed rate.",
     ],
     meaning: [
-      { id: "check", en: "check", ko: "확인하다", any: ["check|measure|confirm|verify|test"], critical: true },
-      { id: "should", en: "should", ko: "~해야 한다", any: ["should|need|must", "have to"] },
+      { id: "check", en: "check", ko: "확인하다", any: ["check|measure|confirm|verify|test|analyze|analyse|monitor"], critical: true },
+      { id: "should", en: "should", ko: "~해야 한다", any: ["should|need|must", "have to", "=let us"] },
       { id: "moisture", en: "feed moisture", ko: "원료 수분", any: ["moisture"], term: true },
       { id: "before", en: "before", ko: "~하기 전에", any: ["before"], critical: true },
       { id: "increase", en: "increase", ko: "늘리다", any: ["increase|raise|=up"], critical: true },
@@ -373,15 +380,16 @@ export const SENTENCES_A: Question[] = [
       { id: "might-need", en: "might need", ko: "필요할 수도 있다", any: ["might|may|could ... need|require|have", "possibly|perhaps|maybe"], critical: true },
       { id: "larger", en: "larger", ko: "더 큰", any: ["larger|bigger|greater"] },
       { id: "dryer", en: "dryer", ko: "건조기", any: ["dryer|drier"], term: true, critical: true },
-      { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|due"] },
+      { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|due|so"] },
       { id: "moisture", en: "feed moisture", ko: "원료 수분", any: ["moisture", "wet|wetter"], term: true },
-      { id: "higher", en: "could be higher", ko: "더 높을 수도 있다", any: ["higher|greater|more|increase|wetter"], critical: true },
+      { id: "higher", en: "could be higher", ko: "더 높을 수도 있다", any: ["higher|greater|more|increase|wetter|rise", "go|=going up"], critical: true },
       { id: "rainy", en: "in the rainy season", ko: "우기에", any: ["rainy|wet|monsoon season", "rain|rainy"] },
     ],
     pitfalls: [
       { id: "will-need", pattern: "we will need", category: "meaning-shift", severity: "major", fix: "we might need", messageKo: "'will need'는 '반드시 필요하다'는 확정으로 들립니다. '필요할 수도 있다'는 가능성이므로 'might/may need'를 씁니다.", skill: "modal-possibility" },
       { id: "must-need", pattern: "must need", category: "meaning-shift", severity: "major", fix: "might need", messageKo: "'must need'는 영어에서 쓰지 않는 조합이고 의미도 확정에 가깝습니다. 가능성은 'might need'로 표현합니다.", skill: "modal-possibility" },
       { id: "is-higher", pattern: "moisture is higher", category: "meaning-shift", severity: "minor", fix: "moisture could be higher", messageKo: "'is higher'는 '(항상) 더 높다'는 단정입니다. '더 높을 수도 있다'는 가능성이므로 'could / might be higher'로 씁니다.", skill: "modal-possibility" },
+      { id: "modal-no-be", pattern: "re:(?<=\\b(could|might|may) )higher\\b", category: "be-verb", severity: "major", fix: "be higher", messageKo: "higher는 형용사(비교급)라서 조동사 뒤에 be가 필요합니다: 'could be higher'.", skill: "be-adj" },
     ],
     hints: {
       pattern: "주어 + might/may + 동사원형 + because + 주어 + could be + 비교급",
@@ -418,7 +426,7 @@ export const SENTENCES_A: Question[] = [
       { id: "increased", en: "increased", ko: "늘렸다", any: ["increase|extend|lengthen|raise", "longer"], critical: true },
       { id: "washing-time", en: "washing time", ko: "세척 시간", any: ["washing|wash time|duration", "washing"], term: true, critical: true },
       { id: "last-week", en: "last week", ko: "지난주에", any: ["last week"] },
-      { id: "to-reduce", en: "to reduce", ko: "줄이기 위해", any: ["to|order|for ... reduce|lower|decrease|remove|minimize", "so that ... reduce|lower|decrease|remove|minimize"], critical: true },
+      { id: "to-reduce", en: "to reduce", ko: "줄이기 위해", any: ["to|order|for ... reduce|lower|decrease|remove|minimize|cut", "so that ... reduce|lower|decrease|remove|minimize|cut", "so that ... would|could|will|can|might ... down|drop|fall|decrease|lower|less", "to|order bring|get ... down"], critical: true },
       { id: "ash", en: "ash content", ko: "회분 함량", any: ["ash"], term: true },
       { id: "efb", en: "EFB", ko: "EFB (빈 과방)", any: ["efb", "empty fruit bunch|bunches", "fiber|fibre|biomass"], term: true },
     ],
@@ -456,17 +464,18 @@ export const SENTENCES_A: Question[] = [
       "When the test is finished tomorrow, I will send you the dryer performance data.",
       "When we finish the test tomorrow, I will send you the dryer performance data.",
       "When the test finishes tomorrow, I will send the dryer performance data to you.",
+      "I will send you the dryer performance data when the test is finished tomorrow.",
     ],
     meaning: [
-      { id: "when", en: "when", ko: "~하면 (확실한 일)", any: ["when|after|once", "as soon as"] },
-      { id: "test-finishes", en: "the test finishes", ko: "테스트가 끝나다", any: ["test|run ... finish|end|complete|over|=done", "finish|end|complete ... test|run"], critical: true },
+      { id: "when", en: "when", ko: "~하면 (확실한 일)", any: ["when|after|once", "as soon as", "then"] },
+      { id: "test-finishes", en: "the test finishes", ko: "테스트가 끝나다", any: ["test|run ... finish|end|complete|over|=done", "finish|end|complete|=done ... test|run"], critical: true },
       { id: "tomorrow", en: "tomorrow", ko: "내일", any: ["tomorrow"] },
-      { id: "send", en: "I will send you", ko: "보내 드리겠다", any: ["send|share|give|email|forward"], critical: true },
+      { id: "send", en: "I will send you", ko: "보내 드리겠다", any: ["send|share|give|email|forward|provide"], critical: true },
       { id: "performance-data", en: "dryer performance data", ko: "건조기 성능 데이터", any: ["performance data|result|results", "dryer ... data|result|results"], term: true },
     ],
     pitfalls: [
       { id: "if-certain", pattern: "if the? test|pilot", category: "word-choice", severity: "major", fix: "when the test", messageKo: "'if'는 일어날지 확실하지 않을 때 씁니다. 테스트가 내일 끝나는 것은 확정된 일이므로 'when'을 씁니다.", skill: "if-when" },
-      { id: "will-in-clause", pattern: "test will finish|end|be|complete", category: "tense", severity: "major", fix: "test finishes", messageKo: "'when'으로 시작하는 시간 부사절 안에서는 미래 일이라도 현재시제를 씁니다: 'when the test finishes'.", skill: "time-clause" },
+      { id: "will-in-clause", pattern: "re:(?<=\\b(when|after|once|soon as|if|until|before) (the )?)(test|run) will (finish|end|complete|be finished|be completed|be done|be over|be)\\b", category: "tense", severity: "major", fix: "test finishes", messageKo: "'when'으로 시작하는 시간 부사절 안에서는 미래 일이라도 현재시제를 씁니다: 'when the test finishes'.", skill: "time-clause" },
     ],
     hints: {
       pattern: "When + 주어 + 현재동사, 주어 + will + 동사 (확실히 일어날 일)",
@@ -504,7 +513,7 @@ export const SENTENCES_A: Question[] = [
       { id: "need", en: "need to", ko: "~해야 한다", any: ["need|must|should", "have to"], critical: true },
       { id: "run", en: "run", ko: "돌리다", any: ["run|rerun|redo|repeat|update|perform|carry|do"], critical: true },
       { id: "simulation", en: "process simulation", ko: "공정 시뮬레이션", any: ["simulation|simulations|simulate|model"], term: true, critical: true },
-      { id: "again", en: "again", ko: "다시", any: ["again", "rerun|redo|repeat|another|new"] },
+      { id: "again", en: "again", ko: "다시", any: ["again", "rerun|redo|repeat|another|new", "one more time", "once more"] },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|due|so"] },
       { id: "composition", en: "feed composition", ko: "원료 성분", any: ["composition"], term: true },
       { id: "changed", en: "has changed", ko: "바뀌었다", any: ["change|different|update|vary|modify"], critical: true },
@@ -544,15 +553,16 @@ export const SENTENCES_A: Question[] = [
     accepted: [
       "The pump datasheets will be sent to the vendor after the client approves the P&IDs.",
       "After the P&IDs are approved by the client, the pump datasheets will be sent to the vendor.",
-      "The pump datasheets will be sent to the vendor once the P&IDs have been approved by the client.",
+      "We will send the pump datasheets to the vendor once the client has approved the P&IDs.",
       "We will send the pump datasheets to the vendor after the client approves the P&IDs.",
       "The pump datasheets will be sent to the vendor after the client has approved the P&IDs.",
+      "After the client approves the P&IDs, the pump datasheets will be sent to the vendor.",
     ],
     advanced: "The pump datasheets will be issued to the vendor as soon as the client has approved the P&IDs.",
     meaning: [
       { id: "datasheets", en: "pump datasheets", ko: "펌프 데이터시트", any: ["datasheet", "data sheet", "pump spec|specs|specification|specifications"], term: true, critical: true },
       { id: "pump", en: "pump", ko: "펌프", any: ["pump"] },
-      { id: "sent", en: "will be sent", ko: "발송되다", any: ["send|issue|submit|forward|share"], critical: true },
+      { id: "sent", en: "will be sent", ko: "발송되다", any: ["send|issue|submit|forward|share", "vendor ... get|receive", "go to vendor|supplier|manufacturer"], critical: true },
       { id: "vendor", en: "the vendor", ko: "벤더", any: ["vendor|supplier|manufacturer"] },
       { id: "after", en: "after", ko: "~한 후에", any: ["after|once|when", "as soon as"], critical: true },
       { id: "pid", en: "P&IDs", ko: "P&ID", any: ["p&id|p&ids|pid|pids", "piping and instrumentation"], term: true },
@@ -609,6 +619,7 @@ export const SENTENCES_A: Question[] = [
     pitfalls: [
       { id: "resumptive-it", pattern: "=tested it", category: "sentence-structure", severity: "major", fix: "tested", messageKo: "관계절 안에서는 꾸밈을 받는 명사(the dryer)를 대명사로 다시 쓰지 않습니다. 'that we tested it'이 아니라 'that we tested'입니다.", skill: "relative-clause" },
       { id: "no-subject", pattern: "dryer that|which =tested", category: "sentence-structure", severity: "major", fix: "dryer that we tested", messageKo: "'the dryer that tested'는 '건조기가 테스트를 했다'는 뜻이 됩니다. 우리가 테스트한 것이므로 'the dryer that we tested'로 씁니다.", skill: "relative-clause" },
+      { id: "reach-to", pattern: "re:(?<=\\b(reach|reached|reaches|reaching) )to\\b", category: "preposition", severity: "major", fix: "", messageKo: "reach는 타동사라서 to 없이 목적어를 바로 씁니다: 'could not reach the target moisture'.", skill: "verb-object" },
     ],
     hints: {
       pattern: "명사 + that + 주어 + 동사 (관계절) + 본동사 …",
@@ -648,7 +659,7 @@ export const SENTENCES_A: Question[] = [
       { id: "operating-data", en: "operating data", ko: "운전 데이터", any: ["operating|operation|plant|actual|real|pilot data", "data"], term: true },
       { id: "would", en: "we would", ko: "~할 텐데", any: ["would|could"], critical: true },
       { id: "use", en: "use", ko: "적용하다", any: ["use|apply|choose|select|take|set|have|reduce|design"] },
-      { id: "smaller", en: "smaller", ko: "더 작은", any: ["smaller|lower|less|reduce|reduced"], critical: true },
+      { id: "smaller", en: "smaller", ko: "더 작은", any: ["smaller|lower|less|reduce|reduced", "not need ... large|big|high"], critical: true },
       { id: "margin", en: "design margin", ko: "설계 여유율", any: ["design margin", "margin", "safety factor"], term: true, critical: true },
       { id: "dryer", en: "dryer", ko: "건조기", any: ["dryer|drier"], term: true },
     ],
@@ -692,7 +703,7 @@ export const SENTENCES_A: Question[] = [
     meaning: [
       { id: "capacity", en: "capacity", ko: "처리 용량", any: ["capacity|throughput"], term: true, critical: true },
       { id: "dryer", en: "dryer", ko: "건조기", any: ["dryer|drier"], term: true },
-      { id: "slightly-lower", en: "slightly lower", ko: "약간 낮다", any: ["slightly|little|bit|somewhat|marginally ... lower|below|less|smaller"], critical: true },
+      { id: "slightly-lower", en: "slightly lower", ko: "약간 낮다", any: ["slightly|little|bit|somewhat|marginally ... lower|below|less|smaller|under"], critical: true },
       { id: "guarantee", en: "the vendor's guaranteed value", ko: "벤더 보증값", any: ["guarantee|guaranteed", "vendor|supplier"], term: true },
       { id: "steam", en: "steam consumption", ko: "스팀 사용량", any: ["steam consumption|usage|use|demand", "steam"], term: true, critical: true },
       { id: "much-higher", en: "much higher", ko: "훨씬 많다", any: ["much|far|significantly|considerably|lot|greatly ... higher|more|greater|above"], critical: true },
@@ -702,6 +713,7 @@ export const SENTENCES_A: Question[] = [
     pitfalls: [
       { id: "very-comparative", pattern: "very higher", category: "word-choice", severity: "major", fix: "much higher", messageKo: "'very'는 비교급을 꾸밀 수 없습니다. '훨씬 더 높다'는 'much higher' 또는 'far higher'입니다.", skill: "degree" },
       { id: "a-few", pattern: "a few lower", category: "word-choice", severity: "major", fix: "a little lower", messageKo: "'a few'는 셀 수 있는 명사의 개수(a few samples)에 씁니다. 비교급의 '약간'은 'a little lower' 또는 'slightly lower'입니다.", skill: "degree" },
+      { id: "more-comparative", pattern: "re:\\bmore(?= (higher|lower)\\b)", category: "word-choice", severity: "major", fix: "", messageKo: "higher, lower는 이미 비교급이라 more를 붙이지 않습니다. '훨씬 더 높다'는 'much higher'입니다.", skill: "comparative" },
     ],
     hints: {
       pattern: "slightly / a little + 비교급 (약간) · much / far + 비교급 (훨씬)",
@@ -749,6 +761,7 @@ export const SENTENCES_A: Question[] = [
     pitfalls: [
       { id: "will-in-if", pattern: "moisture will be|go|exceed", category: "tense", severity: "major", fix: "moisture is", messageKo: "if 조건절에서는 미래 일도 현재시제로 씁니다. 'if the outlet moisture will be'가 아니라 'if the outlet moisture is / goes'입니다.", skill: "cond-1" },
       { id: "for-purpose", pattern: "for increase|extend|lengthen", category: "verb-form", severity: "major", fix: "to increase", messageKo: "'~하기 위해'라는 목적은 'to + 동사원형'으로 씁니다. 'for increasing'이 아니라 'to increase'입니다.", skill: "purpose-to" },
+      { id: "will-must", pattern: "will|would must", category: "verb-form", severity: "major", fix: "will have to", messageKo: "조동사 두 개(will + must)를 연달아 쓸 수 없습니다. 미래의 필요는 'will have to + 동사원형'입니다.", skill: "modal-necessity" },
     ],
     hints: {
       pattern: "If + 주어 + 현재동사, 주어 + will have to + 동사 + to + 동사 (목적)",
@@ -783,17 +796,18 @@ export const SENTENCES_A: Question[] = [
     ],
     advanced: "As a result of the higher steam flow, the pressure drop in the steam line now exceeds the allowable limit, so we need to select the next larger pipe size.",
     meaning: [
-      { id: "because-of", en: "because of", ko: "~때문에", any: ["because|due|since|as", "result"], critical: true },
+      { id: "because-of", en: "because of", ko: "~때문에", any: ["because|due|since|as", "result", "flow ... make|cause", "flow ... so ... pressure"], critical: true },
       { id: "steam-flow", en: "higher steam flow", ko: "증가한 스팀 유량", any: ["steam flow|rate|load", "flow"], term: true },
       { id: "increased", en: "higher / increased", ko: "증가한", any: ["higher|increase|increased|more|larger"] },
       { id: "pressure-drop", en: "pressure drop", ko: "압력 강하", any: ["pressure drop|loss", "dp"], term: true, critical: true },
       { id: "too-high", en: "too high", ko: "너무 크다", any: ["too high|large|big|much", "exceed|above"], critical: true },
       { id: "so", en: "so", ko: "그래서", any: ["so|therefore|thus", "as a result"] },
-      { id: "pipe-size", en: "increase the pipe size", ko: "배관 크기를 키우다", any: ["pipe|line size|diameter", "larger|bigger ... pipe|line"], term: true, critical: true },
+      { id: "pipe-size", en: "increase the pipe size", ko: "배관 크기를 키우다", any: ["pipe|line size|diameter", "larger|bigger ... pipe|line", "upsize|enlarge ... pipe|line"], term: true, critical: true },
     ],
     pitfalls: [
       { id: "because-of-clause", pattern: "because|due of|to the? steam flow|rate =increased", category: "sentence-structure", severity: "major", fix: "because the steam flow increased", messageKo: "'because of / due to' 뒤에는 명사(구)가 옵니다. 문장(주어 + 동사)을 쓰려면 because만 씁니다: 'because the steam flow increased' 또는 'because of the higher steam flow'.", skill: "cause-effect" },
       { id: "because-of-has", pattern: "because|due of|to the? steam flow|rate =has", category: "sentence-structure", severity: "major", fix: "because the steam flow has", messageKo: "'because of / due to' 뒤에는 '주어 + 동사'가 올 수 없습니다. 'because the steam flow has increased' 또는 'because of the increased steam flow'로 씁니다.", skill: "cause-effect" },
+      { id: "because-noun", pattern: "re:\\bbecause(?= (the |a )?(higher|increased|increasing|larger|bigger|high) steam (flow|flowrate|rate) (the|so|pressure|we|it)\\b)", category: "sentence-structure", severity: "major", fix: "because of", messageKo: "because 뒤에 명사(구)만 올 때는 'because of'를 씁니다: 'because of the higher steam flow'. 문장을 쓰려면 'because the steam flow has increased'처럼 동사가 필요합니다.", skill: "cause-effect" },
     ],
     hints: {
       pattern: "Because of / Due to + 명사, 주어 + 동사 …, so + 주어 + 동사",
@@ -935,7 +949,7 @@ export const SENTENCES_A: Question[] = [
     ],
     pitfalls: [
       { id: "which-based", pattern: "which|that =based", category: "be-verb", severity: "major", fix: "which is based", messageKo: "'~을 바탕으로 한'은 수동 형태 'be based on'이므로 관계절에서도 be동사가 필요합니다: 'which is based on'.", skill: "relative-clause" },
-      { id: "confirm-about", pattern: "confirm about", category: "preposition", severity: "minor", fix: "confirm", messageKo: "'confirm'은 타동사라서 목적어를 바로 씁니다: 'confirm this'.", skill: "verb-object" },
+      { id: "confirm-about", pattern: "re:\\bconfirm about(?! \\d)", category: "preposition", severity: "major", fix: "confirm", messageKo: "'confirm'은 타동사라서 목적어를 바로 씁니다: 'confirm this'.", skill: "verb-object" },
     ],
     hints: {
       pattern: "명사, which is based on …, + 동사 …, but + 주어 + should + 동사 + before + V-ing",
@@ -967,12 +981,13 @@ export const SENTENCES_A: Question[] = [
       "I see your point, but I'm not sure that we should reduce the dryer size by 20%, since the pilot data showed that the feed moisture could be higher than the design value.",
       "I see your point, but I'm not sure if we should reduce the dryer size by 20%, because the pilot data showed that the feed moisture might be higher than the design value.",
       "I understand your point, but I am not sure that we should make the dryer 20% smaller, because the pilot data showed that the feed moisture could be higher than the design value.",
+      "I see your point, but I'm not sure about reducing the dryer size by 20%, because the pilot data showed that the feed moisture could be higher than the design value.",
     ],
     advanced: "I see your point about CAPEX, but I'm not convinced that we should reduce the dryer size by 20%, since the pilot data showed that the feed moisture could be higher than the design value.",
     meaning: [
-      { id: "see-point", en: "I see your point", ko: "말씀하신 점은 이해합니다", any: ["see|understand|take|get ... point|concern|idea|view|reason"], critical: true },
+      { id: "see-point", en: "I see your point", ko: "말씀하신 점은 이해합니다", any: ["see|understand|take|get ... point|concern|idea|view|reason", "see|understand|get ... mean|=saying", "fair|good|valid point"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"] },
-      { id: "not-sure", en: "I'm not sure", ko: "잘 모르겠습니다", any: ["not sure|certain|convinced", "doubt|unsure|worried|concerned"], critical: true },
+      { id: "not-sure", en: "I'm not sure", ko: "잘 모르겠습니다", any: ["not sure|certain|convinced", "doubt|unsure|worried|concerned", "not think"], critical: true },
       { id: "reduce", en: "reduce the size", ko: "크기를 줄이다", any: ["reduce|decrease|cut|smaller|downsize|lower"], critical: true },
       { id: "dryer", en: "dryer", ko: "건조기", any: ["dryer|drier"], term: true },
       { id: "twenty", en: "by 20%", ko: "20%", any: ["20", "twenty"] },
@@ -982,6 +997,7 @@ export const SENTENCES_A: Question[] = [
     pitfalls: [
       { id: "dont-sure", pattern: "do not sure", category: "be-verb", severity: "major", fix: "am not sure", messageKo: "'sure'는 형용사라서 be동사로 부정합니다. 'I don't sure'가 아니라 'I'm not sure'입니다.", skill: "be-adj" },
       { id: "too-direct", pattern: "you are wrong|=incorrect", category: "word-choice", severity: "major", fix: "I see your point", messageKo: "'You are wrong'은 국제 회의에서 매우 직설적으로 들립니다. 먼저 'I see your point, but …'으로 상대 의견을 인정한 뒤 근거를 말하세요.", skill: "polite-disagree" },
+      { id: "about-base", pattern: "re:(?<=\\bsure about )(reduce|cut|decrease|lower|downsize|make)\\b", category: "verb-form", severity: "major", fix: "reducing", messageKo: "전치사 about 뒤에 동사가 올 때는 동사ing 형태입니다: 'I'm not sure about reducing …'.", skill: "prep-gerund" },
     ],
     hints: {
       pattern: "I see your point, but I'm not sure (that) + 주어 + should + 동사, because …",
