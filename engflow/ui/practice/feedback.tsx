@@ -1,25 +1,24 @@
 "use client";
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AlertTriangle, BookOpen, CheckCircle2, ChevronDown, Copy, Cpu, Loader2, RotateCcw, Sparkles } from "lucide-react";
+import { AlertTriangle, BookOpen, CheckCircle2, ChevronDown, Copy, Cpu, Info, RotateCcw, Sparkles, TrendingDown } from "lucide-react";
 import type { Evaluation, Question } from "../../core/types";
 import { Card, Eyebrow, Meter, ScoreRing, TONE_TEXT, cn, scoreTone, useReduced } from "../kit";
 import { AnswerHighlight, BUCKET_COLOR, CATEGORY_KO, DiffLine, MeaningCheckList, SEVERITY_KO, markClass } from "./parts";
 import type { GuideTab } from "../guide";
 
-export interface AIState {
-  status: "off" | "available" | "pending" | "done" | "error";
-  message?: string;
-}
+/** Weights shown next to each rubric meter (same as SCORE_WEIGHTS in the evaluator). */
+const WEIGHT_LABEL = { grammar: "55%", meaning: "35%", organization: "10%" } as const;
 
 export function FeedbackPanel({
-  question, evaluation, ai, onRequestAI, onRetryAI, onGuide, compact, scheduleNote,
+  question, evaluation, note, weakNote, onGuide, compact, scheduleNote,
 }: {
   question: Question;
   evaluation: Evaluation;
-  ai: AIState;
-  onRequestAI?: () => void;
-  onRetryAI?: () => void;
+  /** Why this grader was used (e.g. Claude was too slow), shown once under the verdict. */
+  note?: string | null;
+  /** "You've missed this grammar N times" — explains why similar questions follow. */
+  weakNote?: string | null;
   onGuide: (skill: string, tab: GuideTab) => void;
   compact?: boolean;
   scheduleNote?: string | null;
@@ -30,8 +29,12 @@ export function FeedbackPanel({
   const e = evaluation;
   const s = e.scores;
   const tone = scoreTone(s.overall);
-  const mainSkill = e.errors.find((x) => x.severity !== "minor")?.skill ?? question.skills[0];
-  const correct = e.exact || (e.errors.length === 0 && s.overall >= 90);
+  const scored = e.errors.filter((x) => !x.advisory);
+  const mainSkill = scored.find((x) => x.severity !== "minor")?.skill ?? question.skills[0];
+  const correct = e.exact || (scored.every((x) => x.category === "spelling") && s.overall >= 90);
+  // Grammar first, then spelling, then site-wording suggestions.
+  const rank = (x: (typeof e.errors)[number]) => (x.advisory ? 2 : x.category === "spelling" ? 1 : 0);
+  const listed = [...e.errors].sort((a, b) => rank(a) - rank(b) || a.start - b.start);
   const stagger = (i: number) => (reduced ? {} : { initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.05 * i, duration: 0.22 } });
 
   return (
@@ -50,9 +53,14 @@ export function FeedbackPanel({
                 ) : (
                   <span className={cn("text-[14px] font-semibold", TONE_TEXT[tone])}>{tone === "ok" ? "거의 맞았어요" : tone === "warn" ? "조금 더 다듬어요" : "다시 연습해요"}</span>
                 )}
-                <EvaluatorBadge evaluation={e} ai={ai} onRequestAI={onRequestAI} onRetryAI={onRetryAI} />
+                <EvaluatorBadge evaluation={e} />
               </div>
               <p className="ef-ko mt-1.5 text-[15px] text-[var(--foreground)]">{e.summaryKo}</p>
+              {note ? (
+                <p className="ef-ko mt-1 flex items-start gap-1 text-[12px] text-[var(--muted)]">
+                  <Info className="mt-0.5 size-3 shrink-0" /> {note}
+                </p>
+              ) : null}
               <div className="mt-2 inline-flex flex-wrap items-center gap-1.5 rounded-full bg-[var(--background)] px-2.5 py-1 text-[12px]">
                 <span className="font-medium">회의 전달력</span>
                 <span className={cn("ef-num font-semibold", TONE_TEXT[scoreTone(s.comprehensibility.score)])}>{s.comprehensibility.score}</span>
@@ -60,17 +68,21 @@ export function FeedbackPanel({
               </div>
             </div>
           </div>
-          {ai.status === "pending" ? <div className="ef-skeleton mt-4 h-1.5 w-full" aria-label="Claude 분석 중" /> : null}
         </Card>
       </motion.div>
 
       {/* Rubric */}
       <motion.div {...stagger(1)}>
         <Card className="grid gap-4 p-4 sm:grid-cols-2 md:p-5">
-          <Meter label="의미 전달" weight={question.mode === "sentence" ? "30%" : "50%"} value={s.meaning.score} note={s.meaning.noteKo} compact={compact} />
-          <Meter label="문법 정확도" weight={question.mode === "sentence" ? "30%" : undefined} value={s.grammar.score} note={s.grammar.noteKo} delay={60} compact={compact} />
-          {question.mode === "sentence" ? <Meter label="기술 용어" weight="20%" value={s.terminology.score} note={s.terminology.noteKo} delay={120} compact={compact} /> : null}
-          <Meter label="문장 구조·어순" weight={question.mode === "sentence" ? "20%" : undefined} value={s.organization.score} note={s.organization.noteKo} delay={180} compact={compact} />
+          <Meter label="문법 정확도" weight={WEIGHT_LABEL.grammar} value={s.grammar.score} note={s.grammar.noteKo} compact={compact} />
+          <Meter label="핵심 의미·표현" weight={WEIGHT_LABEL.meaning} value={s.meaning.score} note={s.meaning.noteKo} delay={60} compact={compact} />
+          <Meter label="어순·문장 구조" weight={WEIGHT_LABEL.organization} value={s.organization.score} note={s.organization.noteKo} delay={120} compact={compact} />
+          <div className="ef-ko flex items-start gap-1.5 self-center text-[12px] text-[var(--muted)]">
+            <Info className="mt-0.5 size-3.5 shrink-0" />
+            <span>
+              <span className="font-medium text-[var(--ef-ink-2)]">현장 용어 · 점수 미반영</span> — {s.terminology.noteKo}
+            </span>
+          </div>
         </Card>
       </motion.div>
 
@@ -81,9 +93,9 @@ export function FeedbackPanel({
           <div className="mt-2">
             <AnswerHighlight text={e.answer} errors={e.errors} active={active} onSelect={(id) => setActive((a) => (a === id ? null : id))} />
           </div>
-          {e.errors.length ? (
+          {listed.length ? (
             <ul className="mt-3 space-y-2">
-              {e.errors.map((er) => {
+              {listed.map((er) => {
                 const cls = markClass(er);
                 return (
                   <li key={er.id}>
@@ -96,7 +108,13 @@ export function FeedbackPanel({
                           <span className="size-2 rounded-full" style={{ background: BUCKET_COLOR[cls] }} />
                           {CATEGORY_KO[er.category] ?? er.category}
                         </span>
-                        <span className={cn("text-[10px] font-semibold", er.severity === "critical" ? "text-[var(--ef-bad)]" : er.severity === "major" ? "text-[var(--ef-warn)]" : "text-[var(--muted)]")}>{SEVERITY_KO[er.severity]}</span>
+                        {er.advisory ? (
+                          <span className="rounded-full border border-dashed border-[var(--line)] px-1.5 text-[10px] font-semibold text-[var(--muted)]">참고 · 점수 미반영</span>
+                        ) : er.category === "spelling" ? (
+                          <span className="text-[10px] font-semibold text-[var(--muted)]">감점 거의 없음</span>
+                        ) : (
+                          <span className={cn("text-[10px] font-semibold", er.severity === "critical" ? "text-[var(--ef-bad)]" : er.severity === "major" ? "text-[var(--ef-warn)]" : "text-[var(--muted)]")}>{SEVERITY_KO[er.severity]}</span>
+                        )}
                         <span className="ef-en text-[14px]">
                           {er.text ? <span className="ef-del">{er.text}</span> : <span className="text-[var(--muted)]">빠짐</span>}
                           <span className="mx-1 text-[var(--muted)]">→</span>
@@ -133,7 +151,7 @@ export function FeedbackPanel({
           ) : null}
           <div className="p-4 md:p-5">
             <div className="flex items-center justify-between gap-2">
-              <Eyebrow>추천 문장 · 국제 회의용 쉬운 영어</Eyebrow>
+              <Eyebrow>원어민이 회의에서 자주 쓰는 표현</Eyebrow>
               <CopyButton text={e.recommended} />
             </div>
             <p className="ef-en mt-2 text-[17px] font-medium leading-7">{e.recommended}</p>
@@ -141,7 +159,7 @@ export function FeedbackPanel({
           {e.advanced || e.alternatives.length ? (
             <div className="p-4 md:p-5">
               <button className="dd-focus flex w-full items-center justify-between rounded-lg text-left" onClick={() => setShowMore((v) => !v)} aria-expanded={showMore}>
-                <Eyebrow>고급 표현 · 다른 정답</Eyebrow>
+                <Eyebrow>다른 자연스러운 표현</Eyebrow>
                 <ChevronDown className={cn("size-4 text-[var(--muted)] transition", showMore && "rotate-180")} />
               </button>
               <AnimatePresence initial={false}>
@@ -197,8 +215,17 @@ export function FeedbackPanel({
         </Card>
       </motion.div>
 
+      {weakNote ? (
+        <motion.div {...stagger(5)}>
+          <div className="ef-ko flex items-start gap-2 rounded-2xl border border-[var(--line)] px-4 py-3 text-[13px] text-[var(--ef-ink-2)]">
+            <TrendingDown className="mt-0.5 size-4 shrink-0 text-[var(--ef-warn)]" />
+            <div>{weakNote}</div>
+          </div>
+        </motion.div>
+      ) : null}
+
       {/* Review decision */}
-      <motion.div {...stagger(5)}>
+      <motion.div {...stagger(6)}>
         <div className={cn("ef-ko flex items-start gap-2 rounded-2xl px-4 py-3 text-[13px]", e.review.add ? "bg-[var(--ef-warn-soft)] text-[var(--ef-warn)]" : "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]")}>
           {e.review.add ? <RotateCcw className="mt-0.5 size-4 shrink-0" /> : <CheckCircle2 className="mt-0.5 size-4 shrink-0" />}
           <div>
@@ -211,34 +238,16 @@ export function FeedbackPanel({
   );
 }
 
-function EvaluatorBadge({ evaluation, ai, onRequestAI, onRetryAI }: { evaluation: Evaluation; ai: AIState; onRequestAI?: () => void; onRetryAI?: () => void }) {
-  if (ai.status === "pending")
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-accent-ink)]">
-        <Loader2 className="size-3 animate-spin" /> Claude 검토 중
-      </span>
-    );
+function EvaluatorBadge({ evaluation }: { evaluation: Evaluation }) {
   if (evaluation.evaluator === "ai")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-accent-ink)]">
-        <Sparkles className="size-3" /> Claude 분석
+      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-accent-ink)]" title="Claude가 문법을 정밀 채점했습니다. 점수는 오류 목록으로 계산합니다.">
+        <Sparkles className="size-3" /> Claude 채점
       </span>
     );
   return (
-    <span className="inline-flex flex-wrap items-center gap-1">
-      <span className="inline-flex items-center gap-1 rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium text-[var(--muted)]" title="기준 답안·의미 단위·문법 규칙으로 즉시 채점">
-        <Cpu className="size-3" /> 규칙 기반
-      </span>
-      {ai.status === "available" && onRequestAI ? (
-        <button onClick={onRequestAI} className="dd-focus inline-flex items-center gap-1 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-accent-ink)]">
-          <Sparkles className="size-3" /> Claude로 정밀 분석
-        </button>
-      ) : null}
-      {ai.status === "error" ? (
-        <button onClick={onRetryAI} className="dd-focus inline-flex items-center gap-1 rounded-full bg-[var(--ef-bad-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-bad)]" title={ai.message}>
-          Claude 분석 실패 · 다시 시도
-        </button>
-      ) : null}
+    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium text-[var(--muted)]" title="기준 답안·의미 단위·문법 규칙으로 즉시 채점">
+      <Cpu className="size-3" /> 규칙 기반
     </span>
   );
 }

@@ -56,22 +56,16 @@ export const questionSchema = z.object({
   probes: z.array(z.object({ answer: z.string().min(1), expect: z.enum(["pass", "fail"]) })).optional(),
 });
 
-/** What Claude returns for an evaluation. Scores are rubric scores 0–100. */
+/**
+ * What Claude returns for an evaluation — deliberately small so grading is fast.
+ * Grammar and structure scores are NOT taken from the model: they are computed
+ * from the listed errors with the same penalty table as the rule-based grader.
+ */
 export const aiEvaluationSchema = z.object({
-  scores: z.object({
-    meaning: z.number().min(0).max(100),
-    grammar: z.number().min(0).max(100),
-    terminology: z.number().min(0).max(100),
-    organization: z.number().min(0).max(100),
-    comprehensibility: z.number().min(0).max(100),
-  }),
-  notes: z.object({
-    meaning: z.string(),
-    grammar: z.string(),
-    terminology: z.string(),
-    organization: z.string(),
-    comprehensibility: z.string(),
-  }),
+  /** Is the message conveyed? Site-specific word choice does not lower it. */
+  meaning: z.number().min(0).max(100),
+  /** How easily an international engineering meeting would understand it. */
+  comprehensibility: z.number().min(0).max(100),
   errors: z
     .array(
       z.object({
@@ -86,17 +80,13 @@ export const aiEvaluationSchema = z.object({
         skill: z.string().optional(),
       }),
     )
-    .max(12),
+    .max(10),
   corrected: z.string().min(1),
+  /** How native-speaking engineers most commonly say it in a meeting. */
   recommended: z.string().min(1),
-  advanced: z.string().optional(),
+  alternatives: z.array(z.string()).max(3),
   summaryKo: z.string().min(1),
   grammarKo: z.string().min(1),
-  alternatives: z.array(z.string()).max(4),
-  addToReview: z.boolean(),
-  reviewReasonKo: z.string(),
-  confidence: z.enum(["high", "medium", "low"]),
-  meaningEquivalent: z.boolean(),
 });
 
 export type AIEvaluationPayload = z.infer<typeof aiEvaluationSchema>;

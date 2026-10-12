@@ -5,6 +5,7 @@ import { buildSession, mulberry32, pickReviewQuestion, reviewShareFor, weakSkill
 import { createInitialState, exportState, importState, recordAttempt } from "@/engflow/core/store";
 import { evaluateLocal } from "@/engflow/core/evaluate";
 import { QUESTIONS, QUESTION_BY_ID } from "@/engflow/content";
+import { similarQuestions, weakGrammar } from "@/engflow/core/weakness";
 
 const T0 = Date.UTC(2026, 9, 12, 1, 0, 0);
 
@@ -124,5 +125,44 @@ describe("learner state", () => {
     const st = createInitialState(T0);
     expect(importState(exportState(st)).items).toEqual(st.items);
     expect(() => importState('{"hello":1}')).toThrow();
+  });
+});
+
+describe("frequent grammar mistakes", () => {
+  const sim = QUESTION_BY_ID["fs-process-run-simulation-again"];
+  const record = (state: ReturnType<typeof createInitialState>, q: typeof sim, answer: string, at: number) =>
+    recordAttempt(state, { question: q, evaluation: evaluateLocal(q, answer), hint: 0, responseMs: 9000, firstKeyMs: 1000, context: "lesson", now: at }, QUESTION_BY_ID).state;
+
+  it("records the grammar point with the learner's own example, but not spelling or site wording", () => {
+    let s = createInitialState(T0);
+    s = record(s, sim, "We need to run the process simulation again because the raw composiotion are changed.", T0);
+    const points = weakGrammar(s, T0, 0);
+    expect(points.length).toBe(1);
+    expect(points[0].category).toBe("tense");
+    expect(points[0].examples[0].fix).toBe("are → has");
+    expect(Object.values(s.weak ?? {}).some((p) => p.category === "spelling" || p.category === "terminology")).toBe(false);
+  });
+
+  it("a repeated mistake becomes a weakness and the next session serves similar questions first", () => {
+    let s = createInitialState(T0);
+    const tq = QUESTIONS.filter((q) => q.skills[0] === "time-clause" && !q.variation);
+    s = record(s, tq[0], tq[0].reference.replace(/\b(finishes|is|arrives|comes|gets|sends|starts)\b/, "will $1").replace("will is", "will be"), T0);
+    s = record(s, tq[1], tq[1].reference.replace(/\b(finishes|is|arrives|comes|gets|sends|starts)\b/, "will $1").replace("will is", "will be"), T0 + 60_000);
+    const weak = weakGrammar(s, T0 + DAY_MS);
+    expect(weak[0]?.skill).toBe("time-clause");
+    const plan = buildSession(s, QUESTIONS, { size: 10, mode: "mixed", now: T0 + 4 * DAY_MS, rng: mulberry32(7) });
+    const fresh = plan.items.filter((i) => i.kind === "new");
+    expect(fresh.some((i) => i.reasonKo.startsWith("자주 틀리는 문법"))).toBe(true);
+    expect(similarQuestions(weak[0], QUESTIONS, s, T0 + DAY_MS).every((q) => q.skills.includes("time-clause"))).toBe(true);
+  });
+
+  it("fades with time and with independent correct answers on the same grammar", () => {
+    let s = createInitialState(T0);
+    s = record(s, sim, "We need to run the process simulation again because the feed composition are changed.", T0);
+    const before = weakGrammar(s, T0, 0)[0].current;
+    expect(weakGrammar(s, T0 + 28 * DAY_MS, 0)[0].current).toBeCloseTo(before / 4, 5);
+    const other = QUESTIONS.find((q) => q.id !== sim.id && q.skills.includes(sim.skills[0]) && !q.variation)!;
+    s = record(s, other, other.reference, T0 + DAY_MS);
+    expect(weakGrammar(s, T0 + DAY_MS, 0)[0].current).toBeLessThan(before * Math.pow(0.5, 1 / 14));
   });
 });

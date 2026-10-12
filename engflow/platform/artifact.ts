@@ -87,6 +87,7 @@ function splitState(s: LearnerState): Docs {
     items: { items: Object.fromEntries(Object.entries(s.items).map(([k, v]) => [k, { ...v, history: v.history.slice(-12) }])) },
     mistakes: { mistakes: Object.fromEntries(Object.values(s.mistakes).sort((a, b) => b.lastAt - a.lastAt).slice(0, 300).map((m) => [m.id, m])) },
     generated: { generated: s.generated.slice(-40) },
+    weak: { weak: s.weak ?? {} },
   };
   for (let i = 0; i * CHUNK < s.attempts.length; i++) docs[`attempts-${i}`] = { list: s.attempts.slice(i * CHUNK, (i + 1) * CHUNK) };
   return docs;
@@ -135,7 +136,7 @@ export function artifactStorage(): StorageService & { ready: Promise<boolean> } 
     const head = await db.doc(`${base}/state`).get();
     if (!head.exists) return null;
     const st = head.data() as Record<string, unknown>;
-    const [items, mistakes, generated] = await Promise.all(["items", "mistakes", "generated"].map((k) => db!.doc(`${base}/${k}`).get()));
+    const [items, mistakes, generated, weak] = await Promise.all(["items", "mistakes", "generated", "weak"].map((k) => db!.doc(`${base}/${k}`).get()));
     const chunks = Number(st.attemptChunks ?? 0);
     const attemptDocs = await Promise.all(Array.from({ length: chunks }, (_, i) => db!.doc(`${base}/attempts-${i}`).get()));
     const attempts = attemptDocs.flatMap((d) => ((d.data()?.list as AttemptRecord[]) ?? []));
@@ -150,6 +151,7 @@ export function artifactStorage(): StorageService & { ready: Promise<boolean> } 
       items: (items.data()?.items as LearnerState["items"]) ?? {},
       mistakes: (mistakes.data()?.mistakes as LearnerState["mistakes"]) ?? {},
       generated: (generated.data()?.generated as Question[]) ?? [],
+      weak: (weak.data()?.weak as LearnerState["weak"]) ?? {},
       attempts,
       updatedAt: Number(st.updatedAt ?? 0),
     } as LearnerState;

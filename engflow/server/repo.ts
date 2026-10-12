@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import type { AttemptRecord, DiagnosticResultRecord, LearnerState, MistakeRecord, Question, ReviewItem, SkillState } from "../core/types";
+import type { AttemptRecord, DiagnosticResultRecord, GrammarWeakPoint, LearnerState, MistakeRecord, Question, ReviewItem, SkillState } from "../core/types";
 import { DEFAULT_SETTINGS, MAX_ATTEMPTS } from "../core/store";
 import type { Db } from "./db/client";
-import { aiEvaluations, attempts, diagnostics, generatedQuestions, learners, mistakes, reviewItems, skillMastery } from "./db/schema";
+import { aiEvaluations, attempts, diagnostics, generatedQuestions, grammarWeak, learners, mistakes, reviewItems, skillMastery } from "./db/schema";
 
 /** Learner identity: the browser holds a random 48-hex sync key; the server stores only its hash. */
 export function learnerIdFromKey(key: string | null): string | null {
@@ -35,19 +35,21 @@ export const syncSchema = z.object({
     .default([]),
   diagnostics: z.array(obj({ id, at: z.number(), cefrLow: z.string(), cefrHigh: z.string(), cefrPoint: z.string(), confidence: z.string(), theta: z.number(), sd: z.number() })).max(50).default([]),
   generated: z.array(obj({ id, skills: z.array(z.string()).min(1) })).max(100).default([]),
+  weak: z.array(obj({ id, skill: z.string(), category: z.string(), count: z.number(), strength: z.number(), lastAt: z.number() })).max(200).default([]),
 });
 export type SyncPayload = z.infer<typeof syncSchema>;
 
 export async function loadState(db: Db, learnerId: string): Promise<LearnerState | null> {
   const [row] = await db.select().from(learners).where(eq(learners.id, learnerId)).limit(1);
   if (!row) return null;
-  const [it, mi, sk, di, ge, at] = await Promise.all([
+  const [it, mi, sk, di, ge, at, wk] = await Promise.all([
     db.select().from(reviewItems).where(eq(reviewItems.learnerId, learnerId)),
     db.select().from(mistakes).where(eq(mistakes.learnerId, learnerId)),
     db.select().from(skillMastery).where(eq(skillMastery.learnerId, learnerId)),
     db.select().from(diagnostics).where(eq(diagnostics.learnerId, learnerId)).orderBy(asc(diagnostics.at)),
     db.select().from(generatedQuestions).where(eq(generatedQuestions.learnerId, learnerId)),
     db.select().from(attempts).where(eq(attempts.learnerId, learnerId)).orderBy(asc(attempts.at)),
+    db.select().from(grammarWeak).where(eq(grammarWeak.learnerId, learnerId)),
   ]);
   return {
     schema: 1,
@@ -61,6 +63,7 @@ export async function loadState(db: Db, learnerId: string): Promise<LearnerState
     diagnostics: di.map((r) => r.data as DiagnosticResultRecord),
     generated: ge.map((r) => r.data as Question),
     attempts: at.slice(-MAX_ATTEMPTS).map((r) => r.data as AttemptRecord),
+    weak: Object.fromEntries(wk.map((r) => [r.id, r.data as GrammarWeakPoint])),
     updatedAt: row.updatedAt,
   };
 }
@@ -105,6 +108,10 @@ export async function applySync(db: Db, learnerId: string, p: SyncPayload): Prom
     }
     for (const g of p.generated) {
       await tx.insert(generatedQuestions).values({ learnerId, id: g.id, skill: g.skills[0], data: g }).onConflictDoNothing();
+    }
+    for (const w of p.weak) {
+      const v = { skill: w.skill, category: w.category, count: Math.round(w.count), strength: w.strength, lastAt: Math.round(w.lastAt), data: w };
+      await tx.insert(grammarWeak).values({ learnerId, id: w.id, ...v }).onConflictDoUpdate({ target: [grammarWeak.learnerId, grammarWeak.id], set: v });
     }
   });
 }

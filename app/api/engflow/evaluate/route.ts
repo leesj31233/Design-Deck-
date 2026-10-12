@@ -1,15 +1,15 @@
 import { z } from "zod";
 import { evaluateLocal } from "@/engflow/core/evaluate";
-import { aiAvailable, aiModel, describeAIError, evaluateWithClaude } from "@/engflow/server/claude";
+import { aiAvailable, aiModel, describeAIError, evalModel, evaluateWithClaude } from "@/engflow/server/claude";
 import { getDb } from "@/engflow/server/db/client";
 import { fail, json, PayloadError, rateLimit, readJson, requireLearner, resolveQuestion } from "@/engflow/server/http";
 import { logAIEvaluation } from "@/engflow/server/repo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 60;
 
-const body = z.object({ question: z.unknown(), answer: z.string().min(1).max(2000), depth: z.enum(["quick", "default"]).default("default") });
+const body = z.object({ question: z.unknown(), answer: z.string().min(1).max(2000), depth: z.enum(["quick", "default"]).default("quick") });
 
 export async function POST(req: Request) {
   const who = requireLearner(req);
@@ -27,14 +27,15 @@ export async function POST(req: Request) {
   if ("error" in r) return fail(400, "invalid_question", r.error);
   const local = evaluateLocal(r.question, parsed.data.answer);
   const started = Date.now();
+  const model = parsed.data.depth === "quick" ? evalModel() : aiModel();
   const db = await getDb();
   try {
     const evaluation = await evaluateWithClaude(r.question, parsed.data.answer, local, parsed.data.depth, req.signal);
-    if (db) await logAIEvaluation(db.db, { learnerId: who.id, questionId: r.question.id, answer: parsed.data.answer, model: aiModel(), overall: evaluation.scores.overall, latencyMs: Date.now() - started, ok: true, result: evaluation }).catch(() => undefined);
+    if (db) await logAIEvaluation(db.db, { learnerId: who.id, questionId: r.question.id, answer: parsed.data.answer, model, overall: evaluation.scores.overall, latencyMs: Date.now() - started, ok: true, result: evaluation }).catch(() => undefined);
     return json({ evaluation });
   } catch (e) {
     const d = describeAIError(e);
-    if (db) await logAIEvaluation(db.db, { learnerId: who.id, questionId: r.question.id, answer: parsed.data.answer, model: aiModel(), overall: null, latencyMs: Date.now() - started, ok: false, error: d.code }).catch(() => undefined);
+    if (db) await logAIEvaluation(db.db, { learnerId: who.id, questionId: r.question.id, answer: parsed.data.answer, model, overall: null, latencyMs: Date.now() - started, ok: false, error: d.code }).catch(() => undefined);
     return fail(d.status, d.code, d.message);
   }
 }

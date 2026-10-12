@@ -68,7 +68,7 @@ test("full-sentence lesson: feedback, grammar guide, mistake saved", async ({ pa
   await page.getByRole("button", { name: /제출/ }).click();
   await expect(page.getByRole("img", { name: /종합/ })).toBeVisible();
   await expect(page.getByText("최소 수정 · 내 표현 유지")).toBeVisible();
-  await expect(page.getByText(/추천 문장/)).toBeVisible();
+  await expect(page.getByText("원어민이 회의에서 자주 쓰는 표현")).toBeVisible();
   await expect(page.getByText(/회의 전달력/)).toBeVisible();
   await page.getByRole("button", { name: "왜 틀렸나요?" }).first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -79,6 +79,68 @@ test("full-sentence lesson: feedback, grammar guide, mistake saved", async ({ pa
   await nav(page, "내 실수");
   await expect(page.getByText("If we will decide it now, we must change it later because data different.").first()).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+/** A stand-in for the artifact runtime: no storage, and a "sample" capability that grades after `delay` ms. */
+async function fakeClaude(page: Page, delay: number) {
+  await page.addInitScript((ms) => {
+    const grade = {
+      meaning: 95,
+      comprehensibility: 90,
+      errors: [{ span: "are", fix: "has", category: "tense", severity: "major", explanationKo: "바뀐 결과가 지금 영향을 주므로 현재완료 has changed를 씁니다.", skill: "present-perfect" }],
+      corrected: "We have to run it again because the composition has changed.",
+      recommended: "We need to rerun it because the composition has changed.",
+      alternatives: ["The composition has changed, so we need to run it again."],
+      summaryKo: "문법 오류 1개: are changed → has changed.",
+      grammarKo: "결과가 지금까지 이어지면 현재완료를 씁니다.",
+    };
+    const sample = Object.assign(async () => ({ text: "" }), {
+      json: (_p: string, opts?: { signal?: AbortSignal }) =>
+        new Promise((resolve, reject) => {
+          const t = setTimeout(() => resolve(grade), ms);
+          opts?.signal?.addEventListener("abort", () => {
+            clearTimeout(t);
+            reject(Object.assign(new Error("aborted"), { name: "AbortError" }));
+          });
+        }),
+    });
+    (window as unknown as { claude: unknown }).claude = { use: async (name: string) => (name === "sample" ? sample : null) };
+  }, delay);
+}
+
+test("one grading pass: Claude's grade appears once and never changes", async ({ page }) => {
+  await fakeClaude(page, 700);
+  const errors = await open(page);
+  await nav(page, "학습");
+  await page.getByRole("radio", { name: /^문장 구성/ }).click();
+  await page.getByRole("button", { name: /^시작/ }).click();
+  await page.locator("#ef-answer").fill("We have to run it again because the composition are changed.");
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByText("문법 채점 중…")).toBeVisible();
+  // No score is shown while grading, so nothing can jump.
+  await expect(page.getByRole("img", { name: /종합/ })).toHaveCount(0);
+  await expect(page.getByText("Claude 채점")).toBeVisible();
+  const ring = page.getByRole("img", { name: /종합/ });
+  const first = await ring.getAttribute("aria-label");
+  await page.waitForTimeout(1500);
+  expect(await ring.getAttribute("aria-label")).toBe(first);
+  await expect(page.getByText("원어민이 회의에서 자주 쓰는 표현")).toBeVisible();
+  await expect(page.getByText("We need to rerun it because the composition has changed.")).toBeVisible();
+  await expect(page.getByText(/문법 정확도/)).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("a slow Claude never blocks: the learner can take the rule-based grade right away", async ({ page }) => {
+  await fakeClaude(page, 60_000);
+  await open(page);
+  await nav(page, "학습");
+  await page.getByRole("radio", { name: /^문장 구성/ }).click();
+  await page.getByRole("button", { name: /^시작/ }).click();
+  await page.locator("#ef-answer").fill("We have to run it again because the composition are changed.");
+  await page.getByRole("button", { name: /제출/ }).click();
+  await page.getByRole("button", { name: /기다리지 않고 바로 보기/ }).click();
+  await expect(page.getByText("규칙 기반", { exact: true })).toBeVisible();
+  await expect(page.getByText(/기다리지 않고 규칙 기반 결과를 표시했습니다/)).toBeVisible();
 });
 
 test("phrase quiz is keyboard-first (Enter submits, Enter advances)", async ({ page }, info) => {

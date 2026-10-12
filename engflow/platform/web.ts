@@ -64,7 +64,8 @@ export async function fetchServerStatus(): Promise<ServerStatus | null> {
   }
 }
 
-type Entity = "items" | "mistakes" | "skills";
+type Entity = "items" | "mistakes" | "skills" | "weak";
+const ENTITIES: Entity[] = ["items", "mistakes", "skills", "weak"];
 
 /** Server persistence: sends only entities that changed since the last successful sync. */
 export function serverStorage(kind: "postgres" | "pglite"): StorageService {
@@ -82,7 +83,7 @@ export function serverStorage(kind: "postgres" | "pglite"): StorageService {
   };
   const remember = (s: LearnerState) => {
     sent.core = JSON.stringify(coreOf(s));
-    for (const e of ["items", "mistakes", "skills"] as Entity[]) for (const [k, v] of Object.entries(s[e])) sent.entities.set(`${e}:${k}`, JSON.stringify(v));
+    for (const e of ENTITIES) for (const [k, v] of Object.entries(s[e] ?? {})) sent.entities.set(`${e}:${k}`, JSON.stringify(v));
     sent.lastAttempt = s.attempts[s.attempts.length - 1]?.id ?? null;
     sent.diagnostics = new Set(s.diagnostics.map((d) => d.id));
     sent.generated = new Set(s.generated.map((g) => g.id));
@@ -92,7 +93,7 @@ export function serverStorage(kind: "postgres" | "pglite"): StorageService {
     const core = coreOf(s);
     const coreJson = JSON.stringify(core);
     const changed = (e: Entity) =>
-      Object.entries(s[e])
+      Object.entries(s[e] ?? {})
         .filter(([k, v]) => sent.entities.get(`${e}:${k}`) !== JSON.stringify(v))
         .map(([, v]) => v);
     const lastIdx = sent.lastAttempt ? s.attempts.findIndex((a) => a.id === sent.lastAttempt) : -1;
@@ -104,8 +105,9 @@ export function serverStorage(kind: "postgres" | "pglite"): StorageService {
       attempts: s.attempts.slice(lastIdx + 1) as AttemptRecord[],
       diagnostics: s.diagnostics.filter((d) => !sent.diagnostics.has(d.id)),
       generated: s.generated.filter((g) => !sent.generated.has(g.id)),
+      weak: changed("weak"),
     };
-    const empty = !payload.core && !payload.items.length && !payload.mistakes.length && !payload.skills.length && !payload.attempts.length && !payload.diagnostics.length && !payload.generated.length;
+    const empty = !payload.core && !payload.items.length && !payload.mistakes.length && !payload.skills.length && !payload.attempts.length && !payload.diagnostics.length && !payload.generated.length && !payload.weak.length;
     if (empty) return;
     await api("/api/engflow/state", { json: payload });
     remember(s);

@@ -1,5 +1,6 @@
 import { aiEvaluationSchema, questionSchema, type AIEvaluationPayload } from "./schema";
-import { defaultBucket } from "./evaluate";
+import { bucketPenalties, defaultBucket, overallFrom, scoredErrors } from "./evaluate";
+import { SKILLS } from "../content/skills";
 import { validateQuestion } from "./validate";
 import type { Category, Cefr, ErrorSpan, Evaluation, Question } from "./types";
 
@@ -10,77 +11,50 @@ import type { Category, Cefr, ErrorSpan, Evaluation, Question } from "./types";
  * produce the same structured result.
  */
 
-export const AI_EVALUATOR_LABEL = "Claude 분석";
+export const AI_EVALUATOR_LABEL = "Claude 채점";
 
-const RUBRIC = `Scoring rubric (each 0–100):
-- meaning: is the intended message (all Korean meaning chunks) conveyed? Wrong technical meaning must be penalized strongly.
-- grammar: grammatical accuracy only. Minor spelling slips cost little (−2 to −4 each).
-- terminology: correct engineering terms and collocations (receive data, run a test, feed rate, moisture content…).
-- organization: sentence structure, word order, naturalness for an international meeting.
-- comprehensibility: how easily a non-native English listener in an engineering meeting would understand it. This is NOT the same as grammar: "We still waiting data" is understandable but ungrammatical.`;
-
-const PRINCIPLES = `Principles:
-1. Understandable does not mean grammatically correct — score them separately.
-2. Minor spelling errors must not cause disproportionate penalties.
-3. Wrong technical meaning must be penalized (meaning and/or terminology).
-4. Accept semantically equivalent valid answers, even if worded differently from the reference.
-5. Charge each underlying error to ONE category only — never penalize the same error in several scores.
-6. Do not invent errors to have something to say. If the answer is correct, return an empty errors list.
-7. Style preferences are not errors. Only report a stylistic point if it would confuse an international listener, and then as severity "minor".
-8. Show exactly which words are wrong and why.
-The learner is a Korean process engineer (~B1). Target: simple, clear international English — not native idioms.`;
+const PRINCIPLES = `Grading principles:
+1. Grammar first. Check every word for grammar precisely: tense and aspect, be + verb forms, passive vs active, subject–verb agreement, articles, countability, prepositions after verbs, word order, clause structure, conditionals. Report each real grammar error with the exact words.
+2. Site-specific word choice is NOT an error. Plants name things differently (raw vs feed composition, material vs feedstock, unit vs plant, vessel vs tank). If the word is understandable in context, accept it. At most add it as category "terminology", severity "minor" — it is shown as a suggestion and never scored.
+3. Common meeting expressions matter: wrong collocations that change or block the meaning ("turn a simulation", "make a meeting") are "word-choice" errors.
+4. Spelling slips are "spelling", severity "minor" (almost no penalty). Never call a spelling slip a grammar error.
+5. Understandable does not mean grammatically correct: "We still waiting data" is understandable but has two grammar errors.
+6. Charge each underlying error ONE category only. Do not invent errors; a correct answer gets an empty list. Style preferences are not errors.
+Severity: "critical" = meaning becomes wrong or opposite; "major" = clear grammar error a listener notices (wrong tense, missing be, wrong verb form, agreement); "minor" = small slip (article, plural -s, preposition nuance).`;
 
 function questionBrief(q: Question): string {
   return [
     `Scenario: ${q.topic} (${q.category}, CEFR ${q.level})`,
     q.contextKo ? `Context (Korean): ${q.contextKo}` : "",
     `Korean prompt: ${q.promptKo}`,
-    `Meaning chunks in English order: ${q.segments.join(" / ")}`,
     `Reference answer: ${q.reference}`,
     q.accepted.length ? `Other accepted answers: ${q.accepted.join(" | ")}` : "",
-    `Target grammar skills: ${q.skills.join(", ")}`,
+    `Target grammar: ${q.skills.join(", ")}`,
   ]
     .filter(Boolean)
     .join("\n");
 }
 
+const CATEGORIES = '"be-verb","verb-form","tense","agreement","preposition","article","word-order","word-choice","missing-content","meaning-shift","terminology","spelling","sentence-structure","countability"';
+
+/** One compact, grammar-focused grading request (fast models answer it in a few seconds). */
 export function buildEvaluationPrompt(q: Question, answer: string, local: Evaluation): string {
-  const localFindings = local.errors.length
-    ? local.errors.map((e) => `- ${e.category}/${e.severity}: "${e.text}" → "${e.fix}" (${e.source})`).join("\n")
-    : "- none";
-  const missing = local.meaning.filter((m) => !m.present).map((m) => `${m.en} (${m.ko})`);
-  return `You are an English coach for Korean process engineers who work in international engineering meetings. Evaluate one learner answer.
+  const pre = scoredErrors(local.errors);
+  const localFindings = pre.length ? pre.map((e) => `"${e.text || "(missing)"}" → "${e.fix}" (${e.category}, ${e.severity})`).join("; ") : "none";
+  return `You grade one English answer from a Korean process engineer (~B1) for an international engineering meeting.
 
 ${questionBrief(q)}
 
-Learner answer (evaluate exactly this text): """${answer}"""
-
-An automatic rule-based pre-check found (it can be wrong — verify, do not copy blindly):
-${localFindings}
-Possibly missing meaning: ${missing.length ? missing.join("; ") : "none"}
-
-${RUBRIC}
+Learner answer (grade exactly this text): """${answer}"""
+Automatic pre-check (may be wrong or incomplete — verify): ${localFindings}
 
 ${PRINCIPLES}
 
-Write all Korean fields in concise, polite Korean (~입니다/~씁니다). Explanations say what is wrong, why, and the correct form.
+Write Korean fields briefly in polite Korean (~입니다). explanationKo: one sentence — what is wrong, why, the right form.
+Skill ids for errors: ${SKILL_IDS}.
 
-Reply with ONLY one JSON object of this shape:
-{
-  "scores": {"meaning": 0-100, "grammar": 0-100, "terminology": 0-100, "organization": 0-100, "comprehensibility": 0-100},
-  "notes": {"meaning": "Korean note", "grammar": "Korean note", "terminology": "Korean note", "organization": "Korean note", "comprehensibility": "Korean note"},
-  "errors": [{"span": "exact substring of the learner answer, or \\"\\" for a missing word", "insertBefore": "for a missing word: the learner word it goes before, or \\"\\" for the end", "fix": "replacement text", "category": one of ["be-verb","verb-form","tense","agreement","preposition","article","word-order","word-choice","missing-content","meaning-shift","terminology","spelling","sentence-structure","countability"], "severity": "minor"|"major"|"critical", "explanationKo": "Korean explanation", "skill": "optional skill id from: ${q.skills.join(", ")} or another relevant id"}],
-  "corrected": "minimal correction that keeps the learner's own words and structure where possible",
-  "recommended": "simple, clear international English version",
-  "advanced": "optional more precise version (still clear for non-native listeners)",
-  "summaryKo": "1–2 sentence Korean verdict that mentions both what works and what is wrong",
-  "grammarKo": "short Korean explanation of the most relevant grammar point",
-  "alternatives": ["up to 3 other correct ways to say it"],
-  "addToReview": true|false,
-  "reviewReasonKo": "Korean reason",
-  "confidence": "high"|"medium"|"low",
-  "meaningEquivalent": true|false
-}`;
+Reply with ONLY this JSON:
+{"meaning":0-100,"comprehensibility":0-100,"errors":[{"span":"exact substring of the answer, or \"\" for a missing word","insertBefore":"for a missing word: the answer word it goes before, \"\" = end","fix":"replacement","category":one of [${CATEGORIES}],"severity":"minor"|"major"|"critical","explanationKo":"…","skill":"skill id"}],"corrected":"the answer with only its errors fixed — keep the learner's own words, including site terms","recommended":"how native-speaking engineers most commonly say this in a meeting: natural, everyday phrasing (not textbook, no rare idioms); keep the learner's site terms","alternatives":["up to 2 other common native ways"],"summaryKo":"one sentence: grammar verdict first","grammarKo":"1–2 sentences on the most important grammar point"}`;
 }
 
 function locate(answer: string, span: string, insertBefore?: string): { start: number; end: number } | null {
@@ -101,9 +75,39 @@ function locate(answer: string, span: string, insertBefore?: string): { start: n
 
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
 
-/** Validate Claude's JSON and merge it with the deterministic findings into an Evaluation. */
+const KNOWN_CATEGORIES = new Set(CATEGORIES.replace(/"/g, "").split(","));
+const CATEGORY_ALIASES: Record<string, string> = { grammar: "verb-form", collocation: "word-choice", vocabulary: "word-choice", "subject-verb-agreement": "agreement", plural: "countability", order: "word-order" };
+
+/**
+ * Fast models occasionally overshoot list lengths, scores or the category list.
+ * Fix those small slips so the one grading pass is not wasted; anything
+ * structurally wrong is still rejected by the schema.
+ */
+function tidy(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
+  const r = { ...(raw as Record<string, unknown>) };
+  for (const k of ["meaning", "comprehensibility"]) if (typeof r[k] === "number") r[k] = Math.max(0, Math.min(100, r[k] as number));
+  if (Array.isArray(r.alternatives)) r.alternatives = r.alternatives.filter((x) => typeof x === "string").slice(0, 3);
+  if (Array.isArray(r.errors)) {
+    r.errors = r.errors.slice(0, 10).map((e) => {
+      if (!e || typeof e !== "object") return e;
+      const x = { ...(e as Record<string, unknown>) };
+      if (typeof x.category === "string" && !KNOWN_CATEGORIES.has(x.category)) x.category = CATEGORY_ALIASES[x.category] ?? "sentence-structure";
+      if (x.insertBefore === null) delete x.insertBefore;
+      if (x.skill === null) delete x.skill;
+      return x;
+    });
+  }
+  return r;
+}
+
+/**
+ * Validate Claude's JSON and turn it into an Evaluation. Scores are computed
+ * from the error list with the same penalty table and weights as the
+ * rule-based grader, so the two can never disagree about how much an error costs.
+ */
 export function normalizeAIEvaluation(raw: unknown, q: Question, answer: string, local: Evaluation): Evaluation {
-  const parsed = aiEvaluationSchema.safeParse(raw);
+  const parsed = aiEvaluationSchema.safeParse(tidy(raw));
   if (!parsed.success) {
     const where = parsed.error.issues.slice(0, 3).map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
     throw new AIFormatError(`AI 응답 형식이 올바르지 않습니다 (${where}).`);
@@ -113,60 +117,84 @@ export function normalizeAIEvaluation(raw: unknown, q: Question, answer: string,
   p.errors.forEach((e, i) => {
     const pos = locate(answer, e.span, e.insertBefore);
     if (!pos) return; // the model quoted text that is not in the answer: drop it rather than mislead
+    const advisory = e.category === "terminology";
     errors.push({
       id: `ai${i + 1}`,
       category: e.category,
-      severity: e.severity,
+      severity: advisory ? "minor" : e.category === "spelling" ? "minor" : e.severity,
       bucket: defaultBucket(e.category),
       start: pos.start,
       end: pos.end,
       text: answer.slice(pos.start, pos.end),
       fix: e.fix,
-      messageKo: e.explanationKo,
-      skill: e.skill && q.skills.includes(e.skill) ? e.skill : e.skill || q.skills[0],
+      messageKo: advisory ? `${e.explanationKo} (현장 용어는 점수에 반영하지 않습니다.)` : e.explanationKo,
+      skill: e.skill && SKILL_SET.has(e.skill) ? e.skill : q.skills[0],
       source: "ai",
+      advisory: advisory || undefined,
     });
   });
   // Curated pitfalls are verified against the reference answers; keep any the model did not cover.
-  for (const le of local.errors.filter((x) => x.source === "pitfall")) {
+  for (const le of local.errors.filter((x) => x.source === "pitfall" && !x.advisory)) {
     const covered = errors.some((e) => e.start < le.end + 1 && le.start < e.end + 1);
     if (!covered) errors.push({ ...le, id: `p-${le.id}` });
   }
   errors.sort((a, b) => a.start - b.start);
 
-  const s = p.scores;
-  const isPhrase = q.mode === "phrase";
-  let overall = isPhrase
-    ? clamp(0.5 * s.meaning + 0.35 * s.grammar + 0.15 * s.organization)
-    : clamp(0.3 * s.meaning + 0.3 * s.grammar + 0.2 * s.terminology + 0.2 * s.organization);
-  if (errors.some((e) => e.category === "meaning-shift" && e.severity === "critical")) overall = Math.min(overall, 60);
-  const hasMajor = errors.some((e) => e.severity !== "minor");
+  const pen = bucketPenalties(errors);
+  const scored = scoredErrors(errors);
+  const M = clamp(Math.min(p.meaning, 100 - pen.meaning));
+  const G = clamp(100 - pen.grammar);
+  const O = clamp(100 - pen.organization);
+  let overall = overallFrom(M, G, O);
+  if (scored.some((e) => e.category === "meaning-shift" && e.severity === "critical")) overall = Math.min(overall, 60);
+  const major = scored.filter((e) => e.severity !== "minor");
+  const grammarCount = scored.filter((e) => e.bucket === "grammar" && e.category !== "spelling").length;
+  const spelling = scored.filter((e) => e.category === "spelling").length;
+  const add = major.length > 0 || overall < 80;
   return {
     ...local,
     evaluator: "ai",
     evaluatorLabel: AI_EVALUATOR_LABEL,
     scores: {
-      meaning: { score: clamp(s.meaning), noteKo: p.notes.meaning },
-      grammar: { score: clamp(s.grammar), noteKo: p.notes.grammar },
-      terminology: { score: clamp(s.terminology), noteKo: p.notes.terminology },
-      organization: { score: clamp(s.organization), noteKo: p.notes.organization },
-      comprehensibility: { score: clamp(s.comprehensibility), noteKo: p.notes.comprehensibility },
+      meaning: { score: M, noteKo: M >= 85 ? "핵심 의미와 표현이 전달됩니다." : M >= 60 ? "의미가 일부 달라졌습니다." : "의미가 제대로 전달되지 않습니다." },
+      grammar: { score: G, noteKo: grammarCount ? `문법 오류 ${grammarCount}개${spelling ? ` · 철자 ${spelling}개` : ""}` : spelling ? `문법 오류 없음 · 철자 ${spelling}개(감점 거의 없음)` : "문법 오류를 찾지 못했습니다." },
+      terminology: termAdvice(errors, local),
+      organization: { score: O, noteKo: scored.some((e) => e.bucket === "organization") ? "어순·문장 구조를 확인하세요." : "문장 구성이 자연스럽습니다." },
+      comprehensibility: { score: clamp(p.comprehensibility), noteKo: p.comprehensibility >= 85 ? "국제 회의에서 쉽게 이해됩니다." : p.comprehensibility >= 65 ? "대체로 이해되지만 듣는 사람이 한 번 더 생각해야 합니다." : "의미가 정확히 전달되기 어렵습니다." },
       overall,
     },
     errors,
     corrected: p.corrected,
     recommended: p.recommended || q.reference,
-    advanced: p.advanced || q.advanced,
     summaryKo: p.summaryKo,
     grammarKo: p.grammarKo,
     alternatives: p.alternatives.length ? p.alternatives.slice(0, 3) : local.alternatives,
-    review: { add: p.addToReview || hasMajor || overall < 80, reasonKo: p.reviewReasonKo || local.review.reasonKo },
-    confidence: p.confidence,
+    review: {
+      add,
+      reasonKo: add
+        ? major.length
+          ? `${major.length}개의 주요 문법 오류가 있어 같은 문법을 다른 문장으로 다시 연습합니다.`
+          : "점수가 기준(80)보다 낮아 다시 연습합니다."
+        : scored.length
+          ? "사소한 오류만 있어 복습 목록에는 넣지 않고 숙련도 기록에만 반영합니다."
+          : "정확합니다. 숙련도 기록에 반영됩니다.",
+    },
+    confidence: "high",
     confidenceNoteKo: undefined,
   };
 }
 
+/** Reference-only note on site wording: names the learner's term next to the common one. */
+function termAdvice(errors: ErrorSpan[], local: Evaluation): Evaluation["scores"]["terminology"] {
+  const notes = errors.filter((e) => e.advisory && e.text && e.fix);
+  if (!notes.length) return local.scores.terminology;
+  return { score: local.scores.terminology.score, noteKo: `${notes.map((e) => `${e.text} → ${e.fix}`).join(", ")}도 많이 씁니다. 현장마다 달라 점수에 반영하지 않습니다.` };
+}
+
 export class AIFormatError extends Error {}
+
+const SKILL_SET = new Set(SKILLS.map((k) => k.id));
+const SKILL_IDS = SKILLS.map((k) => k.id).join(", ");
 
 /* ───────────── Explanations ───────────── */
 
@@ -199,6 +227,8 @@ export interface GenerateRequest {
   level: Cefr;
   mode: "sentence" | "phrase";
   avoidReferences: string[];
+  /** The learner's own recurring mistakes on this grammar point: the new question must test exactly this context. */
+  weakness?: { labelKo: string; examples: { wrong: string; right: string }[] };
 }
 
 export function buildGenerationPrompt(r: GenerateRequest, skillName: string, example: Question): string {
@@ -206,10 +236,14 @@ export function buildGenerationPrompt(r: GenerateRequest, skillName: string, exa
 
 Requirements:
 - mode: "${r.mode}", category: "${r.category}", CEFR level: "${r.level}", primary grammar skill: "${r.skill}" (${skillName}).
-- Simple vocabulary; difficulty comes from grammar and reasoning, not rare words. No idioms.
+- Simple vocabulary; difficulty comes from grammar and reasoning, not rare words.
+- reference = how native-speaking engineers most commonly say it in a real meeting: natural, everyday spoken phrasing (e.g. "Could you take a look at…", "We're still waiting on…", "Let's go with…"), not textbook English and no rare idioms.${r.weakness ? `
+- This learner keeps making this mistake (${r.weakness.labelKo}). Build the question so the SAME grammar context appears, in a new situation:
+${r.weakness.examples.slice(0, 4).map((x) => `  wrong: "${x.wrong}" → right: "${x.right}"`).join("\n")}
+  Add a pitfall that catches this exact mistake.` : ""}
 - promptKo: natural Korean. segments: Korean meaning chunks in ENGLISH word order (${r.mode === "sentence" ? "at least 3" : "1–4"}).
 - Tense must be unambiguous: real future condition = "~한다면" → If + present; hypothetical = "(실제로는 아니지만) ~한다고 가정하면" → If + past, would; past counterfactual = "~했더라면" → If + had p.p., would have p.p.; never "had decided … now".
-- reference = simple international English. accepted = ${r.mode === "sentence" ? "2–4" : "1–3"} other fully correct answers.
+- accepted = ${r.mode === "sentence" ? "2–4" : "1–3"} other fully correct answers.
 - meaning units use this pattern syntax: "word" matches by stem (change ~ changed/changing), "=word" exact form, "a|b" alternatives, "tok?" optional, "..." gap. Make units lenient about grammar and generous with synonyms; every correct answer must match every unit. Mark technical terms with "term": true and essential units with "critical": true.
 - pitfalls: 1–2 typical Korean-speaker mistakes for this skill; a pitfall pattern must NOT match any correct answer; "fix" replaces exactly the matched words; messageKo explains what/why in Korean.
 - hints: pattern (grammar formula), skeleton (reference with ____ blanks), partial (first half + "…").

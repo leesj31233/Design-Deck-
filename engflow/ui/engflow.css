@@ -136,6 +136,7 @@
 .ef-mark[data-c="terminology"] { text-decoration-color: var(--ef-c-term); background: color-mix(in srgb, var(--ef-c-term) 14%, transparent); }
 .ef-mark[data-c="organization"] { text-decoration-color: var(--ef-c-order); background: color-mix(in srgb, var(--ef-c-order) 12%, transparent); }
 .ef-mark[data-c="spelling"] { text-decoration-color: var(--ef-c-spell); text-decoration-style: dotted; background: transparent; }
+.ef-mark[data-advisory="true"] { text-decoration-style: dotted; text-decoration-color: var(--ef-c-term); background: transparent; }
 .ef-mark[data-active="true"] { outline: 2px solid currentColor; outline-offset: 1px; }
 .ef-caret {
   display: inline-block;

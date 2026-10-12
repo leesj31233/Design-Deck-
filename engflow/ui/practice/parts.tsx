@@ -63,7 +63,7 @@ export const CATEGORY_KO: Record<string, string> = {
   "word-choice": "단어 선택",
   "missing-content": "빠진 내용",
   "meaning-shift": "의미 변화",
-  terminology: "기술 용어",
+  terminology: "현장 용어",
   spelling: "철자",
   "sentence-structure": "문장 구조",
   countability: "셀 수 없는 명사",
@@ -101,6 +101,7 @@ export function AnswerHighlight({ text, errors, active, onSelect }: { text: stri
           type="button"
           className="ef-mark dd-focus"
           data-c={cls}
+          data-advisory={e.advisory ? "true" : undefined}
           data-active={active === e.id}
           style={{ color: "inherit" }}
           onClick={() => onSelect?.(e.id)}
@@ -164,20 +165,29 @@ export function DiffLine({ from, to }: { from: string; to: string }) {
 export function MeaningCheckList({ items }: { items: MeaningCheck[] }) {
   return (
     <ul className="flex flex-wrap gap-1.5" aria-label="의미 단위 확인">
-      {items.map((m) => (
-        <li
-          key={m.id}
-          className={cn(
-            "ef-ko inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[12px]",
-            m.present ? "border-transparent bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]" : "border-[var(--ef-bad)]/30 bg-[var(--ef-bad-soft)] text-[var(--ef-bad)]",
-          )}
-          title={m.en}
-        >
-          {m.present ? <Check className="size-3" /> : <X className="size-3" />}
-          {m.ko}
-          {m.term ? <span className="ml-0.5 rounded bg-black/5 px-1 text-[9px] font-semibold uppercase tracking-wide dark:bg-white/10">term</span> : null}
-        </li>
-      ))}
+      {items.map((m) => {
+        // A non-critical term slot is reference only: wording differs between plants.
+        const reference = m.term && !m.critical;
+        return (
+          <li
+            key={m.id}
+            className={cn(
+              "ef-ko inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[12px]",
+              m.present
+                ? "border-transparent bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]"
+                : reference
+                  ? "border-dashed border-[var(--line)] text-[var(--muted)]"
+                  : "border-[var(--ef-bad)]/30 bg-[var(--ef-bad-soft)] text-[var(--ef-bad)]",
+            )}
+            title={reference && !m.present ? `기준 답안 용어: ${m.en} (현장마다 달라 점수에 반영하지 않음)` : m.en}
+          >
+            {m.present ? <Check className="size-3" /> : reference ? null : <X className="size-3" />}
+            {m.ko}
+            {reference && !m.present ? <span className="ef-en ml-0.5 text-[11px]">· {m.en}</span> : null}
+            {m.term ? <span className="ml-0.5 rounded bg-black/5 px-1 text-[9px] font-semibold tracking-wide dark:bg-white/10">{reference ? "용어 참고" : "용어"}</span> : null}
+          </li>
+        );
+      })}
     </ul>
   );
 }

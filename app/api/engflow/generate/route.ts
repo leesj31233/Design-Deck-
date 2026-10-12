@@ -14,6 +14,12 @@ const body = z.object({
   level: cefrSchema,
   mode: z.enum(["sentence", "phrase"]),
   avoidReferences: z.array(z.string().max(400)).max(40).default([]),
+  weakness: z
+    .object({
+      labelKo: z.string().max(120),
+      examples: z.array(z.object({ wrong: z.string().max(400), right: z.string().max(400) })).max(5),
+    })
+    .optional(),
 });
 
 export async function POST(req: Request) {

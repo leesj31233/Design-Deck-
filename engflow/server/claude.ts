@@ -15,6 +15,12 @@ import { SKILLS, skillName } from "../content/skills";
  */
 
 const MODEL = process.env.ENGFLOW_MODEL || "claude-opus-5-5";
+/**
+ * Answer grading runs once per submit and the learner waits for it, so it uses a
+ * fast model by default (ENGFLOW_EVAL_MODEL). Explanations and question
+ * generation keep the main model.
+ */
+const EVAL_MODEL = process.env.ENGFLOW_EVAL_MODEL || "claude-haiku-5-5";
 const FALLBACK_BETA = "server-side-fallback-2026-07-01";
 
 let client: Anthropic | null = null;
@@ -25,6 +31,10 @@ export function aiAvailable(): boolean {
 
 export function aiModel(): string {
   return MODEL;
+}
+
+export function evalModel(): string {
+  return EVAL_MODEL;
 }
 
 function getClient(): Anthropic {
@@ -38,20 +48,22 @@ function effortFor(depth: "quick" | "default"): "low" | "medium" {
 
 export class AIRefusalError extends Error {}
 
-/** Structured evaluation; one repair attempt if the model's output fails our schema. */
+/** Structured, grammar-focused grading in one fast pass; one repair attempt if the output fails our schema. */
 export async function evaluateWithClaude(q: Question, answer: string, local: Evaluation, depth: "quick" | "default", signal?: AbortSignal): Promise<Evaluation> {
   const prompt = buildEvaluationPrompt(q, answer, local);
+  const model = depth === "quick" ? EVAL_MODEL : MODEL;
   const run = async (content: string) => {
     const msg = await getClient().beta.messages.parse(
       {
-        model: MODEL,
-        max_tokens: 6000,
+        model,
+        max_tokens: 2000,
         betas: [FALLBACK_BETA],
         fallbacks: "default",
-        output_config: { effort: effortFor(depth), format: betaZodOutputFormat(aiEvaluationSchema) },
+        // Effort is tuned for the main model only; the fast grading model runs at its default.
+        output_config: model === MODEL ? { effort: effortFor(depth), format: betaZodOutputFormat(aiEvaluationSchema) } : { format: betaZodOutputFormat(aiEvaluationSchema) },
         messages: [{ role: "user", content }],
       },
-      { signal },
+      { signal, timeout: 20_000, maxRetries: 0 },
     );
     if (msg.stop_reason === "refusal") throw new AIRefusalError("Claude declined this evaluation.");
     return msg.parsed_output;

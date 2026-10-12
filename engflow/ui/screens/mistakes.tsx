@@ -11,6 +11,7 @@ import { useNav } from "../app";
 import { Card, Eyebrow, MasteryTrack, Sheet, StatusChip, cn, dateKo, relTimeKo } from "../kit";
 import { CATEGORY_KO } from "../practice/parts";
 import { pickReviewQuestion } from "../../core/session";
+import { WeakGrammarCard } from "../weak-grammar";
 
 type Filter = "all" | Exclude<MasteryStatus, "new">;
 
@@ -64,6 +65,8 @@ export function MistakesScreen() {
         <h1 className="mt-1.5 text-[28px] font-semibold tracking-[-.04em]">틀린 문장이 쌓이는 문법 노트</h1>
         <p className="ef-ko mt-1 max-w-[62ch] text-[14px] text-[var(--muted)]">주요 오류는 자동으로 저장되고 복습 일정에 들어갑니다. 숙달은 서로 다른 날·다른 문장에서 힌트 없이 반복해 맞혀야 인정됩니다.</p>
       </div>
+
+      <WeakGrammarCard limit={5} />
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
         <SearchField value={q} onChange={(e) => setQ(e.target.value)} onClear={() => setQ("")} placeholder="문장·문법·설명 검색" className="h-11 md:w-80" aria-label="실수 검색" />

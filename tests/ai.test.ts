@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { AIFormatError, buildEvaluationPrompt, normalizeAIEvaluation, parseGeneratedQuestion } from "@/engflow/core/ai";
-import { evaluateLocal } from "@/engflow/core/evaluate";
+import { PENALTY, evaluateLocal, overallFrom } from "@/engflow/core/evaluate";
 import { QUESTION_BY_ID, SKILLS } from "@/engflow/content";
 
 const q = QUESTION_BY_ID["ph-cond1-if-decide-now"];
 const answer = "If we will decide now";
 const local = evaluateLocal(q, answer);
 const valid = {
-  scores: { meaning: 90, grammar: 60, terminology: 100, organization: 90, comprehensibility: 88 },
-  notes: { meaning: "의미 전달", grammar: "시제 오류", terminology: "-", organization: "-", comprehensibility: "-" },
+  meaning: 90,
+  comprehensibility: 88,
   errors: [
-    { span: "will decide", fix: "decide", category: "tense", severity: "major", explanationKo: "if절에서는 현재시제를 씁니다." },
+    { span: "will decide", fix: "decide", category: "tense", severity: "major", explanationKo: "if절에서는 현재시제를 씁니다.", skill: "cond-1" },
     { span: "not in the answer", fix: "x", category: "article", severity: "minor", explanationKo: "가짜" },
   ],
   corrected: "If we decide now,",
@@ -18,18 +18,17 @@ const valid = {
   summaryKo: "의미는 통하지만 시제가 틀렸습니다.",
   grammarKo: "if 조건절 현재시제",
   alternatives: ["If we make a decision now,"],
-  addToReview: true,
-  reviewReasonKo: "주요 오류",
-  confidence: "high",
-  meaningEquivalent: true,
 };
 
 describe("AI evaluation contract", () => {
-  it("the prompt carries the rubric, principles and the learner answer verbatim", () => {
+  it("the prompt is grammar-first, accepts site wording, asks for native phrasing and quotes the answer verbatim", () => {
     const p = buildEvaluationPrompt(q, answer, local);
     expect(p).toContain(`"""${answer}"""`);
-    expect(p).toMatch(/Understandable does not mean grammatically correct/);
+    expect(p).toMatch(/Grammar first/);
+    expect(p).toMatch(/Site-specific word choice is NOT an error/);
+    expect(p).toMatch(/native-speaking engineers most commonly say/);
     expect(p).toMatch(/ONE category only/);
+    expect(p.length).toBeLessThan(5000);
   });
   it("validated output maps spans to positions and drops quotes that are not in the answer", () => {
     const e = normalizeAIEvaluation(valid, q, answer, local);
@@ -38,9 +37,28 @@ describe("AI evaluation contract", () => {
     expect(answer.slice(err.start, err.end)).toBe("will decide");
     expect(e.errors.some((x) => x.text === "not in the answer")).toBe(false);
   });
-  it("recomputes the overall score from the rubric instead of trusting the model", () => {
+  it("computes grammar from the error list with the shared penalty table and weights", () => {
     const e = normalizeAIEvaluation(valid, q, answer, local);
-    expect(e.scores.overall).toBe(Math.round(0.5 * 90 + 0.35 * 60 + 0.15 * 90));
+    expect(e.scores.grammar.score).toBe(100 - PENALTY.major);
+    expect(e.scores.overall).toBe(overallFrom(90, 100 - PENALTY.major, 100));
+  });
+  it("site-specific terminology is advisory: shown, never scored or reviewed", () => {
+    const e = normalizeAIEvaluation(
+      { ...valid, errors: [{ span: "decide", fix: "make a decision", category: "terminology", severity: "major", explanationKo: "용어" }] },
+      q, answer, local,
+    );
+    expect(e.errors[0].advisory).toBe(true);
+    expect(e.errors[0].severity).toBe("minor");
+    expect(e.scores.grammar.score).toBe(100);
+    expect(e.review.add).toBe(false);
+  });
+  it("spelling slips cost almost nothing", () => {
+    const e = normalizeAIEvaluation(
+      { ...valid, errors: [{ span: "decide", fix: "decide", category: "spelling", severity: "major", explanationKo: "철자" }] },
+      q, answer, local,
+    );
+    expect(e.scores.grammar.score).toBeGreaterThanOrEqual(97);
+    expect(e.scores.overall).toBeGreaterThanOrEqual(95);
   });
   it("rejects malformed output with a typed error", () => {
     expect(() => normalizeAIEvaluation({ scores: {} }, q, answer, local)).toThrow(AIFormatError);
@@ -69,5 +87,17 @@ describe("generated question validation", () => {
   });
   it("rejects structurally invalid JSON", () => {
     expect(parseGeneratedQuestion({ id: "x" }, ctx).question).toBeNull();
+  });
+});
+
+describe("AI output tidy-up", () => {
+  it("fixes small slips (unknown category, too many alternatives, score overshoot) instead of discarding the grade", () => {
+    const e = normalizeAIEvaluation(
+      { ...valid, meaning: 104, alternatives: ["a", "b", "c", "d"], errors: [{ ...valid.errors[0], category: "grammar", insertBefore: null }] },
+      q, answer, local,
+    );
+    expect(e.scores.meaning.score).toBe(100);
+    expect(e.alternatives.length).toBe(3);
+    expect(e.errors.find((x) => x.source === "ai")?.category).toBe("verb-form");
   });
 });

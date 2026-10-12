@@ -6,8 +6,8 @@ It is built on Design Deck (tokens, primitives, motion rules) and runs in two pl
 
 | Target | Where | Storage | Answer evaluation |
 | --- | --- | --- | --- |
-| **claude.ai artifact** | iPhone, iPad, desktop browser, Claude apps | The viewer's private `db` subtree (`data/users/<id>/…`), synced across their devices; local cache offline | Claude through `claude.use("sample")` on the viewer's own account, after the rule-based result |
-| **Next.js web app** (`/engflow`) | Any host that runs Next.js | PostgreSQL (`DATABASE_URL`), or embedded PGlite in development | Claude on the server (`ANTHROPIC_API_KEY`), after the rule-based result |
+| **claude.ai artifact** | iPhone, iPad, desktop browser, Claude apps | The viewer's private `db` subtree (`data/users/<id>/…`), synced across their devices; local cache offline | One fast Claude grading pass through `claude.use("sample")` (quick tier) on the viewer's own account; rule-based if unavailable or slow |
+| **Next.js web app** (`/engflow`) | Any host that runs Next.js | PostgreSQL (`DATABASE_URL`), or embedded PGlite in development | One fast Claude grading pass on the server (`ANTHROPIC_API_KEY`, `ENGFLOW_EVAL_MODEL`); rule-based if unavailable or slow |
 
 If neither storage nor AI is configured, the app still works. It runs a labeled browser-only demo with the rule-based evaluator, and Settings says exactly where data lives and how answers are scored.
 
@@ -24,7 +24,7 @@ npm run dev:artifact        # Vite dev server for the same app outside Next.js
 Copy `.env.example` to `.env.local` to enable PostgreSQL and server-side Claude:
 
 - `DATABASE_URL`: any PostgreSQL. Migrations in `db/migrations/*.sql` run automatically on first use.
-- `ANTHROPIC_API_KEY`: the key stays on the server. The default model is `claude-opus-5-5`; override it with `ENGFLOW_MODEL`. Requests use server-side refusal fallbacks.
+- `ANTHROPIC_API_KEY`: the key stays on the server. Answer grading uses a fast model (`ENGFLOW_EVAL_MODEL`, default `claude-haiku-5-5`) because the learner waits for it; explanations and question generation use `ENGFLOW_MODEL` (default `claude-opus-5-5`). Requests use server-side refusal fallbacks.
 
 The web app identifies a learner by a random sync key stored in the browser; the server stores only its SHA-256 hash, and every row is scoped to it. To continue on another device, copy the key from Settings. Production multi-user deployments should put real authentication (for example Supabase Auth) in front of this.
 
@@ -57,16 +57,32 @@ db/migrations                    SQL migrations (PostgreSQL)
 
 ### Evaluation
 
-Each answer is evaluated immediately and offline. If Claude is available, it re-evaluates the answer with the same rubric.
+Each answer is graded **once**. On submit, Claude grades it in one fast, grammar-focused pass (usually a few seconds). If Claude is unavailable, fails validation or takes longer than 9 seconds, the rule-based result is shown instead, and the learner can also choose it right away. Whatever is shown first stays: a late reply is discarded, so the score never jumps. An exact match with a reference answer is shown instantly without Claude.
 
-1. **Meaning units.** Lenient patterns check each Korean meaning chunk. Grammar mistakes do not hide meaning.
+**Scoring is grammar-centred** and identical for both graders: the score is computed from the error list with one penalty table.
+
+| Part | Weight | What counts |
+| --- | --- | --- |
+| Grammar accuracy | 55% | Minor −10, major −30, critical −45 per error. Spelling −1 per slip, at most −3. |
+| Key meaning & expressions | 35% | The message chunks and common meeting expressions (*run a simulation*, *wait for*). |
+| Word order & structure | 10% | Word order, sentence structure, answers that are too short. |
+| Site terminology | not scored | Plants name things differently (*raw* vs *feed composition*). A different term is shown as a suggestion only; the correction keeps the learner's word. |
+
+Comprehensibility in an international meeting is reported separately. The recommended sentence is the phrasing native-speaking engineers most commonly use in meetings.
+
+The rule-based grader works offline:
+
+1. **Meaning units.** Lenient patterns check each Korean meaning chunk. A term slot counts only when the message cannot work without it.
 2. **Question pitfalls.** Curated patterns catch known Korean-speaker mistakes for that item and carry the best explanation.
-3. **Grammar rules.** 20 context-checked rule groups, each firing only when the word class is known: missing *be* in the progressive, *wait* without *for*, *before* + base verb, modal + *to*, agreement, *will* in if/when clauses, uncountable plurals, a/an, irregular past forms, third-conditional *will have*, and more.
-4. **Alignment.** The answer is aligned against the closest correct answer, sentence by sentence for long answers. A difference counts as an error only when it sits next to shared words, it is not part of a rephrased phrase, and every equally close correct answer agrees.
-5. **Rubric.** Full sentences are scored on meaning 30%, grammar 30%, terminology 20%, and organization and naturalness 20%. Phrase quizzes are scored on meaning 50% and form 50%. Comprehensibility in an international meeting is reported separately. Each error is charged to exactly one score, and spelling slips cost little.
-6. **Minimal correction.** Only the detected errors are fixed, so the learner's own words are kept. A correction is rejected if it breaks a rule or moves away from every correct answer.
+3. **Grammar rules.** 21 context-checked rule groups, each firing only when the word class is known: missing *be* in the progressive, *wait* without *for*, *before* + base verb, modal + *to*, agreement, *will* in if/when clauses, *every* + plural, uncountable plurals, a/an, irregular past forms, third-conditional *will have*, and more.
+4. **Alignment.** The answer is aligned against the closest correct answer, sentence by sentence for long answers. A difference counts only when it sits next to shared words and is not part of a rephrased phrase. Another equally close correct answer can veto it only if it accepts the learner's word as it is.
+5. **Minimal correction.** Only the detected errors are fixed, so the learner's own words (including site terms) are kept. A correction is rejected if it breaks a rule or moves away from every correct answer.
 
-The rule-based result reports its own confidence. When the learner paraphrases far from every reference, it says so and recommends the Claude review. Claude's output must pass a zod schema. Its quoted error spans must exist in the answer. Scores are recomputed from the rubric, and curated pitfalls are kept. If any of this fails, the rule-based result stays on screen.
+Claude's output must pass a zod schema (small slips such as an unknown category name are tidied first). Its quoted error spans must exist in the answer, terminology notes become non-scoring suggestions, and curated pitfalls are kept.
+
+### Frequent grammar mistakes
+
+Every scored grammar error (articles and prepositions included; spelling, meaning gaps and site wording excluded) strengthens a *skill × error type* weak point, stored with the learner's own wrong → right examples. Strength halves every 14 days and drops with each independent correct answer on that grammar. While a point is strong, sessions rank questions that test the same skill with the same kind of trap first (marked *자주 틀리는 문법*), feedback says when a mistake is a repeat, and Today and *내 실수* list the top points with two drills: curated similar questions, or a new Claude-written question built from the learner's own mistakes (validated by the same QC before use).
 
 ### Review scheduling and mastery
 
@@ -98,7 +114,8 @@ See [CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md) for the authoring rules, the 
 
 ## Known limitations
 
-- The rule-based evaluator is precise on the patterns it knows, but it can miss new kinds of errors in free paraphrases. It flags this with low confidence, and the Claude review covers it.
+- The rule-based grader is precise on the patterns it knows, but it can miss new kinds of errors in free paraphrases. It flags this with low confidence; with Claude available, Claude grades instead.
+- Grading speed depends on the Claude tier the host provides; the 9-second cap and the "바로 보기" button keep the wait bounded.
 - Speaking (recording, transcription, pronunciation) is not implemented.
 - The web app's sync key is device-held identity, not authentication.
 - The TOEIC Speaking figures need manual verification against ETS/YBM (see above).

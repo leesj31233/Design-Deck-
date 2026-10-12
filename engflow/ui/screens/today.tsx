@@ -10,6 +10,7 @@ import { useNav } from "../app";
 import { Card, Eyebrow, MasteryTrack, ProgressRing, StatusChip, cn, dateKo, relTimeKo } from "../kit";
 import { WeekBars } from "../charts";
 import { CATEGORY_LABEL } from "../practice/session";
+import { WeakGrammarCard } from "../weak-grammar";
 
 export function useStartLesson() {
   const app = useApp();
@@ -190,6 +191,8 @@ export function TodayScreen() {
           )}
         </Card>
       </div>
+
+      <WeakGrammarCard />
     </div>
   );
 }

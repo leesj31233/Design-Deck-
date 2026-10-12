@@ -1,5 +1,6 @@
 import { DAY_MS } from "./fsrs";
 import { isDue, isOverdue } from "./scheduler";
+import { weakGrammar, weaknessMatch } from "./weakness";
 import type { Category, Cefr, LearnerState, Question, QuestionMode, ReviewItem, SkillState } from "./types";
 import { CEFR_ORDER } from "./types";
 
@@ -149,6 +150,8 @@ export function buildSession(state: LearnerState, bank: Question[], opts: Sessio
   const weak = weakSkills(state, now);
   const weakSet = new Set(weak.map((w) => w.skill));
   const neglected = weak.filter((w) => w.neglected).map((w) => w.skill);
+  // Grammar the learner keeps getting wrong: similar questions (same skill, same kind of trap) come first.
+  const grammarWeak = weakGrammar(state, now).slice(0, 6);
   const recentCutoff = now - 3 * DAY_MS;
   const pool = lessonBank.filter((q) => {
     if (used.has(q.id)) return false;
@@ -170,21 +173,26 @@ export function buildSession(state: LearnerState, bank: Question[], opts: Sessio
     if (neglected.includes(skill)) score += 2;
     if (!st || st.status === "new") score += 0.5;
     if (st?.status === "mastered") score -= 2;
-    return { q, score };
+    const wm = weaknessMatch(q, grammarWeak);
+    score += 1.5 * wm.score;
+    return { q, score, weakLabel: wm.score >= 1 ? wm.point?.labelKo : undefined };
   });
   scored.sort((a, b) => b.score - a.score);
   const nNew = opts.reviewOnly ? 0 : opts.size - reviews.length;
   const fresh: SessionItem[] = [];
   const skillCount = new Map<string, number>();
-  for (const { q } of scored) {
+  for (const { q, weakLabel } of scored) {
     if (fresh.length >= nNew) break;
     const k = q.skills[0];
-    if ((skillCount.get(k) ?? 0) >= 2) continue; // variety: at most two per primary skill
+    // Variety: at most two per primary skill (three for a frequent-mistake skill).
+    if ((skillCount.get(k) ?? 0) >= (weakLabel ? 3 : 2)) continue;
     skillCount.set(k, (skillCount.get(k) ?? 0) + 1);
     used.add(q.id);
     fresh.push({
       kind: "new", questionId: q.id,
-      reasonKo: neglected.includes(k) ? "오래 연습하지 않은 약점 문법" : weakSet.has(k) ? "약점 문법 집중" : state.seen[q.id] ? "다시 보는 문항" : "새 문항",
+      reasonKo: weakLabel
+        ? `자주 틀리는 문법 · ${weakLabel}`
+        : neglected.includes(k) ? "오래 연습하지 않은 약점 문법" : weakSet.has(k) ? "약점 문법 집중" : state.seen[q.id] ? "다시 보는 문항" : "새 문항",
     });
   }
   // Not enough new questions: fill with more reviews; not enough reviews: fill with more new.

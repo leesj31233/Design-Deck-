@@ -446,13 +446,26 @@ const itsContraction: Rule = (w) => {
   return out;
 };
 
+/** "every flanges" → "every flange": every takes a singular noun. */
+const everyPlural: Rule = (w) =>
+  w.flatMap((t, i) => {
+    if (t.norm !== "every") return [];
+    const n = w[i + 1];
+    if (!n || !/^[a-z]{3,}[^suia']s$/.test(n.norm) || verbInfo(n.norm)?.form === "3sg") return [];
+    const single = n.norm.endsWith("ies") ? `${n.norm.slice(0, -3)}y` : /(ch|sh|x|ss)es$/.test(n.norm) ? n.norm.slice(0, -2) : n.norm.slice(0, -1);
+    return [{
+      rule: "every-plural", from: i + 1, to: i + 2, replacement: single, category: "countability" as const, severity: "major" as const, skill: "countability",
+      messageKo: `'every' 뒤에는 단수 명사가 옵니다: 'every ${single}' (= all ${n.norm}).`,
+    }];
+  });
+
 const RULES: Rule[] = [
   itsContraction,
   lexicalAgreement,
   thirdConditionalWill,
   comparisonForms,
   missingBeProgressive, waitWithoutFor, prepositionBaseVerb, modalTo, modalInflected, doubleModal, beBaseVerb,
-  perfectBaseVerb, doPast, agreement, doubleComparative, willInConditionClause, uncountablePlural, nonWords, articleSound,
+  perfectBaseVerb, doPast, agreement, doubleComparative, willInConditionClause, uncountablePlural, everyPlural, nonWords, articleSound,
   transitivePreposition,
 ];
 

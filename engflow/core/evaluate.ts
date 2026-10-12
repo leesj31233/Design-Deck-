@@ -12,10 +12,43 @@ import type {
 
 export const LOCAL_EVALUATOR_LABEL = "규칙 기반 분석 (오프라인)";
 
-const PENALTY: Record<Severity, number> = { minor: 8, major: 18, critical: 30 };
-const SPELLING_PENALTY = 3;
+/**
+ * Scoring is grammar-centred: grammar accuracy decides most of the score, the
+ * key meaning/expression chunks come next, structure last. Site-specific
+ * terminology (raw vs feed composition) is reference only and never scored;
+ * spelling slips cost almost nothing.
+ */
+export const SCORE_WEIGHTS = { grammar: 0.55, meaning: 0.35, organization: 0.1 } as const;
+export const PENALTY: Record<Severity, number> = { minor: 10, major: 30, critical: 45 };
+export const SPELLING_PENALTY = 1;
+export const SPELLING_CAP = 3;
+/** Alignment findings are heuristic: their total cost per bucket is capped. */
+const ALIGN_CAP = 45;
 const CLOSE_DISTANCE = 0.45;
 const CONSENSUS_MARGIN = 0.08;
+
+/** Overall score from the three scored buckets (terminology is reference only). */
+export function overallFrom(meaning: number, grammar: number, organization: number): number {
+  return clamp(SCORE_WEIGHTS.grammar * grammar + SCORE_WEIGHTS.meaning * meaning + SCORE_WEIGHTS.organization * organization);
+}
+
+/** Errors that count toward the score (advisory word-choice notes do not). */
+export function scoredErrors<T extends { advisory?: boolean }>(errors: T[]): T[] {
+  return errors.filter((e) => !e.advisory);
+}
+
+/** Penalty points per bucket; spelling is nearly free, heuristic alignment findings are capped. */
+export function bucketPenalties(errors: ErrorSpan[]): Record<ScoreBucket, number> {
+  const scored = scoredErrors(errors);
+  const spelling = Math.min(SPELLING_CAP, scored.filter((e) => e.category === "spelling").length * SPELLING_PENALTY);
+  const of = (bucket: ScoreBucket) => {
+    const list = scored.filter((e) => e.bucket === bucket && e.category !== "spelling");
+    const firm = list.filter((e) => e.source !== "alignment").reduce((sum, e) => sum + PENALTY[e.severity], 0);
+    const heuristic = Math.min(ALIGN_CAP, list.filter((e) => e.source === "alignment").reduce((sum, e) => sum + PENALTY[e.severity], 0));
+    return firm + heuristic;
+  };
+  return { grammar: of("grammar") + spelling, meaning: of("meaning"), organization: of("organization"), terminology: 0 };
+}
 
 export function defaultBucket(c: ErrorCategory): ScoreBucket {
   if (c === "meaning-shift" || c === "missing-content") return "meaning";
@@ -197,6 +230,7 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const isVerb = !!(vt && vl);
       if (isVerb && vt!.form === "base" && (vl!.form === "3sg" || vl!.form === "past" || BE_FORMS.has(lt))) continue;
       if (BE_FORMS.has(lt) && (tt === "been" || tt === "be")) continue; // "was damaged" vs "may have been damaged": both valid
+      if (/^(every|each|one)$/.test(w[op.li - 1]?.norm ?? "")) continue; // "every flange" vs "all flanges": both valid
       // "testing data" vs "test data": an -ing/base swap only matters after to/modals or prepositions.
       if (isVerb && vt!.form === "base" && vl!.form === "ing" && !/^(to|can|could|may|might|must|should|will|would)$/.test(tw[op.ti - 1]?.norm ?? "")) continue;
       const prevT = tw[op.ti - 1]?.norm;
@@ -219,6 +253,7 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const lt = w[op.li].norm;
       const tt = tw[op.ti].norm;
       if (!isFunctionWord(lt) || !isFunctionWord(tt)) continue; // content paraphrase: meaning units judge it
+      if (/^(every|each)$/.test(lt) && tt === "all") continue; // "every flange" = "all flanges"
       const lc = wordClass(lt);
       const tc = wordClass(tt);
       let category: ErrorCategory = "word-choice";
@@ -237,6 +272,17 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       } else if (tc === "article" && lc === "article") {
         category = "article";
         msg = `관사: '${w[op.li].raw}' → '${tt}'.`;
+      } else if (lc === "be" && tc === "aux" && /^(has|have|had)$/.test(tt)) {
+        category = "tense";
+        severity = "major";
+        const part = w[op.li + 1]?.raw ?? "";
+        msg = part
+          ? `'${w[op.li].raw} ${part}'는 수동태(누가 바꾸었나)처럼 들립니다. 바뀐 결과가 지금 영향을 줄 때는 현재완료 '${tt} ${part}'를 씁니다.`
+          : `시제: '${w[op.li].raw}' → '${tt}'(현재완료).`;
+      } else if (lc === "aux" && tc === "be" && /^(has|have|had)$/.test(lt)) {
+        category = "verb-form";
+        severity = "major";
+        msg = `주어가 동작을 받는 쪽이면 수동태(be + 과거분사)가 필요합니다: '${w[op.li].raw}' → '${tt}'.`;
       } else if (MODAL_LIKE.has(tt) && MODAL_LIKE.has(lt)) {
         continue; // can/could/may/might/would/should: a nuance judged by meaning units and pitfalls, not a tense error
       } else if (CONJ_SYNONYMS.some((g) => g.has(tt) && g.has(lt))) {
@@ -305,6 +351,48 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
   return { findings, edits };
 }
 
+/**
+ * Consensus across equally close correct answers. Another valid answer vetoes a
+ * finding only when it accepts the learner's word(s) there as they are (or, for a
+ * missing word, does not need a word there). A word that other answers merely
+ * align differently is still wrong, so "raw composition are changed" keeps its error
+ * even though "…composition changed" aligns the words another way.
+ */
+function consensusFilter(
+  findings: Finding[], w: Token[], others: { al: Alignment; tw: Token[] }[], skill: string,
+): Finding[] {
+  if (!others.length) return findings;
+  const views = others.map((o) => {
+    const raw = alignmentFindings(o.al, w, o.tw, skill, true).findings;
+    const flagged = new Set<number>();
+    const inserts = new Set<number>();
+    for (const f of raw) {
+      if (f.from === f.to) inserts.add(f.from);
+      for (let i = f.from; i < f.to; i++) flagged.add(i);
+    }
+    const accepted = new Set<number>();
+    for (const op of o.al.ops) {
+      if (op.type === "ins") continue;
+      if (op.type === "match") accepted.add(op.li);
+      else if (!flagged.has(op.li) && op.type !== "del") {
+        // An unflagged difference between two function words (since/because, in/within) or an
+        // accepted inflection means this answer is fine with the learner's word.
+        const lt = w[op.li].norm;
+        const tt = o.tw[op.ti].norm;
+        if (op.type === "inflect" || op.type === "spell" || (isFunctionWord(lt) && isFunctionWord(tt))) accepted.add(op.li);
+      }
+    }
+    return { accepted, inserts };
+  });
+  return findings.filter((f) => {
+    if (f.from === f.to) return views.every((v) => v.inserts.has(f.from));
+    return views.every((v) => {
+      for (let i = f.from; i < f.to; i++) if (v.accepted.has(i)) return false;
+      return true;
+    });
+  });
+}
+
 const MOVABLE_ADVERBS = new Set(["first", "later", "also", "only", "already", "still", "yet", "again", "now", "today", "tomorrow", "together", "soon", "then", "carefully", "quickly", "again", "immediately", "regularly", "every", "next"]);
 
 /** Korean-style "verb + adverb + object" order: "check first the rate". */
@@ -360,9 +448,7 @@ function sentenceAlignedFindings(q: Question, tokens: Token[], w: Token[], skill
     if (!best || best.al.distance > CLOSE_DISTANCE || best.ts.length < 2) continue;
     const r = alignmentFindings(best.al, part, best.ts, skill);
     const others = ranked.slice(1).filter((o) => o.al.distance <= Math.min(CLOSE_DISTANCE, best.al.distance + CONSENSUS_MARGIN) && o.ts.length >= 2);
-    const keyOf = (f: { from: number; to: number; category: string }) => `${f.from}:${f.to}:${f.category}`;
-    const agreed = others.map((o) => new Set(alignmentFindings(o.al, part, o.ts, skill, true).findings.map(keyOf)));
-    const kept = r.findings.filter((f) => agreed.every((set) => set.has(keyOf(f))));
+    const kept = consensusFilter(r.findings, part, others.map((o) => ({ al: o.al, tw: o.ts })), skill);
     const ranges2 = new Set(kept.map((f) => `${f.from}:${f.to}`));
     findings.push(...kept.map((f) => ({ ...f, from: f.from + a, to: f.to + a })));
     edits.push(...r.edits.filter((e) => ranges2.has(`${e.from}:${e.to}`)).map((e) => ({ ...e, from: e.from + a, to: e.to + a })));
@@ -426,6 +512,21 @@ function applyEdits(tokens: Token[], w: Token[], edits: Edit[]): string {
   }
   if (!endInserted) emitInsertions(w.length);
   return capitalizeSentence(joinWords(parts));
+}
+
+function grammarNote(scored: ErrorSpan[]): string {
+  const g = scored.filter((e) => e.bucket === "grammar" && e.category !== "spelling");
+  const sp = scored.filter((e) => e.category === "spelling").length;
+  if (!g.length) return sp ? `문법 오류 없음 · 철자 ${sp}개(감점 거의 없음)` : "문법 오류를 찾지 못했습니다.";
+  return `문법 오류 ${g.length}개${sp ? ` · 철자 ${sp}개` : ""}`;
+}
+
+function termNote(termUnits: MeaningCheck[]): string {
+  if (!termUnits.length) return "이 문항은 용어 부담이 적습니다.";
+  const other = termUnits.filter((m) => !m.present);
+  return other.length
+    ? `기준 답안 용어: ${other.map((m) => m.en).join(", ")} — 현장마다 달라 점수에 반영하지 않습니다.`
+    : "기준 답안과 같은 용어를 썼습니다(점수에는 반영하지 않음).";
 }
 
 function clamp(n: number): number {
@@ -526,11 +627,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
     const a = alignmentFindings(al, w, tw, primarySkill);
     // Only answers about as close as the best one get a vote (a learner mixing two valid variants).
     const others = ranked.slice(1).filter((r) => r.al.distance <= Math.min(CLOSE_DISTANCE, al.distance + CONSENSUS_MARGIN) && r.tw.length >= 2);
-    const keyOf = (f: { from: number; to: number; category: string }) => `${f.from}:${f.to}:${f.category}`;
-    // Other targets confirm with their raw differences (no paraphrase filter), so a synonym elsewhere cannot hide a real error.
-    const agreed = others.map((o) => new Set(alignmentFindings(o.al, w, o.tw, primarySkill, true).findings.map(keyOf)));
-    const keep = (f: { from: number; to: number; category: string }) => agreed.every((set) => set.has(keyOf(f)));
-    const keptFindings = a.findings.filter(keep);
+    const keptFindings = consensusFilter(a.findings, w, others, primarySkill);
     const keptRanges = new Set(keptFindings.map((f) => `${f.from}:${f.to}`));
     findings.push(...keptFindings);
     edits.push(...a.edits.filter((e) => keptRanges.has(`${e.from}:${e.to}`) || keptFindings.some((f) => f.category === "word-order" && e.replacement === w[f.from]?.raw)));
@@ -581,51 +678,35 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   }
 
   // ── Scores ──
-  const sumPenalty = (bucket: ScoreBucket) =>
-    errors.filter((e) => e.bucket === bucket).reduce((s, e) => s + (e.category === "spelling" ? SPELLING_PENALTY : PENALTY[e.severity]), 0);
-  const spellingTotal = Math.min(9, errors.filter((e) => e.category === "spelling").length * SPELLING_PENALTY);
+  // Site-specific word choice is advisory: never scored, never reviewed, never "corrected" away.
+  for (const e of errors) if (e.category === "terminology") e.advisory = true;
   const weight = (id: string) => q.meaning.find((u) => u.id === id)?.weight ?? 1;
-
-  const nonTerm = meaning.filter((m) => !m.term);
+  // Meaning counts the message chunks; a term slot counts only when the message cannot work without it.
+  const scoredUnits = meaning.filter((m) => !m.term || m.critical);
   const termUnits = meaning.filter((m) => m.term);
   const cover = (list: MeaningCheck[]) => {
     const total = list.reduce((s, m) => s + weight(m.id), 0);
     if (!total) return 1;
     return list.filter((m) => m.present).reduce((s, m) => s + weight(m.id), 0) / total;
   };
-  const isPhrase = q.mode === "phrase";
+  const pen = bucketPenalties(errors);
   // A missing unit and a meaning-shift error usually describe the same problem: take the worse, never the sum.
-  let meaningScore = 100 * (isPhrase ? cover(meaning) : cover(nonTerm));
-  if ((isPhrase ? meaning : nonTerm).some((m) => m.critical && !m.present)) meaningScore = Math.min(meaningScore, 45);
-  meaningScore = Math.min(meaningScore, 100 - sumPenalty("meaning"));
-  let termScore = 100 * cover(termUnits);
-  if (termUnits.some((m) => m.critical && !m.present)) termScore = Math.min(termScore, 45);
-  termScore = Math.min(termScore, 100 - sumPenalty("terminology"));
-  // Alignment findings are heuristic: their total cost per bucket is capped so a long valid answer cannot collapse to zero.
-  const ALIGN_CAP = 40;
-  const bucketPenalty = (bucket: ScoreBucket) => {
-    const list = errors.filter((e) => e.bucket === bucket && e.category !== "spelling");
-    const firm = list.filter((e) => e.source !== "alignment").reduce((s, e) => s + PENALTY[e.severity], 0);
-    const heuristic = Math.min(ALIGN_CAP, list.filter((e) => e.source === "alignment").reduce((s, e) => s + PENALTY[e.severity], 0));
-    return firm + heuristic;
-  };
-  const grammarPenalty = bucketPenalty("grammar") + spellingTotal;
-  const grammarScore = 100 - grammarPenalty;
-  const orgPenalty = bucketPenalty("organization");
+  let meaningScore = 100 * cover(scoredUnits);
+  if (scoredUnits.some((m) => m.critical && !m.present)) meaningScore = Math.min(meaningScore, 45);
+  meaningScore = Math.min(meaningScore, 100 - pen.meaning);
+  const grammarScore = 100 - pen.grammar;
   // Words the learner left out that are already reported as errors do not count again as "too short".
   const explainedMissing = errors.filter((e) => e.start === e.end && e.source !== "meaning").length;
   const ratio = (w.length + explainedMissing) / Math.max(1, tw.length);
   const lengthPenalty = ratio < 0.5 ? 25 : ratio < 0.7 ? 10 : ratio > 2.2 ? 10 : 0;
-  const orgScore = 100 - orgPenalty - lengthPenalty;
+  const orgScore = 100 - pen.organization - lengthPenalty;
 
   const M = clamp(meaningScore);
   const G = clamp(grammarScore);
-  const T = clamp(termScore);
+  const T = clamp(100 * cover(termUnits));
   const O = clamp(orgScore);
-  const C = clamp(0.55 * M + 0.15 * T + 0.15 * O + 0.15 * Math.max(G, 40));
-  // Phrase quiz: meaning and form (grammar + structure) weigh equally.
-  const form = clamp(100 - grammarPenalty - orgPenalty - lengthPenalty);
-  let overall = isPhrase ? clamp(0.5 * M + 0.5 * form) : clamp(0.3 * M + 0.3 * G + 0.2 * T + 0.2 * O);
+  const C = clamp(0.6 * M + 0.2 * O + 0.2 * Math.max(G, 40));
+  let overall = overallFrom(M, G, O);
   if (errors.some((e) => e.category === "meaning-shift" && e.severity === "critical")) overall = Math.min(overall, 60);
 
   // ── Corrections: never output a correction our own rules reject ──
@@ -637,26 +718,34 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
     const cw = words(tokenize(text));
     return Math.min(...correctTargets(q).map((t) => align(cw, words(tokenize(t))).distance)) <= al.distance + 1e-9;
   };
+  // Advisory word-choice notes keep the learner's own (site) wording in the correction.
+  const advisoryRanges = new Set(kept.filter((f) => f.category === "terminology").map((f) => `${f.from}:${f.to}`));
+  for (let i = edits.length - 1; i >= 0; i--) if (advisoryRanges.has(`${edits[i].from}:${edits[i].to}`)) edits.splice(i, 1);
   let corrected = applyEdits(tokens, w, edits);
   if (!validCorrection(corrected) || !closer(corrected)) {
     const strong = applyEdits(tokens, w, edits.filter((e) => e.priority > 1));
     corrected = validCorrection(strong) ? strong : capitalizeSentence(target);
   }
-  const majorErrors = errors.filter((e) => e.severity !== "minor");
-  const mainError = [...errors].sort((a, b) => PENALTY[b.severity] - PENALTY[a.severity])[0];
+  const scored = scoredErrors(errors);
+  const majorErrors = scored.filter((e) => e.severity !== "minor");
+  const grammarErrors = scored.filter((e) => e.bucket !== "meaning" && e.category !== "spelling");
+  const mainError = [...scored].sort((a, b) => PENALTY[b.severity] - PENALTY[a.severity] || Number(a.category === "spelling") - Number(b.category === "spelling"))[0];
 
   const compNote = C >= 85 ? "국제 회의에서 쉽게 이해됩니다." : C >= 65 ? "대체로 이해되지만 듣는 사람이 한 번 더 생각해야 합니다." : "의미가 정확히 전달되기 어렵습니다.";
-  const missingText = missingUnits.length ? `빠진 의미: ${missingUnits.map((m) => `'${m.ko}'`).join(", ")}.` : "";
 
+  const spellingOnly = scored.length > 0 && scored.every((e) => e.category === "spelling");
+  const scoredMissing = missingUnits.filter((m) => !m.term || m.critical);
   let summaryKo: string;
-  if (!errors.length && !missingUnits.length) {
-    summaryKo = "기준 답안과 표현은 다르지만 의미와 문법 모두 문제를 찾지 못했습니다.";
+  if ((!scored.length || spellingOnly) && !scoredMissing.length) {
+    summaryKo = spellingOnly
+      ? "문법은 정확합니다. 철자 실수만 있어 점수에는 거의 영향이 없습니다."
+      : "기준 답안과 표현은 다르지만 문법과 의미 모두 문제를 찾지 못했습니다.";
   } else {
-    const lead = M >= 85 ? "의미는 잘 전달됩니다." : M >= 60 ? "의미는 대체로 전달됩니다." : "의미가 제대로 전달되지 않습니다.";
-    const issue = mainError ? mainError.messageKo.split(/(?<=[.。])\s/)[0] : "";
+    const lead = !grammarErrors.length ? "문법은 정확합니다." : M >= 85 ? "의미는 잘 전달되지만 문법을 고쳐야 합니다." : "문법과 의미 모두 다시 확인하세요.";
+    const issue = mainError && mainError.category !== "spelling" ? mainError.messageKo.split(/(?<=[.。])\s/)[0] : "";
     const parts = [lead];
-    if (issue) parts.push(M >= 60 ? `다만 ${issue}` : `가장 큰 문제: ${issue}`);
-    if (missingText) parts.push(missingText);
+    if (issue) parts.push(`핵심: ${issue}`);
+    if (scoredMissing.length) parts.push(`빠진 의미: ${scoredMissing.map((m) => `'${m.ko}'`).join(", ")}.`);
     summaryKo = parts.join(" ").replace(/\s+/g, " ").trim();
   }
 
@@ -669,7 +758,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
         : (opts.hintLevel ?? 0) >= 2
           ? "힌트 도움을 받은 답이라 독립적으로 다시 확인합니다."
           : "점수가 기준(80)보다 낮아 다시 연습합니다."
-    : errors.length
+    : scored.length
       ? "사소한 오류만 있어 복습 목록에는 넣지 않고 숙련도 기록에만 반영합니다."
       : "정확합니다. 숙련도 기록에 반영됩니다.";
 
@@ -684,9 +773,9 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   return {
     ...base,
     scores: {
-      meaning: { score: M, noteKo: missingUnits.filter((m) => !m.term).length ? missingText : M >= 85 ? "핵심 의미가 모두 들어 있습니다." : "의미가 일부 달라졌습니다." },
-      grammar: { score: G, noteKo: errors.some((e) => e.bucket === "grammar") ? `문법 오류 ${errors.filter((e) => e.bucket === "grammar").length}개` : "문법 오류를 찾지 못했습니다." },
-      terminology: { score: T, noteKo: termUnits.some((m) => !m.present) ? `빠진 기술 용어: ${termUnits.filter((m) => !m.present).map((m) => m.en).join(", ")}` : termUnits.length ? "기술 용어가 정확합니다." : "이 문항은 용어 부담이 적습니다." },
+      meaning: { score: M, noteKo: scoredMissing.length ? `빠진 의미: ${scoredMissing.map((m) => `'${m.ko}'`).join(", ")}.` : M >= 85 ? "핵심 의미와 표현이 모두 들어 있습니다." : "의미가 일부 달라졌습니다." },
+      grammar: { score: G, noteKo: grammarNote(scored) },
+      terminology: { score: T, noteKo: termNote(termUnits) },
       organization: { score: O, noteKo: errors.some((e) => e.category === "word-order") ? "어순을 다시 확인하세요." : ratio < 0.7 ? "문장이 불완전하거나 너무 짧습니다." : "문장 구성이 자연스럽습니다." },
       comprehensibility: { score: C, noteKo: compNote },
       overall,

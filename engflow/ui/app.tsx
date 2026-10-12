@@ -235,7 +235,7 @@ function StorageDot() {
       <span className={cn("mt-1 size-2 shrink-0 rounded-full", s.durable ? "bg-[var(--ef-ok-fill)]" : "bg-[var(--ef-warn-fill)]")} />
       <span>
         {s.labelKo}
-        <span className="block">{app.ai.available ? "Claude 분석 사용 가능" : "규칙 기반 평가"}</span>
+        <span className="block">{app.ai.available && app.state.settings.ai !== "off" ? "Claude 빠른 채점" : "규칙 기반 채점"}</span>
       </span>
     </div>
   );

@@ -120,11 +120,8 @@ export function SettingsScreen() {
         <Row label="하루 목표" hint="오늘 화면의 목표 문항 수입니다.">
           <Choice value={String(s.dailyTarget)} label="하루 목표" options={["6", "12", "20", "30"].map((v) => ({ v, label: `${v}문항` }))} onChange={(v) => set({ dailyTarget: Number(v) })} />
         </Row>
-        <Row label="AI 평가" hint="자동: 문장 구성과 확신이 낮은 구문 답을 Claude가 다시 평가합니다. 요청 시: 버튼을 눌렀을 때만. 끄기: 규칙 기반만.">
-          <Choice value={s.ai} label="AI 평가" options={[{ v: "auto", label: "자동" }, { v: "on-request", label: "요청 시" }, { v: "off", label: "끄기" }]} onChange={(v) => set({ ai: v })} />
-        </Row>
-        <Row label="문장 평가 정밀도" hint="정밀은 더 깊이 생각하지만 결과가 늦게 옵니다(규칙 기반 결과는 즉시 표시).">
-          <Choice value={s.aiDepth} label="평가 정밀도" options={[{ v: "default", label: "정밀" }, { v: "quick", label: "빠름" }]} onChange={(v) => set({ aiDepth: v })} />
+        <Row label="채점 방식" hint="제출하면 한 번만 채점합니다. Claude가 문법을 정밀하게 보고(보통 몇 초), 응답이 늦거나 연결이 없으면 규칙 기반 결과를 바로 보여 줍니다. 한번 나온 점수는 바뀌지 않습니다. 철자와 현장 용어(raw/feed 등)는 점수에 거의 또는 전혀 반영하지 않습니다.">
+          <Choice value={s.ai === "off" ? "off" : "auto"} label="채점 방식" options={[{ v: "auto", label: "Claude 빠른 채점" }, { v: "off", label: "규칙 기반만" }]} onChange={(v) => set({ ai: v })} />
         </Row>
         <Row label="복습 간격" hint="적응형: 1→3→7→14→30일로 시작해 두 번 성공하면 FSRS가 기억 상태에 맞춰 조정합니다. 고정: 항상 사다리 간격.">
           <Choice value={s.scheduler} label="복습 간격" options={[{ v: "adaptive", label: "적응형 FSRS" }, { v: "ladder", label: "고정 간격" }]} onChange={(v) => set({ scheduler: v })} />
@@ -176,10 +173,12 @@ export function SettingsScreen() {
       <Card className="p-4 md:p-5">
         <Eyebrow>채점 방식</Eyebrow>
         <ul className="ef-ko mt-2 space-y-1.5 text-[13px] text-[var(--ef-ink-2)]">
-          <li>· 문장 구성: 의미 30% · 문법 30% · 기술 용어 20% · 구조·자연스러움 20%. 회의 전달력은 문법 점수와 따로 표시합니다.</li>
-          <li>· 규칙 기반 분석은 즉시, 오프라인으로 동작합니다: 기준 답안과 다른 정답들, 의미 단위, 문항별 오답 패턴, 일반 문법 규칙을 사용합니다. 처음 보는 표현에서는 오류를 놓칠 수 있어 신뢰도를 함께 표시합니다.</li>
-          <li>· Claude 분석은 같은 기준표로 다시 평가하고 결과를 형식 검증(JSON 스키마)한 뒤에만 보여 줍니다. 실패하면 규칙 기반 결과를 유지합니다.</li>
-          <li>· 같은 오류는 한 항목에서만 감점합니다. 사소한 철자는 작게 감점합니다.</li>
+          <li>· 점수는 문법 중심입니다: 문법 정확도 55% · 핵심 의미·표현 35% · 어순·문장 구조 10%. 회의 전달력은 따로 표시합니다.</li>
+          <li>· 철자 실수는 1개에 1점, 최대 3점만 감점합니다. raw/feed composition처럼 현장마다 다른 용어 선택은 감점하지 않고 참고로만 보여 줍니다.</li>
+          <li>· 제출하면 한 번만 채점합니다. Claude 빠른 채점이 문법을 정밀하게 보고, 늦거나 연결이 없으면 규칙 기반 결과를 바로 보여 줍니다. 한번 표시된 점수는 바뀌지 않습니다.</li>
+          <li>· Claude 결과는 형식 검증(JSON 스키마)을 통과해야 쓰이고, 점수는 Claude가 찾은 오류 목록에 규칙 기반과 같은 감점표를 적용해 계산합니다.</li>
+          <li>· 추천 문장은 원어민 엔지니어가 회의에서 자주 쓰는 말투를 기준으로 합니다.</li>
+          <li>· 자주 틀리는 문법(문법 × 오류 종류)은 내 실수 예문과 함께 기록되고, 다음 세션에서 같은 문법 함정이 있는 문제를 먼저 냅니다. 시간이 지나거나 힌트 없이 맞히면 약해집니다.</li>
           <li>· 힌트를 쓰면 그 답은 독립 숙련 증거로 덜 반영되고 복습 간격도 짧아집니다.</li>
         </ul>
       </Card>

@@ -32,10 +32,11 @@ export function deriveGrade(input: GradeInput): { grade: Grade; reasons: string[
   if (input.skipped) return { grade: 1, reasons: ["건너뛴 문항"] };
   if (input.hint >= 3) return { grade: 1, reasons: [input.hint === 4 ? "정답 보기 사용" : "부분 정답 힌트 사용"] };
   const { overall } = input.evaluation.scores;
-  const errs = input.evaluation.errors;
+  // Advisory notes (site-specific wording) never affect the grade; spelling alone does not block "Easy".
+  const errs = input.evaluation.errors.filter((e) => !e.advisory);
   const hasCritical = errs.some((e) => e.severity === "critical");
   const hasMajor = errs.some((e) => e.severity === "major");
-  let g: Grade = overall >= 95 && errs.length === 0 ? 4 : overall >= 85 && !hasMajor ? 3 : overall >= 70 ? 2 : 1;
+  let g: Grade = overall >= 95 && errs.every((e) => e.category === "spelling") ? 4 : overall >= 85 && !hasMajor ? 3 : overall >= 70 ? 2 : 1;
   if (hasCritical && g > 1) {
     g = 1;
     reasons.push("의미가 달라지는 오류");

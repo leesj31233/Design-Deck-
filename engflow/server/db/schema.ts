@@ -93,6 +93,21 @@ export const diagnostics = pgTable(
   (t) => [primaryKey({ columns: [t.learnerId, t.id] })],
 );
 
+export const grammarWeak = pgTable(
+  "engflow_grammar_weak",
+  {
+    learnerId: text("learner_id").notNull().references(() => learners.id, { onDelete: "cascade" }),
+    id: text("id").notNull(),
+    skill: text("skill").notNull(),
+    category: text("category").notNull(),
+    count: integer("count").notNull(),
+    strength: real("strength").notNull(),
+    lastAt: bigint("last_at", { mode: "number" }).notNull(),
+    data: jsonb("data").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.learnerId, t.id] }), index("engflow_grammar_weak_strength").on(t.learnerId, t.strength)],
+);
+
 export const generatedQuestions = pgTable(
   "engflow_generated_questions",
   {

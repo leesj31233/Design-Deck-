@@ -57,7 +57,10 @@ export interface MeaningUnit {
   any: Pattern[];
   /** Relative weight (default 1). */
   weight?: number;
-  /** Technical-terminology slot: scored under Terminology instead of Meaning. */
+  /**
+   * Technical-terminology slot. Site-specific wording varies between plants, so a
+   * term slot is shown for reference only; it counts toward meaning only when critical.
+   */
   term?: boolean;
   /** Message cannot work without it. */
   critical?: boolean;
@@ -148,6 +151,11 @@ export interface ErrorSpan {
   skill?: string;
   /** Where the finding came from. */
   source: "pitfall" | "rule" | "alignment" | "meaning" | "ai";
+  /**
+   * Shown as a suggestion only: never scored, never scheduled for review.
+   * Used for site-specific word choice (raw/feed composition…), which varies by plant.
+   */
+  advisory?: boolean;
 }
 
 export interface MeaningCheck {
@@ -287,6 +295,24 @@ export interface MistakeRecord {
   questionIds: string[];
 }
 
+/**
+ * A grammar point the learner keeps getting wrong (skill × error type), with
+ * the learner's own wrong → right examples. Drives question selection.
+ */
+export interface GrammarWeakPoint {
+  id: string;
+  skill: string;
+  category: ErrorCategory;
+  /** Total times this error was made. */
+  count: number;
+  /** Decaying strength (half-life 14 days; independent successes on the skill lower it). */
+  strength: number;
+  firstAt: number;
+  lastAt: number;
+  /** Most recent examples (newest last). */
+  examples: { wrong: string; right: string; fix: string; at: number; questionId: string }[];
+}
+
 export interface AttemptRecord {
   id: string;
   at: number;
@@ -318,8 +344,10 @@ export interface Settings {
   theme: "system" | "light" | "dark";
   dailyTarget: number;
   scheduler: "adaptive" | "ladder";
+  /** "auto": one fast Claude grading pass per answer (rule-based if unavailable). "on-request" is a legacy value treated as "auto". */
   ai: "auto" | "on-request" | "off";
-  aiDepth: "quick" | "default";
+  /** Legacy (grading is always the fast tier now). */
+  aiDepth?: "quick" | "default";
   autocorrect: boolean;
   showNaturalKorean: boolean;
   reducedMotion: "system" | "reduce";
@@ -366,5 +394,7 @@ export interface LearnerState {
   daily: Record<string, DailyLog>;
   seen: Record<string, { count: number; lastAt: number; best: number }>;
   generated: Question[];
+  /** Frequent grammar mistakes, keyed `${skill}:${category}` (added after v1; may be missing in old states). */
+  weak?: Record<string, GrammarWeakPoint>;
   updatedAt: number;
 }

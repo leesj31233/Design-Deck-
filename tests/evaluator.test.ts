@@ -142,3 +142,38 @@ describe("evaluation principles", () => {
     expect(e.review.add).toBe(true);
   });
 });
+
+describe("grammar-centred scoring (learner feedback from iPhone testing)", () => {
+  const sim = QUESTION_BY_ID["fs-process-run-simulation-again"];
+  it("catches 'are changed' even when two valid answers align it differently, and keeps the learner's site term", () => {
+    const e = evaluateLocal(sim, "We have to run the process simulation again because raw composiotion are changed.");
+    const tense = e.errors.find((x) => x.text === "are");
+    expect(tense?.severity).toBe("major");
+    expect(tense?.fix).toBe("has");
+    // "raw" vs "feed" is site-specific wording: not an error, not changed in the correction.
+    expect(e.errors.some((x) => x.text === "raw" && !x.advisory)).toBe(false);
+    expect(e.corrected).toContain("raw composition has changed");
+    expect(e.scores.overall).toBeLessThan(85);
+  });
+  it("a spelling slip barely moves the score", () => {
+    const e = evaluateLocal(sim, "We need to run the process simulaton again because the feed composition has changed.");
+    expect(e.errors.every((x) => x.category === "spelling")).toBe(true);
+    expect(e.scores.overall).toBeGreaterThanOrEqual(98);
+  });
+  it("a different site term for a non-critical term slot does not lower the score", () => {
+    const e = evaluateLocal(sim, "We need to run the process simulation again because the raw material has changed.");
+    expect(e.scores.overall).toBe(100);
+    expect(e.scores.terminology.noteKo).toMatch(/점수에 반영하지 않습니다/);
+  });
+  it("grammar weighs most: one major grammar error costs more than a missing minor meaning chunk", () => {
+    const grammar = evaluateLocal(sim, "We need to run the process simulation again because the feed composition is change.");
+    const meaning = evaluateLocal(sim, "We need to run the process simulation because the feed composition has changed.");
+    expect(grammar.scores.overall).toBeLessThan(meaning.scores.overall);
+  });
+  it("'every' takes a singular noun; 'every flange' and 'all flanges' are both correct", () => {
+    const rq = QUESTION_BY_ID["rv-check-object-l2-b"];
+    expect(evaluateLocal(rq, "Before startup, please check the steam pressure and check every flange for leaks.").scores.overall).toBe(100);
+    const bad = evaluateLocal(rq, "Before startup, please check the steam pressure and check every flanges for leaks.");
+    expect(bad.errors.some((x) => x.text === "flanges" && x.fix === "flange" && x.severity === "major")).toBe(true);
+  });
+});

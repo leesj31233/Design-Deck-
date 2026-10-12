@@ -6,6 +6,7 @@ import type {
   AttemptRecord, DiagnosticResultRecord, Evaluation, Grade, HintLevel, LearnerState, MistakeRecord, Question,
   ReviewItem, Settings,
 } from "./types";
+import { updateWeakness } from "./weakness";
 import { SEEDS } from "../content/seeds";
 import { skillName } from "../content/skills";
 
@@ -14,7 +15,6 @@ export const DEFAULT_SETTINGS: Settings = {
   dailyTarget: 12,
   scheduler: "adaptive",
   ai: "auto",
-  aiDepth: "default",
   autocorrect: false,
   showNaturalKorean: false,
   reducedMotion: "system",
@@ -82,6 +82,7 @@ export function createInitialState(now: number): LearnerState {
     daily: {},
     seen: {},
     generated: [],
+    weak: {},
     updatedAt: now,
   };
 }
@@ -156,7 +157,7 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
       organization: ev.scores.organization.score,
       comprehensibility: ev.scores.comprehensibility.score,
     },
-    errorCategories: [...new Set(ev.errors.map((e) => e.category))],
+    errorCategories: [...new Set(ev.errors.filter((e) => !e.advisory).map((e) => e.category))],
     hint: input.hint,
     responseMs: input.responseMs,
     firstKeyMs: input.firstKeyMs,
@@ -182,7 +183,8 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
     if (before.status !== after.status) masteryChanges.push({ skill, from: before.status, to: after.status, mastery: after.mastery });
   };
   update(primary, 1, success);
-  const errorSkills = new Set(ev.errors.filter((e) => e.severity !== "minor" && e.skill && e.skill !== primary).map((e) => e.skill!));
+  const scored = ev.errors.filter((e) => !e.advisory);
+  const errorSkills = new Set(scored.filter((e) => e.severity !== "minor" && e.skill && e.skill !== primary).map((e) => e.skill!));
   for (const s of errorSkills) update(s, 0.5, false);
 
   // ── Review scheduling ──
@@ -199,7 +201,7 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
     scheduled.push({ itemId: item.id, label: item.label, due: item.due, note: item.scheduleNote, created: false });
   }
   if (ev.review.add && !input.reviewItemId) {
-    const significant = ev.errors.filter((e) => e.severity !== "minor");
+    const significant = scored.filter((e) => e.severity !== "minor");
     const targets = significant.length
       ? [...new Map(significant.map((e) => [errorKey(e.skill ?? primary, e.category), e])).values()].slice(0, 3)
       : [null];
@@ -240,7 +242,7 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
   }
 
   // ── Mistake notebook (major/critical errors) ──
-  for (const e of ev.errors.filter((x) => x.severity !== "minor")) {
+  for (const e of scored.filter((x) => x.severity !== "minor")) {
     const skill = e.skill ?? primary;
     const id = `mistake-${skill}-${e.category}-${(e.text || e.fix).toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}`;
     const reviewItemId = state.items[errorKey(skill, e.category)] ? errorKey(skill, e.category) : input.reviewItemId ?? "";
@@ -252,6 +254,9 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
           count: 1, firstAt: now, lastAt: now, reviewItemId, questionIds: [q.id],
         };
   }
+
+  // ── Frequent grammar mistakes (drive "similar question" selection) ──
+  state.weak = updateWeakness(prev.weak, { question: q, evaluation: ev, hint: input.hint, skipped: input.skipped, now });
 
   // ── Daily log & seen ──
   const day = localDayKey(now);
@@ -316,7 +321,15 @@ export function importState(json: string): LearnerState {
   const parsed = JSON.parse(json) as { app?: string; state?: LearnerState };
   const s = parsed.state ?? (parsed as unknown as LearnerState);
   if (!s || s.schema !== 1 || typeof s.items !== "object" || !Array.isArray(s.attempts)) throw new Error("EngFlow 학습 기록 파일이 아닙니다.");
-  return { ...s, settings: { ...DEFAULT_SETTINGS, ...s.settings } };
+  return { ...s, settings: normalizeSettings(s.settings), weak: s.weak ?? {} };
+}
+
+/** Current defaults plus stored choices; legacy values map to their current meaning. */
+function normalizeSettings(stored: Partial<Settings> | undefined): Settings {
+  const merged: Settings = { ...DEFAULT_SETTINGS, ...stored };
+  if (merged.ai === "on-request") merged.ai = "auto"; // grading is one fast pass now; there is no second, on-request pass
+  delete merged.aiDepth;
+  return merged;
 }
 
 /** Bring a stored state up to the current shape (new defaults, new seeds). */
@@ -325,8 +338,9 @@ export function migrateState(s: LearnerState, now: number): LearnerState {
   return {
     ...fresh,
     ...s,
-    settings: { ...DEFAULT_SETTINGS, ...s.settings },
+    settings: normalizeSettings(s.settings),
     profile: { ...fresh.profile, ...s.profile },
+    weak: s.weak ?? {},
     generated: s.generated ?? [],
     seen: s.seen ?? {},
     daily: s.daily ?? {},
