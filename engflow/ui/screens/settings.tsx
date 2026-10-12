@@ -30,6 +30,12 @@ function gradeStats(attempts: { gradeMs?: number; evaluator: "local" | "ai" }[])
   return `최근 ${recent.length}회: 평균 ${(Math.round(avg / 100) / 10).toFixed(1)}초 · Claude 채점 ${Math.round((ai / recent.length) * 100)}%.`;
 }
 
+/** Wordings Claude approved: graded at once next time (core/learned.ts). */
+function learnedStats(seen: Record<string, { ok?: string[] }>): string {
+  const n = Object.values(seen).reduce((k, x) => k + (x.ok?.length ?? 0), 0);
+  return n ? ` Claude가 정확하다고 확인한 내 표현 ${n}개는 다음에 기다리지 않고 바로 채점합니다.` : "";
+}
+
 function Row({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2 py-3.5 sm:flex-row sm:items-center sm:justify-between">
@@ -147,7 +153,7 @@ export function SettingsScreen() {
         </Row>
         <Row
           label="채점 대기 시간"
-          hint={`자동(권장): 기준 답안과 비슷한 답은 1초 안에, 표현이 많이 다른 답은 Claude 확인을 기다립니다. 기다리는 시간은 이 기기에서 잰 Claude 응답 속도에 맞춰 줄어듭니다(처음에는 최대 8초). 규칙 기반 검사는 처음 보는 문장의 오류를 놓칠 수 있기 때문입니다. 항상 1초: 더 빠르지만 다르게 쓴 답은 정확도가 떨어질 수 있습니다. ${gradeStats(app.state.attempts)}${claudeSpeed()}`}
+          hint={`자동(권장): 기준 답안과 비슷한 답은 1초 안에, 표현이 많이 다른 답은 Claude 확인을 기다립니다. 기다리는 시간은 이 기기에서 잰 Claude 응답 속도에 맞춰 줄어듭니다(처음에는 최대 8초). 규칙 기반 검사는 처음 보는 문장의 오류를 놓칠 수 있기 때문입니다. 항상 1초: 더 빠르지만 다르게 쓴 답은 정확도가 떨어질 수 있습니다. ${gradeStats(app.state.attempts)}${claudeSpeed()}${learnedStats(app.state.seen)}`}
         >
           <Choice
             value={s.gradeMode ?? "auto"}
