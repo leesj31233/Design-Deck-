@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, X } from "lucide-react";
 import { Kbd } from "@/components/ui/kbd";
 import { evaluateLocal } from "../../core/evaluate";
+import { GRADE_WAIT_MS, createGrader, type GradeVia } from "../../core/grader";
 import { pickReviewQuestion, type SessionItem } from "../../core/session";
 import type { RecordResult } from "../../core/store";
 import type { Evaluation, HintLevel, Question } from "../../core/types";
@@ -20,8 +21,6 @@ import { FeedbackPanel } from "./feedback";
 import { weaknessNote } from "../../core/weakness";
 import { GuideSheet, type GuideTab } from "../guide";
 
-/** Longest wait for Claude's grade before the rule-based result is shown instead. */
-const GRADE_TIMEOUT_MS = 9000;
 
 export const CATEGORY_LABEL: Record<string, string> = {
   process: "공정 설계",
@@ -108,6 +107,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   // The one result shown for this answer. It is set once and never replaced.
   const [evaluation, setEvaluation] = React.useState<Evaluation | null>(null);
   const [gradeNote, setGradeNote] = React.useState<string | null>(null);
+  const [gradeInfo, setGradeInfo] = React.useState<{ ms: number; via: GradeVia } | null>(null);
   const [slow, setSlow] = React.useState(false);
   const [committed, setCommitted] = React.useState<RecordResult | null>(null);
   const [practiceRetry, setPracticeRetry] = React.useState(false);
@@ -123,8 +123,6 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const firstKey = React.useRef<number | null>(null);
   // Response time ends at submit: grading and reading the feedback do not count as "slow".
   const submittedAt = React.useRef<number | null>(null);
-  const aiCtl = React.useRef<AbortController | null>(null);
-  const showLocalNow = React.useRef<(() => void) | null>(null);
   const inputRef = React.useRef<HTMLTextAreaElement & HTMLInputElement>(null);
   const nextRef = React.useRef<HTMLButtonElement>(null);
 
@@ -132,6 +130,21 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const q = item ? app.qIndex[item.questionId] : undefined;
   const settings = app.state.settings;
   const aiPossible = app.ai.available && settings.ai !== "off";
+  const budgetMs = GRADE_WAIT_MS[settings.gradeWait ?? "fast"];
+  const live = React.useRef({ aiPossible, budgetMs });
+  live.current = { aiPossible, budgetMs };
+  // One grader per session: background grading while typing, one result per submit within the budget.
+  const grader = React.useMemo(
+    () =>
+      createGrader({
+        evaluate: (question, text, local, signal) => app.platform.ai.evaluate(question, text, local, "quick", signal),
+        aiEnabled: () => live.current.aiPossible,
+        budgetMs: () => live.current.budgetMs,
+      }),
+    [app.platform.ai],
+  );
+  // Guards against a grade arriving for a question the learner already left.
+  const gradeToken = React.useRef(0);
 
   // Reset per question.
   React.useEffect(() => {
@@ -140,6 +153,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     setPhase("answer");
     setEvaluation(null);
     setGradeNote(null);
+    setGradeInfo(null);
     setSlow(false);
     setShowKo(false);
     setCommitted(null);
@@ -147,7 +161,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     t0.current = app.now();
     firstKey.current = null;
     submittedAt.current = null;
-    aiCtl.current?.abort();
+    gradeToken.current++;
+    grader.reset();
     const t = setTimeout(() => {
       if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) inputRef.current?.focus();
     }, 60);
@@ -155,49 +170,33 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, item?.questionId]);
 
-  React.useEffect(() => () => aiCtl.current?.abort(), []);
+  React.useEffect(() => () => grader.reset(), [grader]);
+
+  // While the learner types: a pause on a fairly complete sentence starts Claude grading in the background,
+  // so the grade is usually ready the moment they submit.
+  React.useEffect(() => {
+    if (phase !== "answer" || !q || !aiPossible) return;
+    const text = answer.trim();
+    if (!text) return;
+    const t = setTimeout(() => grader.prefetch(q, text, hint), /[.?!]$/.test(text) ? 150 : 450);
+    return () => clearTimeout(t);
+  }, [answer, hint, phase, q, aiPossible, grader]);
 
   const pulse = (id: string) => {
     setFlash(id);
     setTimeout(() => setFlash(null), 450);
   };
 
-  /**
-   * One grading pass per answer. Claude grades first (fast tier, grammar-focused);
-   * if it is unavailable or slower than GRADE_TIMEOUT_MS the rule-based result is
-   * shown instead. Whatever is shown first stays: a late reply is discarded.
-   */
-  const grade = (question: Question, text: string, local: Evaluation) => {
-    aiCtl.current?.abort();
-    const c = new AbortController();
-    aiCtl.current = c;
-    let settled = false;
-    const finish = (ev: Evaluation, note: string | null) => {
-      if (settled || aiCtl.current !== c || c.signal.aborted) return;
-      settled = true;
-      clearTimeout(timer);
-      clearTimeout(slowTimer);
-      showLocalNow.current = null;
-      c.abort();
-      setEvaluation(ev);
-      setGradeNote(note);
-      setPhase("feedback");
-      setTimeout(() => nextRef.current?.focus({ preventScroll: true }), 50);
-    };
+  const show = (ev: Evaluation, info: { ms: number; via: GradeVia }, note: string | null) => {
+    setEvaluation(ev);
+    setGradeInfo(info);
+    setGradeNote(note);
     setSlow(false);
-    setPhase("grading");
-    const timer = setTimeout(() => finish(local, "Claude 응답이 늦어 규칙 기반 결과를 표시했습니다."), GRADE_TIMEOUT_MS);
-    const slowTimer = setTimeout(() => setSlow(true), 2500);
-    showLocalNow.current = () => finish(local, "기다리지 않고 규칙 기반 결과를 표시했습니다.");
-    app.platform.ai
-      .evaluate(question, text, local, "quick", c.signal)
-      .then((ev) => finish(ev, null))
-      .catch((e) => {
-        if (e instanceof AIUnavailableError && e.code === "cancelled") return;
-        finish(local, "Claude 채점을 사용할 수 없어 규칙 기반 결과를 표시했습니다.");
-      });
+    setPhase("feedback");
+    setTimeout(() => nextRef.current?.focus({ preventScroll: true }), 50);
   };
 
+  /** One grade per answer, within the budget (1 s by default); see core/grader.ts. */
   const submit = () => {
     if (!q || phase !== "answer") return;
     const text = answer.trim();
@@ -208,23 +207,25 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       return;
     }
     submittedAt.current = app.now();
-    const local = evaluateLocal(q, text, { hintLevel: hint });
-    // An exact match needs no second opinion; without Claude the rule-based result is final.
-    if (!aiPossible || local.exact) {
-      setEvaluation(local);
-      setGradeNote(null);
-      setPhase("feedback");
-      setTimeout(() => nextRef.current?.focus({ preventScroll: true }), 50);
+    const quick = grader.peek(q, text, hint);
+    if (quick) {
+      show(quick.evaluation, quick, quick.noteKo);
       return;
     }
-    grade(q, text, local);
+    const token = ++gradeToken.current;
+    setPhase("grading");
+    const slowTimer = budgetMs > 1500 ? setTimeout(() => token === gradeToken.current && setSlow(true), 1200) : null;
+    grader.grade(q, text, hint).then((out) => {
+      if (slowTimer) clearTimeout(slowTimer);
+      if (token !== gradeToken.current) return;
+      show(out.evaluation, out, out.noteKo);
+    });
   };
 
   const commit = (opts: { skipped?: boolean } = {}): RecordResult | null => {
     if (!q || !item || committed || practiceRetry) return committed;
     const ev = opts.skipped ? evaluateLocal(q, "") : evaluation;
     if (!ev) return null;
-    aiCtl.current?.abort();
     const responseMs = (submittedAt.current ?? app.now()) - t0.current;
     const result = app.record({
       question: q,
@@ -235,6 +236,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       context: item.kind === "review" ? "review" : "lesson",
       reviewItemId: item.reviewItemId,
       skipped: opts.skipped,
+      gradeMs: opts.skipped ? undefined : gradeInfo?.ms,
     });
     setCommitted(result);
     setDone((d) => [...d, { item, question: q, result, evaluation: ev }]);
@@ -272,6 +274,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     setPhase("answer");
     setEvaluation(null);
     setGradeNote(null);
+    setGradeInfo(null);
+    grader.reset();
     setTimeout(() => inputRef.current?.focus(), 30);
   };
 
@@ -448,7 +452,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
 
           {/* Answer */}
           <div className="mt-6">
-            {phase === "answer" ? (
+            {phase === "answer" || phase === "grading" ? (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -463,6 +467,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                       ref={inputRef}
                       value={answer}
                       rows={3}
+                      readOnly={phase === "grading"}
                       onChange={(e) => {
                         if (firstKey.current === null) firstKey.current = app.now();
                         setAnswer(e.target.value);
@@ -491,6 +496,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                         if (firstKey.current === null) firstKey.current = app.now();
                         setAnswer(e.target.value);
                       }}
+                      readOnly={phase === "grading"}
                       placeholder="영어로 입력 후 Enter"
                       lang="en"
                       autoCapitalize="sentences"
@@ -515,10 +521,34 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                       <SkipForward className="size-4" /> 건너뛰기
                     </button>
                   ) : null}
-                  <button type="submit" className={cn("dd-focus ml-auto inline-flex h-11 items-center gap-2 rounded-xl bg-[var(--foreground)] px-5 text-[15px] font-semibold text-[var(--background)] transition active:scale-[.98]", flash === "submit" && "opacity-80")}>
-                    제출 <CornerDownLeft className="ef-kbd-hint size-4 opacity-70" />
+                  <button
+                    type="submit"
+                    disabled={phase === "grading"}
+                    className={cn("dd-focus ml-auto inline-flex h-11 min-w-[92px] items-center justify-center gap-2 rounded-xl bg-[var(--foreground)] px-5 text-[15px] font-semibold text-[var(--background)] transition active:scale-[.98] disabled:opacity-80", flash === "submit" && "opacity-80")}
+                  >
+                    {phase === "grading" ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" /> 채점 중
+                      </>
+                    ) : (
+                      <>
+                        제출 <CornerDownLeft className="ef-kbd-hint size-4 opacity-70" />
+                      </>
+                    )}
                   </button>
                 </div>
+                {phase === "grading" ? (
+                  <div className="mt-2" aria-live="polite">
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--ef-track)]">
+                      <div className="ef-grade-bar h-full rounded-full bg-[var(--accent)]" style={{ animationDuration: `${budgetMs}ms` }} />
+                    </div>
+                    {slow ? (
+                      <button type="button" onClick={() => grader.skip()} className="dd-focus mt-1.5 text-[12px] text-[var(--muted)] underline underline-offset-4">
+                        기다리지 않고 바로 보기 (규칙 기반)
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
                 <p className="ef-kbd-hint mt-2 items-center gap-1.5 px-1 text-[11px] text-[var(--muted)]">
                   <Kbd>Enter</Kbd> 제출 {isSentence ? <><Kbd>Shift</Kbd>+<Kbd>Enter</Kbd> 줄바꿈</> : null} <Kbd>⌥S</Kbd> 건너뛰기 <Kbd>Esc</Kbd> 나가기
                 </p>
@@ -529,24 +559,6 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
             </div>
           </div>
 
-          {/* Grading: one pass, a few seconds at most */}
-          {phase === "grading" ? (
-            <div className="mt-2" aria-live="polite">
-              <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3">
-                <p className="ef-en ef-answer whitespace-pre-wrap break-words">{answer.trim()}</p>
-              </div>
-              <div className="mt-3 flex items-center gap-2 text-[14px] font-medium">
-                <Loader2 className="size-4 animate-spin text-[var(--accent)]" /> 문법 채점 중…
-              </div>
-              <div className="ef-skeleton mt-2 h-1.5 w-full" />
-              {slow ? (
-                <button onClick={() => showLocalNow.current?.()} className="dd-focus mt-2 text-[12px] text-[var(--muted)] underline underline-offset-4">
-                  기다리지 않고 바로 보기 (규칙 기반)
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-
           {/* Feedback */}
           {phase === "feedback" && evaluation ? (
             <div className="mt-6">
@@ -555,6 +567,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                 question={q}
                 evaluation={evaluation}
                 note={gradeNote}
+                gradeMs={gradeInfo?.ms ?? null}
                 weakNote={committed ? null : weaknessNote(app.state, evaluation, q)}
                 compact={!isSentence}
                 onGuide={(skill, tab) => setGuide({ skill, tab })}

@@ -81,7 +81,7 @@ test("full-sentence lesson: feedback, grammar guide, mistake saved", async ({ pa
   expect(errors).toEqual([]);
 });
 
-/** A stand-in for the artifact runtime: no storage, and a "sample" capability that grades after `delay` ms. */
+/** A stand-in for the artifact runtime: no storage, and a "sample" capability that grades after `delay` ms and counts calls. */
 async function fakeClaude(page: Page, delay: number) {
   await page.addInitScript((ms) => {
     const grade = {
@@ -90,13 +90,13 @@ async function fakeClaude(page: Page, delay: number) {
       errors: [{ span: "are", fix: "has", category: "tense", severity: "major", explanationKo: "바뀐 결과가 지금 영향을 주므로 현재완료 has changed를 씁니다.", skill: "present-perfect" }],
       corrected: "We have to run it again because the composition has changed.",
       recommended: "We need to rerun it because the composition has changed.",
-      alternatives: ["The composition has changed, so we need to run it again."],
-      summaryKo: "문법 오류 1개: are changed → has changed.",
-      grammarKo: "결과가 지금까지 이어지면 현재완료를 씁니다.",
     };
+    const w = window as unknown as { claude: unknown; __claudeCalls: number };
+    w.__claudeCalls = 0;
     const sample = Object.assign(async () => ({ text: "" }), {
       json: (_p: string, opts?: { signal?: AbortSignal }) =>
         new Promise((resolve, reject) => {
+          w.__claudeCalls++;
           const t = setTimeout(() => resolve(grade), ms);
           opts?.signal?.addEventListener("abort", () => {
             clearTimeout(t);
@@ -104,43 +104,78 @@ async function fakeClaude(page: Page, delay: number) {
           });
         }),
     });
-    (window as unknown as { claude: unknown }).claude = { use: async (name: string) => (name === "sample" ? sample : null) };
+    w.claude = { use: async (name: string) => (name === "sample" ? sample : null) };
   }, delay);
 }
 
-test("one grading pass: Claude's grade appears once and never changes", async ({ page }) => {
-  await fakeClaude(page, 700);
-  const errors = await open(page);
+const WRONG = "We have to run it again because the composition are changed.";
+
+async function startSentenceLesson(page: Page) {
   await nav(page, "학습");
   await page.getByRole("button", { name: "문장 말하기", exact: true }).click();
   await page.getByRole("button", { name: /^시작/ }).click();
-  await page.locator("#ef-answer").fill("We have to run it again because the composition are changed.");
+  await expect(page.locator("textarea#ef-answer")).toBeVisible();
+}
+
+test("fast grading: Claude's grade appears within about a second, once, and never changes", async ({ page }) => {
+  await fakeClaude(page, 400);
+  const errors = await open(page);
+  await startSentenceLesson(page);
+  await page.locator("#ef-answer").fill(WRONG);
+  const t0 = Date.now();
   await page.getByRole("button", { name: /제출/ }).click();
-  await expect(page.getByText("문법 채점 중…")).toBeVisible();
-  // No score is shown while grading, so nothing can jump.
-  await expect(page.getByRole("img", { name: /종합/ })).toHaveCount(0);
-  await expect(page.getByText("Claude 채점")).toBeVisible();
+  await expect(page.getByText(/Claude 채점/)).toBeVisible();
+  expect(Date.now() - t0).toBeLessThan(1500);
   const ring = page.getByRole("img", { name: /종합/ });
   const first = await ring.getAttribute("aria-label");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1200);
   expect(await ring.getAttribute("aria-label")).toBe(first);
+  await expect(page.getByText(/Claude 채점 · 0\.\d초/)).toBeVisible();
   await expect(page.getByText("원어민이 회의에서 자주 쓰는 표현")).toBeVisible();
   await expect(page.getByText("We need to rerun it because the composition has changed.")).toBeVisible();
-  await expect(page.getByText(/문법 정확도/)).toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test("a slow Claude never blocks: the learner can take the rule-based grade right away", async ({ page }) => {
+test("a slow Claude never blocks: after 1 second the rule-based grade stands, and stays", async ({ page }) => {
   await fakeClaude(page, 60_000);
   await open(page);
-  await nav(page, "학습");
-  await page.getByRole("button", { name: "문장 말하기", exact: true }).click();
-  await page.getByRole("button", { name: /^시작/ }).click();
-  await page.locator("#ef-answer").fill("We have to run it again because the composition are changed.");
+  await startSentenceLesson(page);
+  await page.locator("#ef-answer").fill(WRONG);
+  const t0 = Date.now();
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByText(/규칙 기반 · \d\.\d초/)).toBeVisible();
+  expect(Date.now() - t0).toBeLessThan(2000);
+  await expect(page.getByText(/1초 안에 Claude 응답이 없어 규칙 기반으로 채점했습니다/)).toBeVisible();
+  const ring = page.getByRole("img", { name: /종합/ });
+  const first = await ring.getAttribute("aria-label");
+  await page.waitForTimeout(1000);
+  expect(await ring.getAttribute("aria-label")).toBe(first);
+  await expect(page.getByText(/Claude 채점/)).toHaveCount(0);
+});
+
+test("grading starts while typing: submitting after a pause shows Claude's grade at once", async ({ page }) => {
+  await fakeClaude(page, 1200);
+  await open(page);
+  await startSentenceLesson(page);
+  await page.locator("#ef-answer").fill(WRONG);
+  await page.waitForTimeout(1900); // the pause: background grading starts and finishes
+  const t0 = Date.now();
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByText(/Claude 채점 · 0\.[0-4]초/)).toBeVisible();
+  expect(Date.now() - t0).toBeLessThan(800);
+  expect(await page.evaluate(() => (window as unknown as { __claudeCalls: number }).__claudeCalls)).toBe(1);
+});
+
+test("with a longer wait chosen in Settings, the learner can still skip to the rule-based grade", async ({ page }) => {
+  await fakeClaude(page, 60_000);
+  await open(page);
+  await nav(page, "설정");
+  await page.getByRole("radiogroup", { name: "채점 대기 시간" }).getByRole("radio", { name: "3초" }).click();
+  await startSentenceLesson(page);
+  await page.locator("#ef-answer").fill(WRONG);
   await page.getByRole("button", { name: /제출/ }).click();
   await page.getByRole("button", { name: /기다리지 않고 바로 보기/ }).click();
-  await expect(page.getByText("규칙 기반", { exact: true })).toBeVisible();
-  await expect(page.getByText(/기다리지 않고 규칙 기반 결과를 표시했습니다/)).toBeVisible();
+  await expect(page.getByText(/기다리지 않고 규칙 기반으로 채점했습니다/)).toBeVisible();
 });
 
 test("scene + difficulty: a meal conversation at difficulty 3 shows the chat and my turn", async ({ page }) => {

@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   const who = requireLearner(req);
   if (who instanceof Response) return who;
   if (!aiAvailable()) return fail(503, "ai_not_configured", "서버에 AI 키가 설정되지 않았습니다.");
-  if (!rateLimit(`eval:${who.id}`, 30)) return fail(429, "rate_limited", "AI 평가 요청이 많습니다. 잠시 후 다시 시도하세요.");
+  if (!rateLimit(`eval:${who.id}`, 90)) return fail(429, "rate_limited", "AI 평가 요청이 많습니다. 잠시 후 다시 시도하세요.");
   let parsed;
   try {
     parsed = body.safeParse(await readJson(req, 100_000));

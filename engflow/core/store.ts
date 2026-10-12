@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
   dailyTarget: 12,
   scheduler: "adaptive",
   ai: "auto",
+  gradeWait: "fast",
   autocorrect: false,
   showNaturalKorean: false,
   reducedMotion: "system",
@@ -96,6 +97,8 @@ export interface RecordInput {
   context: AttemptRecord["context"];
   reviewItemId?: string;
   skipped?: boolean;
+  /** Time from submit to the grade appearing (ms). */
+  gradeMs?: number;
   now: number;
 }
 
@@ -163,6 +166,7 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
     firstKeyMs: input.firstKeyMs,
     grade,
     evaluator: ev.evaluator,
+    gradeMs: input.gradeMs,
     skipped: input.skipped || undefined,
     reviewItemId: input.reviewItemId,
   };

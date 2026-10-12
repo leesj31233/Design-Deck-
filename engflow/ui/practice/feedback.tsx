@@ -11,12 +11,14 @@ import type { GuideTab } from "../guide";
 const WEIGHT_LABEL = { grammar: "55%", meaning: "35%", organization: "10%" } as const;
 
 export function FeedbackPanel({
-  question, evaluation, note, weakNote, onGuide, compact, scheduleNote,
+  question, evaluation, note, gradeMs, weakNote, onGuide, compact, scheduleNote,
 }: {
   question: Question;
   evaluation: Evaluation;
   /** Why this grader was used (e.g. Claude was too slow), shown once under the verdict. */
   note?: string | null;
+  /** Time from submit to this result (shown next to the grader's name). */
+  gradeMs?: number | null;
   /** "You've missed this grammar N times" — explains why similar questions follow. */
   weakNote?: string | null;
   onGuide: (skill: string, tab: GuideTab) => void;
@@ -53,7 +55,7 @@ export function FeedbackPanel({
                 ) : (
                   <span className={cn("text-[14px] font-semibold", TONE_TEXT[tone])}>{tone === "ok" ? "거의 맞았어요" : tone === "warn" ? "조금 더 다듬어요" : "다시 연습해요"}</span>
                 )}
-                <EvaluatorBadge evaluation={e} />
+                <EvaluatorBadge evaluation={e} ms={gradeMs ?? null} />
               </div>
               <p className="ef-ko mt-1.5 text-[15px] text-[var(--foreground)]">{e.summaryKo}</p>
               {note ? (
@@ -244,16 +246,22 @@ export function FeedbackPanel({
   );
 }
 
-function EvaluatorBadge({ evaluation }: { evaluation: Evaluation }) {
+/** Seconds with one decimal ("0.4초"). */
+export function secondsKo(ms: number): string {
+  return `${(Math.round(ms / 100) / 10).toFixed(1)}초`;
+}
+
+function EvaluatorBadge({ evaluation, ms }: { evaluation: Evaluation; ms: number | null }) {
+  const time = ms !== null ? <span className="ef-num font-normal opacity-80">· {secondsKo(ms)}</span> : null;
   if (evaluation.evaluator === "ai")
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-accent-ink)]" title="Claude가 문법을 정밀 채점했습니다. 점수는 오류 목록으로 계산합니다.">
-        <Sparkles className="size-3" /> Claude 채점
+        <Sparkles className="size-3" /> Claude 채점 {time}
       </span>
     );
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium text-[var(--muted)]" title="기준 답안·의미 단위·문법 규칙으로 즉시 채점">
-      <Cpu className="size-3" /> 규칙 기반
+      <Cpu className="size-3" /> 규칙 기반 {time}
     </span>
   );
 }

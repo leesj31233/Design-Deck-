@@ -57,7 +57,14 @@ db/migrations                    SQL migrations (PostgreSQL)
 
 ### Evaluation
 
-Each answer is graded **once**. On submit, Claude grades it in one fast, grammar-focused pass (usually a few seconds). If Claude is unavailable, fails validation or takes longer than 9 seconds, the rule-based result is shown instead, and the learner can also choose it right away. Whatever is shown first stays: a late reply is discarded, so the score never jumps. An exact match with a reference answer is shown instantly without Claude.
+Each answer is graded **once**, and the grade appears within about a second of submitting (`engflow/core/grader.ts`):
+
+- **Instant.** An exact match, or a close answer in which nothing but spelling differs, is graded by the rule-based grader at once (about 1 ms; 20 ms at worst on a laptop). Claude adds nothing there.
+- **Graded while typing.** When the learner pauses on a fairly complete sentence (450 ms, or 150 ms after a final period), Claude starts grading that text in the background. Submitting the same text (a final period or extra spaces may differ) shows that grade at once. A question allows at most five background requests, and a newer one cancels the previous one.
+- **One-second cap.** Otherwise Claude gets 1 second after submit (3 or 9 seconds if chosen in Settings). If it has not answered, the rule-based grade is shown and the late reply is discarded, so the score never jumps.
+- **Short replies.** Claude returns only the scores, the errors with one-sentence explanations, the minimal correction and the native phrasing. The app writes the verdict and grammar note from the error list, because reply length is what sets the wait.
+
+Each result shows how long grading took ("Claude 채점 · 0.4초"), and Settings shows the device's average over the last 20 answers.
 
 **Scoring is grammar-centred** and identical for both graders: the score is computed from the error list with one penalty table.
 
@@ -134,7 +141,7 @@ See [CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md) for the authoring rules, the 
 ## Known limitations
 
 - The rule-based grader is precise on the patterns it knows, but it can miss new kinds of errors in free paraphrases. It flags this with low confidence; with Claude available, Claude grades instead.
-- Grading speed depends on the Claude tier the host provides; the 9-second cap and the "바로 보기" button keep the wait bounded.
+- Claude's own response time depends on the tier the host provides. When Claude is slower than the 1-second cap and the learner submits right after typing, the rule-based grade is used for that answer; Settings shows how often Claude made it in time.
 - Speaking (recording, transcription, pronunciation) is not implemented.
 - The web app's sync key is device-held identity, not authentication.
 - The TOEIC Speaking figures need manual verification against ETS/YBM (see above).

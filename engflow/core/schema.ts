@@ -86,11 +86,8 @@ export const aiEvaluationSchema = z.object({
     )
     .max(10),
   corrected: z.string().min(1),
-  /** How native-speaking engineers most commonly say it in a meeting. */
+  /** How native speakers most commonly say it in a meeting. */
   recommended: z.string().min(1),
-  alternatives: z.array(z.string()).max(3),
-  summaryKo: z.string().min(1),
-  grammarKo: z.string().min(1),
 });
 
 export type AIEvaluationPayload = z.infer<typeof aiEvaluationSchema>;

@@ -40,7 +40,11 @@ function questionBrief(q: Question): string {
 
 const CATEGORIES = '"be-verb","verb-form","tense","agreement","preposition","article","word-order","word-choice","missing-content","meaning-shift","terminology","spelling","sentence-structure","countability"';
 
-/** One compact, grammar-focused grading request (fast models answer it in a few seconds). */
+/**
+ * One compact, grammar-focused grading request. The reply is kept short (no
+ * summaries or alternatives — the app writes those from the error list), because
+ * output length is what decides how fast the learner sees the grade.
+ */
 export function buildEvaluationPrompt(q: Question, answer: string, local: Evaluation): string {
   const pre = scoredErrors(local.errors);
   const localFindings = pre.length ? pre.map((e) => `"${e.text || "(missing)"}" → "${e.fix}" (${e.category}, ${e.severity})`).join("; ") : "none";
@@ -53,11 +57,11 @@ Automatic pre-check (may be wrong or incomplete — verify): ${localFindings}
 
 ${PRINCIPLES}
 
-Write Korean fields briefly in polite Korean (~입니다). explanationKo: one sentence — what is wrong, why, the right form.
+Be brief: the learner is waiting. explanationKo = ONE short polite Korean sentence (~입니다): what is wrong and the right form.
 Skill ids for errors: ${SKILL_IDS}.
 
 Reply with ONLY this JSON:
-{"meaning":0-100,"comprehensibility":0-100,"errors":[{"span":"exact substring of the answer, or \"\" for a missing word","insertBefore":"for a missing word: the answer word it goes before, \"\" = end","fix":"replacement","category":one of [${CATEGORIES}],"severity":"minor"|"major"|"critical","explanationKo":"…","skill":"skill id"}],"corrected":"the answer with only its errors fixed — keep the learner's own words, including site terms","recommended":"how native-speaking engineers most commonly say this in a meeting: natural, everyday phrasing (not textbook, no rare idioms); keep the learner's site terms","alternatives":["up to 2 other common native ways"],"summaryKo":"one sentence: grammar verdict first","grammarKo":"1–2 sentences on the most important grammar point"}`;
+{"meaning":0-100,"comprehensibility":0-100,"errors":[{"span":"exact substring of the answer, or \"\" for a missing word","insertBefore":"for a missing word: the answer word it goes before, \"\" = end","fix":"replacement","category":one of [${CATEGORIES}],"severity":"minor"|"major"|"critical","explanationKo":"…","skill":"skill id"}],"corrected":"the answer with only its errors fixed — keep the learner's own words, including site terms","recommended":"how native speakers most commonly say this in a meeting: natural, everyday phrasing (not textbook, no rare idioms); keep the learner's site terms"}`;
 }
 
 function locate(answer: string, span: string, insertBefore?: string): { start: number; end: number } | null {
@@ -90,7 +94,6 @@ function tidy(raw: unknown): unknown {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
   const r = { ...(raw as Record<string, unknown>) };
   for (const k of ["meaning", "comprehensibility"]) if (typeof r[k] === "number") r[k] = Math.max(0, Math.min(100, r[k] as number));
-  if (Array.isArray(r.alternatives)) r.alternatives = r.alternatives.filter((x) => typeof x === "string").slice(0, 3);
   if (Array.isArray(r.errors)) {
     r.errors = r.errors.slice(0, 10).map((e) => {
       if (!e || typeof e !== "object") return e;
@@ -154,6 +157,14 @@ export function normalizeAIEvaluation(raw: unknown, q: Question, answer: string,
   const grammarCount = scored.filter((e) => e.bucket === "grammar" && e.category !== "spelling").length;
   const spelling = scored.filter((e) => e.category === "spelling").length;
   const add = major.length > 0 || overall < 80;
+  // The verdict and grammar note are written here from the errors, so the model's reply stays short.
+  const main = [...scored].sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity] || Number(a.category === "spelling") - Number(b.category === "spelling"))[0];
+  const firstSentence = (t: string) => t.split(/(?<=[.。])\s/)[0];
+  const summaryKo = !scored.length
+    ? M >= 85 ? "문법 오류가 없고 의미도 잘 전달됩니다." : "문법 오류는 없지만 의미가 일부 달라졌습니다."
+    : !grammarCount && spelling
+      ? "문법은 정확합니다. 철자 실수만 있어 점수에는 거의 영향이 없습니다."
+      : `${grammarCount ? `문법 오류 ${grammarCount}개.` : "의미를 다시 확인하세요."} 핵심: ${firstSentence(main.messageKo)}`;
   return {
     ...local,
     evaluator: "ai",
@@ -169,9 +180,9 @@ export function normalizeAIEvaluation(raw: unknown, q: Question, answer: string,
     errors,
     corrected: p.corrected,
     recommended: p.recommended || q.reference,
-    summaryKo: p.summaryKo,
-    grammarKo: p.grammarKo,
-    alternatives: p.alternatives.length ? p.alternatives.slice(0, 3) : local.alternatives,
+    summaryKo,
+    grammarKo: main && main.category !== "spelling" ? `${main.messageKo}\n\n${q.explanationKo}` : q.explanationKo,
+    alternatives: local.alternatives,
     review: {
       add,
       reasonKo: add
@@ -196,6 +207,7 @@ function termAdvice(errors: ErrorSpan[], local: Evaluation): Evaluation["scores"
 
 export class AIFormatError extends Error {}
 
+const SEVERITY_RANK = { minor: 1, major: 2, critical: 3 } as const;
 const SKILL_SET = new Set(SKILLS.map((k) => k.id));
 const SKILL_IDS = SKILLS.map((k) => k.id).join(", ");
 

@@ -351,6 +351,8 @@ export interface AttemptRecord {
   firstKeyMs: number | null;
   grade: Grade;
   evaluator: "local" | "ai";
+  /** Time from submit to the grade appearing (ms). */
+  gradeMs?: number;
   skipped?: boolean;
   reviewItemId?: string;
 }
@@ -371,6 +373,8 @@ export interface Settings {
   ai: "auto" | "on-request" | "off";
   /** Legacy (grading is always the fast tier now). */
   aiDepth?: "quick" | "default";
+  /** How long a submit waits for Claude before the rule-based grade is shown: 1 s / 3 s / 9 s. */
+  gradeWait?: "fast" | "balanced" | "accurate";
   /** Preferred difficulty (1–10) per situation; missing = automatic from the level estimate. */
   difficulty?: Partial<Record<Situation | "all", number>>;
   autocorrect: boolean;
