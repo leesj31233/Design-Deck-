@@ -114,6 +114,7 @@ const WRONG: [string, string, string?][] = [
   ["If you can accept 10% increase, we can start on Monday.", "missing-article", "a"],
   ["Does the shuttle runs every hour?", "do-inflected", "run"],
   ["I stayed there during a week.", "during-duration", "for"],
+  ["Is Thursday okay for you? If not, Friday morning also fine.", "missing-be-adjective", "is"],
 ];
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
@@ -172,6 +173,9 @@ const RIGHT = [
   "the feed was wetter because of the heavy rain that would explain the lower yield",
   "I bought a SIM card.",
   "Nobody's come yet.",
+  "Friday morning is also fine.",
+  "see you friday morning okay",
+  "Thanks, Friday works fine.",
   "We will have to update the PFD.",
   "Would you mind sending me the file?",
   "We have to keep updating the schedule.",

@@ -2715,6 +2715,24 @@ const everydaySlips: Rule = (w) => {
       continue;
     }
 
+    // "If not, Friday morning also fine." → "Friday morning is also fine": a day or time with no verb in its clause.
+    if (/^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|today|tonight|morning|afternoon|evening|weekend)$/.test(t) && !brk(i)) {
+      let j = i + 1;
+      while (j < w.length && /^(also|too|still|really)$/.test(w[j].norm) && !brk(j - 1)) j++;
+      const adj = w[j];
+      const endsHere = adj && (j === w.length - 1 || brokenAfter(w, j) || (w[j + 1]?.norm === "for" && /^(me|you|us|them|everyone|both)$/.test(w[j + 2]?.norm ?? "")));
+      let c = i;
+      while (c > 0 && !brokenAfter(w, c - 1)) c--;
+      // Any verb or preposition before it ("see you Friday morning okay", "on Friday …") means another structure.
+      const clauseHasVerb = w.slice(c, i).some((x) => BE_FORMS.has(x.norm) || MODALS.has(x.norm) || x.expanded || PREPOSITIONS.has(x.norm) || /^(do|does|did|have|has|had|if|when)$/.test(x.norm) || !!verbInfo(x.norm));
+      if (adj && endsHere && j > i && /^(fine|okay|ok|good|great|available|possible|free|better|perfect|busy)$/.test(adj.norm) && !clauseHasVerb) {
+        push({
+          rule: "missing-be-adjective", from: i + 1, to: i + 1, replacement: "is", category: "be-verb", severity: "major", skill: "be-adj",
+          messageKo: `형용사 '${adj.raw}' 앞에 be동사가 필요합니다: '${w.slice(c, i + 1).map((x) => x.raw).join(" ")} is ${w.slice(i + 1, j + 1).map((x) => x.raw).join(" ")}'.`,
+        });
+      }
+    }
+
     // "My battery is almost die" → "is almost dead".
     if (BE_FORMS.has(t) && n1 === "almost" && n2 === "die") {
       push({
