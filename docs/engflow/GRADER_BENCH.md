@@ -68,6 +68,15 @@ Blind B (held out): see the last section.
 - **Scoring.** Word order and sentence structure count as grammar (a major word-order
   mistake no longer scores 97).
 
+## Claude and the rules together
+
+When Claude grades, it gets the rule-based findings as a pre-check to verify.
+Curated pitfalls and major grammar-rule findings stay in the result even when
+Claude's reply leaves them out, and its correction is fixed to match. These
+rules have not fired on any correct sentence: about 2,000 in the bank, 291 in
+blind set A and 220 in the learner corpus. A lenient quick-tier reply therefore
+cannot pass *is not satisfy* or *I'm interesting in*.
+
 ## Wait policy
 
 `gradeBudgetMs` (core/grader.ts) waits for Claude only when the rule-based grade

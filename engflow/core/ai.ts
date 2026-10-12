@@ -139,10 +139,20 @@ export function normalizeAIEvaluation(raw: unknown, q: Question, answer: string,
       advisory: advisory || undefined,
     });
   });
-  // Curated pitfalls are verified against the reference answers; keep any the model did not cover.
-  for (const le of local.errors.filter((x) => x.source === "pitfall" && !x.advisory)) {
+  // Curated pitfalls are verified against the reference answers, and major grammar-rule findings never fired on
+  // any correct sentence in the bank or the blind test sets (docs/engflow/GRADER_BENCH.md): keep any the model did not cover,
+  // so a lenient reply cannot pass "is not satisfy" or "I'm interesting in".
+  let corrected = p.corrected;
+  for (const le of local.errors.filter((x) => (x.source === "pitfall" || (x.source === "rule" && x.severity !== "minor")) && !x.advisory)) {
     const covered = errors.some((e) => e.start < le.end + 1 && le.start < e.end + 1);
-    if (!covered) errors.push({ ...le, id: `p-${le.id}` });
+    if (covered) continue;
+    errors.push({ ...le, id: `p-${le.id}` });
+    // The model's correction left this mistake in: fix it there too, so the correction matches the error list.
+    if (le.text && corrected.includes(le.text)) corrected = corrected.replace(le.text, le.fix).replace(/\s{2,}/g, " ").replace(/\s+([.,!?])/g, "$1");
+    else if (!le.text && le.fix && le.start >= 0) {
+      const before = answer.slice(0, le.start).trimEnd();
+      if (before && corrected.startsWith(before)) corrected = `${before} ${le.fix} ${corrected.slice(before.length).trimStart()}`.replace(/\s{2,}/g, " ");
+    }
   }
   errors.sort((a, b) => a.start - b.start);
 
@@ -178,7 +188,7 @@ export function normalizeAIEvaluation(raw: unknown, q: Question, answer: string,
       overall,
     },
     errors,
-    corrected: p.corrected,
+    corrected,
     recommended: p.recommended || q.reference,
     summaryKo,
     grammarKo: main && main.category !== "spelling" ? `${main.messageKo}\n\n${q.explanationKo}` : q.explanationKo,

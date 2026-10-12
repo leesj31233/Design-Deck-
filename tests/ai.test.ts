@@ -72,6 +72,16 @@ describe("AI evaluation contract", () => {
     expect(() => normalizeAIEvaluation({ scores: {} }, q, answer, local)).toThrow(AIFormatError);
     expect(() => normalizeAIEvaluation({ ...valid, errors: [{ ...valid.errors[0], severity: "fatal" }] }, q, answer, local)).toThrow(AIFormatError);
   });
+  it("keeps a major grammar-rule finding even when the model misses it", () => {
+    const rq = QUESTION_BY_ID["ph-collocation-meet-requirements"];
+    const text = "This suggestion is not satisfy the requirements of customer.";
+    const e = normalizeAIEvaluation({ meaning: 95, comprehensibility: 90, errors: [], corrected: text, recommended: rq.reference }, rq, text, evaluateLocal(rq, text));
+    expect(e.errors.some((x) => x.source === "rule" && x.severity === "major")).toBe(true);
+    expect(e.scores.overall).toBeLessThan(85);
+    // The correction no longer contains the mistake.
+    expect(e.corrected).not.toContain("is not satisfy");
+  });
+
   it("keeps curated pitfall findings the model did not mention", () => {
     const pit = evaluateLocal(q, "If we had decided now");
     const e = normalizeAIEvaluation({ ...valid, errors: [] }, q, "If we had decided now", pit);
