@@ -51,6 +51,12 @@ const WRONG: [string, string, string?][] = [
   ["The shutdown starts on May... no, on June.", "time-preposition", "in"],
   ["Let's meet in 3 pm.", "time-preposition", "at"],
   ["We can finish it by Wednesday at latest.", "idiom-the", "the"],
+  ["Samgyetang is usually eat in summer.", "be-base-verb", "is usually eaten"],
+  ["The report is not finish yet.", "be-base-verb", "is not finished"],
+  ["It is not meet the requirements.", "be-base-verb", "does not meet"],
+  ["It has was a pleasure.", "perfect-finite-be", "been"],
+  ["Sari said me it was the best meal of the trip.", "said-me", "told"],
+  ["So we are not have any full load data yet.", "be-base-verb"],
 ];
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
@@ -124,6 +130,18 @@ const RIGHT = [
   "The plant was built in 2019.",
   "I'll get back to you by end of day.",
   "We'll start in June and finish on Friday at 5 pm.",
+  "Sorry for keeping you waiting.",
+  "I'll look into it. Do you have the drawing?",
+  "Quick question about the schedule.",
+  "Yes, I did! It was so exciting.",
+  "There's still lots of food left.",
+  "Dinner's on me tonight.",
+  "The pump's leaking again.",
+  "Mr. Tan is waiting for us in the lobby.",
+  "Let's meet at 9 a.m. tomorrow.",
+  "She said to me that it was fine.",
+  "He said her name twice.",
+  "We are having lunch now.",
 ];
 
 describe("grammar rules: Korean-speaker mistakes without a reference answer", () => {

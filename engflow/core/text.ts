@@ -23,7 +23,12 @@ export interface Token {
   expanded?: boolean;
   /** Clause punctuation (. , ; : ! ? — or a bracket) follows this word: grammar rules do not read across it. */
   breakAfter?: boolean;
+  /** A sentence ends after this word (. ! ? …, not an abbreviation such as "Mr." or "a.m."). */
+  sentenceEnd?: boolean;
 }
+
+/** Words whose trailing dot is an abbreviation, not the end of a sentence. */
+const ABBREVIATIONS = /^(mr|mrs|ms|dr|st|vs|etc|no|approx|a\.m|p\.m|e\.g|i\.e|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|inc|ltd|co|corp|dept|est|min|max|fig|ref)$/;
 
 const CONTRACTIONS: Record<string, string[]> = {
   "won't": ["will", "not"],
@@ -130,7 +135,8 @@ export function tokenize(text: string): Token[] {
     if (next.punct) continue;
     // "Thursday's meeting", "the plant's building": a noun in -ing after a possessive is not a verb.
     const ing = verbInfo(next.norm)?.form === "ing" && !ING_NOUNS.has(next.norm);
-    if (next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over)$/.test(next.norm)) {
+    // A possessive is followed by a noun, never by a preposition: "dinner's on me", "the file's in the folder".
+    if (next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away)$/.test(next.norm)) {
       t.expanded = true;
       tokens.splice(i + 1, 0, { norm: "is", raw: t.raw, start: t.start, end: t.end, stem: stem("is"), punct: false, expanded: true });
     }
@@ -157,7 +163,10 @@ export function tokenize(text: string): Token[] {
     }
   }
   for (let i = 0; i < tokens.length - 1; i++) {
-    if (!tokens[i].punct && tokens[i + 1].punct && /^[.,;:!?…—–()]$/.test(tokens[i + 1].norm)) tokens[i].breakAfter = true;
+    if (!tokens[i].punct && tokens[i + 1].punct && /^[.,;:!?…—–()]$/.test(tokens[i + 1].norm)) {
+      tokens[i].breakAfter = true;
+      if (/^[.!?…]$/.test(tokens[i + 1].norm) && !(tokens[i + 1].norm === "." && ABBREVIATIONS.test(tokens[i].norm))) tokens[i].sentenceEnd = true;
+    }
   }
   return tokens;
 }
@@ -254,7 +263,7 @@ export function joinWords(parts: { text: string; punct?: boolean }[]): string {
   const open = new Set<string>();
   for (const p of parts) {
     if (!p.text) continue;
-    let text = p.text;
+    let text = p.text === "i" ? "I" : p.text;
     // A word that starts a new sentence (after a fix replaced its first word) is capitalized.
     if (!p.punct && /[.!?]$/.test(out) && /^[a-z]/.test(text)) text = text[0].toUpperCase() + text.slice(1);
     if (p.punct && /^['"“”‘’]$/.test(text)) {

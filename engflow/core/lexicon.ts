@@ -5,7 +5,7 @@
  */
 
 const IRREGULAR: Record<string, [past: string, pp: string]> = {
-  be: ["was", "been"], begin: ["began", "begun"], bring: ["brought", "brought"], build: ["built", "built"],
+  be: ["was", "been"], freeze: ["froze", "frozen"], stick: ["stuck", "stuck"], begin: ["began", "begun"], bring: ["brought", "brought"], build: ["built", "built"],
   buy: ["bought", "bought"], choose: ["chose", "chosen"], come: ["came", "come"], cut: ["cut", "cut"],
   do: ["did", "done"], draw: ["drew", "drawn"], find: ["found", "found"], forget: ["forgot", "forgotten"],
   get: ["got", "got"], give: ["gave", "given"], go: ["went", "gone"], have: ["had", "had"], hold: ["held", "held"],
@@ -27,6 +27,9 @@ const IRREGULAR: Record<string, [past: string, pp: string]> = {
 /** Verbs common in engineering meetings (base forms). */
 export const BASE_VERBS = new Set<string>([
   ...Object.keys(IRREGULAR),
+  // Plant troubles and everyday verbs the bank uses ("the pump's leaking", "let me recap").
+  "leak", "drip", "overheat", "vibrate", "crack", "rust", "slip", "melt", "boil", "spill", "flood", "clog", "jam", "recap",
+  "smell", "burn", "taste", "pour", "grill", "toast", "celebrate", "congratulate", "recommend", "order", "book", "pay",
   "accept", "adjust", "agree", "allow", "analyze", "analyse", "answer", "apply", "approve", "arrange", "ask", "assign",
   "assume", "attach", "avoid", "calculate", "call", "cancel", "change", "check", "clarify", "clean", "close", "collect",
   "commission", "compare", "complete", "confirm", "consider", "contact", "continue", "control", "correct", "cover",

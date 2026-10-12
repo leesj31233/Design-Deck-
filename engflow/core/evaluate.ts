@@ -221,6 +221,19 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
     const g = w[li - 1];
     return g ? (verbInfo(g.norm)?.base ?? g.norm) : "";
   };
+  // Target words inside a discourse marker the learner said in one word ("to be honest" ↔ "honestly").
+  const inIdiomSpan = new Set<number>();
+  const learnerSays = new Set(w.map((x) => x.norm));
+  const MARKERS: [string[], RegExp][] = [
+    [["to", "be", "honest"], /^(honestly|frankly)$/], [["to", "be", "frank"], /^(honestly|frankly)$/],
+    [["to", "tell", "the", "truth"], /^(honestly|frankly|actually)$/], [["in", "fact"], /^(actually|indeed|really)$/], [["as", "well"], /^(too|also)$/],
+  ];
+  for (const [phrase, single] of MARKERS) {
+    if (![...learnerSays].some((x) => single.test(x))) continue;
+    for (let t = 0; t + phrase.length <= tw.length; t++) {
+      if (phrase.every((p, k) => tw[t + k].norm === p)) for (let k = 0; k < phrase.length; k++) inIdiomSpan.add(t + k);
+    }
+  }
   // "I plan to" for "I'm planning to": a state verb in a simple form that agrees with its subject.
   const simpleState = new Set<number>();
   for (const op of al.ops) {
@@ -371,6 +384,13 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const tc = wordClass(tt);
       // Two ways to open a question: "Is it possible…?" / "Would it be possible…?"
       if (/^(be|aux|modal)$/.test(lc) && /^(be|aux|modal)$/.test(tc) && op.li === clauseStart(op.li) && isSubjectWord(w[op.li + 1])) continue;
+      // A tense/voice difference only shows when the same verb follows ("is changed" vs "has changed");
+      // "when you're free" vs "when you have a moment", "do the call" vs "have the call" are rewordings.
+      const nextOp = al.ops[k + 1];
+      const sameNext = !!nextOp && (nextOp.type === "match" || nextOp.type === "inflect" || nextOp.type === "spell");
+      const verbNext = /^(not|been|being)$/.test(w[op.li + 1]?.norm ?? "") || !!verbInfo(w[op.li + 1]?.norm ?? "");
+      if ((lc === "be" || lc === "aux") && (tc === "be" || tc === "aux") && lc !== tc && !sameNext) continue;
+      if ((lc === "aux" || lc === "modal") && (tc === "aux" || tc === "modal") && !verbNext) continue;
       let category: ErrorCategory = "word-choice";
       let severity: Severity = "minor";
       let msg = `'${w[op.li].raw}' 대신 '${tt}'가 자연스럽습니다.`;
@@ -426,9 +446,10 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         severity = "major";
         msg = `'${w[op.li].raw}'는 필요 없는 전치사입니다. 이 동사는 목적어를 바로 받고, 명사 앞에는 '${tt}'가 필요합니다.`;
       } else if (tc === "conj" && lc === "conj") {
+        // Connector choice is meaning, not grammar: noted, not a major grammar error.
         category = "word-choice";
-        severity = "major";
-        msg = `연결어 선택: '${w[op.li].raw}' → '${tt}'. 두 말은 의미가 다릅니다.`;
+        severity = "minor";
+        msg = `연결어 선택: '${w[op.li].raw}' → '${tt}'. 두 말은 뜻이 조금 다르니 문맥에 맞는지 확인하세요.`;
       }
       push({ from: op.li, to: op.li + 1, category, severity, fix: tt, messageKo: msg, skill }, { from: op.li, to: op.li + 1, replacement: tt });
       continue;
@@ -468,6 +489,12 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const c = wordClass(tt);
       if (c === "content" || c === "modal") continue;
       if (c === "be" && simpleState.has(op.at)) continue;
+      // "…yesterday but (it) won't arrive…": a repeated subject may be left out after and/but/or.
+      if (c === "pronoun" && /^(and|but|or|then)$/.test(w[op.at - 1]?.norm ?? "") && (verbInfo(w[op.at]?.norm ?? "") || OPENER.test(w[op.at]?.norm ?? ""))) continue;
+      // "(for) this weekend", "(on) next Monday": deictic time words need no preposition.
+      if (c === "prep" && /^(this|next|last|today|tomorrow|tonight|yesterday|every)$/.test(w[op.at]?.norm ?? "")) continue;
+      // "To be honest," / "Honestly,", "In fact," / "Actually,": the same discourse marker.
+      if (inIdiomSpan.has(op.ti)) continue;
       // "Is it possible…?" needs no second be: the question already opens with its verb.
       if ((c === "be" || c === "aux") && inverted(op.at)) continue;
       // Casual replies leave out "I (am)": "Hope so.", "Don't think so.", "Sorry, …".

@@ -50,7 +50,7 @@ const missingBeProgressive: Rule = (w) => {
     if (!SUBJECT_PRONOUNS.has(subj)) continue;
     if (i > 0 && /^(to|than|as|let)$/.test(w[i - 1].norm)) continue;
     // "Sorry to keep you waiting", "I saw it coming": you/it right after a verb is its object.
-    if ((subj === "you" || subj === "it") && i > 0 && !brokenAfter(w, i - 1) && /^(keep|keeps|kept|see|saw|seen|find|found|hear|heard|leave|left|watch|catch|caught|imagine|mind|get|got|notice|noticed|have|had|spot|spotted|set|start|started|send|sent)$/.test(w[i - 1].norm)) continue;
+    if ((subj === "you" || subj === "it") && i > 0 && !brokenAfter(w, i - 1) && /^(keep|keeps|kept|keeping|see|saw|seen|seeing|find|found|finding|hear|heard|hearing|leave|left|leaving|watch|watching|catch|caught|catching|imagine|mind|get|got|getting|notice|noticed|have|had|having|spot|spotted|set|start|started|send|sent)$/.test(w[i - 1].norm)) continue;
     // Question word order ("Is it working?", "are you asking") already has the be verb before the subject.
     if (i > 0 && (BE_FORMS.has(w[i - 1].norm) || /^(do|does|did|have|has|had|will|would|can|could|should)$/.test(w[i - 1].norm))) continue;
     let j = i + 1;
@@ -177,10 +177,10 @@ const doubleModal: Rule = (w) => {
 };
 
 /** Verbs that are also nouns, wrong right after "I am / we are / they are": "I am plan to bring" → "I plan to bring". */
-const PRONOUN_BE_VERBS = new Set(["plan", "need", "hope", "work", "use", "help", "try", "support", "check", "review", "request", "mean", "visit", "call", "feel", "start", "look", "wait", "go", "come", "leave", "stay", "focus", "think", "want", "know", "agree", "understand", "remember", "forget"]);
+const PRONOUN_BE_VERBS = new Set(["have", "plan", "need", "hope", "work", "use", "help", "try", "support", "check", "review", "request", "mean", "visit", "call", "feel", "start", "look", "wait", "go", "come", "leave", "stay", "focus", "think", "want", "know", "agree", "understand", "remember", "forget"]);
 
 /** Words that are also adjectives after be ("isn't complete yet", "is clear"). */
-const BE_ADJECTIVE_OK = new Set(["complete", "correct", "separate", "open", "close", "clean", "dry", "free", "clear", "ready", "secure", "finish", "approve"]);
+const BE_ADJECTIVE_OK = new Set(["complete", "correct", "separate", "open", "close", "clean", "dry", "free", "clear", "ready", "secure"]);
 
 /** be + base verb: "I am agree", "it is need" → "I agree", "it needs". */
 const beBaseVerb: Rule = (w) => {
@@ -226,12 +226,21 @@ const beBaseVerb: Rule = (w) => {
     const subj = w[i - 1]?.norm ?? "";
     // A singular subject ("this suggestion", "the plan", "it") takes does/-s; plural or I/you/we/they take do.
     const third = /^(he|she|it|this|that)$/.test(subj) || (/^(is|was|isn't|wasn't)$/.test(w[i].norm) && !/^(i|you|we|they)$/.test(subj));
-    void negated;
-    const fix = v.norm === "agree" || !third ? v.norm : v.norm + "s";
+    const fix = v.norm === "agree" || !third ? v.norm : thirdPersonOf(v.norm);
+    const advs = w.slice(i + 1, j).map((x) => x.norm);
+    // A thing that undergoes the action with no object after it was meant as passive:
+    // "Samgyetang is usually eat in summer" → "is usually eaten", "The report is not finish yet" → "is not finished".
+    const nextW = w[j + 1]?.norm ?? "";
+    const objectFollows = DETERMINERS.has(nextW) || /^(me|you|him|her|us|them|it|this|that|these|those|everything|something)$/.test(nextW);
+    const passive = !personal && !/^(i|we|you|they|he|she)$/.test(subj) && !objectFollows && UNAMBIGUOUS_VERBS.has(v.norm) && !/^(work|happen|exist|matter|depend|belong|seem|look|apply|agree|arrive|wait|go|come|stay|suit|fit)$/.test(v.norm);
+    // Negative: "is not meet" → "does not meet"; adverbs only: "is usually eat" → "usually eats".
+    const replacement = passive
+      ? [w[i].norm, ...advs, participleOf(v.norm)].join(" ")
+      : !advs.length ? fix : negated ? `${third ? "does" : "do"} ${advs.join(" ")} ${v.norm}` : `${advs.join(" ")} ${fix}`;
     out.push({
-      rule: "be-base-verb", from: i, to: j + 1, replacement: (j > i + 1 ? `${third ? "does" : "do"} ${w.slice(i + 1, j).map((x) => x.norm).join(" ")} ` : "") + (j > i + 1 ? v.norm : fix),
+      rule: "be-base-verb", from: i, to: j + 1, replacement,
       category: "verb-form", severity: "major", skill: "agreement",
-      messageKo: `be동사와 일반동사를 함께 쓸 수 없습니다. '${w.slice(i, j + 1).map((x) => x.raw).join(" ")}' → '${j > i + 1 ? `${third ? "does" : "do"} ${w.slice(i + 1, j).map((x) => x.norm).join(" ")} ${v.norm}` : fix}'. 부정은 do/does + not + 동사원형입니다. (예: It does not meet … / We do not agree.)`,
+      messageKo: `be동사와 일반동사를 함께 쓸 수 없습니다. '${w.slice(i, j + 1).map((x) => x.raw).join(" ")}' → '${replacement}'. 부정은 do/does + not + 동사원형입니다. (예: It does not meet … / We do not agree.)`,
     });
   }
   return out;
@@ -617,7 +626,10 @@ const thereIsPlural: Rule = (w) => {
     let j = i + 2;
     while (j < w.length && /^(also|still|only|just|now|already|probably)$/.test(w[j].norm)) j++;
     const q = w[j]?.norm ?? "";
-    const plural = /^(two|three|four|five|six|seven|eight|nine|ten|several|many|both|lots)$/.test(q) || (q === "a" && w[j + 1]?.norm === "few") || (q === "some" && /^[a-z]{3,}[^s']s$/.test(w[j + 1]?.norm ?? "") && verbInfo(w[j + 1].norm)?.form !== "3sg");
+    // "lots of food" is uncountable: only "lots of" + a plural noun needs "are".
+    const plural = /^(two|three|four|five|six|seven|eight|nine|ten|several|many|both)$/.test(q) ||
+      (q === "lots" && w[j + 1]?.norm === "of" && /^[a-z]{3,}[^s']s$/.test(w[j + 2]?.norm ?? "")) ||
+      (q === "a" && w[j + 1]?.norm === "few") || (q === "some" && /^[a-z]{3,}[^s']s$/.test(w[j + 1]?.norm ?? "") && verbInfo(w[j + 1].norm)?.form !== "3sg");
     if (!plural) continue;
     const fix = w[i + 1].norm === "is" ? "are" : "were";
     out.push({
@@ -806,6 +818,8 @@ const bareSingularCountable: Rule = (w) => {
     // "Pangyo Station", "Tower B Lobby": a capitalized name needs no article.
     if (/^[A-Z]/.test(n.raw) && i > 0) continue;
     if (start < i && start > 0 && /^[A-Z]/.test(w[start].raw) && !brokenAfter(w, start - 1)) continue;
+    // "Quick question about …", "Small update on …": a spoken headline at the start of a turn.
+    if ((start === 0 || brokenAfter(w, start - 1)) && start < i && /^(question|idea|point|thought|update|reminder|suggestion|request|comment|note|favor|favour)$/.test(n.norm)) continue;
     // "Good question.", "Great idea!": a short reply that is only a noun phrase stands without an article.
     if ((start === 0 || brokenAfter(w, start - 1)) && (i === w.length - 1 || brokenAfter(w, i)) && start < i) continue;
     // "kind of problem", "type of valve": the bare noun is idiomatic.
@@ -1026,6 +1040,34 @@ const idiomArticle: Rule = (w) => {
   return out;
 };
 
+/** "It has was", "we have are": a perfect auxiliary never takes a finite be (also catches broken corrections). */
+const perfectFiniteBe: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    if (!/^(has|have|had)$/.test(w[i].norm) || !/^(was|were|is|are|am)$/.test(w[i + 1].norm) || w[i + 1].expanded) continue;
+    out.push({
+      rule: "perfect-finite-be", from: i + 1, to: i + 2, replacement: "been", category: "verb-form", severity: "major", skill: "present-perfect",
+      messageKo: `have/has 뒤에는 be동사의 과거분사 'been'이 옵니다: '${w[i].raw} been'.`,
+    });
+  }
+  return out;
+};
+
+/** "Sari said me" → "Sari told me": say takes no person object (say to me / tell me). */
+const saidMe: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    const info = verbInfo(w[i].norm);
+    if (!info || info.base !== "say" || !/^(me|us|him|them)$/.test(w[i + 1].norm) || brokenAfter(w, i)) continue;
+    const told = { base: "tell", "3sg": "tells", past: "told", pp: "told", ing: "telling" }[info.form];
+    out.push({
+      rule: "said-me", from: i, to: i + 1, replacement: told, category: "verb-form", severity: "major", skill: "reporting",
+      messageKo: `'say'는 사람을 바로 목적어로 쓰지 않습니다: '${told} ${w[i + 1].raw}' 또는 '${w[i].raw} to ${w[i + 1].raw}'.`,
+    });
+  }
+  return out;
+};
+
 const RULES: Rule[] = [
   itsContraction,
   lexicalAgreement,
@@ -1035,11 +1077,19 @@ const RULES: Rule[] = [
   perfectBaseVerb, doPast, agreement, doubleComparative, willInConditionClause, uncountablePlural, everyPlural, nonWords, articleSound,
   transitivePreposition, bareSingularCountable, perfectNeedsPassive, thirdPersonBase,
   moreShortAdjective, veryVerb, enoughOrder, missingSubjectIt, missingBeAdjective, letMakeTo, thereIsPlural, numberSingular,
-  sinceDuration, muchPlural, suggestTo, adjectiveBeforeVerb, timePreposition, idiomArticle,
+  sinceDuration, muchPlural, suggestTo, adjectiveBeforeVerb, timePreposition, idiomArticle, perfectFiniteBe, saidMe,
 ];
 
 export function runRules(words: Token[]): RuleFinding[] {
-  const all = RULES.flatMap((r) => r(words));
+  // One sentence at a time: no rule may read across "I did! It was …" or "I'll look into it. Do you …".
+  const all: RuleFinding[] = [];
+  let start = 0;
+  for (let i = 0; i < words.length; i++) {
+    if (!words[i].sentenceEnd && i < words.length - 1) continue;
+    const part = words.slice(start, i + 1);
+    for (const r of RULES) for (const f of r(part)) all.push({ ...f, from: f.from + start, to: f.to + start });
+    start = i + 1;
+  }
   // Drop findings whose ranges overlap an earlier finding (first rule wins).
   const kept: RuleFinding[] = [];
   for (const f of all) {

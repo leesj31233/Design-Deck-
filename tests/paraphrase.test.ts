@@ -42,6 +42,14 @@ const RIGHT: [string, string[], string][] = [
   ["Let's discuss it after the meeting.", [], "Let's discuss it later."],
   ["The price includes the warranty for two years.", [], "The price includes the warranty of two years."],
   ["We can deliver it by the end of June.", [], "We can deliver it at the end of June."],
+  ["Could we talk when you have a moment?", [], "Could we talk when you're free?"],
+  ["Could we have the call tomorrow?", [], "Could we do the call tomorrow?"],
+  ["It was shipped yesterday, but it won't arrive until Friday.", [], "It was shipped yesterday but won't arrive until Friday."],
+  ["Do you have any plans for this weekend?", [], "Do you have any plans this weekend?"],
+  ["To be honest, I prefer the second option.", [], "Honestly, I prefer the second option."],
+  ["I don't drink, but I'll have a soda.", [], "I don't drink, so I'll have a soda."],
+  ["I spoke to her yesterday.", [], "I spoke with her yesterday."],
+  ["Can we discuss it over the phone?", [], "Can we discuss it on the phone?"],
 ];
 
 const WRONG: [string, string[], string][] = [
