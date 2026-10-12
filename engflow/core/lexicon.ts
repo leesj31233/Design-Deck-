@@ -52,6 +52,7 @@ export const BASE_VERBS = new Set<string>([
   "gather", "generate", "highlight", "implement", "indicate", "integrate", "interpret", "interrupt", "locate", "minimize",
   "negotiate", "predict", "preserve", "promote", "raise", "register", "remain", "reserve", "restore", "resume", "retain",
   "simplify", "stabilize", "strengthen", "supervise", "troubleshoot", "utilize", "weigh",
+  "look", "talk", "sound", "matter", "like", "love", "hope", "worry", "relax", "rest", "travel", "walk", "watch", "wish",
 ]);
 
 /** Verbs that are rarely nouns — safe for rules like "have + base verb". */
