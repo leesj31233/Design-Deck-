@@ -1259,7 +1259,9 @@ const tooToObject: Rule = (w) => {
   const t = w.findIndex((x, k) => x.norm === "too" && k < w.length - 1);
   if (t < 0) return out;
   for (let k = t + 2; k < Math.min(w.length - 2, t + 9); k++) {
-    if (w[k].norm !== "to" || !isBaseVerb(w[k + 1].norm)) continue;
+    // "to deal with it": a verb the lexicon does not know still counts when a preposition and it/them end the clause.
+    const verbPrepIt = /^[a-z]+$/.test(w[k + 1]?.norm ?? "") && !DETERMINERS.has(w[k + 1].norm) && PREPOSITIONS.has(w[k + 2]?.norm ?? "") && /^(it|them)$/.test(w[k + 3]?.norm ?? "");
+    if (w[k].norm !== "to" || (!isBaseVerb(w[k + 1].norm) && !verbPrepIt)) continue;
     let p = k + 2;
     if (PREPOSITIONS.has(w[p]?.norm ?? "")) p++;
     if (!/^(it|them)$/.test(w[p]?.norm ?? "") || (p < w.length - 1 && !brokenAfter(w, p))) continue;
@@ -1390,6 +1392,8 @@ const modalAdjective: Rule = (w) => {
 };
 
 /** "a great weekends" → "weekend": a/an with a singular noun. */
+/** "a moments", "a minutes": time words after a/an. */
+const TIME_PLURAL: Record<string, string> = { moments: "moment", seconds: "second", minutes: "minute", hours: "hour", days: "day", weeks: "week", months: "month", years: "year" };
 const articlePlural: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 0; i < w.length - 1; i++) {
@@ -1397,7 +1401,7 @@ const articlePlural: Rule = (w) => {
     if (/^(lot|few|couple|number|series|pair|bit|little|half|dozen|hundred|thousand)$/.test(w[i + 1].norm)) continue;
     let j = i + 1;
     if (!PLURAL_NOUN_SINGULAR(w[j].norm) && w[j + 1] && PLURAL_NOUN_SINGULAR(w[j + 1].norm) && !verbInfo(w[j].norm)) j++;
-    const single = PLURAL_NOUN_SINGULAR(w[j]?.norm ?? "");
+    const single = PLURAL_NOUN_SINGULAR(w[j]?.norm ?? "") ?? TIME_PLURAL[w[j]?.norm ?? ""] ?? null;
     if (!single || (w[j + 1] && !brokenAfter(w, j) && !PREPOSITIONS.has(w[j + 1].norm) && !/^(and|or|but|so|too|today|tomorrow|now)$/.test(w[j + 1].norm))) continue;
     out.push({
       rule: "article-plural", from: j, to: j + 1, replacement: single, category: "countability", severity: "minor", skill: "articles",
@@ -1894,7 +1898,9 @@ const determinerNumber: Rule = (w) => {
     const n = w[i + 1];
     if (/^(this|that)$/.test(w[i].norm) && !n.expanded) {
       const single = singularOf(n.norm);
-      if (single && !/^(in|from|for)$/.test(w[i + 2]?.norm ?? "") && !brokenAfter(w, i)) {
+      // "the reason that people like it", "I know that engineers are busy": that + subject + verb is a clause.
+      const clause = w[i].norm === "that" && !!w[i + 2] && (!!verbInfo(w[i + 2].norm) || BE_FORMS.has(w[i + 2].norm) || MODALS.has(w[i + 2].norm));
+      if (single && !clause && !/^(in|from|for)$/.test(w[i + 2]?.norm ?? "") && !brokenAfter(w, i)) {
         const fix = w[i].norm === "this" ? "these" : "those";
         out.push({ rule: "determiner-number", from: i, to: i + 1, replacement: fix, category: "countability", severity: "major", skill: "countability", messageKo: `복수 명사(${n.raw}) 앞에서는 '${fix}'를 씁니다.` });
       }
@@ -2605,6 +2611,77 @@ const everydaySlips: Rule = (w) => {
             messageKo: `'${noun.raw}'(단수)를 꾸미는 ${rel.raw}절의 동사에는 -s를 붙입니다: '${rel.raw} ${fix}'.`,
           });
         }
+      }
+    }
+
+    // "reduce size of the dryer" → "the size of": a measured quantity of something takes "the".
+    if (/^(size|level|cost|price|quality|temperature|pressure|capacity|efficiency|amount|speed|weight|length|width|height|volume|concentration|performance|output|yield|number)$/.test(t) && n1 === "of" && i > 0 && !w[i].expanded && !brokenAfter(w, i - 1)) {
+      const prev = w[i - 1].norm;
+      const pv = verbInfo(prev);
+      // "the design pressure of", "the contact number of": a noun before it that has its own determiner.
+      const modifier = i > 1 && (DETERMINERS.has(w[i - 2].norm) || /^(the|a|an|its|whose)$/.test(w[i - 2].norm) || !!w[i - 2].num);
+      if (!modifier && ((pv && pv.base !== "be" && !/^(have|has|had|do|does|did)$/.test(prev) && !DETERMINERS.has(prev)) || /^(to|for|about|with)$/.test(prev))) {
+        push({
+          rule: "missing-article", from: i, to: i, replacement: "the", category: "article", severity: "minor", skill: "articles",
+          messageKo: `'~의 ${w[i].raw}'처럼 정해진 대상의 크기·양을 말할 때는 'the ${w[i].raw} of …'입니다.`,
+        });
+      }
+    }
+
+    // "after the meeting finish" → "finishes": a singular subject in a when/after/if clause.
+    if (/^(after|before|until|when|once|if|because|since|unless)$/.test(t) && /^(the|this|that|our|my|your|their|his|her)$/.test(n1) && COUNTABLE_NOUNS.has(n2) && w[i + 3]) {
+      const v = w[i + 3];
+      const vi = verbInfo(v.norm);
+      if (vi && vi.form === "base" && v.norm === vi.base && /^(start|finish|end|begin|arrive|leave|work|run|need|take|look|seem|cost|go|come|happen|change|stop|close|open|fail|break|get|become|show|include|require|depend|exceed|reach|drop|rise|increase|decrease|want|know|say|agree|approve|send|reply|call)$/.test(v.norm) && !/^(time|date|point|button|line|level|up|off|to)$/.test(w[i + 4]?.norm ?? "") && !v.expanded) {
+        const fix = thirdPersonOf(v.norm);
+        push({
+          rule: "clause-agreement", from: i + 3, to: i + 4, replacement: fix, category: "agreement", severity: "major", skill: "agreement",
+          messageKo: `'${w[i + 1].raw} ${w[i + 2].raw}'는 단수 주어라서 동사에 -s를 붙입니다: '${fix}'.`,
+        });
+      }
+    }
+
+    // "I'll go back to previous one" → "the previous one"; "at same time" → "at the same time".
+    if (/^(previous|same|following)$/.test(t) && /^(one|slide|page|meeting|version|step|point|question|section|item|chart|time|day|thing|way|problem|issue|place|result|size|level|price|team|project|reason|year|month|week|email|report|graph|table|figure)$/.test(n1)) {
+      const prev = w[i - 1]?.norm ?? "";
+      if (i > 0 && !DETERMINERS.has(prev) && !/^(the|a|an|this|that|my|our|your|their|his|her|its|same|very)$/.test(prev) && !brokenAfter(w, i - 1)) {
+        push({
+          rule: "missing-article", from: i, to: i, replacement: "the", category: "article", severity: "minor", skill: "articles",
+          messageKo: `'${w[i].raw}'는 정해진 하나를 가리키므로 'the ${w[i].raw} ${w[i + 1].raw}'입니다.`,
+        });
+      }
+    }
+
+    // "If there are any questions, I'd be glad to answer it." → "them".
+    if (t === "answer" && n1 === "it" && brk(i + 1) && w.slice(0, i).some((x) => x.norm === "questions")) {
+      push({
+        rule: "pronoun-agreement", from: i + 1, to: i + 2, replacement: "them", category: "agreement", severity: "minor", skill: "agreement",
+        messageKo: "앞의 'questions'(복수)를 가리키므로 'them'입니다.",
+      });
+    }
+
+    // "It has been really long time" → "a really long time"; "for long time" → "for a long time".
+    if (/^(been|for|in|such|quite|took|takes|take)$/.test(t)) {
+      let j = i + 1;
+      if (/^(really|very|so|pretty)$/.test(w[j]?.norm ?? "")) j++;
+      if (w[j]?.norm === "long" && w[j + 1]?.norm === "time") {
+        push({
+          rule: "missing-article", from: i + 1, to: i + 1, replacement: "a", category: "article", severity: "minor", skill: "articles",
+          messageKo: "'오랜 시간'은 'a long time'입니다(예: for a long time, It's been a long time).",
+        });
+      }
+    }
+
+    // "accept 10% increase" → "a 10% increase".
+    if (/^(accept|offer|give|get|got|see|saw|seen|expect|propose|request|want|need|consider|approve|apply|announce|achieve|show|showed|shows|offered|accepted|expected|proposed|requested|approved|announced|achieved)$/.test(t) && /^\d+(\.\d+)?$/.test(n1)) {
+      let j = i + 2;
+      if (w[j]?.norm === "percent") j++;
+      if (/^(increase|decrease|discount|reduction|rise|drop|cut|improvement|raise|increment|delay|extension|price)$/.test(w[j]?.norm ?? "")) {
+        const an = /^8/.test(n1) || /^(11|18)$/.test(n1);
+        push({
+          rule: "missing-article", from: i + 1, to: i + 1, replacement: an ? "an" : "a", category: "article", severity: "minor", skill: "articles",
+          messageKo: `'${w[j].raw}'는 셀 수 있는 명사라서 '${an ? "an" : "a"} ${w[i + 1].raw}% ${w[j].raw}'처럼 관사가 필요합니다.`,
+        });
       }
     }
 
