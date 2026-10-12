@@ -634,6 +634,8 @@ const missingBeAdjective: Rule = (w) => {
     if ((s === "it" || s === "you") && i > 0 && !brokenAfter(w, i - 1) && !/^(and|but|so|because|if|when|that|since|or|then|maybe|actually|well|yes|no|oh|okay|ok|sure|hope|think|guess|believe|know)$/.test(prev)) continue;
     const a = w[i + 1];
     if (!PREDICATE_ADJECTIVES.test(a.norm)) continue;
+    // "You okay?", "You ready?", "You free tonight?": casual spoken questions drop "Are".
+    if (s === "you" && (i === 0 || brokenAfter(w, i - 1)) && w[w.length - 1]?.question) continue;
     // "I sure hope so" (sure as an adverb), "we free up", "they right-click" are not this pattern.
     const after = w[i + 2]?.norm ?? "";
     if (a.norm === "sure" && verbInfo(after)?.form === "base") continue;

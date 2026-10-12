@@ -629,6 +629,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         const negQuestion = op.at > 0 && clauseStart(op.at - 1) === op.at - 1 && OPENER.test(w[op.at - 1].norm) && isSubjectWord(w[op.at]);
         // "Nobody has tested it" / "It has never been tested": the negation is in another word.
         if (w.some((x) => /^(nobody|nothing|none|neither|nor|never|without|no|fail|fails|failed)$/.test(x.norm))) continue;
+        // "Oh no, …" / "No, …" as an interjection: leaving it out does not reverse anything.
+        if (tt === "no" && (tw[op.ti].breakAfter || tw[op.ti - 1]?.norm === "oh" || op.ti === tw.length - 1)) continue;
         entry = negQuestion
           ? ["word-choice", "minor", `'~하지 않나요?'라고 확인할 때는 부정 의문문(예: Shouldn't it …?)이 더 자연스럽습니다. 뜻은 통합니다.`]
           : ["meaning-shift", "critical", `부정어 '${tt}'가 빠져 의미가 반대가 됩니다.`, "meaning"];

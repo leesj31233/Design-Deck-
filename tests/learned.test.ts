@@ -4,9 +4,22 @@ import { evaluateLocal } from "@/engflow/core/evaluate";
 import { createGrader, ruleBasedIsEnough } from "@/engflow/core/grader";
 import { createInitialState, recordAttempt } from "@/engflow/core/store";
 import { QUESTION_BY_ID } from "@/engflow/content";
-import type { Evaluation } from "@/engflow/core/types";
+import type { Evaluation, Question } from "@/engflow/core/types";
 
-const q = QUESTION_BY_ID["tk-presentation2-go-back-slide"];
+// A fixed question (not from the bank, whose meaning units keep getting broader): "the previous slide" must be said.
+const q: Question = {
+  ...QUESTION_BY_ID["tk-presentation2-go-back-slide"],
+  id: "learned-test-go-back",
+  reference: "Sure, let me go back to the previous slide.",
+  accepted: ["Sure, I'll go back to the previous slide.", "Of course, let me go back to the previous slide."],
+  meaning: [
+    { id: "go-back", en: "go back", ko: "돌아가다", any: ["go ... back", "=going ... back", "return"], critical: true },
+    { id: "slide", en: "the previous slide", ko: "이전 슬라이드", any: ["slide|slides|page"] },
+    { id: "sure", en: "sure", ko: "그럼요", any: ["sure|course|okay|ok|yes|certainly|problem"] },
+  ],
+  pitfalls: [],
+  probes: [],
+};
 // Correct, but worded differently from every stored answer ("one" for "slide").
 const MINE = "No problem, let me go back to the previous one.";
 const T0 = Date.UTC(2026, 9, 12, 9);
@@ -49,7 +62,9 @@ describe("the grader learns answers Claude approved", () => {
     const variant = evaluateLocal(q, "Sure, let me go back to the previous one.", { learned: [MINE] });
     expect(variant.meaning.every((m) => m.present)).toBe(true);
     expect(variant.scores.overall).toBeGreaterThanOrEqual(85);
-    expect(evaluateLocal(q, "Sure, let me go back to the previous one.").scores.overall).toBeLessThan(85);
+    const plain = evaluateLocal(q, "Sure, let me go back to the previous one.");
+    expect(plain.meaning.find((m) => m.id === "slide")?.present).toBe(false);
+    expect(plain.scores.overall).toBeLessThan(variant.scores.overall);
     // …but only while the words that carried it are still there.
     const changed = evaluateLocal(q, "No problem, let me go back to the previous meeting.", { learned: [MINE] });
     expect(changed.meaning.find((m) => m.id === "slide")?.present).toBe(false);
