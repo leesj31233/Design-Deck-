@@ -128,7 +128,25 @@ export function TodayScreen() {
         </Card>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      {/* Phones: one compact row; wider screens: three cards with the week chart. */}
+      <Card className="grid grid-cols-3 divide-x divide-[var(--line)] p-0 sm:hidden">
+        <button onClick={() => nav.go("test")} className="dd-focus px-3 py-3 text-left">
+          <div className="text-[11px] text-[var(--muted)]">레벨</div>
+          <div className="mt-0.5 truncate text-[16px] font-semibold">{lvl.label}</div>
+        </button>
+        <div className="px-3 py-3">
+          <div className="text-[11px] text-[var(--muted)]">연속 학습</div>
+          <div className="mt-0.5 flex items-center gap-1 text-[16px] font-semibold">
+            <Flame className={cn("size-4", streak ? "text-[var(--ef-warn-fill)]" : "text-[var(--muted)]")} />
+            <span className="ef-num">{streak}</span>일
+          </div>
+        </div>
+        <div className="px-3 py-3">
+          <div className="text-[11px] text-[var(--muted)]">이번 주</div>
+          <div className="ef-num mt-0.5 text-[16px] font-semibold">{weekTotal}문항</div>
+        </div>
+      </Card>
+      <div className="hidden gap-3 sm:grid sm:grid-cols-3">
         <button onClick={() => nav.go("test")} className="dd-focus text-left">
           <Card className="h-full p-4">
             <Eyebrow>레벨 추정</Eyebrow>
@@ -161,6 +179,11 @@ export function TodayScreen() {
             <Eyebrow>추천 학습</Eyebrow>
             <div className="mt-1.5 text-[17px] font-semibold">{suggestion.nameKo}</div>
             <div className="ef-mono mt-1 text-[13px] text-[var(--ef-accent-ink)]">{suggestion.formula}</div>
+            {weakest && weakest.skill === suggestion.id ? (
+              <div className="mt-3">
+                <MasteryTrack status={weakest.status} mastery={weakest.mastery} />
+              </div>
+            ) : null}
             <p className="ef-ko mt-2 text-[13px] text-[var(--muted)]">
               {weakest ? "가장 약한 문법을 먼저 연습합니다." : "커리큘럼의 다음 문법입니다."}
               {suggestionCategory ? ` · ${CATEGORY_LABEL[suggestionCategory]} 상황` : ""}
@@ -175,7 +198,7 @@ export function TodayScreen() {
             </div>
           </Card>
         ) : null}
-        <Card className="p-5">
+        <Card className={cn("p-5", weakest && suggestion && weakest.skill === suggestion.id && "hidden lg:block")}>
           <div className="flex items-center justify-between">
             <Eyebrow>가장 약한 문법</Eyebrow>
             {weakest ? <StatusChip status={weakest.status} /> : null}
