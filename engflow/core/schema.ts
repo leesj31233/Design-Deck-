@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export const cefrSchema = z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]);
 export const categorySchema = z.enum(["process", "pilot", "meeting", "collab", "operation", "business"]);
-export const situationSchema = z.enum(["online", "presentation", "discussion", "reaction", "smalltalk", "meal", "phone", "negotiation", "trouble", "visit", "technical"]);
+export const situationSchema = z.enum(["online", "presentation", "discussion", "reaction", "smalltalk", "daily", "office", "feelings", "meal", "phone", "negotiation", "trouble", "visit", "technical"]);
 export const errorCategorySchema = z.enum([
   "be-verb", "verb-form", "tense", "agreement", "preposition", "article", "word-order", "word-choice",
   "missing-content", "meaning-shift", "terminology", "spelling", "sentence-structure", "countability",
@@ -86,9 +86,10 @@ export const aiEvaluationSchema = z.object({
       }),
     )
     .max(10),
-  corrected: z.string().min(1),
-  /** How native speakers most commonly say it in a meeting. */
-  recommended: z.string().min(1),
+  /** The answer with only its errors fixed; "" when nothing is wrong (fewer tokens, faster reply). */
+  corrected: z.string(),
+  /** How native speakers most commonly say it (optional: the question's curated reference is used otherwise). */
+  recommended: z.string().optional(),
 });
 
 export type AIEvaluationPayload = z.infer<typeof aiEvaluationSchema>;

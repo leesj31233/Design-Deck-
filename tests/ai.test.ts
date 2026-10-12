@@ -21,14 +21,26 @@ const valid = {
 };
 
 describe("AI evaluation contract", () => {
-  it("the prompt is grammar-first, accepts site wording, asks for native phrasing and quotes the answer verbatim", () => {
+  it("the prompt is grammar-first, accepts site wording, asks for a short reply and quotes the answer verbatim", () => {
     const p = buildEvaluationPrompt(q, answer, local);
     expect(p).toContain(`"""${answer}"""`);
     expect(p).toMatch(/Grammar first/);
     expect(p).toMatch(/Site-specific word choice is NOT an error/);
-    expect(p).toMatch(/how native speakers most commonly say this in a meeting/);
     expect(p).toMatch(/ONE category only/);
+    // The reply carries no recommended sentence (the question's curated reference is shown) and an empty
+    // correction when nothing is wrong: fewer tokens, so the grade comes back sooner.
+    expect(p).not.toMatch(/"recommended"/);
+    expect(p).toMatch(/"" when errors is empty/);
     expect(p.length).toBeLessThan(5000);
+  });
+
+  it("a short reply without a correction or recommendation is complete", () => {
+    const ok = normalizeAIEvaluation({ meaning: 95, comprehensibility: 92, errors: [], corrected: "" }, q, q.reference, evaluateLocal(q, q.reference));
+    expect(ok.corrected).toBe(q.reference);
+    expect(ok.recommended).toBe(q.reference);
+    // Errors listed but no correction: the fixes are applied to the answer.
+    const fixed = normalizeAIEvaluation({ ...valid, corrected: "" }, q, answer, local);
+    expect(fixed.corrected).not.toContain("will decide");
   });
   it("validated output maps spans to positions and drops quotes that are not in the answer", () => {
     const e = normalizeAIEvaluation(valid, q, answer, local);

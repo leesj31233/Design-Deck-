@@ -60,8 +60,8 @@ ${PRINCIPLES}
 Be brief: the learner is waiting. explanationKo = ONE short polite Korean sentence (~입니다): what is wrong and the right form.
 Skill ids for errors: ${SKILL_IDS}.
 
-Reply with ONLY this JSON:
-{"meaning":0-100,"comprehensibility":0-100,"errors":[{"span":"exact substring of the answer, or \"\" for a missing word","insertBefore":"for a missing word: the answer word it goes before, \"\" = end","fix":"replacement","category":one of [${CATEGORIES}],"severity":"minor"|"major"|"critical","explanationKo":"…","skill":"skill id"}],"corrected":"the answer with only its errors fixed — keep the learner's own words, including site terms","recommended":"how native speakers most commonly say this in a meeting: natural, everyday phrasing (not textbook, no rare idioms); keep the learner's site terms"}`;
+Reply with ONLY this JSON (no other keys):
+{"meaning":0-100,"comprehensibility":0-100,"errors":[{"span":"exact substring of the answer, or \"\" for a missing word","insertBefore":"for a missing word: the answer word it goes before, \"\" = end","fix":"replacement","category":one of [${CATEGORIES}],"severity":"minor"|"major"|"critical","explanationKo":"…","skill":"skill id"}],"corrected":"the answer with only its errors fixed — keep the learner's own words, including site terms; \"\" when errors is empty"}`;
 }
 
 function locate(answer: string, span: string, insertBefore?: string): { start: number; end: number } | null {
@@ -81,6 +81,16 @@ function locate(answer: string, span: string, insertBefore?: string): { start: n
 }
 
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
+
+/** The answer with each error's fix applied (right to left, so earlier positions stay valid). */
+function applyFixes(answer: string, errors: ErrorSpan[]): string {
+  let out = answer;
+  for (const e of [...errors].sort((a, b) => b.start - a.start)) {
+    const fix = e.start === e.end && e.fix ? (e.start >= out.length ? ` ${e.fix}` : `${e.fix} `) : e.fix;
+    out = out.slice(0, e.start) + fix + out.slice(e.end);
+  }
+  return out.replace(/\s{2,}/g, " ").replace(/\s+([.,!?])/g, "$1").trim();
+}
 
 const KNOWN_CATEGORIES = new Set(CATEGORIES.replace(/"/g, "").split(","));
 const CATEGORY_ALIASES: Record<string, string> = { grammar: "verb-form", collocation: "word-choice", vocabulary: "word-choice", "subject-verb-agreement": "agreement", plural: "countability", order: "word-order" };
@@ -142,7 +152,9 @@ export function normalizeAIEvaluation(raw: unknown, q: Question, answer: string,
   // Curated pitfalls are verified against the reference answers, and major grammar-rule findings never fired on
   // any correct sentence in the bank or the blind test sets (docs/engflow/GRADER_BENCH.md): keep any the model did not cover,
   // so a lenient reply cannot pass "is not satisfy" or "I'm interesting in".
-  let corrected = p.corrected;
+  // An empty correction means nothing was wrong (the prompt asks for "" then, to keep the reply short); if the
+  // model listed errors anyway, apply its fixes to the answer.
+  let corrected = p.corrected.trim() || applyFixes(answer, errors);
   for (const le of local.errors.filter((x) => (x.source === "pitfall" || (x.source === "rule" && x.severity !== "minor")) && !x.advisory)) {
     const covered = errors.some((e) => e.start < le.end + 1 && le.start < e.end + 1);
     if (covered) continue;
