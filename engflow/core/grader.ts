@@ -37,6 +37,8 @@ export interface GraderOptions {
   budgetMs: (local: Evaluation) => number;
   /** Claude's own response time for each completed request (for the on-device speed figure). */
   onLatency?: (ms: number) => void;
+  /** Answers Claude approved earlier for this learner (core/learned.ts); accepted at once like stored answers. */
+  learned?: (q: Question) => string[] | undefined;
   /** Background grading requests allowed per question. */
   maxPrefetch?: number;
   clock?: () => number;
@@ -75,6 +77,8 @@ export function createGrader(opts: GraderOptions) {
   const keyOf = (q: Question, text: string, hint: number) => `${q.id}|${hint}|${text.trim().replace(/\s+/g, " ").replace(/[.!?]+$/, "")}`;
   const asSubmitted = (ev: Evaluation, text: string): Evaluation => (ev.answer === text ? ev : { ...ev, answer: text });
 
+  const localOf = (q: Question, text: string, hint: number) => evaluateLocal(q, text, { hintLevel: hint, learned: opts.learned?.(q) });
+
   function start(q: Question, text: string, hint: number, local: Evaluation): Pending {
     pending?.ctl.abort();
     const ctl = new AbortController();
@@ -101,7 +105,7 @@ export function createGrader(opts: GraderOptions) {
   /** A result that needs no waiting: rule-based for clear answers, or Claude's prefetched grade. */
   function peek(q: Question, text: string, hint: number, t0 = clock()): GradeOutcome | null {
     const t = text.trim();
-    const local = evaluateLocal(q, t, { hintLevel: hint });
+    const local = localOf(q, t, hint);
     const ms = () => Math.round(clock() - t0);
     if (!opts.aiEnabled()) return { evaluation: local, ms: ms(), via: "local-off", noteKo: null };
     if (ruleBasedIsEnough(local)) return { evaluation: local, ms: ms(), via: "instant", noteKo: null };
@@ -111,6 +115,8 @@ export function createGrader(opts: GraderOptions) {
 
   return {
     peek,
+    /** The rule-based grade (with this learner's Claude-approved answers). */
+    local: localOf,
 
     /** Start grading the current text in the background (returns whether a request was sent). */
     prefetch(q: Question, text: string, hint: number): boolean {
@@ -118,7 +124,7 @@ export function createGrader(opts: GraderOptions) {
       if (!t || !opts.aiEnabled() || prefetches >= maxPrefetch || !looksComplete(q, t)) return false;
       const key = keyOf(q, t, hint);
       if (finished.has(key) || (pending && pending.key === key && !pending.done)) return false;
-      const local = evaluateLocal(q, t, { hintLevel: hint });
+      const local = localOf(q, t, hint);
       if (ruleBasedIsEnough(local)) return false;
       prefetches++;
       start(q, t, hint, local);
@@ -131,7 +137,7 @@ export function createGrader(opts: GraderOptions) {
       const quick = peek(q, text, hint, t0);
       if (quick) return quick;
       const t = text.trim();
-      const local = evaluateLocal(q, t, { hintLevel: hint });
+      const local = localOf(q, t, hint);
       const key = keyOf(q, t, hint);
       const p = pending && pending.key === key && !(pending.done && !pending.result) ? pending : start(q, t, hint, local);
       const budget = opts.budgetMs(local);

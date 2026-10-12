@@ -9,6 +9,7 @@ import type {
 import { updateWeakness } from "./weakness";
 import { SEEDS } from "../content/seeds";
 import { skillName } from "../content/skills";
+import { claudeApproved, rememberAnswer } from "./learned";
 
 export const DEFAULT_SETTINGS: Settings = {
   theme: "system",
@@ -277,7 +278,9 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
     ms: d.ms + Math.min(input.responseMs, 10 * 60_000),
   };
   const seen = state.seen[q.id];
-  state.seen[q.id] = { count: (seen?.count ?? 0) + 1, lastAt: now, best: Math.max(seen?.best ?? 0, ev.scores.overall) };
+  // An answer Claude graded fully correct is remembered, so the rule-based grader accepts it at once next time.
+  const ok = !input.skipped && claudeApproved(ev) ? rememberAnswer(q, seen?.ok, ev.answer) : seen?.ok;
+  state.seen[q.id] = { count: (seen?.count ?? 0) + 1, lastAt: now, best: Math.max(seen?.best ?? 0, ev.scores.overall), ...(ok?.length ? { ok } : {}) };
   state.updatedAt = now;
   return { state, attempt, grade, gradeReasons: reasons, scheduled, masteryChanges };
 }

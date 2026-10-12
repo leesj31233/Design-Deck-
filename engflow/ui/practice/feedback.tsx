@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AlertTriangle, BookOpen, CheckCircle2, ChevronDown, Copy, Cpu, Info, RotateCcw, Sparkles, TrendingDown } from "lucide-react";
+import { AlertTriangle, BadgeCheck, BookOpen, CheckCircle2, ChevronDown, Copy, Cpu, Info, RotateCcw, Sparkles, TrendingDown } from "lucide-react";
 import type { Evaluation, Question } from "../../core/types";
 import { Card, Eyebrow, Meter, ScoreRing, TONE_TEXT, cn, scoreTone, useReduced } from "../kit";
 import { AnswerHighlight, BUCKET_COLOR, CATEGORY_KO, DiffLine, MeaningCheckList, SEVERITY_KO, markClass } from "./parts";
@@ -271,6 +271,12 @@ export function secondsKo(ms: number): string {
 
 function EvaluatorBadge({ evaluation, ms }: { evaluation: Evaluation; ms: number | null }) {
   const time = ms !== null ? <span className="ef-num font-normal opacity-80">· {secondsKo(ms)}</span> : null;
+  if (evaluation.exact && evaluation.learned)
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-ok-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-ok)]" title="전에 Claude가 정확하다고 확인한 내 표현이라 기다리지 않고 바로 채점했습니다.">
+        <BadgeCheck className="size-3" /> Claude 확인한 내 표현 {time}
+      </span>
+    );
   if (evaluation.evaluator === "ai")
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-accent-ink)]" title="Claude가 문법을 정밀 채점했습니다. 점수는 오류 목록으로 계산합니다.">

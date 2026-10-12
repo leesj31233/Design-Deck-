@@ -237,6 +237,8 @@ export interface Evaluation {
   confidenceNoteKo?: string;
   /** The answer matched the reference or an accepted answer exactly (after normalization). */
   exact: boolean;
+  /** An answer Claude approved earlier for this learner decided this grade: an exact match, or it showed a meaning chunk can be said another way (core/learned.ts). */
+  learned?: boolean;
   /** Closest target sentence the diff was computed against. */
   target: string;
 }
@@ -431,6 +433,18 @@ export interface DiagnosticResultRecord {
   partScores: Record<string, number>;
 }
 
+export interface SeenRecord {
+  count: number;
+  lastAt: number;
+  best: number;
+  /**
+   * The learner's own answers that Claude graded fully correct and that match
+   * no stored answer (newest last, at most 3). The rule-based grader accepts
+   * them next time, so the same answer is graded at once (core/learned.ts).
+   */
+  ok?: string[];
+}
+
 export interface LearnerState {
   schema: 1;
   profile: Profile;
@@ -441,7 +455,7 @@ export interface LearnerState {
   attempts: AttemptRecord[];
   diagnostics: DiagnosticResultRecord[];
   daily: Record<string, DailyLog>;
-  seen: Record<string, { count: number; lastAt: number; best: number }>;
+  seen: Record<string, SeenRecord>;
   generated: Question[];
   /** Frequent grammar mistakes, keyed `${skill}:${category}` (added after v1; may be missing in old states). */
   weak?: Record<string, GrammarWeakPoint>;

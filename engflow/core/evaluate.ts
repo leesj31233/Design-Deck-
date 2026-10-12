@@ -25,6 +25,8 @@ export const SPELLING_CAP = 3;
 /** Alignment findings are heuristic: their total cost per bucket is capped. */
 const ALIGN_CAP = 45;
 const CLOSE_DISTANCE = 0.45;
+/** Close enough to a known correct answer to trust the rule-based grade ("high" confidence). */
+const HIGH_DISTANCE = 0.2;
 const CONSENSUS_MARGIN = 0.08;
 
 /** Overall score from the three scored buckets (terminology is reference only). */
@@ -829,6 +831,8 @@ function clamp(n: number): number {
 export interface LocalEvalOptions {
   /** Used only to annotate the summary. */
   hintLevel?: number;
+  /** This learner's answers that Claude graded fully correct (core/learned.ts): accepted like stored answers. */
+  learned?: string[];
 }
 
 export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOptions = {}): Evaluation {
@@ -865,8 +869,13 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   }
 
   const norm = normalizeForMatch(text);
-  const exactTarget = correctTargets(q).find((t) => normalizeForMatch(t) === norm);
+  const learned = opts.learned ?? [];
+  const storedExact = correctTargets(q).find((t) => normalizeForMatch(t) === norm);
+  const learnedExact = storedExact ? undefined : learned.find((t) => normalizeForMatch(t) === norm);
+  const exactTarget = storedExact ?? learnedExact;
   const meaning = checkMeaning(q, w);
+  // Claude approved this exact wording, so every meaning chunk is in it (some in words the question does not list).
+  if (learnedExact) for (const m of meaning) m.present = true;
   if (exactTarget) {
     const full = { score: 100, noteKo: "정확합니다." };
     return {
@@ -875,17 +884,40 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
       errors: [],
       meaning,
       corrected: capitalizeSentence(text),
-      summaryKo: "정확합니다. 회의에서 그대로 써도 좋은 문장입니다.",
+      summaryKo: learnedExact ? "정확합니다. 전에 Claude가 정확하다고 확인한 내 표현과 같아 바로 채점했습니다." : "정확합니다. 회의에서 그대로 써도 좋은 문장입니다.",
       grammarKo: q.explanationKo,
       review: { add: false, reasonKo: "오류가 없어 별도 복습이 필요 없습니다. 기술 숙련도 기록에는 반영됩니다." },
       confidence: "high",
       exact: true,
+      ...(learnedExact ? { learned: true } : {}),
       target: exactTarget,
     };
   }
 
   const ranked = rankTargets(q, w);
   const { target, tw, al } = ranked[0];
+  // Close to the learner's own wording that Claude approved: a meaning chunk that wording says in other words
+  // (no listed synonym matches) is not missing here either, as long as every content word of that wording outside
+  // the listed chunks is here too ("the previous one" for "the previous slide"; "ordered" for "got" is not excused).
+  // Approved wordings never raise confidence: a near variant can carry a new mistake the rules do not see.
+  let usedLearned = false;
+  const here = new Set(w.map((t) => t.norm));
+  for (const t of learned) {
+    const ltw = words(tokenize(t));
+    if (align(w, ltw).distance > CLOSE_DISTANCE) continue;
+    const listed = new Set<number>();
+    for (const u of q.meaning) {
+      const mm = matchAny(u.any, ltw, 2);
+      if (mm) for (let i = mm.from; i < mm.to; i++) listed.add(i);
+    }
+    if (!ltw.every((x, i) => listed.has(i) || isFunctionWord(x.norm) || here.has(x.norm))) continue;
+    const inApproved = checkMeaning(q, ltw);
+    for (const m of meaning) {
+      if (m.present || inApproved.find((x) => x.id === m.id)?.present) continue;
+      m.present = true;
+      usedLearned = true;
+    }
+  }
   const close = al.distance <= CLOSE_DISTANCE && tw.length >= 2;
   const findings: Finding[] = [];
   const edits: Edit[] = [];
@@ -1063,7 +1095,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
       ? "사소한 오류만 있어 복습 목록에는 넣지 않고 숙련도 기록에만 반영합니다."
       : "정확합니다. 숙련도 기록에 반영됩니다.";
 
-  const confidence: Evaluation["confidence"] = close ? (al.distance <= 0.2 ? "high" : "medium") : "low";
+  const confidence: Evaluation["confidence"] = close ? (al.distance <= HIGH_DISTANCE ? "high" : "medium") : "low";
   const confidenceNoteKo =
     confidence === "low"
       ? "기준 답안과 표현이 많이 달라 의미 단위와 일반 문법 규칙으로만 검사했습니다. 이 방식은 처음 보는 문장의 오류를 놓칠 수 있습니다."
@@ -1090,6 +1122,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
     confidence,
     confidenceNoteKo,
     exact: false,
+    ...(usedLearned ? { learned: true } : {}),
     target,
   };
 }

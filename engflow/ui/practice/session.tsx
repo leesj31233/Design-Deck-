@@ -146,8 +146,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const settings = app.state.settings;
   const aiPossible = app.ai.available && settings.ai !== "off";
   const gradeMode = settings.gradeMode ?? "auto";
-  const live = React.useRef({ aiPossible, gradeMode });
-  live.current = { aiPossible, gradeMode };
+  const live = React.useRef({ aiPossible, gradeMode, seen: app.state.seen });
+  live.current = { aiPossible, gradeMode, seen: app.state.seen };
   // While grading: how long the bar runs, and whether the wait is because the answer is reworded.
   const [wait, setWait] = React.useState<{ budgetMs: number; reworded: boolean } | null>(null);
   // One grader per session: background grading while typing, one result per submit within the budget.
@@ -158,6 +158,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
         aiEnabled: () => live.current.aiPossible,
         budgetMs: (local) => gradeBudgetMs(live.current.gradeMode, local, claudeLatencyQuantiles()),
         onLatency: recordClaudeLatency,
+        learned: (question) => live.current.seen[question.id]?.ok,
       }),
     [app.platform.ai],
   );
@@ -252,7 +253,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       return;
     }
     const token = ++gradeToken.current;
-    const local = evaluateLocal(q, text, { hintLevel: hint });
+    const local = grader.local(q, text, hint);
     const budget = gradeBudgetMs(gradeMode, local, claudeLatencyQuantiles());
     setWait({ budgetMs: budget, reworded: local.confidence !== "high" });
     setPhase("grading");
