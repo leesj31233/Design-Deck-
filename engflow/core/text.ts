@@ -120,6 +120,18 @@ export function tokenize(text: string): Token[] {
       tokens.push({ norm: p, raw, start, end, stem: stem(p), punct: false, expanded: parts.length > 1 || undefined });
     }
   }
+  // A noun's "'s" before not / V-ing / a state word is "is", not a possessive: "my camera's not working".
+  for (let i = tokens.length - 2; i >= 0; i--) {
+    const t = tokens[i];
+    if (t.punct || t.expanded || !/'s$/i.test(t.raw.replace(/’/g, "'")) || t.norm.endsWith("'s")) continue;
+    const next = tokens[i + 1];
+    if (next.punct) continue;
+    const ing = verbInfo(next.norm)?.form === "ing";
+    if (next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over)$/.test(next.norm)) {
+      t.expanded = true;
+      tokens.splice(i + 1, 0, { norm: "is", raw: t.raw, start: t.start, end: t.end, stem: stem("is"), punct: false, expanded: true });
+    }
+  }
   // "'d" is "had" before a past participle ("we'd measured"), otherwise "would".
   for (let i = 0; i < tokens.length - 1; i++) {
     const t = tokens[i];

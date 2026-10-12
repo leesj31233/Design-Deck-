@@ -120,13 +120,14 @@ The TOEIC Speaking panel shows the ETS **minimum scores** per CEFR level (Speaki
 
 | Bank | Items |
 | --- | --- |
-| Conversation turns (6 scenes × difficulty 1–10) | in progress |
+| Conversation turns (6 scenes × 15, covering difficulty 1–10) | 90 |
 | Full-sentence construction (Mode A) | 48 |
 | Phrase & structure quiz (Mode B) | 75 |
 | Review variation ladders (7 imported mistakes × 4 levels × 2) | 56 |
 | Diagnostic items | 40 |
-| Grammar guide entries | 30 (one per skill) |
-| QC probes (expected pass/fail answers) | 614 |
+| Grammar guide entries | 37 (one per skill, incl. 7 conversation skills) |
+| Dialogue context added to older questions | 179 |
+| QC probes (expected pass/fail answers) | 800 |
 
 See [CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md) for the authoring rules, the pattern syntax and the QC contract.
 

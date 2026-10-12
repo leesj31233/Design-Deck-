@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { evaluateLocal } from "@/engflow/core/evaluate";
+import { tokenize, words } from "@/engflow/core/text";
 import { QUESTION_BY_ID } from "@/engflow/content";
 import { SEEDS } from "@/engflow/content/seeds";
 import type { Question } from "@/engflow/core/types";
@@ -205,5 +206,22 @@ describe("everyday-conversation false positives", () => {
     const offer = q({ reference: "Would you like to try some kimchi?", accepted: ["Do you want to try some kimchi?"], meaning: [{ id: "try", en: "try kimchi", ko: "김치 먹어 보다", any: ["try ... kimchi"] }] });
     expect(evaluateLocal(offer, "Do you want to try some kimchi?").scores.overall).toBe(100);
     expect(evaluateLocal(offer, "Would you want to try some kimchi?").errors.filter((x) => x.category === "tense")).toEqual([]);
+  });
+});
+
+describe("spoken-English false positives (round 2)", () => {
+  it("a noun's 's before not/V-ing is 'is', so 'my camera's not working' is correct", () => {
+    const t = q({ reference: "My camera is not working.", accepted: ["My camera isn't working."], meaning: [{ id: "cam", en: "camera not working", ko: "카메라가 안 된다", any: ["camera ... not ... work"] }] });
+    expect(evaluateLocal(t, "My camera's not working.").scores.overall).toBe(100);
+    // Possessives stay possessives.
+    expect(words(tokenize("The vendor's drawings")).map((x) => x.norm)).toEqual(["the", "vendor", "drawings"]);
+  });
+  it("leaving out 'd in 'I'd suggest' is not a tense error", () => {
+    const t = q({ reference: "I'd suggest going with Option B.", accepted: ["I would recommend going with Option B."], meaning: [{ id: "b", en: "option B", ko: "B안", any: ["option b"] }] });
+    expect(evaluateLocal(t, "I suggest going with Option B.").errors.filter((x) => x.category === "tense")).toEqual([]);
+  });
+  it("an object pronoun before 'and' is not a duplicated object, but 'check it the rate' still is", () => {
+    const t = q({ reference: "I'll check and get back to you.", accepted: ["I will check and get back to you."], meaning: [{ id: "back", en: "get back to you", ko: "다시 연락", any: ["get back"] }] });
+    expect(evaluateLocal(t, "I'll check it and get back to you.").errors.filter((x) => x.severity !== "minor")).toEqual([]);
   });
 });

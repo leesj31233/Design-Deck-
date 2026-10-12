@@ -77,7 +77,7 @@ Matched against the normalized answer (lower-case, contractions expanded: *it's 
 | `...` | gap: 0–3 tokens (0–6 inside meaning units) |
 | `re:<regex>` | regex over the normalized, space-joined answer |
 
-Alternatives (`a|b`) are single tokens: a multi-word option such as *go through* needs its own `any` entry (`"review ... data", "go through ... data"`), because spaces separate pattern tokens. The light stemmer does not reduce irregular forms such as *going* → *go*; list them (`=going`).
+Alternatives (`a|b`) are single tokens: a multi-word option such as *go through* needs its own `any` entry (`"review ... data", "go through ... data"`), because spaces separate pattern tokens. The light stemmer does not reduce irregular forms such as *going* → *go*; list them (`=going`). A plain `is` matches every form of *be* (`is there` also matches *Are there*); write `=is` for the exact form.
 
 **Meaning units** tolerate up to 2 extra tokens between pattern tokens, and spelling slips in long words. Make them **lenient about grammar** (meaning ≠ grammar): *"We still waiting data"* must still contain the unit "waiting for data" — e.g. `wait ... data`. Give synonyms generously (`change|revise|modify|update`). Don't include articles. Mark `term: true` for technical terms. Site wording differs between plants, so a term slot is reference only and never scored, unless it is also `critical` (then it counts toward meaning). Do not write pitfalls that punish a different but understandable site term and `critical: true` when the message fails without it (negation, key verb, key quantity). 3–8 units per sentence, 1–4 per phrase. **Every correct answer (reference and accepted) must match every unit** — QC checks this.
 

@@ -328,7 +328,12 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         prep: ["preposition", prevIsVerb ? "major" : "minor", prevIsVerb ? `'${w[op.li - 1].raw}'는 목적어를 바로 받는 동사라서 '${w[op.li].raw}'가 필요 없습니다.` : `불필요한 전치사 '${w[op.li].raw}'가 있습니다.`],
         pronoun: ["sentence-structure", "major", `'${w[op.li].raw}'가 다른 말과 겹칩니다(목적어 중복).`],
       };
-      if (c === "pronoun" && !(/^(it|them)$/.test(lt) && op.li > 0 && verbInfo(w[op.li - 1].norm))) continue;
+      // An extra "it/them" is a duplicated object only when another object follows ("check it the rate").
+      let k = op.li + 1;
+      while (k < w.length && MOVABLE_ADVERBS.has(w[k].norm)) k++; // "check it first the rate"
+      const nextL = w[k]?.norm ?? "";
+      const objectFollows = ARTICLES.has(nextL) || /^(this|that|these|those|our|your|their|my|his|her|its)$/.test(nextL);
+      if (c === "pronoun" && !(/^(it|them)$/.test(lt) && op.li > 0 && verbInfo(w[op.li - 1].norm) && objectFollows)) continue;
       const entry = map[c];
       if (!entry) continue;
       push({ from: op.li, to: op.li + 1, category: entry[0], severity: entry[1], fix: "", messageKo: entry[2], skill }, { from: op.li, to: op.li + 1, replacement: "" });
@@ -341,6 +346,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       if (c === "content" || c === "modal") continue;
       if (tt === "that") continue; // usually optional
       if (tt === "at" && tw[op.ti + 1]?.norm === "all") continue; // "(not spicy) at all" is optional emphasis
+      // "I('d) suggest …": would softens the suggestion; leaving it out is not a grammar error.
+      if (tt === "would" && /^(suggest|recommend|propose|say|think|advise|prefer|imagine|guess)$/.test(tw[op.ti + 1]?.norm ?? "")) continue;
       if (APPROX.test(tt) && QUANTITY_START.test(tw[op.ti + 1]?.norm ?? "")) continue; // "about 20%" is optional precision
       if (c === "pronoun" && /^(than|as)$/.test(tw[op.ti - 1]?.norm ?? "")) continue; // "than (we) expected"
       if (/^(us|them|him|me|it|you)$/.test(tt) && op.at > 0) continue; // optional objects ("send (us)", "tell (you)")
