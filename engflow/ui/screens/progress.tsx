@@ -16,6 +16,7 @@ import { situationOf } from "../../core/situations";
 import { listScenarios } from "../../core/roleplay";
 import { SITUATION_INFO } from "../../content";
 import { useStartLesson } from "./today";
+import { BadgeShelf } from "../badges";
 
 export function ProgressScreen() {
   const app = useApp();
@@ -107,6 +108,8 @@ export function ProgressScreen() {
           </div>
         </Card>
       </div>
+
+      <BadgeShelf />
 
       <SceneMap />
 

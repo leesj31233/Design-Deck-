@@ -26,6 +26,8 @@ import { weaknessNote } from "../../core/weakness";
 import { GuideSheet, type GuideTab } from "../guide";
 import { RoleplayReplay } from "../roleplay";
 import { Staircase } from "../ladder";
+import { NewBadgeList } from "../badges";
+import { badgeStatuses, earnedBadgeIds, newBadges } from "../../core/badges";
 
 
 export const CATEGORY_LABEL: Record<string, string> = {
@@ -125,6 +127,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   // Consecutive clean answers, and the learner's own lines per role-play (by step) for the chat.
   const [streak, setStreak] = React.useState(0);
   const [bestStreak, setBestStreak] = React.useState(0);
+  // Badge tiers held when the session started, to announce new ones at the end.
+  const [badgesBefore] = React.useState(() => earnedBadgeIds(badgeStatuses(app.state, app.questions, app.qIndex)));
   const [said, setSaid] = React.useState<Record<string, SaidLine[]>>({});
   const [celebration, setCelebration] = React.useState<Celebration | null>(null);
   const [finished, setFinished] = React.useState(false);
@@ -386,7 +390,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     }
   };
 
-  if (finished) return <SessionSummary spec={spec} done={done} bestStreak={bestStreak} onExit={onExit} />;
+  if (finished) return <SessionSummary spec={spec} done={done} bestStreak={bestStreak} onExit={onExit} badgesBefore={badgesBefore} />;
   if (!q || !item) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
@@ -720,9 +724,11 @@ function SpeedTimer({ stoppedAt, now }: { stoppedAt: number | null; now: () => n
   );
 }
 
-function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec; done: Done[]; bestStreak: number; onExit: () => void }) {
+function SessionSummary({ spec, done, bestStreak, onExit, badgesBefore }: { spec: SessionSpec; done: Done[]; bestStreak: number; onExit: () => void; badgesBefore: Set<string> }) {
   const app = useApp();
   const reduced = useReduced();
+  // Badge tiers reached during this session.
+  const gained = React.useMemo(() => newBadges(badgesBefore, badgeStatuses(app.state, app.questions, app.qIndex)), [badgesBefore, app.state, app.questions, app.qIndex]);
   const answered = done.filter((d) => !d.result.attempt.skipped);
   const avg = answered.length ? Math.round(answered.reduce((s, d) => s + d.result.attempt.overall, 0) / answered.length) : 0;
   const good = done.filter((d) => d.result.grade >= 3).length;
@@ -771,6 +777,7 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
             {bestStreak >= 3 ? <span className="rounded-full bg-[#ff9f0a]/15 px-2.5 py-1 font-semibold text-[#c25e00] dark:text-[#ffb340]">최고 {bestStreak}연속 정답</span> : null}
           </div>
         ) : null}
+        <NewBadgeList items={gained} />
       </motion.div>
       {spec.speed && speedTimes.length ? (
         <Card className="mt-6 p-4">
