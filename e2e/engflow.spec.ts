@@ -251,6 +251,25 @@ test("short to long: a small-talk ladder climbs from a one-line reply to a long 
   expect(errors).toEqual([]);
 });
 
+test("speed round: short replies against a live timer, with response times in the summary", async ({ page }) => {
+  const errors = await open(page);
+  await page.getByRole("button", { name: "순발력 훈련 시작" }).click();
+  await expect(page.getByLabel(/^응답 시간 \d+\.\d초$/)).toBeVisible();
+  await expect(page.getByText(/^순발력 1\/10/)).toBeVisible();
+  for (let i = 0; i < 10; i++) {
+    await expect(page.locator("#ef-answer")).toBeVisible();
+    await page.locator("#ef-answer").fill("Sounds good.");
+    await page.getByRole("button", { name: /제출/ }).click();
+    await expect(page.getByRole("img", { name: /종합/ })).toBeVisible();
+    await page.getByRole("button", { name: /^다음|^결과 보기/ }).click();
+    if (await page.getByRole("heading", { name: /순발력/ }).isVisible()) break;
+  }
+  await expect(page.getByRole("heading", { name: /순발력 (만점!|훈련 끝)/ })).toBeVisible();
+  await expect(page.getByText("평균 응답")).toBeVisible();
+  await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
+
 test("expression notebook: study an expression step by step, then speak it", async ({ page }) => {
   const errors = await open(page);
   await nav(page, "표현 노트");

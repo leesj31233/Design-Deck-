@@ -1,8 +1,8 @@
 "use client";
 import * as React from "react";
 import { motion } from "motion/react";
-import { ArrowRight, TrendingUp } from "lucide-react";
-import { buildLadder, ladderRange, ladderSteps } from "../core/ladder";
+import { ArrowRight, Timer, TrendingUp } from "lucide-react";
+import { buildLadder, buildSpeedRound, ladderRange, ladderSteps } from "../core/ladder";
 import { autoDifficulty } from "../core/situations";
 import type { Situation } from "../core/types";
 import { SITUATION_INFO } from "../content";
@@ -83,6 +83,34 @@ export function LadderCard({ situation, compact }: { situation: Situation | "all
             시작 <ArrowRight className="size-4" />
           </button>
         </div>
+      </div>
+    </Card>
+  );
+}
+
+/** A speed round of short replies, answered against a live timer. */
+export function SpeedCard() {
+  const app = useApp();
+  const nav = useNav();
+  const start = () => {
+    const items = buildSpeedRound(app.state, app.questions, { size: 10, now: app.now() });
+    if (!items.length) return;
+    nav.startSession({ id: `speed-${app.now()}`, title: "순발력 훈련", kind: "lesson", items, note: "짧은 대답 10개", speed: true });
+  };
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="flex items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <Timer className="size-4 text-[var(--ef-accent-ink)]" />
+            <Eyebrow>순발력 훈련</Eyebrow>
+          </div>
+          <div className="mt-1 text-[16px] font-semibold">짧은 대답 10개, 바로 말하기</div>
+          <p className="ef-ko mt-1 text-[13px] text-[var(--muted)]">"Got it.", "Sounds good.", "No worries." 같은 한마디를 생각하지 않고 바로. 대답까지 걸린 시간을 재 줍니다.</p>
+        </div>
+        <button onClick={start} className="dd-focus inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]" aria-label="순발력 훈련 시작">
+          시작 <ArrowRight className="size-4" />
+        </button>
       </div>
     </Card>
   );

@@ -62,3 +62,23 @@ export function buildLadder(state: Pick<LearnerState, "seen">, bank: Question[],
     .sort((a, b) => a.d - b.d)
     .map(({ it, d }, k) => ({ ...it, reasonKo: `계단 ${k + 1}/${items.length} · 난이도 ${d}` }));
 }
+
+/**
+ * A speed round: short replies (quick reactions first, then other one-line
+ * turns) to answer as fast as you can. The point is to say the right thing
+ * without thinking, as in a real conversation.
+ */
+export function buildSpeedRound(state: Pick<LearnerState, "seen">, bank: Question[], opts: { size: number; now: number; rng?: () => number }): SessionItem[] {
+  const rng = opts.rng ?? Math.random;
+  const recent = opts.now - DAY_MS;
+  const pool = bank.filter((q) => !q.variation && !q.scenario && !q.id.startsWith("dg-") && q.mode === "phrase" && q.difficulty <= 3 && q.dialogue?.length);
+  const score = (q: Question) => {
+    const seen = state.seen[q.id];
+    return (situationOf(q) === "reaction" ? 2 : 0) + (q.difficulty <= 2 ? 1 : 0) + (seen ? (seen.lastAt > recent ? -3 : seen.best >= 85 ? -1 : 0.5) : 1) + rng() * 1.5;
+  };
+  return pool
+    .map((q) => ({ q, s: score(q) }))
+    .sort((a, b) => b.s - a.s)
+    .slice(0, opts.size)
+    .map(({ q }, k) => ({ kind: "new" as const, questionId: q.id, reasonKo: `순발력 ${k + 1}/${Math.min(opts.size, pool.length)} · 바로 대답해 보세요` }));
+}

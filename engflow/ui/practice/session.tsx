@@ -45,6 +45,8 @@ export interface SessionSpec {
   note?: string;
   /** A short-to-long climb: the summary shows the staircase of answers. */
   ladder?: boolean;
+  /** A speed round: a live response timer and the response times in the summary. */
+  speed?: boolean;
 }
 
 type QueueItem = SessionItem & { retry?: boolean };
@@ -297,7 +299,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     }
     // Significant error → immediate retry with a different sentence for the same grammar.
     // A ladder keeps its climb: a missed step goes to review later instead of an immediate retry.
-    if (result.grade === 1 && !item.retry && !spec.ladder) {
+    if (result.grade === 1 && !item.retry && !spec.ladder && !spec.speed) {
       const target = result.scheduled[0] ? result.state.items[result.scheduled[0].itemId] : undefined;
       const rq = target ? pickReviewQuestion({ ...target, recentQuestionIds: [...target.recentQuestionIds, q.id] }, app.questions, "mixed") : null;
       if (target && rq && rq.id !== q.id && !queue.some((x, k) => k > idx && x.questionId === rq.id)) {
@@ -408,6 +410,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="truncate font-semibold">{spec.title}</span>
                 <StreakChip n={streak} />
+                {spec.speed && q ? <SpeedTimer key={`${idx}-${q.id}`} stoppedAt={phase === "answer" ? null : submittedAt.current} now={app.now} /> : null}
               </span>
               <span className="ef-num shrink-0 text-[var(--muted)]">
                 {Math.min(idx + 1, queue.length)} / {queue.length}
@@ -691,6 +694,30 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   );
 }
 
+/** Seconds since the question appeared; stops at submit. Green under 5 s, amber under 10 s. */
+function SpeedTimer({ stoppedAt, now }: { stoppedAt: number | null; now: () => number }) {
+  // Keyed per question, so mounting is when the question appeared.
+  const [startedAt] = React.useState(() => now());
+  const [t, setT] = React.useState(() => now());
+  React.useEffect(() => {
+    if (stoppedAt !== null) return;
+    const id = setInterval(() => setT(now()), 100);
+    return () => clearInterval(id);
+  }, [stoppedAt, now]);
+  const s = Math.max(0, ((stoppedAt ?? t) - startedAt) / 1000);
+  return (
+    <span
+      className={cn(
+        "ef-num inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums",
+        s < 5 ? "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]" : s < 10 ? "bg-[var(--ef-warn-soft)] text-[var(--ef-warn)]" : "bg-[var(--ef-bad-soft)] text-[var(--ef-bad)]",
+      )}
+      aria-label={`응답 시간 ${s.toFixed(1)}초`}
+    >
+      ⏱ {s.toFixed(1)}초
+    </span>
+  );
+}
+
 function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec; done: Done[]; bestStreak: number; onExit: () => void }) {
   const app = useApp();
   const reduced = useReduced();
@@ -714,8 +741,12 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
   // A short-to-long climb: the first answer per question, in climbing order.
   const ladder = spec.ladder ? spec.items.map((it) => done.find((d) => d.question.id === it.questionId && !d.item.retry)) : null;
   const ladderTop = !!ladder && ladder.every((d) => d && !d.result.attempt.skipped && d.result.attempt.overall >= 85);
+  // A speed round: how fast the answers came (time from the question to submit).
+  const speedTimes = spec.speed ? answered.map((d) => d.result.attempt.responseMs / 1000) : [];
+  const speedAvg = speedTimes.length ? speedTimes.reduce((a, b) => a + b, 0) / speedTimes.length : 0;
+  const speedTop = spec.speed && speedTimes.length >= 5 && speedAvg <= 6 && good >= Math.ceil(done.length * 0.7);
   // A great session earns a trophy and confetti: every answer clean, or an average of 90+.
-  const trophy = (answered.length >= 3 && (good === done.length || avg >= 90)) || roleplayClean || ladderTop;
+  const trophy = (answered.length >= 3 && (good === done.length || avg >= 90)) || roleplayClean || ladderTop || speedTop;
   const [party, setParty] = React.useState(trophy && app.state.settings.celebrate !== false);
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-10">
@@ -727,7 +758,7 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
         >
           {trophy ? <Trophy className="size-7" /> : <CheckCircle2 className="size-7" />}
         </div>
-        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{roleplay ? (roleplayClean ? "대화 완주!" : "대화 끝") : ladder ? (ladderTop ? "꼭대기까지 올랐어요!" : "계단 오르기 끝") : trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
+        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{roleplay ? (roleplayClean ? "대화 완주!" : "대화 끝") : ladder ? (ladderTop ? "꼭대기까지 올랐어요!" : "계단 오르기 끝") : spec.speed ? (speedTop ? "순발력 만점!" : "순발력 훈련 끝") : trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
         <p className="ef-ko mt-1 text-[14px] text-[var(--muted)]">{spec.title}</p>
         {perfects || bestStreak >= 3 || goalNow ? (
           <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[12px]">
@@ -737,6 +768,34 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
           </div>
         ) : null}
       </motion.div>
+      {spec.speed && speedTimes.length ? (
+        <Card className="mt-6 p-4">
+          <Eyebrow>순발력</Eyebrow>
+          <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+            <div>
+              <div className={cn("ef-num text-[22px] font-semibold", speedAvg < 5 ? "text-[var(--ef-ok)]" : speedAvg < 10 ? "text-[var(--ef-warn)]" : "text-[var(--ef-bad)]")}>{speedAvg.toFixed(1)}초</div>
+              <div className="text-[11px] text-[var(--muted)]">평균 응답</div>
+            </div>
+            <div>
+              <div className="ef-num text-[22px] font-semibold">{Math.min(...speedTimes).toFixed(1)}초</div>
+              <div className="text-[11px] text-[var(--muted)]">가장 빠른 대답</div>
+            </div>
+            <div>
+              <div className="ef-num text-[22px] font-semibold">{speedTimes.filter((x) => x < 5).length}/{speedTimes.length}</div>
+              <div className="text-[11px] text-[var(--muted)]">5초 안에</div>
+            </div>
+          </div>
+          <p className="ef-ko mt-3 text-[13px] text-[var(--muted)]">
+            {good < Math.ceil(done.length / 2)
+              ? "빠르게 대답했지만 틀린 표현이 많아요. 피드백의 자연스러운 표현을 소리 내 읽어 보고 다시 해 보세요."
+              : speedAvg < 5
+                ? "실제 대화처럼 바로 나왔어요. 이 속도를 유지하세요."
+                : speedAvg < 10
+                  ? "조금만 더 빨라지면 대화가 자연스러워집니다. 같은 표현을 한 번 더 해 보세요."
+                  : "생각하는 시간이 길어요. 짧은 대답은 통째로 외워 두면 바로 나옵니다."}
+          </p>
+        </Card>
+      ) : null}
       {ladder ? (
         <Card className="mt-6 p-4">
           <div className="flex items-baseline justify-between gap-2">
