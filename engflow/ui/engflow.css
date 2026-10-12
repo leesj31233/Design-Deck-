@@ -212,3 +212,19 @@
   .ef-skeleton { animation: none; }
 }
 .ef-reduce-motion .ef-skeleton { animation: none; }
+
+/* Voice answers: a soft ring breathes around the microphone while it listens. */
+@keyframes ef-mic-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ef-bad) 45%, transparent); }
+  100% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--ef-bad) 0%, transparent); }
+}
+@keyframes ef-mic-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .25; }
+}
+.ef-mic-ring { animation: ef-mic-ring 1.1s ease-out infinite; }
+.ef-mic-dot { animation: ef-mic-dot 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .ef-mic-ring, .ef-mic-dot { animation: none; }
+}
+.ef-reduce-motion .ef-mic-ring, .ef-reduce-motion .ef-mic-dot { animation: none; }

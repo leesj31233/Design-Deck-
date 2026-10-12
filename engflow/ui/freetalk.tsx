@@ -10,6 +10,7 @@ import { useNav } from "./app";
 import { Card, Eyebrow, cn, scoreTone, TONE_TEXT, useReduced } from "./kit";
 import { DiffLine, tintFor } from "./practice/parts";
 import { SpeakButton, speak, stopSpeaking } from "./speech";
+import { DictationNote, MicButton, useDictation } from "./listen";
 import { Burst } from "./celebrate";
 
 /* ───────────── Entry card ───────────── */
@@ -164,6 +165,16 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
   const endRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const turn = lines.filter((l) => l.who === "me").length;
+  // Speaking instead of typing: the words fill the box (and are sent at once when Settings say so).
+  const [voiceDone, setVoiceDone] = React.useState(0);
+  const dictation = useDictation({
+    value: text,
+    onText: setText,
+    onDone: () => {
+      if (app.state.settings.voiceSend) setVoiceDone((n) => n + 1);
+      else if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) inputRef.current?.focus();
+    },
+  });
 
   React.useEffect(() => () => {
     ctl.current?.abort();
@@ -210,14 +221,21 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
   const send = () => {
     const t = text.trim();
     if (!t || waiting || done) return;
+    dictation.cancel();
     const history: TalkLine[] = [...lines, { who: "me", en: t }];
     setLines(history);
     setText("");
     void ask(history);
   };
 
+  React.useEffect(() => {
+    if (voiceDone) send();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [voiceDone]);
+
   const restart = () => {
     ctl.current?.abort();
+    dictation.cancel();
     setLines([opening]);
     setDone(false);
     setError(null);
@@ -390,8 +408,9 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
               rows={1}
               placeholder={waiting ? `${topic.partner}이(가) 답하는 중…` : "영어로 대답해 보세요"}
               aria-label="내 대답"
-              className="ef-en dd-focus max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-2.5 text-[16px] leading-snug"
+              className="ef-en dd-focus max-h-32 min-h-11 min-w-0 flex-1 resize-none rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-2.5 text-[16px] leading-snug"
             />
+            <MicButton dictation={dictation} disabled={waiting} className="mb-0.5" />
             <button
               onClick={send}
               disabled={!text.trim() || waiting}
@@ -401,6 +420,7 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
               <ArrowUp className="size-5" />
             </button>
           </div>
+          <DictationNote dictation={dictation} />
         </div>
       ) : null}
     </div>

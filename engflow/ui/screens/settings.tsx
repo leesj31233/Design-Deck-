@@ -10,6 +10,7 @@ import { clock, useApp } from "../store";
 import { claudeLatencyQuantiles, claudeLatencyStats } from "../latency";
 import { gradeBudgetMs } from "../../core/grader";
 import { Card, ConfirmDialog, Eyebrow, cn } from "../kit";
+import { canListen } from "../listen";
 
 /** Claude's own response time on this device (from grading requests, including ones that finished late). */
 function claudeSpeed(): string {
@@ -70,6 +71,9 @@ function Choice<T extends string>({ value, options, onChange, label }: { value: 
 export function SettingsScreen() {
   const app = useApp();
   const s = app.state.settings;
+  // The voice-answer option only matters where the browser can listen.
+  const [voice, setVoice] = React.useState(false);
+  React.useEffect(() => setVoice(canListen()), []);
   const set = (p: Partial<Settings>) => app.updateSettings(p);
   const [confirmReset, setConfirmReset] = React.useState(false);
   const [keyInput, setKeyInput] = React.useState("");
@@ -194,6 +198,11 @@ export function SettingsScreen() {
         <Row label="읽기 속도">
           <Choice value={s.slowSpeech ? "slow" : "normal"} label="읽기 속도" options={[{ v: "normal", label: "보통" }, { v: "slow", label: "천천히" }]} onChange={(v) => set({ slowSpeech: v === "slow" })} />
         </Row>
+        {voice ? (
+          <Row label="말로 답하기" hint="답 칸의 마이크 버튼(⌥M)을 누르고 영어로 말하면 글로 바뀝니다. '바로 제출'로 두면 말을 마치는 순간 채점하고, 자유 대화에서는 바로 보냅니다.">
+            <Choice value={s.voiceSend ? "send" : "check"} label="말로 답하기" options={[{ v: "check", label: "확인 후 제출" }, { v: "send", label: "바로 제출" }]} onChange={(v) => set({ voiceSend: v === "send" })} />
+          </Row>
+        ) : null}
         <Row label="자동 수정 (iOS·Android)" hint="끄면 키보드가 철자를 고치지 않아 실제 실력대로 평가됩니다. 권장: 끄기.">
           <Choice value={s.autocorrect ? "on" : "off"} label="자동 수정" options={[{ v: "off", label: "끄기" }, { v: "on", label: "켜기" }]} onChange={(v) => set({ autocorrect: v === "on" })} />
         </Row>

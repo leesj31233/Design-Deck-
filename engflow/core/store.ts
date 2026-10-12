@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sound: false,
   autoSpeak: false,
   slowSpeech: false,
+  voiceSend: false,
   autocorrect: false,
   showNaturalKorean: false,
   reducedMotion: "system",

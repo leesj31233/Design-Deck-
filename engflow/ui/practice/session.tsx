@@ -9,6 +9,7 @@ import { claudeLatencyQuantiles, recordClaudeLatency } from "../latency";
 import { celebrationFor, isSuccess, type Celebration } from "../../core/celebration";
 import { Burst, StreakChip } from "../celebrate";
 import { speak, stopSpeaking } from "../speech";
+import { DictationNote, MicButton, useDictation } from "../listen";
 import { pickReviewQuestion, type SessionItem } from "../../core/session";
 import type { RecordResult } from "../../core/store";
 import type { Evaluation, HintLevel, Question } from "../../core/types";
@@ -143,6 +144,25 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   // Response time ends at submit: grading and reading the feedback do not count as "slow".
   const submittedAt = React.useRef<number | null>(null);
   const inputRef = React.useRef<HTMLTextAreaElement & HTMLInputElement>(null);
+  const [voiceDone, setVoiceDone] = React.useState(0);
+  // Answering by voice: the words fill the box; on a computer the cursor waits at the end so Enter sends it.
+  const dictation = useDictation({
+    value: answer,
+    onText: setAnswer,
+    onStart: () => {
+      if (firstKey.current === null) firstKey.current = app.now();
+    },
+    onDone: () => {
+      if (app.state.settings.voiceSend) {
+        setVoiceDone((n) => n + 1);
+        return;
+      }
+      const el = inputRef.current;
+      if (!el || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    },
+  });
   const nextRef = React.useRef<HTMLButtonElement>(null);
 
   const item = queue[idx];
@@ -181,6 +201,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     setShowKo(false);
     setCelebration(null);
     stopSpeaking();
+    dictation.cancel();
     setCommitted(null);
     setPracticeRetry(false);
     t0.current = app.now();
@@ -217,6 +238,12 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     return () => clearTimeout(t);
   }, [answer, hint, phase, q, aiPossible, grader]);
 
+  // "Submit as soon as I stop speaking" (Settings): the spoken words are in the box now.
+  React.useEffect(() => {
+    if (voiceDone && phase === "answer") submit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [voiceDone]);
+
   const pulse = (id: string) => {
     setFlash(id);
     setTimeout(() => setFlash(null), 450);
@@ -244,6 +271,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   /** One grade per answer, within the budget (1 s by default); see core/grader.ts. */
   const submit = () => {
     if (!q || phase !== "answer") return;
+    dictation.cancel();
     const text = answer.trim();
     if (!text) {
       setNudge(true);
@@ -326,6 +354,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
 
   const skip = () => {
     if (phase === "grading") return;
+    dictation.cancel();
     commit({ skipped: true });
     if (idx + 1 >= queue.length) setFinished(true);
     else setIdx((i) => i + 1);
@@ -358,6 +387,9 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
         e.preventDefault();
         pulse("hint");
         showHint();
+      } else if (e.altKey && e.code === "KeyM" && phase === "answer" && dictation.supported) {
+        e.preventDefault();
+        dictation.toggle();
       } else if (e.altKey && e.code === "KeyS" && phase === "answer") {
         e.preventDefault();
         pulse("skip");
@@ -530,6 +562,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
               >
                 <label htmlFor="ef-answer" className="sr-only">영어 답안</label>
                 <div className={cn("rounded-[18px] border bg-[var(--surface-strong)] p-1.5 shadow-sm transition focus-within:border-[var(--accent)]/60 focus-within:ring-4 focus-within:ring-[var(--accent)]/10", nudge ? "border-[var(--ef-bad)]" : "border-[var(--line)]")}>
+                  <div className={cn("flex gap-1", isSentence ? "items-end" : "items-center")}>
                   {isSentence ? (
                     <textarea
                       id="ef-answer"
@@ -554,7 +587,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                       autoCorrect={settings.autocorrect ? "on" : "off"}
                       spellCheck={settings.autocorrect}
                       enterKeyHint="send"
-                      className="ef-answer block w-full resize-none bg-transparent px-3 py-2.5 outline-none placeholder:text-[var(--muted)]/70"
+                      className="ef-answer block w-full min-w-0 resize-none bg-transparent px-3 py-2.5 outline-none placeholder:text-[var(--muted)]/70"
                     />
                   ) : (
                     <input
@@ -573,10 +606,13 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                       spellCheck={settings.autocorrect}
                       enterKeyHint="send"
                       autoComplete="off"
-                      className="ef-answer block h-12 w-full bg-transparent px-3 outline-none placeholder:text-[var(--muted)]/70"
+                      className="ef-answer block h-12 w-full min-w-0 bg-transparent px-3 outline-none placeholder:text-[var(--muted)]/70"
                     />
                   )}
+                  <MicButton dictation={dictation} disabled={phase === "grading"} className={isSentence ? "mb-1 mr-0.5" : "mr-1"} />
+                  </div>
                 </div>
+                <DictationNote dictation={dictation} />
                 {nudge ? <p className="ef-ko mt-1.5 px-1 text-[12px] text-[var(--ef-bad)]">답을 입력하세요. 모르면 힌트를 보거나 건너뛸 수 있습니다.</p> : null}
                 {practiceRetry ? <p className="ef-ko mt-1.5 px-1 text-[12px] text-[var(--muted)]">연습 재시도 — 학습 기록에는 첫 답이 반영됩니다.</p> : null}
 
@@ -622,7 +658,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                   </div>
                 ) : null}
                 <p className="ef-kbd-hint mt-2 items-center gap-1.5 px-1 text-[11px] text-[var(--muted)]">
-                  <Kbd>Enter</Kbd> 제출 {isSentence ? <><Kbd>Shift</Kbd>+<Kbd>Enter</Kbd> 줄바꿈</> : null} <Kbd>⌥S</Kbd> 건너뛰기 <Kbd>Esc</Kbd> 나가기
+                  <Kbd>Enter</Kbd> 제출 {isSentence ? <><Kbd>Shift</Kbd>+<Kbd>Enter</Kbd> 줄바꿈</> : null} <Kbd>⌥S</Kbd> 건너뛰기 {dictation.supported ? <><Kbd>⌥M</Kbd> 말로 답하기</> : null} <Kbd>Esc</Kbd> 나가기
                 </p>
               </form>
             ) : null}

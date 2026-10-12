@@ -399,6 +399,8 @@ export interface Settings {
   autoSpeak?: boolean;
   /** Read aloud more slowly. */
   slowSpeech?: boolean;
+  /** After answering by voice, submit as soon as the learner stops speaking (default off: check, then Enter). */
+  voiceSend?: boolean;
   /** Preferred difficulty (1–10) per situation; missing = automatic from the level estimate. */
   difficulty?: Partial<Record<Situation | "all", number>>;
   autocorrect: boolean;

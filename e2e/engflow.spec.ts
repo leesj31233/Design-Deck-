@@ -426,3 +426,85 @@ test("badges: the Progress screen shows every badge family and the first 100 ear
   await noHorizontalOverflow(page);
   expect(errors).toEqual([]);
 });
+
+/** A stand-in for the browser's speech recognition: says `window.__speech.text` (or fails with `.error`). */
+async function fakeSpeech(page: Page) {
+  await page.addInitScript(() => {
+    type Ev = { resultIndex: number; results: ({ transcript: string }[] & { isFinal: boolean })[] };
+    const w = window as unknown as { __speech: { text: string; error: string }; SpeechRecognition: unknown; webkitSpeechRecognition: unknown };
+    w.__speech = { text: "i'm on my way", error: "" };
+    class FakeRecognition {
+      lang = "";
+      interimResults = false;
+      continuous = false;
+      maxAlternatives = 1;
+      onresult: ((e: Ev) => void) | null = null;
+      onerror: ((e: { error: string }) => void) | null = null;
+      onend: (() => void) | null = null;
+      timers: ReturnType<typeof setTimeout>[] = [];
+      start() {
+        const { text, error } = w.__speech;
+        if (error) {
+          this.timers.push(setTimeout(() => (this.onerror?.({ error }), this.onend?.()), 50));
+          return;
+        }
+        const ev = (t: string, isFinal: boolean): Ev => ({ resultIndex: 0, results: [Object.assign([{ transcript: t }], { isFinal })] });
+        const half = text.split(" ").slice(0, Math.ceil(text.split(" ").length / 2)).join(" ");
+        this.timers.push(setTimeout(() => this.onresult?.(ev(half, false)), 200));
+        this.timers.push(setTimeout(() => this.onresult?.(ev(text, true)), 600));
+        this.timers.push(setTimeout(() => this.onend?.(), 650));
+      }
+      stop() {
+        this.timers.forEach(clearTimeout);
+        setTimeout(() => this.onend?.(), 10);
+      }
+      abort() {
+        this.timers.forEach(clearTimeout);
+        setTimeout(() => (this.onerror?.({ error: "aborted" }), this.onend?.()), 0);
+      }
+    }
+    // Recent Chromium has the unprefixed name too.
+    w.SpeechRecognition = w.webkitSpeechRecognition = FakeRecognition;
+  });
+}
+
+test("voice answers: speaking fills the answer box and the spoken answer is graded like a typed one", async ({ page }) => {
+  await fakeSpeech(page);
+  const errors = await open(page);
+  await nav(page, "학습");
+  await page.getByRole("button", { name: "롤플레이 주간 화상회의 시작 시작" }).click();
+  await page.evaluate(() => ((window as unknown as { __speech: { text: string } }).__speech.text = "yes i can hear you clearly"));
+  await page.getByRole("button", { name: "말로 답하기" }).click();
+  await expect(page.getByText(/듣고 있어요/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "듣기 멈추기" })).toBeVisible();
+  await expect(page.locator("#ef-answer")).toHaveValue("Yes I can hear you clearly");
+  await expect(page.getByText(/듣고 있어요/)).toBeHidden();
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByRole("status").filter({ hasText: /100점|완벽/ }).first()).toBeVisible();
+  // A refused microphone: say why once, then the button goes away.
+  await page.getByRole("button", { name: /^다음/ }).click();
+  await page.evaluate(() => ((window as unknown as { __speech: { error: string } }).__speech.error = "not-allowed"));
+  await page.getByRole("button", { name: "말로 답하기" }).click();
+  await expect(page.getByText(/마이크를 쓸 수 없습니다/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "말로 답하기" })).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("voice answers in free talk: with 'send at once' in Settings, a spoken line goes to Claude when I stop speaking", async ({ page }) => {
+  await fakeSpeech(page);
+  await fakeTalkClaude(page);
+  const errors = await open(page);
+  await nav(page, "설정");
+  await page.getByRole("radiogroup", { name: "말로 답하기" }).getByRole("radio", { name: "바로 제출" }).click();
+  await nav(page, "학습");
+  await page.getByRole("button", { name: "월요일 아침 주말 이야기 자유 대화 시작" }).click();
+  const talk = page.getByRole("list", { name: "자유 대화" });
+  await expect(talk.getByText("Morning, Minsu! How was your weekend?")).toBeVisible();
+  await page.evaluate(() => ((window as unknown as { __speech: { text: string } }).__speech.text = "it was great i went hiking with my family"));
+  await page.getByRole("button", { name: "말로 답하기" }).click();
+  await expect(talk.getByText("It was great I went hiking with my family")).toBeVisible();
+  await expect(talk.getByText("Nice! Where did you go hiking?")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "내 대답" })).toHaveValue("");
+  await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
