@@ -11,6 +11,7 @@ import { Card, Eyebrow, MasteryTrack, ProgressRing, StatusChip, cn, dateKo, relT
 import { WeekBars } from "../charts";
 import { CATEGORY_LABEL } from "../practice/session";
 import { ExpressionCollection } from "../expressions";
+import { RoleplayShortcut } from "../roleplay";
 import { situationOf } from "../../core/situations";
 import { SITUATIONS } from "../../core/types";
 import { SITUATION_INFO } from "../../content";
@@ -195,6 +196,7 @@ export function TodayScreen() {
         </Card>
       </div>
 
+      <RoleplayShortcut />
       <SceneShortcuts />
       <ExpressionCollection limit={4} />
     </div>

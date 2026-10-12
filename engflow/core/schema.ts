@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export const cefrSchema = z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]);
 export const categorySchema = z.enum(["process", "pilot", "meeting", "collab", "operation", "business"]);
-export const situationSchema = z.enum(["online", "presentation", "discussion", "smalltalk", "meal", "visit", "technical"]);
+export const situationSchema = z.enum(["online", "presentation", "discussion", "reaction", "smalltalk", "meal", "phone", "negotiation", "trouble", "visit", "technical"]);
 export const errorCategorySchema = z.enum([
   "be-verb", "verb-form", "tense", "agreement", "preposition", "article", "word-order", "word-choice",
   "missing-content", "meaning-shift", "terminology", "spelling", "sentence-structure", "countability",
@@ -58,6 +58,7 @@ export const questionSchema = z.object({
   situation: situationSchema.optional(),
   dialogue: z.array(z.object({ speaker: z.string().min(1).max(60), en: z.string().min(1).max(400), ko: z.string().max(400).optional() })).max(4).optional(),
   expression: z.string().max(120).optional(),
+  scenario: z.object({ id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/), titleKo: z.string().min(1), step: z.number().int().min(1), total: z.number().int().min(2).max(8) }).optional(),
 });
 
 /**

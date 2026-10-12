@@ -170,6 +170,18 @@ export function SettingsScreen() {
         <Row label="복습 간격" hint="적응형: 1→3→7→14→30일로 시작해 두 번 성공하면 FSRS가 기억 상태에 맞춰 조정합니다. 고정: 항상 사다리 간격.">
           <Choice value={s.scheduler} label="복습 간격" options={[{ v: "adaptive", label: "적응형 FSRS" }, { v: "ladder", label: "고정 간격" }]} onChange={(v) => set({ scheduler: v })} />
         </Row>
+        <Row label="축하 효과" hint="100점, 연속 정답, 약점 극복, 점수 향상 때 폭죽·반짝임으로 축하합니다. '동작 줄이기'를 켜 두면 효과 없이 문구만 보여 줍니다.">
+          <Choice value={s.celebrate === false ? "off" : "on"} label="축하 효과" options={[{ v: "on", label: "켜기" }, { v: "off", label: "끄기" }]} onChange={(v) => set({ celebrate: v === "on" })} />
+        </Row>
+        <Row label="효과음" hint="좋은 답에 짧은 효과음을 냅니다(무음 모드에서는 들리지 않을 수 있습니다).">
+          <Choice value={s.sound ? "on" : "off"} label="효과음" options={[{ v: "off", label: "끄기" }, { v: "on", label: "켜기" }]} onChange={(v) => set({ sound: v === "on" })} />
+        </Row>
+        <Row label="상대 말 읽어 주기" hint="문제가 열리면 상대의 마지막 말을 영어 음성으로 읽어 줍니다. 말풍선의 🔊 버튼으로 언제든 다시 들을 수 있습니다.">
+          <Choice value={s.autoSpeak ? "on" : "off"} label="상대 말 읽어 주기" options={[{ v: "off", label: "버튼으로만" }, { v: "on", label: "자동" }]} onChange={(v) => set({ autoSpeak: v === "on" })} />
+        </Row>
+        <Row label="읽기 속도">
+          <Choice value={s.slowSpeech ? "slow" : "normal"} label="읽기 속도" options={[{ v: "normal", label: "보통" }, { v: "slow", label: "천천히" }]} onChange={(v) => set({ slowSpeech: v === "slow" })} />
+        </Row>
         <Row label="자동 수정 (iOS·Android)" hint="끄면 키보드가 철자를 고치지 않아 실제 실력대로 평가됩니다. 권장: 끄기.">
           <Choice value={s.autocorrect ? "on" : "off"} label="자동 수정" options={[{ v: "off", label: "끄기" }, { v: "on", label: "켜기" }]} onChange={(v) => set({ autocorrect: v === "on" })} />
         </Row>

@@ -13,8 +13,9 @@ export type Category = "process" | "pilot" | "meeting" | "collab" | "operation" 
  * Where the conversation happens. Most questions are "how do I say this?"
  * turns in one of these scenes; engineering discussion is one scene among them.
  */
-export type Situation = "online" | "presentation" | "discussion" | "smalltalk" | "meal" | "visit" | "technical";
-export const SITUATIONS: Situation[] = ["online", "presentation", "discussion", "smalltalk", "meal", "visit", "technical"];
+export type Situation =
+  | "online" | "presentation" | "discussion" | "reaction" | "smalltalk" | "meal" | "phone" | "negotiation" | "trouble" | "visit" | "technical";
+export const SITUATIONS: Situation[] = ["online", "presentation", "discussion", "reaction", "smalltalk", "meal", "phone", "negotiation", "trouble", "visit", "technical"];
 
 /** One earlier line in the conversation; the learner speaks next. */
 export interface DialogueTurn {
@@ -146,6 +147,11 @@ export interface Question {
   dialogue?: DialogueTurn[];
   /** The key spoken expression this question practises, e.g. "Let me share my screen." */
   expression?: string;
+  /**
+   * Role-play: one of several turns the learner speaks in the same conversation.
+   * Earlier turns of the learner appear in `dialogue` as speaker "Minsu".
+   */
+  scenario?: { id: string; titleKo: string; step: number; total: number };
   source?: "curated" | "generated";
   /**
    * QC probes (not shown to learners): plausible learner answers with the
@@ -381,6 +387,14 @@ export interface Settings {
   gradeMode?: "auto" | "fast" | "accurate";
   /** Legacy (replaced by gradeMode). */
   gradeWait?: "fast" | "balanced" | "accurate";
+  /** Confetti and celebration effects (default on; reduced motion always wins). */
+  celebrate?: boolean;
+  /** Short synthesized chimes on good answers (default off). */
+  sound?: boolean;
+  /** Read the colleague's line aloud when a question opens (default off). */
+  autoSpeak?: boolean;
+  /** Read aloud more slowly. */
+  slowSpeech?: boolean;
   /** Preferred difficulty (1–10) per situation; missing = automatic from the level estimate. */
   difficulty?: Partial<Record<Situation | "all", number>>;
   autocorrect: boolean;

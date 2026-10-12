@@ -66,6 +66,11 @@ export const SKILLS: SkillDef[] = [
   { id: "thanks-looking-forward", group: "conversation", nameKo: "감사·기대 표현", nameEn: "Thanks & looking forward", formula: "Thank you for + V-ing / I'm looking forward to + V-ing", order: 35, band: "B1" },
   { id: "signpost", group: "conversation", nameKo: "발표 흐름 표현", nameEn: "Presentation signposting", formula: "Let me walk you through … / Moving on to … / As you can see, …", order: 36, band: "B1" },
   { id: "opinion", group: "conversation", nameKo: "의견·제안 말하기", nameEn: "Giving opinions", formula: "I think we should … / I'd suggest + V-ing / In my view, …", order: 37, band: "B1" },
+  { id: "reaction", group: "conversation", nameKo: "맞장구·짧은 대답", nameEn: "Quick reactions", formula: "Sounds good. / Got it. / Fair enough. / Makes sense.", order: 38, band: "A2" },
+  { id: "phrasal-verb", group: "conversation", nameKo: "자주 쓰는 구동사", nameEn: "Common phrasal verbs", formula: "follow up on / figure out / go over / look into / set up", order: 39, band: "B1" },
+  { id: "apology", group: "conversation", nameKo: "사과·양해 구하기", nameEn: "Apologizing", formula: "Sorry for + V-ing / I apologize for … / Sorry to keep you waiting.", order: 40, band: "B1" },
+  { id: "hedging", group: "conversation", nameKo: "완곡하게 말하기", nameEn: "Softening & hedging", formula: "I'm afraid … / I was wondering if … / It might be better to …", order: 41, band: "B2" },
+  { id: "empathy", group: "conversation", nameKo: "공감·축하·위로", nameEn: "Empathy & reactions to news", formula: "That sounds tough. / I'm sorry to hear that. / Congratulations on …!", order: 42, band: "B1" },
   { id: "cond-3", group: "conditional", nameKo: "3형 조건문 (과거 사실 반대 가정)", nameEn: "Third conditional", formula: "If + had p.p., would have + p.p.", order: 30, band: "C1" },
 ];
 

@@ -41,4 +41,9 @@ export const EXPRESSION_TITLES: Record<string, { en: string; ko: string }> = {
   "thanks-looking-forward": { en: "Thank you for coming. / I'm looking forward to seeing you.", ko: "감사·기대 (for/to 뒤 V-ing)" },
   signpost: { en: "Let me walk you through … / Moving on to …", ko: "발표 흐름 잡기" },
   opinion: { en: "I think we should … / I'd suggest + V-ing", ko: "의견·제안 말하기" },
+  reaction: { en: "Sounds good. / Got it. / Fair enough.", ko: "바로 나와야 하는 맞장구·짧은 대답" },
+  "phrasal-verb": { en: "follow up on / figure out / go over", ko: "원어민이 자주 쓰는 구동사" },
+  apology: { en: "Sorry for the delay. / Sorry to keep you waiting.", ko: "사과는 Sorry for + 명사/V-ing" },
+  hedging: { en: "I'm afraid … / I was wondering if …", ko: "부드럽게 말하기" },
+  empathy: { en: "That sounds tough. / I'm sorry to hear that.", ko: "공감·축하·위로" },
 };

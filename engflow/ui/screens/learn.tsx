@@ -10,6 +10,7 @@ import { useApp } from "../store";
 import { useNav } from "../app";
 import { Card, Eyebrow, cn } from "../kit";
 import { CATEGORY_LABEL } from "../practice/session";
+import { RoleplayList } from "../roleplay";
 import { toast } from "sonner";
 
 const MODES: { id: QuestionMode | "mixed"; title: string; body: string }[] = [
@@ -283,6 +284,8 @@ export function LearnScreen() {
           </button>
         </div>
       </Card>
+
+      <RoleplayList situation={situation} />
 
       <BankOverview onPick={(sc, n) => {
         setSituation(sc);

@@ -166,6 +166,8 @@ export function buildSession(state: LearnerState, bank: Question[], opts: Sessio
     if (opts.category && opts.category !== "all" && q.category !== opts.category) return false;
     if (opts.skill && opts.skill !== "all" && !q.skills.includes(opts.skill)) return false;
     if (scene && situationOf(q) !== scene) return false;
+    // Later role-play turns depend on the earlier ones: they are played from the role-play list, not alone.
+    if (q.scenario && q.scenario.step > 1) return false;
     const seen = state.seen[q.id];
     if (seen && seen.lastAt > recentCutoff) return false;
     return true;

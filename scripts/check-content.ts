@@ -3,7 +3,7 @@
  * and the grammar guide. Exit code 1 when any error is found.
  *
  *   npx tsx scripts/check-content.ts                # everything
- *   npx tsx scripts/check-content.ts --only phrases # one bank: sentences-a | sentences-b | phrases | variations | talk-online | talk-presentation | talk-discussion | talk-smalltalk | talk-meal | talk-visit | overlay | diagnostic | guide
+ *   npx tsx scripts/check-content.ts --only phrases # one bank: sentences-a | sentences-b | phrases | variations | any talk-* or roleplay-* file name | overlay | diagnostic | guide
  *   npx tsx scripts/check-content.ts --quiet        # summary + errors only
  */
 import { validateBank, validateQuestion, type QcIssue } from "../engflow/core/validate";
@@ -15,7 +15,7 @@ import { PHRASES } from "../engflow/content/bank/phrases";
 import { VARIATIONS } from "../engflow/content/bank/variations";
 import { DIAGNOSTIC_ITEMS } from "../engflow/content/bank/diagnostic";
 import { GUIDE } from "../engflow/content/guide";
-import { TALK_BANKS, withDialogue } from "../engflow/content";
+import { MIXED_BANKS, TALK_BANKS, sceneOfBank, withDialogue } from "../engflow/content";
 import { DIALOGUE_OVERLAY } from "../engflow/content/bank/dialogue-overlay";
 import { SITUATIONS } from "../engflow/core/types";
 import type { Question } from "../engflow/core/types";
@@ -28,8 +28,8 @@ const seedIds = new Set(SEEDS.map((s) => s.id));
 const ctx = { skillIds, seedIds };
 const issues: QcIssue[] = [];
 
-const banks: Record<string, Question[]> = { "sentences-a": SENTENCES_A, "sentences-b": SENTENCES_B, phrases: PHRASES, variations: VARIATIONS, ...TALK_BANKS };
-const selected = Object.entries(banks).filter(([k]) => !only || only === k || (only === "overlay" && !k.startsWith("talk-")));
+const banks: Record<string, Question[]> = { "sentences-a": SENTENCES_A, "sentences-b": SENTENCES_B, phrases: PHRASES, variations: VARIATIONS, ...TALK_BANKS, ...MIXED_BANKS };
+const selected = Object.entries(banks).filter(([k]) => !only || only === k || (only === "overlay" && !k.startsWith("talk-") && !k.startsWith("roleplay-")));
 // Dialogue overlays are validated together with the questions they belong to.
 const all = selected.flatMap(([, v]) => v).map(withDialogue);
 if (!only || banks[only] || only === "overlay") issues.push(...validateBank(all, ctx));
@@ -40,21 +40,53 @@ if (!only || only === "overlay") {
   for (const id of Object.keys(DIALOGUE_OVERLAY)) if (!ids.has(id)) issues.push({ level: "error", questionId: id, message: "dialogue overlay for an unknown question id" });
 }
 
-// Conversation banks: every question is a dialogue turn with a scene and a key expression,
-// and every scene covers difficulty 1–10.
-for (const [name, list] of Object.entries(TALK_BANKS)) {
+// Conversation banks: every question is a dialogue turn with a scene and a key expression.
+const conversation = [...Object.entries(TALK_BANKS), ...Object.entries(MIXED_BANKS)];
+for (const [name, list] of conversation) {
   if (only && only !== name) continue;
-  const scene = name.replace("talk-", "");
+  const fixedScene = TALK_BANKS[name] ? sceneOfBank(name) : null;
   for (const q of list) {
     const e = (message: string) => issues.push({ level: "error", questionId: q.id, message });
-    if (q.situation !== scene) e(`situation must be "${scene}"`);
+    if (fixedScene && q.situation !== fixedScene) e(`situation must be "${fixedScene}"`);
+    if (!fixedScene && (!q.situation || !SITUATIONS.includes(q.situation))) e("conversation question needs a situation");
     if (!q.dialogue?.length) e("conversation question needs ≥1 dialogue turn");
     if (!q.expression) e("conversation question needs an expression");
     if (q.probes === undefined || q.probes.length < 2) e("needs ≥2 probes (one pass, one fail)");
+    if (q.probes && (!q.probes.some((p) => p.expect === "pass") || !q.probes.some((p) => p.expect === "fail"))) e("probes need at least one pass and one fail");
   }
-  const covered = new Set(list.map((q) => q.difficulty));
-  const missing = Array.from({ length: 10 }, (_, i) => i + 1).filter((d) => !covered.has(d));
-  if (list.length && missing.length) issues.push({ level: "error", questionId: name, message: `difficulty not covered: ${missing.join(", ")}` });
+}
+
+// Every scene covers difficulty 1–10 (quick replies: 1–5), counting all its files together.
+if (!only) {
+  const byScene = new Map<string, Set<number>>();
+  for (const [, list] of conversation) for (const q of list) {
+    if (!q.situation) continue;
+    if (!byScene.has(q.situation)) byScene.set(q.situation, new Set());
+    byScene.get(q.situation)!.add(q.difficulty);
+  }
+  for (const [scene, covered] of byScene) {
+    if (scene === "technical") continue;
+    const need = scene === "reaction" ? 5 : 10;
+    const missing = Array.from({ length: need }, (_, i) => i + 1).filter((d) => !covered.has(d));
+    if (missing.length) issues.push({ level: "error", questionId: `scene:${scene}`, message: `difficulty not covered: ${missing.join(", ")}` });
+  }
+}
+
+// Role-play scenarios: steps 1..total in one file, consistent titles, and from step 2 on the learner's earlier line is in the chat.
+for (const [name, list] of conversation) {
+  if (only && only !== name) continue;
+  const scenarios = new Map<string, Question[]>();
+  for (const q of list) if (q.scenario) scenarios.set(q.scenario.id, [...(scenarios.get(q.scenario.id) ?? []), q]);
+  for (const [id, steps] of scenarios) {
+    const e = (message: string) => issues.push({ level: "error", questionId: `scenario:${id}`, message });
+    const total = steps[0].scenario!.total;
+    if (steps.length !== total) e(`has ${steps.length} steps but total is ${total}`);
+    const nums = steps.map((q) => q.scenario!.step).sort((a, b) => a - b);
+    if (nums.some((n, i) => n !== i + 1)) e(`steps must be 1..${total}, got ${nums.join(",")}`);
+    if (new Set(steps.map((q) => q.scenario!.titleKo)).size > 1) e("titleKo differs between steps");
+    if (new Set(steps.map((q) => q.situation)).size > 1) e("all steps need the same situation");
+    for (const q of steps) if (q.scenario!.step > 1 && !q.dialogue?.some((t) => t.speaker === "Minsu")) e(`step ${q.scenario!.step} (${q.id}) must show Minsu's earlier line in dialogue`);
+  }
 }
 void SITUATIONS;
 

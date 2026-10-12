@@ -10,6 +10,20 @@ import { TALK_DISCUSSION } from "./bank/talk-discussion";
 import { TALK_SMALLTALK } from "./bank/talk-smalltalk";
 import { TALK_MEAL } from "./bank/talk-meal";
 import { TALK_VISIT } from "./bank/talk-visit";
+import { TALK_REACTION } from "./bank/talk-reaction";
+import { TALK_PHONE } from "./bank/talk-phone";
+import { TALK_TROUBLE } from "./bank/talk-trouble";
+import { TALK_NEGOTIATION } from "./bank/talk-negotiation";
+import { TALK_DISCUSSION_2 } from "./bank/talk-discussion-2";
+import { TALK_ONLINE_2 } from "./bank/talk-online-2";
+import { TALK_PRESENTATION_2 } from "./bank/talk-presentation-2";
+import { TALK_SMALLTALK_2 } from "./bank/talk-smalltalk-2";
+import { TALK_MEAL_2 } from "./bank/talk-meal-2";
+import { TALK_VISIT_2 } from "./bank/talk-visit-2";
+import { ROLEPLAY_WORK } from "./bank/roleplay-work";
+import { ROLEPLAY_SOCIAL } from "./bank/roleplay-social";
+import { TALK_LONG } from "./bank/talk-long";
+import { TALK_PHRASAL } from "./bank/talk-phrasal";
 import { DIALOGUE_OVERLAY } from "./bank/dialogue-overlay";
 
 export { SKILLS, SKILL_BY_ID, SKILL_GROUPS, skillName } from "./skills";
@@ -18,15 +32,38 @@ export { GUIDE } from "./guide";
 export { SITUATION_INFO, DIFFICULTY_INFO } from "./situations";
 export { DIAGNOSTIC_ITEMS };
 
-/** Conversation questions ("how do I say this?") by scene. */
+/** Conversation questions ("how do I say this?"), one scene per file: talk-<scene>[-n]. */
 export const TALK_BANKS: Record<string, Question[]> = {
   "talk-online": TALK_ONLINE,
+  "talk-online-2": TALK_ONLINE_2,
   "talk-presentation": TALK_PRESENTATION,
+  "talk-presentation-2": TALK_PRESENTATION_2,
   "talk-discussion": TALK_DISCUSSION,
+  "talk-discussion-2": TALK_DISCUSSION_2,
+  "talk-reaction": TALK_REACTION,
   "talk-smalltalk": TALK_SMALLTALK,
+  "talk-smalltalk-2": TALK_SMALLTALK_2,
   "talk-meal": TALK_MEAL,
+  "talk-meal-2": TALK_MEAL_2,
+  "talk-phone": TALK_PHONE,
+  "talk-negotiation": TALK_NEGOTIATION,
+  "talk-trouble": TALK_TROUBLE,
   "talk-visit": TALK_VISIT,
+  "talk-visit-2": TALK_VISIT_2,
 };
+
+/** Conversation questions whose scene varies per question: role-play scenarios, long turns, phrasal verbs. */
+export const MIXED_BANKS: Record<string, Question[]> = {
+  "roleplay-work": ROLEPLAY_WORK,
+  "roleplay-social": ROLEPLAY_SOCIAL,
+  "talk-long": TALK_LONG,
+  "talk-phrasal": TALK_PHRASAL,
+};
+
+/** Scene of a talk-<scene>[-n] file. */
+export function sceneOfBank(name: string): string {
+  return name.replace(/^talk-/, "").replace(/-\d+$/, "");
+}
 
 /** Adds conversation context written separately for questions that predate dialogue support. */
 export function withDialogue(q: Question): Question {
@@ -35,7 +72,9 @@ export function withDialogue(q: Question): Question {
 }
 
 /** The curated, QC-validated question bank (lessons + conversation + review variations). */
-export const QUESTIONS: Question[] = [...SENTENCES_A, ...SENTENCES_B, ...PHRASES, ...Object.values(TALK_BANKS).flat(), ...VARIATIONS].map((q) => ({
+export const QUESTIONS: Question[] = [
+  ...SENTENCES_A, ...SENTENCES_B, ...PHRASES, ...Object.values(TALK_BANKS).flat(), ...Object.values(MIXED_BANKS).flat(), ...VARIATIONS,
+].map((q) => ({
   ...withDialogue(q),
   source: "curated" as const,
 }));

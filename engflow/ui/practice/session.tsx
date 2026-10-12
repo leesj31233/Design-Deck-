@@ -1,11 +1,14 @@
 "use client";
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, Trophy, X } from "lucide-react";
 import { Kbd } from "@/components/ui/kbd";
 import { evaluateLocal } from "../../core/evaluate";
 import { createGrader, gradeBudgetMs, type GradeVia } from "../../core/grader";
 import { recordClaudeLatency } from "../latency";
+import { celebrationFor, isSuccess, type Celebration } from "../../core/celebration";
+import { Burst, StreakChip } from "../celebrate";
+import { speak, stopSpeaking } from "../speech";
 import { pickReviewQuestion, type SessionItem } from "../../core/session";
 import type { RecordResult } from "../../core/store";
 import type { Evaluation, HintLevel, Question } from "../../core/types";
@@ -113,6 +116,11 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const [committed, setCommitted] = React.useState<RecordResult | null>(null);
   const [practiceRetry, setPracticeRetry] = React.useState(false);
   const [done, setDone] = React.useState<Done[]>([]);
+  // Consecutive clean answers, and the learner's own lines per role-play (by step) for the chat.
+  const [streak, setStreak] = React.useState(0);
+  const [bestStreak, setBestStreak] = React.useState(0);
+  const [said, setSaid] = React.useState<Record<string, string[]>>({});
+  const [celebration, setCelebration] = React.useState<Celebration | null>(null);
   const [finished, setFinished] = React.useState(false);
   const [showNatural, setShowNatural] = React.useState(app.state.settings.showNaturalKorean);
   const [showKo, setShowKo] = React.useState(false);
@@ -160,6 +168,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     setGradeInfo(null);
     setSlow(false);
     setShowKo(false);
+    setCelebration(null);
+    stopSpeaking();
     setCommitted(null);
     setPracticeRetry(false);
     t0.current = app.now();
@@ -175,6 +185,16 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   }, [idx, item?.questionId]);
 
   React.useEffect(() => () => grader.reset(), [grader]);
+
+  // Optional: read the colleague's latest line aloud when a question opens.
+  React.useEffect(() => {
+    if (!settings.autoSpeak || !q?.dialogue?.length) return;
+    const line = [...q.dialogue].reverse().find((t) => t.speaker !== "Minsu");
+    if (!line) return;
+    const t = setTimeout(() => speak(line.en, { slow: settings.slowSpeech }), 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q?.id, settings.autoSpeak]);
 
   // While the learner types: a pause on a fairly complete sentence starts Claude grading in the background,
   // so the grade is usually ready the moment they submit.
@@ -192,6 +212,15 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   };
 
   const show = (ev: Evaluation, info: { ms: number; via: GradeVia }, note: string | null) => {
+    // Decided once, from the learner state before this answer is recorded, so it never changes on screen.
+    setCelebration(
+      q && !practiceRetry
+        ? celebrationFor({
+            evaluation: ev, question: q, prev: app.state, streak: isSuccess(ev, hint) ? streak + 1 : 0, hint, now: app.now(),
+            skillOf: (id) => app.qIndex[id]?.skills[0],
+          })
+        : null,
+    );
     setEvaluation(ev);
     setGradeInfo(info);
     setGradeNote(note);
@@ -247,12 +276,27 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     });
     setCommitted(result);
     setDone((d) => [...d, { item, question: q, result, evaluation: ev }]);
+    const ok = !opts.skipped && isSuccess(ev, hint);
+    setStreak((n) => {
+      const v = ok ? n + 1 : 0;
+      setBestStreak((b) => Math.max(b, v));
+      return v;
+    });
+    if (q.scenario && !opts.skipped) {
+      const sc = q.scenario;
+      setSaid((m) => {
+        const lines = [...(m[sc.id] ?? [])];
+        lines[sc.step - 1] = ev.exact ? ev.answer : ev.corrected;
+        return { ...m, [sc.id]: lines };
+      });
+    }
     // Significant error → immediate retry with a different sentence for the same grammar.
     if (result.grade === 1 && !item.retry) {
       const target = result.scheduled[0] ? result.state.items[result.scheduled[0].itemId] : undefined;
       const rq = target ? pickReviewQuestion({ ...target, recentQuestionIds: [...target.recentQuestionIds, q.id] }, app.questions, "mixed") : null;
       if (target && rq && rq.id !== q.id && !queue.some((x, k) => k > idx && x.questionId === rq.id)) {
-        const at = Math.min(queue.length, idx + 3);
+        // Never break into a role-play: the retry comes after the conversation ends.
+        const at = q.scenario ? queue.length : Math.min(queue.length, idx + 3);
         setQueue((qq) => [...qq.slice(0, at), { kind: "review", questionId: rq.id, reviewItemId: target.id, reasonKo: "즉시 재시도 · 같은 문법, 다른 문장", retry: true }, ...qq.slice(at)]);
       }
     }
@@ -332,7 +376,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     }
   };
 
-  if (finished) return <SessionSummary spec={spec} done={done} onExit={onExit} />;
+  if (finished) return <SessionSummary spec={spec} done={done} bestStreak={bestStreak} onExit={onExit} />;
   if (!q || !item) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
@@ -355,7 +399,10 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
           </button>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2 text-[12px]">
-              <span className="truncate font-semibold">{spec.title}</span>
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span className="truncate font-semibold">{spec.title}</span>
+                <StreakChip n={streak} />
+              </span>
               <span className="ef-num shrink-0 text-[var(--muted)]">
                 {Math.min(idx + 1, queue.length)} / {queue.length}
               </span>
@@ -407,7 +454,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
           {/* Conversation so far, then the learner's turn */}
           {q.dialogue?.length ? (
             <div className="mt-5">
-              <ChatThread turns={q.dialogue} showKo={showKo} />
+              <ChatThread turns={q.dialogue} showKo={showKo} slow={settings.slowSpeech} mine={q.scenario ? said[q.scenario.id]?.slice(0, q.scenario.step - 1) : undefined} />
               <button onClick={() => setShowKo((v) => !v)} className="dd-focus ml-10 mt-1.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showKo}>
                 <Languages className="size-3.5" /> 번역 {showKo ? "숨기기" : "보기"}
               </button>
@@ -577,6 +624,10 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                 question={q}
                 evaluation={evaluation}
                 note={gradeNote}
+                celebration={celebration}
+                effects={settings.celebrate !== false}
+                sound={!!settings.sound}
+                slowSpeech={settings.slowSpeech}
                 gradeMs={gradeInfo?.ms ?? null}
                 weakNote={committed ? null : weaknessNote(app.state, evaluation, q)}
                 compact={!isSentence}
@@ -634,7 +685,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   );
 }
 
-function SessionSummary({ spec, done, onExit }: { spec: SessionSpec; done: Done[]; onExit: () => void }) {
+function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec; done: Done[]; bestStreak: number; onExit: () => void }) {
   const app = useApp();
   const reduced = useReduced();
   const answered = done.filter((d) => !d.result.attempt.skipped);
@@ -647,14 +698,28 @@ function SessionSummary({ spec, done, onExit }: { spec: SessionSpec; done: Done[
     .filter((i) => !i.suspended && i.due > app.now())
     .sort((a, b) => a.due - b.due)
     .slice(0, 4);
+  const perfects = answered.filter((d) => d.result.attempt.overall === 100).length;
+  // A great session earns a trophy and confetti: every answer clean, or an average of 90+.
+  const trophy = answered.length >= 3 && (good === done.length || avg >= 90);
+  const [party, setParty] = React.useState(trophy && app.state.settings.celebrate !== false);
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-10">
+      {party ? <Burst kind="confetti" onDone={() => setParty(false)} /> : null}
       <motion.div initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-        <div className="mx-auto grid size-14 place-items-center rounded-full bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]" style={{ animation: reduced ? undefined : "ef-pop .5s ease" }}>
-          <CheckCircle2 className="size-7" />
+        <div
+          className={cn("mx-auto grid size-14 place-items-center rounded-full", trophy ? "bg-[#f2a516]/15 text-[#c27c00] dark:text-[#ffbf47]" : "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]")}
+          style={{ animation: reduced ? undefined : "ef-pop .5s ease" }}
+        >
+          {trophy ? <Trophy className="size-7" /> : <CheckCircle2 className="size-7" />}
         </div>
-        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
+        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
         <p className="ef-ko mt-1 text-[14px] text-[var(--muted)]">{spec.title}</p>
+        {perfects || bestStreak >= 3 ? (
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[12px]">
+            {perfects ? <span className="rounded-full bg-[var(--ef-accent-soft)] px-2.5 py-1 font-semibold text-[var(--ef-accent-ink)]">100점 {perfects}개</span> : null}
+            {bestStreak >= 3 ? <span className="rounded-full bg-[#ff9f0a]/15 px-2.5 py-1 font-semibold text-[#c25e00] dark:text-[#ffb340]">최고 {bestStreak}연속 정답</span> : null}
+          </div>
+        ) : null}
       </motion.div>
       <div className="mt-6 grid grid-cols-3 gap-2">
         <Card className="p-4 text-center">

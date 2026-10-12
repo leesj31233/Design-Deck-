@@ -6,12 +6,15 @@ import type { Evaluation, Question } from "../../core/types";
 import { Card, Eyebrow, Meter, ScoreRing, TONE_TEXT, cn, scoreTone, useReduced } from "../kit";
 import { AnswerHighlight, BUCKET_COLOR, CATEGORY_KO, DiffLine, MeaningCheckList, SEVERITY_KO, markClass } from "./parts";
 import type { GuideTab } from "../guide";
+import type { Celebration } from "../../core/celebration";
+import { CelebrationBanner } from "../celebrate";
+import { SpeakButton } from "../speech";
 
 /** Weights shown next to each rubric meter (same as SCORE_WEIGHTS in the evaluator). */
 const WEIGHT_LABEL = { grammar: "55%", meaning: "35%", organization: "10%" } as const;
 
 export function FeedbackPanel({
-  question, evaluation, note, gradeMs, weakNote, onGuide, compact, scheduleNote,
+  question, evaluation, note, gradeMs, weakNote, onGuide, compact, scheduleNote, celebration, effects = true, sound = false, slowSpeech,
 }: {
   question: Question;
   evaluation: Evaluation;
@@ -24,6 +27,11 @@ export function FeedbackPanel({
   onGuide: (skill: string, tab: GuideTab) => void;
   compact?: boolean;
   scheduleNote?: string | null;
+  /** The moment this answer is celebrated as (decided once by the session). */
+  celebration?: Celebration | null;
+  effects?: boolean;
+  sound?: boolean;
+  slowSpeech?: boolean;
 }) {
   const reduced = useReduced();
   const [active, setActive] = React.useState<string | null>(null);
@@ -43,6 +51,7 @@ export function FeedbackPanel({
 
   return (
     <div className="space-y-3" aria-live="polite">
+      {celebration ? <CelebrationBanner c={celebration} effects={effects} sound={sound} /> : null}
       {/* Verdict */}
       <motion.div {...stagger(0)}>
         <Card className="p-4 md:p-5">
@@ -160,7 +169,10 @@ export function FeedbackPanel({
           <div className="p-4 md:p-5">
             <div className="flex items-center justify-between gap-2">
               <Eyebrow>원어민이 회의에서 자주 쓰는 표현</Eyebrow>
-              <CopyButton text={e.recommended} />
+              <span className="flex items-center gap-0.5">
+                <SpeakButton text={e.recommended} slow={slowSpeech} label="추천 문장 읽어 주기" />
+                <CopyButton text={e.recommended} />
+              </span>
             </div>
             <p className="ef-en mt-2 text-[17px] font-medium leading-7">{e.recommended}</p>
             {question.expression ? (

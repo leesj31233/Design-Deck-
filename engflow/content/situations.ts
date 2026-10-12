@@ -5,8 +5,12 @@ export const SITUATION_INFO: Record<Situation, { ko: string; en: string; descKo:
   online: { ko: "온라인 미팅 진행", en: "Running an online meeting", descKo: "접속·소리 확인, 화면 공유, 안건 소개, 발언 넘기기, 마무리" },
   presentation: { ko: "발표", en: "Presenting", descKo: "자료 소개, 슬라이드 넘기기, 결과 설명, 질문 받기" },
   discussion: { ko: "회의 대화", en: "Meeting discussion", descKo: "의견 말하기, 동의·반대, 확인 질문, 일정·요청" },
+  reaction: { ko: "짧은 대답·맞장구", en: "Quick replies & reactions", descKo: "Sounds good, Got it, Fair enough처럼 바로 나와야 하는 한마디" },
   smalltalk: { ko: "안부·스몰토크", en: "Greetings & small talk", descKo: "인사, 주말·날씨·근황, 오랜만의 대화, 칭찬과 감사" },
   meal: { ko: "식사·회식", en: "Meals & dinners", descKo: "메뉴 추천, 주문, 건배, 계산, 정중한 거절" },
+  phone: { ko: "전화·메신저", en: "Calls & messaging", descKo: "전화 받기·걸기, 다시 연락하기, 메신저·음성 메시지" },
+  negotiation: { ko: "협상·조율", en: "Negotiating", descKo: "가격·일정·범위 조율, 조건 제시, 정중하게 밀고 당기기" },
+  trouble: { ko: "문제·사과", en: "Problems & apologies", descKo: "지연·실수 알리기, 사과, 해결책 제시, 불만 대응" },
   visit: { ko: "출장·방문", en: "Business trips & site visits", descKo: "공항 마중, 현장 안내, 안전 설명, 일정 조율" },
   technical: { ko: "기술 논의", en: "Technical discussion", descKo: "공정·파일럿·설비·데이터에 대한 엔지니어링 대화" },
 };

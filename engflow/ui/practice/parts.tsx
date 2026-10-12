@@ -3,6 +3,7 @@ import * as React from "react";
 import { motion } from "motion/react";
 import { Check, ChevronRight, X } from "lucide-react";
 import { cn, useReduced } from "../kit";
+import { SpeakButton } from "../speech";
 import type { DialogueTurn, ErrorSpan, MeaningCheck, ScoreBucket } from "../../core/types";
 
 /* ───────────── Meaning chunks (numbered like process streams) ───────────── */
@@ -202,32 +203,56 @@ function tintFor(name: string): string {
   return AVATAR_TINTS[h % AVATAR_TINTS.length];
 }
 
-export function ChatThread({ turns, showKo }: { turns: DialogueTurn[]; showKo: boolean }) {
+/** The learner's own name in role-play dialogue: shown as "나", on the right. */
+export const LEARNER_SPEAKER = "Minsu";
+
+export function ChatThread({ turns, showKo, mine, slow }: { turns: DialogueTurn[]; showKo: boolean; mine?: (string | undefined)[]; slow?: boolean }) {
   const reduced = useReduced();
+  // In a role-play the learner's earlier lines are replaced by what they actually said (last line = previous step).
+  const own = turns.map((t, i) => (t.speaker === LEARNER_SPEAKER ? i : -1)).filter((i) => i >= 0);
+  const said = new Map<number, string>();
+  own.reverse().forEach((idx, k) => {
+    const text = mine?.[mine.length - 1 - k];
+    if (text) said.set(idx, text);
+  });
   return (
     <ol className="space-y-2.5" aria-label="대화">
-      {turns.map((t, i) => (
-        <motion.li
-          key={i}
-          className="flex items-end gap-2"
-          initial={reduced ? false : { opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: reduced ? 0 : 0.08 * i, duration: 0.2 }}
-        >
-          <span
-            className="grid size-8 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white"
-            style={{ background: tintFor(t.speaker) }}
-            aria-hidden
+      {turns.map((t, i) => {
+        const me = t.speaker === LEARNER_SPEAKER;
+        const text = said.get(i) ?? t.en;
+        return (
+          <motion.li
+            key={i}
+            className={cn("flex items-end gap-2", me && "flex-row-reverse")}
+            initial={reduced ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: reduced ? 0 : 0.08 * i, duration: 0.2 }}
           >
-            {t.speaker.replace(/^(Mr|Ms|Mrs|Dr)\.\s*/, "").charAt(0)}
-          </span>
-          <div className="min-w-0 max-w-[88%] rounded-[18px] rounded-bl-[6px] border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-2 shadow-[0_1px_0_rgba(16,17,20,.03)]">
-            <div className="text-[11px] font-semibold text-[var(--muted)]">{t.speaker}</div>
-            <p className="ef-en text-[16px] leading-snug md:text-[17px]">{t.en}</p>
-            {showKo && t.ko ? <p className="ef-ko mt-0.5 text-[13px] text-[var(--muted)]">{t.ko}</p> : null}
-          </div>
-        </motion.li>
-      ))}
+            <span
+              className="grid size-8 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white"
+              style={{ background: me ? "var(--ef-accent-ink)" : tintFor(t.speaker) }}
+              aria-hidden
+            >
+              {me ? "나" : t.speaker.replace(/^(Mr|Ms|Mrs|Dr)\.\s*/, "").charAt(0)}
+            </span>
+            <div
+              className={cn(
+                "min-w-0 max-w-[85%] rounded-[18px] px-3.5 py-2 shadow-[0_1px_0_rgba(16,17,20,.03)]",
+                me ? "rounded-br-[6px] bg-[var(--ef-accent-soft)]" : "rounded-bl-[6px] border border-[var(--line)] bg-[var(--surface-strong)]",
+              )}
+            >
+              <div className={cn("text-[11px] font-semibold", me ? "text-right text-[var(--ef-accent-ink)]" : "text-[var(--muted)]")}>
+                {me ? (said.has(i) ? "나 (내가 한 말)" : "나") : t.speaker}
+              </div>
+              <div className="flex items-start gap-1">
+                <p className={cn("ef-en min-w-0 flex-1 text-[16px] leading-snug md:text-[17px]", me && "text-right")}>{text}</p>
+                {!me ? <SpeakButton text={t.en} slow={slow} className="-mr-2 -mt-1" label={`${t.speaker}의 말 읽어 주기`} /> : null}
+              </div>
+              {showKo && t.ko && !said.has(i) ? <p className={cn("ef-ko mt-0.5 text-[13px] text-[var(--muted)]", me && "text-right")}>{t.ko}</p> : null}
+            </div>
+          </motion.li>
+        );
+      })}
     </ol>
   );
 }

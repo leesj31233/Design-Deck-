@@ -120,6 +120,10 @@ Conversation questions live in `engflow/content/bank/talk-<situation>.ts`, one f
 | `smalltalk` | Greetings & small talk | greetings, weekend, weather, catching up, compliments, thanks |
 | `meal` | Meals & dinners | recommending, ordering, toasts, dietary needs, paying, declining politely |
 | `visit` | Business trips & site visits | airport pickup, hotel, site tour, safety briefing, scheduling |
+| `reaction` | Quick replies & reactions | the one-liners that must come out instantly: *Sounds good.*, *Got it.*, *Fair enough.*, *Makes sense.*, *No worries.*, *Same here.*, *I see what you mean.* |
+| `phone` | Calls & messaging | answering and making calls, bad line, calling back, leaving and answering voice messages, chat messages |
+| `negotiation` | Negotiating | price, schedule and scope, conditions (*If you can …, we can …*), polite push-back, meeting halfway, closing a deal |
+| `trouble` | Problems & apologies | reporting a delay or mistake, apologizing, explaining the cause, proposing a fix, handling a complaint |
 
 Required fields, on top of the normal schema:
 
@@ -146,6 +150,16 @@ Difficulty (1–10) follows the turn's length and grammar, and every scene must 
 | 10 | C1 | long, diplomatic turn: polite disagreement and an alternative |
 
 Use `mode: "phrase"` for difficulty 1–3 and `mode: "sentence"` from 4 up. The grammar must be real (skills from `skills.ts`, including the conversation skills `small-talk`, `online-meeting`, `question-form`, `offer-suggest`, `thanks-looking-forward`, `signpost`, `opinion`), and pitfalls target the mistakes Korean speakers actually make (`let me to`, `I'm looking forward to see`, `How was your weekend was?`, `Do you can …?`, missing articles, wrong tense).
+
+A scene may span several files: `talk-<scene>.ts`, `talk-<scene>-2.ts`, … (the scene is read from the file name). Difficulty coverage is checked per scene across all its files; `reaction` needs 1–5, every other scene 1–10. Files whose scene varies per question (`roleplay-*.ts`, `talk-long.ts`, `talk-phrasal.ts`) set `situation` on each question.
+
+**Quick replies** (`reaction`, difficulty 1–5) are the short answers a learner must produce without thinking. Give generous `accepted` lists (every common native variant: *Sounds good. / Sounds great. / That works for me. / Works for me. / Perfect.*), one lenient meaning unit, and a pitfall for the typical Korean-speaker version (*Sounds well.*, *Me too.* where *Same here.* is meant, *I agree with you.* for every situation).
+
+**Common, natural phrasing.** References are what native speakers say in that moment, not textbook English: contractions are fine (*I'll*, *we're*), phrasal verbs are welcome (*follow up on*, *figure out*, *go over*, *look into*, *set up*, *catch up*), and short answers stay short.
+
+### Role-play
+
+A role-play is one conversation in which the learner speaks several times (3–6 turns). Each turn is a normal question with a `scenario: { id, titleKo, step, total }` field; all steps share `id`, `titleKo`, `total` and `situation`, and live in the same file. From step 2 on, `dialogue` starts with the learner's previous line as speaker `"Minsu"` (use that step's reference), followed by the partner's new line. The app shows Minsu's lines as the learner's own bubbles and replaces them with what the learner actually answered. Difficulty may rise through the scenario. See `rp-weekly-call` in `roleplay-work.ts`.
 
 `engflow/content/bank/dialogue-overlay.ts` adds the same kind of `dialogue` to older questions by id, without changing their files.
 
