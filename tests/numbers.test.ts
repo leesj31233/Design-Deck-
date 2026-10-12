@@ -61,3 +61,15 @@ describe("a wrong number", () => {
     expect(isSuccess(evaluateLocal(q, q.reference.replace("Line 4", "Line four")), 0)).toBe(true);
   });
 });
+
+describe("everyday synonyms in meaning chunks", () => {
+  it("accept 'a cab' for 'a taxi' and 'fantastic' for 'great', but never in mistake patterns or exact alternatives", async () => {
+    const { matchAny, matchPattern, compilePattern } = await import("@/engflow/core/pattern");
+    const w = (s: string) => words(tokenize(s));
+    expect(matchAny(["call ... taxi"], w("Why don't I call you a cab?"), 2, true)).not.toBeNull();
+    expect(matchAny(["call ... taxi"], w("Why don't I call you a cab?"), 2)).toBeNull();
+    expect(matchAny(["great|perfect"], w("That would be fantastic."), 2, true)).not.toBeNull();
+    expect(matchAny(["=great"], w("That would be fantastic."), 2, true)).toBeNull();
+    expect(matchPattern(compilePattern("take ... taxi"), w("Let's take a cab."))).toBeNull();
+  });
+});

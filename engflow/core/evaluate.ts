@@ -135,7 +135,7 @@ export function closestTarget(q: Question, w: Token[]): { target: string; tw: To
 
 export function checkMeaning(q: Question, w: Token[]): MeaningCheck[] {
   return q.meaning.map((u) => {
-    const m = matchAny(u.any, w, 2);
+    const m = matchAny(u.any, w, 2, true);
     return { id: u.id, en: u.en, ko: u.ko, present: !!m, fuzzy: m?.fuzzy || undefined, term: !!u.term, critical: !!u.critical };
   });
 }

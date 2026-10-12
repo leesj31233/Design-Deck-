@@ -78,11 +78,49 @@ export function compilePattern(source: string): CompiledPattern {
   return compiled;
 }
 
-function tokenMatches(alt: Alt, tok: Token): "exact" | "fuzzy" | null {
+/**
+ * Everyday synonyms a learner may use for a word in a meaning chunk ("a cab" for "a taxi", "fantastic" for
+ * "great"). Only meaning chunks use them, never mistake patterns, and an exact alternative (=word) never does.
+ */
+const SYNONYM_GROUPS: string[][] = [
+  ["taxi", "cab"],
+  ["great", "fantastic", "wonderful", "amazing", "awesome", "excellent", "brilliant", "terrific"],
+  ["maybe", "perhaps"],
+  ["problem", "issue"],
+  ["start", "begin"],
+  ["buy", "purchase"],
+  ["fix", "repair"],
+  ["photo", "picture"],
+  ["bathroom", "restroom", "toilet", "washroom"],
+  ["movie", "film"],
+  ["holiday", "vacation"],
+  ["happy", "glad", "pleased", "delighted"],
+  ["big", "large"],
+  ["sick", "ill"],
+  ["shop", "store"],
+  ["elevator", "lift"],
+  ["luggage", "baggage"],
+  ["hard", "difficult", "tough"],
+  ["easy", "simple"],
+  ["error", "mistake"],
+  ["choose", "pick", "select"],
+  ["talk", "speak"],
+  ["guess", "suppose"],
+  ["loud", "noisy"],
+  ["kind", "nice", "sweet"],
+  ["delicious", "tasty"],
+  ["finish", "complete"],
+  ["help", "assist"],
+];
+const SYNONYM_OF = new Map<string, number>();
+SYNONYM_GROUPS.forEach((g, k) => g.forEach((word) => SYNONYM_OF.set(stem(word), k)));
+
+function tokenMatches(alt: Alt, tok: Token, synonyms = false): "exact" | "fuzzy" | null {
   if (alt.any) return "exact";
   if (alt.exact) return tok.norm === alt.value ? "exact" : null;
   if (tok.norm === alt.value || tok.stem === alt.stem) return "exact";
   if (alt.num !== undefined && tok.num === alt.num) return "exact";
+  if (synonyms && SYNONYM_OF.has(alt.stem) && SYNONYM_OF.get(alt.stem) === SYNONYM_OF.get(tok.stem)) return "exact";
   if (isSpellingVariant(tok.norm, alt.value)) return "fuzzy";
   // A misspelled inflected form ("wating" for wait → waiting).
   if (/^[a-z]+$/.test(alt.value) && [ingOf(alt.value), pastOf(alt.value), alt.value + "s"].some((f) => isSpellingVariant(tok.norm, f))) return "fuzzy";
@@ -93,7 +131,7 @@ function tokenMatches(alt: Alt, tok: Token): "exact" | "fuzzy" | null {
  * Find the first match of a compiled pattern in `words`.
  * `slack` = number of unrelated tokens tolerated between consecutive pattern tokens.
  */
-export function matchPattern(p: CompiledPattern, words: Token[], slack = 0, allowFuzzy = true): PatternMatch | null {
+export function matchPattern(p: CompiledPattern, words: Token[], slack = 0, allowFuzzy = true, synonyms = false): PatternMatch | null {
   if (p.regex) {
     const joined = words.map((w) => w.norm).join(" ");
     const m = p.regex.exec(joined);
@@ -115,7 +153,7 @@ export function matchPattern(p: CompiledPattern, words: Token[], slack = 0, allo
     return { from: Math.max(0, from), to: Math.max(from + 1, to), fuzzy: false };
   }
   for (let start = 0; start < words.length; start++) {
-    const r = matchFrom(p.tokens, 0, words, start, slack, allowFuzzy, true);
+    const r = matchFrom(p.tokens, 0, words, start, slack, allowFuzzy, true, synonyms);
     if (r) return { from: r.first, to: r.end, fuzzy: r.fuzzy };
   }
   return null;
@@ -135,13 +173,14 @@ function matchFrom(
   slack: number,
   allowFuzzy: boolean,
   anchored: boolean,
+  synonyms = false,
 ): Partial | null {
   if (pi === pts.length) return { first: wi, end: wi, fuzzy: false };
   const pt = pts[pi];
   if (pt.gap) {
     const maxGap = slack > 0 ? 6 : 3;
     for (let g = 0; g <= maxGap && wi + g <= words.length; g++) {
-      const r = matchFrom(pts, pi + 1, words, wi + g, slack, allowFuzzy, true);
+      const r = matchFrom(pts, pi + 1, words, wi + g, slack, allowFuzzy, true, synonyms);
       if (r) return { first: wi, end: r.end, fuzzy: r.fuzzy };
     }
     return null;
@@ -153,25 +192,25 @@ function matchFrom(
     for (const pass of ["exact", "fuzzy"] as const) {
       if (pass === "fuzzy" && !allowFuzzy) break;
       for (const alt of pt.alts) {
-        const kind = tokenMatches(alt, tok);
+        const kind = tokenMatches(alt, tok, synonyms);
         if (kind !== pass) continue;
-        const r = matchFrom(pts, pi + 1, words, wi + skip + 1, slack, allowFuzzy, false);
+        const r = matchFrom(pts, pi + 1, words, wi + skip + 1, slack, allowFuzzy, false, synonyms);
         if (r) return { first: wi + skip, end: Math.max(r.end, wi + skip + 1), fuzzy: r.fuzzy || kind === "fuzzy" };
       }
     }
   }
   if (pt.optional) {
-    const r = matchFrom(pts, pi + 1, words, wi, slack, allowFuzzy, anchored);
+    const r = matchFrom(pts, pi + 1, words, wi, slack, allowFuzzy, anchored, synonyms);
     if (r) return r;
   }
   return null;
 }
 
-/** Match any of several patterns; returns the first that matches. */
-export function matchAny(patterns: string[], words: Token[], slack = 0): (PatternMatch & { pattern: string }) | null {
+/** Match any of several patterns; returns the first that matches. `synonyms`: also accept everyday synonyms (meaning chunks). */
+export function matchAny(patterns: string[], words: Token[], slack = 0, synonyms = false): (PatternMatch & { pattern: string }) | null {
   let fuzzy: (PatternMatch & { pattern: string }) | null = null;
   for (const src of patterns) {
-    const m = matchPattern(compilePattern(src), words, slack);
+    const m = matchPattern(compilePattern(src), words, slack, true, synonyms);
     if (m && !m.fuzzy) return { ...m, pattern: src };
     if (m && !fuzzy) fuzzy = { ...m, pattern: src };
   }
