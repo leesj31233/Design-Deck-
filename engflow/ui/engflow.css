@@ -1,0 +1,205 @@
+/*
+ * EngFlow product layer on top of Design Deck tokens (app/tokens.css).
+ * Layout: one focused learning column; navigation as a sidebar ≥1024px and a
+ * bottom tab bar below. Engineering motif: meaning chunks are numbered like
+ * process streams on a PFD.
+ */
+:root {
+  --ef-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "IBM Plex Sans KR", "Noto Sans KR", "Segoe UI", sans-serif;
+  --ef-mono: ui-monospace, "SF Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
+  --ef-ink-2: #3a3f49;
+  --ef-accent-ink: #0060df;
+  --ef-accent-soft: rgba(10, 132, 255, 0.10);
+  --ef-ok: #1a7f37;
+  --ef-ok-fill: #30b158;
+  --ef-ok-soft: rgba(48, 177, 88, 0.12);
+  --ef-warn: #9a5b00;
+  --ef-warn-fill: #f2a516;
+  --ef-warn-soft: rgba(242, 165, 22, 0.14);
+  --ef-bad: #c4282f;
+  --ef-bad-fill: #ff453a;
+  --ef-bad-soft: rgba(255, 69, 58, 0.12);
+  /* Error categories (underline + wash). */
+  --ef-c-grammar: #e5484d;
+  --ef-c-meaning: #8e4ec6;
+  --ef-c-term: #d97706;
+  --ef-c-order: #0a7cff;
+  --ef-c-spell: #8b8d98;
+  --ef-track: rgba(16, 17, 20, 0.07);
+  --ef-chunk: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ef-ink-2: #c9ced8;
+    --ef-accent-ink: #6cb2ff;
+    --ef-accent-soft: rgba(77, 163, 255, 0.14);
+    --ef-ok: #4cd97b;
+    --ef-ok-fill: #30d158;
+    --ef-ok-soft: rgba(48, 209, 88, 0.14);
+    --ef-warn: #ffbf47;
+    --ef-warn-fill: #ffb340;
+    --ef-warn-soft: rgba(255, 179, 64, 0.14);
+    --ef-bad: #ff7a72;
+    --ef-bad-fill: #ff6961;
+    --ef-bad-soft: rgba(255, 105, 97, 0.14);
+    --ef-c-grammar: #ff6b6f;
+    --ef-c-meaning: #b98cf0;
+    --ef-c-term: #f5a524;
+    --ef-c-order: #4da3ff;
+    --ef-c-spell: #a1a4ae;
+    --ef-track: rgba(255, 255, 255, 0.09);
+    --ef-chunk: #1b1d22;
+  }
+}
+:root[data-theme="dark"] {
+  --ef-ink-2: #c9ced8;
+  --ef-accent-ink: #6cb2ff;
+  --ef-accent-soft: rgba(77, 163, 255, 0.14);
+  --ef-ok: #4cd97b;
+  --ef-ok-fill: #30d158;
+  --ef-ok-soft: rgba(48, 209, 88, 0.14);
+  --ef-warn: #ffbf47;
+  --ef-warn-fill: #ffb340;
+  --ef-warn-soft: rgba(255, 179, 64, 0.14);
+  --ef-bad: #ff7a72;
+  --ef-bad-fill: #ff6961;
+  --ef-bad-soft: rgba(255, 105, 97, 0.14);
+  --ef-c-grammar: #ff6b6f;
+  --ef-c-meaning: #b98cf0;
+  --ef-c-term: #f5a524;
+  --ef-c-order: #4da3ff;
+  --ef-c-spell: #a1a4ae;
+  --ef-track: rgba(255, 255, 255, 0.09);
+  --ef-chunk: #1b1d22;
+}
+
+.ef-root {
+  font-family: var(--ef-font);
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100%;
+  -webkit-tap-highlight-color: transparent;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+.ef-root button, .ef-root [role="button"], .ef-root a { touch-action: manipulation; }
+
+/* Korean reads best without mid-word breaks; long English tokens may still wrap. */
+.ef-ko { word-break: keep-all; overflow-wrap: anywhere; line-height: 1.7; }
+.ef-en { font-feature-settings: "kern"; overflow-wrap: anywhere; }
+.ef-mono { font-family: var(--ef-mono); }
+.ef-num { font-variant-numeric: tabular-nums; }
+
+/* Answer field: ≥16px so iOS never zooms on focus. */
+.ef-answer {
+  font-size: 18px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+}
+@media (min-width: 768px) {
+  .ef-answer { font-size: 19px; }
+}
+
+/* Meaning chunks drawn as numbered process streams. */
+.ef-stream-tag {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  transform: rotate(45deg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-strong);
+}
+.ef-stream-tag > span {
+  transform: rotate(-45deg);
+  font-family: var(--ef-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1;
+}
+
+/* Error highlights in the learner's sentence. */
+.ef-mark {
+  border-radius: 4px;
+  padding: 1px 1px;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+.ef-mark[data-c="grammar"] { text-decoration-color: var(--ef-c-grammar); background: color-mix(in srgb, var(--ef-c-grammar) 12%, transparent); }
+.ef-mark[data-c="meaning"] { text-decoration-color: var(--ef-c-meaning); background: color-mix(in srgb, var(--ef-c-meaning) 13%, transparent); }
+.ef-mark[data-c="terminology"] { text-decoration-color: var(--ef-c-term); background: color-mix(in srgb, var(--ef-c-term) 14%, transparent); }
+.ef-mark[data-c="organization"] { text-decoration-color: var(--ef-c-order); background: color-mix(in srgb, var(--ef-c-order) 12%, transparent); }
+.ef-mark[data-c="spelling"] { text-decoration-color: var(--ef-c-spell); text-decoration-style: dotted; background: transparent; }
+.ef-mark[data-active="true"] { outline: 2px solid currentColor; outline-offset: 1px; }
+.ef-caret {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 1em;
+  vertical-align: -0.12em;
+  cursor: pointer;
+}
+.ef-caret::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -2px;
+  bottom: -4px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--caret, var(--ef-c-grammar));
+}
+.ef-caret::after {
+  content: "+";
+  position: absolute;
+  left: -5px;
+  top: -14px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--caret, var(--ef-c-grammar));
+}
+
+/* Correction diff. */
+.ef-ins { background: var(--ef-ok-soft); color: var(--ef-ok); border-radius: 4px; padding: 0 2px; font-weight: 600; }
+.ef-del { color: var(--ef-bad); text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: .8; }
+
+/* Hover-capable devices show keyboard hints; touch devices do not. */
+.ef-kbd-hint { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .ef-kbd-hint { display: inline-flex; }
+}
+
+.ef-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.ef-scroll-x::-webkit-scrollbar { display: none; }
+
+.ef-safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); }
+
+@keyframes ef-pop {
+  0% { transform: scale(.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes ef-flash {
+  0% { background: var(--ef-accent-soft); }
+  100% { background: transparent; }
+}
+@keyframes ef-shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+.ef-skeleton {
+  background: linear-gradient(90deg, var(--ef-track) 0px, color-mix(in srgb, var(--ef-track) 40%, transparent) 80px, var(--ef-track) 160px);
+  background-size: 400px 100%;
+  animation: ef-shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ef-skeleton { animation: none; }
+}
+.ef-reduce-motion .ef-skeleton { animation: none; }

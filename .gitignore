@@ -7,3 +7,7 @@ out
 .DS_Store
 *.log
 .vercel
+dist
+.data
+test-results
+playwright-report

@@ -1,0 +1,22 @@
+/* Artifact build: Tailwind + Design Deck tokens + EngFlow layer, all inlined into one page. */
+@import "tailwindcss" source(none);
+@source "../";
+@source "../../components/ui";
+@import "../../app/tokens.css";
+@import "../ui/engflow.css";
+
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { background: var(--background); }
+body { margin: 0; color: var(--foreground); -webkit-font-smoothing: antialiased; }
+button, input, textarea, select { font: inherit; }
