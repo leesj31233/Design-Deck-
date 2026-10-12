@@ -415,7 +415,7 @@ export const TALK_NEGOTIATION: Question[] = [
     meaning: [
       { id: "afraid", en: "I'm afraid", ko: "죄송하지만", any: ["afraid|sorry|unfortunately"] },
       { id: "cant-go-over", en: "we can't go over", ko: "넘길 수 없다", any: ["not ... over|above|beyond|higher|more|exceed", "limit|maximum|max|ceiling|cap", "the most|highest"], critical: true },
-      { id: "amount", en: "90,000 dollars", ko: "9만 달러", any: ["90|ninety|90k"], critical: true },
+      { id: "amount", en: "90,000 dollars", ko: "9만 달러", any: ["90000|90|ninety|90k"], critical: true },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|so"] },
       { id: "budget", en: "our total budget", ko: "전체 예산", any: ["budget"], critical: true },
     ],

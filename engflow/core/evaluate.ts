@@ -1,6 +1,7 @@
 import { align, type AlignOp, type Alignment } from "./align";
 import { compilePattern, matchAny, matchPattern } from "./pattern";
 import { runRules } from "./rules";
+import { numberSlip } from "./numbers";
 import {
   ARTICLES, AUXILIARIES, BE_FORMS, CONJUNCTIONS, DETERMINERS, MODALS, NEGATIONS, PREPOSITIONS, SUBJECT_PRONOUNS,
   capitalizeSentence, isFunctionWord, joinWords, normalizeForMatch, tokenize, words, type Token,
@@ -1060,6 +1061,22 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
         : "부정어(not/never)가 빠져 하려던 말과 뜻이 반대가 됩니다. 한국어 문장은 부정문입니다.",
       skill: primarySkill, source: "alignment", priority: 3,
     });
+  }
+
+  // 5) A wrong number: the answer says a time, amount or number that no correct answer has, where the closest one
+  //    has another ("Line 4" for "Line 5"). Alignment treats numbers as content words, so this is checked here;
+  //    "3" for "three" is the same number; numbers of different units ("24 months" / "two years") are not compared.
+  //    A meaning chunk that also misses the number is not charged twice (meaning takes the worse of the two).
+  const slip = numberSlip(w, text, [...correctTargets(q), ...learned], target);
+  if (slip) {
+    const startsSentence = slip.at.from === 0 || !!w[slip.at.from - 1]?.sentenceEnd;
+    const fix = startsSentence ? slip.fix.raw : slip.fix.raw.replace(/^[A-Z](?=[a-z])/, (c) => c.toLowerCase());
+    findings.push({
+      from: slip.at.from, to: slip.at.to, category: "meaning-shift", severity: "major", bucket: "meaning", fix,
+      messageKo: `숫자가 다릅니다: '${slip.at.raw}' → '${fix}'. 한국어 문장의 시간·수량·번호를 그대로 말해야 뜻이 맞습니다.`,
+      skill: primarySkill, source: "meaning", priority: 3,
+    });
+    edits.push({ from: slip.at.from, to: slip.at.to, replacement: fix, priority: 3 });
   }
 
   // Alignment insertions next to a pitfall/rule fix that already supplies the word are redundant.

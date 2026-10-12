@@ -1,5 +1,6 @@
 import { isSpellingVariant, stem, type Token } from "./text";
 import { ingOf, pastOf } from "./lexicon";
+import { numberKey } from "./numwords";
 
 /**
  * Compiles the pattern mini-language documented in types.ts and matches it
@@ -12,6 +13,8 @@ interface Alt {
   value: string;
   stem: string;
   any: boolean;
+  /** The number the alternative says ("3" for "three"), matched in any spelling. */
+  num?: string;
 }
 
 interface PatternToken {
@@ -64,7 +67,7 @@ export function compilePattern(source: string): CompiledPattern {
         const exact = a.startsWith("=");
         const value = exact ? a.slice(1) : a;
         if (!/^[a-z0-9][a-z0-9&.'-]*$/.test(value)) throw new PatternSyntaxError(`Invalid token "${a}" in "${source}"`);
-        return { exact, value, stem: stem(value), any: false };
+        return { exact, value, stem: stem(value), any: false, num: numberKey(value) };
       });
       return { alts, optional, gap: false };
     });
@@ -79,6 +82,7 @@ function tokenMatches(alt: Alt, tok: Token): "exact" | "fuzzy" | null {
   if (alt.any) return "exact";
   if (alt.exact) return tok.norm === alt.value ? "exact" : null;
   if (tok.norm === alt.value || tok.stem === alt.stem) return "exact";
+  if (alt.num !== undefined && tok.num === alt.num) return "exact";
   if (isSpellingVariant(tok.norm, alt.value)) return "fuzzy";
   // A misspelled inflected form ("wating" for wait → waiting).
   if (/^[a-z]+$/.test(alt.value) && [ingOf(alt.value), pastOf(alt.value), alt.value + "s"].some((f) => isSpellingVariant(tok.norm, f))) return "fuzzy";

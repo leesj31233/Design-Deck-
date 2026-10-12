@@ -29,6 +29,7 @@ export interface Alignment {
 
 function pairCost(a: Token, b: Token): { cost: number; type: "match" | "spell" | "inflect" | "sub" } {
   if (a.norm === b.norm) return { cost: 0, type: "match" };
+  if (a.num !== undefined && a.num === b.num) return { cost: 0, type: "match" }; // "3" = "three"
   if (a.stem === b.stem) return { cost: 0.4, type: "inflect" };
   if (isSpellingVariant(a.norm, b.norm)) return { cost: 0.25, type: "spell" };
   const bothFunction = isFunctionWord(a.norm) && isFunctionWord(b.norm);

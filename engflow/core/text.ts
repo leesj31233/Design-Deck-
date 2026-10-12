@@ -6,6 +6,7 @@
  */
 
 import { ING_NOUNS, verbInfo } from "./lexicon";
+import { numberKey } from "./numwords";
 
 export interface Token {
   /** Normalized (lower-case) token text. */
@@ -27,6 +28,8 @@ export interface Token {
   sentenceEnd?: boolean;
   /** The sentence ending here is a question (it ends with "?"). */
   question?: boolean;
+  /** The number this word says, spelled canonically ("three" and "3" → "3"; "four-week" → "4-week"). */
+  num?: string;
 }
 
 /** Words whose trailing dot is an abbreviation, not the end of a sentence. */
@@ -129,6 +132,18 @@ export function tokenize(text: string): Token[] {
       tokens.push({ norm: p, raw, start, end, stem: stem(p), punct: false, expanded: parts.length > 1 || undefined });
     }
   }
+  // "90,000" is one number (the tokenizer splits it at the comma).
+  for (let i = 0; i + 2 < tokens.length; i++) {
+    const [a, c, b] = [tokens[i], tokens[i + 1], tokens[i + 2]];
+    if (!a.punct && /^\d+$/.test(a.norm) && c.norm === "," && c.start === a.end && /^\d{3}$/.test(b.norm) && b.start === c.end) {
+      tokens.splice(i, 3, { ...a, norm: a.norm + b.norm, stem: a.norm + b.norm, raw: text.slice(a.start, b.end), end: b.end });
+      i--;
+    }
+  }
+  for (const t of tokens) {
+    const k = t.punct ? undefined : numberKey(t.norm);
+    if (k !== undefined) t.num = k;
+  }
   // A noun's "'s" before not / V-ing / a state word is "is", not a possessive: "my camera's not working".
   for (let i = tokens.length - 2; i >= 0; i--) {
     const t = tokens[i];
@@ -228,6 +243,7 @@ export function editDistance(a: string, b: string, max = 3): number {
 export function isSpellingVariant(a: string, b: string): boolean {
   if (a === b) return false;
   if (!/^[a-z]+$/.test(a) || !/^[a-z]+$/.test(b)) return false;
+  if (numberKey(a) !== undefined && numberKey(b) !== undefined) return false; // "seventy" is not a misspelled "seventh"
   const len = Math.max(a.length, b.length);
   if (len < 6 || Math.min(a.length, b.length) < 5) return false;
   const allowed = len >= 9 ? 2 : 1;
