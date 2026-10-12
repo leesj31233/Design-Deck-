@@ -37,7 +37,8 @@ export function TalkCard({ compact, scene }: { compact?: boolean; scene?: string
       </p>
       {!compact ? (
         <div className="-mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="대화 주제">
-          {TALK_TOPICS.map((t) => (
+          {/* Topics of the scene chosen on Learn come first. */}
+          {[...TALK_TOPICS.filter((t) => t.scene === scene), ...TALK_TOPICS.filter((t) => t.scene !== scene)].map((t) => (
             <button
               key={t.id}
               role="radio"

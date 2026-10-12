@@ -113,6 +113,54 @@ export const TALK_TOPICS: TalkTopic[] = [
     goalKo: "메뉴 추천, 매운 정도 설명, 주문 도와주기", goal: "Recommend dishes, explain how spicy they are, and help order.",
     opener: { en: "Everything looks delicious, but I'm not sure what to order. What would you recommend?", ko: "다 맛있어 보이는데 뭘 시켜야 할지 모르겠네요. 뭘 추천하세요?", hint: { en: "I'd recommend the bulgogi. It's sweet and not spicy at all.", ko: "불고기를 추천해요. 달고 전혀 맵지 않아요." } },
   },
+  {
+    id: "call-trouble", scene: "online", titleKo: "화상회의 중 연결이 끊길 때", partner: "Budi", persona: "a process engineer on the Jakarta team, patient and friendly",
+    setupKo: "자카르타 팀과 주간 화상회의 중, 민수 씨 화면이 멈추고 소리가 끊깁니다.", setup: "The weekly online meeting with the Jakarta team; Minsu's video froze and the audio is breaking up.",
+    goalKo: "연결 문제 알리기, 다시 말해 달라고 하기, 해결 방법 제안하고 회의 이어 가기", goal: "Say there is a connection problem, ask Budi to repeat, suggest a fix (camera off, call back) and continue.",
+    opener: { en: "Minsu, are you still there? Your video froze, and I only heard half of what you said.", ko: "민수 씨, 아직 계세요? 화면이 멈췄고 말씀하신 것 중 절반만 들렸어요.", hint: { en: "Sorry, my connection is a bit unstable. Can you hear me now?", ko: "죄송해요, 연결이 좀 불안정하네요. 지금은 들리세요?" } },
+  },
+  {
+    id: "friday-plans", scene: "smalltalk", titleKo: "금요일 오후 주말 계획 이야기", partner: "Linh", persona: "a cheerful project engineer in Vietnam who loves travelling and food",
+    setupKo: "금요일 오후 회의가 일찍 끝나서 베트남의 Linh과 잠깐 이야기합니다.", setup: "A Friday afternoon call that ended early, chatting with Linh.",
+    goalKo: "주말 계획 말하기, 상대 계획 묻고 반응하기, 좋은 주말 인사로 마무리", goal: "Talk about weekend plans, ask about Linh's and react, and end with a friendly goodbye.",
+    opener: { en: "Finally Friday! Do you have any plans for the weekend?", ko: "드디어 금요일이네요! 주말에 무슨 계획 있어요?", hint: { en: "Not really. I'm just going to relax at home. How about you?", ko: "딱히 없어요. 그냥 집에서 쉬려고요. 당신은요?" } },
+  },
+  {
+    id: "hobby-chat", scene: "smalltalk", titleKo: "새 동료와 취미 이야기", partner: "Arif", persona: "a new engineer who just joined the Jakarta team and plays futsal",
+    setupKo: "자카르타 팀에 새로 온 Arif와 점심을 먹으며 서로 알아 갑니다.", setup: "Lunch with Arif, who just joined the Jakarta team.",
+    goalKo: "취미 소개, 얼마나 자주 하는지 말하기, 상대 취미에 질문하기", goal: "Talk about hobbies, say how often you do them, and ask about Arif's.",
+    opener: { en: "So, what do you like to do in your free time?", ko: "그래서, 쉬는 시간엔 뭐 하는 걸 좋아해요?", hint: { en: "I like hiking and cooking. I go hiking almost every weekend. What about you?", ko: "등산이랑 요리를 좋아해요. 거의 주말마다 등산 가요. 당신은요?" } },
+  },
+  {
+    id: "friend-bad-day", scene: "feelings", titleKo: "힘든 하루를 보낸 친구 위로하기", partner: "Emma", persona: "Minsu's friend from Canada who works in marketing in Seoul",
+    setupKo: "친구 Emma가 저녁에 메시지를 보냈습니다. 오늘 중요한 발표를 망쳤다고 합니다.", setup: "An evening chat with a friend whose important presentation went badly today.",
+    goalKo: "공감하기, 무슨 일이었는지 묻기, 격려하고 기분 전환할 일 제안하기", goal: "Show sympathy, ask what happened, encourage her, and suggest something to cheer her up.",
+    opener: { en: "Ugh, today was the worst. My presentation went really badly.", ko: "으, 오늘 최악이었어. 발표를 완전 망쳤어.", hint: { en: "I'm sorry to hear that. What happened?", ko: "안됐다. 무슨 일 있었어?" } },
+  },
+  {
+    id: "new-colleague", scene: "office", titleKo: "첫 출근한 동료 안내하기", partner: "Dewi", persona: "a new engineer from Jakarta on her first day at the Ulsan office, a little nervous",
+    setupKo: "자카르타에서 온 Dewi가 오늘 울산 사무실에 처음 출근했습니다. 민수 씨 옆자리입니다.", setup: "Dewi's first day at the Ulsan office; she sits next to Minsu.",
+    goalKo: "환영 인사, 사무실 안내(식당·회의실), 도움 제안하기", goal: "Welcome her, show her around (cafeteria, meeting rooms) and offer help.",
+    opener: { en: "Hi, I'm Dewi. It's my first day here. Nice to meet you!", ko: "안녕하세요, 데위예요. 오늘 첫 출근이에요. 만나서 반가워요!", hint: { en: "Nice to meet you, Dewi! I'm Minsu. Welcome to the team.", ko: "반가워요, 데위 씨! 저는 민수예요. 팀에 온 걸 환영해요." } },
+  },
+  {
+    id: "taxi-ride", scene: "daily", titleKo: "택시 기사와 목적지·길 이야기", partner: "Driver", persona: "a chatty taxi driver in Jakarta",
+    setupKo: "자카르타 출장 중, 호텔 앞에서 택시를 타고 공장으로 갑니다. 차가 막히는 시간입니다.", setup: "A taxi from the hotel to the plant in Jakarta during rush hour.",
+    goalKo: "목적지 말하기, 걸리는 시간 묻기, 급하다고 부탁하기, 요금 내기", goal: "Give the destination, ask how long it takes, say you are in a hurry, and pay.",
+    opener: { en: "Good morning! Where are you heading?", ko: "안녕하세요! 어디로 가세요?", hint: { en: "To the Cilegon plant, please. How long will it take?", ko: "실레곤 공장으로 가 주세요. 얼마나 걸릴까요?" } },
+  },
+  {
+    id: "site-alarm", scene: "trouble", titleKo: "현장에서 설비 알람이 울릴 때", partner: "Budi", persona: "a shift engineer at the Jakarta plant, worried but competent",
+    setupKo: "건조기 출구 온도 알람이 울렸다고 현장의 Budi에게서 전화가 왔습니다.", setup: "A phone call from the plant: the dryer outlet temperature alarm just went off.",
+    goalKo: "침착하게 상황 묻기, 확인할 것 지시하기, 다음 조치와 연락 약속하기", goal: "Stay calm, ask for the readings, tell Budi what to check, and agree on next steps.",
+    opener: { en: "Minsu, the dryer outlet temperature alarm just went off. What should we do?", ko: "민수 씨, 건조기 출구 온도 알람이 방금 울렸어요. 어떻게 할까요?", hint: { en: "Okay, let's stay calm. What's the outlet temperature right now?", ko: "알겠어요, 침착하게 해요. 지금 출구 온도가 몇 도예요?" } },
+  },
+  {
+    id: "plant-tour", scene: "visit", titleKo: "고객에게 파일럿 플랜트 안내하기", partner: "Mr. Tan", persona: "a client from Malaysia visiting the Ulsan pilot plant, curious and technical",
+    setupKo: "울산 파일럿 플랜트를 방문한 고객 Mr. Tan을 안내합니다. 건조기 앞에 왔습니다.", setup: "Showing a visiting client around the pilot plant in Ulsan; they are standing in front of the dryer.",
+    goalKo: "설비 소개, 시험 목적 설명, 질문에 답하고 안전 안내하기", goal: "Introduce the equipment, explain what it is tested for, answer questions and give a safety reminder.",
+    opener: { en: "So this is the pilot plant. What exactly are we looking at here?", ko: "여기가 파일럿 플랜트군요. 지금 보고 있는 게 정확히 뭐죠?", hint: { en: "This is our pilot dryer. We use it to test new feeds before we scale up.", ko: "이건 저희 파일럿 건조기예요. 스케일업 전에 새 원료를 시험하는 데 써요." } },
+  },
 ];
 
 export const TALK_TOPIC_BY_ID: Record<string, TalkTopic> = Object.fromEntries(TALK_TOPICS.map((t) => [t.id, t]));
