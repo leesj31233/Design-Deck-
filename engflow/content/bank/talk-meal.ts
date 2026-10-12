@@ -22,7 +22,7 @@ export const TALK_MEAL: Question[] = [
     accepted: ["Wow, this looks really good!", "Wow, it looks delicious!", "Wow, everything looks delicious!"],
     meaning: [
       { id: "looks", en: "looks", ko: "~해 보여요", any: ["look|looks"], critical: true },
-      { id: "delicious", en: "delicious", ko: "맛있는", any: ["delicious|good|great|tasty|amazing|yummy|nice|fantastic"], critical: true },
+      { id: "delicious", en: "delicious", ko: "맛있는", any: ["delicious|good|great|tasty|amazing|yummy|nice|fantastic|incredible|wonderful|lovely|awesome|appetizing|excellent|perfect"], critical: true },
     ],
     pitfalls: [
       { id: "looks-like-adj", pattern: "look like =delicious|=tasty|=yummy|=good|=great", category: "word-choice", severity: "major", fix: "looks delicious", messageKo: "'~해 보이다' 뒤에 형용사가 오면 'look + 형용사'(looks delicious)입니다. 'look like'는 뒤에 명사가 올 때 씁니다." },
@@ -54,12 +54,13 @@ export const TALK_MEAL: Question[] = [
     promptKo: "아이고! 너무 매워요?",
     segments: ["아이고!", "그것이 ~인가요", "너무 매운", "(당신에게)"],
     reference: "Oh no! Is it too spicy for you?",
-    accepted: ["Are you okay? Is it too spicy for you?", "Oh no, is it too spicy?", "Oh no! Is it too hot for you?"],
+    accepted: ["Are you okay? Is it too spicy for you?", "Oh no, is it too spicy?", "Oh no! Is it too hot for you?", "Oh no! Too spicy for you?"],
     meaning: [
       { id: "too", en: "too", ko: "너무", any: ["too"], critical: true },
       { id: "spicy", en: "spicy", ko: "매운", any: ["spicy|hot"], critical: true },
     ],
     pitfalls: [
+      { id: "does-it-too", pattern: "=does|=do it|this|that too", category: "be-verb", severity: "major", fix: "is it too", messageKo: "형용사(spicy)가 있는 의문문은 do가 아니라 be동사로 만듭니다: 'Is it too spicy?'" },
       { id: "too-much-spicy", pattern: "too much =spicy|=hot", category: "word-choice", severity: "major", fix: "too spicy", messageKo: "'너무 맵다'는 'too + 형용사'(too spicy)입니다. 형용사 앞에는 much를 쓰지 않습니다." },
       { id: "spicy-too-much", pattern: "=spicy|=hot too much", category: "word-order", severity: "major", fix: "too spicy", messageKo: "'너무'(too)는 형용사 앞에 둡니다: 'too spicy'. 'spicy too much'는 우리말 어순을 옮긴 표현입니다." },
     ],
@@ -89,8 +90,8 @@ export const TALK_MEAL: Question[] = [
     reference: "You're welcome. What would you like to drink?",
     accepted: ["My pleasure. What would you like to drink?", "You're welcome. What do you want to drink?", "You're welcome. What can I get you to drink?"],
     meaning: [
-      { id: "welcome", en: "you're welcome", ko: "천만에요", any: ["welcome|pleasure|problem"] },
-      { id: "what-drink", en: "what would you like to drink", ko: "음료는 뭐로", any: ["what ... drink|drinks"], critical: true },
+      { id: "welcome", en: "you're welcome", ko: "천만에요", any: ["welcome|pleasure|problem|mention"] },
+      { id: "what-drink", en: "what would you like to drink", ko: "음료는 뭐로", any: ["what ... drink|drinks", "something|anything to drink"], critical: true },
     ],
     pitfalls: [
       { id: "like-drink", pattern: "would you like =drink", category: "verb-form", severity: "major", fix: "would you like to drink", messageKo: "'would you like' 뒤에 동사가 오면 'to + 동사원형'이 필요합니다: 'What would you like to drink?'" },
@@ -169,6 +170,7 @@ export const TALK_MEAL: Question[] = [
       { id: "bibimbap", en: "bibimbap", ko: "비빔밥", any: ["bibimbap|bibimbab|bibimbop"], critical: true },
     ],
     pitfalls: [
+      { id: "did-ever-past", pattern: "=did you ever? =tried|=ate|=eaten|=had", category: "tense", severity: "major", fix: "have you ever tried", messageKo: "did 뒤에는 동사원형이 옵니다. 먹어 본 경험은 현재완료로 묻습니다: 'Have you ever tried …?'", skill: "present-perfect" },
       { id: "ever-base", pattern: "have you ever? =try|=eat|=ate", category: "verb-form", severity: "major", fix: "have you ever tried", messageKo: "현재완료 의문문은 'Have you (ever) + 과거분사?'입니다. try의 과거분사는 tried, eat은 eaten입니다." },
       { id: "do-ever", pattern: "do you ever =try|=eat", category: "tense", severity: "major", fix: "have you ever tried", messageKo: "'Do you ever eat …?'은 '평소에 가끔 먹나요?'라는 뜻입니다. 지금까지의 경험은 현재완료 'Have you ever tried …?'로 묻습니다." },
     ],
@@ -209,7 +211,7 @@ export const TALK_MEAL: Question[] = [
       { id: "have", en: "have / contain / is there", ko: "들어가나요", any: ["have|has|contain|contains|there|with|include|includes|use"], critical: true },
     ],
     pitfalls: [
-      { id: "is-have", pattern: "is this dish? =have|=has", category: "sentence-structure", severity: "major", fix: "does this dish have", messageKo: "일반동사 have가 있는 의문문은 be동사가 아니라 does로 만듭니다: 'Does this dish have …?' 또는 'Is there any pork in …?'" },
+      { id: "is-have", pattern: "is this dish? =have|=has|=contain|=contains|=include|=includes", category: "sentence-structure", severity: "major", fix: "does this dish have", messageKo: "일반동사 have가 있는 의문문은 be동사가 아니라 does로 만듭니다: 'Does this dish have …?' 또는 'Is there any pork in …?'" },
       { id: "does-has", pattern: "does this dish? =has|=contains|=includes", category: "agreement", severity: "major", fix: "does this dish have", messageKo: "does가 이미 3인칭 단수를 표시하므로 뒤의 동사는 원형을 씁니다: 'Does this dish have …?'" },
     ],
     hints: { pattern: "Does + 주어 + have + 명사 (+ in it)? / Is there + 명사 + in …?", skeleton: "Excuse me, ____ this dish ____ any pork in it?", partial: "Excuse me, does this dish…" },
@@ -245,7 +247,7 @@ export const TALK_MEAL: Question[] = [
     ],
     meaning: [
       { id: "offer", en: "would you like to", ko: "~하시겠어요", any: ["would ... like|want", "why ... you", "do ... want", "how about", "please"] },
-      { id: "join-us", en: "join us", ko: "저희랑 같이", any: ["us", "join ... team"], critical: true },
+      { id: "join-us", en: "join us", ko: "저희랑 같이", any: ["us", "join ... team", "together"], critical: true },
       { id: "lunch", en: "for lunch", ko: "점심", any: ["lunch"], critical: true },
     ],
     pitfalls: [
@@ -285,13 +287,14 @@ export const TALK_MEAL: Question[] = [
       "Then I'd recommend the bulgogi because it's not spicy.",
     ],
     meaning: [
-      { id: "recommend", en: "I'd recommend", ko: "추천해요", any: ["recommend|suggest", "should|could ... try|have|get|order", "try"], critical: true },
+      { id: "recommend", en: "I'd recommend", ko: "추천해요", any: ["recommend|suggest", "should|could ... try|have|get|order", "try", "go with|for", "good|best|safe|great choice|option|bet"], critical: true },
       { id: "bulgogi", en: "the bulgogi", ko: "불고기", any: ["bulgogi|bulgoki|pulgogi"], critical: true },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|so"] },
       { id: "not-spicy", en: "isn't spicy at all", ko: "전혀 맵지 않다", any: ["not ... spicy|hot", "mild"], critical: true },
     ],
     pitfalls: [
       { id: "recommend-you-to", pattern: "recommend|suggest you to =try", category: "verb-form", severity: "major", fix: "recommend trying", messageKo: "'recommend you to try'는 틀린 형태입니다. 'I'd recommend the bulgogi' 또는 'I'd recommend trying the bulgogi'처럼 씁니다." },
+      { id: "doesnt-spicy", pattern: "=does|=do not =spicy|=hot", category: "be-verb", severity: "major", fix: "is not spicy", messageKo: "spicy는 형용사라서 do로 부정하지 않고 be동사로 부정합니다: 'it isn't spicy'." },
       { id: "no-spicy", pattern: "is =no spicy|hot", category: "word-choice", severity: "major", fix: "is not spicy", messageKo: "형용사를 부정할 때는 no가 아니라 not을 씁니다: 'it isn't spicy'." },
     ],
     hints: { pattern: "I'd recommend + 명사 + because + 주어 + 동사", skeleton: "Then I'd ______ the bulgogi because it ____ spicy at all.", partial: "Then I'd recommend the bulgogi because…" },
@@ -324,13 +327,14 @@ export const TALK_MEAL: Question[] = [
       "Thanks, but I'm okay. I can't have any more because I'm driving tonight.",
     ],
     meaning: [
-      { id: "thanks", en: "thanks, but", ko: "고맙지만", any: ["thank|thanks"] },
-      { id: "cant-drink", en: "I can't drink any more", ko: "더는 못 마셔요", any: ["not ... drink|have|more", "no more"], critical: true },
+      { id: "thanks", en: "thanks, but", ko: "고맙지만", any: ["thank|thanks", "kind"] },
+      { id: "cant-drink", en: "I can't drink any more", ko: "더는 못 마셔요", any: ["not ... drink|have|more", "no more", "better not"], critical: true },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|so"] },
       { id: "driving", en: "I'm driving tonight", ko: "제가 운전해요", any: ["drive|driving"], critical: true },
     ],
     pitfalls: [
       { id: "because-drive", pattern: "because i =drive", category: "tense", severity: "major", fix: "because I'm driving", messageKo: "오늘 밤처럼 이미 정해진 일정은 진행형 'I'm driving tonight'로 말합니다. 'I drive'는 평소 습관처럼 들립니다." },
+      { id: "better-not-ing", pattern: "better not =drinking|=having", category: "verb-form", severity: "major", fix: "better not", messageKo: "'had better (not)' 뒤에는 동사원형이 옵니다: 'I'd better not (drink)'. -ing를 쓰지 않습니다." },
       { id: "am-drive", pattern: "am =drive", category: "verb-form", severity: "major", fix: "am driving", messageKo: "be동사 뒤에 동사원형을 쓸 수 없습니다. 진행형은 'I'm driving'입니다." },
     ],
     hints: { pattern: "I can't + 동사 + any more because + I'm + 동사ing (정해진 일정)", skeleton: "Thanks, but I'm okay. I can't drink ___ more because I'm ______ tonight.", partial: "Thanks, but I'm okay. I can't drink any more because…" },
@@ -409,9 +413,9 @@ export const TALK_MEAL: Question[] = [
       "It's called japchae. It's made of sweet potato noodles, vegetables and beef.",
     ],
     meaning: [
-      { id: "called", en: "it's called", ko: "~라고 해요", any: ["called|call|named|name"], critical: true },
+      { id: "called", en: "it's called", ko: "~라고 해요", any: ["called|call|named|name", "re:\\b(this|it|that) is (japchae|chapchae|japche|japchea)\\b"], critical: true },
       { id: "japchae", en: "japchae", ko: "잡채", any: ["japchae|chapchae|japche|japchea", "jap chae"], critical: true },
-      { id: "made", en: "it's made with", ko: "~로 만들어요", any: ["made|make|cooked|cook|contain|contains|has|have|use"], critical: true },
+      { id: "made", en: "it's made with", ko: "~로 만들어요", any: ["made|make|cooked|cook|contain|contains|has|have|use", "noodle|noodles with"], critical: true },
       { id: "noodles", en: "sweet potato noodles", ko: "고구마 당면", any: ["noodle|noodles"], critical: true },
       { id: "ingredients", en: "vegetables and beef", ko: "채소와 소고기", any: ["vegetable|vegetables|veggies", "beef|meat"] },
     ],
@@ -453,7 +457,7 @@ export const TALK_MEAL: Question[] = [
       { id: "no-problem", en: "no problem at all", ko: "전혀 문제없어요", any: ["problem", "fine|okay|ok"] },
       { id: "booked", en: "I've booked", ko: "예약해 뒀어요", any: ["book|booked|reserve|reserved|chose|choose|found|picked"], critical: true },
       { id: "restaurant", en: "a restaurant", ko: "식당", any: ["restaurant|place"], critical: true },
-      { id: "vegetarian", en: "vegetarian dishes", ko: "채식 메뉴", any: ["vegetarian|veggie|vegan"], critical: true },
+      { id: "vegetarian", en: "vegetarian dishes", ko: "채식 메뉴", any: ["re:(?<!\\bnot (?:\\w+ ){0,2})\\b(vegetarian|veggie|vegan)\\b"], critical: true },
       { id: "a-lot", en: "a lot of", ko: "많이", any: ["lot|lots|many|plenty|several|good|great"] },
     ],
     pitfalls: [

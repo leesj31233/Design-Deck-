@@ -20,8 +20,8 @@ export const TALK_PRESENTATION: Question[] = [
     reference: "Great. Any questions so far?",
     accepted: ["Good. Any questions so far?", "Great. Do you have any questions so far?", "Great. Are there any questions so far?"],
     meaning: [
-      { id: "questions", en: "any questions", ko: "질문", any: ["question|questions"], critical: true },
-      { id: "so-far", en: "so far", ko: "여기까지", any: ["so far", "until now", "up to now", "at this point", "now"] },
+      { id: "questions", en: "any questions", ko: "질문", any: ["question|questions", "anything ... ask"], critical: true },
+      { id: "so-far", en: "so far", ko: "여기까지", any: ["so far", "until now", "up to now", "at this point", "now", "this point|stage", "before ... move|continue|go|=going"] },
     ],
     pitfalls: [
       { id: "is-there-questions", pattern: "=is there any =questions", category: "agreement", severity: "major", fix: "are there any questions", messageKo: "'questions'는 복수라서 'Is there'가 아니라 'Are there any questions?'입니다." },
@@ -128,11 +128,12 @@ export const TALK_PRESENTATION: Question[] = [
     meaning: [
       { id: "thanks", en: "thank you", ko: "감사합니다", any: ["thank|thanks"] },
       { id: "today", en: "today", ko: "오늘", any: ["today"] },
-      { id: "talk", en: "talk about / present", ko: "말씀드리다", any: ["talk|speak ... about", "present|share|show|explain|introduce|cover|go|walk|report"], critical: true },
+      { id: "talk", en: "talk about / present", ko: "말씀드리다", any: ["talk|speak|tell ... about", "present|share|show|explain|introduce|cover|go|walk|report"], critical: true },
       { id: "results", en: "pilot test results", ko: "파일럿 시험 결과", any: ["result|results|outcome"], critical: true },
     ],
     pitfalls: [
       { id: "present-about", pattern: "present|explain|introduce about", category: "preposition", severity: "major", fix: "talk about", messageKo: "'present / explain / introduce'는 목적어를 바로 받는 동사라서 'about'을 붙이지 않습니다. 'talk about our results' 또는 'present our results'라고 합니다.", skill: "verb-object" },
+      { id: "tell-about", pattern: "tell about", category: "sentence-structure", severity: "major", fix: "tell you about", messageKo: "tell은 '누구에게' 말하는지 목적어가 필요합니다: 'tell you about …'. 목적어 없이 쓸 때는 'talk about'을 씁니다.", skill: "verb-object" },
       { id: "like-base", pattern: "would like =talk|=present|=explain|=share", category: "verb-form", severity: "major", fix: "would like to talk", messageKo: "'would like' 뒤에 동사가 오면 'to + 동사원형'입니다: 'I'd like to talk about …'." },
     ],
     hints: { pattern: "Today, I'd like to + talk about / present + 명사", skeleton: "Thank you. Today, I'd like to ____ _____ our pilot test results.", partial: "Thank you. Today, I'd like to…" },
@@ -163,9 +164,10 @@ export const TALK_PRESENTATION: Question[] = [
       "My presentation has three parts: background, test results, and next steps.",
       "My presentation consists of three parts: the background, the test results, and the next steps.",
       "There are three parts to my presentation: the background, the test results, and the next steps.",
+      "There are three parts to my presentation: background, test results, and next steps.",
     ],
     meaning: [
-      { id: "three-parts", en: "three parts", ko: "세 부분", any: ["three|3 ... part|parts|section|sections"], critical: true },
+      { id: "three-parts", en: "three parts", ko: "세 부분", any: ["three|3 ... part|parts|section|sections|thing|things|topic|topics|point|points"], critical: true },
       { id: "background", en: "the background", ko: "배경", any: ["background|introduction|overview"] },
       { id: "results", en: "the test results", ko: "시험 결과", any: ["result|results"] },
       { id: "next-steps", en: "the next steps", ko: "다음 단계", any: ["next step|steps", "plan|plans", "next"] },
@@ -205,6 +207,7 @@ export const TALK_PRESENTATION: Question[] = [
       "Yes, let me take you through the process flow step by step. I'll start with the feed inlet.",
       "Yes, let me explain the process flow to you step by step. I'll start with the feed inlet.",
       "Yes, let me walk you through the process flow step by step. I'll start from the feed inlet.",
+      "Yes, let me walk you through the process flow step by step, starting with the feed inlet.",
     ],
     meaning: [
       { id: "let-me", en: "let me", ko: "제가 ~할게요", any: ["let me|us", "i will", "i am going to"], critical: true },
@@ -249,12 +252,13 @@ export const TALK_PRESENTATION: Question[] = [
     meaning: [
       { id: "as-you-see", en: "as you can see", ko: "보시다시피", any: ["as ... see", "you can see", "here"] },
       { id: "results", en: "the results", ko: "결과", any: ["result|results|data|performance"] },
-      { id: "better", en: "better", ko: "더 좋았다", any: ["better", "improve|improved"], critical: true },
+      { id: "better", en: "better", ko: "더 좋았다", any: ["re:(?<!\\bnot (?:\\w+ )?)\\bbetter\\b", "improve|improved"], critical: true },
       { id: "expected", en: "than we expected", ko: "예상보다", any: ["expect|expected|expectation|expectations|thought|estimate|estimated|target"], critical: true },
-      { id: "much", en: "much", ko: "훨씬", any: ["much|lot|far|significantly|clearly"] },
+      { id: "much", en: "much", ko: "훨씬", any: ["much|lot|far|significantly|clearly|way"] },
     ],
     pitfalls: [
       { id: "more-better", pattern: "more better", category: "word-choice", severity: "major", fix: "much better", messageKo: "'better'는 이미 비교급이라 'more'를 붙이지 않습니다. 강조할 때는 'much better'라고 합니다." },
+      { id: "results-was", pattern: "results =was|=is", category: "agreement", severity: "major", fix: "results were", messageKo: "주어 'the results'는 복수라서 be동사도 복수형을 씁니다: 'the results were'." },
       { id: "very-better", pattern: "very better", category: "word-choice", severity: "major", fix: "much better", messageKo: "비교급은 'very'로 강조하지 않습니다. 'very better'가 아니라 'much / a lot / far better'입니다." },
       { id: "than-expect", pattern: "than we? =expect", category: "tense", severity: "major", fix: "than we expected", messageKo: "예상은 결과가 나오기 전(과거)에 한 것이므로 'than we expected'(과거형)를 씁니다." },
     ],
@@ -329,7 +333,7 @@ export const TALK_PRESENTATION: Question[] = [
       "Yes, that's the end of my presentation. If you have any questions, I'd be happy to answer them.",
     ],
     meaning: [
-      { id: "end", en: "that's all", ko: "여기까지입니다", any: ["that ... all|it|everything|end", "finish|finished|done"] },
+      { id: "end", en: "that's all", ko: "여기까지입니다", any: ["that ... all|it|everything|end|last", "finish|finished|done"] },
       { id: "if-questions", en: "if you have any questions", ko: "질문이 있으시면", any: ["if ... question|questions"], critical: true },
       { id: "answer", en: "happy to answer them", ko: "기꺼이 답하다", any: ["answer|take|respond|discuss|help|ask"], critical: true },
     ],
@@ -363,6 +367,7 @@ export const TALK_PRESENTATION: Question[] = [
     reference: "Since our last meeting, we've finished two more pilot runs, and the results are quite stable.",
     accepted: [
       "Since our last meeting, we have finished two more pilot runs, and the results are quite stable.",
+      "Since we last met, we've finished two more pilot runs, and the results are quite stable.",
       "Since the last meeting, we've completed two more pilot runs, and the results are quite stable.",
       "Since our last meeting, we've done two more pilot runs, and the results have been quite stable.",
       "Since our last meeting, we've finished two more pilot tests, and the results look quite stable.",
@@ -409,13 +414,14 @@ export const TALK_PRESENTATION: Question[] = [
     ],
     meaning: [
       { id: "samples", en: "all the samples", ko: "모든 샘플", any: ["sample|samples"], critical: true },
-      { id: "analyzed", en: "were analyzed", ko: "분석되었다", any: ["analyze|analyse|analyzed|analysed|test|tested|measure|measured|check|checked"], critical: true },
+      { id: "analyzed", en: "were analyzed", ko: "분석되었다", any: ["analyze|analyse|analyzed|analysed|analysis|test|tested|measure|measured|check|checked"], critical: true },
       { id: "external-lab", en: "by an external lab", ko: "외부 실험실", any: ["external|outside|independent|third|third-party|another ... lab|laboratory|company", "external|outside|independent|third-party"] },
-      { id: "reliable", en: "the data is reliable", ko: "데이터는 신뢰할 수 있다", any: ["reliable|trust|accurate|trustworthy|confident|valid"], critical: true },
+      { id: "reliable", en: "the data is reliable", ko: "데이터는 신뢰할 수 있다", any: ["re:(?<!\\bnot (?:\\w+ ){0,2})\\b(reliable|trust|trusted|accurate|trustworthy|confident|valid|rely|relied)\\b"], critical: true },
       { id: "so", en: "so", ko: "그래서", any: ["so|because|since|therefore", "that is why"] },
     ],
     pitfalls: [
       { id: "no-be", pattern: "samples =analyzed|=analysed|=tested", category: "be-verb", severity: "major", fix: "samples were analyzed", messageKo: "샘플은 분석'되는' 대상이므로 수동태 'were analyzed'가 필요합니다. be동사를 빼면 샘플이 무언가를 분석했다는 뜻이 됩니다." },
+      { id: "rely-no-on", pattern: "re:\\brely(?= (the|this|that|these|our|its|their|it)\\b)", category: "preposition", severity: "major", fix: "rely on", messageKo: "rely는 전치사 on과 함께 씁니다: 'we can rely on the data'." },
       { id: "be-base", pattern: "were|was =analyze|=analyse|=test", category: "verb-form", severity: "major", fix: "were analyzed", messageKo: "수동태는 'be + 과거분사'입니다: 'were analyze'가 아니라 'were analyzed'입니다." },
     ],
     hints: { pattern: "주어 + were + 과거분사 + by + 행위자", skeleton: "All the samples ____ ________ by an external lab, so the data is reliable.", partial: "All the samples were…" },
@@ -449,13 +455,14 @@ export const TALK_PRESENTATION: Question[] = [
       "I think it's a bit too early to decide, because we only have two weeks of data so far.",
     ],
     meaning: [
-      { id: "too-early", en: "too early", ko: "너무 이르다", any: ["too early|soon"], critical: true },
+      { id: "too-early", en: "too early", ko: "너무 이르다", any: ["re:(?<!\\bnot )\\btoo (early|soon)\\b"], critical: true },
       { id: "say", en: "to say", ko: "말하기에는", any: ["say|decide|tell|judge|confirm|conclude|know"] },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as", "only"] },
       { id: "two-weeks", en: "two weeks of data", ko: "2주치", any: ["two|2 ... week|weeks"], critical: true },
       { id: "only", en: "only", ko: "~밖에 없다", any: ["only|just"] },
     ],
     pitfalls: [
+      { id: "think-is", pattern: "i think =is", category: "sentence-structure", severity: "major", fix: "I think it's", messageKo: "영어 문장에는 주어가 꼭 필요합니다. '~하기에는 이르다'는 가주어 it을 써서 'I think it's too early'라고 합니다." },
       { id: "so-early", pattern: "so|very early to", category: "word-choice", severity: "major", fix: "too early to", messageKo: "'~하기에는 너무 이르다'는 'too + 형용사 + to 동사'입니다. 'so early / very early'에는 '그래서 아직 할 수 없다'는 뜻이 없습니다." },
       { id: "early-for-base", pattern: "early for =say|=decide|=saying|=deciding", category: "verb-form", severity: "major", fix: "early to say", messageKo: "'too + 형용사' 뒤에 동작이 오면 'to + 동사원형'입니다: 'too early to say'." },
       { id: "weeks-data", pattern: "weeks =data", category: "preposition", severity: "minor", fix: "weeks of data", messageKo: "'2주치 데이터'는 'two weeks of data'처럼 of로 연결합니다." },
@@ -533,7 +540,7 @@ export const TALK_PRESENTATION: Question[] = [
       "In summary, the new dryer is working well, but the outlet moisture is still slightly higher than the target, so we need to do one more test at full load before finalizing the design.",
     ],
     meaning: [
-      { id: "sum", en: "to sum up", ko: "요약하자면", any: ["sum|summarize|summarise|summary|conclusion|overall"] },
+      { id: "sum", en: "to sum up", ko: "요약하자면", any: ["sum|summarize|summarise|summary|conclusion|overall|short|brief|briefly|basically"] },
       { id: "works-well", en: "works well", ko: "잘 작동한다", any: ["work|working|perform|performs|operate|operates|run|runs ... well|good|fine", "good"] },
       { id: "moisture-high", en: "moisture is slightly higher than the target", ko: "수분이 목표보다 높다", any: ["moisture ... high|higher|above|over"], critical: true },
       { id: "still", en: "still", ko: "아직", any: ["still", "yet"] },
@@ -576,10 +583,10 @@ export const TALK_PRESENTATION: Question[] = [
       "I understand, but I'm a bit concerned about scaling up directly. If the feed moisture changes in the rainy season, the dryer might not reach the target. Instead, could we run a short test with wet feed first? It would only take about two weeks.",
     ],
     meaning: [
-      { id: "understand", en: "I understand", ko: "이해합니다", any: ["understand|see|agree"] },
-      { id: "worried", en: "I'm a bit worried", ko: "좀 걱정됩니다", any: ["worry|worried|concern|concerned|sure|risk|risky"], critical: true },
+      { id: "understand", en: "I understand", ko: "이해합니다", any: ["understand|see|agree", "make sense", "fair point|enough"] },
+      { id: "worried", en: "I'm a bit worried", ko: "좀 걱정됩니다", any: ["re:(?<!\\bnot (?:\\w+ )?)\\b(worry|worried|worries|concern|concerned|concerns|risk|risky|risks|nervous|uneasy|hesitant|cautious)\\b", "not sure"], critical: true },
       { id: "scale-up", en: "scaling up directly", ko: "바로 스케일업하기", any: ["scale|scaling ... up", "full-scale|full"], critical: true },
-      { id: "moisture-change", en: "if the feed moisture changes", ko: "원료 수분이 바뀌면", any: ["moisture ... change|changes|increase|increases|vary|varies|differ|differs|higher|rise|rises"], critical: true },
+      { id: "moisture-change", en: "if the feed moisture changes", ko: "원료 수분이 바뀌면", any: ["moisture ... change|changes|increase|increases|vary|varies|differ|differs|higher|rise|rises", "moisture ... go up", "=wetter"], critical: true },
       { id: "might-not", en: "might not reach the target", ko: "목표에 도달하지 못할 수도 있다", any: ["not ... reach|meet|achieve|hit|get"], critical: true },
       { id: "short-test", en: "a short test with wet feed", ko: "젖은 원료로 짧은 시험", any: ["short|quick|small ... test|trial|run", "test|trial ... wet"], critical: true },
       { id: "proposal", en: "why don't we …?", ko: "~하면 어떨까요?", any: ["why ... we", "could|can|shall ... we", "how|what about", "suggest|propose", "instead"] },

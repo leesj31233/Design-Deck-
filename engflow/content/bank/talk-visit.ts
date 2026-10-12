@@ -21,7 +21,7 @@ export const TALK_VISIT: Question[] = [
     reference: "No problem. How was your flight?",
     accepted: ["You're welcome. How was your flight?", "My pleasure. How was the flight?", "No problem. Did you have a good flight?"],
     meaning: [
-      { id: "how-was", en: "how was", ko: "어땠어요", any: ["how =was", "did you have"], critical: true },
+      { id: "how-was", en: "how was", ko: "어땠어요", any: ["how =was", "did you have", "how did ... go"], critical: true },
       { id: "flight", en: "your flight", ko: "비행", any: ["flight|trip"], critical: true },
     ],
     pitfalls: [
@@ -58,11 +58,12 @@ export const TALK_VISIT: Question[] = [
     accepted: ["Let me help you with those bags.", "Let me take your bags.", "Here, let me carry your bags."],
     meaning: [
       { id: "let-me", en: "let me / I'll", ko: "제가 ~할게요", any: ["let me", "i will", "can i"], critical: true },
-      { id: "help-bags", en: "help you with your bags", ko: "가방을 들어 주다", any: ["help ... bag|bags|luggage|suitcase", "take|carry ... bag|bags|luggage|suitcase"], critical: true },
+      { id: "help-bags", en: "help you with your bags", ko: "가방을 들어 주다", any: ["help ... bag|bags|luggage|suitcase", "take|carry ... bag|bags|luggage|suitcase", "help ... with those|them|these", "hand ... bag|bags|luggage|suitcase|those|them|these", "grab|get|hold ... bag|bags|luggage|suitcase"], critical: true },
     ],
     pitfalls: [
       { id: "help-your-bags", pattern: "help your|the|those bag|bags|luggage|suitcase", category: "preposition", severity: "major", fix: "help you with your bags", messageKo: "help의 목적어는 사람입니다. '가방을 도와주다'는 'help you with your bags'처럼 '사람 + with + 물건'으로 씁니다." },
       { id: "let-me-to", pattern: "let me to", category: "verb-form", severity: "major", fix: "let me", messageKo: "'let me' 뒤에는 동사원형이 바로 옵니다: 'let me help'. to를 넣지 않습니다." },
+      { id: "hand-for-base", pattern: "hand for =carry|=carrying|=take|=help", category: "preposition", severity: "major", fix: "hand with", messageKo: "'~을 도와주다'는 'give you a hand with + 명사'입니다: 'let me give you a hand with your bags'." },
     ],
     hints: { pattern: "Let me help + 사람 + with + 물건", skeleton: "Let me ____ you ____ your bags.", partial: "Let me help you…" },
     explanationKo: "'제가 ~해 드릴게요'는 'Let me + 동사원형'입니다. help는 사람을 목적어로 받아서 'help you with your bags'라고 하고, 'help your bags'(가방을 돕다)라고 하지 않습니다.",
@@ -90,8 +91,8 @@ export const TALK_VISIT: Question[] = [
     reference: "You need to wear a helmet here.",
     accepted: ["You have to wear a helmet here.", "You need to wear a hard hat here.", "You must wear a helmet here."],
     meaning: [
-      { id: "need-to", en: "need to / have to", ko: "~해야 한다", any: ["need|must|should|please", "have to"], critical: true },
-      { id: "wear", en: "wear", ko: "착용하다", any: ["wear", "put on"], critical: true },
+      { id: "need-to", en: "need to / have to", ko: "~해야 한다", any: ["re:(?<!\\bnot )\\b(need|needs|needed|must|should|please)\\b", "re:(?<!\\bnot )\\bhave to\\b", "re:(?<!\\bnot )\\b(required|mandatory|compulsory|necessary)\\b", "not ... without"], critical: true },
+      { id: "wear", en: "wear", ko: "착용하다", any: ["wear", "put on", "re:\\b(helmets?|hard hats?|hats?) (are|is) (required|mandatory|compulsory|necessary)\\b", "without ... helmet|helmets|hat"], critical: true },
       { id: "helmet", en: "a helmet", ko: "안전모", any: ["helmet|hat"], term: true },
     ],
     pitfalls: [
@@ -124,11 +125,11 @@ export const TALK_VISIT: Question[] = [
     promptKo: "전에 한국에 와 보신 적 있으세요?",
     segments: ["~해 본 적 있으세요", "한국에", "전에"],
     reference: "Have you been to Korea before?",
-    accepted: ["Have you ever been to Korea before?", "Have you visited Korea before?", "Is this your first time in Korea?"],
+    accepted: ["Have you ever been to Korea before?", "Have you visited Korea before?", "Is this your first time in Korea?", "Have you ever been to Korea?"],
     meaning: [
-      { id: "been", en: "have you been", ko: "와 본 적 있다", any: ["have you", "first time"], critical: true },
+      { id: "been", en: "have you been", ko: "와 본 적 있다", any: ["have you", "first time|visit|trip"], critical: true },
       { id: "korea", en: "to Korea", ko: "한국에", any: ["korea"] },
-      { id: "before", en: "before", ko: "전에", any: ["before|ever", "first time"] },
+      { id: "before", en: "before", ko: "전에", any: ["before|ever", "first time|visit|trip"] },
     ],
     pitfalls: [
       { id: "have-you-base-past", pattern: "have you ever? =visit|=go|=went|=came", category: "verb-form", severity: "major", fix: "have you been", messageKo: "현재완료 의문문은 'Have you + 과거분사?'입니다. '가 본 적 있다'는 보통 'Have you been to …?'라고 합니다." },
@@ -196,12 +197,13 @@ export const TALK_VISIT: Question[] = [
     reference: "Can I take a few photos of the dryer?",
     accepted: ["Could I take a few photos of the dryer?", "Is it okay if I take some photos of the dryer?", "Do you mind if I take a few pictures of the dryer?"],
     meaning: [
-      { id: "can-i", en: "can I", ko: "~해도 될까요", any: ["can|could|may i", "okay|ok|alright|fine ... if", "mind if", "allowed"], critical: true },
+      { id: "can-i", en: "can I", ko: "~해도 될까요", any: ["can|could|may i", "okay|ok|alright|fine|right ... if", "okay|ok|alright|fine|right to", "mind if", "allowed"], critical: true },
       { id: "take-photos", en: "take a few photos", ko: "사진을 찍다", any: ["take ... photo|photos|picture|pictures|pic|pics"], critical: true },
       { id: "dryer", en: "of the dryer", ko: "그 건조기", any: ["dryer|unit|it"] },
     ],
     pitfalls: [
       { id: "photo-about", pattern: "photo|photos|picture|pictures about|for|=to the|this|your? dryer", category: "preposition", severity: "major", fix: "photos of the dryer", messageKo: "'~의 사진'은 'photos of + 대상'입니다. about이나 for를 쓰지 않습니다." },
+      { id: "to-taking", pattern: "re:(?<=\\b(?:(?:okay|ok|alright|fine|possible|right) to|(?:can|could|may) i) )taking\\b", category: "verb-form", severity: "major", fix: "take", messageKo: "'Can I / okay to' 뒤에는 동사원형이 옵니다: 'Can I take …?', 'Would it be okay to take …?'" },
       { id: "photo-no-of", pattern: "photo|photos|picture|pictures the|this|your dryer", category: "preposition", severity: "major", fix: "photos of the dryer", messageKo: "사진의 대상 앞에는 of가 필요합니다: 'take a few photos of the dryer'." },
       { id: "of-dryer", pattern: "of dryer", category: "article", severity: "minor", fix: "of the dryer", messageKo: "눈앞에 있는 특정한 건조기를 가리키므로 'the dryer'라고 합니다." },
     ],
@@ -237,7 +239,7 @@ export const TALK_VISIT: Question[] = [
     ],
     meaning: [
       { id: "sorry", en: "sorry", ko: "죄송해요", any: ["sorry|apologize|afraid"] },
-      { id: "late", en: "late", ko: "늦다", any: ["late|delayed"], critical: true },
+      { id: "late", en: "late", ko: "늦다", any: ["late|delayed|behind"], critical: true },
       { id: "ten-min", en: "about ten minutes", ko: "10분 정도", any: ["ten|10 minute|minutes|mins|min"] },
       { id: "traffic", en: "because of the traffic", ko: "차가 막혀서", any: ["traffic|jam"], critical: true },
     ],
@@ -280,8 +282,8 @@ export const TALK_VISIT: Question[] = [
       { id: "when", en: "when", ko: "~하면", any: ["when|once|after", "as soon as"], critical: true },
       { id: "arrive", en: "we get to the site", ko: "현장에 도착하다", any: ["get|arrive|reach ... site|plant", "get there"], critical: true },
       { id: "briefing", en: "a short safety briefing", ko: "간단한 안전 교육", any: ["safety", "briefing"], critical: true },
-      { id: "give", en: "I'll give you", ko: "해 드릴게요", any: ["give|do|have|run|explain"] },
-      { id: "first", en: "first", ko: "먼저", any: ["first", "before"] },
+      { id: "give", en: "I'll give you", ko: "해 드릴게요", any: ["give|do|have|run|explain", "start|begin with"] },
+      { id: "first", en: "first", ko: "먼저", any: ["first", "before", "start|begin with"] },
     ],
     pitfalls: [
       { id: "arrive-to", pattern: "arrive to the? site|plant", category: "preposition", severity: "major", fix: "arrive at the site", messageKo: "'~에 도착하다'는 'arrive at + 장소' 또는 'get to + 장소'입니다. 'arrive to'라고 하지 않습니다." },
@@ -318,6 +320,7 @@ export const TALK_VISIT: Question[] = [
       { id: "start", en: "starts", ko: "시작하다", any: ["start|begin"], critical: true },
     ],
     pitfalls: [
+      { id: "direct-no-do", pattern: "re:^(so |sorry |and |okay |ok )?(what time|when) the (plant |factory )?(tour|visit) (starts|start|begins|begin)\\b", category: "word-order", severity: "major", fix: "what time does the plant tour start", messageKo: "직접 묻는 의문문에는 do/does가 필요합니다: 'What time does the tour start?'. 'Could you tell me' 뒤에서만 평서문 어순(the tour starts)을 씁니다." },
       { id: "embedded-does", pattern: "tell me what|when time? does|=do", category: "word-order", severity: "major", fix: "tell me what time", messageKo: "'Could you tell me ~' 안에 들어간 질문은 평서문 어순(주어 + 동사)입니다: 'what time the tour starts'. does를 쓰지 않습니다." },
       { id: "embedded-start", pattern: "re:(?<=\\bme (what time|when) the (plant |factory )?)tour start\\b", category: "agreement", severity: "major", fix: "tour starts", messageKo: "간접 의문문 안은 평서문이므로 주어(the tour)에 맞춰 'starts'로 씁니다." },
     ],
@@ -355,13 +358,14 @@ export const TALK_VISIT: Question[] = [
     meaning: [
       { id: "before", en: "before entering", ko: "들어가기 전에", any: ["before ... enter|go|come|=going|=coming"], critical: true },
       { id: "plant", en: "the plant", ko: "공장", any: ["plant|site|factory"] },
-      { id: "need-to", en: "you'll need to", ko: "~해야 한다", any: ["need|must|should|please", "have to"], critical: true },
-      { id: "sign-in", en: "sign in", ko: "출입 등록하다", any: ["sign|register"], critical: true },
+      { id: "need-to", en: "you'll need to", ko: "~해야 한다", any: ["re:(?<!\\bnot )\\b(need|needs|needed|must|should|please)\\b", "re:(?<!\\bnot )\\bhave to\\b"], critical: true },
+      { id: "sign-in", en: "sign in", ko: "출입 등록하다", any: ["sign|register", "check in"], critical: true },
       { id: "security", en: "at the security office", ko: "경비실에서", any: ["security|gate|guard|reception"] },
     ],
     pitfalls: [
       { id: "before-enter", pattern: "before =enter", category: "verb-form", severity: "major", fix: "before entering", messageKo: "before 뒤에 동사를 바로 쓸 때는 동명사(entering)를 씁니다: 'before entering the plant' 또는 'before you enter the plant'.", skill: "prep-gerund" },
       { id: "enter-to", pattern: "enter|entering to the? plant|site|factory", category: "preposition", severity: "major", fix: "entering the plant", messageKo: "enter는 타동사라서 장소를 바로 씁니다: 'enter the plant'. 'enter to'라고 하지 않습니다." },
+      { id: "to-signing", pattern: "to =signing|=registering", category: "verb-form", severity: "major", fix: "to sign", messageKo: "'need to' 뒤에는 동사원형이 옵니다: 'you'll need to sign in'. -ing 형태를 쓰지 않습니다.", skill: "modal-necessity" },
       { id: "need-sign", pattern: "need =sign", category: "verb-form", severity: "major", fix: "need to sign", messageKo: "'~해야 한다'의 need는 'need to + 동사원형'입니다. to를 빠뜨리지 마세요.", skill: "modal-necessity" },
     ],
     hints: { pattern: "Before + 동사ing + 목적어, you'll need to + 동사원형", skeleton: "Before ________ the plant, you'll need __ sign in at the security office.", partial: "Before entering the plant, you'll need to…" },
@@ -433,6 +437,7 @@ export const TALK_VISIT: Question[] = [
       "Thanks a lot for showing us around. I'm really looking forward to working with your team.",
       "Thank you so much for the tour. I'm really looking forward to working with you.",
       "Thank you for showing us around today. We're really looking forward to working with your team.",
+      "Thank you so much for showing us around. Really looking forward to working with your team.",
     ],
     meaning: [
       { id: "thank", en: "thank you", ko: "감사해요", any: ["thank|thanks|appreciate"], critical: true },
@@ -474,9 +479,10 @@ export const TALK_VISIT: Question[] = [
       "It takes about two hours to get to the site, so why don't we leave the hotel at seven tomorrow morning?",
       "It takes around two hours to get to the site. Shall we leave the hotel at 7 tomorrow morning?",
       "The drive to the site takes about two hours. Why don't we leave the hotel at seven tomorrow morning?",
+      "It takes about two hours to get to the site. Why don't we leave from the hotel at seven tomorrow morning?",
     ],
     meaning: [
-      { id: "two-hours", en: "it takes about two hours", ko: "두 시간쯤 걸린다", any: ["two|2 hour|hours"], critical: true },
+      { id: "two-hours", en: "it takes about two hours", ko: "두 시간쯤 걸린다", any: ["two|2 hour|hours", "two-hour|2-hour"], critical: true },
       { id: "site", en: "to get to the site", ko: "현장까지", any: ["site|plant"] },
       { id: "suggest", en: "why don't we", ko: "~하는 게 어때요", any: ["why ... not", "shall|could|can|should we", "how|what about", "let us|=let's"], critical: true },
       { id: "leave", en: "leave the hotel", ko: "호텔에서 출발하다", any: ["leave|start|depart|go"], critical: true },
@@ -527,6 +533,7 @@ export const TALK_VISIT: Question[] = [
     ],
     pitfalls: [
       { id: "if-have-would", pattern: "re:\\bif i have(?= .*\\bwould\\b)", category: "tense", severity: "major", fix: "if I had", messageKo: "지금 사실과 다른 가정(시간이 더 있다면)은 'If + 과거형, would + 동사원형'입니다: 'If I had more time, I would …'.", skill: "cond-2" },
+      { id: "love-to-ing", pattern: "love|like to =seeing|=visiting|=going", category: "verb-form", severity: "major", fix: "love to see", messageKo: "'would love to' 뒤에는 동사원형이 옵니다: 'I would love to see it'." },
       { id: "had-will", pattern: "re:(?<=\\bif i had .{0,30})\\bi will (?=love|like|want|go|see|visit)", category: "tense", severity: "major", fix: "I would", messageKo: "'If I had …'로 가정했다면 결과도 'would + 동사원형'입니다. 'I will love'가 아니라 'I would love'입니다.", skill: "cond-2" },
     ],
     hints: { pattern: "If I had + 명사, I would + 동사원형. Next time, you should …", skeleton: "Unfortunately, no. If I ___ more time, I _____ love to see it. Next time, …", partial: "Unfortunately, no. If I had more time, I would…" },
@@ -563,7 +570,7 @@ export const TALK_VISIT: Question[] = [
     meaning: [
       { id: "kind", en: "that's very kind of you", ko: "감사한 말씀", any: ["kind|thank|thanks|appreciate|nice"] },
       { id: "afraid", en: "but I'm afraid", ko: "죄송하지만", any: ["but|unfortunately|afraid"], critical: true },
-      { id: "cant", en: "I can't make it tonight", ko: "오늘 저녁은 어렵다", any: ["not ... make|join|come|go|attend", "unable"], critical: true },
+      { id: "cant", en: "I can't make it tonight", ko: "오늘 저녁은 어렵다", any: ["not ... make|join|come|go|attend|work", "unable"], critical: true },
       { id: "flight", en: "my flight is at six", ko: "6시 비행기", any: ["flight|plane"], critical: true },
       { id: "six", en: "at six tomorrow morning", ko: "내일 아침 6시", any: ["six|6|6am"] },
       { id: "bed-early", en: "go to bed early", ko: "일찍 자야 한다", any: ["bed|sleep|rest|early"] },

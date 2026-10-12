@@ -20,7 +20,7 @@ export const TALK_DISCUSSION: Question[] = [
     segments: ["네,", "저는 동의해요", "당신 의견에"],
     reference: "Yes, I agree with you.",
     accepted: ["I agree with you.", "Yes, I agree.", "I agree with you, Sari."],
-    meaning: [{ id: "agree", en: "I agree", ko: "동의하다", any: ["agree"], critical: true }],
+    meaning: [{ id: "agree", en: "I agree", ko: "동의하다", any: ["re:(?<!\\bnot (?:\\w+ ){0,2})\\bagree(d|s)?\\b", "re:\\bnot agree more\\b", "re:(?<!\\bnot )\\bthink so (too|as well)\\b", "re:(?<!\\bnot (?:\\w+ )?)\\b(i am|we are) (totally |completely |fully |definitely |100 )?with you\\b", "re:(?<!\\bnot (?:\\w+ ){0,3})\\byou are (absolutely |totally |completely |quite |so )?right\\b", "re:(?<!\\bnot )\\bfeel the same\\b", "re:\\bwhat i (think|thought) too\\b", "re:(?<!\\bnot )\\bexactly what i (think|thought)\\b"], critical: true }],
     pitfalls: [
       { id: "am-agree", pattern: "=am|=are agree", category: "be-verb", severity: "major", fix: "agree", messageKo: "agree는 그 자체가 동사라서 be동사 없이 'I agree'라고 합니다. 'I am agree'는 틀린 형태입니다." },
       { id: "agree-to-you", pattern: "agree to you", category: "preposition", severity: "major", fix: "agree with you", messageKo: "사람의 의견에 동의할 때는 'agree with + 사람'입니다. 'agree to'는 제안이나 조건을 받아들일 때 씁니다." },
@@ -58,6 +58,7 @@ export const TALK_DISCUSSION: Question[] = [
     ],
     pitfalls: [
       { id: "no-do", pattern: "re:(?<=^(sorry |excuse me )?)what you mean\\b", category: "sentence-structure", severity: "major", fix: "what do you mean", messageKo: "의문문이라 'do'가 필요합니다: 'What do you mean by …?'. 'What you mean'은 질문이 되지 않습니다." },
+      { id: "what-is-mean", pattern: "what =is mean", category: "verb-form", severity: "major", fix: "what do you mean", messageKo: "be동사 뒤에 동사원형 mean을 쓸 수 없습니다. 상대가 쓴 말의 뜻은 'What do you mean by …?'로 묻습니다." },
       { id: "what-means", pattern: "what =means", category: "sentence-structure", severity: "major", fix: "what do you mean by", messageKo: "'What means margin?'은 영어 어순이 아닙니다. 상대가 쓴 말의 뜻은 'What do you mean by margin?'으로 묻습니다." },
       { id: "mean-about", pattern: "mean about|=of", category: "preposition", severity: "major", fix: "mean by", messageKo: "'~라는 말이 무슨 뜻이냐'는 'mean by + 단어'입니다. about이나 of를 쓰지 않습니다." },
     ],
@@ -87,7 +88,7 @@ export const TALK_DISCUSSION: Question[] = [
     reference: "It's still too early to decide.",
     accepted: ["It's too early to decide.", "I think it's still too early to decide.", "It's still too early to make a decision."],
     meaning: [
-      { id: "too-early", en: "too early", ko: "너무 이르다", any: ["too early|soon"], critical: true },
+      { id: "too-early", en: "too early", ko: "너무 이르다", any: ["re:(?<!\\bnot )\\btoo (early|soon)\\b"], critical: true },
       { id: "decide", en: "to decide", ko: "결정하기", any: ["decide|decision|choose"], critical: true },
     ],
     pitfalls: [
@@ -124,7 +125,7 @@ export const TALK_DISCUSSION: Question[] = [
     meaning: [
       { id: "actually", en: "actually", ko: "사실", any: ["actually", "in fact", "sorry", "well"] },
       { id: "schedule", en: "the schedule", ko: "일정", any: ["schedule|plan|timeline|date"] },
-      { id: "changed", en: "has changed", ko: "바뀌었다", any: ["change|move"], critical: true },
+      { id: "changed", en: "has changed", ko: "바뀌었다", any: ["re:(?<!\\bnot (?:been )?)\\b(chang|mov|updat|revis|reschedul)(e|ed|es|ing)\\b", "re:(?<!\\bnot (?:been )?)\\bshift(ed|s|ing)?\\b"], critical: true },
     ],
     pitfalls: [
       { id: "is-changed", pattern: "schedule|plan =is =changed", category: "tense", severity: "major", fix: "schedule has changed", messageKo: "'is changed'는 '바뀐 상태로 되어 있다'는 수동 상태처럼 들립니다. 이미 바뀌어서 지금 상황이 달라졌다면 현재완료 'has changed'를 씁니다." },
@@ -156,11 +157,12 @@ export const TALK_DISCUSSION: Question[] = [
     reference: "I partly agree with you.",
     accepted: ["I agree with you to some extent.", "I partly agree.", "I agree with you up to a point."],
     meaning: [
-      { id: "partly", en: "partly / to some extent", ko: "부분적으로", any: ["partly|partially", "to some extent|degree", "up to a point", "some of"], critical: true },
+      { id: "partly", en: "partly / to some extent", ko: "부분적으로", any: ["partly|partially", "to some extent|degree", "up to a point", "some of", "certain extent|degree", "in part", "part of", "some point|points|parts", "not ... completely|entirely|fully|totally"], critical: true },
       { id: "agree", en: "I agree", ko: "동의하다", any: ["agree"], critical: true },
     ],
     pitfalls: [
       { id: "am-partly-agree", pattern: "=am|=are partly|partially agree", category: "be-verb", severity: "major", fix: "partly agree", messageKo: "agree는 일반동사라서 be동사와 함께 쓰지 않습니다: 'I partly agree'." },
+      { id: "agree-to-you", pattern: "agree to you", category: "preposition", severity: "major", fix: "agree with you", messageKo: "사람의 의견에 동의할 때는 'agree with + 사람'입니다. 'agree to'는 제안이나 조건을 받아들일 때 씁니다." },
       { id: "half-agree", pattern: "half agree", category: "word-choice", severity: "major", fix: "partly agree", messageKo: "'half agree'는 영어에서 쓰지 않는 표현입니다. 'partly agree' 또는 'agree to some extent'라고 합니다." },
     ],
     hints: { pattern: "I partly agree (with + 사람)", skeleton: "I ______ agree with you.", partial: "I partly…" },
@@ -189,12 +191,13 @@ export const TALK_DISCUSSION: Question[] = [
     promptKo: "알겠습니다. 언제까지 필요하세요?",
     segments: ["알겠습니다.", "언제", "필요하세요", "그것이", "~까지"],
     reference: "Sure. When do you need it by?",
-    accepted: ["Sure. By when do you need it?", "Sure. When do you need the datasheet by?", "No problem. When do you need it by?"],
+    accepted: ["Sure. By when do you need it?", "Sure. When do you need the datasheet by?", "No problem. When do you need it by?", "Sure. When do you need the datasheet?"],
     meaning: [
-      { id: "when", en: "when … by", ko: "언제까지", any: ["when"], critical: true },
-      { id: "need", en: "do you need it", ko: "필요하세요", any: ["need|want|require"], critical: true },
+      { id: "when", en: "when … by", ko: "언제까지", any: ["when", "deadline"], critical: true },
+      { id: "need", en: "do you need it", ko: "필요하세요", any: ["need|want|require|like|deadline", "send|deliver|ready"], critical: true },
     ],
     pitfalls: [
+      { id: "it-until", pattern: "re:\\b(until|till)$", category: "preposition", severity: "major", fix: "by", messageKo: "마감(언제까지)을 물을 때는 until이 아니라 by를 씁니다: 'When do you need it by?'" },
       { id: "until-when", pattern: "until|till when", category: "preposition", severity: "major", fix: "by when", messageKo: "'until'은 '그때까지 계속'이라는 뜻이라 마감을 물을 때는 맞지 않습니다. 마감은 'When do you need it by?' 또는 'By when …?'으로 묻습니다." },
       { id: "no-do", pattern: "re:(?<=^(\\w+ ){0,2})when you need\\b", category: "sentence-structure", severity: "major", fix: "when do you need", messageKo: "의문문에는 do가 필요합니다: 'When do you need it by?'. 'When you need it?'은 질문 어순이 아닙니다." },
     ],
@@ -228,13 +231,14 @@ export const TALK_DISCUSSION: Question[] = [
       "Great. Can you send us the test report by Friday?",
     ],
     meaning: [
-      { id: "could-you", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "please"], critical: true },
-      { id: "send", en: "send", ko: "보내다", any: ["send|share|email|forward"], critical: true },
+      { id: "could-you", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "please", "could|can|may we|i", "possible"], critical: true },
+      { id: "send", en: "send", ko: "보내다", any: ["send|share|email|forward", "get|have|receive ... report|result|results"], critical: true },
       { id: "report", en: "the test report", ko: "시험 보고서", any: ["report", "result|results"], critical: true },
       { id: "friday", en: "by Friday", ko: "금요일까지", any: ["friday"] },
     ],
     pitfalls: [
       { id: "until-friday", pattern: "until|till friday", category: "preposition", severity: "major", fix: "by Friday", messageKo: "마감(~까지)은 'by Friday'입니다. 'until Friday'는 '금요일까지 계속'이라는 뜻이라 보내는 시점에는 맞지 않습니다." },
+      { id: "could-you-ing", pattern: "could|can|would you =sending|=sharing|=emailing", category: "verb-form", severity: "major", fix: "could you send", messageKo: "조동사 could 뒤에는 동사원형이 옵니다: 'Could you send …?'. -ing 형태를 쓰지 않습니다." },
       { id: "send-to-us-the", pattern: "send to us the", category: "word-order", severity: "major", fix: "send us the", messageKo: "'send + 사람 + 물건' 또는 'send + 물건 + to + 사람' 순서로 씁니다. 'send to us the report'는 어순이 어색합니다." },
     ],
     hints: { pattern: "Could you + 동사원형 + 사람 + 물건 + by + 요일?", skeleton: "Great. Could you ____ us the test report __ Friday?", partial: "Great. Could you send us…" },
@@ -270,10 +274,10 @@ export const TALK_DISCUSSION: Question[] = [
     ],
     meaning: [
       { id: "think", en: "I think", ko: "제 생각엔", any: ["think|suggest|maybe|probably", "in my view|opinion"] },
-      { id: "should", en: "we should", ko: "~해야 한다", any: ["should|must", "need to", "have to", "let us|=let's"] },
+      { id: "should", en: "we should", ko: "~해야 한다", any: ["should|must|would", "need to", "have to", "let us|=let's"] },
       { id: "check", en: "check", ko: "확인하다", any: ["check|inspect|verify|confirm|measure", "look at"], critical: true },
       { id: "pressure", en: "steam pressure", ko: "스팀 압력", any: ["pressure"], term: true, critical: true },
-      { id: "first", en: "first", ko: "먼저", any: ["first"] },
+      { id: "first", en: "first", ko: "먼저", any: ["first", "start|begin by|with"] },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|so"] },
       { id: "temp-low", en: "the outlet temperature is low", ko: "출구 온도가 낮다", any: ["temperature ... low|lower|down|drop"], critical: true },
     ],
@@ -310,11 +314,11 @@ export const TALK_DISCUSSION: Question[] = [
       "We're still waiting for the lab results, so we can't make a decision yet.",
     ],
     meaning: [
-      { id: "waiting", en: "still waiting for", ko: "아직 기다리고 있다", any: ["wait"], critical: true },
+      { id: "waiting", en: "still waiting for", ko: "아직 기다리고 있다", any: ["wait", "not ... receive|get|got|have"], critical: true },
       { id: "results", en: "the lab results", ko: "실험실 결과", any: ["result|results|data|analysis|report"], critical: true },
       { id: "still", en: "still", ko: "아직", any: ["still"] },
       { id: "so", en: "so", ko: "그래서", any: ["so|because|since|therefore"] },
-      { id: "cant-decide", en: "can't decide yet", ko: "아직 결정할 수 없다", any: ["not ... decide|decision|choose|confirm|finalize"], critical: true },
+      { id: "cant-decide", en: "can't decide yet", ko: "아직 결정할 수 없다", any: ["not ... decide|decision|choose|confirm|finalize", "too early|soon"], critical: true },
     ],
     pitfalls: [
       { id: "still-wait", pattern: "we still =wait", category: "tense", severity: "major", fix: "we are still waiting", messageKo: "지금 진행 중인 일은 현재진행형 'are waiting'입니다. 'We still wait'는 '평소에 늘 기다린다'는 뜻처럼 들립니다." },
@@ -354,7 +358,7 @@ export const TALK_DISCUSSION: Question[] = [
     ],
     meaning: [
       { id: "you", en: "have you (had a chance)", ko: "보실 기회가 있으셨어요", any: ["have you", "did you", "chance"] },
-      { id: "look", en: "look at / review", ko: "검토하다", any: ["look|review|check|see|read", "go through"], critical: true },
+      { id: "look", en: "look at / review", ko: "검토하다", any: ["look|review|check|see|read", "go through|over"], critical: true },
       { id: "drawings", en: "the drawings", ko: "도면", any: ["drawing|drawings|layout"], term: true, critical: true },
       { id: "sent", en: "we sent", ko: "우리가 보낸", any: ["send|share|submit"] },
       { id: "last-week", en: "last week", ko: "지난주에", any: ["last week"] },
@@ -395,9 +399,9 @@ export const TALK_DISCUSSION: Question[] = [
       "I understand, but I'm not sure we need a dryer that big.",
     ],
     meaning: [
-      { id: "see", en: "I see what you mean", ko: "무슨 말씀인지 알겠다", any: ["see|understand|get ... mean|point", "understand"], critical: true },
+      { id: "see", en: "I see what you mean", ko: "무슨 말씀인지 알겠다", any: ["see|understand|get ... mean|point", "understand", "make sense", "fair point|enough", "i hear you"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
-      { id: "not-sure", en: "I'm not sure", ko: "잘 모르겠다", any: ["not sure|certain", "not think", "doubt"], critical: true },
+      { id: "not-sure", en: "I'm not sure", ko: "잘 모르겠다", any: ["not sure|certain|convinced", "not think", "doubt", "do we really need"], critical: true },
       { id: "need", en: "we need", ko: "필요하다", any: ["need|require"] },
       { id: "big-dryer", en: "such a big dryer", ko: "그렇게 큰 건조기", any: ["big|large|bigger|larger ... dryer", "dryer ... big|large"] },
     ],
@@ -438,7 +442,7 @@ export const TALK_DISCUSSION: Question[] = [
     meaning: [
       { id: "not-yet", en: "not yet", ko: "아직이요", any: ["yet", "still"] },
       { id: "layout", en: "the layout", ko: "배치도", any: ["layout|drawing|drawings", "plot plan"], term: true, critical: true },
-      { id: "approved", en: "hasn't been approved", ko: "승인되지 않았다", any: ["not ... approve", "approval"], critical: true },
+      { id: "approved", en: "hasn't been approved", ko: "승인되지 않았다", any: ["not ... approve", "approval", "wait ... approve", "not ... sign"], critical: true },
       { id: "client", en: "by the client", ko: "고객사", any: ["client|customer"] },
     ],
     pitfalls: [
@@ -475,14 +479,15 @@ export const TALK_DISCUSSION: Question[] = [
       "The lab results will be ready on Thursday. Why don't we meet again next Monday, after we check them?",
       "The lab results will be ready on Thursday, so why don't we meet again next Monday after checking them?",
       "We'll get the lab results on Thursday. How about meeting again next Monday after we've checked them?",
+      "The lab results will be ready on Thursday. How about meeting again next Monday after we check them?",
     ],
     meaning: [
       { id: "results", en: "the lab results", ko: "실험실 결과", any: ["result|results|data"], critical: true },
       { id: "thursday", en: "on Thursday", ko: "목요일에", any: ["thursday"], critical: true },
       { id: "suggest", en: "why don't we", ko: "~하는 게 어때요", any: ["why ... not", "how|what about", "shall|could|can we", "let us|=let's", "suggest"], critical: true },
-      { id: "meet", en: "meet again", ko: "다시 만나다", any: ["meet|meeting|discuss|talk"], critical: true },
+      { id: "meet", en: "meet again", ko: "다시 만나다", any: ["meet|meeting|discuss|talk", "get together"], critical: true },
       { id: "monday", en: "next Monday", ko: "다음 주 월요일", any: ["monday"] },
-      { id: "after-check", en: "after checking them", ko: "확인한 다음에", any: ["after|once|when ... check|review|look|see|analyze"] },
+      { id: "after-check", en: "after checking them", ko: "확인한 다음에", any: ["after|once|when ... check|review|look|see|analyze", "after|once|when ... go through|over"] },
     ],
     pitfalls: [
       { id: "after-check-base", pattern: "after =check|=review|=see", category: "verb-form", severity: "major", fix: "after checking", messageKo: "after는 전치사라서 뒤에 동사원형이 올 수 없습니다. 'after checking them' 또는 'after we check them'으로 쓰세요.", skill: "prep-gerund" },
@@ -520,13 +525,13 @@ export const TALK_DISCUSSION: Question[] = [
       "Sure. So, we agreed that Priya will send the updated datasheet by Friday and we'll check it on Monday. If there aren't any big changes, we'll place the order next week.",
     ],
     meaning: [
-      { id: "summarize", en: "let me summarize", ko: "정리할게요", any: ["summarize|summarise|summary|recap", "so"] },
+      { id: "summarize", en: "let me summarize", ko: "정리할게요", any: ["summarize|summarise|summary|recap|sum", "so"] },
       { id: "agreed", en: "we agreed that", ko: "합의했다", any: ["agree|decide"] },
       { id: "send-datasheet", en: "Priya will send the revised datasheet", ko: "수정 데이터시트를 보낸다", any: ["send|share|provide|submit ... datasheet|datasheets", "send|share|provide|submit ... data sheet"], critical: true },
       { id: "friday", en: "by Friday", ko: "금요일까지", any: ["friday"] },
       { id: "review", en: "we'll review it on Monday", ko: "월요일에 검토한다", any: ["review|check", "go through", "look at"], critical: true },
       { id: "monday", en: "on Monday", ko: "월요일에", any: ["monday"] },
-      { id: "if-no-change", en: "if there are no big changes", ko: "큰 변경이 없으면", any: ["if ... no|not|any ... change|changes|problem|problems|issue|issues", "unless"], critical: true },
+      { id: "if-no-change", en: "if there are no big changes", ko: "큰 변경이 없으면", any: ["if ... no|not|any|nothing ... change|changes|problem|problems|issue|issues", "unless", "long as ... no|not|any|nothing ... change|changes|problem|problems|issue|issues"], critical: true },
       { id: "order", en: "we'll place the order", ko: "발주하겠다", any: ["order|purchase|buy"], critical: true },
     ],
     pitfalls: [
@@ -570,8 +575,8 @@ export const TALK_DISCUSSION: Question[] = [
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
       { id: "worried", en: "I'm a little worried", ko: "좀 걱정된다", any: ["worried|worry|concerned|concern|afraid", "not sure"], critical: true },
       { id: "skip", en: "skipping the pilot test", ko: "파일럿 시험을 건너뛰기", any: ["skip|cancel|drop|=without ... pilot|test"], critical: true },
-      { id: "if-different", en: "if the feed behaves differently", ko: "원료가 다르게 반응하면", any: ["if ... different|differently"], critical: true },
-      { id: "change-design", en: "we might have to change the design", ko: "설계를 바꿔야 할 수도 있다", any: ["change|revise|modify|redo ... design"], critical: true },
+      { id: "if-different", en: "if the feed behaves differently", ko: "원료가 다르게 반응하면", any: ["if ... different|differently", "if ... not ... same"], critical: true },
+      { id: "change-design", en: "we might have to change the design", ko: "설계를 바꿔야 할 수도 있다", any: ["change|revise|modify|redo ... design", "redesign"], critical: true },
       { id: "shorter", en: "a shorter four-week test", ko: "더 짧은 4주 시험", any: ["short|shorter ... test|pilot|trial", "four-week|4-week", "four|4 weeks"], critical: true },
       { id: "what-if", en: "what if … instead", ko: "대신 ~하면 어떨까요", any: ["what if", "how|what about", "why ... not", "could|can|shall we", "instead"] },
     ],

@@ -23,6 +23,7 @@ export const TALK_SMALLTALK: Question[] = [
     meaning: [{ id: "how-been", en: "how have you been", ko: "그동안 어떻게 지냈는지", any: ["how ... been"], critical: true }],
     pitfalls: [
       { id: "are-been", pattern: "are|is|were you =been", category: "tense", severity: "major", fix: "have you been", messageKo: "'그동안 어떻게 지냈어요?'는 현재완료 'How have you been?'입니다. be동사(are)와 been을 함께 쓰지 않습니다.", skill: "present-perfect" },
+      { id: "did-you-been", pattern: "=did you =been", category: "tense", severity: "major", fix: "have you been", messageKo: "'been'은 과거분사라서 did가 아니라 have와 함께 씁니다: 'How have you been?'.", skill: "present-perfect" },
       { id: "you-have-been", pattern: "how you have been", category: "word-order", severity: "major", fix: "how have you been", messageKo: "의문문에서는 have가 주어 앞으로 나옵니다: 'How have you been?'. 'How you have been?'은 평서문 어순입니다.", skill: "question-form" },
     ],
     hints: { pattern: "How + have + 주어 + been? (그동안 지금까지)", skeleton: "How ____ you ____?", partial: "How have…" },
@@ -54,7 +55,7 @@ export const TALK_SMALLTALK: Question[] = [
     accepted: ["Morning, Sari! How was your weekend?", "Good morning! How was your weekend?", "Good morning, Sari! Did you have a good weekend?"],
     meaning: [
       { id: "greeting", en: "good morning", ko: "좋은 아침", any: ["morning", "hi|hello"] },
-      { id: "weekend-q", en: "how was your weekend", ko: "주말 어땠는지", any: ["how ... weekend", "did ... good|nice|great ... weekend"], critical: true },
+      { id: "weekend-q", en: "how was your weekend", ko: "주말 어땠는지", any: ["how ... weekend", "did ... good|nice|great ... weekend", "enjoy ... weekend", "re:(?<!\\bhave a )\\b(good|nice|great) weekend$"], critical: true },
     ],
     pitfalls: [
       { id: "was-twice", pattern: "weekend =was", category: "sentence-structure", severity: "major", fix: "weekend", messageKo: "의문문에서 was는 이미 주어 앞에 나왔으므로 끝에 다시 쓰지 않습니다: 'How was your weekend?'" },
@@ -90,6 +91,7 @@ export const TALK_SMALLTALK: Question[] = [
       { id: "promotion", en: "your promotion", ko: "승진", any: ["promotion|promoted|director|position|role"] },
     ],
     pitfalls: [
+      { id: "congrats-to", pattern: "congratulations|congrats to your|the promotion|new", category: "preposition", severity: "major", fix: "congratulations on your", messageKo: "'~을 축하해요'는 'Congratulations on + 명사'입니다. 'congratulations to'는 사람 앞에 씁니다(Congratulations to you).", skill: "verb-prep" },
       { id: "congrats-for", pattern: "congratulations|congrats for", category: "preposition", severity: "major", fix: "congratulations on", messageKo: "'~을 축하해요'는 'Congratulations on + 명사'입니다. for가 아니라 on을 씁니다.", skill: "verb-prep" },
       { id: "congratulation-s", pattern: "=congratulation", category: "word-choice", severity: "minor", fix: "congratulations", messageKo: "축하 인사는 항상 복수형 'Congratulations'입니다." },
     ],
@@ -121,10 +123,11 @@ export const TALK_SMALLTALK: Question[] = [
     reference: "It's snowing here right now!",
     accepted: ["It's snowing here now.", "It is snowing here at the moment.", "Right now, it's snowing here."],
     meaning: [
-      { id: "snowing", en: "snowing", ko: "눈이 오다", any: ["snow"], critical: true },
+      { id: "snowing", en: "snowing", ko: "눈이 오다", any: ["re:(?<!\\bnot )\\bsnow(s|ing|ed)?\\b"], critical: true },
       { id: "now", en: "right now", ko: "지금", any: ["now", "at the moment", "today"] },
     ],
     pitfalls: [
+      { id: "here-is-snowing", pattern: "here|seoul =is =snowing", category: "sentence-structure", severity: "major", fix: "it's snowing here", messageKo: "날씨는 주어 it으로 말합니다: 'It's snowing here.' 'Here is snowing'처럼 장소를 주어로 쓰지 않습니다." },
       { id: "snows-now", pattern: "it =snows", category: "tense", severity: "major", fix: "it's snowing", messageKo: "'It snows'는 '(평소에) 눈이 온다'는 뜻입니다. 지금 내리고 있는 눈은 진행형 'It's snowing'으로 말합니다." },
       { id: "is-snow", pattern: "it is =snow", category: "verb-form", severity: "major", fix: "it is snowing", messageKo: "be동사 뒤에 동사원형 snow를 쓸 수 없습니다. 진행형은 'is snowing'입니다." },
     ],
@@ -152,10 +155,10 @@ export const TALK_SMALLTALK: Question[] = [
     promptKo: "좋았어요. 가족이랑 캠핑 갔어요.",
     segments: ["좋았어요.", "저는 캠핑 갔어요", "가족과 함께"],
     reference: "It was great. I went camping with my family.",
-    accepted: ["It was good. I went camping with my family.", "It was really nice. I went camping with my family.", "Great, thanks. I went camping with my family."],
+    accepted: ["It was good. I went camping with my family.", "It was really nice. I went camping with my family.", "Great, thanks. I went camping with my family.", "It was great. We went camping as a family."],
     meaning: [
-      { id: "good", en: "it was great", ko: "좋았어요", any: ["great|good|nice|fun|wonderful|fantastic|relaxing"] },
-      { id: "camping", en: "went camping", ko: "캠핑 갔어요", any: ["camp|camping"], critical: true },
+      { id: "good", en: "it was great", ko: "좋았어요", any: ["great|good|nice|fun|wonderful|fantastic|relaxing|lovely|amazing|awesome|excellent|perfect"] },
+      { id: "camping", en: "went camping", ko: "캠핑 갔어요", any: ["re:(?<!\\bnot (?:\\w+ )?)\\bcamp(ing|ed|s)?\\b"], critical: true },
       { id: "family", en: "with my family", ko: "가족과 함께", any: ["family|wife|kids|children|parents"] },
     ],
     pitfalls: [
@@ -192,6 +195,7 @@ export const TALK_SMALLTALK: Question[] = [
       "Yes, I did. Thank you for helping me with the hotel booking.",
       "Yes, I got it. Thanks for helping me with the hotel reservation.",
       "Yes, I received it. Thank you for your help with the hotel booking.",
+      "Yes, got it. Thank you for helping me with the hotel booking.",
     ],
     meaning: [
       { id: "got-it", en: "I got it", ko: "받았어요", any: ["yes|yeah|got|received|receive|=did"] },
@@ -239,6 +243,7 @@ export const TALK_SMALLTALK: Question[] = [
       { id: "doing", en: "how are … doing", ko: "잘 지내요?", any: ["how ... are|doing|is", "are ... doing|well|okay|ok|fine"] },
     ],
     pitfalls: [
+      { id: "do-wife-doing", pattern: "=do|=does your? wife and the? baby =doing", category: "be-verb", severity: "major", fix: "are your wife and the baby doing", messageKo: "진행형 'doing'은 be동사와 함께 씁니다: 'How are your wife and the baby doing?'. do와 -ing를 섞지 않습니다." },
       { id: "is-wife-and", pattern: "=is your? wife and", category: "agreement", severity: "major", fix: "are your wife and", messageKo: "주어가 'your wife and the baby' 두 사람이므로 복수 be동사 are를 씁니다. 'How is your wife and …'가 아니라 'How are your wife and …'입니다." },
     ],
     hints: { pattern: "How + are + 주어(A and B) + doing?", skeleton: "Congratulations! How ____ your wife and the baby ______?", partial: "Congratulations! How are…" },
@@ -274,7 +279,7 @@ export const TALK_SMALLTALK: Question[] = [
       "Let's wait a few minutes for Daniel to join.",
     ],
     meaning: [
-      { id: "wait", en: "let's wait", ko: "기다려요", any: ["wait"], critical: true },
+      { id: "wait", en: "let's wait", ko: "기다려요", any: ["re:(?<!\\bnot )\\bwait(s|ed|ing)?\\b", "give ... minute|minutes|moment|bit|while", "hold|hang on"], critical: true },
       { id: "minutes", en: "a few minutes", ko: "몇 분", any: ["minute|minutes|moment|bit|while"] },
       { id: "daniel-joins", en: "until Daniel joins", ko: "다니엘 씨가 들어올 때까지", any: ["daniel ... join|come|arrive|connect|log|here", "until|till ... daniel", "wait ... for ... daniel"], critical: true },
     ],
@@ -314,9 +319,9 @@ export const TALK_SMALLTALK: Question[] = [
     ],
     meaning: [
       { id: "like", en: "I like it", ko: "좋아요", any: ["like|great|good|nice|love"] },
-      { id: "bigger", en: "much bigger", ko: "훨씬 더 넓다", any: ["bigger|larger|wider|roomier", "more spacious|space|room", "big|large"], critical: true },
+      { id: "bigger", en: "much bigger", ko: "훨씬 더 넓다", any: ["re:(?<!\\bnot (?:\\w+ )?)\\b(bigger|larger|wider|roomier|big|large)\\b", "re:(?<!\\bnot (?:\\w+ )?)\\bmore (\\w+ )?(spacious|space|room)\\b"], critical: true },
       { id: "than-old", en: "than the old one", ko: "예전 사무실보다", any: ["than", "old|previous"] },
-      { id: "closer", en: "closer to my home", ko: "집에서 더 가깝다", any: ["closer|nearer|close|near ... home|house"], critical: true },
+      { id: "closer", en: "closer to my home", ko: "집에서 더 가깝다", any: ["re:(?<!\\bnot (?:\\w+ )?)\\b(closer|nearer|close|near)\\b.{0,30}\\b(home|house|live|place|apartment|flat)\\b", "commute ... shorter|short|easier|quicker|better", "shorter|easier|quicker ... commute"], critical: true },
     ],
     pitfalls: [
       { id: "very-bigger", pattern: "more|very =bigger|=larger", category: "word-choice", severity: "major", fix: "much bigger", messageKo: "'훨씬 더 넓다'는 'much bigger'입니다. 비교급 앞에는 very를 쓰지 않고, bigger는 이미 비교급이라 more도 붙이지 않습니다." },
@@ -359,6 +364,7 @@ export const TALK_SMALLTALK: Question[] = [
       { id: "been", en: "been to Malaysia", ko: "말레이시아에 가 보다", any: ["been|go|went|gone|visit ... malaysia|kl|kuala|there"], critical: true },
     ],
     pitfalls: [
+      { id: "didnt-go-before", pattern: "i =did not =go|=visit", category: "tense", severity: "major", fix: "I have never been", messageKo: "'~에 가 본 적이 없다'는 경험이므로 현재완료 'I've never been to ~'로 말합니다. 'I didn't go'는 특정한 때에 가지 않았다는 뜻입니다.", skill: "present-perfect" },
       { id: "never-go", pattern: "have never =go|=went", category: "verb-form", severity: "major", fix: "have never been", messageKo: "'가 본 적이 없다'는 'have never been to + 장소'입니다. have 뒤에는 과거분사가 오고, 경험은 보통 been을 씁니다." },
       { id: "no-have", pattern: "i =am? never =been", category: "tense", severity: "major", fix: "I've never been", messageKo: "현재완료에는 have가 꼭 필요합니다: 'I've never been to …'. 'I never been'이나 'I am never been'은 틀린 형태입니다." },
     ],
@@ -394,8 +400,8 @@ export const TALK_SMALLTALK: Question[] = [
       "Not really. I was born in Busan, but I was raised in Seoul.",
     ],
     meaning: [
-      { id: "born", en: "was born in Busan", ko: "부산에서 태어났다", any: ["born ... busan"], critical: true },
-      { id: "grew-up", en: "grew up in Seoul", ko: "서울에서 자랐다", any: ["grow|raised ... seoul"], critical: true },
+      { id: "born", en: "was born in Busan", ko: "부산에서 태어났다", any: ["born ... busan", "from busan"], critical: true },
+      { id: "grew-up", en: "grew up in Seoul", ko: "서울에서 자랐다", any: ["grow|raised ... seoul", "bring up ... seoul", "childhood ... seoul", "seoul since ... kid|child|young|little|small|baby"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|though|although|however"] },
     ],
     pitfalls: [
@@ -477,10 +483,10 @@ export const TALK_SMALLTALK: Question[] = [
     ],
     meaning: [
       { id: "great", en: "that's great", ko: "잘됐네요", any: ["great|good|wonderful|nice"] },
-      { id: "long-time", en: "it's been a long time", ko: "오래됐어요", any: ["long time|while", "been ... while", "ages"], critical: true },
+      { id: "long-time", en: "it's been a long time", ko: "오래됐어요", any: ["long time|while", "been ... while", "ages", "been ... long"], critical: true },
       { id: "met", en: "since we last met", ko: "만난 이후로", any: ["met|meet|seen|see"], critical: true },
       { id: "coffee", en: "have coffee", ko: "커피 한잔", any: ["coffee"], critical: true },
-      { id: "suggest", en: "let's / why don't we", ko: "~해요 (제안)", any: ["let us", "why ... we", "shall we", "how about", "would you like"] },
+      { id: "suggest", en: "let's / why don't we", ko: "~해요 (제안)", any: ["let us", "why ... we", "shall we", "how about", "would you like", "we should|could|must"] },
       { id: "while-seoul", en: "while you're in Seoul", ko: "서울에 계시는 동안", any: ["seoul|here"] },
     ],
     pitfalls: [
@@ -527,6 +533,7 @@ export const TALK_SMALLTALK: Question[] = [
       { id: "stay-home", en: "just stay home and rest", ko: "그냥 집에서 쉬다", any: ["stay|rest|relax ... home", "home"] },
     ],
     pitfalls: [
+      { id: "if-would", pattern: "if i =would", category: "tense", severity: "major", fix: "if I had", messageKo: "if 절에는 would를 쓰지 않습니다. 사실과 반대인 가정은 'If I had more time, I would …'처럼 if 절에 과거형을 씁니다." },
       { id: "if-have", pattern: "if i =have more time", category: "tense", severity: "major", fix: "if I had more time", messageKo: "실제로는 시간이 없는 상황을 가정하므로 'If I had more time, I would …'(과거형 + would)를 씁니다. 'If I have'는 실제로 시간이 생길 수 있을 때 씁니다." },
       { id: "had-will", pattern: "time i =will", category: "tense", severity: "major", fix: "time, I would", messageKo: "'If I had …' 가정의 결과는 'I would + 동사원형'입니다. 'I will'을 쓰면 실제 계획처럼 들립니다." },
     ],

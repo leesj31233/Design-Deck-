@@ -20,7 +20,7 @@ export const TALK_ONLINE: Question[] = [
     reference: "Sure, let me share my screen.",
     accepted: ["Sure, I'll share my screen.", "Yes, let me share my screen.", "Sure. Let me share my screen."],
     meaning: [
-      { id: "let-me", en: "let me / I'll", ko: "제가 ~할게요", any: ["let me", "i will", "i am going to"], critical: true },
+      { id: "let-me", en: "let me / I'll", ko: "제가 ~할게요", any: ["let me", "i will", "i am going to", "=sharing"], critical: true },
       { id: "share", en: "share my screen", ko: "화면을 공유", any: ["share ... screen"], critical: true },
     ],
     pitfalls: [
@@ -53,12 +53,14 @@ export const TALK_ONLINE: Question[] = [
     reference: "Can you hear me okay?",
     accepted: ["Can you hear me?", "Can you hear me all right?", "Can everyone hear me?"],
     meaning: [
-      { id: "hear-me", en: "hear me", ko: "제 목소리가 들리다", any: ["hear ... me", "hear ... my voice", "audio|sound|voice|mic ... okay|ok|clear|fine|good|working"], critical: true },
-      { id: "can", en: "can you …?", ko: "~할 수 있나요?", any: ["can|could", "is|are ... okay|ok|clear|fine|good|working"] },
+      { id: "hear-me", en: "hear me", ko: "제 목소리가 들리다", any: ["hear ... me", "hear ... my voice", "audio|sound|voice|mic ... okay|ok|clear|fine|good|working", "come through"], critical: true },
+      { id: "can", en: "can you …?", ko: "~할 수 있나요?", any: ["can|could", "is|are ... okay|ok|clear|fine|good|working", "is ... come through"] },
     ],
     pitfalls: [
       { id: "listen", pattern: "listen", category: "word-choice", severity: "major", fix: "hear", messageKo: "'listen (to)'은 '귀 기울여 듣다'라는 의도적인 행동입니다. 소리가 들리는지 확인할 때는 'Can you hear me?'처럼 'hear'를 씁니다." },
       { id: "do-you-can", pattern: "do|does you can", category: "word-order", severity: "major", fix: "can you", messageKo: "조동사 can이 있는 의문문은 'Can you ~?'입니다. 'Do you can'처럼 do와 can을 함께 쓰지 않습니다." },
+      { id: "am-come-through", pattern: "re:(?<=\\b(am|is|are) (i|it|you|my \\w+|the \\w+) )come through\\b", category: "be-verb", severity: "major", fix: "coming through", messageKo: "be동사 뒤에 동사원형을 쓸 수 없습니다. 진행형으로 'Am I coming through okay?'라고 합니다." },
+      { id: "can-you-hearing", pattern: "can|could you =hearing", category: "verb-form", severity: "major", fix: "can you hear", messageKo: "조동사 can 뒤에는 동사원형이 옵니다: 'Can you hear me?'. 'hearing'처럼 -ing 형태를 쓰지 않습니다." },
     ],
     hints: { pattern: "Can you + hear + me (+ okay)?", skeleton: "Can you ____ me okay?", partial: "Can you hear…" },
     explanationKo: "소리가 잘 들리는지 확인할 때는 'Can you hear me?'를 씁니다. 'listen'은 일부러 귀 기울이는 행동이라 여기서는 어색하고, 조동사 의문문은 'Do you can'이 아니라 'Can you ~?' 순서입니다.",
@@ -123,7 +125,7 @@ export const TALK_ONLINE: Question[] = [
     accepted: ["Sorry, my camera is not working right now.", "Sorry, my camera isn't working at the moment.", "Sorry, my camera doesn't work right now."],
     meaning: [
       { id: "camera", en: "my camera", ko: "제 카메라", any: ["camera|webcam|video"], critical: true },
-      { id: "not-working", en: "isn't working", ko: "작동하지 않다", any: ["not ... work|working", "broken"], critical: true },
+      { id: "not-working", en: "isn't working", ko: "작동하지 않다", any: ["not ... work|working", "broken", "stop working", "re:(?<!\\b(?:no|any|not an?) )\\b(?:trouble|problems?|issues?)\\b"], critical: true },
       { id: "now", en: "right now", ko: "지금", any: ["now", "moment", "today"] },
     ],
     pitfalls: [
@@ -157,7 +159,7 @@ export const TALK_ONLINE: Question[] = [
     accepted: ["Today we have three items on the agenda.", "There are three items on the agenda today.", "We have three things on the agenda today.", "We have three things to discuss today."],
     meaning: [
       { id: "three", en: "three items", ko: "세 가지", any: ["three|3"], critical: true },
-      { id: "agenda", en: "on the agenda", ko: "안건에", any: ["agenda", "discuss|cover"], critical: true },
+      { id: "agenda", en: "on the agenda", ko: "안건에", any: ["agenda", "discuss|cover", "go|=going through|over", "talk about"], critical: true },
       { id: "today", en: "today", ko: "오늘", any: ["today"] },
     ],
     pitfalls: [
@@ -197,7 +199,7 @@ export const TALK_ONLINE: Question[] = [
     meaning: [
       { id: "sorry", en: "sorry", ko: "죄송합니다", any: ["sorry", "apologize|apologise"], critical: true },
       { id: "late", en: "late", ko: "늦게", any: ["late", "delay|delayed"], critical: true },
-      { id: "problem", en: "a problem", ko: "문제", any: ["problem|problems|issue|issues|trouble", "bad|poor|slow|unstable|down|lost|dropped"], critical: true },
+      { id: "problem", en: "a problem", ko: "문제", any: ["problem|problems|issue|issues|trouble", "bad|poor|slow|unstable|down|lost|dropped", "not ... work|working|connect"], critical: true },
       { id: "connection", en: "internet connection", ko: "인터넷 연결", any: ["connection|internet|network|wifi|wi-fi", "connect"] },
     ],
     pitfalls: [
@@ -237,11 +239,12 @@ export const TALK_ONLINE: Question[] = [
     meaning: [
       { id: "froze", en: "you froze", ko: "화면이 멈췄다", any: ["froze|frozen|freeze|freezing|freezed", "stuck"], critical: true },
       { id: "could-you", en: "could you …?", ko: "~해 주시겠어요?", any: ["could|can|would you", "please"], critical: true },
-      { id: "repeat", en: "repeat", ko: "다시 말하다", any: ["repeat", "say ... again", "go ... again"], critical: true },
+      { id: "repeat", en: "repeat", ko: "다시 말하다", any: ["repeat", "say ... again", "go ... again", "go back"], critical: true },
       { id: "last-part", en: "the last part", ko: "마지막 부분", any: ["last ... part|bit|sentence|point", "what you said"] },
     ],
     pitfalls: [
       { id: "freezed", pattern: "=freezed", category: "verb-form", severity: "major", fix: "froze", messageKo: "'freeze'의 과거형은 불규칙 변화 'froze'입니다. 'freezed'라고 쓰지 않습니다." },
+      { id: "could-you-to", pattern: "could|can|would you to", category: "verb-form", severity: "major", fix: "could you", messageKo: "조동사 could 뒤에는 to 없이 동사원형이 바로 옵니다: 'Could you repeat …?'" },
       { id: "repeat-again", pattern: "repeat ... again", category: "word-choice", severity: "minor", fix: "repeat", messageKo: "'repeat'에 이미 '다시'라는 뜻이 있어서 'again'을 붙이지 않습니다. 'Could you repeat the last part?' 또는 'Could you say that again?'이라고 합니다." },
     ],
     hints: { pattern: "Could you + 동사원형 + 목적어?", skeleton: "Sorry, you _____ for a moment. Could you ______ the last part?", partial: "Sorry, you froze for a moment. Could you…" },
@@ -275,9 +278,9 @@ export const TALK_ONLINE: Question[] = [
       "Let's wait for a few more minutes until Mr. Tan joins.",
     ],
     meaning: [
-      { id: "wait", en: "wait", ko: "기다리다", any: ["wait", "give ... minutes"], critical: true },
+      { id: "wait", en: "wait", ko: "기다리다", any: ["re:(?<!\\bnot )\\bwait(s|ed|ing)?\\b", "give ... minutes", "hold|hang on"], critical: true },
       { id: "minutes", en: "a few more minutes", ko: "몇 분 더", any: ["minute|minutes|moment"] },
-      { id: "until-joins", en: "until Mr. Tan joins", ko: "들어올 때까지", any: ["until|till ... join|here|arrive|come|connect", "for ... to join|arrive|come|connect", "wait for ... tan"], critical: true },
+      { id: "until-joins", en: "until Mr. Tan joins", ko: "들어올 때까지", any: ["until|till ... join|here|arrive|come|connect", "for ... to join|arrive|come|connect", "wait for ... tan", "minute|minutes|moment|bit|while for ... tan", "give ... tan"], critical: true },
       { id: "tan", en: "Mr. Tan", ko: "Mr. Tan", any: ["tan"] },
     ],
     pitfalls: [
@@ -319,11 +322,12 @@ export const TALK_ONLINE: Question[] = [
       { id: "all", en: "that's all", ko: "여기까지입니다", any: ["that ... all|everything|it", "finish|finished|done"] },
       { id: "budi", en: "Budi", ko: "부디 씨", any: ["budi"] },
       { id: "would-like", en: "would you like to …?", ko: "~하시겠어요?", any: ["would you like", "do you want", "could|can|would you", "please", "over to"], critical: true },
-      { id: "next", en: "go next", ko: "다음에 하다", any: ["next", "your turn", "over to", "take over", "continue", "go ahead"], critical: true },
+      { id: "next", en: "go next", ko: "다음에 하다", any: ["next", "your turn", "over to", "take over", "continue", "go ahead", "take ... from here", "start|begin"], critical: true },
     ],
     pitfalls: [
-      { id: "like-go", pattern: "like =go", category: "verb-form", severity: "major", fix: "like to go", messageKo: "'would you like' 뒤에 동사가 오면 'to + 동사원형'입니다: 'Would you like to go next?'" },
-      { id: "want-go", pattern: "want =go", category: "verb-form", severity: "major", fix: "want to go", messageKo: "'want' 뒤에 동사가 오면 'to + 동사원형'입니다: 'Do you want to go next?'" },
+      { id: "like-go", pattern: "like =go|=going", category: "verb-form", severity: "major", fix: "like to go", messageKo: "'would you like' 뒤에 동사가 오면 'to + 동사원형'입니다: 'Would you like to go next?'" },
+      { id: "to-taking", pattern: "to =taking", category: "verb-form", severity: "major", fix: "to take", messageKo: "'would like to' 뒤에는 동사원형이 옵니다: 'Would you like to take it from here?'" },
+      { id: "want-go", pattern: "want =go|=going", category: "verb-form", severity: "major", fix: "want to go", messageKo: "'want' 뒤에 동사가 오면 'to + 동사원형'입니다: 'Do you want to go next?'" },
     ],
     hints: { pattern: "Would you like to + 동사원형?", skeleton: "That's all from my side. Budi, would you ____ __ go next?", partial: "That's all from my side. Budi, would you…" },
     explanationKo: "다음 사람에게 순서를 넘길 때는 'Would you like to + 동사원형?'으로 정중하게 권합니다. like와 want 뒤에 동사가 오면 반드시 to가 필요해서 'would you like go'는 틀립니다.",
@@ -399,8 +403,8 @@ export const TALK_ONLINE: Question[] = [
     ],
     meaning: [
       { id: "dont-worry", en: "don't worry", ko: "걱정 마세요", any: ["worry|worries", "problem", "fine"] },
-      { id: "recorded", en: "is being recorded", ko: "녹화되고 있다", any: ["meeting|call|this ... record", "record ... meeting|call|this"], critical: true },
-      { id: "shared", en: "will be shared", ko: "공유될 것이다", any: ["share|send|sent|upload|circulate|distribute"], critical: true },
+      { id: "recorded", en: "is being recorded", ko: "녹화되고 있다", any: ["re:\\b(meeting|call|this)( (?!not\\b)\\w+){0,5} record(ed|ing)?\\b", "re:(?<!\\bnot )\\brecord(ing|ed|s)?( \\w+){0,3} (meeting|call|this)\\b"], critical: true },
+      { id: "shared", en: "will be shared", ko: "공유될 것이다", any: ["re:(?<!\\bnot (?:be )?)\\b(share|shared|shares|sharing|send|sends|sent|sending|upload|uploaded|uploading|circulate|circulated|distribute|distributed)\\b", "re:\\b(will|can|would) (get|receive|access|have) (the |a )?(recording|video|file|link)\\b", "re:\\b(will|would|is|are) (be )?(made )?available\\b"], critical: true },
       { id: "everyone", en: "with everyone", ko: "모두에게", any: ["everyone|everybody|all|team"] },
       { id: "after", en: "after the call", ko: "회의 후에", any: ["after|afterwards|afterward|later"] },
     ],
@@ -439,11 +443,12 @@ export const TALK_ONLINE: Question[] = [
       "No, that's all from our side. Thank you all for your time today. We're looking forward to seeing the lab results next week.",
       "No, that's all from our side. Thank you all for joining today. We're looking forward to getting the lab results next week.",
       "No, that's all from our side. Thank you all for joining today. I'm looking forward to seeing the lab results next week.",
+      "No, that's all from our side. Thank you all for joining today. Looking forward to seeing the lab results next week.",
     ],
     meaning: [
       { id: "thats-all", en: "that's all", ko: "그게 다입니다", any: ["that ... all|everything|it", "nothing"] },
       { id: "thanks", en: "thank you for", ko: "감사합니다", any: ["thank|thanks", "appreciate"], critical: true },
-      { id: "joining", en: "joining", ko: "참석해 주셔서", any: ["join|joining|time|attend|attending|come|coming"] },
+      { id: "joining", en: "joining", ko: "참석해 주셔서", any: ["join|joining|time|attend|attending|come|coming", "=being here|there"] },
       { id: "look-forward", en: "looking forward to", ko: "기대하다", any: ["look|looking forward"], critical: true },
       { id: "results", en: "the lab results", ko: "실험실 결과", any: ["result|results|data|report"], critical: true },
       { id: "next-week", en: "next week", ko: "다음 주", any: ["next week"] },
@@ -486,7 +491,7 @@ export const TALK_ONLINE: Question[] = [
     meaning: [
       { id: "five-min", en: "five minutes left", ko: "5분 남았다", any: ["five|5 ... minute|minutes"], critical: true },
       { id: "only", en: "only … left", ko: "~밖에 안 남았다", any: ["only|left|remaining|remain|just"] },
-      { id: "too-late", en: "too late to start", ko: "시작하기에 너무 늦다", any: ["too late", "not enough time"], critical: true },
+      { id: "too-late", en: "too late to start", ko: "시작하기에 너무 늦다", any: ["too late", "not enough time", "not ... enough time"], critical: true },
       { id: "schedule", en: "the schedule review", ko: "일정 검토", any: ["schedule"] },
       { id: "move", en: "move it to next week", ko: "다음 주로 넘기다", any: ["move|postpone|push|shift|continue|discuss|do ... next week", "next week"], critical: true },
       { id: "shall-we", en: "shall we …?", ko: "~할까요?", any: ["shall|can|could|should|why ... we", "let", "how about"] },
@@ -526,7 +531,7 @@ export const TALK_ONLINE: Question[] = [
       "To sum up, Budi will check the dryer data, and Sari will update the schedule. I'll send the meeting minutes by email after the call. If anything is wrong, please let me know by Friday.",
     ],
     meaning: [
-      { id: "sum-up", en: "to sum up", ko: "정리하면", any: ["sum|summarize|summarise|summary|recap", "so"] },
+      { id: "sum-up", en: "to sum up", ko: "정리하면", any: ["sum|summarize|summarise|summary|recap|wrap", "so"] },
       { id: "budi-check", en: "Budi will check the data", ko: "부디 씨는 데이터를 확인", any: ["budi ... check|review|confirm|look|verify"], critical: true },
       { id: "sari-update", en: "Sari will update the schedule", ko: "사리 씨는 일정을 업데이트", any: ["sari ... update|revise|change|modify"], critical: true },
       { id: "send-minutes", en: "send the minutes", ko: "회의록을 보내다", any: ["send|email|share|circulate ... minute|minutes|summary|notes"], critical: true },
@@ -570,9 +575,10 @@ export const TALK_ONLINE: Question[] = [
       "I see your point, but I'm not sure we can finalize the layout by email, because the pipe routing depends on the vendor drawings and we're still waiting for them. Could we have a quick call on Tuesday instead?",
       "I see your point, but I don't think we can finalize the layout by email. The pipe routing depends on the vendor drawings, and we're still waiting for them. Could we have a short call on Tuesday instead?",
       "I see your point, but I'm not sure we can finalize the layout by email. The pipe routing depends on the vendor drawings, which we're still waiting for. Could we have a short call on Tuesday instead?",
+      "I see your point, but I'm not sure we can finalize the layout by email. The pipe routing depends on the vendor drawings, and we haven't received them yet. Could we have a short call on Tuesday instead?",
     ],
     meaning: [
-      { id: "see-point", en: "I see your point", ko: "말씀은 알겠다", any: ["see|understand ... point", "understand", "i see"] },
+      { id: "see-point", en: "I see your point", ko: "말씀은 알겠다", any: ["see|understand|get ... point", "understand", "i see", "see|know what you mean", "make sense", "fair point|enough"] },
       { id: "not-sure", en: "I'm not sure", ko: "잘 모르겠다", any: ["not sure|certain", "not ... think", "doubt", "difficult|hard"], critical: true },
       { id: "email", en: "by email", ko: "메일로", any: ["email|mail"] },
       { id: "depends", en: "depends on", ko: "~에 달려 있다", any: ["depend|depends|depending|dependent", "based", "rely|relies"], critical: true },
