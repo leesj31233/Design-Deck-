@@ -11,7 +11,7 @@ import { useNav } from "../app";
 import { Card, Eyebrow, MasteryTrack, Sheet, StatusChip, cn, dateKo, relTimeKo } from "../kit";
 import { CATEGORY_KO } from "../practice/parts";
 import { pickReviewQuestion } from "../../core/session";
-import { WeakGrammarCard } from "../weak-grammar";
+import { ExpressionCollection, ExpressionIndex } from "../expressions";
 
 type Filter = "all" | Exclude<MasteryStatus, "new">;
 
@@ -61,12 +61,18 @@ export function MistakesScreen() {
   return (
     <div className="space-y-5">
       <div>
-        <Eyebrow>내 실수</Eyebrow>
-        <h1 className="mt-1.5 text-[28px] font-semibold tracking-[-.04em]">틀린 문장이 쌓이는 문법 노트</h1>
-        <p className="ef-ko mt-1 max-w-[62ch] text-[14px] text-[var(--muted)]">주요 오류는 자동으로 저장되고 복습 일정에 들어갑니다. 숙달은 서로 다른 날·다른 문장에서 힌트 없이 반복해 맞혀야 인정됩니다.</p>
+        <Eyebrow>표현 노트</Eyebrow>
+        <h1 className="mt-1.5 text-[28px] font-semibold tracking-[-.04em]">자주 틀리는 표현을 모아 익히기</h1>
+        <p className="ef-ko mt-1 max-w-[62ch] text-[14px] text-[var(--muted)]">틀린 문법은 표현별로 자동으로 모입니다. 표현을 누르면 내 실수 → 규칙·비교 → 확인 퀴즈 → 대화로 말해 보기 순서로 익힙니다.</p>
       </div>
 
-      <WeakGrammarCard limit={5} />
+      <ExpressionCollection />
+      <ExpressionIndex />
+
+      <div className="pt-2">
+        <Eyebrow>틀린 문장 기록</Eyebrow>
+        <p className="ef-ko mt-1 text-[13px] text-[var(--muted)]">주요 오류는 자동으로 저장되고 복습 일정에 들어갑니다. 숙달은 서로 다른 날·다른 문장에서 힌트 없이 반복해 맞혀야 인정됩니다.</p>
+      </div>
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
         <SearchField value={q} onChange={(e) => setQ(e.target.value)} onClear={() => setQ("")} placeholder="문장·문법·설명 검색" className="h-11 md:w-80" aria-label="실수 검색" />

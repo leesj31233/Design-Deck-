@@ -3,7 +3,7 @@
  * and the grammar guide. Exit code 1 when any error is found.
  *
  *   npx tsx scripts/check-content.ts                # everything
- *   npx tsx scripts/check-content.ts --only phrases # one bank: sentences-a | sentences-b | phrases | variations | diagnostic | guide
+ *   npx tsx scripts/check-content.ts --only phrases # one bank: sentences-a | sentences-b | phrases | variations | talk-online | talk-presentation | talk-discussion | talk-smalltalk | talk-meal | talk-visit | overlay | diagnostic | guide
  *   npx tsx scripts/check-content.ts --quiet        # summary + errors only
  */
 import { validateBank, validateQuestion, type QcIssue } from "../engflow/core/validate";
@@ -15,6 +15,9 @@ import { PHRASES } from "../engflow/content/bank/phrases";
 import { VARIATIONS } from "../engflow/content/bank/variations";
 import { DIAGNOSTIC_ITEMS } from "../engflow/content/bank/diagnostic";
 import { GUIDE } from "../engflow/content/guide";
+import { TALK_BANKS, withDialogue } from "../engflow/content";
+import { DIALOGUE_OVERLAY } from "../engflow/content/bank/dialogue-overlay";
+import { SITUATIONS } from "../engflow/core/types";
 import type { Question } from "../engflow/core/types";
 
 const args = process.argv.slice(2);
@@ -25,10 +28,35 @@ const seedIds = new Set(SEEDS.map((s) => s.id));
 const ctx = { skillIds, seedIds };
 const issues: QcIssue[] = [];
 
-const banks: Record<string, Question[]> = { "sentences-a": SENTENCES_A, "sentences-b": SENTENCES_B, phrases: PHRASES, variations: VARIATIONS };
-const selected = Object.entries(banks).filter(([k]) => !only || only === k);
-const all = selected.flatMap(([, v]) => v);
-if (!only || banks[only]) issues.push(...validateBank(all, ctx));
+const banks: Record<string, Question[]> = { "sentences-a": SENTENCES_A, "sentences-b": SENTENCES_B, phrases: PHRASES, variations: VARIATIONS, ...TALK_BANKS };
+const selected = Object.entries(banks).filter(([k]) => !only || only === k || (only === "overlay" && !k.startsWith("talk-")));
+// Dialogue overlays are validated together with the questions they belong to.
+const all = selected.flatMap(([, v]) => v).map(withDialogue);
+if (!only || banks[only] || only === "overlay") issues.push(...validateBank(all, ctx));
+
+// Overlay keys must name existing questions.
+if (!only || only === "overlay") {
+  const ids = new Set(Object.values(banks).flat().map((q) => q.id));
+  for (const id of Object.keys(DIALOGUE_OVERLAY)) if (!ids.has(id)) issues.push({ level: "error", questionId: id, message: "dialogue overlay for an unknown question id" });
+}
+
+// Conversation banks: every question is a dialogue turn with a scene and a key expression,
+// and every scene covers difficulty 1–10.
+for (const [name, list] of Object.entries(TALK_BANKS)) {
+  if (only && only !== name) continue;
+  const scene = name.replace("talk-", "");
+  for (const q of list) {
+    const e = (message: string) => issues.push({ level: "error", questionId: q.id, message });
+    if (q.situation !== scene) e(`situation must be "${scene}"`);
+    if (!q.dialogue?.length) e("conversation question needs ≥1 dialogue turn");
+    if (!q.expression) e("conversation question needs an expression");
+    if (q.probes === undefined || q.probes.length < 2) e("needs ≥2 probes (one pass, one fail)");
+  }
+  const covered = new Set(list.map((q) => q.difficulty));
+  const missing = Array.from({ length: 10 }, (_, i) => i + 1).filter((d) => !covered.has(d));
+  if (list.length && missing.length) issues.push({ level: "error", questionId: name, message: `difficulty not covered: ${missing.join(", ")}` });
+}
+void SITUATIONS;
 
 if (!only || only === "variations") {
   for (const seed of SEEDS) {

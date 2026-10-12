@@ -3,7 +3,7 @@
  * of these ids. Groups drive the notebook's category grouping.
  */
 
-export type SkillGroup = "tense" | "conditional" | "structure" | "preposition" | "noun" | "function";
+export type SkillGroup = "tense" | "conditional" | "structure" | "preposition" | "noun" | "function" | "conversation";
 
 export interface SkillDef {
   id: string;
@@ -25,6 +25,7 @@ export const SKILL_GROUPS: Record<SkillGroup, { ko: string; en: string }> = {
   preposition: { ko: "전치사·어휘 결합", en: "Prepositions & word choice" },
   noun: { ko: "명사·관사", en: "Nouns & articles" },
   function: { ko: "회의 표현", en: "Meeting functions" },
+  conversation: { ko: "대화·관계 표현", en: "Conversation & relationships" },
 };
 
 export const SKILLS: SkillDef[] = [
@@ -57,6 +58,14 @@ export const SKILLS: SkillDef[] = [
   { id: "reporting", group: "structure", nameKo: "회의 결정 요약·전달", nameEn: "Reporting & summarizing", formula: "We agreed that … / The vendor said that …", order: 27, band: "B2" },
   { id: "cond-2", group: "conditional", nameKo: "2형 조건문 (현재 사실 반대 가정)", nameEn: "Second conditional", formula: "If + past, would + V", order: 28, band: "B2" },
   { id: "polite-disagree", group: "function", nameKo: "정중한 반대·완곡 표현", nameEn: "Polite disagreement", formula: "I see your point, but … / I'm not sure that …", order: 29, band: "B2" },
+  // Everyday spoken English for online meetings, presentations, small talk and meals.
+  { id: "small-talk", group: "conversation", nameKo: "안부·스몰토크", nameEn: "Greetings & small talk", formula: "How was your weekend? / It's been a while. / How have you been?", order: 31, band: "A2" },
+  { id: "online-meeting", group: "conversation", nameKo: "온라인 회의 진행 표현", nameEn: "Running an online meeting", formula: "Can you hear me? / Let me share my screen. / You're on mute.", order: 32, band: "A2" },
+  { id: "question-form", group: "conversation", nameKo: "의문문 만들기", nameEn: "Forming questions", formula: "Do you …? / How long have you …? / What do you think of …?", order: 33, band: "A2" },
+  { id: "offer-suggest", group: "conversation", nameKo: "권유·제안", nameEn: "Offers & suggestions", formula: "Would you like …? / Why don't we …? / Shall we …?", order: 34, band: "B1" },
+  { id: "thanks-looking-forward", group: "conversation", nameKo: "감사·기대 표현", nameEn: "Thanks & looking forward", formula: "Thank you for + V-ing / I'm looking forward to + V-ing", order: 35, band: "B1" },
+  { id: "signpost", group: "conversation", nameKo: "발표 흐름 표현", nameEn: "Presentation signposting", formula: "Let me walk you through … / Moving on to … / As you can see, …", order: 36, band: "B1" },
+  { id: "opinion", group: "conversation", nameKo: "의견·제안 말하기", nameEn: "Giving opinions", formula: "I think we should … / I'd suggest + V-ing / In my view, …", order: 37, band: "B1" },
   { id: "cond-3", group: "conditional", nameKo: "3형 조건문 (과거 사실 반대 가정)", nameEn: "Third conditional", formula: "If + had p.p., would have + p.p.", order: 30, band: "C1" },
 ];
 

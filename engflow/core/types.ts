@@ -8,6 +8,23 @@ export type Cefr = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 export const CEFR_ORDER: Cefr[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 export type Category = "process" | "pilot" | "meeting" | "collab" | "operation" | "business";
+
+/**
+ * Where the conversation happens. Most questions are "how do I say this?"
+ * turns in one of these scenes; engineering discussion is one scene among them.
+ */
+export type Situation = "online" | "presentation" | "discussion" | "smalltalk" | "meal" | "visit" | "technical";
+export const SITUATIONS: Situation[] = ["online", "presentation", "discussion", "smalltalk", "meal", "visit", "technical"];
+
+/** One earlier line in the conversation; the learner speaks next. */
+export interface DialogueTurn {
+  /** Who speaks, e.g. "Budi" or "Ms. Tan (client)". */
+  speaker: string;
+  /** What they say, in natural spoken English. */
+  en: string;
+  /** Korean translation (shown on request). */
+  ko?: string;
+}
 export type QuestionMode = "sentence" | "phrase";
 
 /** Error taxonomy used for highlighting, grouping in the notebook and review routing. */
@@ -123,6 +140,12 @@ export interface Question {
   explanationKo: string;
   /** Review-variation ladder membership for generalization (0 = closest to the original mistake). */
   variation?: { seed: string; level: 0 | 1 | 2 | 3 };
+  /** Conversation scene (defaults from category: meeting/collab/business → discussion, else technical). */
+  situation?: Situation;
+  /** Earlier lines of the conversation (1–3); the learner's answer is the next line. */
+  dialogue?: DialogueTurn[];
+  /** The key spoken expression this question practises, e.g. "Let me share my screen." */
+  expression?: string;
   source?: "curated" | "generated";
   /**
    * QC probes (not shown to learners): plausible learner answers with the
@@ -348,6 +371,8 @@ export interface Settings {
   ai: "auto" | "on-request" | "off";
   /** Legacy (grading is always the fast tier now). */
   aiDepth?: "quick" | "default";
+  /** Preferred difficulty (1–10) per situation; missing = automatic from the level estimate. */
+  difficulty?: Partial<Record<Situation | "all", number>>;
   autocorrect: boolean;
   showNaturalKorean: boolean;
   reducedMotion: "system" | "reduce";

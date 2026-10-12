@@ -43,7 +43,7 @@ export function Anatomy({ entry }: { entry: GuideEntry["anatomy"][number] }) {
   );
 }
 
-function RuleList({ g }: { g: GuideEntry }) {
+export function RuleList({ g }: { g: GuideEntry }) {
   return (
     <ul className="space-y-2">
       {g.rules.map((r, i) => (

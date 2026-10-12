@@ -410,7 +410,7 @@ function TestResult({ r, onBack }: { r: DiagnosticResultRecord; onBack: () => vo
             <ul className="ef-ko mt-1.5 space-y-1 text-[14px]">
               <li>· 시작 레벨: <b>{r.recommendedLevel}</b> 중심, 한 단계 위 문항을 25% 섞습니다.</li>
               <li>· 하루 {app.state.settings.dailyTarget}문항: 새 학습 약 70% + 복습 30%.</li>
-              <li>· {r.sub.construction < r.sub.grammar ? "문장 구성이 약해 처음 2주는 구문 퀴즈 비중을 높입니다." : "문장 구성 모드로 긴 회의 문장을 꾸준히 연습합니다."}</li>
+              <li>· {r.sub.construction < r.sub.grammar ? "문장 구성이 약해 처음 2주는 짧은 표현 비중을 높입니다." : "문장 말하기로 긴 회의 문장을 꾸준히 연습합니다."}</li>
               {r.weaknesses.length ? <li>· 집중 문법: {r.weaknesses.slice(0, 3).map(skillName).join(", ")}</li> : null}
             </ul>
             <button onClick={() => start({ title: "맞춤 학습", size: 10 })} className="dd-focus mt-3 inline-flex h-11 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]">

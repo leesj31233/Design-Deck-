@@ -155,6 +155,12 @@ export function FeedbackPanel({
               <CopyButton text={e.recommended} />
             </div>
             <p className="ef-en mt-2 text-[17px] font-medium leading-7">{e.recommended}</p>
+            {question.expression ? (
+              <p className="mt-2 flex flex-wrap items-baseline gap-x-2 text-[13px]">
+                <span className="rounded bg-[var(--ef-accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--ef-accent-ink)]">핵심 표현</span>
+                <span className="ef-en font-medium">{question.expression}</span>
+              </p>
+            ) : null}
           </div>
           {e.advanced || e.alternatives.length ? (
             <div className="p-4 md:p-5">

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { categorySchema, cefrSchema } from "@/engflow/core/schema";
+import { categorySchema, cefrSchema, situationSchema } from "@/engflow/core/schema";
 import { SKILL_BY_ID } from "@/engflow/content/skills";
 import { aiAvailable, describeAIError, generateWithClaude } from "@/engflow/server/claude";
 import { fail, json, PayloadError, rateLimit, readJson, requireLearner } from "@/engflow/server/http";
@@ -14,6 +14,8 @@ const body = z.object({
   level: cefrSchema,
   mode: z.enum(["sentence", "phrase"]),
   avoidReferences: z.array(z.string().max(400)).max(40).default([]),
+  situation: situationSchema.optional(),
+  difficulty: z.number().int().min(1).max(10).optional(),
   weakness: z
     .object({
       labelKo: z.string().max(120),

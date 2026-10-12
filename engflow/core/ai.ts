@@ -1,8 +1,10 @@
 import { aiEvaluationSchema, questionSchema, type AIEvaluationPayload } from "./schema";
 import { bucketPenalties, defaultBucket, overallFrom, scoredErrors } from "./evaluate";
 import { SKILLS } from "../content/skills";
+import { SITUATION_INFO } from "../content/situations";
+import { situationOf } from "./situations";
 import { validateQuestion } from "./validate";
-import type { Category, Cefr, ErrorSpan, Evaluation, Question } from "./types";
+import type { Category, Cefr, ErrorSpan, Evaluation, Question, Situation } from "./types";
 
 /**
  * Prompt builders and response normalization for Claude-backed evaluation,
@@ -24,8 +26,9 @@ Severity: "critical" = meaning becomes wrong or opposite; "major" = clear gramma
 
 function questionBrief(q: Question): string {
   return [
-    `Scenario: ${q.topic} (${q.category}, CEFR ${q.level})`,
+    `Scene: ${SITUATION_INFO[situationOf(q)].en} — ${q.topic} (CEFR ${q.level}, difficulty ${q.difficulty}/10)`,
     q.contextKo ? `Context (Korean): ${q.contextKo}` : "",
+    q.dialogue?.length ? `Conversation so far:\n${q.dialogue.map((t) => `  ${t.speaker}: ${t.en}`).join("\n")}\n  (the learner answers next)` : "",
     `Korean prompt: ${q.promptKo}`,
     `Reference answer: ${q.reference}`,
     q.accepted.length ? `Other accepted answers: ${q.accepted.join(" | ")}` : "",
@@ -41,7 +44,7 @@ const CATEGORIES = '"be-verb","verb-form","tense","agreement","preposition","art
 export function buildEvaluationPrompt(q: Question, answer: string, local: Evaluation): string {
   const pre = scoredErrors(local.errors);
   const localFindings = pre.length ? pre.map((e) => `"${e.text || "(missing)"}" → "${e.fix}" (${e.category}, ${e.severity})`).join("; ") : "none";
-  return `You grade one English answer from a Korean process engineer (~B1) for an international engineering meeting.
+  return `You grade one spoken-English answer from a Korean process engineer (~B1) in an international online meeting or business conversation (meetings, presentations, small talk, meals, site visits).
 
 ${questionBrief(q)}
 
@@ -226,16 +229,25 @@ export interface GenerateRequest {
   skill: string;
   level: Cefr;
   mode: "sentence" | "phrase";
+  /** Conversation scene; the question is a turn in that conversation. */
+  situation?: Situation;
+  /** 1–10 (see the difficulty table in the prompt). */
+  difficulty?: number;
   avoidReferences: string[];
   /** The learner's own recurring mistakes on this grammar point: the new question must test exactly this context. */
   weakness?: { labelKo: string; examples: { wrong: string; right: string }[] };
 }
 
 export function buildGenerationPrompt(r: GenerateRequest, skillName: string, example: Question): string {
-  return `Create ONE new English practice question for a Korean process engineer (~B1) who needs clear English in international engineering meetings (Korean and Southeast Asian teams: pilot plants, Pre-FEED, PFD/P&ID, mass balance, dryers, pumps, steam, vendors, commissioning, CAPEX/OPEX).
+  const scene = r.situation ?? "discussion";
+  const d = r.difficulty;
+  return `Create ONE new "how do I say this?" practice turn for a Korean process engineer (~B1) who works with international colleagues (Indonesian, Malaysian, Vietnamese, Indian and European teams) in online meetings, presentations, small talk, business meals and site visits.
 
 Requirements:
 - mode: "${r.mode}", category: "${r.category}", CEFR level: "${r.level}", primary grammar skill: "${r.skill}" (${skillName}).
+- situation: "${scene}" (${SITUATION_INFO[scene].en}: ${SITUATION_INFO[scene].descKo}). The question is a turn in that conversation: "dialogue" holds 1–2 earlier lines { "speaker", "en", "ko" } from a colleague (Budi, Sari, Mr. Tan, Linh, Priya or Daniel), and the learner (Minsu) answers next. The colleague's line must not give away the target structure. "expression" = the key spoken expression practised.${d ? `
+- difficulty: ${d} (1 = fixed 3–6 word expression, 3 = one clause, 5 = two clauses, 7 = passive/relative clause/polite hedging, 9 = several sentences with hypothesis or reporting, 10 = long diplomatic turn). Match length and grammar to it.` : ""}${scene === "technical" ? "" : `
+- Keep the topic everyday and relationship-focused for this scene; light engineering context only if natural.`}
 - Simple vocabulary; difficulty comes from grammar and reasoning, not rare words.
 - reference = how native-speaking engineers most commonly say it in a real meeting: natural, everyday spoken phrasing (e.g. "Could you take a look at…", "We're still waiting on…", "Let's go with…"), not textbook English and no rare idioms.${r.weakness ? `
 - This learner keeps making this mistake (${r.weakness.labelKo}). Build the question so the SAME grammar context appears, in a new situation:
@@ -255,6 +267,13 @@ Here is an example of the exact JSON shape (different topic):
 ${JSON.stringify(example)}
 
 Reply with ONLY the JSON object for the new question. Use id "gen-${r.skill}-${Date.now().toString(36)}".`;
+}
+
+/** The example shown to the model: a conversation turn, same scene and mode if possible, different skill. */
+export function generationExample(req: GenerateRequest, bank: Question[]): Question {
+  const rank = (q: Question) =>
+    (q.dialogue?.length ? 4 : 0) + (q.situation && q.situation === req.situation ? 2 : 0) + (q.mode === req.mode ? 3 : 0) + (q.skills[0] !== req.skill ? 1 : -5) + (q.variation ? -5 : 0);
+  return [...bank].sort((a, b) => rank(b) - rank(a))[0];
 }
 
 export function parseGeneratedQuestion(raw: unknown, ctx: { skillIds: Set<string> }): { question: Question | null; problems: string[] } {

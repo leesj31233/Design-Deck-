@@ -17,6 +17,7 @@ import { LevelTestScreen } from "./screens/level-test";
 import { ProgressScreen } from "./screens/progress";
 import { SettingsScreen } from "./screens/settings";
 import { GuideSheet } from "./guide";
+import { ExpressionStudy } from "./expressions";
 
 export type Route = "today" | "learn" | "review" | "mistakes" | "test" | "progress" | "settings";
 const ROUTES: Route[] = ["today", "learn", "review", "mistakes", "test", "progress", "settings"];
@@ -30,6 +31,8 @@ export interface Nav {
   practiceSkill: (skill: string) => void;
   /** Hide navigation chrome (level test in progress). */
   setFocus: (on: boolean) => void;
+  /** Open the study flow for one expression (grammar point). */
+  openExpression: (skill: string) => void;
 }
 
 export const NavContext = React.createContext<Nav | null>(null);
@@ -48,7 +51,7 @@ const NAV_ITEMS: { id: Route; label: string; icon: React.ElementType; mobile?: b
   { id: "today", label: "오늘", icon: CalendarCheck2, mobile: true },
   { id: "learn", label: "학습", icon: PenLine, mobile: true },
   { id: "review", label: "복습", icon: RotateCcw, mobile: true },
-  { id: "mistakes", label: "내 실수", icon: NotebookPen, mobile: true },
+  { id: "mistakes", label: "표현 노트", icon: NotebookPen, mobile: true },
   { id: "test", label: "레벨 테스트", icon: ClipboardCheck },
   { id: "progress", label: "진도", icon: ChartColumn, mobile: true },
   { id: "settings", label: "설정", icon: Settings },
@@ -60,6 +63,7 @@ function Shell() {
   const [route, setRoute] = React.useState<Route>(readHash);
   const [session, setSession] = React.useState<SessionSpec | null>(null);
   const [guideSkill, setGuideSkill] = React.useState<string | null>(null);
+  const [study, setStudy] = React.useState<string | null>(null);
   const [focus, setFocus] = React.useState(false);
   const desktop = useMediaQuery("(min-width: 1024px)");
   const mainRef = React.useRef<HTMLDivElement>(null);
@@ -85,11 +89,17 @@ function Shell() {
     go,
     startSession: (spec) => {
       setGuideSkill(null);
+      setStudy(null);
       setSession(spec);
       window.scrollTo({ top: 0 });
     },
     openGuide: (skill) => setGuideSkill(skill),
     setFocus,
+    openExpression: (skill) => {
+      setGuideSkill(null);
+      setStudy(skill);
+      window.scrollTo({ top: 0 });
+    },
     practiceSkill: (skill) => {
       import("../core/session").then(({ buildSession }) => {
         const plan = buildSession(app.state, app.questions, { size: 6, mode: "mixed", skill, now: app.now() });
@@ -109,6 +119,18 @@ function Shell() {
         <div className="ef-root min-h-[100dvh]">
           {offset ? <TimeBanner /> : null}
           <SessionRunner key={session.id} spec={session} onExit={() => setSession(null)} onPracticeSkill={nav.practiceSkill} />
+        </div>
+      </NavContext.Provider>
+    );
+  }
+
+  if (study) {
+    return (
+      <NavContext.Provider value={nav}>
+        <div className="ef-root min-h-[100dvh]">
+          {offset ? <TimeBanner /> : null}
+          <ExpressionStudy key={study} skill={study} onExit={() => setStudy(null)} />
+          {guideSkill ? <GuideSheet open onOpenChange={(o) => !o && setGuideSkill(null)} skill={guideSkill} onPractice={nav.practiceSkill} /> : null}
         </div>
       </NavContext.Provider>
     );

@@ -3,7 +3,8 @@ import * as React from "react";
 import { Cloud, Copy, Cpu, Download, HardDrive, KeyRound, Monitor, Moon, Sparkles, Sun, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { exportState, importState } from "../../core/store";
-import type { Settings } from "../../core/types";
+import { SITUATIONS, type Settings } from "../../core/types";
+import { SITUATION_INFO } from "../../content";
 import { learnerKey, setLearnerKey } from "../../platform/web";
 import { clock, useApp } from "../store";
 import { Card, ConfirmDialog, Eyebrow, cn } from "../kit";
@@ -123,13 +124,29 @@ export function SettingsScreen() {
         <Row label="채점 방식" hint="제출하면 한 번만 채점합니다. Claude가 문법을 정밀하게 보고(보통 몇 초), 응답이 늦거나 연결이 없으면 규칙 기반 결과를 바로 보여 줍니다. 한번 나온 점수는 바뀌지 않습니다. 철자와 현장 용어(raw/feed 등)는 점수에 거의 또는 전혀 반영하지 않습니다.">
           <Choice value={s.ai === "off" ? "off" : "auto"} label="채점 방식" options={[{ v: "auto", label: "Claude 빠른 채점" }, { v: "off", label: "규칙 기반만" }]} onChange={(v) => set({ ai: v })} />
         </Row>
+        <Row label="상황별 난이도" hint="학습 화면에서 상황마다 고른 난이도(1–10)입니다. 고르지 않은 상황은 레벨에 맞춰 자동으로 정합니다.">
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            {SITUATIONS.filter((sc) => s.difficulty?.[sc]).map((sc) => (
+              <span key={sc} className="ef-num rounded-full border border-[var(--line)] px-2.5 py-1 text-[12px]">
+                {SITUATION_INFO[sc].ko} {s.difficulty![sc]}
+              </span>
+            ))}
+            {Object.keys(s.difficulty ?? {}).length ? (
+              <button onClick={() => set({ difficulty: {} })} className="dd-focus h-8 rounded-lg border border-[var(--line)] px-3 text-[12px] font-medium">
+                모두 자동으로
+              </button>
+            ) : (
+              <span className="text-[12px] text-[var(--muted)]">모두 자동</span>
+            )}
+          </div>
+        </Row>
         <Row label="복습 간격" hint="적응형: 1→3→7→14→30일로 시작해 두 번 성공하면 FSRS가 기억 상태에 맞춰 조정합니다. 고정: 항상 사다리 간격.">
           <Choice value={s.scheduler} label="복습 간격" options={[{ v: "adaptive", label: "적응형 FSRS" }, { v: "ladder", label: "고정 간격" }]} onChange={(v) => set({ scheduler: v })} />
         </Row>
         <Row label="자동 수정 (iOS·Android)" hint="끄면 키보드가 철자를 고치지 않아 실제 실력대로 평가됩니다. 권장: 끄기.">
           <Choice value={s.autocorrect ? "on" : "off"} label="자동 수정" options={[{ v: "off", label: "끄기" }, { v: "on", label: "켜기" }]} onChange={(v) => set({ autocorrect: v === "on" })} />
         </Row>
-        <Row label="자연스러운 한국어 기본 표시" hint="문장 구성 문제에서 영어 어순 의미 단위와 함께 자연스러운 한국어 문장을 처음부터 보여 줍니다.">
+        <Row label="자연스러운 한국어 기본 표시" hint="문장 말하기 문제에서 영어 어순 의미 단위와 함께 자연스러운 한국어 문장을 처음부터 보여 줍니다.">
           <Choice value={s.showNaturalKorean ? "on" : "off"} label="자연스러운 한국어" options={[{ v: "off", label: "숨김" }, { v: "on", label: "표시" }]} onChange={(v) => set({ showNaturalKorean: v === "on" })} />
         </Row>
         <Row label="테마">

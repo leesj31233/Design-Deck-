@@ -1611,4 +1611,375 @@ export const GUIDE: Record<string, GuideEntry> = {
       { wrong: "If we have decided earlier, we would have saved time.", right: "If we had decided earlier, we would have saved time.", ko: "과거에 대한 가정은 have가 아니라 had + 과거분사입니다." },
     ],
   },
+
+  // ───────────────────────────── conversation ─────────────────────────────
+  "small-talk": {
+    skill: "small-talk",
+    summaryKo: "회의 시작 전이나 식사 자리의 안부는 How are you? / How was your weekend? / How have you been?처럼 짧은 질문으로 시작합니다. 대답은 'I'm fine, thank you, and you?'로 끝내지 말고 '짧은 답 + 정보 한 가지 + 되묻기'로 대화를 이어 갑니다.",
+    simpleKo:
+      "스몰토크는 탁구와 같습니다. 공(질문)을 받으면 짧게 넘기고(답), 다시 상대에게 공을 보내야(되묻기) 랠리가 이어집니다. 'Good, thanks. I went hiking with my family. How about you?'처럼 세 조각이면 충분합니다. 시제도 챙기세요: 이미 끝난 주말은 과거형(How was …?), 오랜만에 만난 사람의 '그동안'은 현재완료(How have you been?)입니다.",
+    rules: [
+      { formula: "How are you? / How's it going? → Good, thanks. + 한 문장", ko: "자주 보는 동료와의 가벼운 인사입니다. 짧게 답하고 근황을 한 문장 덧붙입니다.", example: "Pretty busy, actually. We have a design review on Friday." },
+      { formula: "How was + your weekend / your trip / the flight?", ko: "이미 끝난 일은 과거형 was로 묻습니다. 의문사 바로 뒤에 was가 오고, 문장 끝에 동사를 다시 쓰지 않습니다.", example: "How was your trip to Jakarta?" },
+      { formula: "It's been a while. / How have you been?", ko: "오랜만에 만난 사람에게 씁니다. '지난번 이후 지금까지' 어떻게 지냈는지 묻는 현재완료입니다.", example: "Hi Arjun, it's been a while! How have you been?" },
+      { formula: "Nice to meet you. (처음) / Nice to see you again. (다시)", ko: "처음 만날 때는 meet, 이미 아는 사람을 다시 만날 때는 see를 씁니다.", example: "Nice to see you again, Ms. Linh." },
+      { formula: "답 + 정보 한 가지 + How about you? / How was yours?", ko: "대화를 이어 가는 기본 틀입니다. 되묻기를 빼면 대화가 바로 끊깁니다.", example: "It was great, thanks. I took my kids to the beach. How was yours?" },
+    ],
+    anatomy: [
+      {
+        sentence: "How was your weekend?",
+        parts: [
+          p("How", "question word", "의문사", true),
+          p("was", "be (past)", "be동사 과거형", true),
+          p("your weekend?", "subject", "주어(끝난 일)"),
+        ],
+      },
+      {
+        sentence: "Good, thanks. I went hiking with my family. How about you?",
+        parts: [
+          p("Good, thanks.", "short answer", "짧은 답", true),
+          p("I went hiking with my family.", "one detail", "정보 한 가지"),
+          p("How about you?", "return question", "되묻기", true),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Hi Budi, how was your weekend? Did you do anything fun?", ko: "안녕하세요 부디 씨, 주말 잘 보내셨어요? 뭐 재미있는 거 하셨어요?" },
+      { en: "It's been a while, Arjun! How have you been since the kickoff meeting?", ko: "오랜만이에요, 아르준 씨! 킥오프 회의 이후로 어떻게 지내셨어요?" },
+      { en: "Pretty busy, actually. We're preparing for the site visit next week. How about you?", ko: "사실 꽤 바빴어요. 다음 주 현장 방문을 준비하고 있거든요. 그쪽은 어떠세요?" },
+      { en: "Nice to see you again, Ms. Linh. How was your flight from Ho Chi Minh City?", ko: "다시 뵙게 되어 반갑습니다, 린 씨. 호찌민에서 오시는 비행은 어떠셨어요?" },
+      { en: "Is it still the rainy season in Kuala Lumpur? It's getting quite cold in Seoul.", ko: "쿠알라룸푸르는 아직 우기인가요? 서울은 꽤 추워지고 있어요." },
+    ],
+    compare: [
+      { a: "How are you?", b: "How have you been?", ko: "How are you?는 '지금 어때요?'라는 일상 인사라 자주 보는 동료에게 씁니다. How have you been?은 '지난번 이후 그동안 어떻게 지냈어요?'라는 뜻이라 오랜만에 만난 사람에게 씁니다." },
+      { a: "Nice to meet you.", b: "Nice to see you again.", ko: "meet은 처음 만나 인사할 때, see you again은 이미 만난 적이 있는 사람과 다시 만날 때 씁니다. 화상 회의로만 보던 사람을 현장에서 처음 직접 만나면 Nice to finally meet you in person.이라고 합니다." },
+      { a: "I'm fine, thank you. And you?", b: "Good, thanks. It's been a busy week. How about you?", ko: "첫 번째도 틀리지는 않지만 교과서처럼 딱딱하고 대화가 바로 끝납니다. 두 번째처럼 짧은 정보를 하나 덧붙이면 상대가 이어서 말할 거리가 생깁니다." },
+    ],
+    mistakes: [
+      { wrong: "How was your weekend was?", right: "How was your weekend?", ko: "의문문에서는 was가 이미 주어 앞으로 나왔으므로 문장 끝에 다시 쓰지 않습니다. 한국어 '주말 어땠어요?'의 '어땠어요'를 한 번 더 붙인 셈입니다." },
+      { wrong: "How was your weekend? — I'm fine, thank you, and you?", right: "How was your weekend? — It was nice, thanks. How was yours?", ko: "질문에 맞게 답해야 합니다. 주말이 어땠는지 물었으므로 It was …로 답하고, 되물을 때는 How was yours?라고 합니다." },
+      { wrong: "How are you been?", right: "How have you been?", ko: "'그동안 어떻게 지냈어요?'는 현재완료 have + been입니다. are와 been은 함께 쓰지 않습니다." },
+      { wrong: "Nice to meet you again, Mr. Tan.", right: "Nice to see you again, Mr. Tan.", ko: "meet은 '처음 만나다'의 느낌이 강해서, 이미 아는 사람에게는 see you again이 자연스럽습니다." },
+      { wrong: "I went to hiking on Sunday.", right: "I went hiking on Sunday.", ko: "go hiking / go shopping / go fishing처럼 활동은 go + V-ing로 말하고 to를 넣지 않습니다." },
+    ],
+  },
+
+  "online-meeting": {
+    skill: "online-meeting",
+    summaryKo: "화상 회의에서는 소리·화면 상태를 확인하는 짧은 고정 표현을 씁니다: Can you hear me? / Can you see my screen? / You're on mute. / Let me share my screen. 연결 문제는 You're breaking up. / You froze.처럼 상태를 간단히 말합니다.",
+    simpleKo:
+      "온라인 회의 표현은 무전기 용어처럼 '정해진 짧은 말'입니다. 길게 문장을 만들 필요 없이 통째로 외워 두면 됩니다. 특히 'Let me + 동사원형'은 '제가 ~할게요'라고 다음 행동을 알리는 만능 틀입니다: Let me share my screen. / Let me check. / Let me drop the link in the chat.",
+    rules: [
+      { formula: "Can you hear me? / Can you see my screen?", ko: "회의 시작이나 화면 공유 직후에 상태를 확인합니다. 답은 Yes, I can hear you fine. / Yes, we can see it.처럼 합니다.", example: "Can you see my screen? It should show the PFD." },
+      { formula: "Let me + 동사원형 (share / check / open …)", ko: "'제가 ~하겠습니다'라고 다음 행동을 알립니다. let me 뒤에는 to 없이 동사원형을 씁니다.", example: "Let me share my screen." },
+      { formula: "You're on mute. / You're breaking up. / You froze.", ko: "상대의 마이크·연결 문제를 알려 줍니다. 마이크 꺼짐은 on mute, 소리 끊김은 breaking up, 화면 멈춤은 froze입니다.", example: "Sorry, Budi, you're on mute." },
+      { formula: "I'll drop / put + 자료 + in the chat.", ko: "링크나 파일을 채팅창에 올리겠다고 말합니다. 채팅창은 in the chat입니다.", example: "I'll drop the link in the chat." },
+      { formula: "Let's wrap up (for today).", ko: "회의를 마무리하자는 신호입니다. 보통 요약이나 다음 단계를 바로 이어서 말합니다.", example: "We're almost out of time, so let's wrap up." },
+    ],
+    anatomy: [
+      {
+        sentence: "Let me share my screen.",
+        parts: [
+          p("Let me", "let + me", "제가 ~할게요", true),
+          p("share", "base verb", "동사원형", true),
+          p("my screen.", "object", "목적어"),
+        ],
+      },
+      {
+        sentence: "Sorry, you're breaking up a little.",
+        parts: [
+          p("Sorry,", "softener", "쿠션 표현"),
+          p("you're", "subject + be", "주어 + be동사"),
+          p("breaking up", "V-ing (connection)", "소리가 끊김", true),
+          p("a little.", "degree", "정도(조금)"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Good morning, everyone. Can you hear me okay?", ko: "안녕하세요, 여러분. 제 목소리 잘 들리시나요?" },
+      { en: "Hi Thanh, I think you're on mute. We can't hear you.", ko: "탄 씨, 음소거 상태이신 것 같아요. 말씀이 안 들립니다." },
+      { en: "Let me share my screen. Can you all see the heat and material balance?", ko: "제 화면을 공유하겠습니다. 다들 열·물질 수지표가 보이시나요?" },
+      { en: "Sorry, Priya, you froze for a few seconds. Could you repeat the last part?", ko: "죄송해요, 프리야 씨, 몇 초간 화면이 멈췄어요. 마지막 부분을 다시 말씀해 주시겠어요?" },
+      { en: "Let's wrap up for today. I'll drop the action items in the chat.", ko: "오늘은 여기서 마무리하겠습니다. 액션 아이템은 채팅창에 올려 둘게요." },
+    ],
+    compare: [
+      { a: "I can't hear your voice well.", b: "Sorry, you're breaking up.", ko: "'your voice'는 한국어 '목소리가 잘 안 들려요'를 그대로 옮긴 표현이라 어색합니다. 영어는 I can't hear you very well.처럼 사람을 목적어로 쓰고, 소리가 뚝뚝 끊기면 You're breaking up.이라고 상태를 구체적으로 말합니다." },
+      { a: "You're on mute.", b: "You're breaking up.", ko: "on mute는 마이크가 꺼져 아예 안 들리는 상태, breaking up은 연결이 불안정해 소리가 끊겨 들리는 상태입니다. 화면이 멈췄으면 You froze.라고 합니다." },
+      { a: "Let's finish the meeting.", b: "Let's wrap up.", ko: "finish the meeting은 '회의를 끝내자'로 다소 갑작스럽게 들립니다. wrap up은 '정리하며 마무리하자'는 뜻이라 요약·다음 단계를 말하는 흐름과 잘 맞습니다." },
+    ],
+    mistakes: [
+      { wrong: "Let me to share my screen.", right: "Let me share my screen.", ko: "let + 사람 뒤에는 to 없이 동사원형을 씁니다." },
+      { wrong: "I can't hear your voice well.", right: "Sorry, I can't hear you very well. You're breaking up.", ko: "hear 뒤에는 your voice보다 사람(you)을 씁니다. 소리가 끊겨 들리면 You're breaking up.을 덧붙여 원인을 알려 줍니다." },
+      { wrong: "Thanh, you are mute.", right: "Thanh, you're on mute.", ko: "mute는 사람에게 쓰면 '말을 못 하는'이라는 뜻이 되어 실례가 될 수 있습니다. 마이크가 꺼진 상태는 on mute입니다." },
+      { wrong: "I'll drop the link on the chat.", right: "I'll drop the link in the chat.", ko: "채팅창 '안에' 올리는 것이므로 in the chat이라고 합니다." },
+    ],
+  },
+
+  "question-form": {
+    skill: "question-form",
+    summaryKo: "일반동사 질문은 Do / Does / Did + 주어 + 동사원형, 경험·완료 질문은 Have / Has + 주어 + p.p., 의문사 질문은 의문사 + do / does / did + 주어 + 동사원형 순서입니다. 정중한 간접의문문(Could you tell me what …)에서는 다시 주어 + 동사 순서로 돌아갑니다.",
+    simpleKo:
+      "한국어는 끝에 '-요?'만 붙이면 질문이 되지만, 영어는 문장 '맨 앞'에 질문 신호(Do, Does, Did, Have, Is, Can)를 세워야 합니다. 신호가 시제와 3인칭 -s를 가져가므로 뒤의 동사는 항상 원형입니다: She works → Does she work? 의문사가 있으면 의문사가 신호 앞에 섭니다: Where do you work?",
+    rules: [
+      { formula: "Do / Does / Did + 주어 + 동사원형?", ko: "일반동사 질문입니다. does·did가 -s와 시제를 가져가므로 뒤 동사는 원형입니다.", example: "Did you receive the revised drawing?" },
+      { formula: "Have / Has + 주어 + p.p.?", ko: "경험이나 이미 끝났는지를 묻습니다. ever, yet과 자주 씁니다.", example: "Have you ever visited a palm oil mill?" },
+      { formula: "Be / Can / Will + 주어 + …?", ko: "be동사나 조동사가 있는 문장은 그것만 주어 앞으로 보내고 do를 쓰지 않습니다.", example: "Can you join the call at 3 p.m.?" },
+      { formula: "의문사 + do / does / did / have + 주어 + 동사?", ko: "What, When, How long 같은 의문사가 맨 앞에 오고, 그 뒤는 Yes/No 질문과 같은 어순입니다.", example: "What time does the meeting start?" },
+      { formula: "Could you tell me + 의문사 + 주어 + 동사?", ko: "간접의문문은 더 정중하며, 의문사 뒤를 평서문 어순으로 씁니다.", example: "Could you tell me what the deadline is?" },
+    ],
+    anatomy: [
+      {
+        sentence: "What time does the meeting start?",
+        parts: [
+          p("What time", "question word", "의문사", true),
+          p("does", "auxiliary", "조동사(does)", true),
+          p("the meeting", "subject", "주어"),
+          p("start?", "base verb", "동사원형", true),
+        ],
+      },
+      {
+        sentence: "How long have you worked at this plant?",
+        parts: [
+          p("How long", "question word", "의문사(기간)", true),
+          p("have", "auxiliary", "조동사(have)", true),
+          p("you", "subject", "주어"),
+          p("worked", "p.p.", "과거분사", true),
+          p("at this plant?", "place", "장소"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Do you usually join the morning meeting from the site office?", ko: "보통 현장 사무실에서 아침 회의에 들어오시나요?" },
+      { en: "Did the vendor send the updated quotation yesterday?", ko: "벤더가 어제 수정 견적서를 보냈나요?" },
+      { en: "How long have you worked at the Penang plant?", ko: "페낭 공장에서 근무하신 지 얼마나 되셨어요?" },
+      { en: "What do you think of the new layout for the dryer area?", ko: "건조기 구역의 새 배치안에 대해 어떻게 생각하세요?" },
+      { en: "Could you tell me what the deadline for the FEED package is?", ko: "FEED 패키지 마감일이 언제인지 알려 주시겠어요?" },
+    ],
+    compare: [
+      { a: "You finished the report?", b: "Did you finish the report?", ko: "평서문 끝만 올려 묻는 질문은 친한 사이의 구어에서 '벌써 끝냈어요?'처럼 놀람·확인의 느낌입니다. 회의나 이메일에서 정식으로 물을 때는 Did you …? 어순을 씁니다." },
+      { a: "Did you send the data?", b: "Have you sent the data yet?", ko: "Did you …?는 특정 과거 시점(어제, 지난주)의 일을 묻고, Have you … yet?은 '지금까지 보냈는지' 현재 결과를 묻습니다. 마감을 확인할 때는 Have you … yet?이 자연스럽습니다." },
+      { a: "What time does the meeting start?", b: "Could you tell me what time the meeting starts?", ko: "직접 질문은 does + 동사원형, 간접의문문은 평서문 어순이라 does가 사라지고 starts에 -s가 돌아옵니다. 간접의문문이 더 정중합니다." },
+    ],
+    mistakes: [
+      { wrong: "Do you can join the meeting tomorrow?", right: "Can you join the meeting tomorrow?", ko: "can 같은 조동사가 있으면 do를 쓰지 않고, 조동사를 주어 앞으로 보냅니다." },
+      { wrong: "You finished the commissioning report?", right: "Did you finish the commissioning report?", ko: "평서문에 억양만 올리는 질문은 격식 있는 자리에서 어색합니다. 과거의 일은 Did + 주어 + 동사원형으로 묻습니다." },
+      { wrong: "What time the meeting starts?", right: "What time does the meeting start?", ko: "의문사 뒤에 does가 필요하고, does가 -s를 가져가므로 동사는 원형(start)입니다." },
+      { wrong: "Does she works at the Hanoi office?", right: "Does she work at the Hanoi office?", ko: "does에 이미 3인칭 -s가 들어 있으므로 동사에는 -s를 붙이지 않습니다." },
+      { wrong: "Did you sent the drawing?", right: "Did you send the drawing?", ko: "did가 과거를 나타내므로 뒤의 동사는 원형(send)입니다." },
+    ],
+  },
+
+  "offer-suggest": {
+    skill: "offer-suggest",
+    summaryKo: "무언가를 권할 때는 Would you like + 명사 / to + 동사원형?, 함께 하자고 제안할 때는 Why don't we / Shall we + 동사원형? 또는 How about + V-ing?를 씁니다. 표현마다 뒤에 오는 동사 형태가 다르니 틀째로 외워 두세요.",
+    simpleKo:
+      "식사 자리에서 '이거 드셔 보실래요?'는 Would you like to try …?, '같이 ~할까요?'는 Shall we …? / Why don't we …?, '~하는 건 어때요?'는 How about …ing?입니다. 뒤에 붙는 모양을 짝으로 기억하세요: would you like + to 동사, why don't we / shall we + 동사원형, how about + -ing.",
+    rules: [
+      { formula: "Would you like + 명사?", ko: "음식·음료·물건을 정중하게 권합니다. Do you want …?보다 공손합니다.", example: "Would you like some more tea?" },
+      { formula: "Would you like + to + 동사원형?", ko: "어떤 행동을 하고 싶은지 묻습니다. to를 빼지 않습니다.", example: "Would you like to try some Korean barbecue?" },
+      { formula: "Why don't we / Shall we + 동사원형?", ko: "'우리 ~할까요?'라고 함께 하자고 제안합니다. 둘 다 뒤에 동사원형이 옵니다.", example: "Why don't we take a short break?" },
+      { formula: "How about + V-ing / 명사?", ko: "가볍게 아이디어를 내놓습니다. about이 전치사이므로 동사는 V-ing로 씁니다.", example: "How about meeting again on Thursday?" },
+      { formula: "I can + 동사원형, if you like.", ko: "내가 해 주겠다고 부담 없이 제안합니다.", example: "I can send you the slides after the meeting, if you like." },
+    ],
+    anatomy: [
+      {
+        sentence: "Would you like to try some Korean barbecue?",
+        parts: [
+          p("Would you like", "offer frame", "권유 틀", true),
+          p("to try", "to + base verb", "to + 동사원형", true),
+          p("some Korean barbecue?", "object", "목적어"),
+        ],
+      },
+      {
+        sentence: "How about meeting again on Thursday?",
+        parts: [
+          p("How about", "suggestion frame", "제안 틀", true),
+          p("meeting", "V-ing", "동명사", true),
+          p("again", "adverb", "부사(다시)"),
+          p("on Thursday?", "time", "시간"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Would you like something to drink before we order?", ko: "주문하기 전에 뭐 마실 것 좀 드릴까요?" },
+      { en: "Would you like to try some kimchi? It's a little spicy.", ko: "김치 좀 드셔 보시겠어요? 조금 맵습니다." },
+      { en: "Why don't we take a ten-minute break and then continue with the P&ID review?", ko: "10분 쉬고 P&ID 검토를 이어서 할까요?" },
+      { en: "Shall we start? I think everyone from the Vietnam team has joined.", ko: "시작할까요? 베트남 팀 분들이 모두 들어오신 것 같습니다." },
+      { en: "How about visiting the packaging line after lunch?", ko: "점심 후에 포장 라인을 둘러보는 건 어떨까요?" },
+    ],
+    compare: [
+      { a: "Do you want some coffee?", b: "Would you like some coffee?", ko: "Do you want …?는 가까운 사이의 일상 표현이고, Would you like …?는 손님·고객에게 쓰는 정중한 표현입니다. 비즈니스 식사에서는 Would you like …?가 안전합니다." },
+      { a: "Why don't we check the data again?", b: "Why don't you check the data again?", ko: "Why don't we …?는 '우리 같이 ~할까요?'라는 제안이고, Why don't you …?는 '(당신이) ~해 보는 게 어때요?'라고 상대에게 권하는 말입니다. 말투에 따라 지시처럼 들릴 수 있으니 고객이나 윗사람에게는 조심해서 씁니다." },
+      { a: "Shall we start?", b: "How about starting with the cost estimate?", ko: "Shall we …?는 '이제 ~할까요?'라고 바로 행동하자는 정중한 제안이고, How about …?는 여러 선택지 중 하나를 가볍게 제시하는 느낌입니다." },
+    ],
+    mistakes: [
+      { wrong: "Would you like eat some bulgogi?", right: "Would you like to eat some bulgogi?", ko: "Would you like 뒤에 동사가 오면 to + 동사원형을 씁니다." },
+      { wrong: "How about go to the site after lunch?", right: "How about going to the site after lunch?", ko: "about은 전치사이므로 뒤의 동사는 V-ing가 됩니다." },
+      { wrong: "Why don't we to take a short break?", right: "Why don't we take a short break?", ko: "Why don't we 뒤에는 to 없이 동사원형을 씁니다." },
+      { wrong: "Shall we going for dinner?", right: "Shall we go for dinner?", ko: "shall은 조동사이므로 뒤에 동사원형이 옵니다." },
+      { wrong: "Would you like to coffee?", right: "Would you like some coffee?", ko: "명사를 권할 때는 to 없이 Would you like + (some / a) + 명사를 씁니다." },
+    ],
+  },
+
+  "thanks-looking-forward": {
+    skill: "thanks-looking-forward",
+    summaryKo: "감사는 Thank you for + 명사 / V-ing, 기대는 I'm looking forward to + 명사 / V-ing로 말합니다. 두 표현의 for, to는 전치사이므로 뒤에 동사가 오면 반드시 -ing 형태입니다.",
+    simpleKo:
+      "for와 to 뒤는 '명사 자리'라고 생각하세요. 동사를 명사 자리에 넣으려면 -ing 옷을 입혀야 합니다: Thank you for coming. / I'm looking forward to meeting you. 특히 looking forward to의 to는 to부정사가 아니라 '~을 향해'라는 전치사라서 to see가 아니라 to seeing입니다.",
+    rules: [
+      { formula: "Thank you for + 명사", ko: "받은 것(시간, 도움, 자료)에 감사합니다.", example: "Thank you for your quick reply." },
+      { formula: "Thank you for + V-ing", ko: "상대가 해 준 행동에 감사합니다. for 뒤의 동사는 V-ing입니다.", example: "Thank you for joining the call so early." },
+      { formula: "I'm looking forward to + 명사 / V-ing", ko: "앞으로의 일을 기대합니다. to가 전치사이므로 동사는 V-ing입니다.", example: "I'm looking forward to visiting your plant in Malaysia." },
+      { formula: "I (really) appreciate + 명사", ko: "Thank you보다 조금 더 격식 있는 감사입니다. appreciate 뒤에는 for 없이 목적어가 바로 옵니다.", example: "I really appreciate your help with the site data." },
+      { formula: "We look forward to + 명사 / V-ing.", ko: "공식 이메일의 마무리에서 쓰는 격식 있는 형태입니다.", example: "We look forward to working with you." },
+    ],
+    anatomy: [
+      {
+        sentence: "Thank you for joining the call so early.",
+        parts: [
+          p("Thank you", "thanks", "감사 표현"),
+          p("for", "preposition", "전치사", true),
+          p("joining", "V-ing", "동명사", true),
+          p("the call", "object", "목적어"),
+          p("so early.", "adverb", "부사(이렇게 일찍)"),
+        ],
+      },
+      {
+        sentence: "I'm looking forward to meeting you in Jakarta.",
+        parts: [
+          p("I'm looking forward", "expectation", "기대 표현"),
+          p("to", "preposition", "전치사", true),
+          p("meeting", "V-ing", "동명사", true),
+          p("you", "object", "목적어"),
+          p("in Jakarta.", "place", "장소"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Thank you for taking the time to show us around the plant.", ko: "시간을 내어 공장을 안내해 주셔서 감사합니다." },
+      { en: "Thank you for the detailed comments on our P&ID.", ko: "저희 P&ID에 자세한 의견을 주셔서 감사합니다." },
+      { en: "I really appreciate your help with the commissioning data.", ko: "시운전 데이터를 도와주셔서 정말 감사합니다." },
+      { en: "I'm looking forward to meeting your team in Ho Chi Minh City next month.", ko: "다음 달 호찌민에서 팀 분들을 뵙기를 기대하고 있습니다." },
+      { en: "Thank you for a wonderful dinner. We look forward to working with you.", ko: "훌륭한 저녁 식사 감사합니다. 함께 일하게 되기를 기대합니다." },
+    ],
+    compare: [
+      { a: "I'm looking forward to meeting you.", b: "I look forward to meeting you.", ko: "진행형(I'm looking forward to)은 말할 때나 가벼운 이메일에서 따뜻하게 들리고, I look forward to는 공식 이메일 끝맺음에 쓰는 격식 있는 표현입니다. 둘 다 뒤에 V-ing가 옵니다." },
+      { a: "Thank you for your help.", b: "I appreciate your help.", ko: "의미는 같지만 appreciate가 조금 더 격식 있고 진지하게 들립니다. Thank you 뒤에는 for가 필요하고, appreciate 뒤에는 for 없이 목적어가 바로 옵니다." },
+      { a: "Thank you for inviting us.", b: "Thank you for having us.", ko: "inviting us는 '초대해 주셔서', having us는 '맞이해 주셔서·대접해 주셔서'라는 뜻으로 방문이나 식사를 마치고 나올 때 자주 씁니다." },
+    ],
+    mistakes: [
+      { wrong: "I'm looking forward to see you in Kuala Lumpur.", right: "I'm looking forward to seeing you in Kuala Lumpur.", ko: "looking forward to의 to는 전치사라서 뒤의 동사는 V-ing입니다." },
+      { wrong: "Thank you for come to Korea.", right: "Thank you for coming to Korea.", ko: "for는 전치사이므로 동사는 V-ing 형태로 씁니다." },
+      { wrong: "Thank you to join the meeting.", right: "Thank you for joining the meeting.", ko: "감사하는 이유는 to부정사가 아니라 for + V-ing로 말합니다." },
+      { wrong: "I appreciate for your support.", right: "I appreciate your support.", ko: "appreciate는 for 없이 목적어를 바로 씁니다. for는 Thank you for에서 씁니다." },
+      { wrong: "I'm looking forward your reply.", right: "I'm looking forward to your reply.", ko: "look forward 뒤에는 to가 꼭 필요합니다." },
+    ],
+  },
+
+  signpost: {
+    skill: "signpost",
+    summaryKo: "발표에서는 지금 어디쯤인지 알려 주는 '이정표' 표현을 씁니다: Let me walk you through …(시작) → First, … / Moving on to …(전환) → As you can see on this slide, …(설명) → To sum up, …(정리). 청중이 비원어민일수록 이 표현이 이해를 크게 돕습니다.",
+    simpleKo:
+      "내비게이션이 '300m 앞에서 우회전입니다'라고 미리 알려 주듯, 발표자도 '이제 다음 주제로 넘어갑니다'라고 미리 말해 줘야 합니다. 영어가 완벽하지 않아도 이정표 표현만 정확하면 청중은 길을 잃지 않습니다. 뒤에 붙는 형태도 같이 외우세요: walk you through + 명사, moving on to + 명사, as you can see + 문장.",
+    rules: [
+      { formula: "Let me walk you through + 명사.", ko: "자료나 과정을 하나씩 설명하겠다고 시작합니다.", example: "Let me walk you through the new process flow." },
+      { formula: "First, … / Next, … / Finally, …", ko: "순서를 표시합니다. 쉼표 뒤에 완전한 문장을 씁니다.", example: "First, I'll explain the background of the project." },
+      { formula: "Moving on to + 명사, … / That brings me to + 명사.", ko: "다음 주제로 넘어갑니다. That brings me to …는 앞 내용과 다음 주제를 자연스럽게 이어 줍니다.", example: "That brings me to the next point: the schedule." },
+      { formula: "As you can see on this slide, + 주어 + 동사", ko: "화면의 그래프·표를 가리키며 설명합니다. 슬라이드는 on this slide, 그래프는 in this graph를 씁니다.", example: "As you can see in this graph, the moisture content is stable." },
+      { formula: "To sum up, + 주어 + 동사", ko: "마지막에 핵심을 짧게 정리합니다.", example: "To sum up, the new dryer will reduce steam use by about 15%." },
+    ],
+    anatomy: [
+      {
+        sentence: "Let me walk you through the new process flow.",
+        parts: [
+          p("Let me", "let + me", "제가 ~할게요"),
+          p("walk you through", "signpost verb", "하나씩 설명하다", true),
+          p("the new process flow.", "object", "설명할 대상"),
+        ],
+      },
+      {
+        sentence: "As you can see on this slide, the steam consumption dropped by 15%.",
+        parts: [
+          p("As you can see", "signpost", "보시다시피", true),
+          p("on this slide,", "location", "위치(슬라이드 위)", true),
+          p("the steam consumption", "subject", "주어"),
+          p("dropped", "verb", "동사"),
+          p("by 15%.", "amount", "변화량"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Good afternoon, everyone. Today, let me walk you through the results of the pilot test.", ko: "안녕하세요, 여러분. 오늘은 파일럿 시험 결과를 하나씩 설명드리겠습니다." },
+      { en: "First, I'll give you some background, and then I'll show you the test data.", ko: "먼저 배경을 말씀드리고, 그다음 시험 데이터를 보여 드리겠습니다." },
+      { en: "As you can see on this slide, the moisture content stays below 0.5% at full load.", ko: "이 슬라이드에서 보시듯이, 최대 부하에서도 수분 함량이 0.5% 미만으로 유지됩니다." },
+      { en: "That brings me to my next point: the cost of the new dryer.", ko: "이제 다음 주제인 새 건조기 비용으로 넘어가겠습니다." },
+      { en: "To sum up, the new dryer saves about 15% of steam, and we can start commissioning in March.", ko: "정리하면, 새 건조기는 스팀을 약 15% 절감하고 3월에 시운전을 시작할 수 있습니다." },
+    ],
+    compare: [
+      { a: "Moving on to the cost estimate, …", b: "That brings me to the cost estimate.", ko: "Moving on to …는 '이제 ~로 넘어가겠습니다'라는 단순한 전환이고, That brings me to …는 '방금 한 이야기가 자연스럽게 ~로 이어진다'는 연결 느낌이 있어 흐름이 더 매끄럽습니다." },
+      { a: "As you can see on this slide, …", b: "This slide shows …", ko: "As you can see …는 청중의 시선을 화면으로 이끄는 말이고, This slide shows …는 슬라이드 내용을 담담히 소개합니다. 둘 다 자연스러우니 번갈아 쓰면 반복을 피할 수 있습니다." },
+      { a: "To sum up, …", b: "In conclusion, …", ko: "To sum up은 핵심을 짧게 정리할 때, In conclusion은 긴 발표 전체를 공식적으로 마무리할 때 씁니다. 짧은 회의 발표에서는 To sum up이 더 자연스럽습니다." },
+    ],
+    mistakes: [
+      { wrong: "As you see this slide, the pressure is stable.", right: "As you can see on this slide, the pressure is stable.", ko: "'보시다시피'는 can을 넣은 As you can see가 자연스럽고, 슬라이드 '위에' 있는 내용이므로 on this slide를 씁니다." },
+      { wrong: "Let's move on the next slide.", right: "Let's move on to the next slide.", ko: "move on 뒤에 넘어갈 곳(다음 슬라이드)을 말할 때는 to가 필요합니다." },
+      { wrong: "Let me walk you the process.", right: "Let me walk you through the process.", ko: "walk you through는 한 덩어리 표현입니다. through가 빠지면 뜻이 통하지 않습니다." },
+      { wrong: "To summary, the test was successful.", right: "To sum up, the test was successful.", ko: "summary는 명사라서 to 뒤에 쓸 수 없습니다. To sum up 또는 In summary라고 합니다." },
+      { wrong: "I will explain about the test results.", right: "Let me walk you through the test results.", ko: "explain은 about 없이 목적어를 바로 씁니다(I will explain the test results). 발표 시작에는 Let me walk you through …가 더 자연스럽습니다." },
+    ],
+  },
+
+  opinion: {
+    skill: "opinion",
+    summaryKo: "의견은 I think we should + 동사원형 또는 In my view, + 문장으로, 제안은 I'd suggest + V-ing 또는 I'd recommend (that) we + 동사원형으로 말합니다. suggest 뒤에는 to부정사를 쓰지 않고, In my opinion과 I think를 겹쳐 쓰지 않습니다.",
+    simpleKo:
+      "의견을 말할 때는 '의견 신호 + 내용'을 한 번만 쓰면 충분합니다. 'In my opinion, I think …'는 '제 생각에는, 제 생각에는…'이라고 두 번 말하는 셈입니다. would를 붙인 I'd suggest / I'd recommend는 '~하면 어떨까 합니다'처럼 부드러운 제안이 됩니다.",
+    rules: [
+      { formula: "I think (that) we should + 동사원형", ko: "가장 기본적인 의견·제안입니다. should 뒤는 to 없이 동사원형입니다.", example: "I think we should check the steam data again." },
+      { formula: "In my view, / In my opinion, + 주어 + 동사", ko: "조금 더 격식 있게 의견을 시작합니다. 뒤에 I think를 다시 붙이지 않습니다.", example: "In my view, the second option is safer." },
+      { formula: "I'd suggest + V-ing / 명사", ko: "부드럽게 제안합니다. suggest 뒤에 동사가 바로 오면 V-ing입니다.", example: "I'd suggest using a larger heat exchanger." },
+      { formula: "I'd recommend (that) we + 동사원형", ko: "recommend·suggest 뒤에 '누가 할지'를 넣을 때는 that절을 쓰고, 그 안의 동사는 동사원형입니다.", example: "I'd recommend that we order the spare parts now." },
+      { formula: "I'm not sure, but I think … / It might be better to + 동사원형", ko: "확신이 없을 때 의견을 부드럽게 말합니다.", example: "It might be better to wait for the lab results." },
+    ],
+    anatomy: [
+      {
+        sentence: "I'd suggest using a larger heat exchanger.",
+        parts: [
+          p("I'd suggest", "opinion frame", "제안 표현", true),
+          p("using", "V-ing", "동명사", true),
+          p("a larger heat exchanger.", "object", "목적어"),
+        ],
+      },
+      {
+        sentence: "In my view, we should replace the seal first.",
+        parts: [
+          p("In my view,", "opinion marker", "의견 신호", true),
+          p("we", "subject", "주어"),
+          p("should", "modal", "조동사", true),
+          p("replace", "base verb", "동사원형"),
+          p("the seal", "object", "목적어"),
+          p("first.", "adverb", "부사(먼저)"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "I think we should run one more test with the real feed.", ko: "실제 원료로 시험을 한 번 더 해야 한다고 생각합니다." },
+      { en: "In my view, the second option is more realistic for the Vietnam site.", ko: "제가 보기에는 베트남 현장에는 두 번째 안이 더 현실적입니다." },
+      { en: "I'd suggest adding a bypass line around the filter.", ko: "필터에 바이패스 라인을 추가하는 것을 제안드립니다." },
+      { en: "I'd recommend that we order the spare pump before the rainy season.", ko: "우기 전에 예비 펌프를 발주할 것을 권해 드립니다." },
+      { en: "I'm not sure, but I think the problem might be the steam trap.", ko: "확실하지는 않지만, 스팀 트랩이 문제일 수도 있다고 생각합니다." },
+    ],
+    compare: [
+      { a: "I think we should add a filter.", b: "I'd suggest adding a filter.", ko: "I think we should …는 '~해야 한다'는 분명한 의견이고, I'd suggest …는 '~하면 어떨까 합니다'처럼 결정을 상대에게 맡기는 부드러운 제안입니다. 고객이나 윗사람에게는 I'd suggest가 무난합니다." },
+      { a: "I'd suggest checking the pump.", b: "I'd recommend checking the pump.", ko: "suggest는 여러 안 중 하나를 제시하는 느낌이고, recommend는 경험·전문 지식을 바탕으로 '이렇게 하는 것이 좋다'고 권하는 조금 더 강한 표현입니다." },
+      { a: "I think …", b: "In my view, …", ko: "I think는 일상적이고 가벼운 의견이고, In my view는 조금 더 격식 있고 신중하게 판단을 말하는 느낌입니다. 발표나 공식 회의에서는 In my view도 섞어 쓰면 좋습니다." },
+    ],
+    mistakes: [
+      { wrong: "I suggest to use a bigger pump.", right: "I'd suggest using a bigger pump.", ko: "suggest 뒤에는 to부정사를 쓰지 않습니다. V-ing나 that절(I suggest that we use …)을 씁니다." },
+      { wrong: "In my opinion, I think we should wait.", right: "In my opinion, we should wait.", ko: "In my opinion과 I think는 같은 뜻이라 겹쳐 쓰면 어색합니다. 둘 중 하나만 쓰세요." },
+      { wrong: "I'd recommend we to order the parts now.", right: "I'd recommend that we order the parts now.", ko: "recommend (that) + 주어 뒤에는 to 없이 동사원형을 씁니다." },
+      { wrong: "I think we should to check the data again.", right: "I think we should check the data again.", ko: "should 뒤에는 to 없이 동사원형이 옵니다." },
+      { wrong: "My opinion is we must change the vendor.", right: "In my view, we should consider changing the vendor.", ko: "My opinion is …는 딱딱하고, must는 명령처럼 강하게 들립니다. In my view + should / consider로 부드럽게 의견을 말하세요." },
+    ],
+  },
 };

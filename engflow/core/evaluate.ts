@@ -514,6 +514,34 @@ function applyEdits(tokens: Token[], w: Token[], edits: Edit[]): string {
   return capitalizeSentence(joinWords(parts));
 }
 
+/**
+ * The grammar point an alignment difference is about, when the words make it
+ * unambiguous ("are changed" → "has changed" is present perfect whatever the
+ * question was mainly practising). Null keeps the question's main skill.
+ */
+function grammarSkillFor(e: ErrorSpan, text: string): string | null {
+  const fix = e.fix.toLowerCase();
+  const next = (text.slice(e.end).match(/[A-Za-z']+/)?.[0] ?? "").toLowerCase();
+  switch (e.category) {
+    case "tense":
+      return /^(has|have|had)$/.test(fix) ? "present-perfect" : null;
+    case "be-verb":
+      return /ing$/.test(next) ? "progressive" : "be-adj";
+    case "article":
+      return "articles";
+    case "countability":
+      return "countability";
+    case "word-order":
+      return "word-order";
+    case "agreement":
+      return "agreement";
+    case "preposition":
+      return e.text === "" ? "verb-prep" : null;
+    default:
+      return null;
+  }
+}
+
 function grammarNote(scored: ErrorSpan[]): string {
   const g = scored.filter((e) => e.bucket === "grammar" && e.category !== "spelling");
   const sp = scored.filter((e) => e.category === "spelling").length;
@@ -670,6 +698,8 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
       source: f.source,
     };
   });
+  // Alignment findings carry the question's main skill; file them under the grammar they are about.
+  for (const e of errors) if (e.source === "alignment" && e.skill === primarySkill) e.skill = grammarSkillFor(e, text) ?? e.skill;
   for (const m of meaning.filter((x) => x.fuzzy)) {
     if (!errors.some((e) => e.category === "spelling")) {
       // Spelling inside a meaning unit is reported by alignment when close; otherwise note it lightly.

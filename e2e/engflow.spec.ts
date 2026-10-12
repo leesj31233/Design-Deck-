@@ -61,7 +61,7 @@ test("level test gives a qualified CEFR estimate", async ({ page }) => {
 test("full-sentence lesson: feedback, grammar guide, mistake saved", async ({ page }) => {
   const errors = await open(page);
   await nav(page, "학습");
-  await page.getByRole("radio", { name: /^문장 구성/ }).click();
+  await page.getByRole("button", { name: "문장 말하기", exact: true }).click();
   await page.getByRole("button", { name: /^시작/ }).click();
   await expect(page.locator("textarea#ef-answer")).toBeVisible();
   await page.locator("#ef-answer").fill("If we will decide it now, we must change it later because data different.");
@@ -76,7 +76,7 @@ test("full-sentence lesson: feedback, grammar guide, mistake saved", async ({ pa
   await page.getByRole("button", { name: "닫기" }).click();
   await page.getByRole("button", { name: /^다음/ }).click();
   await page.getByRole("button", { name: "세션 종료" }).click();
-  await nav(page, "내 실수");
+  await nav(page, "표현 노트");
   await expect(page.getByText("If we will decide it now, we must change it later because data different.").first()).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -112,7 +112,7 @@ test("one grading pass: Claude's grade appears once and never changes", async ({
   await fakeClaude(page, 700);
   const errors = await open(page);
   await nav(page, "학습");
-  await page.getByRole("radio", { name: /^문장 구성/ }).click();
+  await page.getByRole("button", { name: "문장 말하기", exact: true }).click();
   await page.getByRole("button", { name: /^시작/ }).click();
   await page.locator("#ef-answer").fill("We have to run it again because the composition are changed.");
   await page.getByRole("button", { name: /제출/ }).click();
@@ -134,7 +134,7 @@ test("a slow Claude never blocks: the learner can take the rule-based grade righ
   await fakeClaude(page, 60_000);
   await open(page);
   await nav(page, "학습");
-  await page.getByRole("radio", { name: /^문장 구성/ }).click();
+  await page.getByRole("button", { name: "문장 말하기", exact: true }).click();
   await page.getByRole("button", { name: /^시작/ }).click();
   await page.locator("#ef-answer").fill("We have to run it again because the composition are changed.");
   await page.getByRole("button", { name: /제출/ }).click();
@@ -143,11 +143,49 @@ test("a slow Claude never blocks: the learner can take the rule-based grade righ
   await expect(page.getByText(/기다리지 않고 규칙 기반 결과를 표시했습니다/)).toBeVisible();
 });
 
+test("scene + difficulty: a meal conversation at difficulty 3 shows the chat and my turn", async ({ page }) => {
+  const errors = await open(page);
+  await nav(page, "학습");
+  await page.getByRole("radio", { name: /^식사·회식/ }).click();
+  await page.getByRole("radio", { name: "난이도 3" }).click();
+  await expect(page.getByText(/^3 · /)).toBeVisible();
+  await page.getByRole("button", { name: /^시작/ }).click();
+  await expect(page.getByRole("list", { name: "대화" })).toBeVisible();
+  await expect(page.getByText("나 · 이렇게 말하고 싶어요")).toBeVisible();
+  await expect(page.getByText("식사·회식").first()).toBeVisible();
+  const chip = await page.getByLabel(/^난이도 \d+\/10$/).first().getAttribute("aria-label");
+  expect(Math.abs(Number(chip!.match(/\d+/)![0]) - 3)).toBeLessThanOrEqual(2);
+  await page.getByRole("button", { name: "세션 종료" }).click();
+  // The scene remembers its difficulty.
+  await expect(page.getByRole("radio", { name: /^식사·회식/ })).toContainText("난이도 3");
+  expect(errors).toEqual([]);
+});
+
+test("expression notebook: study an expression step by step, then speak it", async ({ page }) => {
+  const errors = await open(page);
+  await nav(page, "표현 노트");
+  await expect(page.getByText("내가 자주 틀리는 표현")).toBeVisible();
+  await page.getByRole("button", { name: /It's too early to decide\. 학습하기/ }).click();
+  await expect(page.getByText("내가 틀린 문장")).toBeVisible();
+  await expect(page.getByText(/I think so late/).first()).toBeVisible();
+  await page.getByRole("button", { name: /다음: 규칙·비교/ }).click();
+  await expect(page.getByText("비슷한 표현 비교")).toBeVisible();
+  await page.getByRole("button", { name: /다음: 확인 퀴즈/ }).click();
+  await expect(page.getByText("어느 쪽이 자연스러울까요?")).toBeVisible();
+  await page.getByRole("radio").first().click();
+  await expect(page.getByText(/맞았습니다|다시 보세요/)).toBeVisible();
+  await page.getByRole("button", { name: /1\. 내 실수/ }).click();
+  await page.getByRole("button", { name: /4\. 말해 보기/ }).click();
+  await page.getByRole("button", { name: /대화 연습 시작/ }).first().click();
+  await expect(page.locator("#ef-answer")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("phrase quiz is keyboard-first (Enter submits, Enter advances)", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "keyboard flow is a desktop interaction");
   await open(page);
   await nav(page, "학습");
-  await page.getByRole("radio", { name: /^구문 퀴즈/ }).click();
+  await page.getByRole("button", { name: "짧은 표현", exact: true }).click();
   await page.getByRole("button", { name: /^시작/ }).click();
   const input = page.locator("input#ef-answer");
   await expect(input).toBeFocused();
@@ -184,7 +222,7 @@ test("returning later serves a review with a different sentence", async ({ page 
 
 test("progress and every screen fit the viewport", async ({ page }) => {
   const errors = await open(page);
-  for (const label of ["오늘", "학습", "복습", "내 실수", "레벨 테스트", "진도", "설정"]) {
+  for (const label of ["오늘", "학습", "복습", "표현 노트", "레벨 테스트", "진도", "설정"]) {
     await nav(page, label);
     await page.waitForTimeout(150);
     await noHorizontalOverflow(page);

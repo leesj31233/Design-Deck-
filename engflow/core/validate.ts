@@ -42,6 +42,11 @@ export function validateQuestion(q: Question, ctx: { skillIds: Set<string>; seed
   if (q.mode === "phrase" && q.segments.length > 5) warn("phrase mode has more than 5 segments");
   if (q.mode === "sentence" && q.accepted.length < 2) warn("sentence mode should list at least 2 accepted alternatives");
   if (new Set(q.meaning.map((m) => m.id)).size !== q.meaning.length) err("duplicate meaning unit ids");
+  for (const [i, t] of (q.dialogue ?? []).entries()) {
+    if (HANGUL.test(t.en)) err(`dialogue ${i + 1}: English line contains Korean`);
+    if (t.ko !== undefined && !HANGUL.test(t.ko)) err(`dialogue ${i + 1}: ko has no Korean text`);
+    if (!t.speaker.trim()) err(`dialogue ${i + 1}: speaker is empty`);
+  }
 
   // Patterns compile.
   const patterns = [...q.meaning.flatMap((u) => u.any.map((p) => ({ p, where: `unit ${u.id}` }))), ...(q.pitfalls ?? []).map((p) => ({ p: p.pattern, where: `pitfall ${p.id}` }))];

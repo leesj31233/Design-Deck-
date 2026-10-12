@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Lightbulb, Loader2, RotateCcw, SkipForward, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, X } from "lucide-react";
 import { Kbd } from "@/components/ui/kbd";
 import { evaluateLocal } from "../../core/evaluate";
 import { pickReviewQuestion, type SessionItem } from "../../core/session";
@@ -13,7 +13,9 @@ import { skillName } from "../../content";
 import { AIUnavailableError } from "../../platform/types";
 import { useApp } from "../store";
 import { Card, ConfirmDialog, Eyebrow, LevelBadge, ScoreRing, StatusChip, TONE_TEXT, cn, relTimeKo, scoreTone, useReduced } from "../kit";
-import { MeaningChunks } from "./parts";
+import { ChatThread, MeaningChunks, MyTurn } from "./parts";
+import { situationOf } from "../../core/situations";
+import { SITUATION_INFO } from "../../content";
 import { FeedbackPanel } from "./feedback";
 import { weaknessNote } from "../../core/weakness";
 import { GuideSheet, type GuideTab } from "../guide";
@@ -112,6 +114,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const [done, setDone] = React.useState<Done[]>([]);
   const [finished, setFinished] = React.useState(false);
   const [showNatural, setShowNatural] = React.useState(app.state.settings.showNaturalKorean);
+  const [showKo, setShowKo] = React.useState(false);
   const [confirmExit, setConfirmExit] = React.useState(false);
   const [guide, setGuide] = React.useState<{ skill: string; tab: GuideTab } | null>(null);
   const [flash, setFlash] = React.useState<string | null>(null);
@@ -138,6 +141,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     setEvaluation(null);
     setGradeNote(null);
     setSlow(false);
+    setShowKo(false);
     setCommitted(null);
     setPracticeRetry(false);
     t0.current = app.now();
@@ -371,13 +375,14 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
         >
           {/* Meta */}
           <div className="flex flex-wrap items-center gap-1.5 text-[12px]">
-            <span className="rounded-full border border-[var(--line)] px-2 py-0.5 font-medium text-[var(--ef-ink-2)]">{isSentence ? "문장 구성" : "구문 퀴즈"}</span>
-            <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[var(--ef-ink-2)]">{CATEGORY_LABEL[q.category]}</span>
+            <span className="rounded-full border border-[var(--line)] px-2 py-0.5 font-medium text-[var(--ef-ink-2)]">{isSentence ? "문장 말하기" : "짧은 표현"}</span>
+            <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[var(--ef-ink-2)]">
+              {SITUATION_INFO[situationOf(q)].ko}
+              {situationOf(q) === "technical" ? ` · ${CATEGORY_LABEL[q.category]}` : ""}
+            </span>
             <LevelBadge level={q.level} />
-            <span className="flex items-center gap-[2px]" aria-label={`난이도 ${q.difficulty}/10`}>
-              {Array.from({ length: 5 }, (_, i) => (
-                <span key={i} className={cn("h-1.5 w-1.5 rounded-full", i < Math.ceil(q.difficulty / 2) ? "bg-[var(--foreground)]/70" : "bg-[var(--ef-track)]")} />
-              ))}
+            <span className="ef-num rounded-full bg-[var(--ef-track)] px-2 py-0.5 font-semibold text-[var(--ef-ink-2)]" aria-label={`난이도 ${q.difficulty}/10`}>
+              난이도 {q.difficulty}
             </span>
             {item.kind === "review" ? <span className="rounded-full bg-[var(--ef-warn-soft)] px-2 py-0.5 font-semibold text-[var(--ef-warn)]">{item.reasonKo}</span> : <span className="text-[var(--muted)]">{item.reasonKo}</span>}
           </div>
@@ -388,9 +393,40 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
           </h1>
           {q.contextKo ? <p className="ef-ko mt-1.5 max-w-[62ch] text-[14px] text-[var(--ef-ink-2)]">{q.contextKo}</p> : null}
 
+          {/* Conversation so far, then the learner's turn */}
+          {q.dialogue?.length ? (
+            <div className="mt-5">
+              <ChatThread turns={q.dialogue} showKo={showKo} />
+              <button onClick={() => setShowKo((v) => !v)} className="dd-focus ml-10 mt-1.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showKo}>
+                <Languages className="size-3.5" /> 번역 {showKo ? "숨기기" : "보기"}
+              </button>
+            </div>
+          ) : null}
+
           {/* Prompt */}
           <div className="mt-5">
-            {isSentence ? (
+            {q.dialogue?.length ? (
+              <MyTurn>
+                {isSentence ? (
+                  <>
+                    <MeaningChunks segments={q.segments} size="md" />
+                    <button onClick={() => setShowNatural((v) => !v)} className="dd-focus mt-2.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showNatural}>
+                      <ChevronDown className={cn("size-3.5 transition", showNatural && "rotate-180")} /> 자연스러운 한국어 {showNatural ? "숨기기" : "보기"}
+                    </button>
+                    {showNatural ? <p className="ef-ko mt-1 text-[14px] text-[var(--ef-ink-2)]">{q.promptKo}</p> : null}
+                  </>
+                ) : (
+                  <>
+                    <p className="ef-ko text-[19px] font-semibold leading-snug tracking-[-.02em] md:text-[22px]">{q.promptKo}</p>
+                    {q.segments.length > 1 ? (
+                      <div className="mt-2.5">
+                        <MeaningChunks segments={q.segments} size="md" />
+                      </div>
+                    ) : null}
+                  </>
+                )}
+              </MyTurn>
+            ) : isSentence ? (
               <>
                 <MeaningChunks segments={q.segments} />
                 <button onClick={() => setShowNatural((v) => !v)} className="dd-focus mt-3 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showNatural}>

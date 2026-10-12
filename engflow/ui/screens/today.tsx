@@ -10,7 +10,10 @@ import { useNav } from "../app";
 import { Card, Eyebrow, MasteryTrack, ProgressRing, StatusChip, cn, dateKo, relTimeKo } from "../kit";
 import { WeekBars } from "../charts";
 import { CATEGORY_LABEL } from "../practice/session";
-import { WeakGrammarCard } from "../weak-grammar";
+import { ExpressionCollection } from "../expressions";
+import { situationOf } from "../../core/situations";
+import { SITUATIONS } from "../../core/types";
+import { SITUATION_INFO } from "../../content";
 
 export function useStartLesson() {
   const app = useApp();
@@ -192,11 +195,41 @@ export function TodayScreen() {
         </Card>
       </div>
 
-      <WeakGrammarCard />
+      <SceneShortcuts />
+      <ExpressionCollection limit={4} />
     </div>
   );
 }
 
 function ScoreRingTarget({ answered, target }: { answered: number; target: number }) {
   return <ProgressRing value={(answered / Math.max(1, target)) * 100} label="달성" />;
+}
+
+/** One tap into a scene at the learner's saved difficulty for it. */
+function SceneShortcuts() {
+  const app = useApp();
+  const start = useStartLesson();
+  const bank = app.questions.filter((q) => !q.variation);
+  return (
+    <Card className="p-5">
+      <Eyebrow>상황별로 말해 보기</Eyebrow>
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {SITUATIONS.map((sc) => {
+          const d = app.state.settings.difficulty?.[sc];
+          const n = bank.filter((q) => situationOf(q) === sc).length;
+          return (
+            <button
+              key={sc}
+              onClick={() => start({ size: 6, situation: sc, difficulty: d, title: `${SITUATION_INFO[sc].ko}${d ? ` · 난이도 ${d}` : ""}` })}
+              disabled={!n}
+              className="dd-focus rounded-2xl border border-[var(--line)] px-3 py-2.5 text-left hover:bg-black/[.03] disabled:opacity-40 dark:hover:bg-white/[.05]"
+            >
+              <div className="text-[14px] font-semibold">{SITUATION_INFO[sc].ko}</div>
+              <div className="ef-num mt-0.5 text-[11px] text-[var(--muted)]">{d ? `난이도 ${d}` : "난이도 자동"} · {n}문항</div>
+            </button>
+          );
+        })}
+      </div>
+    </Card>
+  );
 }

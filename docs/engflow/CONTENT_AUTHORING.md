@@ -104,6 +104,49 @@ For each imported mistake (`engflow/content/seeds.ts`), a ladder tests the gramm
 - **Level 2** (≈ day 7): a longer sentence combining the pattern with another clause.
 - **Level 3** (≈ day 14): the pattern used naturally inside a complete meeting response.
 
+## Conversation questions
+
+Most practice is a turn in a conversation: someone says something, and the learner answers with what they want to say in Korean. The goal is **how to say it** in a real online meeting or business conversation, in the phrasing native speakers commonly use (natural spoken English, not textbook English, and no rare idioms).
+
+Conversation questions live in `engflow/content/bank/talk-<situation>.ts`, one file per scene:
+
+| `situation` | Scene | Typical moments |
+| --- | --- | --- |
+| `online` | Running an online meeting | audio check, screen sharing, agenda, handing over, lag/mute, time check, wrap-up |
+| `presentation` | Presenting | opening, walking through slides, results, transitions, summary, taking questions |
+| `discussion` | Meeting discussion | opinions, agreeing/disagreeing politely, clarifying, requests, schedules |
+| `smalltalk` | Greetings & small talk | greetings, weekend, weather, catching up, compliments, thanks |
+| `meal` | Meals & dinners | recommending, ordering, toasts, dietary needs, paying, declining politely |
+| `visit` | Business trips & site visits | airport pickup, hotel, site tour, safety briefing, scheduling |
+
+Required fields, on top of the normal schema:
+
+- `situation` — the file's scene. `category`: `meeting` for online/presentation/discussion, `collab` for smalltalk/meal/visit.
+- `dialogue` — 1–3 earlier lines, `{ speaker, en, ko }`. Speakers are recurring colleagues (Budi and Sari from Jakarta, Mr. Tan from a Malaysian client, Linh from Vietnam, Priya from a vendor in India, Daniel from a European licensor). Their English is natural and simple. The learner (Minsu) always speaks next.
+- `expression` — the key spoken expression the turn practises, e.g. `"Let me share my screen."`.
+- `promptKo` — what the learner wants to say, in natural Korean. `segments` — Korean meaning chunks in English word order.
+- `reference` — the most common native phrasing. `accepted` — other common, fully correct ways (≥2 for sentences).
+- `probes` — at least one `pass` paraphrase and one `fail` typical Korean-speaker mistake.
+
+Difficulty (1–10) follows the turn's length and grammar, and every scene must cover all ten:
+
+| Difficulty | CEFR | Turn |
+| --- | --- | --- |
+| 1 | A2 | fixed short expression (3–6 words): "Can you hear me?" |
+| 2 | A2 | short expression with one slot: "Let me share my screen." |
+| 3 | B1 | one clause, basic tense |
+| 4 | B1 | one clause with object and preposition |
+| 5 | B1 | two clauses (because / so / when) |
+| 6 | B2 | two clauses with present perfect, modals or a first conditional |
+| 7 | B2 | passive, relative clause or polite hedging |
+| 8 | B2 | two sentences: reason and proposal |
+| 9 | C1 | several sentences: hypothesis, summary or reporting |
+| 10 | C1 | long, diplomatic turn: polite disagreement and an alternative |
+
+Use `mode: "phrase"` for difficulty 1–3 and `mode: "sentence"` from 4 up. The grammar must be real (skills from `skills.ts`, including the conversation skills `small-talk`, `online-meeting`, `question-form`, `offer-suggest`, `thanks-looking-forward`, `signpost`, `opinion`), and pitfalls target the mistakes Korean speakers actually make (`let me to`, `I'm looking forward to see`, `How was your weekend was?`, `Do you can …?`, missing articles, wrong tense).
+
+`engflow/content/bank/dialogue-overlay.ts` adds the same kind of `dialogue` to older questions by id, without changing their files.
+
 ## Validation
 
 ```bash

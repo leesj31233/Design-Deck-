@@ -3,7 +3,7 @@ import * as React from "react";
 import { motion } from "motion/react";
 import { Check, ChevronRight, X } from "lucide-react";
 import { cn, useReduced } from "../kit";
-import type { ErrorSpan, MeaningCheck, ScoreBucket } from "../../core/types";
+import type { DialogueTurn, ErrorSpan, MeaningCheck, ScoreBucket } from "../../core/types";
 
 /* ───────────── Meaning chunks (numbered like process streams) ───────────── */
 
@@ -189,5 +189,55 @@ export function MeaningCheckList({ items }: { items: MeaningCheck[] }) {
         );
       })}
     </ul>
+  );
+}
+
+/* ───────────── Conversation (the lines before the learner's turn) ───────────── */
+
+const AVATAR_TINTS = ["#0a84ff", "#30b158", "#f2a516", "#8e4ec6", "#e5484d", "#0aa5a5"];
+
+function tintFor(name: string): string {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return AVATAR_TINTS[h % AVATAR_TINTS.length];
+}
+
+export function ChatThread({ turns, showKo }: { turns: DialogueTurn[]; showKo: boolean }) {
+  const reduced = useReduced();
+  return (
+    <ol className="space-y-2.5" aria-label="대화">
+      {turns.map((t, i) => (
+        <motion.li
+          key={i}
+          className="flex items-end gap-2"
+          initial={reduced ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: reduced ? 0 : 0.08 * i, duration: 0.2 }}
+        >
+          <span
+            className="grid size-8 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white"
+            style={{ background: tintFor(t.speaker) }}
+            aria-hidden
+          >
+            {t.speaker.replace(/^(Mr|Ms|Mrs|Dr)\.\s*/, "").charAt(0)}
+          </span>
+          <div className="min-w-0 max-w-[88%] rounded-[18px] rounded-bl-[6px] border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-2 shadow-[0_1px_0_rgba(16,17,20,.03)]">
+            <div className="text-[11px] font-semibold text-[var(--muted)]">{t.speaker}</div>
+            <p className="ef-en text-[16px] leading-snug md:text-[17px]">{t.en}</p>
+            {showKo && t.ko ? <p className="ef-ko mt-0.5 text-[13px] text-[var(--muted)]">{t.ko}</p> : null}
+          </div>
+        </motion.li>
+      ))}
+    </ol>
+  );
+}
+
+/** The learner's turn: what they want to say, right-aligned like their own chat bubble. */
+export function MyTurn({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col items-end">
+      <div className="mb-1 text-[11px] font-semibold text-[var(--ef-accent-ink)]">나 · 이렇게 말하고 싶어요</div>
+      <div className="w-full max-w-[94%] rounded-[18px] rounded-br-[6px] border border-dashed border-[var(--ef-accent-ink)]/40 bg-[var(--ef-accent-soft)] px-3 py-3">{children}</div>
+    </div>
   );
 }

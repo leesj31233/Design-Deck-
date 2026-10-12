@@ -4,6 +4,7 @@ import { z } from "zod";
 
 export const cefrSchema = z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]);
 export const categorySchema = z.enum(["process", "pilot", "meeting", "collab", "operation", "business"]);
+export const situationSchema = z.enum(["online", "presentation", "discussion", "smalltalk", "meal", "visit", "technical"]);
 export const errorCategorySchema = z.enum([
   "be-verb", "verb-form", "tense", "agreement", "preposition", "article", "word-order", "word-choice",
   "missing-content", "meaning-shift", "terminology", "spelling", "sentence-structure", "countability",
@@ -54,6 +55,9 @@ export const questionSchema = z.object({
   variation: z.object({ seed: z.string(), level: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]) }).optional(),
   source: z.enum(["curated", "generated"]).optional(),
   probes: z.array(z.object({ answer: z.string().min(1), expect: z.enum(["pass", "fail"]) })).optional(),
+  situation: situationSchema.optional(),
+  dialogue: z.array(z.object({ speaker: z.string().min(1).max(60), en: z.string().min(1).max(400), ko: z.string().max(400).optional() })).max(4).optional(),
+  expression: z.string().max(120).optional(),
 });
 
 /**

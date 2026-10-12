@@ -6,6 +6,10 @@ import { createInitialState, exportState, importState, recordAttempt } from "@/e
 import { evaluateLocal } from "@/engflow/core/evaluate";
 import { QUESTIONS, QUESTION_BY_ID } from "@/engflow/content";
 import { similarQuestions, weakGrammar } from "@/engflow/core/weakness";
+import { buildExpressionQuiz, collectExpressions } from "@/engflow/core/expressions";
+import { situationOf } from "@/engflow/core/situations";
+import { EXPRESSION_TITLES } from "@/engflow/content/expressions";
+import { SKILLS } from "@/engflow/content";
 
 const T0 = Date.UTC(2026, 9, 12, 1, 0, 0);
 
@@ -139,21 +143,23 @@ describe("frequent grammar mistakes", () => {
     const points = weakGrammar(s, T0, 0);
     expect(points.length).toBe(1);
     expect(points[0].category).toBe("tense");
+    expect(points[0].skill).toBe("present-perfect");
     expect(points[0].examples[0].fix).toBe("are → has");
     expect(Object.values(s.weak ?? {}).some((p) => p.category === "spelling" || p.category === "terminology")).toBe(false);
   });
 
   it("a repeated mistake becomes a weakness and the next session serves similar questions first", () => {
     let s = createInitialState(T0);
-    const tq = QUESTIONS.filter((q) => q.skills[0] === "time-clause" && !q.variation);
-    s = record(s, tq[0], tq[0].reference.replace(/\b(finishes|is|arrives|comes|gets|sends|starts)\b/, "will $1").replace("will is", "will be"), T0);
-    s = record(s, tq[1], tq[1].reference.replace(/\b(finishes|is|arrives|comes|gets|sends|starts)\b/, "will $1").replace("will is", "will be"), T0 + 60_000);
+    // The same present-perfect mistake twice ("are changed" for "has changed").
+    s = record(s, sim, "We need to run the process simulation again because the feed composition are changed.", T0);
+    s = record(s, sim, "We need to run the process simulation again because the feed composition are changed.", T0 + 60_000);
     const weak = weakGrammar(s, T0 + DAY_MS);
-    expect(weak[0]?.skill).toBe("time-clause");
+    expect(weak[0]?.skill).toBe("present-perfect");
+    expect(weak[0]?.count).toBe(2);
     const plan = buildSession(s, QUESTIONS, { size: 10, mode: "mixed", now: T0 + 4 * DAY_MS, rng: mulberry32(7) });
     const fresh = plan.items.filter((i) => i.kind === "new");
     expect(fresh.some((i) => i.reasonKo.startsWith("자주 틀리는 문법"))).toBe(true);
-    expect(similarQuestions(weak[0], QUESTIONS, s, T0 + DAY_MS).every((q) => q.skills.includes("time-clause"))).toBe(true);
+    expect(similarQuestions(weak[0], QUESTIONS, s, T0 + DAY_MS).every((q) => q.skills.includes("present-perfect"))).toBe(true);
   });
 
   it("fades with time and with independent correct answers on the same grammar", () => {
@@ -161,8 +167,83 @@ describe("frequent grammar mistakes", () => {
     s = record(s, sim, "We need to run the process simulation again because the feed composition are changed.", T0);
     const before = weakGrammar(s, T0, 0)[0].current;
     expect(weakGrammar(s, T0 + 28 * DAY_MS, 0)[0].current).toBeCloseTo(before / 4, 5);
-    const other = QUESTIONS.find((q) => q.id !== sim.id && q.skills.includes(sim.skills[0]) && !q.variation)!;
+    const other = QUESTIONS.find((q) => q.id !== sim.id && q.skills.includes("present-perfect") && !q.variation)!;
     s = record(s, other, other.reference, T0 + DAY_MS);
     expect(weakGrammar(s, T0 + DAY_MS, 0)[0].current).toBeLessThan(before * Math.pow(0.5, 1 / 14));
+  });
+});
+
+describe("scenes and difficulty", () => {
+  it("an explicit difficulty keeps new questions within ±1 (±2 when the bank is thin)", () => {
+    const s = createInitialState(T0);
+    for (const d of [2, 5, 8]) {
+      const plan = buildSession(s, QUESTIONS, { size: 6, mode: "mixed", difficulty: d, now: T0, rng: mulberry32(d) });
+      const fresh = plan.items.filter((i) => i.kind === "new").map((i) => QUESTION_BY_ID[i.questionId]);
+      expect(fresh.length).toBeGreaterThan(0);
+      for (const q of fresh) expect(Math.abs(q.difficulty - d)).toBeLessThanOrEqual(2);
+    }
+  });
+  it("a scene session only serves that scene's new questions", () => {
+    const s = createInitialState(T0);
+    const plan = buildSession(s, QUESTIONS, { size: 6, mode: "mixed", situation: "online", now: T0, rng: mulberry32(3) });
+    const fresh = plan.items.filter((i) => i.kind === "new").map((i) => QUESTION_BY_ID[i.questionId]);
+    expect(fresh.length).toBeGreaterThan(0);
+    expect(fresh.every((q) => situationOf(q) === "online")).toBe(true);
+  });
+  it("a mixed session spreads over scenes instead of only engineering talk", () => {
+    const s = createInitialState(T0);
+    const plan = buildSession(s, QUESTIONS, { size: 15, mode: "mixed", reviewOnly: false, now: T0 + 40 * DAY_MS, rng: mulberry32(11) });
+    const scenes = new Set(plan.items.filter((i) => i.kind === "new").map((i) => situationOf(QUESTION_BY_ID[i.questionId])));
+    expect(scenes.size).toBeGreaterThanOrEqual(3);
+  });
+  it("a saved per-scene difficulty steers mixed sessions", () => {
+    const s = { ...createInitialState(T0) };
+    s.settings = { ...s.settings, difficulty: { smalltalk: 1, meal: 1, online: 1, presentation: 1, discussion: 1, visit: 1, technical: 1 } };
+    const plan = buildSession(s, QUESTIONS, { size: 8, mode: "mixed", now: T0, rng: mulberry32(5) });
+    const fresh = plan.items.filter((i) => i.kind === "new").map((i) => QUESTION_BY_ID[i.questionId]);
+    const avg = fresh.reduce((n, q) => n + q.difficulty, 0) / fresh.length;
+    expect(avg).toBeLessThan(3.5);
+  });
+});
+
+describe("expression notebook", () => {
+  const sim = QUESTION_BY_ID["fs-process-run-simulation-again"];
+  it("collects the imported history and new mistakes per expression, most urgent first", () => {
+    let s = createInitialState(T0);
+    const before = collectExpressions(s, T0);
+    expect(before.some((e) => e.skill === "too-adj" && e.imported)).toBe(true);
+    for (let i = 0; i < 2; i++) {
+      s = recordAttempt(s, { question: sim, evaluation: evaluateLocal(sim, "We need to run the process simulation again because the feed composition are changed."), hint: 0, responseMs: 9000, firstKeyMs: 1000, context: "lesson", now: T0 + i * 60_000 }, QUESTION_BY_ID).state;
+    }
+    const list = collectExpressions(s, T0 + 60_000);
+    expect(list[0].skill).toBe("present-perfect");
+    expect(list[0].titleEn).toMatch(/has changed/);
+    expect(list[0].examples[0].wrong).toMatch(/are changed/);
+  });
+  it("the check quiz offers one correct and one typical wrong sentence, with the learner's own mistake first", () => {
+    let s = createInitialState(T0);
+    s = recordAttempt(s, { question: sim, evaluation: evaluateLocal(sim, "We need to run the process simulation again because the feed composition are changed."), hint: 0, responseMs: 9000, firstKeyMs: 1000, context: "lesson", now: T0 }, QUESTION_BY_ID).state;
+    const entry = collectExpressions(s, T0).find((e) => e.skill === "present-perfect")!;
+    const quiz = buildExpressionQuiz("present-perfect", entry, QUESTIONS, mulberry32(1));
+    expect(quiz.length).toBeGreaterThanOrEqual(3);
+    expect(quiz[0].source).toBe("mine");
+    for (const item of quiz) {
+      expect(item.options.length).toBe(2);
+      expect(item.options[0]).not.toBe(item.options[1]);
+      expect(item.explainKo.length).toBeGreaterThan(0);
+    }
+    // Wrong options from questions are ones the grader rejects.
+    for (const item of quiz.filter((x) => x.source === "question")) {
+      const q = QUESTIONS.find((x) => x.promptKo === item.promptKo && x.skills.includes("present-perfect"))!;
+      const wrong = item.options[1 - item.answer];
+      const ev = evaluateLocal(q, wrong);
+      expect(ev.scores.overall < 85 || ev.errors.some((e) => e.severity !== "minor")).toBe(true);
+    }
+  });
+  it("every grammar point can be studied: a title, a guide entry and quiz items", () => {
+    for (const skill of SKILLS.map((k) => k.id)) {
+      expect(EXPRESSION_TITLES[skill], skill).toBeTruthy();
+      expect(buildExpressionQuiz(skill, null, QUESTIONS, mulberry32(2)).length, skill).toBeGreaterThanOrEqual(2);
+    }
   });
 });

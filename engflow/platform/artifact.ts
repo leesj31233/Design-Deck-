@@ -1,5 +1,5 @@
 import {
-  AIFormatError, buildEvaluationPrompt, buildExplainPrompt, buildGenerationPrompt, buildRepairPrompt, normalizeAIEvaluation,
+  AIFormatError, buildEvaluationPrompt, buildExplainPrompt, buildGenerationPrompt, buildRepairPrompt, generationExample, normalizeAIEvaluation,
   parseGeneratedQuestion,
 } from "../core/ai";
 import type { AttemptRecord, LearnerState, Question } from "../core/types";
@@ -323,7 +323,7 @@ export function artifactAI(): AIService & { ready: Promise<boolean> } {
       guard(async () => {
         await ready;
         const s = need();
-        const example = QUESTIONS.find((q) => q.mode === req.mode && q.skills[0] !== req.skill) ?? QUESTIONS[0];
+        const example = generationExample(req, QUESTIONS);
         const ctx = { skillIds: new Set(SKILLS.map((x) => x.id)) };
         const raw = await s.json(buildGenerationPrompt(req, skillName(req.skill), stripProbes(example)), { modelTier: "default", signal, cache: false });
         let r = parseGeneratedQuestion(raw, ctx);

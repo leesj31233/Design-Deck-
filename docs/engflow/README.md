@@ -1,6 +1,6 @@
 # EngFlow — Engineering English, Built for Real Meetings
 
-EngFlow helps Korean process and R&D engineers say clear, correct English in international engineering meetings. It practises full meeting sentences built from English-order meaning chunks, drills one grammar pattern at a time, schedules reviews of each mistake with new sentences, and estimates the learner's written-English level with an adaptive, CEFR-aligned test.
+EngFlow helps Korean process and R&D engineers say clear, correct English in international online meetings and business conversations. Most practice is a turn in a conversation: a colleague says something, and the learner writes what they want to say in the phrasing native speakers commonly use. Scenes cover running an online meeting, presenting, meeting discussion, greetings and small talk, meals, business trips and technical discussion, each at difficulty 1–10. EngFlow collects the expressions the learner keeps getting wrong into an expression notebook with a short study flow, schedules reviews of each mistake with new sentences, and estimates the learner's written-English level with an adaptive, CEFR-aligned test.
 
 It is built on Design Deck (tokens, primitives, motion rules) and runs in two places from one codebase:
 
@@ -80,6 +80,23 @@ The rule-based grader works offline:
 
 Claude's output must pass a zod schema (small slips such as an unknown category name are tidied first). Its quoted error spans must exist in the answer, terminology notes become non-scoring suggestions, and curated pitfalls are kept.
 
+### Scenes and difficulty
+
+Every question belongs to a scene (`situation`): running an online meeting, presenting, meeting discussion, greetings and small talk, meals, business trips and site visits, or technical discussion. Older questions derive it from their category. Conversation questions show 1–3 earlier lines as chat bubbles (translation on request) and the learner's turn as their own bubble. Every older question also has conversation context, added by id in `dialogue-overlay`.
+
+Difficulty runs from 1 (a fixed 3–6 word expression) to 10 (a long, diplomatic turn). The learner sets it per scene on the Learn screen, and EngFlow remembers each scene's choice. An explicit difficulty keeps new questions within ±1, or ±2 when the bank is thin. Without a choice, the target comes from the level estimate. Mixed sessions cap each scene at about 30% of new questions, so everyday conversation is mixed in with engineering talk, and conversation turns rank first.
+
+### Expression notebook
+
+Mistakes are gathered per grammar point and shown as the spoken expression (*has changed*, *It's too early to decide*), together with the learner's own wrong → right sentences, the number of times, and how recent they are. This includes the imported history. Opening an expression starts a four-step study flow:
+
+1. **My mistakes.** Why the expression is confusing, plus the learner's own sentences.
+2. **Rules & comparison.** Patterns, sentence anatomy, and similar expressions compared.
+3. **Check quiz.** "Which is natural?" The learner's own mistakes come first, then typical mistakes from questions on that grammar (their QC *fail* probes, which the grader is verified to reject), then the guide's list.
+4. **Speak it.** Conversation questions with that expression near the learner's difficulty, or a new Claude-written question built from the learner's own mistakes.
+
+Every grammar point, including the seven conversation skills, can be opened from the notebook even without mistakes.
+
 ### Frequent grammar mistakes
 
 Every scored grammar error (articles and prepositions included; spelling, meaning gaps and site wording excluded) strengthens a *skill × error type* weak point, stored with the learner's own wrong → right examples. Strength halves every 14 days and drops with each independent correct answer on that grammar. While a point is strong, sessions rank questions that test the same skill with the same kind of trap first (marked *자주 틀리는 문법*), feedback says when a mistake is a repeat, and Today and *내 실수* list the top points with two drills: curated similar questions, or a new Claude-written question built from the learner's own mistakes (validated by the same QC before use).
@@ -103,6 +120,7 @@ The TOEIC Speaking panel shows the ETS **minimum scores** per CEFR level (Speaki
 
 | Bank | Items |
 | --- | --- |
+| Conversation turns (6 scenes × difficulty 1–10) | in progress |
 | Full-sentence construction (Mode A) | 48 |
 | Phrase & structure quiz (Mode B) | 75 |
 | Review variation ladders (7 imported mistakes × 4 levels × 2) | 56 |

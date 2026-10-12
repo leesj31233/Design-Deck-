@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import {
-  AIFormatError, buildEvaluationPrompt, buildExplainPrompt, buildGenerationPrompt, buildRepairPrompt, normalizeAIEvaluation,
+  AIFormatError, buildEvaluationPrompt, buildExplainPrompt, buildGenerationPrompt, buildRepairPrompt, generationExample, normalizeAIEvaluation,
   parseGeneratedQuestion, type ExplainKind, type GenerateRequest,
 } from "../core/ai";
 import { aiEvaluationSchema } from "../core/schema";
@@ -114,7 +114,7 @@ function extractJson(text: string): unknown {
 
 /** Generate a question, validate it with the same QC as the curated bank, repair once. */
 export async function generateWithClaude(req: GenerateRequest, signal?: AbortSignal): Promise<Question> {
-  const example = QUESTIONS.find((q) => q.mode === req.mode && q.skills[0] !== req.skill) ?? QUESTIONS[0];
+  const example = generationExample(req, QUESTIONS);
   const { probes: _p, source: _s, ...clean } = example;
   const ctx = { skillIds: new Set(SKILLS.map((s) => s.id)) };
   const ask = async (content: string) => {
