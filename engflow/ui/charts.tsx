@@ -65,7 +65,7 @@ export function WeekBars({ data, target }: { data: { day: string; answered: numb
 }
 
 /** Review consistency: answered per day over the last `weeks` weeks (sequential, one hue). */
-export function Heatmap({ daily, now, weeks = 12 }: { daily: Record<string, { answered: number }>; now: number; weeks?: number }) {
+export function Heatmap({ daily, now, weeks = 12 }: { daily: Record<string, { answered: number; talk?: number }>; now: number; weeks?: number }) {
   const [hover, setHover] = React.useState<{ key: string; n: number; x: number; y: number } | null>(null);
   const today = new Date(now);
   const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -75,7 +75,7 @@ export function Heatmap({ daily, now, weeks = 12 }: { daily: Record<string, { an
     const d = new Date(end.getFullYear(), end.getMonth(), end.getDate() - i);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const idx = startOffset - i;
-    cells.push({ key, n: daily[key]?.answered ?? 0, col: Math.floor(idx / 7), row: idx % 7, future: i < 0 });
+    cells.push({ key, n: (daily[key]?.answered ?? 0) + (daily[key]?.talk ?? 0), col: Math.floor(idx / 7), row: idx % 7, future: i < 0 });
   }
   const level = (n: number) => (n === 0 ? 0 : n < 5 ? 1 : n < 10 ? 2 : n < 20 ? 3 : 4);
   const fill = ["var(--ef-track)", "color-mix(in srgb, var(--accent) 25%, transparent)", "color-mix(in srgb, var(--accent) 50%, transparent)", "color-mix(in srgb, var(--accent) 75%, transparent)", "var(--accent)"];

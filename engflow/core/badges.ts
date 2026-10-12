@@ -1,4 +1,4 @@
-import { localDayKey } from "./mastery";
+import { localDayKey, practiced } from "./mastery";
 import { situationOf } from "./situations";
 import { tokenize, words } from "./text";
 import { SITUATIONS, type LearnerState, type Question, type Situation } from "./types";
@@ -12,7 +12,7 @@ import { SITUATIONS, type LearnerState, type Question, type Situation } from "./
  */
 
 export type BadgeIcon =
-  | "perfect" | "streak" | "collection" | "roleplay" | "long" | "speed" | "scenes" | "hard" | "review" | "goal" | "approved" | "talk";
+  | "perfect" | "streak" | "collection" | "roleplay" | "long" | "speed" | "scenes" | "hard" | "review" | "goal" | "approved" | "talk" | "freetalk";
 
 export interface BadgeFamily {
   id: string;
@@ -37,6 +37,7 @@ export const BADGE_FAMILIES: BadgeFamily[] = [
   { id: "goal", icon: "goal", titlesKo: ["목표 첫 달성", "목표 7일", "목표 30일"], unitKo: "하루 목표를 채운 날", goals: [1, 7, 30] },
   { id: "approved", icon: "approved", titlesKo: ["내 표현 인정", "내 표현 10개", "내 표현 30개"], unitKo: "Claude가 정확하다고 확인한 나만의 표현", goals: [1, 10, 30] },
   { id: "talk", icon: "talk", titlesKo: ["답변 50개", "답변 300개", "답변 1000개"], unitKo: "지금까지 말해 본 답", goals: [50, 300, 1000] },
+  { id: "freetalk", icon: "freetalk", titlesKo: ["자유 대화 10줄", "자유 대화 50줄", "자유 대화 200줄"], unitKo: "Claude와 자유 대화에서 말한 문장", goals: [10, 50, 200] },
 ];
 
 export interface BadgeStatus {
@@ -54,7 +55,7 @@ const DAY_MS = 86_400_000;
 
 /** Longest run of consecutive practice days in the log. */
 export function longestStreak(daily: LearnerState["daily"]): number {
-  const days = Object.keys(daily).filter((k) => daily[k]?.answered).map((k) => Date.parse(`${k}T12:00:00Z`)).filter(Number.isFinite).sort((a, b) => a - b);
+  const days = Object.keys(daily).filter((k) => practiced(daily[k])).map((k) => Date.parse(`${k}T12:00:00Z`)).filter(Number.isFinite).sort((a, b) => a - b);
   let best = 0;
   let run = 0;
   for (let i = 0; i < days.length; i++) {
@@ -91,6 +92,7 @@ export function badgeValues(state: LearnerState, questions: Question[], qIndex: 
     goal: target > 0 ? Object.values(state.daily).filter((d) => d.answered >= target).length : 0,
     approved: Object.values(state.seen).reduce((n, x) => n + (x.ok?.length ?? 0), 0),
     talk: answered.length,
+    freetalk: Object.values(state.daily).reduce((n, d) => n + (d.talk ?? 0), 0),
   };
 }
 
@@ -126,6 +128,6 @@ export function newBadges(before: Set<string>, now: BadgeStatus[]): { status: Ba
 /** Days practised this calendar week (for small summaries). */
 export function daysThisWeek(daily: LearnerState["daily"], now: number): number {
   let n = 0;
-  for (let i = 0; i < 7; i++) if (daily[localDayKey(now - i * DAY_MS)]?.answered) n++;
+  for (let i = 0; i < 7; i++) if (practiced(daily[localDayKey(now - i * DAY_MS)])) n++;
   return n;
 }

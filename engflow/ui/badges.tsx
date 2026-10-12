@@ -1,14 +1,14 @@
 "use client";
 import * as React from "react";
 import { motion } from "motion/react";
-import { BadgeCheck, Compass, Crown, Flame, Library, MessagesSquare, Mountain, PartyPopper, Repeat, Target, Zap, MessageCircle, type LucideIcon } from "lucide-react";
+import { BadgeCheck, Compass, Crown, Flame, Library, MessageSquareText, MessagesSquare, Mountain, PartyPopper, Repeat, Target, Zap, MessageCircle, type LucideIcon } from "lucide-react";
 import { badgeStatuses, type BadgeIcon, type BadgeStatus } from "../core/badges";
 import { useApp } from "./store";
 import { Card, Eyebrow, cn, useReduced } from "./kit";
 
 const ICONS: Record<BadgeIcon, LucideIcon> = {
   perfect: PartyPopper, streak: Flame, collection: Library, roleplay: MessagesSquare, long: Crown, speed: Zap,
-  scenes: Compass, hard: Mountain, review: Repeat, goal: Target, approved: BadgeCheck, talk: MessageCircle,
+  scenes: Compass, hard: Mountain, review: Repeat, goal: Target, approved: BadgeCheck, talk: MessageCircle, freetalk: MessageSquareText,
 };
 
 /** Medal colours: none yet, bronze, silver, gold. */

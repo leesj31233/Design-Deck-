@@ -2,7 +2,7 @@
 import * as React from "react";
 import { QUESTIONS } from "../content";
 import {
-  applyDiagnostic as applyDiag, createInitialState, migrateState, recordAttempt, type RecordInput, type RecordResult,
+  applyDiagnostic as applyDiag, createInitialState, migrateState, recordAttempt, recordTalkLine, type RecordInput, type RecordResult,
 } from "../core/store";
 import type { DiagnosticResultRecord, LearnerState, Profile, Question, Settings } from "../core/types";
 import type { AIStatus, Platform, StorageStatus } from "../platform/types";
@@ -42,6 +42,8 @@ export interface AppContextValue {
   qIndex: Record<string, Question>;
   now: () => number;
   record: (input: Omit<RecordInput, "now">) => RecordResult;
+  /** One line said in free talk (counts as practice for the day). */
+  recordTalk: () => void;
   applyDiagnostic: (r: DiagnosticResultRecord) => void;
   updateSettings: (patch: Partial<Settings>) => void;
   updateProfile: (patch: Partial<Profile>) => void;
@@ -126,6 +128,11 @@ export function AppProvider({ platform, children }: { platform: Platform; childr
       stateRef.current = result.state;
       setState(result.state);
       return result;
+    },
+    recordTalk: () => {
+      const next = recordTalkLine(stateRef.current, clock.now());
+      stateRef.current = next;
+      setState(next);
     },
     applyDiagnostic: (r) => setState((s) => applyDiag(s, r)),
     updateSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch }, updatedAt: clock.now() })),

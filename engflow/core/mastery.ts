@@ -32,6 +32,11 @@ export function importedSkillState(skill: string): SkillState {
   return { ...newSkillState(skill), status: "learning", mastery: 0.15, imported: true };
 }
 
+/** A day with any practice: answered questions or free-talk lines. */
+export function practiced(d: { answered?: number; talk?: number } | undefined): boolean {
+  return !!d && ((d.answered ?? 0) > 0 || (d.talk ?? 0) > 0);
+}
+
 export function localDayKey(ts: number): string {
   const d = new Date(ts);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;

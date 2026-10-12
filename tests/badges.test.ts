@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BADGE_FAMILIES, badgeStatuses, earnedBadgeIds, longestStreak, newBadges } from "@/engflow/core/badges";
 import { evaluateLocal } from "@/engflow/core/evaluate";
-import { createInitialState, recordAttempt } from "@/engflow/core/store";
+import { createInitialState, recordAttempt, recordTalkLine, streakDays } from "@/engflow/core/store";
 import { QUESTIONS, QUESTION_BY_ID } from "@/engflow/content";
 import type { LearnerState } from "@/engflow/core/types";
 
@@ -39,6 +39,18 @@ describe("badges", () => {
     const d = (k: number) => new Date(T0 + k * DAY).toISOString().slice(0, 10);
     const daily = Object.fromEntries([0, 1, 2, 3, 6, 7].map((k) => [d(k), { answered: 3, correct: 2, reviews: 0, newItems: 3, ms: 1000 }]));
     expect(longestStreak(daily)).toBe(4);
+  });
+
+  it("free-talk lines count as practice for streaks and towards their own badge", () => {
+    let st = createInitialState(T0);
+    for (let i = 0; i < 10; i++) st = recordTalkLine(st, T0 + i * 1000);
+    expect(status(st, "freetalk")).toMatchObject({ value: 10, tier: 1 });
+    st = recordTalkLine(st, T0 + DAY);
+    st = recordTalkLine(st, T0 + 2 * DAY);
+    expect(longestStreak(st.daily)).toBe(3);
+    expect(streakDays(st, T0 + 2 * DAY)).toBe(3);
+    // Free talk does not fill the daily question goal.
+    expect(st.daily[Object.keys(st.daily)[0]].answered).toBe(0);
   });
 
   it("a role-play counts once every turn has been said at 85+", () => {

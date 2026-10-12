@@ -1,5 +1,5 @@
 import { DAY_MS, newFsrsState } from "./fsrs";
-import { applyEvidence, importedSkillState, localDayKey, newSkillState } from "./mastery";
+import { applyEvidence, importedSkillState, localDayKey, newSkillState, practiced } from "./mastery";
 import { deriveGrade, expectedResponseMs, scheduleReview, IMMEDIATE_RETRY_MS } from "./scheduler";
 import { tokenize, words } from "./text";
 import type {
@@ -297,12 +297,19 @@ export function applyDiagnostic(prev: LearnerState, result: DiagnosticResultReco
 export function streakDays(state: LearnerState, now: number): number {
   let streak = 0;
   let t = now;
-  if (!state.daily[localDayKey(t)]?.answered) t -= DAY_MS; // today not started yet: count from yesterday
-  while (state.daily[localDayKey(t)]?.answered) {
+  if (!practiced(state.daily[localDayKey(t)])) t -= DAY_MS; // today not started yet: count from yesterday
+  while (practiced(state.daily[localDayKey(t)])) {
     streak++;
     t -= DAY_MS;
   }
   return streak;
+}
+
+/** One line said in free talk: counts as practice for the day (core/freetalk.ts). */
+export function recordTalkLine(prev: LearnerState, now: number): LearnerState {
+  const day = localDayKey(now);
+  const d = prev.daily[day] ?? { answered: 0, correct: 0, reviews: 0, newItems: 0, ms: 0 };
+  return { ...prev, daily: { ...prev.daily, [day]: { ...d, talk: (d.talk ?? 0) + 1 } }, updatedAt: now };
 }
 
 export function weekSeries(state: LearnerState, now: number): { day: string; answered: number; correct: number }[] {

@@ -189,6 +189,7 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
     try {
       const r = await app.platform.ai.talk(topic.id, history.map(({ who, en }) => ({ who, en })), myTurn, c.signal);
       if (c.signal.aborted) return;
+      app.recordTalk();
       const next = history.map((l, i) => (i === history.length - 1 ? { ...l, feedback: r.feedback } : l));
       const finished = r.done || myTurn >= TALK_TURNS;
       setLines([...next, { who: "partner", en: r.reply.en, ko: r.reply.ko, hint: r.done ? undefined : r.hint }]);

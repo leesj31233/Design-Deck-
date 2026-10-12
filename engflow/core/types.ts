@@ -371,6 +371,8 @@ export interface DailyLog {
   reviews: number;
   newItems: number;
   ms: number;
+  /** Lines said in free talk with Claude (not questions; they count as practice for streaks). */
+  talk?: number;
 }
 
 export interface Settings {

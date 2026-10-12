@@ -420,7 +420,7 @@ test("badges: the Progress screen shows every badge family and the first 100 ear
   await nav(page, "진도");
   const shelf = page.getByRole("list", { name: "배지 목록" });
   await expect(shelf).toBeVisible();
-  await expect(shelf.getByRole("listitem")).toHaveCount(12);
+  await expect(shelf.getByRole("listitem")).toHaveCount(13);
   await expect(shelf.getByText("첫 100점")).toBeVisible();
   await expect(shelf.getByLabel("브론즈 달성").first()).toBeVisible();
   await noHorizontalOverflow(page);

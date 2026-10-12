@@ -1,7 +1,7 @@
 import { scoredErrors } from "./evaluate";
 import { situationOf } from "./situations";
 import { weakGrammar, weaknessMatch } from "./weakness";
-import { localDayKey } from "./mastery";
+import { localDayKey, practiced } from "./mastery";
 import { tokenize, words } from "./text";
 import type { Evaluation, LearnerState, Question } from "./types";
 
@@ -43,7 +43,7 @@ const secs = (ms: number) => (ms / 1000).toFixed(1);
 /** Days in a row with practice before today (today not counted). */
 function daysBefore(daily: LearnerState["daily"], now: number): number {
   let n = 0;
-  for (let t = now - DAY_MS; daily[localDayKey(t)]?.answered; t -= DAY_MS) n++;
+  for (let t = now - DAY_MS; practiced(daily[localDayKey(t)]); t -= DAY_MS) n++;
   return n;
 }
 
