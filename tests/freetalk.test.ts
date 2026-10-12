@@ -30,6 +30,9 @@ describe("free talk", () => {
     expect(ok.feedback).toMatchObject({ score: 100, notes: [], corrected: "It was great, I went hiking." });
     expect(ok.feedback.natural).toBeUndefined();
     expect(ok.reply.en).toContain("Sunday");
+    const withHint = parseTalkReply({ ...reply({ score: 100, notes: [], corrected: "" }), hint: { en: "We went to Bukhansan.", ko: "북한산에 갔어요." } }, "It was great.");
+    expect(withHint.hint).toEqual({ en: "We went to Bukhansan.", ko: "북한산에 갔어요." });
+    expect(TALK_TOPICS.every((t) => t.opener.hint?.en && t.opener.hint.ko)).toBe(true);
     const fixed = parseTalkReply(
       reply({ score: 70, notes: [{ text: "go hiking", fix: "went hiking", whyKo: "지난 일은 과거형입니다." }], corrected: "I went hiking yesterday.", natural: "I went hiking yesterday. It was great!" }),
       "I go hiking yesterday.",

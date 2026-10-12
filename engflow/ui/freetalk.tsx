@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { motion } from "motion/react";
-import { ArrowRight, ArrowUp, CheckCircle2, Languages, MessagesSquare, RotateCcw, Sparkles, X } from "lucide-react";
+import { ArrowRight, ArrowUp, CheckCircle2, Languages, Lightbulb, MessagesSquare, RotateCcw, Sparkles, X } from "lucide-react";
 import { TALK_TOPICS, TALK_TOPIC_BY_ID, TALK_TURNS, localTalkNotes, talkSummary, type TalkLine, type TalkTopic } from "../core/freetalk";
 import { SITUATION_INFO } from "../content";
 import { AIUnavailableError } from "../platform/types";
@@ -150,7 +150,10 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
   const reduced = useReduced();
   const topic: TalkTopic = TALK_TOPIC_BY_ID[topicId] ?? TALK_TOPICS[0];
   const slow = app.state.settings.slowSpeech;
-  const [lines, setLines] = React.useState<TalkLine[]>([{ who: "partner", en: topic.opener.en, ko: topic.opener.ko }]);
+  const opening: TalkLine = { who: "partner", en: topic.opener.en, ko: topic.opener.ko, hint: topic.opener.hint };
+  const [lines, setLines] = React.useState<TalkLine[]>([opening]);
+  // Hint for the partner's latest line: 0 hidden, 1 the Korean meaning, 2 the English sentence.
+  const [hintLevel, setHintLevel] = React.useState(0);
   const [text, setText] = React.useState("");
   const [waiting, setWaiting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -169,6 +172,7 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
   React.useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "end" });
   }, [lines.length, waiting, done, reduced]);
+  React.useEffect(() => setHintLevel(0), [lines.length]);
   React.useEffect(() => {
     if (app.state.settings.autoSpeak) speak(topic.opener.en, { slow });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -187,7 +191,7 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
       if (c.signal.aborted) return;
       const next = history.map((l, i) => (i === history.length - 1 ? { ...l, feedback: r.feedback } : l));
       const finished = r.done || myTurn >= TALK_TURNS;
-      setLines([...next, { who: "partner", en: r.reply.en, ko: r.reply.ko }]);
+      setLines([...next, { who: "partner", en: r.reply.en, ko: r.reply.ko, hint: r.done ? undefined : r.hint }]);
       if (app.state.settings.autoSpeak) speak(r.reply.en, { slow });
       if (finished) {
         setDone(true);
@@ -213,7 +217,7 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
 
   const restart = () => {
     ctl.current?.abort();
-    setLines([{ who: "partner", en: topic.opener.en, ko: topic.opener.ko }]);
+    setLines([opening]);
     setDone(false);
     setError(null);
     setWaiting(false);
@@ -224,6 +228,8 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
   // Instant hint while typing: a major grammar-rule finding before Claude even sees the line.
   const instant = text.trim().split(/\s+/).length >= 3 ? localTalkNotes(text.trim()) : [];
   const summary = done ? talkSummary(lines) : null;
+  const latest = lines[lines.length - 1];
+  const hint = latest?.who === "partner" && !waiting ? latest.hint : undefined;
 
   return (
     <div className="mx-auto flex min-h-[100dvh] w-full max-w-2xl flex-col">
@@ -344,6 +350,25 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
 
       {!done ? (
         <div className="ef-safe-bottom sticky bottom-0 z-20 border-t border-[var(--line)] bg-[var(--background)]/92 px-4 pt-2 backdrop-blur-xl">
+          {hint ? (
+            <div className="mb-1.5 flex items-start gap-2 text-[12px]">
+              <button
+                onClick={() => setHintLevel((h) => Math.min(2, h + 1))}
+                disabled={hintLevel >= 2}
+                className="dd-focus inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-[var(--line)] px-2.5 font-medium text-[var(--muted)] disabled:opacity-60"
+                aria-label={hintLevel === 0 ? "힌트 보기" : "영어 문장 보기"}
+              >
+                <Lightbulb className="size-3.5" /> {hintLevel === 0 ? "힌트" : hintLevel === 1 ? "영어로 보기" : "힌트"}
+              </button>
+              {hintLevel === 1 ? <p className="ef-ko min-w-0 flex-1 pt-1 text-[var(--ef-ink-2)]">이런 뜻으로 말해 보세요: {hint.ko ?? hint.en}</p> : null}
+              {hintLevel === 2 ? (
+                <div className="flex min-w-0 flex-1 items-start gap-1 pt-0.5">
+                  <p className="ef-en min-w-0 flex-1 text-[14px] leading-snug">{hint.en}</p>
+                  <SpeakButton text={hint.en} slow={slow} className="-mt-1" label="힌트 문장 읽어 주기" />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {instant.length ? (
             <p className="ef-ko mb-1.5 text-[12px] text-[var(--ef-warn)]" aria-live="polite">
               잠깐: <span className="ef-en font-medium">{instant[0].text || "…"}</span> → <span className="ef-en font-semibold">{instant[0].fix}</span>

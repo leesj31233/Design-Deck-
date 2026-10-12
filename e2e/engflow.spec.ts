@@ -385,6 +385,11 @@ test("free talk: Claude plays the partner, every line gets feedback, and the tal
   await start.click();
   const talk = page.getByRole("list", { name: "자유 대화" });
   await expect(talk.getByText("Morning, Minsu! How was your weekend?")).toBeVisible();
+  // Stuck? The hint shows the meaning first, then the English sentence.
+  await page.getByRole("button", { name: "힌트 보기" }).click();
+  await expect(page.getByText(/이런 뜻으로 말해 보세요/)).toBeVisible();
+  await page.getByRole("button", { name: "영어 문장 보기" }).click();
+  await expect(page.getByText("It was great! I went hiking with my family. How about you?")).toBeVisible();
   const input = page.getByRole("textbox", { name: "내 대답" });
   await input.fill("It was great. I went hiking with my family.");
   await input.press("Enter");
