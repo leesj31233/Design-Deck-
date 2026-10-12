@@ -44,7 +44,8 @@ export const MUTATIONS: Mutation[] = [
   { id: "is-not-verb", ko: "is not + 동사원형 (does not)", apply: sub(/\b(doesn't|does not) (\w+)/i, (_m, _a, v) => `is not ${v}`) },
   { id: "are-not-verb", ko: "are not + 동사원형 (do not)", apply: sub(/\b(we|they|you) (don't|do not) (\w+)/i, (_m, s, _d, v) => `${s} are not ${v}`) },
   { id: "drop-be-ing", ko: "진행형 be 빠짐", apply: sub(/\b(we|they|you)('re| are) (\w+ing)\b/i, (_m, s, _b, v) => `${s} ${v}`) },
-  { id: "wait-without-for", ko: "wait for의 for 빠짐", apply: sub(/\bwait(ing)? for\b/i, (_m, g) => `wait${g ?? ""}`) },
+  // Not before a length of time: "wait a few more minutes" is correct.
+  { id: "wait-without-for", ko: "wait for의 for 빠짐", apply: sub(/\bwait(ing)? for\b(?! (?:a few|a couple|a moment|a minute|a second|a bit|a while|\d+|one|two|three|five|ten|another|several)\b)/i, (_m, g) => `wait${g ?? ""}`) },
   { id: "modal-to", ko: "조동사 + to", apply: sub(/\b(can|could|should|must|will|would) (?!be\b|have\b|not\b)([a-z]+)\b/i, (_m, mo, v) => `${mo} to ${v}`) },
   { id: "modal-s", ko: "조동사 + 3인칭 -s", apply: sub(/\b(will|can|should|must) (send|check|finish|share|confirm|need|take|make|get)\b/i, (_m, mo, v) => `${mo} ${v}s`) },
   { id: "forward-to-base", ko: "look forward to + 동사원형", apply: sub(/\bforward to (\w+ing)\b/i, (_m, v) => `forward to ${baseOf(v)}`) },
@@ -85,7 +86,8 @@ export const MUTATIONS: Mutation[] = [
   { id: "an-uncountable", ko: "an information / an advice", apply: sub(/\b(some|any|the|more) (information|advice|feedback|news|equipment)(?=[.,?!]|$| (?:and|but|so|because|for|to|in|on|at|with|from|about|is|was|has|will|yet|now|today)\b)/i, (_m, _d, n) => `${/^[aeiou]/i.test(n) ? "an" : "a"} ${n}`) },
   { id: "ly-dropped", ko: "부사 대신 형용사", apply: sub(/\b(carefully|quickly|clearly|properly|correctly|safely|smoothly)\b/i, (m) => m.replace(/ly$/i, "").replace(/il$/, "y")) },
   { id: "perfect-base", ko: "have + 동사원형", apply: sub(/\b(have|has) (sent|checked|finished|received|done|seen|made|taken|given|tried|talked)\b/i, (_m, h, v) => `${h} ${{ sent: "send", checked: "check", finished: "finish", received: "receive", done: "do", seen: "see", made: "make", taken: "take", given: "give", tried: "try", talked: "talk" }[v.toLowerCase()]}`) },
-  { id: "more-er", ko: "more + 비교급 대신 원급", apply: sub(/\b(bigger|smaller|faster|cheaper|higher|lower|longer|shorter|easier|earlier|later|better|safer)\b/i, (m) => `more ${{ bigger: "big", smaller: "small", faster: "fast", cheaper: "cheap", higher: "high", lower: "low", longer: "long", shorter: "short", easier: "easy", earlier: "early", later: "late", better: "good", safer: "safe" }[m.toLowerCase()]}`) },
+  // Not before a plural noun: "more small groups" is a valid (different) phrase.
+  { id: "more-er", ko: "more + 비교급 대신 원급", apply: sub(/\b(bigger|smaller|faster|cheaper|higher|lower|longer|shorter|easier|earlier|later|better|safer)\b(?! [a-z]+s\b)/i, (m) => `more ${{ bigger: "big", smaller: "small", faster: "fast", cheaper: "cheap", higher: "high", lower: "low", longer: "long", shorter: "short", easier: "easy", earlier: "early", later: "late", better: "good", safer: "safe" }[m.toLowerCase()]}`) },
   { id: "it-is-depend", ko: "It is depend", apply: sub(/\b(it|that) depends\b/i, (_m, s) => `${s} is depend`) },
   { id: "gerund-to", ko: "finish/mind/avoid + to", apply: sub(/\b(finish|finished|mind|enjoy|enjoyed|avoid|consider|keep|kept|suggest) (\w+ing)\b/i, (_m, v, g) => `${v} to ${baseOf(g)}`) },
   { id: "drop-subject-it", ko: "주어 it 생략", apply: sub(/^(It's|It is) (?!been\b)/, () => "Is ") },

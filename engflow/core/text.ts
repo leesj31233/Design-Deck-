@@ -5,7 +5,7 @@
  * the browser, the artifact and Node tests.
  */
 
-import { verbInfo } from "./lexicon";
+import { ING_NOUNS, verbInfo } from "./lexicon";
 
 export interface Token {
   /** Normalized (lower-case) token text. */
@@ -21,6 +21,8 @@ export interface Token {
   punct: boolean;
   /** Expanded from a contraction ("it's" → "it" + "is"); shares the span. */
   expanded?: boolean;
+  /** Clause punctuation (. , ; : ! ? — or a bracket) follows this word: grammar rules do not read across it. */
+  breakAfter?: boolean;
 }
 
 const CONTRACTIONS: Record<string, string[]> = {
@@ -126,7 +128,8 @@ export function tokenize(text: string): Token[] {
     if (t.punct || t.expanded || !/'s$/i.test(t.raw.replace(/’/g, "'")) || t.norm.endsWith("'s")) continue;
     const next = tokens[i + 1];
     if (next.punct) continue;
-    const ing = verbInfo(next.norm)?.form === "ing";
+    // "Thursday's meeting", "the plant's building": a noun in -ing after a possessive is not a verb.
+    const ing = verbInfo(next.norm)?.form === "ing" && !ING_NOUNS.has(next.norm);
     if (next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over)$/.test(next.norm)) {
       t.expanded = true;
       tokens.splice(i + 1, 0, { norm: "is", raw: t.raw, start: t.start, end: t.end, stem: stem("is"), punct: false, expanded: true });
@@ -152,6 +155,9 @@ export function tokenize(text: string): Token[] {
       t.norm = "has";
       t.stem = stem("has");
     }
+  }
+  for (let i = 0; i < tokens.length - 1; i++) {
+    if (!tokens[i].punct && tokens[i + 1].punct && /^[.,;:!?…—–()]$/.test(tokens[i + 1].norm)) tokens[i].breakAfter = true;
   }
   return tokens;
 }
@@ -244,12 +250,32 @@ export function capitalizeSentence(s: string): string {
 /** Join tokens back into readable text (punctuation attaches to the previous word). */
 export function joinWords(parts: { text: string; punct?: boolean }[]): string {
   let out = "";
+  let glue = false; // the previous part was an opening quote or bracket
+  const open = new Set<string>();
   for (const p of parts) {
     if (!p.text) continue;
-    if (!out) out = p.text;
-    else if (p.punct && /^[.,!?;:%)]$/.test(p.text)) out += p.text;
-    else if (out.endsWith("(")) out += p.text;
-    else out += " " + p.text;
+    let text = p.text;
+    // A word that starts a new sentence (after a fix replaced its first word) is capitalized.
+    if (!p.punct && /[.!?]$/.test(out) && /^[a-z]/.test(text)) text = text[0].toUpperCase() + text.slice(1);
+    if (p.punct && /^['"“”‘’]$/.test(text)) {
+      const kind = text === "'" || text === "‘" || text === "’" ? "'" : '"';
+      if (open.has(kind)) {
+        out += text; // closing quote attaches to the word before it
+        open.delete(kind);
+      } else {
+        out += out ? " " + text : text;
+        open.add(kind);
+        glue = true;
+      }
+      continue;
+    }
+    if (!out) out = text;
+    else if (glue) out += text;
+    else if (/\d,$/.test(out) && /^\d{3}/.test(text)) out += text; // "90,000"
+    else if (p.punct && /^[.,!?;:%)]$/.test(text)) out += text;
+    else if (out.endsWith("(")) out += text;
+    else out += " " + text;
+    glue = false;
   }
   return out;
 }

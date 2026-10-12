@@ -2,7 +2,7 @@ import { align, type AlignOp, type Alignment } from "./align";
 import { compilePattern, matchAny, matchPattern } from "./pattern";
 import { runRules } from "./rules";
 import {
-  ARTICLES, AUXILIARIES, BE_FORMS, CONJUNCTIONS, MODALS, NEGATIONS, PREPOSITIONS, SUBJECT_PRONOUNS,
+  ARTICLES, AUXILIARIES, BE_FORMS, CONJUNCTIONS, DETERMINERS, MODALS, NEGATIONS, PREPOSITIONS, SUBJECT_PRONOUNS,
   capitalizeSentence, isFunctionWord, joinWords, normalizeForMatch, tokenize, words, type Token,
 } from "./text";
 import { isBaseVerb, verbInfo } from "./lexicon";
@@ -135,12 +135,45 @@ export function checkMeaning(q: Question, w: Token[]): MeaningCheck[] {
 
 const PREP_SYNONYMS = [new Set(["in", "within", "during"]), new Set(["about", "on", "regarding"]), new Set(["to", "toward", "towards"])];
 const APPROX = /^(about|around|approximately|roughly|nearly|almost)$/;
-const QUANTITY_START = /^([0-9]|twice|half|double|three|two|four|five|ten|one)/;
+const QUANTITY_START = /^([0-9][0-9.,%]*|twice|half|double|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|several|few)$/;
 const MODAL_LIKE = new Set(["can", "could", "may", "might", "must", "should", "will", "would", "shall"]);
 const CONJ_SYNONYMS = [
   new Set(["because", "since", "as"]), new Set(["so", "therefore", "and"]), new Set(["when", "once", "after", "while"]),
   new Set(["although", "though", "but"]), new Set(["if", "whether"]), new Set(["that", "which", "who"]),
 ];
+/** Verb + preposition pairs that are correct English: an extra or different preposition here is a paraphrase, not an error. */
+const VERB_PREPS: Record<string, string[]> = {
+  know: ["about", "of"], think: ["about", "of", "over"], talk: ["about", "to", "with", "over"], hear: ["about", "of", "from"],
+  care: ["about", "for"], worry: ["about"], ask: ["about", "for"], learn: ["about", "from"], speak: ["about", "to", "with"],
+  agree: ["with", "on", "to"], decide: ["on", "about"], wait: ["for", "on"], look: ["at", "for", "into", "over", "through", "after", "up"],
+  deal: ["with"], work: ["on", "with", "for", "at"], depend: ["on"], focus: ["on"], apply: ["for", "to"], pay: ["for"], listen: ["to"],
+  reply: ["to"], respond: ["to"], refer: ["to"], belong: ["to"], get: ["to", "back", "on", "through", "over"], go: ["over", "through", "on", "to", "with", "ahead"],
+  come: ["back", "up", "to", "from"], check: ["on", "with", "in", "out"], follow: ["up"], complain: ["about", "to"], dream: ["about", "of"],
+  forget: ["about"], hope: ["for"], read: ["about"], write: ["about", "to"], tell: ["about"], remind: ["about", "of"], warn: ["about", "of"],
+  arrive: ["at", "in"], stay: ["at", "in", "with"], meet: ["with", "up"], plan: ["for", "on"], prepare: ["for"], search: ["for"], vote: ["for", "on"],
+  thank: ["for"], apologize: ["for", "to"], apologise: ["for", "to"], consist: ["of"], succeed: ["in"], believe: ["in"], participate: ["in"],
+  insist: ["on"], comment: ["on"], concentrate: ["on"], rely: ["on"], count: ["on"], result: ["in", "from"], invest: ["in"], specialize: ["in"],
+  cooperate: ["with"], communicate: ["with"], cope: ["with"], help: ["with"], start: ["with", "on"], finish: ["with"], share: ["with"],
+  catch: ["up"], set: ["up"], sort: ["out"], figure: ["out"], find: ["out"], point: ["out"], fill: ["in", "out"], hand: ["over", "in"], run: ["out", "into"],
+};
+/** Words that require one preposition: another one there is a real error ("depend of" → "depend on"). */
+const REQUIRED_PREP: Record<string, string[]> = {
+  depend: ["on"], interested: ["in"], consist: ["of"], listen: ["to"], wait: ["for"], responsible: ["for"], focus: ["on"], rely: ["on"],
+  insist: ["on"], succeed: ["in"], participate: ["in"], belong: ["to"], reply: ["to"], respond: ["to"], similar: ["to"], different: ["from"],
+  afraid: ["of"], proud: ["of"], aware: ["of"], capable: ["of"], famous: ["for"], married: ["to"], good: ["at"], forward: ["to"],
+  according: ["to"], due: ["to"], apply: ["for", "to"], arrive: ["in", "at"], look: ["at", "for", "into", "forward"], talk: ["to", "about", "with"],
+  agree: ["with", "on", "to"], worry: ["about"], think: ["about", "of"], ask: ["for", "about"], pay: ["for"], deal: ["with"],
+};
+const DETERMINERS_NP = new Set([...DETERMINERS].filter((d) => !/^(more|enough|other|all|no)$/.test(d)));
+/** Particles of separable phrasal verbs: "turn on the camera" = "turn the camera on". */
+const PARTICLES = new Set(["on", "off", "up", "down", "out", "in", "over", "back", "away", "around"]);
+/** Verbs of thinking and wanting: "I plan to" and "I'm planning to" are both natural. */
+const STATE_VERBS = new Set(["plan", "hope", "think", "wonder", "look", "consider", "expect", "intend", "feel", "want", "need", "mean", "like", "love", "wish", "guess", "try"]);
+/** Verbs of change: "went up (by) 5%" — "by" before the amount is optional. */
+const CHANGE_VERBS = new Set(["increase", "decrease", "rise", "drop", "fall", "grow", "reduce", "cut", "raise", "improve", "climb", "jump", "go", "come", "lower"]);
+/** -ing / -ed feeling adjectives: "I'm interesting in" means "interested". */
+const FEELING_ADJ = /^(interest|bor|excit|confus|tir|surpris|disappoint|worr|embarrass|amaz|annoy|frustrat|satisf|exhaust|shock|relax|please|terrify|frighten)(ed|ing|ied|ying)$/;
+
 /** "made with/of/from rice": all natural. */
 const MATERIAL_PREPS = new Set(["of", "with", "from"]);
 const PLACE_PREPS = new Set(["in", "at", "on"]);
@@ -157,6 +190,43 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
     findings.push({ ...f, bucket: f.bucket ?? defaultBucket(f.category), source: "alignment", priority: 1 });
     if (e) edits.push({ ...e, priority: 1 });
   };
+
+  // Separable phrasal verbs: "turn your cameras on" = "turn on your cameras".
+  const particleT = new Set<number>();
+  for (const mv of al.moves) {
+    if (PARTICLES.has(w[mv.li].norm) && !movedL.has(mv.li)) {
+      movedL.add(mv.li);
+      particleT.add(mv.ti);
+    }
+  }
+  // Learner clauses start at the beginning or after clause punctuation.
+  const clauseStart = (i: number) => {
+    let k = Math.max(0, Math.min(i, w.length - 1));
+    while (k > 0 && !w[k - 1].breakAfter) k--;
+    return k;
+  };
+  const isSubjectWord = (x?: Token) =>
+    !!x && (SUBJECT_PRONOUNS.has(x.norm) || DETERMINERS_NP.has(x.norm) || /^(there|this|that|everything|everyone|anyone|someone|anything|something)$/.test(x.norm) || /^[A-Z0-9]/.test(x.raw));
+  const OPENER = /^(am|is|are|was|were|do|does|did|have|has|had|can|could|will|would|should|shall|may|might|must)$/;
+  // An inverted question ("Is it possible…?", "Should it be…?") has its finite verb up front.
+  const inverted = (i: number) => {
+    const c = clauseStart(i);
+    return OPENER.test(w[c]?.norm ?? "") && isSubjectWord(w[c + 1]) && i > c + 1;
+  };
+  const governorBase = (li: number) => {
+    const g = w[li - 1];
+    return g ? (verbInfo(g.norm)?.base ?? g.norm) : "";
+  };
+  // "I plan to" for "I'm planning to": a state verb in a simple form that agrees with its subject.
+  const simpleState = new Set<number>();
+  for (const op of al.ops) {
+    if (op.type !== "inflect") continue;
+    const vt = verbInfo(tw[op.ti].norm);
+    const vl = verbInfo(w[op.li].norm);
+    if (!vt || !vl || vt.form !== "ing" || !STATE_VERBS.has(vl.base)) continue;
+    const subj = w[op.li - 1]?.norm ?? "";
+    if ((/^(i|we|you|they)$/.test(subj) && vl.form === "base") || (/^(he|she|it)$/.test(subj) && vl.form === "3sg") || vl.form === "past") simpleState.add(op.li);
+  }
 
   for (const mv of moves) {
     const lw = w[mv.li];
@@ -194,12 +264,23 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
     const run = runOf(k, op.type).filter((o) => !(o.type === "del" && movedL.has(o.li)) && !(o.type === "ins" && movedT.has(o.ti)));
     if (run.length < 2) return false;
     const wordsInRun = run.map((o) => (o.type === "ins" ? tw[o.ti].norm : o.type === "del" ? w[o.li].norm : ""));
+    // "(on that)", "(about it)", "(to you)": an optional prepositional phrase with a pronoun.
+    if (PREPOSITIONS.has(wordsInRun[0]) && wordsInRun.slice(1).every((x) => /^(it|this|that|them|you|me|us|him|her|these|those|all|everyone|everything)$/.test(x))) return true;
     return wordsInRun.some((x) => !isFunctionWord(x) || /^(us|them|him|me|please)$/.test(x)) || wordsInRun.some((x) => MODALS.has(x) || AUXILIARIES.has(x));
   };
   const anchored = (k: number) => {
     if (phraseRun(k)) return false;
     const prev = al.ops[k - 1];
     const next = al.ops[k + 1];
+    // Small words added or left out right next to a reworded stretch belong to that rewording
+    // ("discuss it after the meeting" ↔ "discuss it later").
+    if (al.ops[k].type === "ins" || al.ops[k].type === "del") {
+      let a = k;
+      let b = k;
+      while (a > 0 && (al.ops[a - 1].type === "ins" || al.ops[a - 1].type === "del")) a--;
+      while (b < al.ops.length - 1 && (al.ops[b + 1].type === "ins" || al.ops[b + 1].type === "del")) b++;
+      if ((a !== k || b !== k) && (contentSub(al.ops[a - 1]) || contentSub(al.ops[b + 1]))) return false;
+    }
     // Prepositions depend on the word that governs them: look one step further back.
     const op = al.ops[k];
     const isPrep = (op.type === "ins" && PREPOSITIONS.has(tw[op.ti].norm)) || ((op.type === "del" || op.type === "sub") && PREPOSITIONS.has(w[op.li].norm));
@@ -233,7 +314,30 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const vt = verbInfo(tt);
       const vl = verbInfo(lt);
       const isVerb = !!(vt && vl);
+      if (simpleState.has(op.li)) continue;
+      if ((lt === "thank" && tt === "thanks") || (lt === "thanks" && tt === "thank")) continue;
+      // Feeling adjectives: "I'm interesting in" means "interested" — a real error, whatever the lexicon knows.
+      if (FEELING_ADJ.test(lt) && FEELING_ADJ.test(tt) && lt.replace(/(ed|ing|ied|ying)$/, "") === tt.replace(/(ed|ing|ied|ying)$/, "")) {
+        push(
+          {
+            from: op.li, to: op.li + 1, category: "verb-form", severity: "major", fix: tt, skill: "be-adj",
+            messageKo: /ed$/.test(tt)
+              ? `'${w[op.li].raw}'는 '(남을) ~하게 만드는'이라는 뜻입니다. 사람이 느끼는 감정은 과거분사 '${tt}'로 말합니다.`
+              : `'${w[op.li].raw}'는 사람이 느끼는 감정입니다. 무엇이 그런 느낌을 주는지 말할 때는 '${tt}'를 씁니다.`,
+          },
+          { from: op.li, to: op.li + 1, replacement: tt },
+        );
+        continue;
+      }
       if (isVerb && vt!.form === "base" && (vl!.form === "3sg" || vl!.form === "past" || BE_FORMS.has(lt))) continue;
+      // A base form right after a modal, "to" or do-support is what the grammar requires ("can send", "doesn't work").
+      if (isVerb && vl!.form === "base" && vt!.form !== "ing") {
+        let p = op.li - 1;
+        if (w[p]?.norm === "not") p--;
+        if (/^(can|could|may|might|must|should|will|would|shall|do|does|did|to|let's)$/.test(w[p]?.norm ?? "")) continue;
+      }
+      // A finite verb with its own subject instead of a gerund: "recommend (that) you stay" = "recommend staying".
+      if (isVerb && vt!.form === "ing" && vl!.form !== "ing" && SUBJECT_PRONOUNS.has(w[op.li - 1]?.norm ?? "")) continue;
       if (BE_FORMS.has(lt) && (tt === "been" || tt === "be")) continue; // "was damaged" vs "may have been damaged": both valid
       if (/^(every|each|one)$/.test(w[op.li - 1]?.norm ?? "")) continue; // "every flange" vs "all flanges": both valid
       // "testing data" vs "test data": an -ing/base swap only matters after to/modals or prepositions.
@@ -261,6 +365,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       if (/^(every|each)$/.test(lt) && tt === "all") continue; // "every flange" = "all flanges"
       const lc = wordClass(lt);
       const tc = wordClass(tt);
+      // Two ways to open a question: "Is it possible…?" / "Would it be possible…?"
+      if (/^(be|aux|modal)$/.test(lc) && /^(be|aux|modal)$/.test(tc) && op.li === clauseStart(op.li) && isSubjectWord(w[op.li + 1])) continue;
       let category: ErrorCategory = "word-choice";
       let severity: Severity = "minor";
       let msg = `'${w[op.li].raw}' 대신 '${tt}'가 자연스럽습니다.`;
@@ -275,9 +381,13 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       } else if (/^(do|does|would|could|can|will)$/.test(lt) && /^(do|does|would|could|can|will)$/.test(tt) && SUBJECT_PRONOUNS.has(w[op.li + 1]?.norm ?? "")) {
         continue; // "Do you want …?" vs "Would you like …?": politeness, not tense
       } else if (tc === "prep" && lc === "prep") {
+        const gov = governorBase(op.li);
+        const timeObject = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|january|february|march|april|may|june|july|august|september|october|november|december|\d{1,2}(:\d{2})?|noon|midnight|night|weekend)$/.test(w[op.li + 1]?.norm ?? "");
+        if (VERB_PREPS[gov]?.includes(lt) && !timeObject) continue; // "go through" / "go over", "talk to" / "talk with"
         category = "preposition";
-        severity = (PLACE_PREPS.has(tt) && PLACE_PREPS.has(lt)) || (DEADLINE_PREPS.has(tt) && DEADLINE_PREPS.has(lt)) ? "minor" : "major";
-        msg = `전치사 선택: '${w[op.li].raw}' → '${tt}'.`;
+        // Only a word that needs one particular preposition makes another one a clear error ("depend of").
+        severity = REQUIRED_PREP[gov]?.includes(tt) && !REQUIRED_PREP[gov].includes(lt) ? "major" : "minor";
+        msg = severity === "major" ? `'${w[op.li - 1].raw}' 뒤에는 '${tt}'를 씁니다: '${w[op.li - 1].raw} ${tt}'.` : `전치사 선택: '${w[op.li].raw}' → '${tt}'가 더 자연스럽습니다.`;
       } else if (tc === "article" && lc === "article") {
         category = "article";
         msg = `관사: '${w[op.li].raw}' → '${tt}'.`;
@@ -300,6 +410,13 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         category = "tense";
         severity = "major";
         msg = `시제/조동사: '${w[op.li].raw}' → '${tt}'. 의미(가능성·시점)가 달라집니다.`;
+      } else if (lc === "prep" && tc === "article" && VERB_PREPS[governorBase(op.li)]?.includes(lt) && op.li + 1 < w.length) {
+        // "decide on date" vs "decide the date": "decide on" is fine — the article after it is what is missing.
+        push(
+          { from: op.li + 1, to: op.li + 1, category: "article", severity: "minor", fix: tt, messageKo: `명사 앞에 관사 '${tt}'가 필요합니다.`, skill: "articles" },
+          { from: op.li + 1, to: op.li + 1, replacement: tt },
+        );
+        continue;
       } else if (lc === "prep" && tc === "article") {
         category = "preposition";
         severity = "major";
@@ -320,6 +437,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       if (APPROX.test(lt) && QUANTITY_START.test(w[op.li + 1]?.norm ?? "")) continue; // "about twice as high"
       // Indirect questions end with the verb: "let me know what the design pressure is".
       if (c === "be" && w.slice(0, op.li).some((x) => /^(what|which|how|where|when|why|who|whether|if)$/.test(x.norm)) && (op.li === w.length - 1 || w[op.li + 1]?.punct)) continue;
+      // "decide on the date", "wait for a few minutes", "known about it": the verb takes this preposition.
+      if (c === "prep" && VERB_PREPS[governorBase(op.li)]?.includes(lt)) continue;
       const prevIsVerb = op.li > 0 && !!verbInfo(w[op.li - 1].norm);
       const map: Record<string, [ErrorCategory, Severity, string]> = {
         be: ["be-verb", "major", `불필요한 be동사 '${w[op.li].raw}'가 있습니다.`],
@@ -340,10 +459,20 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       continue;
     }
     if (op.type === "ins") {
-      if (movedT.has(op.ti)) continue;
+      if (movedT.has(op.ti) || particleT.has(op.ti)) continue;
       const tt = tw[op.ti].norm;
       const c = wordClass(tt);
       if (c === "content" || c === "modal") continue;
+      if (c === "be" && simpleState.has(op.at)) continue;
+      // "Is it possible…?" needs no second be: the question already opens with its verb.
+      if ((c === "be" || c === "aux") && inverted(op.at)) continue;
+      // Casual replies leave out "I (am)": "Hope so.", "Don't think so.", "Sorry, …".
+      if ((tt === "i" || tt === "am") && op.at === clauseStart(op.at) && /^(hope|think|guess|don't|do|didn't|wish|bet|suppose|love|appreciate|agree|sorry|afraid|glad|happy|sure|not)$/.test(w[op.at]?.norm ?? "")) continue;
+      // "went up (by) 5%": by before the amount of a change is optional.
+      if (tt === "by" && QUANTITY_START.test(w[op.at]?.norm ?? "")) {
+        const pv = w[op.at - 1]?.norm ?? "";
+        if (CHANGE_VERBS.has(verbInfo(pv)?.base ?? pv) || /^(up|down)$/.test(pv)) continue;
+      }
       if (tt === "that") continue; // usually optional
       if (tt === "at" && tw[op.ti + 1]?.norm === "all") continue; // "(not spicy) at all" is optional emphasis
       // "I('d) suggest …": would softens the suggestion; leaving it out is not a grammar error.
@@ -360,7 +489,13 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       else if (c === "prep") entry = ["preposition", "major", `전치사 '${tt}'가 빠졌습니다.`];
       else if (c === "pronoun") entry = ["sentence-structure", "major", `주어/목적어 '${tt}'가 빠졌습니다.`];
       else if (c === "conj") entry = ["sentence-structure", "minor", `연결어 '${tt}'가 빠졌습니다.`];
-      else if (c === "neg") entry = ["meaning-shift", "critical", `부정어 '${tt}'가 빠져 의미가 반대가 됩니다.`, "meaning"];
+      else if (c === "neg") {
+        // "Should it be …?" for "Shouldn't it be …?": a checking question either way, not a reversed meaning.
+        const negQuestion = op.at > 0 && clauseStart(op.at - 1) === op.at - 1 && OPENER.test(w[op.at - 1].norm) && isSubjectWord(w[op.at]);
+        entry = negQuestion
+          ? ["word-choice", "minor", `'~하지 않나요?'라고 확인할 때는 부정 의문문(예: Shouldn't it …?)이 더 자연스럽습니다. 뜻은 통합니다.`]
+          : ["meaning-shift", "critical", `부정어 '${tt}'가 빠져 의미가 반대가 됩니다.`, "meaning"];
+      }
       if (!entry) continue;
       push({ from: op.at, to: op.at, category: entry[0], severity: entry[1], bucket: entry[3], fix: tt, messageKo: entry[2], skill }, { from: op.at, to: op.at, replacement: tt });
     }

@@ -25,14 +25,12 @@ export interface RuleFinding {
 type Rule = (w: Token[]) => RuleFinding[];
 
 /**
- * True when punctuation (a comma, a full stop, a dash) separates word i from
- * word i+1. Rules get words only, so this reads the gap between their source
- * offsets; parts of one contraction share a span and are never split.
+ * True when clause punctuation (a comma, a full stop, a dash, a bracket)
+ * separates word i from word i+1 — marked by the tokenizer, so "15% is" or a
+ * quoted word is not a break. Parts of one contraction are never split.
  */
 function brokenAfter(w: Token[], i: number): boolean {
-  const a = w[i];
-  const b = w[i + 1];
-  return !!a && !!b && b.start - a.end > 1;
+  return !!w[i] && !!w[i + 1] && !!w[i].breakAfter;
 }
 
 const WAIT_OBJECTS = new Set([
@@ -52,7 +50,7 @@ const missingBeProgressive: Rule = (w) => {
     if (!SUBJECT_PRONOUNS.has(subj)) continue;
     if (i > 0 && /^(to|than|as|let)$/.test(w[i - 1].norm)) continue;
     // "Sorry to keep you waiting", "I saw it coming": you/it right after a verb is its object.
-    if ((subj === "you" || subj === "it") && i > 0 && !brokenAfter(w, i - 1) && (verbInfo(w[i - 1].norm) || /^(keep|kept|see|saw|find|found|hear|heard|leave|left|watch|catch|caught|imagine|mind|get|got|notice|noticed|have|had|spot|spotted|set)$/.test(w[i - 1].norm))) continue;
+    if ((subj === "you" || subj === "it") && i > 0 && !brokenAfter(w, i - 1) && /^(keep|keeps|kept|see|saw|seen|find|found|hear|heard|leave|left|watch|catch|caught|imagine|mind|get|got|notice|noticed|have|had|spot|spotted|set|start|started|send|sent)$/.test(w[i - 1].norm)) continue;
     // Question word order ("Is it working?", "are you asking") already has the be verb before the subject.
     if (i > 0 && (BE_FORMS.has(w[i - 1].norm) || /^(do|does|did|have|has|had|will|would|can|could|should)$/.test(w[i - 1].norm))) continue;
     let j = i + 1;
@@ -205,7 +203,13 @@ const beBaseVerb: Rule = (w) => {
       });
       continue;
     }
-    const nounVerb = !!v && personal && PRONOUN_BE_VERBS.has(v.norm);
+    // "If it still is not work", "that is not suit you": a negated be with a verb that is rarely a noun there.
+    const subjBefore = /^(still|really|also|just|now|probably)$/.test(w[i - 1]?.norm ?? "") ? w[i - 2]?.norm : w[i - 1]?.norm;
+    const thingNeg = !!v && negated && /^(it|this|that)$/.test(subjBefore ?? "") && /^(work|suit|fit|match|include|cover|mean|matter|help|need|make|take|look|seem|support|affect|change|happen|exist|apply|depend|belong)$/.test(v.norm);
+    // "It's not work, it's fun" uses the noun; a following word or an if/when clause shows the verb.
+    const clauseHasConj = w.slice(Math.max(0, i - 4), i).some((x) => /^(if|when|because|unless|once)$/.test(x.norm));
+    const verbUse = thingNeg && ((j < w.length - 1 && !brokenAfter(w, j)) || clauseHasConj);
+    const nounVerb = !!v && ((personal && PRONOUN_BE_VERBS.has(v.norm)) || verbUse);
     if (!v || (!UNAMBIGUOUS_VERBS.has(v.norm) && !nounVerb) || isSameFormParticiple(v.norm) || BE_ADJECTIVE_OK.has(v.norm)) continue;
     if (w[j + 1]?.norm === "to" && v.norm === "able") continue;
     // "is" after a question word or "there" is not this pattern ("What is meet?" is not a learner sentence).
@@ -485,7 +489,7 @@ const moreShortAdjective: Rule = (w) => {
     const next = w[i + 2];
     const prev = w[i - 1]?.norm ?? "";
     // "more big dryers", "more good news": more counts the noun phrase, which is fine.
-    const clauseEnds = !next || brokenAfter(w, i + 1) || /^(than|in|on|at|for|to|because|so|and|but|or|if|when|now|today|this|next|during|after|before|with|from|by|until|please|enough|then|again)$/.test(next.norm);
+    const clauseEnds = !next || brokenAfter(w, i + 1) || /^(than|in|on|at|for|to|because|so|and|but|or|if|when|now|today|tonight|tomorrow|this|next|during|after|before|with|from|by|until|please|enough|then|again|soon|later|already|still|too|overall|anyway|these|every)$/.test(next.norm);
     const article = /^(a|an|the|much|even|far|bit|little|lot|slightly|no)$/.test(prev);
     if (!clauseEnds && !article) continue;
     out.push({
@@ -565,7 +569,8 @@ const missingBeAdjective: Rule = (w) => {
     const prev = w[i - 1]?.norm ?? "";
     // Question order ("Are you ready?") or an object pronoun ("make it ready", "keep you busy").
     if (i > 0 && !brokenAfter(w, i - 1) && (BE_FORMS.has(prev) || /^(do|does|did|have|has|had|will|would|can|could|should|to|than|as)$/.test(prev))) continue;
-    if ((s === "it" || s === "you") && i > 0 && !brokenAfter(w, i - 1) && (verbInfo(prev) || PREP_LIKE.test(prev) || /^(keep|make|find|leave|get|got|call|consider|want|need|let|thank|thanks)$/.test(prev))) continue;
+    // "it"/"you" are also objects ("resend it right away", "get it right"): only a clause-initial one is a subject.
+    if ((s === "it" || s === "you") && i > 0 && !brokenAfter(w, i - 1) && !/^(and|but|so|because|if|when|that|since|or|then|maybe|actually|well|yes|no|oh|okay|ok|sure|hope|think|guess|believe|know)$/.test(prev)) continue;
     const a = w[i + 1];
     if (!PREDICATE_ADJECTIVES.test(a.norm)) continue;
     // "I sure hope so" (sure as an adverb), "we free up", "they right-click" are not this pattern.
@@ -593,10 +598,12 @@ const letMakeTo: Rule = (w) => {
     if (!/^(me|us|him|her|them|you|it|everyone)$/.test(w[i + 1].norm) || w[i + 2].norm !== "to") continue;
     // "make it to the meeting" (= arrive) is an idiom.
     if (/^(make|makes|made|making)$/.test(w[i].norm) && w[i + 1].norm === "it") continue;
-    if (!isBaseVerb(w[i + 3].norm)) continue;
+    let v = i + 3;
+    while (v < w.length && /^(just|quickly|briefly|first|really|also|now)$/.test(w[v].norm)) v++;
+    if (!w[v] || !isBaseVerb(w[v].norm)) continue;
     out.push({
       rule: "let-make-to", from: i + 2, to: i + 3, replacement: "", category: "verb-form", severity: "major", skill: "verb-object",
-      messageKo: `'${w[i].norm} + 사람 + 동사원형'입니다. to를 쓰지 않습니다: '${w[i].raw} ${w[i + 1].raw} ${w[i + 3].raw}'.`,
+      messageKo: `'${w[i].norm} + 사람 + 동사원형'입니다. to를 쓰지 않습니다: '${w[i].raw} ${w[i + 1].raw} ${w[v].raw}'.`,
     });
   }
   return out;
@@ -736,6 +743,7 @@ const COUNTABLE_NOUNS = new Set([
   "flight", "hotel", "restaurant", "airport", "contract", "quotation", "invoice", "requirement", "specification",
   "datasheet", "mistake", "project", "meeting", "deadline", "proposal", "machine", "laptop", "microphone",
   "promotion", "wedding", "anniversary", "award", "lab", "laboratory", "warehouse", "workshop", "supervisor",
+  "weekend", "team", "lobby", "station", "price",
 ]);
 const NP_DETERMINERS = new Set([
   ...DETERMINERS, "my", "one", "two", "three", "first", "second", "last", "next", "which", "what", "whose", "such", "many",
@@ -746,6 +754,12 @@ const bareSingularCountable: Rule = (w) => {
   for (let i = 0; i < w.length; i++) {
     const n = w[i];
     if (!COUNTABLE_NOUNS.has(n.norm) || n.expanded) continue;
+    const before = w[i - 1]?.norm ?? "";
+    // "the data and report" shares its determiner; "and report at the meeting", "to report", "we report": a verb.
+    if (/^(and|or)$/.test(before)) continue;
+    // "by train", "by email": transport and means take no article; "an increase in price" is uncountable use.
+    if (before === "by" || (n.norm === "price" && before === "in" && /^(increase|decrease|rise|drop|change|difference|increases|changes)$/.test(w[i - 2]?.norm ?? ""))) continue;
+    if (verbInfo(n.norm) && /^(to|will|would|can|could|should|must|may|might|please|let's|lets|i|we|you|they|not|also|then|and|or|just|always|usually|often)$/.test(before)) continue;
     // Heads its phrase only: followed by the end, a function word or a verb (not by another noun or an object).
     const next = w[i + 1];
     if (next) {
@@ -789,6 +803,9 @@ const bareSingularCountable: Rule = (w) => {
     }
     if (!ok && uncertain) continue;
     if (ok) continue;
+    // "Pangyo Station", "Tower B Lobby": a capitalized name needs no article.
+    if (/^[A-Z]/.test(n.raw) && i > 0) continue;
+    if (start < i && start > 0 && /^[A-Z]/.test(w[start].raw) && !brokenAfter(w, start - 1)) continue;
     // "Good question.", "Great idea!": a short reply that is only a noun phrase stands without an article.
     if ((start === 0 || brokenAfter(w, start - 1)) && (i === w.length - 1 || brokenAfter(w, i)) && start < i) continue;
     // "kind of problem", "type of valve": the bare noun is idiomatic.
@@ -865,7 +882,7 @@ const thirdPersonBase: Rule = (w) => {
     const reaction =
       (/^(look|sound|seem|feel|taste|smell)$/.test(v) &&
         /^(so|really|very|quite|pretty|great|good|nice|fine|perfect|like|amazing|delicious|interesting|weird|strange|right|wrong|okay|ok|correct|lovely|fantastic|awesome|terrible|bad|better|worse|reasonable|fair|familiar|easy|difficult|hard|tough|exciting|fun|busy|tight|expensive|cheap|good)$/.test(after)) ||
-      (v === "make" && after === "sense") ||
+      (v === "make" && /^(sense|a|no|any|it|me|us|everything|things|more)$/.test(after)) ||
       (v === "depend" && after === "on") ||
       (v === "work" && /^(for|fine|well|better)$/.test(after));
     if (!reaction) continue;
@@ -874,6 +891,137 @@ const thirdPersonBase: Rule = (w) => {
       rule: "third-person-s", from: i + 1, to: i + 2, replacement: fix, category: "agreement", severity: "major", skill: "agreement",
       messageKo: `주어 '${w[i].raw}'는 3인칭 단수라서 동사에 -s를 붙입니다: '${w[i].raw} ${fix}'.`,
     });
+  }
+  return out;
+};
+
+/** "since a few hours" → "for a few hours": since takes a starting point, for a length of time. */
+const sinceDuration: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 2; i++) {
+    if (w[i].norm !== "since") continue;
+    let j = i + 1;
+    if (w[j].norm === "a" && /^(few|couple)$/.test(w[j + 1]?.norm ?? "")) j += 2;
+    else if (/^(two|three|four|five|six|seven|eight|nine|ten|several|many|\d+)$/.test(w[j].norm)) j++;
+    else continue;
+    if (w[j]?.norm === "of") j++;
+    if (!/^(seconds|minutes|hours|days|weeks|months|years|decades)$/.test(w[j]?.norm ?? "")) continue;
+    out.push({
+      rule: "since-duration", from: i, to: i + 1, replacement: "for", category: "preposition", severity: "major", skill: "present-perfect",
+      messageKo: `기간(얼마 동안)은 'for'를 씁니다: 'for ${w.slice(i + 1, j + 1).map((x) => x.raw).join(" ")}'. 'since'는 시작 시점과 함께 씁니다(since Monday, since 2020).`,
+    });
+  }
+  return out;
+};
+
+/** "much numbers" → "many numbers": much is for uncountable nouns. */
+const PLURAL_COUNTABLES = /^(numbers|problems|questions|issues|people|things|options|samples|changes|days|hours|meetings|emails|documents|details|mistakes|errors|ideas|points|units|tests|parts|items|drawings|reports|calls|times|cases|steps|tasks|customers|visitors|engineers)$/;
+const muchPlural: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    if (w[i].norm !== "much" || brokenAfter(w, i)) continue;
+    let j = i + 1;
+    if (/^(more|too)$/.test(w[j].norm)) continue; // "much more people" is a comparison
+    while (j < w.length && j <= i + 2 && /^(new|small|big|different|other|technical|important)$/.test(w[j].norm)) j++;
+    if (!PLURAL_COUNTABLES.test(w[j]?.norm ?? "")) continue;
+    out.push({
+      rule: "much-plural", from: i, to: i + 1, replacement: "many", category: "countability", severity: "major", skill: "countability",
+      messageKo: `셀 수 있는 복수 명사('${w[j].raw}')에는 'much'가 아니라 'many'(또는 a lot of)를 씁니다.`,
+    });
+  }
+  return out;
+};
+
+/** "I'd suggest to stay" → "I'd suggest staying": suggest/recommend take -ing or a that-clause, not to + verb. */
+const suggestTo: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 2; i++) {
+    if (!/^(suggest|suggested|suggests|recommend|recommended|recommends|avoid|avoided|enjoy|enjoyed|finish|finished|mind|consider|considered|keep|kept)$/.test(w[i].norm)) continue;
+    if (w[i + 1].norm !== "to" || brokenAfter(w, i)) continue;
+    const v = w[i + 2];
+    if (!isBaseVerb(v.norm) || /^(me|you|him|her|us|them|everyone|the|a|an|our|your)$/.test(v.norm)) continue;
+    const ing = ingOf(v.norm);
+    const base = verbInfo(w[i].norm)?.base ?? w[i].norm;
+    out.push({
+      rule: "verb-gerund-to", from: i + 1, to: i + 3, replacement: ing, category: "verb-form", severity: "major", skill: base === "suggest" || base === "recommend" ? "opinion" : "prep-gerund",
+      messageKo: base === "suggest" || base === "recommend"
+        ? `'${base}' 뒤에는 to부정사가 아니라 동사ing나 that절이 옵니다: '${w[i].raw} ${ing}' 또는 '${w[i].raw} (that) we ${v.norm}'.`
+        : `'${base}' 뒤에는 동사ing가 옵니다: '${w[i].raw} ${ing}'.`,
+    });
+  }
+  return out;
+};
+
+/** "Let me quick recap" → "quickly recap": an adjective cannot describe a verb. */
+const adjectiveBeforeVerb: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  const ADV: Record<string, string> = { quick: "quickly", careful: "carefully", clear: "clearly", brief: "briefly", proper: "properly", slow: "slowly", easy: "easily", final: "finally", direct: "directly", immediate: "immediately", simple: "simply" };
+  for (let i = 1; i < w.length - 1; i++) {
+    const a = w[i].norm;
+    if (!ADV[a]) continue;
+    const prev = w[i - 1].norm;
+    if (!/^(me|us|i|we|you|they|please|to|will|would|can|could|should|must|let's)$/.test(prev)) continue;
+    if (prev === "me" && w[i - 2]?.norm !== "let") continue;
+    if (prev === "us" && w[i - 2]?.norm !== "let") continue;
+    const v = w[i + 1];
+    const info = verbInfo(v.norm);
+    // "a quick recap" has an article; "Let me quick recap" / "I'll quick check" use the word as a verb.
+    // After "let me/us" the next word must be a verb, even one the lexicon does not know ("recap").
+    const verbSlot = (prev === "me" || prev === "us") && !DETERMINERS.has(v.norm) && /^[a-z]{3,}$/.test(v.norm) && !/(s|ly)$/.test(v.norm);
+    if (!(info ? info.form === "base" : verbSlot) || COUNTABLE_NOUNS.has(v.norm)) continue;
+    out.push({
+      rule: "adjective-before-verb", from: i, to: i + 1, replacement: ADV[a], category: "word-choice", severity: "major", skill: "word-order",
+      messageKo: `동사 '${v.raw}'를 꾸밀 때는 부사를 씁니다: '${ADV[a]} ${v.raw}'. (명사로 쓰려면 'do a ${a} ${v.raw}')`,
+    });
+  }
+  return out;
+};
+
+/** Prepositions of time: on Monday, in May, at 3 pm. */
+const WEEKDAY = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/;
+const MONTH = /^(january|february|march|april|june|july|august|september|october|november|december)$/; // "may" is also a modal
+const timePreposition: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    const p = w[i].norm;
+    if (!/^(in|on|at)$/.test(p) || brokenAfter(w, i)) continue;
+    let j = i + 1;
+    if (/^(next|last|this)$/.test(w[j].norm)) continue; // "on next Monday" is handled elsewhere; "next Monday" needs none
+    const n = w[j].norm;
+    let fix = "";
+    const dated = /^\d{1,2}(st|nd|rd|th)?$/.test(w[j + 1]?.norm ?? ""); // "on March 15"
+    if ((WEEKDAY.test(n) || (MONTH.test(n) && dated)) && p !== "on") fix = "on";
+    else if (((MONTH.test(n) && !dated) || (/^(19|20)\d\d$/.test(n) && p === "on")) && p !== "in") fix = "in";
+    else if (/^\d{1,2}(:\d{2})?$/.test(n) && /^(am|pm|o'clock|oclock)$/.test(w[j + 1]?.norm ?? "") && p !== "at") fix = "at";
+    if (!fix) continue;
+    out.push({
+      rule: "time-preposition", from: i, to: i + 1, replacement: fix, category: "preposition", severity: "major", skill: "verb-prep",
+      messageKo: `시간 전치사: 요일·날짜는 on, 월·연도는 in, 시각은 at입니다: '${fix} ${w[j].raw}'.`,
+    });
+  }
+  return out;
+};
+
+/** Fixed phrases that need "the": "at the latest", "at the moment", "on the other hand", "in the meantime". */
+const IDIOM_THE: [RegExp, string][] = [
+  [/^at latest$/, "at the latest"], [/^at earliest$/, "at the earliest"], [/^at moment$/, "at the moment"],
+  [/^in meantime$/, "in the meantime"], [/^on other hand$/, "on the other hand"], [/^at same time$/, "at the same time"],
+  [/^for first time$/, "for the first time"], [/^in middle of$/, "in the middle of"], [/^at end of$/, "at the end of"], [/^by end of$/, "by the end of"],
+];
+const idiomArticle: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    for (const [re, fix] of IDIOM_THE) {
+      const n = fix.split(" ").length - 1;
+      const phrase = w.slice(i, i + n).map((t) => t.norm).join(" ");
+      if (!re.test(phrase)) continue;
+      // "by end of day" (EOD) is common business English.
+      if (/end of$/.test(phrase) && /^(day|business)$/.test(w[i + n]?.norm ?? "")) continue;
+      out.push({
+        rule: "idiom-the", from: i + 1, to: i + 1, replacement: "the", category: "article", severity: "minor", skill: "articles",
+        messageKo: `'${fix}'는 the가 들어가는 굳어진 표현입니다.`,
+      });
+    }
   }
   return out;
 };
@@ -887,6 +1035,7 @@ const RULES: Rule[] = [
   perfectBaseVerb, doPast, agreement, doubleComparative, willInConditionClause, uncountablePlural, everyPlural, nonWords, articleSound,
   transitivePreposition, bareSingularCountable, perfectNeedsPassive, thirdPersonBase,
   moreShortAdjective, veryVerb, enoughOrder, missingSubjectIt, missingBeAdjective, letMakeTo, thereIsPlural, numberSingular,
+  sinceDuration, muchPlural, suggestTo, adjectiveBeforeVerb, timePreposition, idiomArticle,
 ];
 
 export function runRules(words: Token[]): RuleFinding[] {

@@ -127,7 +127,14 @@ for (const b of BASE_VERBS) {
 }
 
 export function verbInfo(w: string): { base: string; form: "base" | "past" | "pp" | "ing" | "3sg" } | null {
-  return FORM_INDEX.get(w) ?? null;
+  const hit = FORM_INDEX.get(w);
+  if (hit) return hit;
+  // "resend", "rescheduled", "rechecking": re- + a known verb is that verb again.
+  if (w.length > 4 && w.startsWith("re")) {
+    const inner = FORM_INDEX.get(w.slice(2));
+    if (inner && inner.base.length >= 3) return { base: `re${inner.base}`, form: inner.form };
+  }
+  return null;
 }
 
 export function isSameFormParticiple(base: string): boolean {
