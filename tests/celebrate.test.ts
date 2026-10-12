@@ -18,12 +18,42 @@ const skillOf = (id: string) => QUESTION_BY_ID[id]?.skills[0];
 const base = { question: q, streak: 1, hint: 0, now: NOW, skillOf };
 
 describe("celebrations", () => {
-  it("a perfect answer without hints gets confetti, and the same answer always gets the same line", () => {
-    const a = celebrationFor({ ...base, evaluation: exact(), prev: fresh() });
-    const b = celebrationFor({ ...base, evaluation: exact(), prev: fresh() });
+  it("a perfect answer without hints gets fireworks, and the same answer always gets the same line", () => {
+    const seenBefore = { ...fresh(), seen: { [q.id]: { count: 1, lastAt: NOW - 86_400_000, best: 70 } } };
+    const a = celebrationFor({ ...base, evaluation: exact(), prev: seenBefore });
+    const b = celebrationFor({ ...base, evaluation: exact(), prev: seenBefore });
     expect(a?.kind).toBe("perfect");
-    expect(a?.burst).toBe("confetti");
+    expect(a?.burst).toBe("fireworks");
     expect(a?.titleKo).toBe(b?.titleKo);
+    // A fast perfect answer says how fast.
+    expect(celebrationFor({ ...base, evaluation: exact(), prev: seenBefore, responseMs: 3200 })?.detailKo).toContain("3.2초");
+  });
+
+  it("100 points on a question never seen before, or on a long explanation, has its own fireworks", () => {
+    expect(celebrationFor({ ...base, evaluation: exact(), prev: fresh() })).toMatchObject({ kind: "first-perfect", titleKo: "첫 도전에 100점!", burst: "fireworks" });
+    const long = QUESTION_BY_ID["fs-pilot-dryer-tested-last-month"] as Question;
+    const c = celebrationFor({ ...base, question: long, evaluation: evaluateLocal(long, long.reference), prev: fresh() });
+    expect(c).toMatchObject({ kind: "long-perfect", burst: "fireworks" });
+    expect(c?.detailKo).toContain("23단어");
+  });
+
+  it("the third clean answer in a row on the same question is 'mastered', once", () => {
+    const att = (overall: number, at: number): AttemptRecord => ({ id: `a${at}`, at, questionId: q.id, mode: q.mode, context: "review", answer: q.reference, overall, scores: { meaning: overall, grammar: overall, terminology: overall, organization: overall, comprehensibility: overall }, errorCategories: [], hint: 0, responseMs: 3000, firstKeyMs: 500, grade: 3, evaluator: "local" });
+    const seen = { [q.id]: { count: 2, lastAt: NOW - 1000, best: 95 } };
+    expect(celebrationFor({ ...base, evaluation: scored(92), prev: { ...fresh(), seen, attempts: [att(90, 1), att(95, 2)] } })).toMatchObject({ kind: "mastered", burst: "sparkle" });
+    // Already mastered (three clean before), or a miss in between: no repeat.
+    expect(celebrationFor({ ...base, evaluation: scored(92), prev: { ...fresh(), seen, attempts: [att(88, 0), att(90, 1), att(95, 2)] } })?.kind).not.toBe("mastered");
+    expect(celebrationFor({ ...base, evaluation: scored(92), prev: { ...fresh(), seen, attempts: [att(60, 1), att(95, 2)] } })?.kind).not.toBe("mastered");
+  });
+
+  it("a short reply at conversation speed is 'speedy'; a slow one or a long answer is not", () => {
+    const short = QUESTION_BY_ID["tk-reaction-got-it"] as Question;
+    const ev = { ...evaluateLocal(short, short.reference), exact: false, scores: { ...evaluateLocal(short, short.reference).scores, overall: 92 } };
+    expect(celebrationFor({ ...base, question: short, evaluation: ev, prev: fresh(), responseMs: 2500 })).toMatchObject({ kind: "speedy", burst: "sparkle" });
+    expect(celebrationFor({ ...base, question: short, evaluation: ev, prev: fresh(), responseMs: 9000 })?.kind).not.toBe("speedy");
+    const long = QUESTION_BY_ID["fs-pilot-dryer-tested-last-month"] as Question;
+    const lev = { ...evaluateLocal(long, long.reference), exact: false, scores: { ...evaluateLocal(long, long.reference).scores, overall: 92 } };
+    expect(celebrationFor({ ...base, question: long, evaluation: lev, prev: fresh(), responseMs: 2500 })?.kind).not.toBe("speedy");
   });
 
   it("a perfect answer after the first hint is still a success but not 'perfect'", () => {

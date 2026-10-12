@@ -2,7 +2,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { motion } from "motion/react";
-import { CalendarCheck, Flame, Library, PartyPopper, ShieldCheck, Sparkles, Target, TrendingUp, Trophy } from "lucide-react";
+import { CalendarCheck, Crown, Flame, Library, Medal, PartyPopper, Rocket, ShieldCheck, Sparkles, Target, TrendingUp, Trophy, Zap } from "lucide-react";
 import type { Celebration } from "../core/celebration";
 import { cn, useReduced } from "./kit";
 
@@ -34,12 +34,149 @@ function drawStar(ctx: CanvasRenderingContext2D, r: number) {
   ctx.fill();
 }
 
+/* Fireworks: rockets rise from the bottom and burst into rings of sparks. */
+
+interface Spark {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  color: string;
+  life: number;
+  decay: number;
+  twinkle: number; // 0 = steady, otherwise a phase for flickering
+}
+
+interface Shell {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  x: number;
+  y: number;
+  launchAt: number;
+  rise: number;
+  colors: [string, string];
+  exploded: boolean;
+}
+
+const SHELL_COLORS: [string, string][] = [
+  ["#ff453a", "#ffd60a"], ["#0a84ff", "#64d2ff"], ["#30d158", "#ffd60a"], ["#bf5af2", "#ff9f0a"], ["#ff9f0a", "#ff375f"], ["#64d2ff", "#30d158"],
+];
+
 /**
- * A one-shot burst over the page. "confetti" rains from the top and bursts
- * from the origin; "sparkle" is a small ring of stars around the origin.
- * Respects reduced motion (renders nothing) and cleans up after itself.
+ * Runs fireworks on a canvas context; returns a cancel function. The first
+ * rocket bursts just above the origin (the celebration banner), the others
+ * across the upper part of the screen, about a quarter second apart.
  */
-export function Burst({ kind, origin, onDone }: { kind: "confetti" | "sparkle"; origin?: { x: number; y: number } | null; onDone?: () => void }) {
+function fireworks(ctx: CanvasRenderingContext2D, W: number, H: number, ox: number, oy: number, shells: number, onEnd: () => void): () => void {
+  const scale = Math.max(0.8, Math.min(1.5, Math.min(W, H) / 600));
+  const list: Shell[] = Array.from({ length: shells }, (_, i) => {
+    const x1 = i === 0 ? Math.min(W * 0.8, Math.max(W * 0.2, ox + 60)) : W * (0.12 + Math.random() * 0.76);
+    const y1 = i === 0 ? Math.max(H * 0.14, Math.min(H * 0.6, oy - 90)) : H * (0.12 + Math.random() * 0.34);
+    const x0 = x1 + (Math.random() - 0.5) * 60;
+    return { x0, y0: H + 12, x1, y1, x: x0, y: H + 12, launchAt: i * 260 + Math.random() * 60, rise: 420 + Math.random() * 140, colors: SHELL_COLORS[(i + Math.floor(Math.random() * 6)) % SHELL_COLORS.length], exploded: false };
+  });
+  const sparks: Spark[] = [];
+  const flashes: { x: number; y: number; life: number; color: string }[] = [];
+  const started = performance.now();
+  let raf = 0;
+  const burst = (sh: Shell) => {
+    const n = 64 + Math.floor(Math.random() * 20);
+    for (let k = 0; k < n; k++) {
+      const a = (Math.PI * 2 * k) / n + (Math.random() - 0.5) * 0.1;
+      const v = (4.2 + Math.random() * 2.6) * scale;
+      sparks.push({ x: sh.x, y: sh.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, color: sh.colors[k % 3 === 0 ? 1 : 0], life: 1, decay: 0.0105 + Math.random() * 0.006, twinkle: 0 });
+    }
+    // An inner ring of glitter that flickers as it falls.
+    for (let k = 0; k < 22; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const v = (1 + Math.random() * 2) * scale;
+      sparks.push({ x: sh.x, y: sh.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, color: "#fff4b0", life: 1, decay: 0.008 + Math.random() * 0.005, twinkle: 1 + Math.random() * 6 });
+    }
+    flashes.push({ x: sh.x, y: sh.y, life: 1, color: sh.colors[1] });
+  };
+  const ease = (k: number) => 1 - Math.pow(1 - k, 3);
+  const tick = (t: number) => {
+    const el = t - started;
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = "round";
+    for (const sh of list) {
+      if (sh.exploded || el < sh.launchAt) continue;
+      const k = Math.min(1, (el - sh.launchAt) / sh.rise);
+      const px = sh.x;
+      const py = sh.y;
+      sh.x = sh.x0 + (sh.x1 - sh.x0) * ease(k);
+      sh.y = sh.y0 + (sh.y1 - sh.y0) * ease(k);
+      // Rising trail with a bright head.
+      ctx.globalAlpha = 0.85;
+      ctx.strokeStyle = sh.colors[1];
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(px, py + 14);
+      ctx.lineTo(sh.x, sh.y);
+      ctx.stroke();
+      ctx.fillStyle = "#fffbe6";
+      ctx.beginPath();
+      ctx.arc(sh.x, sh.y, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+      if (k >= 1) {
+        sh.exploded = true;
+        burst(sh);
+      }
+    }
+    for (const f of flashes) {
+      if (f.life <= 0) continue;
+      ctx.globalAlpha = f.life * 0.5;
+      ctx.fillStyle = f.color;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 30 * scale * (1.3 - f.life), 0, Math.PI * 2);
+      ctx.fill();
+      f.life -= 0.1;
+    }
+    for (const p of sparks) {
+      if (p.life <= 0) continue;
+      p.vx *= 0.968;
+      p.vy = p.vy * 0.968 + 0.06;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      const alpha = Math.max(0, p.life) * (p.twinkle ? 0.5 + 0.5 * Math.sin(el / 40 + p.twinkle) : 1);
+      ctx.globalAlpha = alpha;
+      if (p.twinkle) {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        ctx.moveTo(p.x - p.vx * 3.2, p.y - p.vy * 3.2);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+    const live = list.some((sh) => !sh.exploded) || sparks.some((p) => p.life > 0);
+    if (live && el < 4200) raf = requestAnimationFrame(tick);
+    else {
+      ctx.clearRect(0, 0, W, H);
+      onEnd();
+    }
+  };
+  raf = requestAnimationFrame(tick);
+  return () => cancelAnimationFrame(raf);
+}
+
+/**
+ * A one-shot effect over the page. "fireworks" launches rockets that burst
+ * into rings of sparks (a 100-point answer, a perfect session); "confetti"
+ * rains from the top and bursts from the origin; "sparkle" is a small ring
+ * of stars around the origin. Respects reduced motion (renders nothing) and
+ * cleans up after itself.
+ */
+export function Burst({ kind, origin, onDone, shells = 4 }: { kind: "fireworks" | "confetti" | "sparkle"; origin?: { x: number; y: number } | null; onDone?: () => void; shells?: number }) {
   const ref = React.useRef<HTMLCanvasElement>(null);
   const reduced = useReduced();
   React.useEffect(() => {
@@ -58,6 +195,7 @@ export function Burst({ kind, origin, onDone }: { kind: "confetti" | "sparkle"; 
     ctx.scale(dpr, dpr);
     const ox = origin?.x ?? W / 2;
     const oy = origin?.y ?? H * 0.3;
+    if (kind === "fireworks") return fireworks(ctx, W, H, ox, origin?.y ?? H * 0.45, shells, () => onDone?.());
     const parts: Particle[] = [];
     const add = (p: Partial<Particle> & Pick<Particle, "x" | "y" | "vx" | "vy">) =>
       parts.push({ size: 6 + Math.random() * 6, color: COLORS[Math.floor(Math.random() * COLORS.length)], rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.3, shape: 0, life: 1, ...p });
@@ -119,6 +257,33 @@ export function Burst({ kind, origin, onDone }: { kind: "confetti" | "sparkle"; 
 
 let audio: AudioContext | null = null;
 
+/** Soft "pop … crackle" for each firework (noise bursts), timed roughly with the explosions. */
+export function playPops(count: number): void {
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return;
+    audio = audio ?? new Ctx();
+    const a = audio;
+    const len = Math.floor(a.sampleRate * 0.25);
+    const buf = a.createBuffer(1, len, a.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    for (let i = 0; i < count; i++) {
+      const src = a.createBufferSource();
+      const filter = a.createBiquadFilter();
+      const gain = a.createGain();
+      src.buffer = buf;
+      filter.type = "bandpass";
+      filter.frequency.value = 900 + Math.random() * 900;
+      gain.gain.value = 0.08;
+      src.connect(filter).connect(gain).connect(a.destination);
+      src.start(a.currentTime + 0.48 + i * 0.26);
+    }
+  } catch {
+    /* audio unavailable */
+  }
+}
+
 export function playChime(kind: "perfect" | "good" | "streak"): void {
   try {
     const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -145,8 +310,15 @@ export function playChime(kind: "perfect" | "good" | "streak"): void {
 
 /* ───────────── Banner ───────────── */
 
-const ICONS = { goal: Target, days: CalendarCheck, collection: Library, perfect: PartyPopper, streak: Flame, "weak-cleared": ShieldCheck, improved: TrendingUp, comeback: Trophy, great: Sparkles } as const;
+const ICONS = {
+  goal: Target, days: CalendarCheck, collection: Library, "long-perfect": Crown, "first-perfect": Rocket, perfect: PartyPopper, streak: Flame, mastered: Medal,
+  "weak-cleared": ShieldCheck, improved: TrendingUp, speedy: Zap, comeback: Trophy, great: Sparkles,
+} as const;
 const TONES = {
+  "long-perfect": "from-[#f2a516]/20 via-[#ff453a]/10 to-[#8e4ec6]/14 text-[var(--foreground)]",
+  "first-perfect": "from-[#0a84ff]/16 via-[#8e4ec6]/12 to-[#ff9f0a]/14 text-[var(--foreground)]",
+  mastered: "from-[#30b158]/16 via-[#f2a516]/12 to-transparent text-[var(--foreground)]",
+  speedy: "from-[#f2a516]/20 via-[#ffd60a]/10 to-[#0a84ff]/10 text-[var(--foreground)]",
   goal: "from-[#30b158]/18 via-[#0a84ff]/12 to-[#f2a516]/16 text-[var(--foreground)]",
   days: "from-[#ff9f0a]/18 via-[#f2a516]/12 to-[#30b158]/12 text-[var(--foreground)]",
   collection: "from-[#8e4ec6]/16 via-[#0a84ff]/12 to-[#30b158]/12 text-[var(--foreground)]",
@@ -169,8 +341,13 @@ export function CelebrationBanner({ c, effects, sound }: { c: Celebration; effec
       const r = ref.current?.getBoundingClientRect();
       setBurst(r ? { x: r.left + 28, y: r.top + r.height / 2 } : { x: window.innerWidth / 2, y: window.innerHeight * 0.3 });
     }
-    if (sound) playChime(c.kind === "perfect" || c.kind === "goal" || c.kind === "collection" ? "perfect" : c.kind === "streak" || c.kind === "days" ? "streak" : "good");
-    if (c.kind === "perfect" || c.kind === "goal" || c.kind === "days") navigator.vibrate?.(30);
+    const shells = c.kind === "long-perfect" ? 6 : 4;
+    if (sound) {
+      playChime(c.burst === "fireworks" || c.kind === "goal" || c.kind === "collection" ? "perfect" : c.kind === "streak" || c.kind === "days" ? "streak" : "good");
+      if (c.burst === "fireworks" && effects && !reduced) playPops(shells);
+    }
+    if (c.burst === "fireworks") navigator.vibrate?.([24, 60, 24]);
+    else if (c.kind === "goal" || c.kind === "days") navigator.vibrate?.(30);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -184,14 +361,22 @@ export function CelebrationBanner({ c, effects, sound }: { c: Celebration; effec
         className={cn("flex items-center gap-3 rounded-2xl bg-gradient-to-r px-4 py-3", TONES[c.kind])}
       >
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--surface-strong)] shadow-sm" style={{ animation: reduced ? undefined : "ef-pop .5s ease" }}>
-          <Icon className={cn("size-5", c.kind === "streak" || c.kind === "days" ? "text-[#ff6b00]" : c.kind === "perfect" ? "text-[var(--ef-accent-ink)]" : "text-[var(--ef-ok)]")} />
+          <Icon
+            className={cn(
+              "size-5",
+              c.kind === "streak" || c.kind === "days" ? "text-[#ff6b00]"
+                : c.kind === "long-perfect" || c.kind === "speedy" || c.kind === "mastered" ? "text-[#c27c00] dark:text-[#ffbf47]"
+                  : c.kind === "perfect" || c.kind === "first-perfect" ? "text-[var(--ef-accent-ink)]"
+                    : "text-[var(--ef-ok)]",
+            )}
+          />
         </span>
         <div className="min-w-0">
           <div className="text-[16px] font-semibold tracking-[-.01em]">{c.titleKo}</div>
           {c.detailKo ? <div className="ef-ko text-[13px] text-[var(--ef-ink-2)]">{c.detailKo}</div> : null}
         </div>
       </motion.div>
-      {burst && c.burst !== "none" ? <Burst kind={c.burst} origin={burst} onDone={() => setBurst(null)} /> : null}
+      {burst && c.burst !== "none" ? <Burst kind={c.burst} origin={burst} shells={c.kind === "long-perfect" ? 6 : 4} onDone={() => setBurst(null)} /> : null}
     </>
   );
 }

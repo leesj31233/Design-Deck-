@@ -225,6 +225,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
         ? celebrationFor({
             evaluation: ev, question: q, prev: app.state, streak: isSuccess(ev, hint) ? streak + 1 : 0, hint, now: app.now(),
             skillOf: (id) => app.qIndex[id]?.skills[0],
+            responseMs: submittedAt.current !== null ? submittedAt.current - t0.current : undefined,
           })
         : null,
     );
@@ -748,10 +749,12 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
   const speedTop = spec.speed && speedTimes.length >= 5 && speedAvg <= 6 && good >= Math.ceil(done.length * 0.7);
   // A great session earns a trophy and confetti: every answer clean, or an average of 90+.
   const trophy = (answered.length >= 3 && (good === done.length || avg >= 90)) || roleplayClean || ladderTop || speedTop;
+  // Not a single miss (or three 100s and more): fireworks instead of confetti.
+  const allClear = answered.length >= 3 && good === done.length;
   const [party, setParty] = React.useState(trophy && app.state.settings.celebrate !== false);
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-10">
-      {party ? <Burst kind="confetti" onDone={() => setParty(false)} /> : null}
+      {party ? <Burst kind={allClear || perfects >= 3 ? "fireworks" : "confetti"} shells={6} onDone={() => setParty(false)} /> : null}
       <motion.div initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center">
         <div
           className={cn("mx-auto grid size-14 place-items-center rounded-full", trophy ? "bg-[#f2a516]/15 text-[#c27c00] dark:text-[#ffbf47]" : "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]")}
@@ -759,7 +762,7 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
         >
           {trophy ? <Trophy className="size-7" /> : <CheckCircle2 className="size-7" />}
         </div>
-        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{roleplay ? (roleplayClean ? "대화 완주!" : "대화 끝") : ladder ? (ladderTop ? "꼭대기까지 올랐어요!" : "계단 오르기 끝") : spec.speed ? (speedTop ? "순발력 만점!" : "순발력 훈련 끝") : trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
+        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{roleplay ? (roleplayClean ? "대화 완주!" : "대화 끝") : ladder ? (ladderTop ? "꼭대기까지 올랐어요!" : "계단 오르기 끝") : spec.speed ? (speedTop ? "순발력 만점!" : "순발력 훈련 끝") : allClear ? "한 문제도 놓치지 않았어요!" : trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
         <p className="ef-ko mt-1 text-[14px] text-[var(--muted)]">{spec.title}</p>
         {perfects || bestStreak >= 3 || goalNow ? (
           <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[12px]">

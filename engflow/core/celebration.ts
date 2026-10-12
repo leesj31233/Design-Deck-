@@ -2,6 +2,7 @@ import { scoredErrors } from "./evaluate";
 import { situationOf } from "./situations";
 import { weakGrammar, weaknessMatch } from "./weakness";
 import { localDayKey } from "./mastery";
+import { tokenize, words } from "./text";
 import type { Evaluation, LearnerState, Question } from "./types";
 
 /**
@@ -9,14 +10,16 @@ import type { Evaluation, LearnerState, Question } from "./types";
  * same answer always gets the same celebration and it can be tested.
  */
 
-export type CelebrationKind = "goal" | "days" | "collection" | "perfect" | "streak" | "weak-cleared" | "improved" | "comeback" | "great";
+export type CelebrationKind =
+  | "goal" | "days" | "collection" | "long-perfect" | "first-perfect" | "perfect" | "streak" | "mastered"
+  | "weak-cleared" | "improved" | "speedy" | "comeback" | "great";
 
 export interface Celebration {
   kind: CelebrationKind;
   titleKo: string;
   detailKo?: string;
-  /** Visual effect: a full confetti burst, a smaller sparkle, or nothing. */
-  burst: "confetti" | "sparkle" | "none";
+  /** Visual effect: fireworks (100 points), a confetti burst, a smaller sparkle, or nothing. */
+  burst: "fireworks" | "confetti" | "sparkle" | "none";
   /** Points gained over the previous best on this question. */
   delta?: number;
 }
@@ -27,6 +30,15 @@ const STREAK_MILESTONES = new Set([3, 5, 10, 15, 20, 30, 50]);
 const DAY_MILESTONES = new Set([3, 7, 14, 21, 30, 50, 100, 200, 365]);
 const DAY_MS = 86_400_000;
 const COLLECTION_MILESTONES = new Set([10, 25, 50, 75, 100, 150, 200, 300, 400, 500]);
+/** A long answer: a full explanation rather than a reply. */
+const LONG_WORDS = 14;
+
+/** Time to answer that feels like real conversation, by answer length (ms); long answers have none. */
+function quickLimitMs(n: number): number {
+  return n <= 6 ? 4000 : n <= 12 ? 8000 : 0;
+}
+
+const secs = (ms: number) => (ms / 1000).toFixed(1);
 
 /** Days in a row with practice before today (today not counted). */
 function daysBefore(daily: LearnerState["daily"], now: number): number {
@@ -58,12 +70,16 @@ export function celebrationFor(input: {
   now: number;
   /** Primary skill of a question id (attempts store only the id). */
   skillOf: (questionId: string) => string | undefined;
+  /** Time from the question appearing to submit (ms), when known. */
+  responseMs?: number;
 }): Celebration | null {
-  const { evaluation: ev, question: q, prev, streak, hint, now, skillOf } = input;
+  const { evaluation: ev, question: q, prev, streak, hint, now, skillOf, responseMs } = input;
   const success = isSuccess(ev, hint);
   const seed = `${q.id}|${ev.answer}`;
   if (!success) return null;
   const perfect = (ev.scores.overall === 100 || ev.exact) && hint === 0;
+  const n = words(tokenize(ev.answer)).length;
+  const quick = responseMs !== undefined && responseMs > 0 && responseMs <= quickLimitMs(n);
 
   // Today's goal reached with this answer, or the first answer of the day extends the practice-days streak to a milestone.
   if (prev.daily) {
@@ -86,11 +102,26 @@ export function celebrationFor(input: {
     }
   }
 
+  // 100 points: fireworks. A long explanation or a sentence never seen before gets its own line.
   if (perfect) {
-    return { kind: "perfect", titleKo: pick(PERFECT_TITLES, seed), detailKo: streak >= 3 ? `${streak}연속 정답 중이에요.` : undefined, burst: "confetti" };
+    if (n >= LONG_WORDS) return { kind: "long-perfect", titleKo: "긴 문장도 완벽!", detailKo: `${n}단어로 길게 설명하면서 실수가 하나도 없어요.`, burst: "fireworks" };
+    if (!prev.seen[q.id]) {
+      return { kind: "first-perfect", titleKo: "첫 도전에 100점!", detailKo: quick ? `처음 보는 상황에서 ${secs(responseMs!)}초 만에 완벽하게.` : "처음 보는 상황인데 한 번에 완벽하게 말했어요.", burst: "fireworks" };
+    }
+    return {
+      kind: "perfect", titleKo: pick(PERFECT_TITLES, seed),
+      detailKo: streak >= 3 ? `${streak}연속 정답 중이에요.` : quick ? `${secs(responseMs!)}초 만에 완벽하게!` : undefined,
+      burst: "fireworks",
+    };
   }
   if (STREAK_MILESTONES.has(streak)) {
     return { kind: "streak", titleKo: `${streak}연속 정답!`, detailKo: "흐름이 좋아요. 이 속도로 계속 가요.", burst: streak >= 5 ? "confetti" : "sparkle" };
+  }
+  // Third clean answer in a row on this very question: it is the learner's own now.
+  const mine = prev.attempts.filter((a) => a.questionId === q.id && !a.skipped);
+  const clean = (a: (typeof mine)[number]) => a.overall >= 85 && a.hint <= 1;
+  if (mine.length >= 2 && mine.slice(-2).every(clean) && !(mine.length >= 3 && clean(mine[mine.length - 3]))) {
+    return { kind: "mastered", titleKo: "완전히 내 표현!", detailKo: "이 문장을 세 번 연속 정확하게 말했어요. 이제 복습 간격이 길어집니다.", burst: "sparkle" };
   }
   // A question on a grammar point the learner keeps getting wrong, answered without that mistake.
   const weak = weakGrammar(prev, now);
@@ -102,6 +133,10 @@ export function celebrationFor(input: {
   if (best !== undefined && ev.scores.overall - best >= 10) {
     const delta = ev.scores.overall - best;
     return { kind: "improved", titleKo: `+${delta}점 향상!`, detailKo: `지난번 최고 ${best}점에서 ${ev.scores.overall}점이 됐어요.`, burst: "sparkle", delta };
+  }
+  // A short reply that came out at conversation speed.
+  if (quick) {
+    return { kind: "speedy", titleKo: "번개 같은 대답!", detailKo: `${secs(responseMs!)}초 만에 정확하게. 실제 대화에서 필요한 속도예요.`, burst: "sparkle" };
   }
   // The previous answer on the same grammar fell short; this one did not.
   const last = [...prev.attempts].reverse().find((a) => !a.skipped && a.questionId !== q.id && skillOf(a.questionId) === q.skills[0]);
