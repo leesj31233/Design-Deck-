@@ -21,11 +21,12 @@ export const TALK_NEGOTIATION: Question[] = [
     reference: "What's your best price?",
     accepted: ["What's the best price you can offer?", "What's your best price for the decanter?", "What's the best price you can give us?", "What's your best offer?"],
     meaning: [
-      { id: "best-price", en: "your best price", ko: "최대한 낮춘 가격", any: ["best|lowest|final ... price|offer"], critical: true },
+      { id: "best-price", en: "your best price", ko: "최대한 낮춘 가격", any: ["best|lowest|final|bottom ... price|offer|deal"], critical: true },
       { id: "what", en: "what's", ko: "얼마예요", any: ["what", "tell|know"] },
     ],
     pitfalls: [
       { id: "how-much-price", pattern: "how much ... price|offer", category: "word-choice", severity: "major", fix: "what's your best price", messageKo: "price는 이미 '금액'이라서 'How much is the price?'처럼 how much와 함께 쓰지 않습니다. 가격은 'What's your best price?'처럼 what으로 묻습니다." },
+      { id: "you-best", pattern: "re:(?<=\\bwhat (?:is|are) )you(?= (?:best|lowest|final|last)\\b)", category: "word-choice", severity: "major", fix: "your", messageKo: "'당신의 (최대한의) 가격'은 소유격 your를 씁니다: 'What's your best price?'" },
     ],
     hints: { pattern: "What's + your best + price?", skeleton: "What's your ____ _____?", partial: "What's your best…" },
     explanationKo: "가격 자체를 물을 때는 'What's the price?', 최대한 낮춰 줄 수 있는 가격은 'What's your best price?'라고 합니다. price는 이미 금액이라 'How much is the price?'처럼 how much와 함께 쓰면 어색합니다.",
@@ -51,9 +52,10 @@ export const TALK_NEGOTIATION: Question[] = [
     segments: ["~할 수 있을까요", "우리가", "중간에서 타협하다"],
     reference: "Can we meet halfway?",
     accepted: ["Can we meet in the middle?", "How about meeting halfway?", "Why don't we meet halfway?", "Can we meet halfway on this?", "Shall we meet halfway?"],
-    meaning: [{ id: "meet-halfway", en: "meet halfway", ko: "중간에서 타협하다", any: ["meet ... halfway|middle", "meet ... half way", "split ... difference"], critical: true }],
+    meaning: [{ id: "meet-halfway", en: "meet halfway", ko: "중간에서 타협하다", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bmeet(?:ing|s)? (?:\\S+ ){0,2}?(?:halfway|half way|in the middle)\\b", "re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bsplit(?:ting)? (?:the )?difference\\b"], critical: true }],
     pitfalls: [
       { id: "meet-in-half", pattern: "meet in the? half", category: "word-choice", severity: "major", fix: "meet halfway", messageKo: "'중간에서 타협하다'는 'meet halfway' 또는 'meet in the middle'입니다. 한국어 '반반'을 옮긴 'meet in half'는 영어에서 쓰지 않습니다." },
+      { id: "modal-meeting", pattern: "re:(?<=\\b(?:can|could|shall|should|not|would|will) we )meeting\\b", category: "verb-form", severity: "major", fix: "meet", messageKo: "can/could/shall 같은 조동사 뒤에는 동사원형이 옵니다: 'Can we meet halfway?'" },
     ],
     hints: { pattern: "Can we + meet halfway?", skeleton: "Can we ____ ________?", partial: "Can we meet…" },
     explanationKo: "서로 한 걸음씩 양보해 중간에서 합의하자고 할 때는 'meet halfway'(또는 meet in the middle)를 씁니다. 'meet in half'는 쓰지 않는 표현입니다.",
@@ -88,6 +90,7 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "price-expensive", pattern: "price =is|=was ... expensive", category: "word-choice", severity: "major", fix: "price is a bit too high", messageKo: "price(가격)는 'high/low'로 말합니다. 'The price is expensive'는 어색하고, expensive는 물건에 씁니다(The tanks are expensive)." },
       { id: "too-much-high", pattern: "too much high|expensive", category: "word-choice", severity: "major", fix: "too high", messageKo: "'너무 ~하다'는 'too + 형용사'입니다. 'too much high'처럼 much를 넣지 않습니다." },
+      { id: "price-are", pattern: "=price =are|=were", category: "agreement", severity: "major", fix: "price is", messageKo: "price는 단수 명사라서 be동사도 단수형을 씁니다: 'The price is a bit too high.'", skill: "agreement" },
     ],
     hints: { pattern: "The price is (a bit) too + 형용사 (for us).", skeleton: "Hmm, the price is a bit ___ ____ for us.", partial: "Hmm, the price is a bit too…" },
     explanationKo: "가격이 '너무 높다'는 'too high'이고, 앞에 'a bit'을 붙이면 훨씬 부드럽게 들립니다. price는 high/low와 함께 쓰므로 'The price is expensive'라고 하지 않고, 'too much high'처럼 much를 넣지도 않습니다.",
@@ -115,7 +118,7 @@ export const TALK_NEGOTIATION: Question[] = [
     reference: "Does the price include shipping?",
     accepted: ["Does that include shipping?", "Is shipping included in the price?", "Is shipping included?", "Does the price include delivery?", "Does that price include shipping?"],
     meaning: [
-      { id: "include", en: "include", ko: "포함하다", any: ["include"], critical: true },
+      { id: "include", en: "include", ko: "포함하다", any: ["include", "cover"], critical: true },
       { id: "shipping", en: "shipping", ko: "운송비", any: ["shipping|delivery|transport|transportation|freight"], critical: true },
     ],
     pitfalls: [
@@ -219,6 +222,7 @@ export const TALK_NEGOTIATION: Question[] = [
     ],
     pitfalls: [
       { id: "down-the-price", pattern: "re:(?<!\\b(bring|come|go|get|knock|push|cut) )\\bdown (the|your|this) price", category: "word-choice", severity: "major", fix: "lower the price", messageKo: "'가격을 다운하다'를 옮긴 'down the price'는 영어에서 쓰지 않습니다. 'lower the price' 또는 'bring the price down'이라고 합니다." },
+      { id: "modal-lowering", pattern: "re:(?<=\\b(?:could|can|would|will) you )(?:lowering|reducing)\\b", category: "verb-form", severity: "major", fix: "lower", messageKo: "could/can 뒤에는 동사원형이 옵니다: 'Could you lower the price a little?'" },
       { id: "dc", pattern: "dc|d.c", category: "word-choice", severity: "major", fix: "discount", messageKo: "'DC'는 한국식 표현이라 외국 회의에서는 통하지 않습니다. 'discount'라고 하거나 'lower the price'라고 말하세요." },
     ],
     hints: { pattern: "Could you + lower + the price + a little?", skeleton: "Could you _____ the price a ______?", partial: "Could you lower…" },
@@ -325,7 +329,7 @@ export const TALK_NEGOTIATION: Question[] = [
     ],
     meaning: [
       { id: "can-you", en: "can you", ko: "~해 주실 수 있나요", any: ["can|could|would you", "possible", "able"] },
-      { id: "deliver", en: "deliver", ko: "납품하다", any: ["deliver|delivery|ship|send|supply", "get ... to"], critical: true },
+      { id: "deliver", en: "deliver", ko: "납품하다", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\b(?:deliver|delivered|delivery|ship|shipped|send|sent|supply|supplied|get|bring)\\b"], critical: true },
       { id: "pumps", en: "the pumps", ko: "펌프", any: ["pump|pumps|them"], term: true },
       { id: "site", en: "to the site", ko: "현장에", any: ["site"] },
       { id: "end-may", en: "by the end of May", ko: "5월 말까지", any: ["end ... may", "late may"], critical: true },
@@ -333,6 +337,7 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "until-end", pattern: "until|till the? end", category: "preposition", severity: "major", fix: "by the end", messageKo: "납품 마감은 'by the end of May'입니다. until은 '그때까지 계속'이라는 뜻이라 한 번에 끝나는 납품에는 쓰지 않습니다." },
       { id: "in-the-end", pattern: "in the end of", category: "preposition", severity: "major", fix: "by the end of", messageKo: "'~말까지'는 'by the end of'입니다. 'in the end'는 '결국'이라는 뜻이라 의미가 달라집니다." },
+      { id: "modal-delivery", pattern: "re:(?<=\\b(?:can|could|would|will) (?:you |we )?)delivery\\b", category: "verb-form", severity: "major", fix: "deliver", messageKo: "delivery는 '납품'이라는 명사입니다. 조동사 뒤에는 동사 deliver를 씁니다: 'Can you deliver the pumps …?'" },
     ],
     hints: { pattern: "Can you deliver + 목적어 + to + 장소 + by the end of + 월?", skeleton: "Can you _______ the pumps to the site __ the end of May?", partial: "Can you deliver the pumps…" },
     explanationKo: "마감 시점(~까지)은 by를 써서 'by the end of May'라고 합니다. until은 '그때까지 계속'이라는 뜻이고, 'in the end'는 '결국'이라는 뜻이라 납기를 말할 때는 맞지 않습니다.",
@@ -371,7 +376,8 @@ export const TALK_NEGOTIATION: Question[] = [
       { id: "dryer", en: "on the dryer", ko: "건조기", any: ["dryer"], term: true },
     ],
     pitfalls: [
-      { id: "how-long-the-is", pattern: "how long the ... =is", category: "word-order", severity: "major", fix: "how long is the warranty", messageKo: "직접 묻는 의문문은 'How long is + 주어?' 어순입니다. 'How long the warranty is?'는 평서문 어순이라 질문이 되지 않습니다." },
+      { id: "how-long-the-is", pattern: "re:(?<!\\b(?:me|us|know|ask|asking|asked|wonder|wondering|check|confirm|sure|idea|out|understand|tell) )\\bhow long (?:the|this|your) (?:\\S+ ){0,4}?is\\b", category: "word-order", severity: "major", fix: "how long is the warranty", messageKo: "직접 묻는 의문문은 'How long is + 주어?' 어순입니다. 'How long the warranty is?'는 평서문 어순이라 질문이 되지 않습니다. (Could you tell me how long the warranty is?처럼 다른 문장 안에 넣을 때만 평서문 어순을 씁니다.)" },
+      { id: "how-long-does-no-verb", pattern: "re:\\bhow long (?:does|do) the (?:\\S+ )?(?:warranty|guarantee)(?: (?:on|for|of) the (?:\\S+ )?dryer)?$", category: "sentence-structure", severity: "major", fix: "how long does the warranty last", messageKo: "'How long does …?'로 물을 때는 동사가 필요합니다: 'How long does the warranty last?'. 동사 없이 물으려면 'How long is the warranty?'라고 합니다." },
       { id: "a-s", pattern: "re:\\b(a/s|after service)\\b", category: "word-choice", severity: "major", fix: "warranty", messageKo: "'A/S'는 한국식 표현이라 외국 회의에서는 통하지 않습니다. 보증은 'warranty', 사후 서비스는 'after-sales service'라고 합니다." },
     ],
     hints: { pattern: "How long is + the warranty + on + 제품?", skeleton: "Yes, how ____ is the ________ on the dryer?", partial: "Yes, how long is the warranty…" },
@@ -408,7 +414,7 @@ export const TALK_NEGOTIATION: Question[] = [
     ],
     meaning: [
       { id: "afraid", en: "I'm afraid", ko: "죄송하지만", any: ["afraid|sorry|unfortunately"] },
-      { id: "cant-go-over", en: "we can't go over", ko: "넘길 수 없다", any: ["not ... over|above|beyond|higher|more|exceed"], critical: true },
+      { id: "cant-go-over", en: "we can't go over", ko: "넘길 수 없다", any: ["not ... over|above|beyond|higher|more|exceed", "limit|maximum|max|ceiling|cap", "the most|highest"], critical: true },
       { id: "amount", en: "90,000 dollars", ko: "9만 달러", any: ["90|ninety|90k"], critical: true },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|so"] },
       { id: "budget", en: "our total budget", ko: "전체 예산", any: ["budget"], critical: true },
@@ -486,11 +492,12 @@ export const TALK_NEGOTIATION: Question[] = [
       "This is a new design, so could you extend the warranty to two years?",
       "Because this is a new design, could you extend the warranty to two years?",
       "Since this is a new design, would it be possible to extend the warranty to two years?",
+      "Since this is a new design, could you make the warranty two years?",
     ],
     meaning: [
       { id: "since", en: "since", ko: "~이니까", any: ["since|because|as|so"] },
-      { id: "new-design", en: "a new design", ko: "새로운 설계", any: ["new ... design|model|type", "first ... design|unit"], critical: true },
-      { id: "extend", en: "extend the warranty", ko: "보증을 늘리다", any: ["extend|increase|lengthen ... warranty|guarantee", "warranty|guarantee ... longer", "two-year|2-year|longer ... warranty|guarantee"], critical: true },
+      { id: "new-design", en: "a new design", ko: "새로운 설계", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,2})\\b(?:new|brand-new|novel|untested)\\b(?: \\S+){0,2}? (?:design|model|type|unit|dryer|one)\\b", "re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,2})\\bfirst (?:\\S+ ){0,2}?(?:design|unit|one|time)\\b"], critical: true },
+      { id: "extend", en: "extend the warranty", ko: "보증을 늘리다", any: ["extend|increase|lengthen ... warranty|guarantee", "warranty|guarantee ... longer", "two-year|2-year|longer ... warranty|guarantee", "make|give|offer ... warranty|guarantee ... two|2|24"], critical: true },
       { id: "two-years", en: "to two years", ko: "2년으로", any: ["two|2 years", "24 months", "two-year|2-year"], critical: true },
     ],
     pitfalls: [
@@ -538,6 +545,7 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "if-you-will", pattern: "re:(?<=\\bif you )will\\b", category: "tense", severity: "major", fix: "can", messageKo: "if 조건절에서는 미래 일도 현재시제로 씁니다: 'If you can deliver by May'. 'If you will deliver'라고 하지 않습니다.", skill: "cond-1" },
       { id: "until-may", pattern: "until|till may", category: "preposition", severity: "major", fix: "by May", messageKo: "납품 마감(~까지)은 'by May'입니다. until은 '5월까지 계속'이라는 뜻입니다." },
+      { id: "modal-delivery", pattern: "re:(?<=\\b(?:can|could|would|will) )delivery\\b", category: "verb-form", severity: "major", fix: "deliver", messageKo: "delivery는 '납품'이라는 명사입니다. 조동사 뒤에는 동사 deliver를 씁니다: 'If you can deliver by May, …'" },
     ],
     hints: { pattern: "If you can + 동사원형, we can + 동사원형.", skeleton: "If you ___ deliver __ May, we can ______ the price.", partial: "If you can deliver by May…" },
     explanationKo: "조건을 걸어 양보할 때는 'If you can …, we can …'을 씁니다. if절에는 미래 일이라도 will을 쓰지 않고, 납품 마감은 until이 아니라 by May입니다.",
@@ -571,13 +579,14 @@ export const TALK_NEGOTIATION: Question[] = [
     ],
     meaning: [
       { id: "already", en: "already", ko: "이미", any: ["already"] },
-      { id: "lowered", en: "lowered our price", ko: "가격을 낮췄다", any: ["lower|reduce|cut|drop|discount ... price|fee", "price|fee ... down"], critical: true },
+      { id: "lowered", en: "lowered our price", ko: "가격을 낮췄다", any: ["lower|reduce|cut|drop|discount ... price|fee", "price|fee ... down|lower|lowered|reduced|cut|dropped|discounted"], critical: true },
       { id: "twice", en: "twice", ko: "두 번", any: ["twice", "two times"], critical: true },
       { id: "afraid", en: "I'm afraid", ko: "죄송하지만", any: ["afraid|sorry|unfortunately"] },
-      { id: "cant-lower", en: "we can't go any lower", ko: "더 낮출 수 없다", any: ["not ... lower|further|more|less", "not ... reduce|cut"], critical: true },
+      { id: "cant-lower", en: "we can't go any lower", ko: "더 낮출 수 없다", any: ["not ... lower|further|more|less", "not ... reduce|cut", "as low as", "lowest|final|bottom|best ... price|offer|line"], critical: true },
     ],
     pitfalls: [
       { id: "have-lower", pattern: "re:(?<=\\bhave (already )?)lower\\b", category: "verb-form", severity: "major", fix: "lowered", messageKo: "현재완료는 'have + 과거분사'입니다: 'We've already lowered …'. 'have lower'처럼 동사원형을 쓰지 않습니다." },
+      { id: "lowered-already", pattern: "re:(?<=\\bhave )lowered already\\b", category: "word-order", severity: "major", fix: "already lowered", messageKo: "already는 have와 과거분사 사이에 둡니다: 'We've already lowered our price'. 동사와 목적어 사이에 넣지 않습니다.", skill: "word-order" },
       { id: "more-lower", pattern: "more lower", category: "word-choice", severity: "major", fix: "lower", messageKo: "lower는 이미 비교급이라 more를 붙이지 않습니다: 'any lower'." },
     ],
     hints: { pattern: "We've already + 과거분사 …, so I'm afraid we can't + 동사원형 …", skeleton: "We've _______ lowered our price _____, so I'm afraid we can't go any _____.", partial: "We've already lowered our price twice, so…" },
@@ -657,10 +666,12 @@ export const TALK_NEGOTIATION: Question[] = [
       { id: "price", en: "the price", ko: "가격", any: ["price|quote|quotation|offer"], critical: true },
       { id: "march", en: "you quoted in March", ko: "3월에 견적 낸", any: ["march"], critical: true },
       { id: "still", en: "still", ko: "아직", any: ["still"] },
-      { id: "valid", en: "valid", ko: "유효한", any: ["valid|good|effective|stand|standing|apply|applies", "in effect", "same"], critical: true },
+      { id: "valid", en: "valid", ko: "유효한", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never|longer) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,2})\\b(?:valid|good|effective|stand|stands|standing|apply|applies|hold|holds|same)\\b", "re:(?<!\\b(?:not|never|longer) )\\bin effect\\b"], critical: true },
     ],
     pitfalls: [
+      { id: "does-valid", pattern: "re:\\b(?:does|do)(?= (?:the|your|that|this) (?:\\S+ ){0,6}?(?:still )?valid\\b)", category: "verb-form", severity: "major", fix: "is", messageKo: "valid는 형용사라서 의문문을 be동사로 만듭니다: 'Is the price … still valid?'. does와 형용사를 함께 쓰지 않습니다.", skill: "question-form" },
       { id: "price-available", pattern: "re:(?<=\\b(price|quote|quotation|offer)\\b.*)\\bavailable\\b", category: "word-choice", severity: "major", fix: "valid", messageKo: "가격·견적이 '아직 유효하다'는 'still valid'입니다. available은 물건이나 사람을 '구할 수 있다/시간이 된다'는 뜻이라 가격에는 쓰지 않습니다." },
+      { id: "quote-present", pattern: "re:(?<=\\byou )quote(?= (?:us |me )?in march\\b)", category: "tense", severity: "major", fix: "quoted", messageKo: "3월에 견적을 낸 것은 지난 일이라 과거형 'you quoted in March'를 씁니다.", skill: "relative-clause" },
       { id: "have-quoted-march", pattern: "re:\\bhave (?=(quoted|given|sent|offered) (us )?in march)", category: "tense", severity: "major", fix: "", messageKo: "'in March'처럼 끝난 과거 시점이 있으면 현재완료를 쓰지 않고 과거형 'you quoted'를 씁니다." },
     ],
     hints: { pattern: "Is + the price (that) you quoted + in March + still valid?", skeleton: "Sure. First, is the price you ______ in March _____ valid?", partial: "Sure. First, is the price you quoted…" },
@@ -705,6 +716,8 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "to-approve-by", pattern: "re:(?<=\\bto )(approve|approved)(?= by\\b)", category: "verb-form", severity: "major", fix: "be approved", messageKo: "변경 사항은 승인을 '받는' 쪽이므로 수동태 'has to be approved by …'를 씁니다. be를 빼면 변경 사항이 무언가를 승인하는 것처럼 들립니다.", skill: "passive" },
       { id: "until-friday", pattern: "until|till friday", category: "preposition", severity: "major", fix: "by Friday", messageKo: "답변 마감(~까지)은 'by Friday'입니다. until은 '금요일까지 계속'이라는 뜻입니다." },
+      { id: "approved-from", pattern: "approved from", category: "preposition", severity: "major", fix: "approved by", messageKo: "수동태에서 승인하는 사람은 by로 나타냅니다: 'approved by our finance team'. '~로부터'를 옮긴 from을 쓰지 않습니다.", skill: "passive" },
+      { id: "change-have", pattern: "re:(?<=\\b(?:any|a|the|this|that|each) change (?:to|in|of) (?:the |our )?payment terms )have(?= to\\b)", category: "agreement", severity: "major", fix: "has", messageKo: "주어는 'any change'(단수)라서 'has to be approved'입니다. 바로 앞의 terms에 맞춰 have를 쓰지 않습니다.", skill: "agreement" },
     ],
     hints: { pattern: "주어 + has to be + 과거분사 + by + 승인자, so I'll get back to you by + 요일.", skeleton: "Any change to the payment terms has to __ ________ by our finance team, so I'll get back to you by Friday.", partial: "Any change to the payment terms has to be approved…" },
     explanationKo: "지급 조건 변경은 승인을 '받는' 대상이므로 'has to be approved by + 승인자'처럼 수동태로 말합니다. 'get back to you'는 '확인 후 다시 연락하다'라는 뜻이고, 마감은 until이 아니라 by Friday입니다.",
@@ -745,12 +758,14 @@ export const TALK_NEGOTIATION: Question[] = [
       { id: "but", en: "but", ko: "하지만", any: ["but|however|though"] },
       { id: "ten", en: "10%", ko: "10%", any: ["10|ten"], critical: true },
       { id: "suggest", en: "why don't we", ko: "~하면 어떨까요", any: ["why ... not", "how|what about", "can|could|shall we", "let us|=let's", "what if"] },
-      { id: "halfway", en: "meet halfway", ko: "중간에서 타협하다", any: ["meet ... halfway|middle", "meet ... half way", "split ... difference", "halfway"], critical: true },
+      { id: "halfway", en: "meet halfway", ko: "중간에서 타협하다", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bmeet(?:ing|s)? (?:\\S+ ){0,2}?(?:halfway|half way|in the middle)\\b", "re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bsplit(?:ting)? (?:the )?difference\\b", "re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\b(?:halfway|middle)\\b"], critical: true },
       { id: "seven", en: "at 7%", ko: "7%로", any: ["7|seven"], critical: true },
     ],
     pitfalls: [
       { id: "thanks-for-go", pattern: "re:(?<=\\bthanks? (you )?for )go\\b", category: "verb-form", severity: "major", fix: "going", messageKo: "for는 전치사라서 뒤에 동사원형이 올 수 없습니다: 'Thanks for going up to 4%'.", skill: "prep-gerund" },
       { id: "meet-in-half", pattern: "meet in the? half", category: "word-choice", severity: "major", fix: "meet halfway", messageKo: "'중간에서 타협하다'는 'meet halfway' 또는 'meet in the middle'입니다. 'meet in half'는 쓰지 않습니다." },
+      { id: "modal-meeting", pattern: "re:(?<=\\b(?:can|could|shall|should|not|would|will) we )meeting\\b", category: "verb-form", severity: "major", fix: "meet", messageKo: "can/shall 같은 조동사나 'Why don't we' 뒤에는 동사원형이 옵니다: 'Why don't we meet halfway at 7%?'", skill: "offer-suggest" },
+      { id: "why-we-dont", pattern: "why we do not", category: "word-order", severity: "major", fix: "why don't we", messageKo: "제안하는 'Why don't we …?'는 의문문 어순이라 don't가 we 앞에 옵니다. 'Why we don't …'는 질문 어순이 아닙니다.", skill: "offer-suggest" },
     ],
     hints: { pattern: "Thanks for + 동사ing …, but … . Why don't we + 동사원형 …?", skeleton: "Thanks for _____ up to 4%, but we were hoping for 10%. Why ____ we meet halfway at 7%?", partial: "Thanks for going up to 4%, but…" },
     explanationKo: "상대의 양보를 먼저 인정하고(Thanks for going up to 4%) 이쪽 기대치를 말한 뒤 'Why don't we …?'로 제안하면 부드럽습니다. for는 전치사라서 뒤에 동명사(going)가 오고, 중간 타협은 'meet halfway'라고 합니다.",
@@ -794,6 +809,7 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "in-written", pattern: "in|by =written", category: "word-choice", severity: "major", fix: "in writing", messageKo: "'서면으로'는 'in writing'입니다. 'in written'이나 'by written'은 틀린 표현입니다." },
       { id: "before-sign", pattern: "before =sign the|a|our", category: "verb-form", severity: "major", fix: "before signing the", messageKo: "before 뒤에 동사를 바로 쓸 때는 동명사(before signing)이고, 아니면 'before we sign'처럼 주어를 넣습니다.", skill: "prep-gerund" },
+      { id: "approve-no-it", pattern: "re:(?<=\\b(?:to|must|will|should) )approve(?= before\\b)", category: "sentence-structure", severity: "major", fix: "approve it", messageKo: "approve는 목적어가 필요한 동사라서 'approve it before …'처럼 it을 넣습니다." },
     ],
     hints: { pattern: "Could you send us + 명사 + in writing? 주어 + needs to + 동사원형 + before + 주어 + 동사.", skeleton: "Great. Could you send us the final offer __ _______? Our director needs to approve it before we ____ the contract.", partial: "Great. Could you send us the final offer in writing?…" },
     explanationKo: "말로 합의한 내용을 문서로 받고 싶을 때는 'Could you send us … in writing?'이라고 합니다. '서면으로'는 'in written'이 아니라 'in writing'이고, before 뒤에는 '주어 + 동사'(before we sign) 또는 동명사(before signing)를 씁니다.",
@@ -826,20 +842,24 @@ export const TALK_NEGOTIATION: Question[] = [
       "If we ordered twelve pumps at once for both phases, would you offer us a 10% discount? It would make it much easier to get approval internally.",
       "Suppose we ordered twelve pumps at once for both phases. Would you give us a 10% discount? That would make internal approval much easier.",
       "If we ordered twelve pumps at once for both phases, could you give us 10% off? That would make it much easier to get internal approval.",
+      "If we placed a single order for twelve pumps for both phases, would you give us a 10% discount? That would make internal approval much easier.",
     ],
     meaning: [
       { id: "if-ordered", en: "if we ordered", ko: "주문한다고 가정하면", any: ["if|suppose|supposing ... order|ordered|buy|bought|purchase|purchased"], critical: true },
       { id: "twelve", en: "twelve pumps", ko: "펌프 12대", any: ["twelve|12"], critical: true },
-      { id: "at-once", en: "at once", ko: "한꺼번에", any: ["at once", "together", "one order", "same time"] },
+      { id: "at-once", en: "at once", ko: "한꺼번에", any: ["at once", "together", "one|single ... order", "same time"] },
       { id: "both-phases", en: "for both phases", ko: "두 단계 모두", any: ["both ... phase|phases", "second phase", "phase 2|two"] },
       { id: "would-you", en: "would you give us", ko: "~해 주시겠어요", any: ["would|could you"], critical: true },
       { id: "discount", en: "a 10% discount", ko: "10% 할인", any: ["discount", "10|ten ... off"], critical: true },
-      { id: "easier", en: "much easier", ko: "훨씬 쉽게", any: ["easier|easy|help"] },
+      { id: "easier", en: "much easier", ko: "훨씬 쉽게", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\b(?:easier|easy|simpler|smoother|help|helps|helpful)\\b"], critical: true },
       { id: "approval", en: "internal approval", ko: "내부 승인", any: ["approval|approve|approved", "sign off"] },
     ],
     pitfalls: [
       { id: "ordered-will", pattern: "re:(?<=\\bif we (ordered|bought|purchased)\\b.*)\\bwill you\\b", category: "tense", severity: "major", fix: "would you", messageKo: "가정하는 'If we ordered …'(과거형) 뒤에는 'would you …?'가 와야 합니다. will을 쓰면 시제가 섞입니다.", skill: "cond-2" },
       { id: "more-easier", pattern: "more easier", category: "word-choice", severity: "major", fix: "easier", messageKo: "easier는 이미 비교급이라 more를 붙이지 않습니다. 강조할 때는 'much easier'라고 합니다.", skill: "comparative" },
+      { id: "much-easy", pattern: "much =easy", category: "word-choice", severity: "major", fix: "much easier", messageKo: "much는 비교급을 강조합니다: 'much easier'. 'much easy'라고 하지 않습니다.", skill: "comparative" },
+      { id: "if-would-order", pattern: "if we =would order", category: "tense", severity: "major", fix: "if we ordered", messageKo: "가정하는 if절에는 would를 쓰지 않고 과거형을 씁니다: 'If we ordered …, would you …?'. would는 결과 쪽에만 씁니다.", skill: "cond-2" },
+      { id: "discount-no-a", pattern: "re:(?<=\\b(?:give|offer) us )(?=(?:10|ten) (?:percent )?discount\\b)", category: "article", severity: "minor", fix: "a 10", messageKo: "'10% 할인'은 셀 수 있는 명사라서 'a 10% discount'처럼 a를 붙입니다. (또는 '10% off')" },
     ],
     hints: { pattern: "If we + 과거형 …, would you + 동사원형 …? That would + 동사원형 …", skeleton: "If we _______ twelve pumps at once …, _____ you give us a 10% discount? That would make it much ______ …", partial: "If we ordered twelve pumps at once for both phases, would you…" },
     explanationKo: "아직 정하지 않은 일을 가정해서 물을 때는 'If we + 과거형(ordered), would you …?'를 씁니다. 과거형 조건 뒤에 will을 쓰면 시제가 섞이고, easier는 이미 비교급이라 'more easier'가 아니라 'much easier'라고 합니다.",
@@ -927,6 +947,8 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "accept-it", pattern: "increase =is|=was difficult|hard for? us? to accept it", category: "sentence-structure", severity: "major", fix: "increase is difficult for us to accept", messageKo: "'A is difficult to accept' 구조에서는 A(15% 인상)가 이미 accept의 목적어라서 뒤에 it을 다시 쓰지 않습니다." },
       { id: "since-years", pattern: "since five|5 years", category: "preposition", severity: "major", fix: "for five years", messageKo: "기간(5년 동안)은 for를 씁니다. since는 시작 시점(since 2021) 앞에 씁니다.", skill: "present-perfect" },
+      { id: "worked-past", pattern: "re:\\bwe(?= worked together (?:for|since)\\b)", category: "tense", severity: "major", fix: "we've", messageKo: "지금까지 5년째 이어지는 관계는 현재완료로 말합니다: 'We've worked together for five years'. 과거형 'We worked'는 지금은 함께 일하지 않는다는 뜻이 됩니다.", skill: "present-perfect" },
+      { id: "difficult-to-us", pattern: "re:(?<=\\b(?:difficult|hard|tough) )to(?= us to\\b)", category: "preposition", severity: "major", fix: "for", messageKo: "'우리가 ~하기 어렵다'는 'difficult for us to + 동사원형'입니다. 사람 앞에는 for를 씁니다." },
     ],
     hints: { pattern: "I understand that …, but … is difficult for us to accept. We've + p.p. … Would you consider …?", skeleton: "I understand that your costs have ____ __, but a 15% increase is difficult for us to accept. …", partial: "I understand that your costs have gone up, but…" },
     explanationKo: "상대 사정을 먼저 인정하고(I understand that …) but 뒤에 입장을 말한 뒤 'Would you consider …?'로 대안을 제시하면 정중한 반대가 됩니다. 5년째 이어지는 관계는 현재완료와 for(for five years)로 말하고, 'A is difficult to accept'에서는 accept 뒤에 it을 다시 쓰지 않습니다.",
@@ -971,6 +993,7 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "add-as-subject", pattern: "but =add a|another|the", category: "verb-form", severity: "major", fix: "but adding a", messageKo: "동사를 주어로 쓸 때는 동명사(adding)로 바꿉니다: 'Adding a second line is …'. 'Add a second line is …'는 문장이 성립하지 않습니다." },
       { id: "more-n-weeks", pattern: "re:\\bmore (two|three|four|five|six|2|3|4|5|6)(?= (weeks|months)\\b)", category: "word-order", severity: "major", fix: "four more", messageKo: "'4주 더'는 'four more weeks'처럼 숫자를 more 앞에 둡니다. 'more four weeks'는 어순이 틀립니다." },
+      { id: "on-next-monday", pattern: "re:\\b(?:start|begin) on(?= next (?:monday|week)\\b)", category: "preposition", severity: "major", fix: "start", messageKo: "'next Monday'처럼 next가 붙은 시간 앞에는 전치사를 쓰지 않습니다: 'we can start next Monday'." },
     ],
     hints: { pattern: "I understand that …, but + 동명사 주어 … It would take … If you can …, we can …", skeleton: "I understand that you want to keep the same budget, but ______ a second line is a big change to the scope. …", partial: "I understand that you want to keep the same budget, but adding…" },
     explanationKo: "상대 입장을 먼저 인정한 뒤(I understand that …) but 뒤에 이유를 말하고, 'If you can …, we can …'으로 조건부 대안을 제시합니다. 동사를 주어로 쓸 때는 동명사(Adding a second line is …)를 쓰고, '4주 더'는 'four more weeks' 순서입니다.",
