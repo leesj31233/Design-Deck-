@@ -80,7 +80,7 @@ export function validateQuestion(q: Question, ctx: { skillIds: Set<string>; seed
 
   // Tense/hypothesis disambiguation heuristics.
   const ref = q.reference.toLowerCase();
-  if (/\bif\b[^,]*\bhad\b\s+\w+(ed|en|ne|wn|t)\b/.test(ref) && !/(더라면|었다면|았다면|했다면|였다면)/.test(q.promptKo)) {
+  if (/\bif\b[^,]*\bhad\b\s+(?!(?:one|none)\b)\w+(ed|en|ne|wn|t)\b/.test(ref) && !/(더라면|었다면|았다면|했다면|였다면)/.test(q.promptKo)) {
     warn("third-conditional reference but the Korean prompt lacks a past-counterfactual marker (~했더라면/~였다면)");
   }
   if (/\bif\b[^,]*\b(had decided|had known)\b[^,]*\bnow\b/.test(ref)) err("'had + p.p.' combined with 'now' in the if-clause mixes past and present");
