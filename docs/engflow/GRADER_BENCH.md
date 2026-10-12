@@ -23,16 +23,32 @@ development to measure what generalizes.
 
 | Measure | Start | Now |
 | --- | ---: | ---: |
-| Blind A: correct answers marked wrong | 60 / 291 (20.6%) | 32 / 291 (11.0%) |
-| Blind A: wrong answers flagged (any grammar note) | 76.8% | 92.8% |
-| Blind A: wrong answers flagged as a major error or below 85 | 61.9% | 74.2% |
+| Blind A: correct answers marked wrong | 60 / 291 (20.6%) | 13 / 291 (4.5%) |
+| Blind A: wrong answers flagged (any grammar note) | 76.8% | 92.3% |
+| Blind A: wrong answers flagged as a major error or below 85 | 61.9% | 76.3% |
 | Blind A: wrong answers shown at once as fine | 11 | 2 |
+| **Blind B (held out): correct answers marked wrong** | 38 / 312 (12.2%) | 31 / 312 (9.9%) |
+| **Blind B (held out): wrong answers flagged (any note)** | 77.9% | 80.8% |
+| **Blind B (held out): flagged as major or below 85** | 63.9% | 67.3% |
+| **Blind B (held out): wrong answers shown at once as fine** | 10 | 7 |
 | Learner corpus, rules alone: mistakes flagged | 40.0% | 90.5% |
 | Learner corpus, rules alone: correct sentences flagged | 0.5% | 0.0% |
-| Mutation bench: recall / no false alarm | 95.7% / 99.7% (first run, 209 / 312 rows) | 99.3% / 100% (1,299 / 825 rows) |
+| Mutation bench: recall / no false alarm | 95.7% / 99.7% (first run, 209 / 312 rows) | 98.3% / 100% (1,723 / 1,195 rows; the bank grew to 868 questions) |
 | Rule-based grading time (p95) | ~10 ms | ~18 ms |
 
-Blind B (held out): see the last section.
+Blind B's "start" is its first measurement, taken after set A and the first content passes had
+already been used for development; everything after that was done without looking at a single
+set-B item (only its summary and distance bands were read). The gap between A and B is the
+expected cost of tuning on A; B's gains come from the content passes on other questions and the
+new rules, so they generalize.
+
+### Should "close enough to trust" be wider?
+
+On set A, raising the high-confidence cut-off from 0.2 to 0.25 looked free: 37 more correct
+answers shown at once for 1 more wrong one. Set B said otherwise: the 0.2–0.25 band holds 40
+correct answers with nothing found but also 6 wrong ones with nothing found, and those would be
+shown at once as fine. The cut-off stays at 0.2. This is the decision the held-out set was kept
+for.
 
 ## What changed
 
@@ -77,13 +93,51 @@ rules have not fired on any correct sentence: about 2,000 in the bank, 291 in
 blind set A and 220 in the learner corpus. A lenient quick-tier reply therefore
 cannot pass *is not satisfy* or *I'm interesting in*.
 
+## The grader learns from Claude
+
+When Claude grades one of the learner's own wordings fully correct (95+, nothing
+to fix), the grader keeps it with the question (`core/learned.ts`, at most three).
+The same answer later, contractions and final punctuation aside, is graded at once.
+A close variant is not marked down for a meaning chunk that the approved wording
+also said in other words, as long as that wording's other content words are still
+there ("the previous one" for "the previous slide"; "ordered" for "got" is not
+excused).
+
+A first version also let approved wordings count as "close to a known answer". The
+bench below showed no gain from that and two more wrong answers shown at once as
+fine (a near variant can carry a new mistake that alignment treats as harmless extra
+words), so approved wordings never raise confidence.
+
+| `npx tsx scripts/bench/learning.ts` | answers | without memory | with memory |
+| --- | ---: | ---: | ---: |
+| Same wording again (harmless changes), shown at once | 2,013 | 55.1% | 100.0% |
+| Same wording again, marked wrong | 2,013 | 1 | 0 |
+| One mistake in that wording, caught | 718 | 97.4% | 97.4% |
+| One mistake in that wording, shown at once as fine | 718 | 7 | 7 |
+| Blind A: another correct paraphrase, shown at once | 194 | 18.6% | 18.6% |
+| Blind A: a wrong paraphrase, shown at once as fine | 194 | 2 | 2 |
+
+## Reversed meaning
+
+A close answer that adds or drops the verb's *not*/*never* says the opposite ("We
+don't need to update the PFD" for "We need to update the PFD"). The meaning units
+did not notice: they look for the words, not the polarity. The check compares
+polarity statement by statement against every close stored answer. Questions
+("Why don't we …?"), reassuring commands ("Don't worry"), if/until clauses and
+words that carry negation themselves (*unable, missed, nobody, still, broken*) are
+left to Claude. On 5,091 correct answers (stored answers, pass probes, blind set A)
+it fires on none; it catches 110 of 162 stored answers with their polarity flipped.
+
 ## Wait policy
 
 `gradeBudgetMs` (core/grader.ts) waits for Claude only when the rule-based grade
 can't be trusted:
 
-- **Close to a stored answer** (high confidence): at most 1 s; shown at once when
-  nothing is found.
+- **Close to a stored answer** (high confidence): shown at once when nothing is
+  found. With a finding, the wait is 1 s, or none once this device's measurements
+  show that even Claude's fastest tenth of replies takes longer (the wait could only
+  time out); a grade already being prepared in the background is still awaited.
+- **An answer Claude approved before**: shown at once (see above).
 - **Reworded** (medium/low confidence): waits for Claude. Once the device has five
   or more measured Claude response times, the wait is the 90th/95th percentile
   plus a margin, within the old 2.5 s / 8 s caps.
@@ -93,7 +147,7 @@ would have shown another 40% of correct answers instantly. It would also have sh
 3.6% more wrong answers as fine without Claude. That is the failure the learner
 reported ("is not satisfy … of customer" scored 100), so the policy stays.
 
-| Blind A, now | right answers | right with nothing found | wrong answers | wrong with nothing found |
+| Blind A, earlier in the run | right answers | right with nothing found | wrong answers | wrong with nothing found |
 | --- | ---: | ---: | ---: | ---: |
 | high | 94 | 77 | 53 | 2 |
 | medium | 157 | 118 | 106 | 7 |
@@ -107,12 +161,22 @@ reported ("is not satisfy … of customer" scored 100), so the policy stays.
   reference (*change it* for plural specifications) and errors that are only wrong in
   context still need Claude.
 
+## Shorter replies from Claude
+
+Generation time grows with the reply. The quick grade no longer asks for a
+"recommended" sentence (the question's curated reference is shown, as for
+rule-based grades) and asks for an empty correction when nothing is wrong. A
+correct answer, the most common case, now needs only two scores and an empty error
+list.
+
 ## How to run
 
 ```bash
 npx tsx scripts/grader-bench.ts --misses          # mutation bench
 npx tsx scripts/bench/blind.ts --list             # blind set A (paraphrase-corpus.ts)
 npx tsx scripts/bench/rules-corpus.ts --list      # rules alone on the learner corpus
+npx tsx scripts/bench/blind.ts --set b --bands     # held-out set B: summary and distance bands only
+npx tsx scripts/bench/learning.ts                  # what remembering Claude-approved answers changes
 ```
 
 Every change must also keep `npx tsx scripts/check-content.ts` at 0 errors: no rule may fire on any correct answer in the bank, and the bank has about 2,000 correct sentences.
