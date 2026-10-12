@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createGrader, gradeBudgetMs, looksComplete, ruleBasedIsEnough } from "@/engflow/core/grader";
+import { createGrader, gradeBudgetMs, latencyQuantiles, looksComplete, ruleBasedIsEnough } from "@/engflow/core/grader";
 import { evaluateLocal } from "@/engflow/core/evaluate";
 import { QUESTION_BY_ID } from "@/engflow/content";
 import type { Evaluation, Question } from "@/engflow/core/types";
@@ -66,6 +66,22 @@ describe("fast grading", () => {
     expect(gradeBudgetMs("auto", { confidence: "low" })).toBe(8000);
     expect(gradeBudgetMs("fast", { confidence: "low" })).toBe(1000);
     expect(gradeBudgetMs("accurate", { confidence: "high" })).toBe(9000);
+  });
+
+  it("with measured Claude latency, reworded answers wait only about as long as Claude usually needs", () => {
+    // Fast connection: Claude answers in 0.6–1.1 s → the caps shrink to their floors.
+    const fast = latencyQuantiles([600, 700, 650, 800, 900, 1100, 750, 720, 680, 640]);
+    expect(fast).not.toBeNull();
+    expect(gradeBudgetMs("auto", { confidence: "high" }, fast)).toBe(1000);
+    expect(gradeBudgetMs("auto", { confidence: "medium" }, fast)).toBe(1500);
+    expect(gradeBudgetMs("auto", { confidence: "low" }, fast)).toBe(2500);
+    // Slow connection: never more than the original caps.
+    const slow = latencyQuantiles([4000, 5200, 6100, 7000, 9000, 4500]);
+    expect(gradeBudgetMs("auto", { confidence: "medium" }, slow)).toBe(2500);
+    expect(gradeBudgetMs("auto", { confidence: "low" }, slow)).toBe(8000);
+    // Too few samples: defaults.
+    expect(latencyQuantiles([500, 600])).toBeNull();
+    expect(gradeBudgetMs("auto", { confidence: "low" }, latencyQuantiles([500, 600]))).toBe(8000);
   });
 
   it("a reworded answer waits for Claude instead of taking an unreliable rule-based grade", async () => {

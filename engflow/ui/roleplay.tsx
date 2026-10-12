@@ -1,13 +1,16 @@
 "use client";
 import * as React from "react";
-import { ArrowRight, Check, MessagesSquare } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowRight, Check, MessagesSquare, Play, Square } from "lucide-react";
 import { listScenarios, recommendScenario, scenarioItems, type ScenarioInfo } from "../core/roleplay";
 import { autoDifficulty } from "../core/situations";
-import type { Situation } from "../core/types";
+import type { Evaluation, Question, Situation } from "../core/types";
 import { SITUATION_INFO } from "../content";
 import { useApp } from "./store";
 import { useNav } from "./app";
-import { Card, Eyebrow, cn } from "./kit";
+import { Card, Eyebrow, cn, useReduced } from "./kit";
+import { LEARNER_SPEAKER } from "./practice/parts";
+import { canSpeak, speakSequence, stopSpeaking } from "./speech";
 
 function useStartScenario() {
   const app = useApp();
@@ -61,6 +64,121 @@ export function RoleplayList({ situation = "all", limit }: { situation?: Situati
         ))}
       </div>
     </section>
+  );
+}
+
+/** One finished turn of a role-play: the question and the learner's final answer to it. */
+export interface PlayedTurn {
+  question: Question;
+  evaluation: Evaluation;
+}
+
+/**
+ * The whole conversation after a role-play: the partner's lines, what the
+ * learner actually said (with the score), and the natural version under any
+ * line that was not perfect. "전체 듣기" reads it all aloud, using the natural
+ * version for the learner's lines.
+ */
+export function RoleplayReplay({ turns, slow }: { turns: PlayedTurn[]; slow?: boolean }) {
+  const reduced = useReduced();
+  const [playing, setPlaying] = React.useState<number | null>(null);
+  const [supported, setSupported] = React.useState(false);
+  React.useEffect(() => setSupported(canSpeak()), []);
+  React.useEffect(() => () => stopSpeaking(), []);
+  // Last answer per step, in order.
+  const byStep = new Map<number, PlayedTurn>();
+  for (const t of turns) if (t.question.scenario) byStep.set(t.question.scenario.step, t);
+  const steps = [...byStep.entries()].sort((a, b) => a[0] - b[0]).map(([, t]) => t);
+  if (!steps.length) return null;
+  const lines: { who: "them" | "me"; speaker: string; en: string; ko?: string; turn?: PlayedTurn }[] = [];
+  for (const t of steps) {
+    const d = t.question.dialogue ?? [];
+    const lastMine = d.map((x) => x.speaker).lastIndexOf(LEARNER_SPEAKER);
+    for (const x of d.slice(lastMine + 1)) lines.push({ who: "them", speaker: x.speaker, en: x.en, ko: x.ko });
+    lines.push({ who: "me", speaker: LEARNER_SPEAKER, en: t.evaluation.answer, turn: t });
+  }
+  const audio = lines.map((l) => (l.who === "me" && l.turn && l.turn.evaluation.scores.overall < 100 ? l.turn.evaluation.recommended || l.en : l.en));
+  const clean = steps.filter((t) => t.evaluation.scores.overall >= 85).length;
+  return (
+    <Card className="p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <Eyebrow>대화 다시 보기</Eyebrow>
+          <p className="ef-ko mt-0.5 text-[13px] text-[var(--muted)]">
+            {steps.length}번 주고받음 · 자연스럽게 말한 턴 {clean}/{steps.length}
+          </p>
+        </div>
+        {supported ? (
+          <button
+            type="button"
+            onClick={() => {
+              if (playing !== null) {
+                stopSpeaking();
+                setPlaying(null);
+                return;
+              }
+              setPlaying(0);
+              speakSequence(audio, { slow, onLine: setPlaying, onEnd: () => setPlaying(null) });
+            }}
+            className={cn(
+              "dd-focus inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-[13px] font-semibold",
+              playing !== null ? "border-transparent bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)]" : "border-[var(--line)]",
+            )}
+            aria-pressed={playing !== null}
+          >
+            {playing !== null ? <Square className="size-3.5" /> : <Play className="size-3.5" />}
+            {playing !== null ? "멈추기" : "전체 듣기"}
+          </button>
+        ) : null}
+      </div>
+      <ol className="mt-3 space-y-2.5" aria-label="대화 기록">
+        {lines.map((l, i) => {
+          const me = l.who === "me";
+          const ev = l.turn?.evaluation;
+          const natural = ev && ev.scores.overall < 100 && ev.recommended && ev.recommended.trim() !== ev.answer.trim() ? ev.recommended : null;
+          return (
+            <motion.li
+              key={i}
+              className={cn("flex items-end gap-2", me && "flex-row-reverse")}
+              initial={reduced ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: reduced ? 0 : 0.05 * i, duration: 0.2 }}
+            >
+              <span
+                className="grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold text-white"
+                style={{ background: me ? "var(--ef-accent-ink)" : "#8e8e93" }}
+                aria-hidden
+              >
+                {me ? "나" : l.speaker.replace(/^(Mr|Ms|Mrs|Dr)\.\s*/, "").charAt(0)}
+              </span>
+              <div
+                className={cn(
+                  "min-w-0 max-w-[85%] rounded-[18px] px-3.5 py-2 transition-shadow",
+                  me ? "rounded-br-[6px] bg-[var(--ef-accent-soft)]" : "rounded-bl-[6px] border border-[var(--line)] bg-[var(--surface-strong)]",
+                  playing === i && "ring-2 ring-[var(--ef-accent-ink)]/50",
+                )}
+              >
+                <div className={cn("flex items-center gap-1.5 text-[11px] font-semibold", me ? "justify-end text-[var(--ef-accent-ink)]" : "text-[var(--muted)]")}>
+                  {me ? "나" : l.speaker}
+                  {ev ? (
+                    <span className={cn("ef-num rounded-full px-1.5 py-px text-[10px]", ev.scores.overall >= 85 ? "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]" : "bg-[var(--ef-warn-soft)] text-[var(--ef-warn)]")}>
+                      {ev.scores.overall}
+                    </span>
+                  ) : null}
+                </div>
+                <p className={cn("ef-en text-[15px] leading-snug", me && "text-right")}>{l.en}</p>
+                {natural ? (
+                  <p className="ef-en mt-1 border-t border-[var(--ef-accent-ink)]/15 pt-1 text-right text-[13px] text-[var(--ef-ink-2)]">
+                    <span className="ef-ko mr-1 text-[11px] font-semibold text-[var(--ef-accent-ink)]">자연스럽게</span>
+                    {natural}
+                  </p>
+                ) : null}
+              </div>
+            </motion.li>
+          );
+        })}
+      </ol>
+    </Card>
   );
 }
 

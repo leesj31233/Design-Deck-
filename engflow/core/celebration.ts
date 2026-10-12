@@ -1,6 +1,7 @@
 import { scoredErrors } from "./evaluate";
 import { situationOf } from "./situations";
 import { weakGrammar, weaknessMatch } from "./weakness";
+import { localDayKey } from "./mastery";
 import type { Evaluation, LearnerState, Question } from "./types";
 
 /**
@@ -8,7 +9,7 @@ import type { Evaluation, LearnerState, Question } from "./types";
  * same answer always gets the same celebration and it can be tested.
  */
 
-export type CelebrationKind = "perfect" | "streak" | "weak-cleared" | "improved" | "comeback" | "great";
+export type CelebrationKind = "goal" | "days" | "collection" | "perfect" | "streak" | "weak-cleared" | "improved" | "comeback" | "great";
 
 export interface Celebration {
   kind: CelebrationKind;
@@ -23,6 +24,16 @@ export interface Celebration {
 const PERFECT_TITLES = ["완벽해요!", "원어민처럼 말했어요!", "Nailed it! 완벽합니다", "100점! 회의에서 그대로 쓰세요", "Spot on! 흠잡을 데가 없어요"];
 const GREAT_TITLES = ["아주 좋아요!", "자연스러워요!", "Nice! 거의 완벽해요", "좋은 표현이에요!"];
 const STREAK_MILESTONES = new Set([3, 5, 10, 15, 20, 30, 50]);
+const DAY_MILESTONES = new Set([3, 7, 14, 21, 30, 50, 100, 200, 365]);
+const DAY_MS = 86_400_000;
+const COLLECTION_MILESTONES = new Set([10, 25, 50, 75, 100, 150, 200, 300, 400, 500]);
+
+/** Days in a row with practice before today (today not counted). */
+function daysBefore(daily: LearnerState["daily"], now: number): number {
+  let n = 0;
+  for (let t = now - DAY_MS; daily[localDayKey(t)]?.answered; t -= DAY_MS) n++;
+  return n;
+}
 
 /** A stable pick from a list (the same answer always shows the same line). */
 function pick<T>(list: T[], seed: string): T {
@@ -39,8 +50,8 @@ export function isSuccess(ev: Evaluation, hint: number): boolean {
 export function celebrationFor(input: {
   evaluation: Evaluation;
   question: Question;
-  /** Learner state BEFORE this answer is recorded. */
-  prev: Pick<LearnerState, "seen" | "attempts" | "weak">;
+  /** Learner state BEFORE this answer is recorded (daily log and target enable the daily-goal and practice-days moments). */
+  prev: Pick<LearnerState, "seen" | "attempts" | "weak"> & { daily?: LearnerState["daily"]; settings?: Pick<LearnerState["settings"], "dailyTarget"> };
   /** Consecutive clean answers in this session, including this one (0 if this one is not clean). */
   streak: number;
   hint: number;
@@ -52,8 +63,30 @@ export function celebrationFor(input: {
   const success = isSuccess(ev, hint);
   const seed = `${q.id}|${ev.answer}`;
   if (!success) return null;
+  const perfect = (ev.scores.overall === 100 || ev.exact) && hint === 0;
 
-  if ((ev.scores.overall === 100 || ev.exact) && hint === 0) {
+  // Today's goal reached with this answer, or the first answer of the day extends the practice-days streak to a milestone.
+  if (prev.daily) {
+    const today = prev.daily[localDayKey(now)]?.answered ?? 0;
+    const target = prev.settings?.dailyTarget ?? 0;
+    if (target > 0 && today + 1 === target) {
+      return { kind: "goal", titleKo: "오늘 목표 달성!", detailKo: `${target}문항을 채웠어요.${perfect ? " 마지막은 100점으로!" : ""} 내일도 이어서 해요.`, burst: "confetti" };
+    }
+    const days = today === 0 ? daysBefore(prev.daily, now) + 1 : 0;
+    if (DAY_MILESTONES.has(days)) {
+      return { kind: "days", titleKo: `${days}일 연속 학습!`, detailKo: days >= 7 ? "꾸준함이 실력이 됩니다. 정말 잘하고 있어요." : "습관이 만들어지고 있어요.", burst: "confetti" };
+    }
+  }
+
+  // Sentences the learner can now say well (best 85+): a milestone when this answer adds one.
+  if ((prev.seen[q.id]?.best ?? 0) < 85) {
+    const owned = Object.values(prev.seen).filter((x) => x.best >= 85).length + 1;
+    if (COLLECTION_MILESTONES.has(owned)) {
+      return { kind: "collection", titleKo: `말할 수 있는 문장 ${owned}개!`, detailKo: "처음 보는 상황에서도 바로 꺼내 쓸 수 있게 복습으로 이어 갈게요.", burst: "confetti" };
+    }
+  }
+
+  if (perfect) {
     return { kind: "perfect", titleKo: pick(PERFECT_TITLES, seed), detailKo: streak >= 3 ? `${streak}연속 정답 중이에요.` : undefined, burst: "confetti" };
   }
   if (STREAK_MILESTONES.has(streak)) {

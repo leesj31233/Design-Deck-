@@ -43,6 +43,26 @@ export function stopSpeaking(): void {
   if (canSpeak()) window.speechSynthesis.cancel();
 }
 
+/** Reads several lines one after another (a whole conversation); onLine reports which line is playing. */
+export function speakSequence(lines: string[], opts: { slow?: boolean; onLine?: (i: number) => void; onEnd?: () => void } = {}): void {
+  if (!canSpeak() || !lines.length) return;
+  const s = window.speechSynthesis;
+  s.cancel();
+  const v = voice();
+  lines.forEach((text, i) => {
+    const u = new SpeechSynthesisUtterance(text);
+    if (v) u.voice = v;
+    u.lang = v?.lang ?? "en-US";
+    u.rate = opts.slow ? 0.8 : 0.95;
+    u.onstart = () => opts.onLine?.(i);
+    if (i === lines.length - 1) {
+      u.onend = () => opts.onEnd?.();
+      u.onerror = () => opts.onEnd?.();
+    }
+    s.speak(u);
+  });
+}
+
 /** A small "read aloud" button. */
 export function SpeakButton({ text, slow, className, label = "읽어 주기" }: { text: string; slow?: boolean; className?: string; label?: string }) {
   const [on, setOn] = React.useState(false);

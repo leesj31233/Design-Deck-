@@ -2,7 +2,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { motion } from "motion/react";
-import { Flame, PartyPopper, ShieldCheck, Sparkles, TrendingUp, Trophy } from "lucide-react";
+import { CalendarCheck, Flame, Library, PartyPopper, ShieldCheck, Sparkles, Target, TrendingUp, Trophy } from "lucide-react";
 import type { Celebration } from "../core/celebration";
 import { cn, useReduced } from "./kit";
 
@@ -145,8 +145,11 @@ export function playChime(kind: "perfect" | "good" | "streak"): void {
 
 /* ───────────── Banner ───────────── */
 
-const ICONS = { perfect: PartyPopper, streak: Flame, "weak-cleared": ShieldCheck, improved: TrendingUp, comeback: Trophy, great: Sparkles } as const;
+const ICONS = { goal: Target, days: CalendarCheck, collection: Library, perfect: PartyPopper, streak: Flame, "weak-cleared": ShieldCheck, improved: TrendingUp, comeback: Trophy, great: Sparkles } as const;
 const TONES = {
+  goal: "from-[#30b158]/18 via-[#0a84ff]/12 to-[#f2a516]/16 text-[var(--foreground)]",
+  days: "from-[#ff9f0a]/18 via-[#f2a516]/12 to-[#30b158]/12 text-[var(--foreground)]",
+  collection: "from-[#8e4ec6]/16 via-[#0a84ff]/12 to-[#30b158]/12 text-[var(--foreground)]",
   perfect: "from-[#0a84ff]/15 via-[#30b158]/12 to-[#f2a516]/15 text-[var(--foreground)]",
   streak: "from-[#ff9f0a]/18 to-[#ff453a]/12 text-[var(--foreground)]",
   "weak-cleared": "from-[#30b158]/16 to-[#0aa5a5]/10 text-[var(--foreground)]",
@@ -166,8 +169,8 @@ export function CelebrationBanner({ c, effects, sound }: { c: Celebration; effec
       const r = ref.current?.getBoundingClientRect();
       setBurst(r ? { x: r.left + 28, y: r.top + r.height / 2 } : { x: window.innerWidth / 2, y: window.innerHeight * 0.3 });
     }
-    if (sound) playChime(c.kind === "perfect" ? "perfect" : c.kind === "streak" ? "streak" : "good");
-    if (c.kind === "perfect") navigator.vibrate?.(30);
+    if (sound) playChime(c.kind === "perfect" || c.kind === "goal" || c.kind === "collection" ? "perfect" : c.kind === "streak" || c.kind === "days" ? "streak" : "good");
+    if (c.kind === "perfect" || c.kind === "goal" || c.kind === "days") navigator.vibrate?.(30);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -181,7 +184,7 @@ export function CelebrationBanner({ c, effects, sound }: { c: Celebration; effec
         className={cn("flex items-center gap-3 rounded-2xl bg-gradient-to-r px-4 py-3", TONES[c.kind])}
       >
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--surface-strong)] shadow-sm" style={{ animation: reduced ? undefined : "ef-pop .5s ease" }}>
-          <Icon className={cn("size-5", c.kind === "streak" ? "text-[#ff6b00]" : c.kind === "perfect" ? "text-[var(--ef-accent-ink)]" : "text-[var(--ef-ok)]")} />
+          <Icon className={cn("size-5", c.kind === "streak" || c.kind === "days" ? "text-[#ff6b00]" : c.kind === "perfect" ? "text-[var(--ef-accent-ink)]" : "text-[var(--ef-ok)]")} />
         </span>
         <div className="min-w-0">
           <div className="text-[16px] font-semibold tracking-[-.01em]">{c.titleKo}</div>

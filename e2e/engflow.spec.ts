@@ -208,6 +208,28 @@ test("scene + difficulty: a meal conversation at difficulty 3 shows the chat and
   expect(errors).toEqual([]);
 });
 
+test("role-play: a perfect answer is celebrated, my own line stays in the chat, and the whole talk replays at the end", async ({ page }) => {
+  const errors = await open(page);
+  await nav(page, "학습");
+  await page.getByRole("button", { name: "롤플레이 주간 화상회의 시작 시작" }).click();
+  const lines = ["Yes, I can hear you clearly.", "Sure. Let me share my screen first.", "Actually, the review has been moved to next Monday."];
+  for (const [i, line] of lines.entries()) {
+    await expect(page.locator("#ef-answer")).toBeVisible();
+    if (i > 0) await expect(page.getByRole("list", { name: "대화" }).getByText(lines[i - 1])).toBeVisible();
+    await page.locator("#ef-answer").fill(line);
+    await page.getByRole("button", { name: /제출/ }).click();
+    await expect(page.getByRole("img", { name: /종합/ })).toBeVisible();
+    if (i === 0) await expect(page.getByRole("status").filter({ hasText: /완벽|Nailed|Spot on|원어민|100점/ }).first()).toBeVisible();
+    await page.getByRole("button", { name: /^다음|^결과 보기/ }).click();
+  }
+  await expect(page.getByRole("heading", { name: "대화 완주!" })).toBeVisible();
+  const replay = page.getByRole("list", { name: "대화 기록" });
+  await expect(replay).toBeVisible();
+  for (const line of lines) await expect(replay.getByText(line)).toBeVisible();
+  await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
+
 test("expression notebook: study an expression step by step, then speak it", async ({ page }) => {
   const errors = await open(page);
   await nav(page, "표현 노트");

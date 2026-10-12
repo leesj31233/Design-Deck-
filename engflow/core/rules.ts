@@ -51,6 +51,8 @@ const missingBeProgressive: Rule = (w) => {
     const subj = w[i].norm;
     if (!SUBJECT_PRONOUNS.has(subj)) continue;
     if (i > 0 && /^(to|than|as|let)$/.test(w[i - 1].norm)) continue;
+    // "Sorry to keep you waiting", "I saw it coming": you/it right after a verb is its object.
+    if ((subj === "you" || subj === "it") && i > 0 && !brokenAfter(w, i - 1) && (verbInfo(w[i - 1].norm) || /^(keep|kept|see|saw|find|found|hear|heard|leave|left|watch|catch|caught|imagine|mind|get|got|notice|noticed|have|had|spot|spotted|set)$/.test(w[i - 1].norm))) continue;
     // Question word order ("Is it working?", "are you asking") already has the be verb before the subject.
     if (i > 0 && (BE_FORMS.has(w[i - 1].norm) || /^(do|does|did|have|has|had|will|would|can|could|should)$/.test(w[i - 1].norm))) continue;
     let j = i + 1;
@@ -76,6 +78,7 @@ const waitWithoutFor: Rule = (w) => {
   for (let i = 0; i < w.length - 1; i++) {
     const info = verbInfo(w[i].norm);
     if (!info || info.base !== "wait") continue;
+    if (brokenAfter(w, i)) continue; // "keep you waiting. The meeting ran over."
     const next = w[i + 1].norm;
     const after = w[i + 2]?.norm;
     const isObj = WAIT_OBJECTS.has(next) || (OBJECT_DETERMINERS.has(next) && !!after && !/^(to|until|for|minute|minutes|day|days|week|weeks|while|few|couple|little|bit|moment|second|hour|hours|month|months)$/.test(after));
@@ -175,6 +178,9 @@ const doubleModal: Rule = (w) => {
   return out;
 };
 
+/** Verbs that are also nouns, wrong right after "I am / we are / they are": "I am plan to bring" → "I plan to bring". */
+const PRONOUN_BE_VERBS = new Set(["plan", "need", "hope", "work", "use", "help", "try", "support", "check", "review", "request", "mean", "visit", "call", "feel", "start", "look", "wait", "go", "come", "leave", "stay", "focus", "think", "want", "know", "agree", "understand", "remember", "forget"]);
+
 /** Words that are also adjectives after be ("isn't complete yet", "is clear"). */
 const BE_ADJECTIVE_OK = new Set(["complete", "correct", "separate", "open", "close", "clean", "dry", "free", "clear", "ready", "secure", "finish", "approve"]);
 
@@ -190,7 +196,17 @@ const beBaseVerb: Rule = (w) => {
       j++;
     }
     const v = w[j];
-    if (!v || !UNAMBIGUOUS_VERBS.has(v.norm) || isSameFormParticiple(v.norm) || BE_ADJECTIVE_OK.has(v.norm)) continue;
+    // After I/we/they/you, also common verbs that double as nouns: "I am plan to…", "we are need…", "I'm look forward…".
+    const personal = /^(i|we|they|you)$/.test(w[i - 1]?.norm ?? "") && /^(am|are|was|were)$/.test(w[i].norm);
+    if (v && personal && v.norm === "worry" && !negated) {
+      out.push({
+        rule: "be-participle", from: j, to: j + 1, replacement: "worried", category: "verb-form", severity: "major", skill: "be-adj",
+        messageKo: `'걱정된다'는 'be worried'입니다: '${w[i].raw} ${v.raw}' → '${w[i].raw} worried'. (동사로 쓰면 'I worry about…')`,
+      });
+      continue;
+    }
+    const nounVerb = !!v && personal && PRONOUN_BE_VERBS.has(v.norm);
+    if (!v || (!UNAMBIGUOUS_VERBS.has(v.norm) && !nounVerb) || isSameFormParticiple(v.norm) || BE_ADJECTIVE_OK.has(v.norm)) continue;
     if (w[j + 1]?.norm === "to" && v.norm === "able") continue;
     // "is" after a question word or "there" is not this pattern ("What is meet?" is not a learner sentence).
     if (i > 0 && /^(there|what|where|how|why|who)$/.test(w[i - 1].norm)) continue;

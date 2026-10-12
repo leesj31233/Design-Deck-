@@ -206,20 +206,26 @@ function tintFor(name: string): string {
 /** The learner's own name in role-play dialogue: shown as "나", on the right. */
 export const LEARNER_SPEAKER = "Minsu";
 
-export function ChatThread({ turns, showKo, mine, slow }: { turns: DialogueTurn[]; showKo: boolean; mine?: (string | undefined)[]; slow?: boolean }) {
+/** A line the learner said earlier in a role-play; `fixed` when it is shown with the grammar corrected. */
+export interface SaidLine {
+  text: string;
+  fixed?: boolean;
+}
+
+export function ChatThread({ turns, showKo, mine, slow }: { turns: DialogueTurn[]; showKo: boolean; mine?: (SaidLine | undefined)[]; slow?: boolean }) {
   const reduced = useReduced();
   // In a role-play the learner's earlier lines are replaced by what they actually said (last line = previous step).
   const own = turns.map((t, i) => (t.speaker === LEARNER_SPEAKER ? i : -1)).filter((i) => i >= 0);
-  const said = new Map<number, string>();
+  const said = new Map<number, SaidLine>();
   own.reverse().forEach((idx, k) => {
-    const text = mine?.[mine.length - 1 - k];
-    if (text) said.set(idx, text);
+    const line = mine?.[mine.length - 1 - k];
+    if (line?.text) said.set(idx, line);
   });
   return (
     <ol className="space-y-2.5" aria-label="대화">
       {turns.map((t, i) => {
         const me = t.speaker === LEARNER_SPEAKER;
-        const text = said.get(i) ?? t.en;
+        const text = said.get(i)?.text ?? t.en;
         return (
           <motion.li
             key={i}
@@ -242,7 +248,7 @@ export function ChatThread({ turns, showKo, mine, slow }: { turns: DialogueTurn[
               )}
             >
               <div className={cn("text-[11px] font-semibold", me ? "text-right text-[var(--ef-accent-ink)]" : "text-[var(--muted)]")}>
-                {me ? (said.has(i) ? "나 (내가 한 말)" : "나") : t.speaker}
+                {me ? (said.has(i) ? (said.get(i)!.fixed ? "나 (문법을 고친 내 말)" : "나 (내가 한 말)") : "나") : t.speaker}
               </div>
               <div className="flex items-start gap-1">
                 <p className={cn("ef-en min-w-0 flex-1 text-[16px] leading-snug md:text-[17px]", me && "text-right")}>{text}</p>

@@ -5,25 +5,26 @@ import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, 
 import { Kbd } from "@/components/ui/kbd";
 import { evaluateLocal } from "../../core/evaluate";
 import { createGrader, gradeBudgetMs, type GradeVia } from "../../core/grader";
-import { recordClaudeLatency } from "../latency";
+import { claudeLatencyQuantiles, recordClaudeLatency } from "../latency";
 import { celebrationFor, isSuccess, type Celebration } from "../../core/celebration";
 import { Burst, StreakChip } from "../celebrate";
 import { speak, stopSpeaking } from "../speech";
 import { pickReviewQuestion, type SessionItem } from "../../core/session";
 import type { RecordResult } from "../../core/store";
 import type { Evaluation, HintLevel, Question } from "../../core/types";
-import { STATUS_LABEL_KO } from "../../core/mastery";
+import { STATUS_LABEL_KO, localDayKey } from "../../core/mastery";
 import { GRADE_LABEL_KO } from "../../core/scheduler";
 import { skillName } from "../../content";
 import { AIUnavailableError } from "../../platform/types";
 import { useApp } from "../store";
 import { Card, ConfirmDialog, Eyebrow, LevelBadge, ScoreRing, StatusChip, TONE_TEXT, cn, relTimeKo, scoreTone, useReduced } from "../kit";
-import { ChatThread, MeaningChunks, MyTurn } from "./parts";
+import { ChatThread, MeaningChunks, MyTurn, type SaidLine } from "./parts";
 import { situationOf } from "../../core/situations";
 import { SITUATION_INFO } from "../../content";
 import { FeedbackPanel } from "./feedback";
 import { weaknessNote } from "../../core/weakness";
 import { GuideSheet, type GuideTab } from "../guide";
+import { RoleplayReplay } from "../roleplay";
 
 
 export const CATEGORY_LABEL: Record<string, string> = {
@@ -119,7 +120,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   // Consecutive clean answers, and the learner's own lines per role-play (by step) for the chat.
   const [streak, setStreak] = React.useState(0);
   const [bestStreak, setBestStreak] = React.useState(0);
-  const [said, setSaid] = React.useState<Record<string, string[]>>({});
+  const [said, setSaid] = React.useState<Record<string, SaidLine[]>>({});
   const [celebration, setCelebration] = React.useState<Celebration | null>(null);
   const [finished, setFinished] = React.useState(false);
   const [showNatural, setShowNatural] = React.useState(app.state.settings.showNaturalKorean);
@@ -150,7 +151,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       createGrader({
         evaluate: (question, text, local, signal) => app.platform.ai.evaluate(question, text, local, "quick", signal),
         aiEnabled: () => live.current.aiPossible,
-        budgetMs: (local) => gradeBudgetMs(live.current.gradeMode, local),
+        budgetMs: (local) => gradeBudgetMs(live.current.gradeMode, local, claudeLatencyQuantiles()),
         onLatency: recordClaudeLatency,
       }),
     [app.platform.ai],
@@ -247,7 +248,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     }
     const token = ++gradeToken.current;
     const local = evaluateLocal(q, text, { hintLevel: hint });
-    const budget = gradeBudgetMs(gradeMode, local);
+    const budget = gradeBudgetMs(gradeMode, local, claudeLatencyQuantiles());
     setWait({ budgetMs: budget, reworded: local.confidence !== "high" });
     setPhase("grading");
     const slowTimer = budget > 1500 ? setTimeout(() => token === gradeToken.current && setSlow(true), 1500) : null;
@@ -286,7 +287,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       const sc = q.scenario;
       setSaid((m) => {
         const lines = [...(m[sc.id] ?? [])];
-        lines[sc.step - 1] = ev.exact ? ev.answer : ev.corrected;
+        const text = ev.exact ? ev.answer : ev.corrected;
+        lines[sc.step - 1] = { text, fixed: text.trim() !== ev.answer.trim() };
         return { ...m, [sc.id]: lines };
       });
     }
@@ -699,8 +701,14 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
     .sort((a, b) => a.due - b.due)
     .slice(0, 4);
   const perfects = answered.filter((d) => d.result.attempt.overall === 100).length;
+  // A role-play session ends with the whole conversation; finishing every turn cleanly counts as a trophy.
+  const roleplay = done.length > 0 && done.every((d) => d.question.scenario) ? done.filter((d) => !d.result.attempt.skipped) : null;
+  const roleplayClean = !!roleplay && roleplay.length > 0 && new Set(roleplay.map((d) => d.question.scenario!.step)).size === roleplay[0].question.scenario!.total && roleplay.every((d) => d.result.attempt.overall >= 85 || done.some((x) => x.question.id === d.question.id && x !== d && x.result.attempt.overall >= 85));
+  // Today's goal reached during this session (counted from the daily log after it).
+  const todayAnswered = app.state.daily[localDayKey(app.now())]?.answered ?? 0;
+  const goalNow = todayAnswered >= app.state.settings.dailyTarget && todayAnswered - done.length < app.state.settings.dailyTarget;
   // A great session earns a trophy and confetti: every answer clean, or an average of 90+.
-  const trophy = answered.length >= 3 && (good === done.length || avg >= 90);
+  const trophy = (answered.length >= 3 && (good === done.length || avg >= 90)) || roleplayClean;
   const [party, setParty] = React.useState(trophy && app.state.settings.celebrate !== false);
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-10">
@@ -712,15 +720,21 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
         >
           {trophy ? <Trophy className="size-7" /> : <CheckCircle2 className="size-7" />}
         </div>
-        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
+        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{roleplay ? (roleplayClean ? "대화 완주!" : "대화 끝") : trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
         <p className="ef-ko mt-1 text-[14px] text-[var(--muted)]">{spec.title}</p>
-        {perfects || bestStreak >= 3 ? (
+        {perfects || bestStreak >= 3 || goalNow ? (
           <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[12px]">
+            {goalNow ? <span className="rounded-full bg-[var(--ef-ok-soft)] px-2.5 py-1 font-semibold text-[var(--ef-ok)]">오늘 목표 달성 · {todayAnswered}문항</span> : null}
             {perfects ? <span className="rounded-full bg-[var(--ef-accent-soft)] px-2.5 py-1 font-semibold text-[var(--ef-accent-ink)]">100점 {perfects}개</span> : null}
             {bestStreak >= 3 ? <span className="rounded-full bg-[#ff9f0a]/15 px-2.5 py-1 font-semibold text-[#c25e00] dark:text-[#ffb340]">최고 {bestStreak}연속 정답</span> : null}
           </div>
         ) : null}
       </motion.div>
+      {roleplay?.length ? (
+        <div className="mt-6">
+          <RoleplayReplay turns={roleplay.map((d) => ({ question: d.question, evaluation: d.evaluation }))} slow={app.state.settings.slowSpeech} />
+        </div>
+      ) : null}
       <div className="mt-6 grid grid-cols-3 gap-2">
         <Card className="p-4 text-center">
           <div className="ef-num text-[24px] font-semibold">{done.length}</div>

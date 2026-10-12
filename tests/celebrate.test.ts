@@ -48,6 +48,24 @@ describe("celebrations", () => {
     expect(celebrationFor({ ...base, evaluation: scored(87), prev: { ...fresh(), attempts: [attempt] } })).toMatchObject({ kind: "comeback", burst: "sparkle" });
   });
 
+  it("reaching today's goal beats everything else, and only a clean answer celebrates it", () => {
+    const day = (ts: number) => { const d = new Date(ts); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+    const log = (answered: number) => ({ answered, correct: answered, minutes: 0 }) as never;
+    const prev = { ...fresh(), daily: { [day(NOW)]: log(9) }, settings: { dailyTarget: 10 } };
+    expect(celebrationFor({ ...base, evaluation: exact(), prev })).toMatchObject({ kind: "goal", burst: "confetti" });
+    expect(celebrationFor({ ...base, evaluation: scored(70), prev })).toBeNull();
+    // First answer of the day after six days in a row: a 7-day milestone.
+    const week = Object.fromEntries([1, 2, 3, 4, 5, 6].map((k) => [day(NOW - k * 86_400_000), log(5)]));
+    expect(celebrationFor({ ...base, evaluation: scored(90), prev: { ...fresh(), daily: week, settings: { dailyTarget: 10 } } })).toMatchObject({ kind: "days", titleKo: "7일 연속 학습!" });
+  });
+
+  it("the 10th sentence the learner can say well is a collection milestone", () => {
+    const seen = Object.fromEntries(QUESTIONS.filter((x) => x.id !== q.id).slice(0, 9).map((x) => [x.id, { count: 1, lastAt: NOW - 3_600_000, best: 90 }]));
+    expect(celebrationFor({ ...base, evaluation: scored(88), prev: { ...fresh(), seen } })).toMatchObject({ kind: "collection", titleKo: "말할 수 있는 문장 10개!" });
+    // Already owned: no second milestone for the same sentence.
+    expect(celebrationFor({ ...base, evaluation: scored(88), prev: { ...fresh(), seen: { ...seen, [q.id]: { count: 1, lastAt: NOW, best: 86 } } } })?.kind).not.toBe("collection");
+  });
+
   it("no celebration below 85 or with a major error; a quiet 'great' at 90+", () => {
     expect(celebrationFor({ ...base, evaluation: scored(80), prev: fresh() })).toBeNull();
     const major = { ...scored(92), errors: [{ id: "e", start: 0, end: 1, category: "tense", severity: "major", bucket: "grammar", fix: "x", noteKo: "" }] } as unknown as Evaluation;

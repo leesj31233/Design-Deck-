@@ -3,6 +3,8 @@
  * localStorage: it describes this phone or computer and its network, so it is
  * not synced. Every access is guarded; without storage the figure is simply absent.
  */
+import { latencyQuantiles, type LatencyQuantiles } from "../core/grader";
+
 const KEY = "engflow.claudeLatency";
 
 export function recordClaudeLatency(ms: number): void {
@@ -20,6 +22,15 @@ export function claudeLatencyStats(): { n: number; avgMs: number; medianMs: numb
     if (!list.length) return null;
     const sorted = [...list].sort((a, b) => a - b);
     return { n: list.length, avgMs: list.reduce((a, b) => a + b, 0) / list.length, medianMs: sorted[Math.floor(sorted.length / 2)] };
+  } catch {
+    return null;
+  }
+}
+
+/** Percentiles of Claude's response time here, once there are at least 5 samples (used to size the wait). */
+export function claudeLatencyQuantiles(): LatencyQuantiles | null {
+  try {
+    return latencyQuantiles(JSON.parse(localStorage.getItem(KEY) ?? "[]") as number[]);
   } catch {
     return null;
   }

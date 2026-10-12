@@ -502,7 +502,8 @@ function applyEdits(tokens: Token[], w: Token[], edits: Edit[]): string {
         emitInsertions(w.length);
         endInserted = true;
       }
-      if (skipUntil < 0 || t.start >= (lastWordTok?.end ?? 0)) parts.push({ text: t.raw, punct: true });
+      // Punctuation inside a replaced span goes with it; punctuation right after the span stays ("This side, please." → "This way, please.").
+      if (skipUntil < 0 || t.start >= (w[skipUntil - 1]?.end ?? 0) || t.start >= (lastWordTok?.end ?? 0)) parts.push({ text: t.raw, punct: true });
       continue;
     }
     const i = wordIndex.get(t)!;

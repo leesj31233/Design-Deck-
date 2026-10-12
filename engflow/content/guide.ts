@@ -1982,4 +1982,271 @@ export const GUIDE: Record<string, GuideEntry> = {
       { wrong: "My opinion is we must change the vendor.", right: "In my view, we should consider changing the vendor.", ko: "My opinion is …는 딱딱하고, must는 명령처럼 강하게 들립니다. In my view + should / consider로 부드럽게 의견을 말하세요." },
     ],
   },
+
+  reaction: {
+    skill: "reaction",
+    summaryKo: "상대의 말에 바로 반응하는 짧은 대답입니다. 제안에는 Sounds good., 설명이나 지시에는 Got it., 납득이 되는 이유에는 (That) makes sense., 생각은 달라도 상대 말에 일리가 있을 때는 Fair enough.를 씁니다. 대부분 주어 That이 생략된 형태라서 동사에 -s가 붙습니다.",
+    simpleKo:
+      "짧은 대답은 '상황별 단축키'라고 생각하세요. 제안을 들으면 → Sounds good. / 할 일을 받으면 → Got it. / 이유를 들으면 → Makes sense. / 내 생각과 다르지만 인정할 때 → Fair enough. 모두 That sounds good., That makes sense.에서 That이 빠진 모양이라 'Sound good'이 아니라 'Sounds good'입니다. 한국어 '네, 알겠습니다'를 매번 'I understand.'로만 옮기면 딱딱하게 들릴 수 있습니다.",
+    rules: [
+      { formula: "(That) sounds good / great / fine (to me).", ko: "제안이나 계획에 '좋아요'라고 동의합니다. sound 뒤에는 부사 well이 아니라 형용사 good이 옵니다.", example: "Thursday at ten? Sounds good to me." },
+      { formula: "Got it. (+ 다음 행동)", ko: "설명이나 지시를 '알겠습니다'라고 받습니다. 동의한다는 뜻이 아니라 '이해했다'는 뜻이고, 뒤에 할 일을 붙이면 더 좋습니다.", example: "Got it. I'll send the revised P&ID by Friday." },
+      { formula: "(That) makes sense.", ko: "상대의 설명이나 이유가 납득될 때 씁니다. make sense는 한 덩어리 동사 표현이라 be동사를 넣지 않습니다.", example: "That makes sense. The feed was much wetter last week." },
+      { formula: "Fair enough.", ko: "내 생각과 조금 다르더라도 상대의 이유가 타당하다고 인정합니다. 의견 차이를 부드럽게 정리할 때 씁니다.", example: "Fair enough. Let's wait for the lab results, then." },
+      { formula: "No worries. / No problem.", ko: "상대의 사과나 감사에 '괜찮아요, 별말씀을요'라고 답합니다.", example: "No worries. These things happen during start-up." },
+    ],
+    anatomy: [
+      {
+        sentence: "That sounds good to me.",
+        parts: [
+          p("That", "subject (often dropped)", "주어(자주 생략)"),
+          p("sounds", "linking verb + -s", "연결동사(-s)", true),
+          p("good", "adjective", "형용사", true),
+          p("to me.", "to + person", "나에게"),
+        ],
+      },
+      {
+        sentence: "Got it. I'll update the drawing by Friday.",
+        parts: [
+          p("Got it.", "quick reaction", "짧은 반응", true),
+          p("I'll update", "next action", "다음 행동", true),
+          p("the drawing", "object", "목적어"),
+          p("by Friday.", "deadline", "기한"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Sounds good. Let's meet again next Tuesday at ten.", ko: "좋아요. 다음 주 화요일 10시에 다시 만나죠." },
+      { en: "Got it. I'll send the updated heat balance after the meeting.", ko: "알겠습니다. 회의 끝나고 수정한 열수지를 보내 드릴게요." },
+      { en: "That makes sense. The steam pressure was low during the test.", ko: "그렇군요, 이해가 됩니다. 시험 중에 스팀 압력이 낮았으니까요." },
+      { en: "Fair enough. Let's wait for the vendor's answer before we decide.", ko: "일리가 있네요. 결정하기 전에 벤더의 답변을 기다리죠." },
+      { en: "No worries. These things happen during commissioning.", ko: "괜찮아요. 시운전 중에는 그런 일이 생기기 마련이에요." },
+    ],
+    compare: [
+      { a: "Got it.", b: "I understand.", ko: "둘 다 '알겠습니다'이지만 Got it.은 짧고 가벼워 동료의 설명이나 지시에 바로 답할 때 쓰고, I understand.는 더 진지해서 상대의 사정이나 걱정을 이해한다고 말할 때 어울립니다(I understand your concern.). 지시마다 I understand.라고 하면 딱딱하게 들릴 수 있습니다." },
+      { a: "Makes sense.", b: "Fair enough.", ko: "Makes sense.는 '설명을 들으니 납득이 된다'는 뜻이고, Fair enough.는 '내 생각과 조금 다르지만 그 이유라면 받아들이겠다'는 뜻입니다. Fair enough.에는 한발 물러서는 느낌이 있습니다." },
+      { a: "Sounds good.", b: "That works for me.", ko: "Sounds good.는 제안 내용이 좋다는 반응이고, That works for me.는 '제 일정이나 상황에도 맞아요'라는 뜻이라 회의 날짜나 시간을 정할 때 특히 자연스럽습니다." },
+    ],
+    mistakes: [
+      { wrong: "Sounds well.", right: "Sounds good.", ko: "sound(~하게 들리다)는 상태를 나타내는 동사라서 뒤에 부사 well이 아니라 형용사 good이 옵니다." },
+      { wrong: "It's make sense.", right: "That makes sense.", ko: "make sense는 동사 표현이라 be동사(It's)와 함께 쓰지 않습니다. 주어가 that·it이므로 makes로 씁니다." },
+      { wrong: "Sounds good for me.", right: "Sounds good to me.", ko: "'나에게는 좋게 들린다'는 to me입니다. for me는 That works for me.처럼 work와 함께 씁니다." },
+      { wrong: "Don't mind. These things happen.", right: "No worries. These things happen.", ko: "'Don't mind'(돈 마인드)는 한국식 표현이라 영어에서는 '괜찮아요, 신경 쓰지 마세요'라는 뜻으로 쓰지 않습니다. 사과에 답할 때는 No worries. 또는 Don't worry about it.이라고 합니다." },
+    ],
+  },
+
+  "phrasal-verb": {
+    skill: "phrasal-verb",
+    summaryKo: "회의에서 원어민은 어려운 단어 대신 '동사 + 작은 단어(up, out, over, into, back)'로 된 구동사를 자주 씁니다: look into(조사하다), figure out(알아내다), go over(검토하다), set up(마련하다), follow up on(후속 조치하다), get back to(다시 연락하다), come up with(생각해 내다). 목적어가 it·them이면 figure it out처럼 가운데에 넣는 구동사와 look into it처럼 항상 뒤에 두는 구동사가 있습니다.",
+    simpleKo:
+      "구동사는 '동사 + 방향'이 합쳐져 새 뜻이 된 한 단어입니다. look(보다) + into(안으로) = 들여다보다 → 조사하다, figure(따져 보다) + out(밖으로) = 답을 꺼내다 → 알아내다. 외울 때는 목적어 자리까지 한 덩어리로 외우세요: figure it out, set it up (it이 가운데) / look into it, go over it, get back to you (it·you가 맨 뒤).",
+    rules: [
+      { formula: "look into + 명사 / it", ko: "문제의 원인을 '조사하다, 알아보다'입니다. 나눌 수 없는 구동사라 목적어는 항상 into 뒤에 옵니다.", example: "We'll look into the pressure drop this week." },
+      { formula: "figure out + 명사 / figure it out", ko: "원인이나 방법을 '알아내다, 파악하다'입니다. 목적어가 대명사면 figure와 out 사이에 넣습니다.", example: "We still need to figure out why the outlet moisture is so high." },
+      { formula: "go over + 명사", ko: "자료를 처음부터 '훑어보며 검토하다'입니다. 회의에서 review 대신 자주 쓰고, 뒤에 about이나 on을 붙이지 않습니다.", example: "Let's go over the action items before we finish." },
+      { formula: "set up + 명사 / set it up", ko: "회의·장비·시스템을 '마련하다, 설치하다, 설정하다'입니다. 명사형은 붙여 써서 setup입니다.", example: "Could you set up a call with the vendor next week?" },
+      { formula: "follow up on + 일 / get back to + 사람 / come up with + 아이디어", ko: "follow up on은 진행 상황을 '챙기다', get back to는 확인한 뒤 '다시 연락드리다', come up with는 해결책을 '생각해 내다'입니다. 세 단어가 한 덩어리입니다.", example: "I'll follow up on the quotation and get back to you by Friday." },
+    ],
+    anatomy: [
+      {
+        sentence: "We'll look into it and get back to you tomorrow.",
+        parts: [
+          p("We'll", "subject + will", "주어 + will"),
+          p("look into", "phrasal verb (inseparable)", "구동사(나눌 수 없음)", true),
+          p("it", "object (after)", "목적어(뒤)"),
+          p("and", "connector", "연결"),
+          p("get back to", "phrasal verb", "다시 연락하다", true),
+          p("you", "person", "사람"),
+          p("tomorrow.", "time", "시간"),
+        ],
+      },
+      {
+        sentence: "We need to figure it out by Friday.",
+        parts: [
+          p("We need to", "necessity", "~해야 한다"),
+          p("figure", "verb", "동사", true),
+          p("it", "pronoun object (middle)", "대명사 목적어(가운데)", true),
+          p("out", "particle", "부사(out)", true),
+          p("by Friday.", "deadline", "기한"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Let's go over the client's comments on the P&ID first.", ko: "먼저 고객사의 P&ID 코멘트를 같이 검토해 봅시다." },
+      { en: "The vendor is looking into the vibration problem on the feed pump.", ko: "벤더가 공급 펌프의 진동 문제를 조사하고 있습니다." },
+      { en: "We haven't figured out the cause of the pressure drop yet.", ko: "압력 강하의 원인을 아직 파악하지 못했습니다." },
+      { en: "Could you set up a short call with Budi's team on Thursday?", ko: "목요일에 부디 씨 팀과 짧은 통화 자리를 마련해 주시겠어요?" },
+      { en: "We need to come up with a cheaper option for the dryer.", ko: "건조기에 대해 더 저렴한 안을 생각해 내야 합니다." },
+    ],
+    compare: [
+      { a: "follow up on the quotation", b: "follow up with the vendor", ko: "follow up on 뒤에는 챙길 '일·안건'(the quotation, the issue)이, follow up with 뒤에는 연락할 '사람·회사'(the vendor, Budi)가 옵니다. 함께 쓰면 I'll follow up with the vendor on the quotation.입니다." },
+      { a: "look at the problem", b: "look into the problem", ko: "look at은 '(한번) 보다, 살펴보다'이고, look into는 원인을 찾기 위해 '자세히 조사하다'입니다. 문제 해결을 약속할 때는 We'll look into it.이 더 책임감 있게 들립니다." },
+      { a: "figure out the cause", b: "find out the delivery date", ko: "figure out은 생각하고 분석해서 답을 '알아내다'(원인, 방법)이고, find out은 묻거나 확인해서 사실을 '알게 되다'(날짜, 가격)입니다." },
+    ],
+    mistakes: [
+      { wrong: "Let me figure out it.", right: "Let me figure it out.", ko: "figure out, set up, pick up처럼 나눌 수 있는 구동사는 목적어가 it·them 같은 대명사면 반드시 가운데에 넣습니다." },
+      { wrong: "We will look it into.", right: "We will look into it.", ko: "look into는 나눌 수 없는 구동사라서 목적어는 항상 into 뒤에 옵니다." },
+      { wrong: "I will get back you tomorrow.", right: "I will get back to you tomorrow.", ko: "'다시 연락드리다'는 get back to + 사람입니다. to를 빠뜨리지 마세요." },
+      { wrong: "We need to come up a better idea.", right: "We need to come up with a better idea.", ko: "'(아이디어를) 생각해 내다'는 come up with + 명사입니다. with가 빠지면 뜻이 통하지 않습니다." },
+      { wrong: "Let's go over about the comments.", right: "Let's go over the comments.", ko: "go over 자체가 '검토하다'라서 about 없이 목적어를 바로 씁니다. discuss about이 틀린 것과 같은 이유입니다." },
+    ],
+  },
+
+  apology: {
+    skill: "apology",
+    summaryKo: "사과는 크기에 맞게 고릅니다. 작은 실수는 Sorry about that. / My mistake., 이유를 밝힐 때는 Sorry for + V-ing / 명사, 고객이나 공식 자리에서는 I apologize for + 명사 / V-ing입니다. 지금 하려는 일에 양해를 구할 때는 Sorry to + 동사원형(Sorry to interrupt, Sorry to keep you waiting)을 씁니다.",
+    simpleKo:
+      "영어 사과는 '사과 한마디 + 무엇에 대해(for) + 어떻게 할지' 세 조각이면 충분합니다: Sorry for the late reply. I was on site all day. I'll send it now. for는 전치사라서 동사가 오면 -ing입니다(Sorry for sending …). '죄송합니다'를 여러 번 반복하기보다 한 번 사과하고 바로 해결책을 말하는 편이 국제 회의에서 더 프로답게 들립니다.",
+    rules: [
+      { formula: "Sorry for + V-ing / 명사", ko: "이미 한 일에 대해 사과합니다. for 뒤의 동사는 V-ing입니다.", example: "Sorry for sending the wrong version of the drawing." },
+      { formula: "Sorry to + 동사원형 (interrupt / bother / keep you waiting)", ko: "지금 하고 있거나 막 하려는 일에 대해 양해를 구합니다.", example: "Sorry to interrupt, but we only have five minutes left." },
+      { formula: "I apologize for + 명사 / V-ing", ko: "고객이나 공식 이메일에서 쓰는 격식 있는 사과입니다. 사과받는 사람을 넣을 때는 apologize to + 사람입니다.", example: "I apologize for the delay in sending the quotation." },
+      { formula: "My mistake. / That's my fault.", ko: "자신의 작은 실수를 바로 인정하는 짧은 표현입니다. 이어서 무엇을 고칠지 말합니다.", example: "My mistake. I'll correct the flow rate and send the table again." },
+      { formula: "사과 + 짧은 이유 + 해결책", ko: "이유가 길어지면 변명처럼 들립니다. 한 문장으로 이유를 말하고 바로 다음 행동을 말합니다.", example: "Sorry for the late reply. I was at the site all day. I'll send the data this afternoon." },
+    ],
+    anatomy: [
+      {
+        sentence: "Sorry for sending the wrong file.",
+        parts: [
+          p("Sorry", "apology", "사과"),
+          p("for", "preposition", "전치사", true),
+          p("sending", "V-ing", "동명사", true),
+          p("the wrong file.", "object", "목적어"),
+        ],
+      },
+      {
+        sentence: "We need to apologize to the client for the delay.",
+        parts: [
+          p("We need to", "necessity", "~해야 한다"),
+          p("apologize", "verb", "동사"),
+          p("to the client", "to + person", "to + 사람", true),
+          p("for the delay.", "for + reason", "for + 이유", true),
+        ],
+      },
+    ],
+    examples: [
+      { en: "Sorry for the late reply. I was at the pilot plant all day.", ko: "답장이 늦어 죄송합니다. 하루 종일 파일럿 플랜트에 있었어요." },
+      { en: "Sorry to keep you waiting. The previous meeting ran over.", ko: "기다리게 해서 죄송합니다. 앞 회의가 길어졌어요." },
+      { en: "I apologize for the delay in sending the revised datasheet.", ko: "수정된 데이터시트 발송이 늦어진 점 사과드립니다." },
+      { en: "My mistake. I used last week's flow rate. I'll correct it now.", ko: "제 실수입니다. 지난주 유량을 썼네요. 지금 바로 고치겠습니다." },
+      { en: "Sorry to interrupt, but could we go back to the steam consumption?", ko: "말씀 중에 죄송하지만, 스팀 소비량 이야기로 다시 돌아가도 될까요?" },
+    ],
+    compare: [
+      { a: "Sorry to interrupt, but …", b: "Sorry for interrupting earlier.", ko: "Sorry to + 동사원형은 지금 막 하려는 일(말 끊기)에 대한 양해이고, Sorry for + V-ing는 이미 한 일에 대한 사과입니다." },
+      { a: "Sorry about that.", b: "I apologize for the inconvenience.", ko: "Sorry about that.은 동료 사이의 작은 실수에 쓰는 가벼운 사과이고, I apologize for …는 고객이나 공식 이메일에 쓰는 격식 있는 사과입니다." },
+      { a: "Excuse me, do you have a minute?", b: "Sorry, I sent the wrong file.", ko: "Excuse me는 말을 걸거나 지나가기 '전에' 양해를 구하는 말이고, Sorry는 이미 한 실수에 대해 '나중에' 사과하는 말입니다." },
+    ],
+    mistakes: [
+      { wrong: "Sorry for send the wrong file.", right: "Sorry for sending the wrong file.", ko: "for는 전치사이므로 뒤의 동사는 V-ing입니다." },
+      { wrong: "Sorry for late.", right: "Sorry I'm late.", ko: "late는 형용사라서 for 뒤에 바로 쓸 수 없습니다. Sorry I'm late. 또는 Sorry for being late.라고 합니다." },
+      { wrong: "Sorry for waiting.", right: "Sorry to keep you waiting.", ko: "Sorry for waiting.은 '내가 기다려서 미안하다'는 뜻이 됩니다. 상대를 기다리게 했을 때는 keep + 사람 + waiting을 써서 Sorry to keep you waiting.이라고 합니다." },
+      { wrong: "I apologize you for the late reply.", right: "I apologize for the late reply.", ko: "apologize 뒤에 사람을 바로 쓰지 않습니다. 사람을 넣을 때는 apologize to + 사람이고, 보통은 생략해서 I apologize for …라고 합니다." },
+      { wrong: "Sorry for the inconvenient.", right: "Sorry for the inconvenience.", ko: "the 뒤에는 명사가 옵니다. inconvenient(불편한)는 형용사이고, 명사는 inconvenience(불편)입니다." },
+    ],
+  },
+
+  hedging: {
+    skill: "hedging",
+    summaryKo: "거절, 나쁜 소식, 큰 부탁, 반대 의견을 그대로 말하면 강하게 들릴 수 있어서 영어는 앞에 '쿠션'을 붙입니다: 나쁜 소식은 I'm afraid + 문장, 조심스러운 부탁은 I was wondering if + 주어 + could + 동사원형, 다른 안 제시는 It might be better to + 동사원형, 큰 부탁은 Would it be possible to + 동사원형?입니다. 과거형(was wondering)과 might·would가 거리를 두어 공손함을 만듭니다.",
+    simpleKo:
+      "같은 말도 완충재로 감싸서 건네면 덜 아픕니다. We can't finish by May. → I'm afraid we can't finish by May. / Send it today. → I was wondering if you could send it today. / Your plan is bad. → It might be better to wait for the data. 여기서 was wondering의 과거형은 과거 이야기가 아니라 '살짝 물러서는' 공손함의 표시이고, I'm afraid는 '무섭다'가 아니라 '유감이지만'이라는 뜻입니다.",
+    rules: [
+      { formula: "I'm afraid (that) + 주어 + 동사", ko: "거절이나 좋지 않은 소식을 부드럽게 전합니다. 뒤에 of 없이 문장을 바로 씁니다.", example: "I'm afraid the vendor can't deliver the dryer before June." },
+      { formula: "I was wondering if + 주어 + could + 동사원형", ko: "아주 공손한 부탁입니다. if 뒤는 평서문 어순(주어 + could)입니다.", example: "I was wondering if you could send us the test data by Friday." },
+      { formula: "It might be better to + 동사원형", ko: "상대 안에 반대하거나 다른 방법을 제안할 때 '~하는 편이 나을 수도 있겠습니다'라고 말합니다.", example: "It might be better to wait for the lab results before we order." },
+      { formula: "Would it be possible to + 동사원형?", ko: "일정 변경처럼 부담이 큰 부탁을, 상대가 거절하기 쉽게 열어 두고 묻습니다.", example: "Would it be possible to move the site visit to next week?" },
+      { formula: "a bit / slightly + 형용사", ko: "부정적인 평가를 작게 줄여 말합니다. impossible 대신 a bit difficult처럼 말하면 협상의 여지가 남습니다.", example: "The delivery date looks a bit tight for us." },
+    ],
+    anatomy: [
+      {
+        sentence: "I was wondering if you could send the data by Friday.",
+        parts: [
+          p("I was wondering", "softener (past progressive)", "공손한 쿠션(과거진행)", true),
+          p("if", "conjunction", "~인지"),
+          p("you could send", "subject + could + base verb", "주어 + could + 동사원형", true),
+          p("the data", "object", "목적어"),
+          p("by Friday.", "deadline", "기한"),
+        ],
+      },
+      {
+        sentence: "It might be better to wait for the lab results.",
+        parts: [
+          p("It might be better", "hedged suggestion", "완곡한 제안", true),
+          p("to wait", "to + base verb", "to + 동사원형", true),
+          p("for the lab results.", "object", "대상"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "I'm afraid we can't finish the commissioning report by Friday.", ko: "죄송하지만 금요일까지 시운전 보고서를 끝내기는 어렵겠습니다." },
+      { en: "I was wondering if you could join our call with the vendor on Thursday.", ko: "혹시 목요일 벤더와의 통화에 참석해 주실 수 있을까 해서요." },
+      { en: "It might be better to run one more test before we change the design.", ko: "설계를 바꾸기 전에 시험을 한 번 더 해 보는 편이 나을 수도 있겠습니다." },
+      { en: "Would it be possible to get the revised quotation by early next week?", ko: "수정 견적서를 다음 주 초까지 받을 수 있을까요?" },
+      { en: "The schedule looks a bit tight for the Jakarta site.", ko: "자카르타 현장 기준으로는 일정이 조금 빠듯해 보입니다." },
+    ],
+    compare: [
+      { a: "Can you send the data today?", b: "I was wondering if you could send the data today.", ko: "첫 번째는 동료 사이의 일반적인 부탁이고, 두 번째는 상대가 바쁘거나 고객·윗사람일 때 쓰는 훨씬 조심스러운 부탁입니다. was wondering은 과거가 아니라 공손함을 나타냅니다." },
+      { a: "We can't do that.", b: "I'm afraid that might be difficult.", ko: "첫 번째는 문을 닫는 단호한 거절이고, 두 번째는 '유감이지만 어려울 것 같다'고 부드럽게 거절하면서 대화의 여지를 남깁니다." },
+      { a: "We should wait.", b: "It might be better to wait.", ko: "We should …는 분명한 주장이고, It might be better to …는 '~하는 편이 나을 수도 있겠다'는 제안이라 상대 의견에 반대할 때도 덜 공격적으로 들립니다." },
+    ],
+    mistakes: [
+      { wrong: "I was wondering if could you send the data.", right: "I was wondering if you could send the data.", ko: "if 뒤는 질문이 아니라 평서문 어순(주어 + could)입니다." },
+      { wrong: "I'm afraid of we can't finish it by May.", right: "I'm afraid we can't finish it by May.", ko: "'유감이지만'의 I'm afraid 뒤에는 of 없이 문장을 바로 씁니다. afraid of + 명사는 '~을 무서워하다'라는 뜻입니다." },
+      { wrong: "It might be better wait for the results.", right: "It might be better to wait for the results.", ko: "It might be better 뒤에는 to + 동사원형이 옵니다." },
+      { wrong: "Would it be possible to moving the meeting?", right: "Would it be possible to move the meeting?", ko: "possible to 뒤에는 동사원형이 옵니다." },
+      { wrong: "I wonder you can check the drawing.", right: "I was wondering if you could check the drawing.", ko: "wonder 뒤에는 if(~인지)가 필요하고, 과거진행형 was wondering과 could를 함께 쓰면 훨씬 공손한 부탁이 됩니다." },
+    ],
+  },
+
+  empathy: {
+    skill: "empathy",
+    summaryKo: "상대가 소식을 전하면 내용에 맞는 반응을 먼저 합니다. 나쁜 소식에는 I'm sorry to hear that. / That sounds tough., 상대의 상황을 짐작할 때는 You must be + 형용사(tired), 좋은 소식에는 Congratulations on + 명사 / V-ing! / That's great news!를 씁니다. 반응 뒤에 짧은 질문이나 위로를 덧붙이면 대화가 따뜻해집니다.",
+    simpleKo:
+      "상대가 소식을 전하면 바로 업무 이야기로 넘어가지 말고 '감정 신호' 한마디를 먼저 보내세요. 나쁜 소식 → I'm sorry to hear that. / 힘든 상황 → That sounds tough. / 짐작 → You must be tired. / 좋은 소식 → Congratulations on …! 여기서 must는 '~해야 한다'가 아니라 '틀림없이 ~하겠네요'라는 추측이고, 사람의 기분은 tired처럼 -ed, 그런 기분을 만드는 상황은 tiring처럼 -ing입니다.",
+    rules: [
+      { formula: "I'm sorry to hear that.", ko: "상대의 안 좋은 소식(병, 사고, 지연)에 '안타깝네요'라고 공감합니다. 내 잘못을 사과하는 말이 아닙니다.", example: "I'm sorry to hear that. I hope your father gets better soon." },
+      { formula: "That sounds + 형용사 (tough / stressful / great)", ko: "들은 내용에 대한 느낌을 말합니다. sound 뒤에는 형용사가 옵니다.", example: "Three night shifts in a row? That sounds tough." },
+      { formula: "You must be + 형용사 / That must be + 형용사", ko: "상대의 기분이나 상황을 '틀림없이 ~하겠네요'라고 짐작하며 공감합니다. 여기서 must는 강한 추측입니다.", example: "You must be tired after the long flight." },
+      { formula: "Congratulations on + 명사 / V-ing!", ko: "축하할 일 앞에는 on을 쓰고, Congratulations에는 항상 -s를 붙입니다.", example: "Congratulations on your promotion!" },
+      { formula: "That's great news! / Good for you!", ko: "좋은 소식에 함께 기뻐합니다. 이어서 짧은 질문을 하면 대화가 이어집니다.", example: "That's great news! When does the new line start up?" },
+    ],
+    anatomy: [
+      {
+        sentence: "Congratulations on passing the safety audit!",
+        parts: [
+          p("Congratulations", "celebration (always -s)", "축하(항상 -s)", true),
+          p("on", "preposition", "전치사", true),
+          p("passing", "V-ing", "동명사"),
+          p("the safety audit!", "object", "축하할 일"),
+        ],
+      },
+      {
+        sentence: "You must be tired after the long flight.",
+        parts: [
+          p("You", "subject", "주어"),
+          p("must be", "guess (must = surely)", "추측(틀림없이)", true),
+          p("tired", "feeling (-ed)", "감정(-ed)", true),
+          p("after the long flight.", "reason", "이유"),
+        ],
+      },
+    ],
+    examples: [
+      { en: "I'm sorry to hear that. I hope your daughter feels better soon.", ko: "안타깝네요. 따님이 빨리 나아지길 바랄게요." },
+      { en: "Another night shift this week? That sounds really tough.", ko: "이번 주에 또 야간 근무라고요? 정말 힘드시겠어요." },
+      { en: "Congratulations on the successful start-up of the Penang plant!", ko: "페낭 공장 가동을 성공적으로 시작하신 것 축하드려요!" },
+      { en: "You must be tired after the long flight from Hanoi.", ko: "하노이에서 오래 비행하셔서 피곤하시겠어요." },
+      { en: "You passed the safety certification? Good for you! That's great news.", ko: "안전 자격증 시험에 합격하셨어요? 잘됐네요! 정말 좋은 소식이에요." },
+    ],
+    compare: [
+      { a: "I'm sorry.", b: "I'm sorry to hear that.", ko: "I'm sorry.만 쓰면 내 잘못을 사과하는 말로 들릴 수 있습니다. 상대의 안 좋은 소식에 공감할 때는 to hear that을 붙여 '그 소식을 들으니 안타깝다'라고 합니다." },
+      { a: "That sounds tough.", b: "That must be tough.", ko: "That sounds tough.는 '들어 보니 힘들겠네요'라는 즉각적인 반응이고, That must be tough.는 '틀림없이 힘드시겠어요'라고 상대 입장을 한 번 더 헤아리는 말입니다. 둘 다 자연스러운 공감입니다." },
+      { a: "Good for you!", b: "Congratulations on your promotion!", ko: "Good for you!는 동료의 개인적인 성취(시험 합격, 운동 목표)에 쓰는 가벼운 칭찬이고, 승진·결혼·프로젝트 성공처럼 공식적인 일에는 Congratulations on …!이 잘 어울립니다. 윗사람에게 Good for you!는 내려다보는 말처럼 들릴 수 있습니다." },
+    ],
+    mistakes: [
+      { wrong: "Congratulation for your promotion!", right: "Congratulations on your promotion!", ko: "축하 인사는 항상 Congratulations(-s)이고, 축하할 일 앞에는 for가 아니라 on을 씁니다." },
+      { wrong: "You must be tiring after the flight.", right: "You must be tired after the flight.", ko: "사람이 느끼는 감정은 -ed(tired), 피곤하게 만드는 일은 -ing(tiring)입니다. You must be tiring은 '당신은 남을 피곤하게 하는 사람이겠네요'라는 뜻이 됩니다." },
+      { wrong: "I'm sorry for hearing that.", right: "I'm sorry to hear that.", ko: "'그 소식을 들으니 안타깝다'는 sorry to hear that입니다. sorry for hearing은 '들은 것을 사과한다'처럼 들립니다." },
+      { wrong: "Congratulations on pass the exam!", right: "Congratulations on passing the exam!", ko: "on은 전치사라서 뒤의 동사는 V-ing입니다." },
+    ],
+  },
 };

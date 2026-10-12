@@ -33,6 +33,9 @@ const WRONG: [string, string, string?][] = [
   ["The work has delayed because of the rain.", "perfect-needs-passive"],
   ["This suggestion is not satisfy the requirements of the customer.", "be-base-verb"],
   ["It doesn't meet the requirements of customer.", "missing-article", "the"],
+  ["I am plan to bring some snacks.", "be-base-verb", "plan"],
+  ["We are need more time.", "be-base-verb", "need"],
+  ["I'm worry about the schedule.", "be-participle", "worried"],
 ];
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
@@ -74,6 +77,12 @@ const RIGHT = [
   "Everyone is ready.",
   "Thanks for having me.",
   "The team is ready, and they're waiting for you.",
+  "Sorry to keep you waiting.",
+  "Sorry to keep you waiting. The previous meeting ran over.",
+  "I saw it coming.",
+  "We are like family here.",
+  "I'm planning to bring some snacks.",
+  "We're going to visit the plant tomorrow.",
 ];
 
 describe("grammar rules: Korean-speaker mistakes without a reference answer", () => {

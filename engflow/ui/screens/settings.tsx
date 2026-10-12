@@ -7,13 +7,18 @@ import { SITUATIONS, type Settings } from "../../core/types";
 import { SITUATION_INFO } from "../../content";
 import { learnerKey, setLearnerKey } from "../../platform/web";
 import { clock, useApp } from "../store";
-import { claudeLatencyStats } from "../latency";
+import { claudeLatencyQuantiles, claudeLatencyStats } from "../latency";
+import { gradeBudgetMs } from "../../core/grader";
 import { Card, ConfirmDialog, Eyebrow, cn } from "../kit";
 
 /** Claude's own response time on this device (from grading requests, including ones that finished late). */
 function claudeSpeed(): string {
   const st = claudeLatencyStats();
-  return st ? ` 이 기기에서 Claude 응답: 최근 ${st.n}회 중앙값 ${(Math.round(st.medianMs / 100) / 10).toFixed(1)}초.` : "";
+  if (!st) return "";
+  const q = claudeLatencyQuantiles();
+  const sec = (ms: number) => (Math.round(ms / 100) / 10).toFixed(1);
+  const waits = q ? ` 지금 대기 한도: 비슷한 답 1초 · 조금 다른 답 ${sec(gradeBudgetMs("auto", { confidence: "medium" }, q))}초 · 많이 다른 답 ${sec(gradeBudgetMs("auto", { confidence: "low" }, q))}초.` : "";
+  return ` 이 기기에서 Claude 응답: 최근 ${st.n}회 중앙값 ${sec(st.medianMs)}초.${waits}`;
 }
 
 /** Measured grading time on this device: "최근 20회 평균 0.6초 · Claude 채점 70%". */
@@ -142,7 +147,7 @@ export function SettingsScreen() {
         </Row>
         <Row
           label="채점 대기 시간"
-          hint={`자동(권장): 기준 답안과 비슷한 답은 1초 안에, 표현이 많이 다른 답은 Claude 확인을 기다립니다(최대 8초). 규칙 기반 검사는 처음 보는 문장의 오류를 놓칠 수 있기 때문입니다. 항상 1초: 더 빠르지만 다르게 쓴 답은 정확도가 떨어질 수 있습니다. ${gradeStats(app.state.attempts)}${claudeSpeed()}`}
+          hint={`자동(권장): 기준 답안과 비슷한 답은 1초 안에, 표현이 많이 다른 답은 Claude 확인을 기다립니다. 기다리는 시간은 이 기기에서 잰 Claude 응답 속도에 맞춰 줄어듭니다(처음에는 최대 8초). 규칙 기반 검사는 처음 보는 문장의 오류를 놓칠 수 있기 때문입니다. 항상 1초: 더 빠르지만 다르게 쓴 답은 정확도가 떨어질 수 있습니다. ${gradeStats(app.state.attempts)}${claudeSpeed()}`}
         >
           <Choice
             value={s.gradeMode ?? "auto"}

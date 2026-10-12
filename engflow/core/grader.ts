@@ -181,8 +181,35 @@ export type Grader = ReturnType<typeof createGrader>;
  * reliable: close answers get 1 s, partly reworded ones 2.5 s, and answers
  * worded very differently wait for Claude (up to 8 s).
  */
-export function gradeBudgetMs(mode: "auto" | "fast" | "accurate", local: Pick<Evaluation, "confidence">): number {
+/**
+ * How long to wait for Claude before showing the rule-based grade.
+ *
+ * Auto mode trusts the rule-based grade by how close the answer is to a
+ * known correct answer: close answers wait 1 s at most; reworded ones wait
+ * for Claude. Once this device has a few measurements of Claude's response
+ * time, the wait for reworded answers shrinks to what Claude usually needs
+ * (its 90th/95th percentile plus a margin), so a fast connection never waits
+ * the full 2.5 s / 8 s cap.
+ */
+export function gradeBudgetMs(mode: "auto" | "fast" | "accurate", local: Pick<Evaluation, "confidence">, recent?: LatencyQuantiles | null): number {
   if (mode === "fast") return 1000;
   if (mode === "accurate") return 9000;
-  return local.confidence === "high" ? 1000 : local.confidence === "medium" ? 2500 : 8000;
+  if (local.confidence === "high") return 1000;
+  const clamp = (x: number, lo: number, hi: number) => Math.round(Math.min(hi, Math.max(lo, x)));
+  if (local.confidence === "medium") return recent ? clamp(recent.p90 * 1.2 + 250, 1500, 2500) : 2500;
+  return recent ? clamp(recent.p95 * 1.25 + 400, 2500, 8000) : 8000;
+}
+
+/** Claude's recent response times on this device (only when there are enough samples to trust). */
+export interface LatencyQuantiles {
+  n: number;
+  p90: number;
+  p95: number;
+}
+
+export function latencyQuantiles(samples: number[], minSamples = 5): LatencyQuantiles | null {
+  const xs = samples.filter((x) => Number.isFinite(x) && x > 0).sort((a, b) => a - b);
+  if (xs.length < minSamples) return null;
+  const at = (p: number) => xs[Math.min(xs.length - 1, Math.ceil(p * xs.length) - 1)];
+  return { n: xs.length, p90: at(0.9), p95: at(0.95) };
 }
