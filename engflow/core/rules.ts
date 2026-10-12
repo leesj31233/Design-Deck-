@@ -79,7 +79,7 @@ const waitWithoutFor: Rule = (w) => {
     if (brokenAfter(w, i)) continue; // "keep you waiting. The meeting ran over."
     const next = w[i + 1].norm;
     const after = w[i + 2]?.norm;
-    const isObj = WAIT_OBJECTS.has(next) || (OBJECT_DETERMINERS.has(next) && !!after && !/^(to|until|for|minute|minutes|day|days|week|weeks|while|few|couple|little|bit|moment|second|hour|hours|month|months)$/.test(after));
+    const isObj = WAIT_OBJECTS.has(next) || (OBJECT_DETERMINERS.has(next) && !!after && !/^(to|until|for|minute|minutes|day|days|week|weeks|while|few|couple|little|bit|moment|second|hour|hours|month|months|long|much)$/.test(after));
     if (!isObj || next === "for" || next === "until") continue;
     out.push({
       rule: "wait-without-for", from: i + 1, to: i + 1, replacement: "for", category: "preposition", severity: "major",
@@ -607,6 +607,9 @@ const missingSubjectIt: Rule = (w) => {
       (info && (info.form === "ing" || info.form === "pp" || (info.form === "past" && participleOf(info.base) === n.norm)) && !ING_NOUNS.has(n.norm)) ||
       /^(still|too|so|very|really|already|not|just|quite|pretty|fine|okay|ok|good|great|nice|ready|done|important|possible|necessary|difficult|easy|hard|hot|cold|warm|true|better|worse|late|early|delicious|expensive|cheap|interesting|raining|snowing|sunny|cloudy|windy|freezing|humid|normal|totally|completely|absolutely|definitely|probably|always|never|usually|perfect|amazing|beautiful|wonderful|terrible|strange|weird|funny|on|in|at|for|from|over|up|down|about|black|white|blank|empty|dark|frozen|broken|stuck|full|closed|open|off)$/.test(n.norm);
     if (!predicate) continue;
+    // "Is early check-in possible?", "Is hot water available?": the adjective begins the subject of a question.
+    const nn = w[i + 2];
+    if (nn && !brokenAfter(w, i + 1) && /^[a-z]/.test(nn.norm) && !verbInfo(nn.norm) && !/^(to|that|than|and|or|but|so|for|with|in|on|at|of|now|today|here|there|enough|yet|again|outside|inside)$/.test(nn.norm) && w.slice(i + 2).some((t) => /^(possible|available|necessary|okay|ok|fine|included|ready|allowed|free)$/.test(t.norm))) continue;
     const fix = be === "is" ? (/^[A-Z]/.test(w[i].raw) ? "It's" : "it's") : /^[A-Z]/.test(w[i].raw) ? "It was" : "it was";
     out.push({
       rule: "missing-subject-it", from: i, to: i + 1, replacement: fix, category: "sentence-structure", severity: "major", skill: "be-adj",
