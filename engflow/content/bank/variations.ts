@@ -12,15 +12,15 @@ import type { MeaningUnit, Pitfall, Question } from "../../core/types";
 
 /* ───────────── Shared meaning units ───────────── */
 
-const TOO_EARLY: MeaningUnit = { id: "too-early", en: "too early", ko: "너무 이르다", any: ["too early|soon"], critical: true };
+const TOO_EARLY: MeaningUnit = { id: "too-early", en: "too early", ko: "너무 이르다", any: ["re:(?<!\\bnot )\\btoo (early|soon)\\b"], critical: true };
 const STILL: MeaningUnit = { id: "still", en: "still", ko: "아직", any: ["still", "yet"] };
 const WAIT: MeaningUnit = { id: "wait", en: "be waiting (for)", ko: "기다리고 있다", any: ["wait"], critical: true };
 const WHEN: MeaningUnit = { id: "when", en: "when (a certain event)", ko: "~하면 (확실한 일)", any: ["when|once|after", "as soon as"] };
-const BEFORE: MeaningUnit = { id: "before", en: "before", ko: "~하기 전에", any: ["before"], critical: true };
-const DELAYED: MeaningUnit = { id: "delayed", en: "delayed", ko: "지연된", any: ["delay|late|behind"], critical: true };
-const A_LITTLE: MeaningUnit = { id: "a-little", en: "a little / slightly", ko: "조금", any: ["a little|bit", "slightly|little|bit"] };
-const CHECK: MeaningUnit = { id: "check", en: "check", ko: "확인하다", any: ["check|confirm|verify|measure"], critical: true };
-const FEED_RATE: MeaningUnit = { id: "feed-rate", en: "feed rate", ko: "원료 투입량", any: ["feed rate|flow", "feeding rate"], term: true, critical: true };
+const BEFORE: MeaningUnit = { id: "before", en: "before", ko: "~하기 전에", any: ["before", "prior to"], critical: true };
+const DELAYED: MeaningUnit = { id: "delayed", en: "delayed", ko: "지연된", any: ["delay|late|behind|slip|postpone", "push ... back"], critical: true };
+const A_LITTLE: MeaningUnit = { id: "a-little", en: "a little / slightly", ko: "조금", any: ["a little|bit", "slightly|little|bit|somewhat"] };
+const CHECK: MeaningUnit = { id: "check", en: "check", ko: "확인하다", any: ["check|double-check|confirm|verify|measure", "look at"], critical: true };
+const FEED_RATE: MeaningUnit = { id: "feed-rate", en: "feed rate", ko: "원료 투입량", any: ["feed rate|flow|flowrate", "feeding rate", "flow|flowrate ... feed"], term: true, critical: true };
 
 /* ───────────── seed-too-early: "I think so late" ───────────── */
 
@@ -47,6 +47,14 @@ const noItAfterThink = (still = false): Pitfall => ({
   severity: "major",
   fix: still ? "think it's still too early" : "think it's too early",
   messageKo: "'I think' 뒤에는 주어와 동사가 있는 완전한 문장이 와야 합니다. 'I think too early'가 아니라 'I think it's too early'처럼 가주어 it과 be동사를 넣습니다.",
+});
+const forIngAfterEarly = (verbs: string[], fix: string): Pitfall => ({
+  id: "for-ing",
+  pattern: `early|soon for ${verbs.map((v) => `=${v}`).join("|")}`,
+  category: "verb-form",
+  severity: "major",
+  fix,
+  messageKo: "'~하기에는 너무 이르다'는 'too early to + 동사원형'입니다. 'too early for + 동사'로 쓰지 않습니다.",
 });
 const noItAtStart: Pitfall = {
   id: "no-it",
@@ -95,6 +103,23 @@ const checkFor: Pitfall = {
   messageKo: "'check for'는 '~이 있는지 찾아보다'(check for leaks)라는 뜻이라 값을 확인한다는 의미가 되지 않습니다. 값을 확인할 때는 전치사 없이 'check + the + 명사'로 씁니다.",
 };
 
+const couldYouForm: Pitfall = {
+  id: "could-you-form",
+  pattern: "re:(?<=\\b(could|can|would|will) )you (checking|checked|confirming|confirmed|verifying|verified)\\b",
+  category: "verb-form",
+  severity: "major",
+  fix: "you check",
+  messageKo: "Could you 뒤에는 동사원형이 옵니다: 'Could you check …?'",
+};
+const pleaseIng = (ing: string, base: string): Pitfall => ({
+  id: "please-ing",
+  pattern: `please =${ing}`,
+  category: "verb-form",
+  severity: "major",
+  fix: `please ${base}`,
+  messageKo: `please 뒤에는 동사원형이 옵니다: 'please ${base} …'.`,
+});
+
 /* ───────────── seed-receive-when: "If we accept data" ───────────── */
 
 const acceptForReceive = (fix = "receive"): Pitfall => ({
@@ -117,6 +142,16 @@ const ifForCertain = (pattern = "if we", fix = "when we"): Pitfall => ({
   skill: "if-when",
 });
 
+const pastInWhenClause: Pitfall = {
+  id: "when-past",
+  pattern: "re:(?<=\\b(when|once|after|as soon as) )we (received|got)\\b",
+  category: "tense",
+  severity: "major",
+  fix: "we receive",
+  messageKo: "앞으로 받을 자료이므로 when / after 같은 시간 부사절에는 현재시제를 씁니다: 'When we receive …'. 'received'(과거형)는 이미 받은 일처럼 들립니다.",
+  skill: "if-when",
+};
+
 /* ───────────── seed-before-ing: "Before complete our design" ───────────── */
 
 const prepTo = (prep: "before" | "after"): Pitfall => ({
@@ -136,6 +171,17 @@ const prepBareVerb = (prep: "before" | "after", forms: string[], fix: string): P
   messageKo: `'${prep}'는 전치사라서 뒤에 동사원형이나 과거형이 바로 올 수 없습니다. '${fix}'(${prep} + V-ing) 또는 '${prep} + 주어 + 동사'로 씁니다.`,
 });
 
+/** Past tense in a time clause about a future action (한국어 '~한 후에' → "after we reviewed"); the span is the verb only. */
+const pastInTimeClause = (conj: string, subj: string, past: string[], base: string): Pitfall => ({
+  id: "time-clause-past",
+  pattern: `re:(?<=\\b(?:${conj}) (?:${subj}) )(?:${past.join("|")})\\b`,
+  category: "tense",
+  severity: "major",
+  fix: base,
+  messageKo: "아직 일어나지 않은 일이므로 시간 부사절(before / after / when)에는 현재시제를 씁니다. 한국어 '~한 후에'의 과거 표현에 이끌려 과거형을 쓰지 않도록 주의하세요.",
+  skill: "time-clause",
+});
+
 /* ───────────── seed-schedule-delayed: "Our design schedule some lated" ───────────── */
 
 const someDelayed: Pitfall = {
@@ -149,7 +195,7 @@ const someDelayed: Pitfall = {
 };
 const noBeDelayed = (subjRe: string, fix: string): Pitfall => ({
   id: "no-be",
-  pattern: `re:\\b(${subjRe}) (some |a little |a bit |slightly |about )?(delayed|late|lated)\\b`,
+  pattern: `re:\\b(${subjRe}) (some |a little |a bit |slightly |about )?(delayed|late|lated|delaying)\\b`,
   category: "be-verb",
   severity: "major",
   fix,
@@ -205,7 +251,7 @@ export const VARIATIONS: Question[] = [
       TOO_EARLY,
       { id: "decide", en: "to decide", ko: "결정하기", any: ["decide|decision|finalize|conclude|choose"], critical: true },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAfterThink()],
+    pitfalls: [lateForEarly, soEarly, noItAfterThink(), forIngAfterEarly(["deciding", "making", "decide", "make"], "early to decide")],
     hints: { pattern: "I think + it's too + 형용사 + to + 동사원형", skeleton: "I think it's too ____ to ____.", partial: "I think it's too early …" },
     explanationKo: "'~하기에는 너무 이르다'는 'it's too early to + 동사'입니다. 'so late'는 '너무 늦었다'는 반대 의미이고, 'I think' 뒤에는 'it's'처럼 주어와 동사가 있는 완전한 문장이 와야 합니다.",
     probes: [
@@ -239,7 +285,7 @@ export const VARIATIONS: Question[] = [
       { id: "finalize", en: "finalize", ko: "확정하다", any: ["finalize|fix|confirm|freeze|decide|set|lock"], critical: true },
       { id: "pump-spec", en: "pump specifications", ko: "펌프 사양", any: ["pump ... spec|specs|specification", "spec|specs|specification ... pump"], term: true },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAfterThink(true)],
+    pitfalls: [lateForEarly, soEarly, noItAfterThink(true), forIngAfterEarly(["finalizing", "fixing", "confirming", "finalize", "fix", "confirm"], "early to finalize")],
     hints: { pattern: "I think + it's still too + 형용사 + to + 동사원형", skeleton: "I think it's still too ____ to ____ the pump specifications.", partial: "I think it's still too early …" },
     explanationKo: "'아직 ~하기에는 이르다'는 'it's still too early to + 동사'입니다. still은 be동사(it's) 뒤, too 앞에 둡니다. 'late'를 쓰면 '이미 늦었다'는 반대 의미가 됩니다.",
     probes: [
@@ -269,7 +315,7 @@ export const VARIATIONS: Question[] = [
       { id: "equipment", en: "equipment", ko: "장비", any: ["equipment"], term: true },
       { id: "now", en: "now", ko: "지금", any: ["now", "at this stage|point", "yet"] },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAtStart],
+    pitfalls: [lateForEarly, soEarly, noItAtStart, forIngAfterEarly(["selecting", "choosing", "picking", "select", "choose", "pick"], "early to select")],
     hints: { pattern: "It's too + 형용사 + to + 동사원형 (+ now)", skeleton: "It's too ____ to ____ the equipment now.", partial: "It's too early to …" },
     explanationKo: "'지금 ~하기에는 너무 이르다'는 가주어 it을 써서 'It's too early to + 동사'로 말합니다. 'Too early select …'처럼 it's와 to를 빼거나 'late'를 쓰면 구조와 의미가 무너집니다.",
     probes: [
@@ -295,11 +341,11 @@ export const VARIATIONS: Question[] = [
     accepted: ["It's too soon to send the datasheet to the vendor.", "It's too early to send the vendor the datasheet.", "It is too early to issue the datasheet to the vendor."],
     meaning: [
       TOO_EARLY,
-      { id: "send", en: "send", ko: "보내다", any: ["send|issue|submit|share|give"], critical: true },
+      { id: "send", en: "send", ko: "보내다", any: ["send|issue|submit|share|give", "forward|provide|email"], critical: true },
       { id: "datasheet", en: "datasheet", ko: "데이터시트", any: ["datasheet", "data sheet"], term: true, critical: true },
       { id: "vendor", en: "the vendor", ko: "벤더", any: ["vendor|supplier|maker"] },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAtStart],
+    pitfalls: [lateForEarly, soEarly, noItAtStart, forIngAfterEarly(["sending", "issuing", "sharing", "send", "issue", "share"], "early to send")],
     hints: { pattern: "It's too early + to + 동사원형 + 목적어", skeleton: "It's too ____ to ____ the datasheet to the vendor.", partial: "It's too early to send …" },
     explanationKo: "'~하기에는 너무 이르다'는 'It's too early to + 동사'입니다. too 뒤에는 형용사(early)가 오고, 하려는 행동은 'to + 동사원형'으로 붙입니다. 'so late'는 '너무 늦었다'는 반대 의미입니다.",
     probes: [
@@ -332,9 +378,12 @@ export const VARIATIONS: Question[] = [
       { id: "decision", en: "make a decision", ko: "결정을 내리다", any: ["decision", "decide|finalize|conclude"], critical: true },
       { id: "final", en: "final", ko: "최종", any: ["final|finally|finalize"] },
       { id: "before", en: "before", ko: "~하기 전에", any: ["before", "until"], critical: true },
-      { id: "check-results", en: "check the test results", ko: "시험 결과를 확인하다", any: ["check|see|review|confirm|get|receive|have ... result"], critical: true },
+      { id: "check-results", en: "check the test results", ko: "시험 결과를 확인하다", any: ["check|see|review|confirm|get|receive|have|look ... result"], critical: true },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAtStart],
+    pitfalls: [lateForEarly, soEarly, noItAtStart, forIngAfterEarly(["making", "deciding", "make", "decide"], "early to make"),
+      prepTo("before"),
+      prepBareVerb("before", ["check", "checked", "review", "reviewed", "see", "saw"], "before checking"),
+      { id: "before-past", pattern: "re:(?<=\\bbefore )we (checked|reviewed|saw|got|received)\\b", category: "tense", severity: "major", fix: "we check", messageKo: "아직 하지 않은 일이므로 before 절에는 현재시제를 씁니다: 'before we check the test results'.", skill: "time-clause" }],
     hints: {
       pattern: "It's too early to + 동사 + before + 주어 + 동사",
       skeleton: "It's too ____ to make a final decision before we ____ the test results.",
@@ -373,9 +422,11 @@ export const VARIATIONS: Question[] = [
       { id: "heat-balance", en: "heat balance", ko: "열수지", any: ["heat balance", "heat and mass balance", "hmb"], term: true, critical: true },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as", "so"] },
       { id: "pilot-data", en: "pilot data", ko: "파일럿 데이터", any: ["pilot ... data|result"], term: true },
-      { id: "not-ready", en: "not ready yet", ko: "아직 준비되지 않았다", any: ["not ready|available|final|complete|finished", "not have|get|receive", "not ... yet"], critical: true },
+      { id: "not-ready", en: "not ready yet", ko: "아직 준비되지 않았다", any: ["not ready|available|final|complete|finished", "not have|get|receive", "not ... yet", "missing"], critical: true },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAfterThink()],
+    pitfalls: [lateForEarly, soEarly, noItAfterThink(), forIngAfterEarly(["finalizing", "fixing", "confirming", "finalize", "fix", "confirm"], "early to finalize"),
+      { id: "do-not-ready", pattern: "=do|=does not ready|available", category: "be-verb", severity: "major", fix: "is not ready", messageKo: "ready는 형용사라서 be동사로 부정합니다: 'the pilot data is not ready yet'. 'don't ready'는 틀린 형태입니다.", skill: "be-adj" },
+    ],
     hints: {
       pattern: "I think it's too early to + 동사 + because + 주어 + is not ready yet",
       skeleton: "I think it's too ____ to ____ the heat balance because the pilot data ____ ready yet.",
@@ -415,10 +466,10 @@ export const VARIATIONS: Question[] = [
       TOO_EARLY,
       { id: "order", en: "order", ko: "발주하다", any: ["order|purchase|buy"], critical: true },
       { id: "dryer", en: "dryer", ko: "건조기", any: ["dryer"], term: true, critical: true },
-      { id: "wait-results", en: "wait for the pilot test results", ko: "파일럿 시험 결과를 기다리다", any: ["wait ... result|data"], critical: true },
+      { id: "wait-results", en: "wait for the pilot test results", ko: "파일럿 시험 결과를 기다리다", any: ["wait ... result|data", "until ... result|data", "hold off"], critical: true },
       { id: "first", en: "first", ko: "먼저", any: ["first", "before"] },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAfterThink()],
+    pitfalls: [lateForEarly, soEarly, noItAfterThink(), forIngAfterEarly(["ordering", "buying", "purchasing", "order", "buy", "purchase"], "early to order")],
     hints: {
       pattern: "I understand …, but I think it's too early to + 동사. We should + 동사 …",
       skeleton: "I understand the schedule is ____, but I think it's too ____ to ____ the dryer. We should ____ the pilot test results first.",
@@ -455,11 +506,11 @@ export const VARIATIONS: Question[] = [
       TOO_EARLY,
       { id: "final", en: "final", ko: "최종", any: ["final"] },
       { id: "capex", en: "CAPEX", ko: "CAPEX(투자비)", any: ["capex", "capital cost|investment"], term: true, critical: true },
-      { id: "after-quotes", en: "after we receive the vendor quotations", ko: "벤더 견적을 받은 후에", any: ["after|when|once ... receive|get|have ... quotation|quote|price|offer"], critical: true },
+      { id: "after-quotes", en: "after we receive the vendor quotations", ko: "벤더 견적을 받은 후에", any: ["after|when|once ... receive|get|have ... quotation|quote|price|offer", "quotation|quote ... come|arrive"], critical: true },
       { id: "next-week", en: "next week", ko: "다음 주", any: ["next week"] },
       { id: "estimate", en: "a more accurate estimate", ko: "더 정확한 추정치", any: ["accurate|exact|reliable|detailed|precise|better|updated ... estimate|number|figure|cost"], critical: true },
     ],
-    pitfalls: [lateForEarly, soEarly, noItAtStart],
+    pitfalls: [lateForEarly, soEarly, noItAtStart, forIngAfterEarly(["giving", "sharing", "providing", "give", "share", "provide"], "early to give"), pastInWhenClause],
     hints: {
       pattern: "It's too early to + 동사 … now. After + 주어 + 동사, we can + 동사 …",
       skeleton: "It's too ____ to give you a final CAPEX number now. After we ____ the vendor quotations, we can share …",
@@ -491,7 +542,7 @@ export const VARIATIONS: Question[] = [
     meaning: [
       STILL,
       WAIT,
-      { id: "test-data", en: "the test data", ko: "시험 데이터", any: ["test|testing ... data|result", "data"], critical: true },
+      { id: "test-data", en: "the test data", ko: "시험 데이터", any: ["test|testing ... data|result", "result ... test", "data"], critical: true },
     ],
     pitfalls: [simplePresentWait("we")],
     hints: { pattern: "주어 + be + still + V-ing + for + 명사", skeleton: "We ____ still ____ ____ the test data.", partial: "We are still waiting …" },
@@ -556,6 +607,7 @@ export const VARIATIONS: Question[] = [
     pitfalls: [
       noBeWaiting("vendor|supplier", "vendor is still waiting"),
       { id: "is-wait", pattern: "is still? =wait", category: "verb-form", severity: "major", fix: "is still waiting", messageKo: "be동사 뒤에는 동사원형이 아니라 V-ing가 와서 진행형이 됩니다: is still waiting." },
+      { id: "vendor-are", pattern: "vendor|supplier =are", category: "agreement", severity: "major", fix: "vendor is", messageKo: "주어 'the vendor'는 3인칭 단수라서 'is'를 씁니다: 'The vendor is still waiting …'." },
     ],
     hints: { pattern: "명사 주어 + is + still + V-ing + for + 명사", skeleton: "The vendor ____ still ____ ____ our final datasheet.", partial: "The vendor is still waiting …" },
     explanationKo: "주어가 3인칭 단수 명사(the vendor)이면 'is + V-ing'입니다. wait 뒤에는 for가 와야 기다리는 대상(our final datasheet)을 말할 수 있습니다.",
@@ -583,7 +635,7 @@ export const VARIATIONS: Question[] = [
     meaning: [
       STILL,
       WAIT,
-      { id: "approval", en: "approval", ko: "승인", any: ["approval|approve|confirmation"], critical: true },
+      { id: "approval", en: "approval", ko: "승인", any: ["approval|approve|confirmation", "sign ... off", "sign-off"], critical: true },
       { id: "client", en: "the client", ko: "고객", any: ["client|customer|owner"] },
     ],
     pitfalls: [simplePresentWait("they"), noForWaiting("client|customer", "waiting for the client's")],
@@ -697,12 +749,16 @@ export const VARIATIONS: Question[] = [
     meaning: [
       { id: "not-finished", en: "haven't finished", ko: "끝내지 못했다", any: ["not finish|complete|close|done|ready", "not ... finish|complete|close"], critical: true },
       { id: "mass-balance", en: "mass balance", ko: "물질수지", any: ["mass balance", "material balance"], term: true, critical: true },
-      { id: "wait-analysis", en: "be waiting for the feed analysis", ko: "원료 분석 결과를 기다리고 있다", any: ["wait ... analysis|result|data"], critical: true },
+      { id: "wait-analysis", en: "be waiting for the feed analysis", ko: "원료 분석 결과를 기다리고 있다", any: ["wait ... analysis|result|data", "wait ... send|share|provide ... analysis|result|data"], critical: true },
       { id: "feed", en: "feed", ko: "원료", any: ["feed|feedstock", "raw material"], term: true },
       { id: "site", en: "from the site", ko: "현장에서", any: ["site|plant|field|indonesia"] },
       { id: "monday", en: "on Monday", ko: "월요일에", any: ["monday"] },
     ],
-    pitfalls: [simplePresentWait("we"), noForWaiting("feed", "waiting for the feed")],
+    pitfalls: [
+      simplePresentWait("we"),
+      noForWaiting("feed", "waiting for the feed"),
+      { id: "expect-ing", pattern: "expect =receiving|=getting", category: "verb-form", severity: "major", fix: "expect to receive", messageKo: "expect 뒤에는 'to + 동사원형'이 옵니다: 'we expect to receive it'." },
+    ],
     hints: {
       pattern: "We haven't + p.p. … yet. We are still + V-ing + for …",
       skeleton: "We haven't ____ the mass balance yet. We ____ still ____ ____ the feed analysis from the site, …",
@@ -738,10 +794,16 @@ export const VARIATIONS: Question[] = [
       STILL,
       { id: "wait-quote", en: "be waiting for your quotation", ko: "견적서를 기다리고 있다", any: ["wait ... quotation|quote|offer|proposal|price"], critical: true },
       { id: "updated", en: "updated", ko: "수정된", any: ["updated|revised|new|corrected"] },
-      { id: "request", en: "could you send it", ko: "보내 주실 수 있을까요", any: ["could|can|would ... send|share|submit|provide", "please send|share|submit"], critical: true },
+      { id: "request", en: "could you send it", ko: "보내 주실 수 있을까요", any: ["could|can|would ... send|share|submit|provide", "please send|share|submit", "possible ... send|share|submit|provide"], critical: true },
       { id: "friday", en: "by this Friday", ko: "이번 주 금요일까지", any: ["friday"], critical: true },
     ],
-    pitfalls: [simplePresentWait("we"), noForWaiting("quotation|quote", "waiting for the quotation")],
+    pitfalls: [
+      simplePresentWait("we"),
+      noForWaiting("quotation|quote", "waiting for the quotation"),
+      { id: "until-deadline", pattern: "until this? friday", category: "preposition", severity: "major", fix: "by this Friday", messageKo: "'until'은 '그때까지 계속'이라는 뜻입니다. 마감(금요일까지 보내기)은 'by this Friday'를 씁니다.", skill: "verb-prep" },
+      { id: "please-to", pattern: "please to", category: "verb-form", severity: "major", fix: "please", messageKo: "'Could you please' 뒤에는 to 없이 동사원형이 옵니다: 'Could you please send it …?'", skill: "polite-request" },
+      pleaseIng("sending", "send"),
+    ],
     hints: {
       pattern: "We are still + V-ing + for … . Could you please + 동사원형 …?",
       skeleton: "We ____ still ____ ____ your updated quotation. Could you please ____ it by this Friday?",
@@ -771,7 +833,10 @@ export const VARIATIONS: Question[] = [
     reference: "Could you check the actual feed rate?",
     accepted: ["Could you please check the actual feed rate?", "Can you check the actual feed rate?", "Please check the actual feed rate."],
     meaning: [CHECK, FEED_RATE, { id: "actual", en: "actual", ko: "실제", any: ["actual|real|current"] }],
-    pitfalls: [checkFor],
+    pitfalls: [
+      checkFor,
+      couldYouForm,
+    ],
     hints: { pattern: "Could you + check + the + 명사?", skeleton: "Could you ____ ____ actual feed rate?", partial: "Could you check …" },
     explanationKo: "check는 목적어를 바로 받는 타동사라서 'check the actual feed rate'처럼 씁니다. 'check for'는 '~이 있는지 점검하다'는 뜻이고, 특정한 값 앞에는 the가 필요합니다.",
     probes: [
@@ -829,7 +894,7 @@ export const VARIATIONS: Question[] = [
       { id: "moisture", en: "moisture content", ko: "수분 함량", any: ["moisture|water content", "moisture"], term: true, critical: true },
       { id: "pellet", en: "the pellets", ko: "펠릿", any: ["pellet"] },
     ],
-    pitfalls: [checkFor],
+    pitfalls: [checkFor, couldYouForm],
     hints: { pattern: "Could you + check + the + 명사 + of …?", skeleton: "Could you ____ ____ moisture content of the pellets?", partial: "Could you check the …" },
     explanationKo: "check 뒤에 바로 확인할 대상(the moisture content)을 씁니다. 'check for moisture'는 '수분이 있는지 찾아보다'는 뜻이라 함량 값을 확인한다는 의미와 다릅니다.",
     probes: [
@@ -854,7 +919,7 @@ export const VARIATIONS: Question[] = [
     accepted: ["I am going to check the pump flow rate tomorrow morning.", "Tomorrow morning, I will check the flow rate of the pump.", "I will check the flow rate of the pump tomorrow morning."],
     meaning: [
       CHECK,
-      { id: "flow-rate", en: "flow rate", ko: "유량", any: ["flow rate|flowrate", "flow"], term: true, critical: true },
+      { id: "flow-rate", en: "flow rate", ko: "유량", any: ["flow rate", "flowrate", "flow"], term: true, critical: true },
       { id: "pump", en: "pump", ko: "펌프", any: ["pump"] },
       { id: "tomorrow", en: "tomorrow morning", ko: "내일 아침", any: ["tomorrow"], critical: true },
     ],
@@ -925,7 +990,7 @@ export const VARIATIONS: Question[] = [
     ],
     meaning: [
       { id: "before-startup", en: "before startup", ko: "기동 전에", any: ["before ... startup|start-up|start|operation|commissioning", "before ... start up"], critical: true },
-      { id: "check-pressure", en: "check the steam pressure", ko: "스팀 압력을 확인하다", any: ["check|confirm|verify ... pressure"], critical: true },
+      { id: "check-pressure", en: "check the steam pressure", ko: "스팀 압력을 확인하다", any: ["check|confirm|verify ... pressure", "double-check|measure|inspect ... pressure"], critical: true },
       { id: "steam-pressure", en: "steam pressure", ko: "스팀 압력", any: ["steam pressure"], term: true },
       { id: "flanges-leaks", en: "check the flanges for leaks", ko: "플랜지 누설 점검", any: ["flange ... leak", "leak ... flange"], critical: true },
     ],
@@ -938,6 +1003,7 @@ export const VARIATIONS: Question[] = [
         fix: "check the steam",
         messageKo: "값(압력)을 확인할 때는 'check + the + 명사'입니다. 'check for'는 'check all flanges for leaks'처럼 '~이 있는지 점검하다'일 때만 씁니다.",
       },
+      pleaseIng("checking", "check"),
     ],
     hints: {
       pattern: "check + the + 명사 (값 확인) / check + 대상 + for + leaks (존재 여부 점검)",
@@ -975,9 +1041,9 @@ export const VARIATIONS: Question[] = [
       CHECK,
       FEED_RATE,
       { id: "steam-pressure", en: "steam pressure", ko: "스팀 압력", any: ["steam pressure", "pressure"], term: true, critical: true },
-      { id: "cause", en: "find the cause", ko: "원인을 찾다", any: ["cause|reason|problem|source"], critical: true },
+      { id: "cause", en: "find the cause", ko: "원인을 찾다", any: ["cause|reason|problem|source", "why"], critical: true },
     ],
-    pitfalls: [checkFor],
+    pitfalls: [checkFor, couldYouForm],
     hints: {
       pattern: "Thank you for … . Could you + check + the + 명사 + and + the + 명사? Then …",
       skeleton: "Thank you for the update. Could you ____ ____ actual feed rate and ____ steam pressure? Then we can find the cause.",
@@ -1010,8 +1076,8 @@ export const VARIATIONS: Question[] = [
     ],
     advanced: "We don't know the exact cause yet. This week, we'll check the feed composition and the moisture content, and then we'll share the results with you.",
     meaning: [
-      { id: "not-sure", en: "not sure yet", ko: "아직 확실하지 않다", any: ["not sure|certain|clear", "not know"], critical: true },
-      CHECK,
+      { id: "not-sure", en: "not sure yet", ko: "아직 확실하지 않다", any: ["not sure|certain|clear", "not know", "unsure|uncertain", "unclear"], critical: true },
+      { ...CHECK, any: [...CHECK.any, "analyze|analyse|test"] },
       { id: "composition", en: "feed composition", ko: "원료 조성", any: ["composition"], term: true, critical: true },
       { id: "moisture", en: "moisture content", ko: "수분 함량", any: ["moisture|water"], term: true },
       { id: "share", en: "share the results", ko: "결과를 공유하다", any: ["share|send|report|give|present ... result", "share|send|report"], critical: true },
@@ -1048,10 +1114,10 @@ export const VARIATIONS: Question[] = [
     accepted: ["When we get the test data,", "Once we receive the test data,", "After we receive the test data,"],
     meaning: [
       WHEN,
-      { id: "receive", en: "we receive", ko: "우리가 받다", any: ["receive|get|have"], critical: true },
+      { id: "receive", en: "we receive", ko: "우리가 받다", any: ["receive|get|have", "come|arrive"], critical: true },
       { id: "data", en: "the test data", ko: "시험 데이터", any: ["data|result"], critical: true },
     ],
-    pitfalls: [acceptForReceive(), ifForCertain()],
+    pitfalls: [acceptForReceive(), ifForCertain(), pastInWhenClause],
     hints: { pattern: "When + 주어 + receive (현재시제) + the + 명사,", skeleton: "____ we ____ the test data,", partial: "When we re…" },
     explanationKo: "데이터를 '받다'는 receive이고, 받는 것이 확실하면 if가 아니라 when을 씁니다. accept는 '수락하다'라는 다른 뜻입니다.",
     probes: [
@@ -1077,11 +1143,11 @@ export const VARIATIONS: Question[] = [
     accepted: ["When we get the data, we will check it.", "Once we receive the data, we'll check it.", "We will check the data when we receive it."],
     meaning: [
       WHEN,
-      { id: "receive", en: "we receive", ko: "우리가 받다", any: ["receive|get|have"], critical: true },
+      { id: "receive", en: "we receive", ko: "우리가 받다", any: ["receive|get|have", "come|arrive"], critical: true },
       { id: "data", en: "the data", ko: "데이터", any: ["data|information"] },
       { id: "check", en: "we will check it", ko: "확인하겠다", any: ["check|review|confirm|verify|look"], critical: true },
     ],
-    pitfalls: [acceptForReceive(), ifForCertain()],
+    pitfalls: [acceptForReceive(), ifForCertain(), pastInWhenClause],
     hints: { pattern: "When + 주어 + 현재동사, 주어 + will + 동사원형", skeleton: "____ we ____ the data, we will check it.", partial: "When we receive the data, …" },
     explanationKo: "확실히 일어날 일은 'When + 주어 + 현재시제'로 쓰고(when 절에는 will을 쓰지 않습니다), 데이터를 받는 것은 receive입니다. 'If we accept data'는 '데이터를 승인한다면'이라는 다른 뜻이 됩니다.",
     probes: [
@@ -1107,11 +1173,11 @@ export const VARIATIONS: Question[] = [
     accepted: ["When we get the vendor quotation, we will compare the prices.", "Once we receive the vendor's quotation, we will compare the prices.", "We will compare the prices when we receive the vendor quotation."],
     meaning: [
       WHEN,
-      { id: "receive-quote", en: "receive the quotation", ko: "견적서를 받다", any: ["receive|get|have ... quotation|quote|offer"], critical: true },
+      { id: "receive-quote", en: "receive the quotation", ko: "견적서를 받다", any: ["receive|get|have ... quotation|quote|offer", "quotation|quote|offer ... come|arrive"], critical: true },
       { id: "vendor", en: "vendor", ko: "벤더", any: ["vendor|supplier"] },
-      { id: "compare", en: "compare the prices", ko: "가격을 비교하다", any: ["compare|check|review"], critical: true },
+      { id: "compare", en: "compare the prices", ko: "가격을 비교하다", any: ["compare|check|review", "evaluate"], critical: true },
     ],
-    pitfalls: [acceptForReceive(), ifForCertain()],
+    pitfalls: [acceptForReceive(), ifForCertain(), pastInWhenClause],
     hints: { pattern: "When + we + receive + 명사, we will + 동사원형", skeleton: "____ we ____ the vendor quotation, we will compare the prices.", partial: "When we receive the vendor quotation, …" },
     explanationKo: "견적서를 '받다'는 receive입니다. 'accept the quotation'은 '견적을 수락하다(그 가격으로 계약하겠다)'는 뜻이라 의미가 크게 달라집니다. 받는 것이 확실하므로 when을 씁니다.",
     probes: [
@@ -1137,8 +1203,8 @@ export const VARIATIONS: Question[] = [
     meaning: [
       WHEN,
       { id: "client", en: "the client", ko: "고객", any: ["client|customer"], critical: true },
-      { id: "receive-report", en: "receives our report", ko: "보고서를 받다", any: ["receive|get|have ... report"], critical: true },
-      { id: "comments", en: "their comments", ko: "코멘트", any: ["comment|feedback"], critical: true },
+      { id: "receive-report", en: "receives our report", ko: "보고서를 받다", any: ["receive|get|have ... report", "report ... come|arrive", "report ... reach"], critical: true },
+      { id: "comments", en: "their comments", ko: "코멘트", any: ["comment|feedback", "input|remark"], critical: true },
     ],
     pitfalls: [
       acceptForReceive("receives"),
@@ -1174,13 +1240,13 @@ export const VARIATIONS: Question[] = [
     ],
     meaning: [
       WHEN,
-      { id: "receive-results", en: "receive the lab results", ko: "분석 결과를 받다", any: ["receive|get|have ... result|data|analysis"], critical: true },
+      { id: "receive-results", en: "receive the lab results", ko: "분석 결과를 받다", any: ["receive|get|have ... result|data|analysis", "result|data|analysis ... come|arrive"], critical: true },
       { id: "next-week", en: "next week", ko: "다음 주", any: ["next week"] },
       { id: "update", en: "update", ko: "업데이트하다", any: ["update|revise|correct|modify"], critical: true },
       { id: "mass-balance", en: "mass balance", ko: "물질수지", any: ["mass balance", "material balance"], term: true, critical: true },
       { id: "send", en: "send it to you", ko: "보내 드리다", any: ["send|share|give|forward"] },
     ],
-    pitfalls: [acceptForReceive(), ifForCertain()],
+    pitfalls: [acceptForReceive(), ifForCertain(), pastInWhenClause],
     hints: {
       pattern: "When + we + receive (현재시제) …, we will + 동사 + and + 동사",
       skeleton: "____ we ____ the lab results next week, we will update the mass balance and send it to you.",
@@ -1213,12 +1279,12 @@ export const VARIATIONS: Question[] = [
     ],
     meaning: [
       WHEN,
-      { id: "receive-approval", en: "receive the client's approval", ko: "고객의 승인을 받다", any: ["receive|get|have ... approval", "client approve"], critical: true },
+      { id: "receive-approval", en: "receive the client's approval", ko: "고객의 승인을 받다", any: ["receive|get|have ... approval", "client approve", "give ... approval"], critical: true },
       { id: "monday", en: "on Monday", ko: "월요일에", any: ["monday"] },
-      { id: "start", en: "start", ko: "시작하다", any: ["start|begin|kick"], critical: true },
+      { id: "start", en: "start", ko: "시작하다", any: ["start|begin|kick", "proceed|move"], critical: true },
       { id: "detailed-design", en: "detailed design", ko: "상세 설계", any: ["detailed|detail design", "design"], term: true, critical: true },
     ],
-    pitfalls: [acceptForReceive(), ifForCertain()],
+    pitfalls: [acceptForReceive(), ifForCertain(), pastInWhenClause],
     hints: {
       pattern: "When + we + receive + 명사 + 시간, we will + 동사원형",
       skeleton: "____ we ____ the client's approval on Monday, we will start the detailed design.",
@@ -1253,13 +1319,18 @@ export const VARIATIONS: Question[] = [
     meaning: [
       { id: "thanks", en: "thank you", ko: "감사합니다", any: ["thank|thanks"] },
       WHEN,
-      { id: "receive-data", en: "receive your performance data", ko: "성능 데이터를 받다", any: ["receive|get|have ... data"], critical: true },
+      { id: "receive-data", en: "receive your performance data", ko: "성능 데이터를 받다", any: ["receive|get|have ... data", "data ... receive|get", "data ... come|arrive"], critical: true },
       { id: "performance", en: "performance data", ko: "성능 데이터", any: ["performance"], term: true },
-      { id: "review", en: "review it", ko: "검토하다", any: ["review|check|evaluate|study"], critical: true },
-      { id: "comments", en: "send our comments", ko: "코멘트를 보내다", any: ["comment|feedback"], critical: true },
+      { id: "review", en: "review it", ko: "검토하다", any: ["review|check|evaluate|study", "go|=going through|over", "look at"], critical: true },
+      { id: "comments", en: "send our comments", ko: "코멘트를 보내다", any: ["comment|feedback", "input|remark"], critical: true },
       { id: "friday", en: "by Friday", ko: "금요일까지", any: ["friday"] },
     ],
-    pitfalls: [acceptForReceive(), ifForCertain()],
+    pitfalls: [
+      acceptForReceive(),
+      ifForCertain(),
+      pastInWhenClause,
+      { id: "until-deadline", pattern: "until friday", category: "preposition", severity: "major", fix: "by Friday", messageKo: "'until'은 '그때까지 계속'이라는 뜻입니다. 마감(금요일까지 보내기)은 'by Friday'를 씁니다.", skill: "verb-prep" },
+    ],
     hints: {
       pattern: "When + we + receive …, we will + 동사 + and + 동사 …",
       skeleton: "Thank you. ____ we ____ your performance data next week, we will review it and send our comments by Friday.",
@@ -1296,12 +1367,12 @@ export const VARIATIONS: Question[] = [
       { id: "send-analysis", en: "send the feed analysis", ko: "원료 분석 결과를 보내다", any: ["send|share|provide ... analysis|result|data"], critical: true },
       { id: "monday", en: "on Monday", ko: "월요일에", any: ["monday"], critical: true },
       WHEN,
-      { id: "receive", en: "we receive it", ko: "우리가 받다", any: ["receive|get|have"], critical: true },
-      { id: "update", en: "update", ko: "업데이트하다", any: ["update|revise|correct"], critical: true },
+      { id: "receive", en: "we receive it", ko: "우리가 받다", any: ["receive|get|have", "come|arrive"], critical: true },
+      { id: "update", en: "update", ko: "업데이트하다", any: ["update|revise|correct", "modify|adjust"], critical: true },
       { id: "heat-balance", en: "heat balance", ko: "열수지", any: ["heat balance", "heat and mass balance", "hmb"], term: true, critical: true },
       { id: "two-days", en: "within two days", ko: "이틀 안에", any: ["two|2 day"] },
     ],
-    pitfalls: [acceptForReceive(), ifForCertain()],
+    pitfalls: [acceptForReceive(), ifForCertain(), pastInWhenClause],
     hints: {
       pattern: "… will send … on Monday. When we receive it, we will + 동사원형 …",
       skeleton: "The Indonesian team will send the feed analysis on Monday. ____ we ____ it, we will update the heat balance within two days.",
@@ -1335,7 +1406,7 @@ export const VARIATIONS: Question[] = [
       { id: "complete", en: "complete", ko: "완료하다", any: ["complete|finish|finalize|close"], critical: true },
       { id: "design", en: "the basic design", ko: "기본 설계", any: ["design"], term: true },
     ],
-    pitfalls: [prepTo("before"), prepBareVerb("before", ["completed", "finished"], "before completing")],
+    pitfalls: [prepTo("before"), prepBareVerb("before", ["completed", "finished"], "before completing"), pastInTimeClause("before", "we", ["completed", "finished", "finalized", "finalised"], "complete")],
     hints: { pattern: "before + V-ing / before + 주어 + 동사", skeleton: "Before ____ the basic design,", partial: "Before comp…" },
     explanationKo: "before 뒤에는 동명사(completing)나 '주어 + 동사'(we complete)가 옵니다. 'Before complete'처럼 동사원형을 바로 쓰면 틀립니다.",
     probes: [
@@ -1361,11 +1432,11 @@ export const VARIATIONS: Question[] = [
     accepted: ["Before you start the pump, open the suction valve.", "Open the suction valve before starting the pump.", "Please open the suction valve before you start the pump."],
     meaning: [
       BEFORE,
-      { id: "start-pump", en: "start the pump", ko: "펌프를 기동하다", any: ["start|run|operate ... pump"], critical: true },
+      { id: "start-pump", en: "start the pump", ko: "펌프를 기동하다", any: ["start|run|operate ... pump", "turn|switch ... pump"], critical: true },
       { id: "open", en: "open", ko: "열다", any: ["open"], critical: true },
       { id: "valve", en: "suction valve", ko: "흡입 밸브", any: ["suction valve", "inlet valve", "valve"], term: true, critical: true },
     ],
-    pitfalls: [prepTo("before"), prepBareVerb("before", ["start", "started"], "before starting")],
+    pitfalls: [prepTo("before"), prepBareVerb("before", ["start", "started"], "before starting"), pastInTimeClause("before", "you|we", ["started"], "start")],
     hints: { pattern: "Before + V-ing …, 명령문", skeleton: "Before ____ the pump, open the suction valve.", partial: "Before starting …" },
     explanationKo: "before는 전치사로 쓰면 뒤에 V-ing가 옵니다: before starting the pump. 주어를 넣으면 'before you start the pump'도 됩니다.",
     probes: [
@@ -1391,9 +1462,9 @@ export const VARIATIONS: Question[] = [
     accepted: ["After we review the P&ID, we will send our comments.", "After reviewing the P&ID, we'll send you our comments.", "We will send our comments after reviewing the P&ID."],
     meaning: [
       { id: "after", en: "after", ko: "~한 후에", any: ["after", "once", "when"], critical: true },
-      { id: "review", en: "review", ko: "검토하다", any: ["review|check|study"], critical: true },
+      { id: "review", en: "review", ko: "검토하다", any: ["review|check|study", "go|=going through|over", "look at"], critical: true },
       { id: "pid", en: "P&ID", ko: "P&ID", any: ["p&id|p&ids|pid|pids", "drawing"], term: true, critical: true },
-      { id: "send-comments", en: "send our comments", ko: "코멘트를 보내다", any: ["send|share|give ... comment|feedback"], critical: true },
+      { id: "send-comments", en: "send our comments", ko: "코멘트를 보내다", any: ["send|share|give ... comment|feedback", "get ... back ... comment|feedback"], critical: true },
     ],
     pitfalls: [
       prepTo("after"),
@@ -1405,6 +1476,7 @@ export const VARIATIONS: Question[] = [
         fix: "after reviewing",
         messageKo: "'after'는 전치사라서 뒤에 동사원형(review)이나 과거형(reviewed)이 바로 올 수 없습니다. 'after reviewing' 또는 'after we review'로 씁니다.",
       },
+      pastInTimeClause("after|once|when", "we", ["reviewed", "checked", "studied"], "review"),
     ],
     hints: { pattern: "After + V-ing …, we will + 동사원형", skeleton: "After ____ the P&ID, we will send our comments.", partial: "After review…" },
     explanationKo: "before와 같이 after도 전치사로 쓰면 뒤에 V-ing가 옵니다: after reviewing. 'after review the P&ID'나 'after reviewed'는 틀립니다.",
@@ -1430,12 +1502,12 @@ export const VARIATIONS: Question[] = [
     reference: "Please check the data before sending it to the client.",
     accepted: ["Please check the data before you send it to the client.", "Before sending the data to the client, please check it.", "Please check the data before we send it to the client."],
     meaning: [
-      { id: "check", en: "check the data", ko: "데이터를 확인하다", any: ["check|review|confirm|verify"], critical: true },
+      { id: "check", en: "check the data", ko: "데이터를 확인하다", any: ["check|double-check|review|confirm|verify"], critical: true },
       { id: "data", en: "the data", ko: "데이터", any: ["data"] },
       BEFORE,
-      { id: "send", en: "send", ko: "보내다", any: ["send|share|submit|give"], critical: true },
+      { id: "send", en: "send", ko: "보내다", any: ["send|share|submit|give", "go|=going to"], critical: true },
     ],
-    pitfalls: [prepTo("before"), prepBareVerb("before", ["send", "sent"], "before sending")],
+    pitfalls: [prepTo("before"), prepBareVerb("before", ["send", "sent"], "before sending"), pastInTimeClause("before", "you|we", ["sent", "submitted", "shared"], "send")],
     hints: { pattern: "명령문 + before + V-ing + it + to …", skeleton: "Please check the data before ____ it to the client.", partial: "Please check the data before …" },
     explanationKo: "'~하기 전에'는 'before + V-ing'(before sending) 또는 'before + 주어 + 동사'(before you send)입니다. 'before send'처럼 동사원형을 바로 쓰지 않습니다.",
     probes: [
@@ -1465,12 +1537,12 @@ export const VARIATIONS: Question[] = [
     ],
     meaning: [
       BEFORE,
-      { id: "finalize", en: "finalize", ko: "확정하다", any: ["finalize|fix|confirm|decide|determine|select|set"], critical: true },
+      { id: "finalize", en: "finalize", ko: "확정하다", any: ["finalize|fix|confirm|decide|determine|select|set", "freeze|lock"], critical: true },
       { id: "dryer-size", en: "dryer size", ko: "건조기 크기", any: ["dryer size|sizing|capacity", "size|capacity ... dryer"], term: true, critical: true },
-      { id: "one-more", en: "one more", ko: "한 번 더", any: ["one more|additional", "another"], critical: true },
+      { id: "one-more", en: "one more", ko: "한 번 더", any: ["one more", "additional|extra|second", "another"], critical: true },
       { id: "pilot-test", en: "pilot test", ko: "파일럿 시험", any: ["pilot test|trial|run", "test|trial"], term: true },
     ],
-    pitfalls: [prepTo("before"), prepBareVerb("before", ["finalized", "decided", "fixed"], "before finalizing")],
+    pitfalls: [prepTo("before"), prepBareVerb("before", ["finalized", "decided", "fixed"], "before finalizing"), pastInTimeClause("before", "we", ["finalized", "finalised", "fixed", "decided"], "finalize")],
     hints: {
       pattern: "Before + V-ing …, we need to + 동사원형 …",
       skeleton: "Before ____ the dryer size, we need to run one more pilot test.",
@@ -1509,7 +1581,12 @@ export const VARIATIONS: Question[] = [
       { id: "datasheet", en: "datasheet", ko: "데이터시트", any: ["datasheet", "data sheet"], term: true, critical: true },
       { id: "send-back", en: "send it back", ko: "다시 보내다", any: ["send ... back", "return|resend"] },
     ],
-    pitfalls: [prepTo("after"), prepBareVerb("after", ["received", "got"], "after receiving")],
+    pitfalls: [
+      prepTo("after"),
+      prepBareVerb("after", ["received", "got"], "after receiving"),
+      pastInTimeClause("after|once|when", "we", ["received", "got"], "receive"),
+      { id: "send-back-it", pattern: "send back it", category: "word-order", severity: "major", fix: "send it back", messageKo: "대명사 it은 동사와 back 사이에 둡니다: 'send it back'. 'send back it'은 틀린 어순입니다.", skill: "word-order" },
+    ],
     hints: {
       pattern: "After + V-ing …, we will + 동사 + and + 동사",
       skeleton: "After ____ the vendor's comments, we will revise the datasheet and send it back.",
@@ -1544,12 +1621,12 @@ export const VARIATIONS: Question[] = [
     meaning: [
       BEFORE,
       { id: "order", en: "place the order", ko: "발주하다", any: ["order|purchase|buy"], critical: true },
-      { id: "see-results", en: "see the test results", ko: "시험 결과를 보다", any: ["see|check|review|get|look ... result|data"], critical: true },
+      { id: "see-results", en: "see the test results", ko: "시험 결과를 보다", any: ["see|check|review|get|look ... result|data", "receive|have ... result|data"], critical: true },
       { id: "vendor", en: "the vendor", ko: "벤더", any: ["vendor|supplier|maker"] },
       { id: "ask", en: "ask them to send", ko: "보내 달라고 요청하다", any: ["ask|request|tell"], critical: true },
       { id: "this-week", en: "this week", ko: "이번 주", any: ["this week"] },
     ],
-    pitfalls: [prepTo("before"), prepBareVerb("before", ["place", "placed", "order", "ordered"], "before placing")],
+    pitfalls: [prepTo("before"), prepBareVerb("before", ["place", "placed", "order", "ordered"], "before placing"), pastInTimeClause("before", "we", ["placed", "ordered"], "place")],
     hints: {
       pattern: "Before + V-ing …, we would like to + 동사. Could you ask them to + 동사 …?",
       skeleton: "Before ____ the order, we would like to see the test results from the vendor. Could you ask them to send the data this week?",
@@ -1584,13 +1661,18 @@ export const VARIATIONS: Question[] = [
     meaning: [
       BEFORE,
       { id: "start-dryer", en: "start the dryer", ko: "건조기를 기동하다", any: ["start|run|operate ... dryer", "start-up|startup ... dryer"], critical: true },
-      { id: "check", en: "check", ko: "확인하다", any: ["check|inspect|confirm|verify"], critical: true },
+      { id: "check", en: "check", ko: "확인하다", any: ["check|inspect|confirm|verify", "double-check|measure"], critical: true },
       { id: "steam-pressure", en: "steam pressure", ko: "스팀 압력", any: ["steam pressure"], term: true },
       { id: "condensate", en: "condensate line", ko: "응축수 라인", any: ["condensate"], term: true },
-      { id: "if-ok", en: "if everything is OK", ko: "모두 문제가 없으면", any: ["if ... ok|okay|fine|good|normal|right", "no problem|issue"], critical: true },
+      { id: "if-ok", en: "if everything is OK", ko: "모두 문제가 없으면", any: ["if ... ok|okay|fine|good|normal|right", "no problem|issue", "not ... problem|issue"], critical: true },
       { id: "tomorrow", en: "tomorrow afternoon", ko: "내일 오후", any: ["tomorrow"], critical: true },
     ],
-    pitfalls: [prepTo("before"), prepBareVerb("before", ["start", "started"], "before starting")],
+    pitfalls: [
+      prepTo("before"),
+      prepBareVerb("before", ["start", "started"], "before starting"),
+      pastInTimeClause("before", "we", ["started"], "start"),
+      { id: "if-will", pattern: "if everything will be", category: "tense", severity: "major", fix: "if everything is", messageKo: "조건을 나타내는 if절에서는 앞으로의 일도 현재시제로 씁니다: 'If everything is OK, …'.", skill: "cond-1" },
+    ],
     hints: {
       pattern: "Before + V-ing …, we need to + 동사 … . If …, we can + 동사 …",
       skeleton: "Before ____ the dryer, we need to check the steam pressure and the condensate line. If everything is OK, …",
@@ -1618,7 +1700,7 @@ export const VARIATIONS: Question[] = [
     promptKo: "P&ID 검토가 (현재) 조금 지연된 상태입니다.",
     segments: ["P&ID 검토가", "~이다 (상태)", "조금", "지연된"],
     reference: "The P&ID review is a little delayed.",
-    accepted: ["The P&ID review is slightly delayed.", "The P&ID review is a bit delayed.", "The P&ID review is a little behind schedule."],
+    accepted: ["The P&ID review is slightly delayed.", "The P&ID review is a bit delayed.", "The P&ID review is a little behind schedule.", "The P&ID review has been a little delayed.", "The P&ID review has been delayed a little."],
     meaning: [
       { id: "pid-review", en: "the P&ID review", ko: "P&ID 검토", any: ["p&id|pid ... review", "review"], term: true },
       A_LITTLE,
@@ -1647,7 +1729,7 @@ export const VARIATIONS: Question[] = [
     promptKo: "우리 파일럿 시험은 (현재) 조금 지연된 상태입니다.",
     segments: ["우리 파일럿 시험이", "~이다 (상태)", "조금", "지연된"],
     reference: "Our pilot test is a little delayed.",
-    accepted: ["Our pilot test is slightly delayed.", "Our pilot test is a bit delayed.", "The pilot test is a little delayed."],
+    accepted: ["Our pilot test is slightly delayed.", "Our pilot test is a bit delayed.", "The pilot test is a little delayed.", "Our pilot test has been a little delayed.", "Our pilot test has been delayed a little."],
     meaning: [
       { id: "pilot-test", en: "pilot test", ko: "파일럿 시험", any: ["pilot ... test|trial|run", "pilot", "test"], term: true, critical: true },
       A_LITTLE,
@@ -1710,7 +1792,7 @@ export const VARIATIONS: Question[] = [
     promptKo: "펌프 납품이 (현재) 약 일주일 지연된 상태입니다.",
     segments: ["펌프 납품이", "~이다 (상태)", "지연된", "약 일주일"],
     reference: "The pump delivery is delayed by about one week.",
-    accepted: ["The pump delivery is about one week late.", "The pump delivery is delayed by about a week.", "The delivery of the pump is about one week behind schedule."],
+    accepted: ["The pump delivery is about one week late.", "The pump delivery is delayed by about a week.", "The delivery of the pump is about one week behind schedule.", "The pump delivery has been delayed by about one week.", "The pump delivery is delayed about a week."],
     meaning: [
       { id: "pump", en: "pump", ko: "펌프", any: ["pump"] },
       { id: "delivery", en: "delivery", ko: "납품", any: ["delivery|shipment|supply"], term: true, critical: true },
@@ -1745,6 +1827,7 @@ export const VARIATIONS: Question[] = [
       "The commissioning is a little delayed since the boiler had a problem last week.",
       "The boiler had a problem last week, so the commissioning is a little delayed.",
       "The commissioning is a little delayed because of a boiler problem last week.",
+      "The commissioning has been a little delayed because the boiler had a problem last week.",
     ],
     meaning: [
       { id: "commissioning", en: "commissioning", ko: "시운전", any: ["commissioning|start-up|startup"], term: true, critical: true },
@@ -1785,6 +1868,7 @@ export const VARIATIONS: Question[] = [
       "The basic design is a little delayed, so we will send the PFD next Monday.",
       "The basic design is slightly delayed, so we'll send you the PFD next Monday.",
       "We will send the PFD next Monday because the basic design is slightly delayed.",
+      "The basic design has been slightly delayed, so we will send the PFD next Monday.",
     ],
     meaning: [
       { id: "basic-design", en: "basic design", ko: "기본 설계", any: ["basic design", "design"], term: true },
@@ -1868,7 +1952,9 @@ export const VARIATIONS: Question[] = [
     accepted: [
       "The dryer installation is slightly delayed, but it won't affect the start-up date because the piping work is already finished.",
       "The dryer installation is a little delayed, but it will not change the start-up date since the piping work is already finished.",
-      "The dryer installation is a little delayed. However, it will not affect the start-up date because the piping work is already complete.",
+      "The dryer installation is a little delayed, but the start-up date won't be affected because the piping work is already finished.",
+      "The dryer installation has been a little delayed, but it will not affect the start-up date because the piping work is already finished.",
+      "The dryer installation is a little delayed, but the start-up date will stay the same because the piping work is already finished.",
     ],
     advanced: "The dryer installation is running slightly behind, but it won't affect the start-up date because the piping work has already been completed.",
     meaning: [
@@ -1876,7 +1962,7 @@ export const VARIATIONS: Question[] = [
       A_LITTLE,
       DELAYED,
       { id: "but", en: "but", ko: "하지만", any: ["but|however|although|though"] },
-      { id: "not-affect", en: "will not affect", ko: "영향을 주지 않다", any: ["not affect|change|impact|delay|move", "no effect|impact"], critical: true },
+      { id: "not-affect", en: "will not affect", ko: "영향을 주지 않다", any: ["not affect|change|impact|delay|move", "no effect|impact", "re:^(?!.*\\b(not|never|unable)\\b.*\\b(stay|stays|remain|remains|keep|maintain)\\b).*\\b((stay|stays|remain|remains) (exactly )?the same|(keep|maintain) (the |our )?(original |current |same |planned )?(start-up |startup )?(date|schedule))\\b"], critical: true },
       { id: "startup", en: "start-up date", ko: "기동 날짜", any: ["start-up|startup|commissioning", "start up"], term: true, critical: true },
       { id: "piping-done", en: "the piping work is finished", ko: "배관 작업이 끝났다", any: ["piping ... finish|complete|done|ready"], critical: true },
     ],
@@ -1909,10 +1995,11 @@ export const VARIATIONS: Question[] = [
     segments: ["확인합시다", "실제 원료 투입량을", "먼저"],
     reference: "Let's check the actual feed rate first.",
     accepted: ["First, let's check the actual feed rate.", "Let's first check the actual feed rate.", "We should check the actual feed rate first."],
-    meaning: [CHECK, FEED_RATE, { id: "first", en: "first", ko: "먼저", any: ["first"] }, { id: "actual", en: "actual", ko: "실제", any: ["actual|real|current"] }],
+    meaning: [CHECK, FEED_RATE, { id: "first", en: "first", ko: "먼저", any: ["first|firstly", "start|begin by|with"] }, { id: "actual", en: "actual", ko: "실제", any: ["actual|real|current"] }],
     pitfalls: [
-      adverbBeforeObject("re:\\bcheck (it )?first (the )?(actual |real )?feed rate\\b", "check the actual feed rate first", "first"),
+      adverbBeforeObject("re:\\bcheck (it )?first(ly)? (the )?(actual |real )?feed rate\\b", "check the actual feed rate first", "first"),
       doubleObject("re:\\bcheck it (the )?(actual |real )?feed rate\\b", "check the actual feed rate"),
+      { id: "let-check", pattern: "re:^let check\\b", category: "verb-form", severity: "major", fix: "let's check", messageKo: "'~하자'는 'Let's + 동사원형'입니다: 'Let's check …'." },
     ],
     hints: { pattern: "동사 + 목적어 + first (또는 First, + 문장)", skeleton: "Let's ____ the actual feed rate ____.", partial: "Let's check the actual …" },
     explanationKo: "'먼저 ~을 확인하자'는 'check + 목적어 + first'입니다. 한국어 순서대로 'check first the …'나 'check it first the …'로 쓰면 어순이 틀리고 목적어가 겹칩니다. 문장 맨 앞에 'First,'를 써도 됩니다.",
@@ -1938,13 +2025,13 @@ export const VARIATIONS: Question[] = [
     reference: "We need to confirm the design basis first.",
     accepted: ["First, we need to confirm the design basis.", "We have to confirm the design basis first.", "We should confirm the design basis first."],
     meaning: [
-      { id: "confirm", en: "confirm", ko: "확정하다", any: ["confirm|fix|finalize|agree|define|decide|check|freeze"], critical: true },
+      { id: "confirm", en: "confirm", ko: "확정하다", any: ["confirm|fix|finalize|agree|define|decide|check|freeze", "settle|lock|set"], critical: true },
       { id: "design-basis", en: "design basis", ko: "설계 기준", any: ["design basis|bases", "basis"], term: true, critical: true },
-      { id: "first", en: "first", ko: "먼저", any: ["first"] },
+      { id: "first", en: "first", ko: "먼저", any: ["first|firstly"] },
       { id: "need", en: "need to", ko: "~해야 한다", any: ["need|have|must|should"] },
     ],
     pitfalls: [
-      adverbBeforeObject("re:\\b(confirm|finalize|fix) (it )?first (the )?design basis\\b", "confirm the design basis first", "first"),
+      adverbBeforeObject("re:\\b(confirm|finalize|fix) (it )?first(ly)? (the )?design bas(i|e)s\\b", "confirm the design basis first", "first"),
       doubleObject("re:\\b(confirm|finalize|fix) it (the )?design basis\\b", "confirm the design basis"),
     ],
     hints: { pattern: "need to + 동사 + 목적어 + first", skeleton: "We need to ____ the design basis ____.", partial: "We need to confirm the …" },
@@ -1969,15 +2056,16 @@ export const VARIATIONS: Question[] = [
     promptKo: "시험 보고서를 다시 보내 주세요.",
     segments: ["보내 주세요", "시험 보고서를", "다시"],
     reference: "Please send the test report again.",
-    accepted: ["Could you send the test report again?", "Please resend the test report.", "Please send me the test report again."],
+    accepted: ["Could you send the test report again?", "Please resend the test report.", "Please send me the test report again.", "Please send over the test report again."],
     meaning: [
-      { id: "send", en: "send", ko: "보내다", any: ["send|resend|share|forward"], critical: true },
+      { id: "send", en: "send", ko: "보내다", any: ["send|resend|share|forward", "email"], critical: true },
       { id: "report", en: "the test report", ko: "시험 보고서", any: ["test ... report", "report"], term: true, critical: true },
-      { id: "again", en: "again", ko: "다시", any: ["again", "resend", "one more time"] },
+      { id: "again", en: "again", ko: "다시", any: ["again", "resend", "one more time", "once more"] },
     ],
     pitfalls: [
-      adverbBeforeObject("re:\\b(send|resend) (it |me |us )?again (me |us )?(the )?(test )?report\\b", "send the test report again", "again"),
+      adverbBeforeObject("re:\\b(send|resend) (it |me |us )?(over )?again (me |us )?(the )?(test )?report\\b", "send the test report again", "again"),
       doubleObject("re:\\bsend it (the )?(test )?report\\b", "send the test report"),
+      { id: "again-before-verb", pattern: "=again send|resend the? test? report", category: "word-order", severity: "major", fix: "send the test report again", messageKo: "again은 '동사 + 목적어' 뒤에 둡니다: 'send the test report again'." },
     ],
     hints: { pattern: "send + 목적어 + again", skeleton: "Please ____ the test report ____.", partial: "Please send the test …" },
     explanationKo: "again도 first처럼 '동사 + 목적어' 뒤에 둡니다: send the test report again. 'send again the report'나 'send it again the report'는 어순이 틀리고 목적어가 겹칩니다.",
@@ -2003,13 +2091,14 @@ export const VARIATIONS: Question[] = [
     reference: "Let's discuss the vendor list later.",
     accepted: ["We can discuss the vendor list later.", "Let's talk about the vendor list later.", "We will discuss the vendor list later."],
     meaning: [
-      { id: "discuss", en: "discuss", ko: "논의하다", any: ["discuss|talk|review|cover"], critical: true },
-      { id: "vendor-list", en: "the vendor list", ko: "벤더 리스트", any: ["vendor list", "list ... vendor", "vendor"], term: true, critical: true },
+      { id: "discuss", en: "discuss", ko: "논의하다", any: ["discuss|talk|review|cover", "go|=going over", "come back to", "leave ... for later"], critical: true },
+      { id: "vendor-list", en: "the vendor list", ko: "벤더 리스트", any: ["vendor|supplier list", "list ... vendor|supplier", "vendor|supplier"], term: true, critical: true },
       { id: "later", en: "later", ko: "나중에", any: ["later", "next time|meeting", "another time"], critical: true },
     ],
     pitfalls: [
       adverbBeforeObject("re:\\b(discuss|talk about|review) (it )?later (about )?(the )?vendor list\\b", "discuss the vendor list later", "later"),
       doubleObject("re:\\bdiscuss it (the )?vendor list\\b", "discuss the vendor list"),
+      { id: "discuss-about", pattern: "discuss about|on", category: "preposition", severity: "major", fix: "discuss", messageKo: "discuss는 타동사라서 목적어를 바로 씁니다: 'discuss the vendor list'. 'discuss about'은 틀린 표현입니다.", skill: "verb-object" },
     ],
     hints: { pattern: "Let's + 동사 + 목적어 + later", skeleton: "Let's ____ the vendor list ____.", partial: "Let's discuss the vendor …" },
     explanationKo: "later(나중에)도 '동사 + 목적어' 뒤에 둡니다: discuss the vendor list later. discuss는 타동사라서 'discuss about'도 쓰지 않습니다.",
@@ -2041,13 +2130,13 @@ export const VARIATIONS: Question[] = [
     meaning: [
       { id: "measure", en: "measure", ko: "측정하다", any: ["measure|check|test|analyze|analyse"], critical: true },
       { id: "moisture", en: "moisture content", ko: "수분 함량", any: ["moisture|water content", "moisture"], term: true, critical: true },
-      { id: "first", en: "first", ko: "먼저", any: ["first"] },
-      { id: "then", en: "and then", ko: "그다음에", any: ["then|after|afterwards|next"] },
+      { id: "first", en: "first", ko: "먼저", any: ["first|firstly"] },
+      { id: "then", en: "and then", ko: "그다음에", any: ["then|after|afterwards|next", "before"] },
       { id: "adjust", en: "adjust", ko: "조정하다", any: ["adjust|change|control|set|increase|reduce|tune"], critical: true },
       { id: "steam-flow", en: "steam flow", ko: "스팀 유량", any: ["steam flow|rate|supply", "steam"], term: true, critical: true },
     ],
     pitfalls: [
-      adverbBeforeObject("re:\\b(measure|check) (it )?first (the )?moisture content\\b", "measure the moisture content first", "first"),
+      adverbBeforeObject("re:\\b(measure|check) (it )?first(ly)? (the )?moisture content\\b", "measure the moisture content first", "first"),
       doubleObject("re:\\b(measure|check) it (the )?moisture content\\b", "measure the moisture content"),
     ],
     hints: {
@@ -2081,16 +2170,17 @@ export const VARIATIONS: Question[] = [
       "Please check the revised P&ID again before you send it to the client.",
     ],
     meaning: [
-      { id: "review", en: "review", ko: "검토하다", any: ["review|check"], critical: true },
+      { id: "review", en: "review", ko: "검토하다", any: ["review|check", "go|=going over|through", "look at"], critical: true },
       { id: "revised", en: "revised", ko: "수정된", any: ["revised|updated|new|modified"] },
       { id: "pid", en: "P&ID", ko: "P&ID", any: ["p&id|p&ids|pid|pids"], term: true, critical: true },
-      { id: "again", en: "again", ko: "다시", any: ["again"] },
-      { id: "before-send", en: "before you send it", ko: "보내기 전에", any: ["before ... send|submit|share|give"], critical: true },
+      { id: "again", en: "again", ko: "다시", any: ["again", "once more", "one more time"] },
+      { id: "before-send", en: "before you send it", ko: "보내기 전에", any: ["before ... send|submit|share|give|go"], critical: true },
       { id: "client", en: "the client", ko: "고객", any: ["client|customer"] },
     ],
     pitfalls: [
       adverbBeforeObject("re:\\b(review|check) (it )?again (the )?(revised |updated )?(p&id|pid)\\b", "review the revised P&ID again", "again"),
       doubleObject("re:\\b(review|check) it (the )?(revised |updated )?(p&id|pid)\\b", "review the revised P&ID"),
+      pastInTimeClause("before", "you|we", ["sent", "submitted", "shared"], "send"),
     ],
     hints: {
       pattern: "명령문(동사 + 목적어 + again) + before + 주어 + 동사",
@@ -2125,17 +2215,17 @@ export const VARIATIONS: Question[] = [
     ],
     advanced: "Before we increase the steam pressure, I think we should check the actual feed rate first. If it's above the design value, we may need to reduce the feed rate instead.",
     meaning: [
-      { id: "think", en: "I think", ko: "생각합니다", any: ["think|believe|suggest"] },
+      { id: "think", en: "I think", ko: "생각합니다", any: ["think|believe|suggest", "my opinion|view"] },
       CHECK,
       FEED_RATE,
-      { id: "first", en: "first", ko: "먼저", any: ["first"] },
+      { id: "first", en: "first", ko: "먼저", any: ["first|firstly"] },
       { id: "if", en: "if", ko: "만약", any: ["if"], critical: true },
       { id: "higher", en: "higher than", ko: "~보다 높다", any: ["higher|more|above|over|greater"], critical: true },
       { id: "design-value", en: "the design value", ko: "설계값", any: ["design ... value|rate|basis|point", "design"] },
       { id: "reduce", en: "reduce it", ko: "줄이다", any: ["reduce|lower|decrease|cut"], critical: true },
     ],
     pitfalls: [
-      adverbBeforeObject("re:\\bcheck (it )?first (the )?(actual |real )?feed rate\\b", "check the actual feed rate first", "first"),
+      adverbBeforeObject("re:\\bcheck (it )?first(ly)? (the )?(actual |real )?feed rate\\b", "check the actual feed rate first", "first"),
       doubleObject("re:\\bcheck it (the )?(actual |real )?feed rate\\b", "check the actual feed rate"),
     ],
     hints: {
@@ -2172,14 +2262,15 @@ export const VARIATIONS: Question[] = [
     meaning: [
       { id: "see", en: "see", ko: "보다", any: ["see|check|review|read|get"], critical: true },
       { id: "fat-report", en: "FAT report", ko: "FAT 보고서", any: ["fat ... report", "report"], term: true, critical: true },
-      { id: "first", en: "first", ko: "먼저", any: ["first"] },
+      { id: "first", en: "first", ko: "먼저", any: ["first|firstly"] },
       { id: "after", en: "after we review it", ko: "검토한 후에", any: ["after|once|when"], critical: true },
       { id: "confirm-date", en: "confirm the date", ko: "날짜를 확정하다", any: ["confirm|fix|decide|finalize|set ... date"], critical: true },
       { id: "shipping", en: "shipping", ko: "출하", any: ["shipping|shipment|delivery|dispatch"], term: true },
     ],
     pitfalls: [
-      adverbBeforeObject("re:\\b(see|check|review) (it )?first (the )?fat report\\b", "see the FAT report first", "first"),
+      adverbBeforeObject("re:\\b(see|check|review) (it )?first(ly)? (the )?fat report\\b", "see the FAT report first", "first"),
       doubleObject("re:\\b(see|check|review) it (the )?fat report\\b", "see the FAT report"),
+      pastInTimeClause("after|once|when", "we", ["reviewed", "checked"], "review"),
     ],
     hints: {
       pattern: "would like to + 동사 + 목적어 + first. After + 주어 + 동사, …",
