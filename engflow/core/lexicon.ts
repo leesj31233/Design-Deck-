@@ -163,6 +163,18 @@ export const UNCOUNTABLE_PLURALS: Record<string, string> = {
 
 /** Learner non-words with their likely intended form. */
 export const NON_WORDS: Record<string, { fix: string; noteKo: string; skill?: string }> = {
+  stucked: { fix: "stuck", noteKo: "stick의 과거·과거분사는 'stuck'입니다: 'The valve is stuck.'" },
+  sticked: { fix: "stuck", noteKo: "stick의 과거·과거분사는 'stuck'입니다." },
+  shutted: { fix: "shut", noteKo: "shut의 과거·과거분사는 'shut' 그대로입니다." },
+  hitted: { fix: "hit", noteKo: "hit의 과거·과거분사는 'hit' 그대로입니다." },
+  spreaded: { fix: "spread", noteKo: "spread의 과거·과거분사는 'spread' 그대로입니다." },
+  leaded: { fix: "led", noteKo: "lead(이끌다)의 과거·과거분사는 'led'입니다." },
+  holded: { fix: "held", noteKo: "hold의 과거·과거분사는 'held'입니다: 'The meeting was held online.'" },
+  feeded: { fix: "fed", noteKo: "feed의 과거·과거분사는 'fed'입니다." },
+  shooted: { fix: "shot", noteKo: "shoot의 과거·과거분사는 'shot'입니다." },
+  splitted: { fix: "split", noteKo: "split의 과거·과거분사는 'split' 그대로입니다." },
+  fighted: { fix: "fought", noteKo: "fight의 과거·과거분사는 'fought'입니다." },
+  readed: { fix: "read", noteKo: "read의 과거·과거분사는 철자가 'read' 그대로입니다(발음만 [red])." },
   lated: { fix: "delayed", noteKo: "'lated'는 영어 단어가 아닙니다. 일정이 늦어진 것은 'delayed', 늦은 것은 'late'입니다.", skill: "be-adj" },
   delaied: { fix: "delayed", noteKo: "delay의 과거분사는 'delayed'입니다.", skill: "be-adj" },
   informated: { fix: "informed", noteKo: "inform의 과거분사는 'informed'입니다." },

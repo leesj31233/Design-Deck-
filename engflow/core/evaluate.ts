@@ -606,6 +606,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       else if (c === "neg") {
         // "Should it be …?" for "Shouldn't it be …?": a checking question either way, not a reversed meaning.
         const negQuestion = op.at > 0 && clauseStart(op.at - 1) === op.at - 1 && OPENER.test(w[op.at - 1].norm) && isSubjectWord(w[op.at]);
+        // "Nobody has tested it" / "It has never been tested": the negation is in another word.
+        if (w.some((x) => /^(nobody|nothing|none|neither|nor|never|without|no|fail|fails|failed)$/.test(x.norm))) continue;
         entry = negQuestion
           ? ["word-choice", "minor", `'~하지 않나요?'라고 확인할 때는 부정 의문문(예: Shouldn't it …?)이 더 자연스럽습니다. 뜻은 통합니다.`]
           : ["meaning-shift", "critical", `부정어 '${tt}'가 빠져 의미가 반대가 됩니다.`, "meaning"];
@@ -828,6 +830,11 @@ function clamp(n: number): number {
   return Math.max(0, Math.min(100, Math.round(n)));
 }
 
+/** Clause punctuation right after word i (a comma, a full stop …). */
+function brokenAfterW(w: Token[], i: number): boolean {
+  return !!w[i] && !!w[i + 1] && !!w[i].breakAfter;
+}
+
 export interface LocalEvalOptions {
   /** Used only to annotate the summary. */
   hintLevel?: number;
@@ -958,6 +965,61 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
     edits.push(...a.edits.filter((e) => keptRanges.has(`${e.from}:${e.to}`) || keptFindings.some((f) => f.category === "word-order" && e.replacement === w[f.from]?.raw)));
   }
 
+  // 4) Reversed meaning: a close answer that adds or drops the verb's "not" (or "never") says the opposite
+  //    ("We don't need to update the PFD" for "We need to update the PFD"). Checked only against close answers,
+  //    statements of 4+ words, and when no other close answer has the same polarity; words that carry negation
+  //    themselves ("unable", "nothing", "without") leave it to Claude.
+  const negationFlip = (() => {
+    if (!close || tw.length < 4 || w.length < 4) return null;
+    const lexical = (ws: Token[]) =>
+      ws.some(
+        (t) =>
+          /^(un|im|in|dis)(able|sure|clear|available|possible|likely|aware|happy|comfortable|agree|agrees|agreed|like|likes)$/.test(t.norm) ||
+          /^(nothing|nobody|none|neither|nor|without|hardly|barely|fail|fails|failed|lack|lacks|instead|rather|unless|until|no|miss|missed|missing|forget|forgot|forgotten|lose|lost|refuse|refused|avoid|avoided|doubt|skip|skipped|cancel|cancelled|canceled|postpone|postponed|wrong|late|behind|short|less|fewer|still|anymore|longer)$/.test(t.norm),
+      );
+    // Polarity of statements only: questions ("Why don't we …?", "…, aren't we?"), commands ("Don't worry") and
+    // conditions ("If that doesn't work, …") are paraphrased with either polarity.
+    const counted = (ws: Token[]) => {
+      const q: boolean[] = new Array(ws.length).fill(false);
+      for (let i = 0, from = 0; i < ws.length; i++) {
+        if (!ws[i].sentenceEnd && i < ws.length - 1) continue;
+        for (let k = from; k <= i; k++) q[k] = !!ws[i].question;
+        from = i + 1;
+      }
+      let n = 0;
+      for (let i = 0; i < ws.length; i++) {
+        const t = ws[i];
+        if (q[i] || !(t.norm === "never" || (t.norm === "not" && i > 0 && (AUXILIARIES.has(ws[i - 1].norm) || MODALS.has(ws[i - 1].norm) || BE_FORMS.has(ws[i - 1].norm) || /^(need|dare|could|can)$/.test(ws[i - 1].norm))))) continue;
+        let c = i - 1;
+        while (c > 0 && !brokenAfterW(ws, c - 1)) c--;
+        // "Don't worry", "Don't forget …": a command added to the answer ("Don't think so." is a statement without "I").
+        if (ws[i - 1]?.norm === "do" && c === i - 1 && /^(worry|hesitate|forget|rush|panic|mention|bother|touch|be|get|take|let|go|miss|wait|stress)$/.test(ws[i + 1]?.norm ?? "")) continue;
+        if (ws.slice(c, i).some((x) => /^(if|unless|whether|or|when|before|until)$/.test(x.norm))) continue;
+        n++;
+      }
+      return n;
+    };
+    if (lexical(w) || lexical(tw)) return null;
+    const mine = counted(w);
+    const theirs = counted(tw);
+    // Only a full flip: one side says it, the other says the opposite.
+    if ((mine === 0) === (theirs === 0)) return null;
+    const near = ranked.filter((r) => r.al.distance <= CLOSE_DISTANCE && r.tw.length >= 4);
+    if (near.some((r) => (counted(r.tw) === 0) === (mine === 0) || lexical(r.tw))) return null;
+    const at = w.findIndex((t, i) => t.norm === "never" || (t.norm === "not" && i > 0));
+    return { extra: mine > 0, at };
+  })();
+  if (negationFlip) {
+    const i = negationFlip.extra ? negationFlip.at : -1;
+    findings.push({
+      from: i >= 0 ? i : 0, to: i >= 0 ? i + 1 : 0, category: "meaning-shift", severity: "major", bucket: "meaning", fix: negationFlip.extra ? "" : "not",
+      messageKo: negationFlip.extra
+        ? "부정어(not/never)가 들어가 하려던 말과 뜻이 반대가 됩니다. 한국어 문장에는 부정의 뜻이 없습니다."
+        : "부정어(not/never)가 빠져 하려던 말과 뜻이 반대가 됩니다. 한국어 문장은 부정문입니다.",
+      skill: primarySkill, source: "alignment", priority: 3,
+    });
+  }
+
   // Alignment insertions next to a pitfall/rule fix that already supplies the word are redundant.
   const explained = (f: { from: number; to: number; fix: string; priority: number }) =>
     f.priority === 1 && f.from === f.to &&
@@ -1049,7 +1111,8 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   const advisoryRanges = new Set(kept.filter((f) => f.category === "terminology").map((f) => `${f.from}:${f.to}`));
   for (let i = edits.length - 1; i >= 0; i--) if (advisoryRanges.has(`${edits[i].from}:${edits[i].to}`)) edits.splice(i, 1);
   let corrected = applyEdits(tokens, w, edits);
-  if (!validCorrection(corrected) || !closer(corrected)) {
+  if (negationFlip) corrected = capitalizeSentence(target);
+  else if (!validCorrection(corrected) || !closer(corrected)) {
     const strong = applyEdits(tokens, w, edits.filter((e) => e.priority > 1));
     corrected = validCorrection(strong) ? strong : capitalizeSentence(target);
   }

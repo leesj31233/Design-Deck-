@@ -143,7 +143,8 @@ export function tokenize(text: string): Token[] {
     // "the schedule's confirmed", "the pump's fixed now": a participle that ends the clause makes 's "is".
     const after = tokens[i + 2];
     const pp = !!verbInfo(next.norm) && /^(pp|past)$/.test(verbInfo(next.norm)!.form) && /ed$/.test(next.norm) && (!after || after.punct || /^(by|for|yet|now|already|today|tomorrow|and|but|so|at|in|on)$/.test(after.norm));
-    if (pronounLike || pp || next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away)$/.test(next.norm)) {
+    // A possessive never comes before an article or an adverb of degree: "the room's a bit cold", "the tank's nearly full".
+    if (pronounLike || pp || next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|nearly|quite|pretty|totally|completely|fully|currently|probably|definitely|usually|actually|clearly|a|an|the|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away)$/.test(next.norm)) {
       t.expanded = true;
       tokens.splice(i + 1, 0, { norm: "is", raw: t.raw, start: t.start, end: t.end, stem: stem("is"), punct: false, expanded: true });
     }
@@ -164,7 +165,9 @@ export function tokenize(text: string): Token[] {
     const t = tokens[i];
     if (!t.expanded || t.norm !== "is" || !/'s$/i.test(t.raw.replace(/’/g, "'"))) continue;
     const next = tokens.slice(i + 1).find((x) => !x.punct && x.norm !== "not" && x.norm !== "already" && x.norm !== "just" && x.norm !== "never" && x.norm !== "always");
-    if (next && /^(been|got|gotten|gone|had|become)$/.test(next.norm)) {
+    // A change-of-state verb after "'s" is the present perfect: "the schedule's changed", "the price's gone up".
+    const change = next && verbInfo(next.norm)?.form !== "base" && /^(change|increase|decrease|drop|rise|improve|arrive|start|happen|grow|fall|worsen|double|shift|slow|leave|come|move|become)$/.test(verbInfo(next.norm)?.base ?? "");
+    if (next && (/^(been|got|gotten|gone|had|become)$/.test(next.norm) || (change && /^(pp|past)$/.test(verbInfo(next.norm)?.form ?? "")))) {
       t.norm = "has";
       t.stem = stem("has");
     }

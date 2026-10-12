@@ -180,10 +180,14 @@ const modalInflected: Rule = (w) => {
 const doubleModal: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 0; i < w.length - 1; i++) {
-    if (!/^(might|may|will|would|should|must)$/.test(w[i].norm) || !/^(can|could)$/.test(w[i + 1].norm)) continue;
+    if (!/^(might|may|will|would|should|must|can|could)$/.test(w[i].norm)) continue;
+    const second = w[i + 1].norm;
+    // "might can" → "might be able to"; "will must" → "will have to".
+    const replacement = /^(can|could)$/.test(second) && w[i].norm !== "can" && w[i].norm !== "could" ? "be able to" : second === "must" ? "have to" : null;
+    if (!replacement) continue;
     out.push({
-      rule: "double-modal", from: i + 1, to: i + 2, replacement: "be able to", category: "verb-form", severity: "major", skill: "modal-possibility",
-      messageKo: `조동사는 두 개를 연달아 쓸 수 없습니다. '${w[i].raw} ${w[i + 1].raw}' 대신 '${w[i].raw} be able to'를 쓰세요.`,
+      rule: "double-modal", from: i + 1, to: i + 2, replacement, category: "verb-form", severity: "major", skill: second === "must" ? "modal-necessity" : "modal-possibility",
+      messageKo: `조동사는 두 개를 연달아 쓸 수 없습니다. '${w[i].raw} ${w[i + 1].raw}' 대신 '${w[i].raw} ${replacement}'를 쓰세요.`,
     });
   }
   return out;
@@ -283,7 +287,10 @@ const perfectBaseVerb: Rule = (w) => {
   for (let i = 0; i < w.length - 1; i++) {
     if (!/^(have|has|had)$/.test(w[i].norm)) continue;
     const prev = w[i - 1]?.norm ?? "";
-    if (!SUBJECT_PRONOUNS.has(prev) && !/^(not|already|we|they|you|i)$/.test(prev) && !(prev === "will" || prev === "would" || prev === "might" || prev === "could" || prev === "should" || prev === "must")) continue;
+    const pronounOrModal = SUBJECT_PRONOUNS.has(prev) || /^(not|already|we|they|you|i|will|would|might|could|should|must)$/.test(prev);
+    // A noun subject counts only with "not" in between ("The parts haven't arrive"): "have" right after a noun may be a main verb.
+    const nounSubject = !!prev && !pronounOrModal && w[i + 1]?.norm === "not" && !DETERMINERS.has(prev) && !PREPOSITIONS.has(prev) && !brokenAfter(w, i - 1);
+    if (!pronounOrModal && !nounSubject) continue;
     let j = i + 1;
     while (j < w.length && /^(already|not|just|still|never|yet|also)$/.test(w[j].norm)) j++;
     const v = w[j];
@@ -1355,7 +1362,13 @@ const modalAdjective: Rule = (w) => {
       while (j < w.length && /^(still|also|really|even)$/.test(w[j].norm)) j++;
     }
     const a = w[j];
-    if (!a || !/^(ready|late|available|sure|able|busy|happy|sorry|careful|possible|necessary|enough|free|done|okay|ok|fine)$/.test(a.norm)) continue;
+    if (
+      !a ||
+      !/^(ready|late|available|sure|able|busy|happy|sorry|careful|possible|necessary|enough|free|done|okay|ok|fine|different|similar|difficult|expensive|cheaper|higher|bigger|smaller|larger|faster|slower|wetter|drier|hotter|colder|longer|shorter|worse|easier|harder|safer|riskier|ready|useful|helpful|important|impossible|unlikely|likely)$/.test(a.norm)
+    )
+      continue;
+    // "could longer" never happens, but "no longer"/"any longer" after a modal is an adverb: "can no longer run".
+    if (/^(longer)$/.test(a.norm) && /^(no|any)$/.test(w[j - 1]?.norm ?? "")) continue;
     if (a.norm === "free" && w[j + 1]?.norm === "up") continue;
     if (a.norm === "done" && j === i + 1) continue; // "it can done"? rare; "will done" is wrong but leave to Claude
     out.push({
@@ -1464,7 +1477,10 @@ const embeddedQuestionOrder: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 1; i < w.length - 2; i++) {
     if (!/^(if|whether|where|what|when|how|why|who)$/.test(w[i].norm)) continue;
-    const before = w.slice(Math.max(0, i - 3), i).map((x) => x.norm);
+    // Only words in the same clause introduce an indirect question: "Sure, how was your flight?" is a direct one.
+    let from = Math.max(0, i - 3);
+    for (let k = i - 1; k >= from; k--) if (brokenAfter(w, k)) { from = k + 1; break; }
+    const before = w.slice(from, i).map((x) => x.norm);
     if (!before.some((x) => /^(tell|know|wonder|wondering|ask|asking|sure|idea|explain|check|confirm|remember|understand|show|out|find|learn|decide|forget|see)$/.test(x))) continue;
     if (!/^(is|are|was|were|do|does|did|can|could|will|would|has|have)$/.test(w[i + 1].norm) || w[i + 1].expanded) continue;
     if (!(SUBJECT_PRONOUNS.has(w[i + 2].norm) || /^(there|the|this|that|your|our|my|their)$/.test(w[i + 2].norm))) continue;
@@ -1626,6 +1642,13 @@ const extraPreposition: Rule = (w) => {
       !/^(agree|decide|work|focus|depend|count|rely|plan|vote|comment|insist|put|come|go|log|check|fill|hand|sign|call|turn|bring|take)$/.test(prevBase) // "agreed on last time", "put in last month"
     )
       drop(i, `'next/last + 시간' 앞에는 전치사를 쓰지 않습니다: '${n} ${w[i + 2].raw}'.`);
+    else if (
+      ((p === "in" && /^(week|month|year|quarter|morning|afternoon|evening|weekend)$/.test(w[i + 2]?.norm ?? "")) ||
+        (p === "on" && /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/.test(w[i + 2]?.norm ?? ""))) &&
+      n === "this" && !/'s$/i.test(w[i + 2].raw) && w[i + 3]?.norm !== "of" && // "in this year's budget", "in this month of"
+      !/^(put|fill|hand|sign|log|check|bring|take|come|go|plug|turn)$/.test(prevBase)
+    )
+      drop(i, `'this + 시간' 앞에는 전치사를 쓰지 않습니다: 'this ${w[i + 2].raw}'.`);
   }
   return out;
 };
@@ -2202,6 +2225,143 @@ const missingBeMore: Rule = (w) => {
   return out;
 };
 
+/**
+ * Inverted questions and requests keep the base form: "Could you sending …?", "Can you hearing me?",
+ * "Could you to repeat …?", "Would you please confirmed …?" → base form, no "to".
+ */
+const invertedModalForm: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 2; i++) {
+    if (!/^(can|could|would|will|should|may|might|must|shall)$/.test(w[i].norm)) continue;
+    if (!(i === 0 || brokenAfter(w, i - 1) || /^(so|and|but|then|also|please|okay|ok|sorry)$/.test(w[i - 1].norm))) continue;
+    if (!SUBJECT_PRONOUNS.has(w[i + 1].norm)) continue;
+    let j = i + 2;
+    while (j < w.length && /^(please|kindly|just|also|still|maybe|possibly|quickly|not)$/.test(w[j].norm)) j++;
+    const v = w[j];
+    if (!v || brokenAfter(w, j - 1)) continue;
+    if (v.norm === "to" && isBaseVerb(w[j + 1]?.norm ?? "")) {
+      out.push({
+        rule: "inverted-modal-form", from: j, to: j + 1, replacement: "", category: "verb-form", severity: "major", skill: "polite-request",
+        messageKo: `'${w[i].raw} ${w[i + 1].raw}' 뒤에는 to 없이 동사원형이 옵니다: '${w[i].raw} ${w[i + 1].raw} ${w[j + 1].raw} …?'`,
+      });
+      continue;
+    }
+    const info = verbInfo(v.norm);
+    if (!info || info.form === "base" || info.base === "be" || info.base === "have") continue;
+    if (info.form === "ing" && ING_NOUNS.has(v.norm)) continue;
+    if ((info.form === "pp" || info.form === "past") && isSameFormParticiple(info.base)) continue;
+    out.push({
+      rule: "inverted-modal-form", from: j, to: j + 1, replacement: info.base, category: "verb-form", severity: "major", skill: "polite-request",
+      messageKo: `'${w[i].raw} ${w[i + 1].raw} …?' 뒤에는 동사원형이 옵니다: '${v.raw}' → '${info.base}'.`,
+    });
+  }
+  return out;
+};
+
+/** "have to updating", "might have to changed", "need to sent": after the infinitive "to" comes the base form. */
+const toInflected: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 1; i < w.length - 1; i++) {
+    if (w[i].norm !== "to") continue;
+    const g = w[i - 1].norm;
+    if (!/^(have|has|had|need|needs|needed|want|wants|wanted|able|plan|plans|planned|try|tries|tried|decide|decided|hope|hoped|expect|expected|agree|agreed|promise|promised|manage|managed|forget|forgot|remember|ought|going|trying|planning|hoping|supposed|allowed|likely|unable|ready|asked|told)$/.test(g)) continue;
+    // "going to meetings" / "going to training": motion, not the future.
+    const v = w[i + 1];
+    const info = verbInfo(v.norm);
+    if (!info || info.form === "base" || info.base === "be") continue;
+    if (info.form === "ing" && (ING_NOUNS.has(v.norm) || g === "going")) continue;
+    if ((info.form === "pp" || info.form === "past") && isSameFormParticiple(info.base)) continue;
+    if (info.form === "3sg" && g === "going") continue;
+    out.push({
+      rule: "to-inflected", from: i + 1, to: i + 2, replacement: info.base, category: "verb-form", severity: "major", skill: "infinitive",
+      messageKo: `'${g} to' 뒤에는 동사원형이 옵니다: '${v.raw}' → '${info.base}'.`,
+    });
+  }
+  return out;
+};
+
+/** "Please opening the valve", "Please sent it" → "Please open", "Please send". */
+const pleaseForm: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    if (w[i].norm !== "please" || brokenAfter(w, i)) continue;
+    const v = w[i + 1];
+    const info = verbInfo(v.norm);
+    if (!info || info.form === "base" || info.base === "be") continue;
+    if (info.form === "ing" && ING_NOUNS.has(v.norm)) continue;
+    if ((info.form === "pp" || info.form === "past") && isSameFormParticiple(info.base)) continue;
+    // "please find attached", "please note": base forms; "please, …" across a comma is not a request verb.
+    out.push({
+      rule: "please-form", from: i + 1, to: i + 2, replacement: info.base, category: "verb-form", severity: "major", skill: "polite-request",
+      messageKo: `please 뒤에는 동사원형이 옵니다: '${v.raw}' → '${info.base}'.`,
+    });
+  }
+  return out;
+};
+
+/** "might be differ" → "might be different" / "might differ". */
+const beDiffer: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    if (!BE_FORMS.has(w[i].norm)) continue;
+    const j = w[i + 1].norm === "not" ? i + 2 : i + 1;
+    if (w[j]?.norm !== "differ") continue;
+    out.push({
+      rule: "be-differ", from: j, to: j + 1, replacement: "different", category: "be-verb", severity: "major", skill: "be-adj",
+      messageKo: "'differ'는 동사입니다. be 뒤에는 형용사 'different'를 쓰거나, be 없이 'differ'를 씁니다: 'might be different' / 'might differ'.",
+    });
+  }
+  return out;
+};
+
+/** "Because the higher steam flow, …" → "Because of": "because" needs a clause; before a noun phrase it is "because of". */
+const becauseOf: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 2; i++) {
+    if (w[i].norm !== "because" || w[i + 1].norm === "of") continue;
+    if (!/^(the|a|an|this|that|these|those|our|your|their|its|his|her|my|some|bad|heavy|high|low|higher|lower)$/.test(w[i + 1].norm)) continue;
+    // The noun phrase runs to the end of the clause without a verb.
+    let k = i + 1;
+    let verb = false;
+    while (k < w.length) {
+      const t = w[k];
+      const info = verbInfo(t.norm);
+      if (BE_FORMS.has(t.norm) || MODALS.has(t.norm) || /^(has|have|had|do|does|did|not)$/.test(t.norm) || t.expanded) verb = true;
+      else if (info && (info.form === "past" || info.form === "3sg") && !/s$/.test(w[k - 1]?.norm ?? "") && k > i + 1) verb = true;
+      else if (info && info.form === "base" && k > i + 2 && /s$/.test(w[k - 1].norm) && !/ss$/.test(w[k - 1].norm)) verb = true; // "because the pumps leak"
+      else if (info && info.form === "pp" && /ed$/.test(t.norm) && k > i + 2) verb = true;
+      if (verb || brokenAfter(w, k)) break;
+      k++;
+    }
+    if (verb || k - i < 2 || k - i > 6) continue;
+    out.push({
+      rule: "because-of", from: i + 1, to: i + 1, replacement: "of", category: "preposition", severity: "major", skill: "conjunction",
+      messageKo: "because 뒤에는 '주어 + 동사'가 옵니다. 명사만 올 때는 'because of + 명사'입니다: 'because of the higher steam flow'.",
+    });
+  }
+  return out;
+};
+
+/** "I think is too early" → "I think it is": a clause after think/hope/guess needs its own subject. */
+const thinkMissingIt: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let k = 1; k < w.length - 1; k++) {
+    if (!/^(think|hope|guess|believe|feel|suppose|bet)$/.test(w[k].norm)) continue;
+    if (!/^(i|we|you|they)$/.test(w[k - 1].norm)) continue;
+    // "What I think is …", "All I know is …": the clause is the subject itself.
+    const before = w[k - 2]?.norm ?? "";
+    if (k >= 2 && !brokenAfter(w, k - 2) && !/^(and|but|so|because|actually|honestly|well|also|really|just|still|personally|yes|yeah|no|oh|um|anyway|now)$/.test(before)) continue;
+    const next = w[k + 1];
+    if (brokenAfter(w, k) || next.expanded) continue;
+    if (!/^(is|was|will|would|can|could|might|may|should|seems|looks|sounds|makes|needs|works)$/.test(next.norm)) continue;
+    out.push({
+      rule: "think-missing-it", from: k + 1, to: k + 1, replacement: "it", category: "sentence-structure", severity: "major", skill: "opinion",
+      messageKo: `'${w[k - 1].raw} ${w[k].raw}' 뒤의 문장에도 주어가 필요합니다: '${w[k - 1].raw} ${w[k].raw} it ${next.raw} …'.`,
+    });
+  }
+  return out;
+};
+
 const RULES: Rule[] = [
   itsContraction,
   lexicalAgreement,
@@ -2219,6 +2379,7 @@ const RULES: Rule[] = [
   passiveIntransitive, participleNeeded, infinitiveNeeded, gerundSubject, makeNounTo, wantThat, promiseWill,
   pluralNeeded, determinerNumber, uncountableDeterminer, theNeeded, extraArticle,
   feelingAdjective, adverbAdjectiveMore, agreementMore, wordOrderMore, miscPatterns, missingBeMore,
+  invertedModalForm, toInflected, pleaseForm, beDiffer, becauseOf, thinkMissingIt,
 ];
 
 export function runRules(words: Token[]): RuleFinding[] {
@@ -2231,10 +2392,17 @@ export function runRules(words: Token[]): RuleFinding[] {
     for (const r of RULES) for (const f of r(part)) all.push({ ...f, from: f.from + start, to: f.to + start });
     start = i + 1;
   }
-  // Drop findings whose ranges overlap an earlier finding (first rule wins).
+  // Drop findings whose ranges overlap an earlier finding (first rule wins), except that on exactly the same
+  // words the more serious finding wins ("mentioned about": a major extra preposition, not a minor note).
+  const SEV = { minor: 0, major: 1, critical: 2 } as const;
   const kept: RuleFinding[] = [];
   for (const f of all) {
-    const overlaps = kept.some((k) => (f.from === f.to ? f.from > k.from && f.from < k.to : f.from < k.to && k.from < f.to) || (f.from === k.from && f.to === k.to));
+    const same = kept.findIndex((k) => f.from === k.from && f.to === k.to);
+    if (same >= 0) {
+      if (SEV[f.severity] > SEV[kept[same].severity]) kept[same] = f;
+      continue;
+    }
+    const overlaps = kept.some((k) => (f.from === f.to ? f.from > k.from && f.from < k.to : f.from < k.to && k.from < f.to));
     if (!overlaps) kept.push(f);
   }
   return kept;
