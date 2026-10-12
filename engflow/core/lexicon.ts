@@ -31,6 +31,7 @@ export const BASE_VERBS = new Set<string>([
   "leak", "drip", "overheat", "vibrate", "crack", "rust", "slip", "melt", "boil", "spill", "flood", "clog", "jam", "recap",
   "smell", "burn", "taste", "pour", "grill", "toast", "celebrate", "congratulate", "recommend", "order", "book", "pay",
   "save", "rejoin", "reopen", "swim", "hike", "relax", "enjoy", "invite", "introduce", "welcome", "miss", "pick", "drop", "fill",
+  "enter", "access", "reply", "respond", "listen", "die", "belong", "consist", "occur", "happen", "exist", "appear", "disappear", "remain",
   "accept", "adjust", "agree", "allow", "analyze", "analyse", "answer", "apply", "approve", "arrange", "ask", "assign",
   "assume", "attach", "avoid", "calculate", "call", "cancel", "change", "check", "clarify", "clean", "close", "collect",
   "commission", "compare", "complete", "confirm", "consider", "contact", "continue", "control", "correct", "cover",

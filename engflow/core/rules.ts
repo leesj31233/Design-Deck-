@@ -382,7 +382,7 @@ const willInConditionClause: Rule = (w) => {
     const isTime = /^(if|when|before|after|until|unless|once)$/.test(c) || (c === "soon" && w[i - 1]?.norm === "as" && w[i + 1]?.norm === "as");
     if (!isTime) continue;
     // Noun clauses ("I don't know when they will…", "not sure if they will…") may take will.
-    if ((c === "if" || c === "when") && /^(know|sure|ask|asked|wonder|check|confirm|tell|clear|decide|understand|see|unclear|certain|idea|whether|about)$/.test(w[i - 1]?.norm ?? "")) continue;
+    if ((c === "if" || c === "when") && /^(know|sure|ask|asked|wonder|check|confirm|tell|clear|decide|understand|see|unclear|certain|idea|whether|about|out|me|us|him|her|them|learn|guess|predict|say|said|note|update)$/.test(w[i - 1]?.norm ?? "")) continue;
     let s = c === "soon" ? i + 2 : i + 1;
     let subj = w[s]?.norm ?? "";
     // A noun-phrase subject ("the pump", "our vendor") stands where a pronoun would.
@@ -1434,6 +1434,8 @@ const questionWordOrder: Rule = (w) => {
     // wh-word + subject (no auxiliary in between) = statement order; "When you say 'soon', do you mean …?" is a clause + question.
     if (!(SUBJECT_PRONOUNS.has(n) || /^(the|your|my|our|his|her|their|this|that)$/.test(n)) || n === "it" && q === "what") return out;
     if (w.slice(j, w.length - 1).some((_, k) => brokenAfter(w, j + k))) return out;
+    // "So what you're saying is that …?": the wh-clause is the subject of a later "is".
+    if (w.some((t, k) => k > j + 1 && /^(is|was)$/.test(t.norm) && /^(that|a|an|the|not|to|very|really|we|you|it)$/.test(w[k + 1]?.norm ?? ""))) return out;
     if (q === "what" && /^(the)$/.test(n) && /^(heck|hell)$/.test(w[j + 1]?.norm ?? "")) return out;
     out.push({
       rule: "question-word-order", from: j, to: j, replacement: "", category: "word-order", severity: "major", skill: "question-form",
@@ -1564,6 +1566,104 @@ const passiveWithObject: Rule = (w) => {
   return out;
 };
 
+/* ───────────── Prepositions and collocations (learner corpus round) ───────────── */
+
+/** Word + the preposition Koreans often use instead of the right one. */
+const PREP_FIX: Record<string, { wrong: string[]; right: string }> = {
+  proud: { wrong: ["with", "about", "for"], right: "of" }, related: { wrong: ["with", "on"], right: "to" }, different: { wrong: ["with"], right: "from" },
+  familiar: { wrong: ["to", "about"], right: "with" }, married: { wrong: ["with"], right: "to" }, depend: { wrong: ["of", "from", "to"], right: "on" },
+  interested: { wrong: ["about", "on", "for", "with"], right: "in" }, similar: { wrong: ["with", "as"], right: "to" }, responsible: { wrong: ["of", "about"], right: "for" },
+  afraid: { wrong: ["about", "for"], right: "of" }, capable: { wrong: ["to"], right: "of" }, aware: { wrong: ["about"], right: "of" },
+  satisfied: { wrong: ["about", "for"], right: "with" }, famous: { wrong: ["about", "with"], right: "for" }, consist: { wrong: ["with", "in"], right: "of" },
+  arrive: { wrong: ["to"], right: "at" }, focus: { wrong: ["in", "to"], right: "on" }, belong: { wrong: ["in", "for"], right: "to" },
+  good: { wrong: ["in"], right: "at" }, angry: { wrong: ["to", "on"], right: "with" }, worried: { wrong: ["for", "on"], right: "about" },
+};
+const prepositionCollocation: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    const base = verbInfo(w[i].norm)?.base ?? w[i].norm;
+    const entry = PREP_FIX[base] ?? PREP_FIX[w[i].norm];
+    if (!entry || !entry.wrong.includes(w[i + 1].norm) || brokenAfter(w, i)) continue;
+    if (base === "good" && w[i - 1]?.norm !== "am" && !BE_FORMS.has(w[i - 1]?.norm ?? "")) continue; // "a good in-house team"
+    if (base === "arrive" && /^(a|an|the)$/.test(w[i + 2]?.norm ?? "") === false && !/^[A-Z]/.test(w[i + 2]?.raw ?? "")) continue;
+    const right = base === "arrive" && /^[A-Z]/.test(w[i + 2]?.raw ?? "") ? "in" : entry.right;
+    out.push({
+      rule: "preposition-collocation", from: i + 1, to: i + 2, replacement: right, category: "preposition", severity: "major", skill: "verb-prep",
+      messageKo: `'${w[i].raw}' 뒤에는 '${right}'를 씁니다: '${w[i].raw} ${right}'.`,
+    });
+  }
+  return out;
+};
+
+/** "go to home", "near from", "call to me", "access to the folder", "consider about", "on next Monday". */
+const extraPreposition: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  const drop = (i: number, msg: string, skill = "verb-prep") =>
+    out.push({ rule: "extra-preposition", from: i, to: i + 1, replacement: "", category: "preposition", severity: "major", skill, messageKo: msg });
+  for (let i = 1; i < w.length - 1; i++) {
+    const prevBase = verbInfo(w[i - 1].norm)?.base ?? w[i - 1].norm;
+    const p = w[i].norm;
+    const n = w[i + 1].norm;
+    if (p === "to" && /^(go|come|get|head|arrive|return|walk|drive|leave)$/.test(prevBase) && /^(home|here|there|abroad|downtown|upstairs|downstairs|overseas)$/.test(n))
+      drop(i, `'${n}'는 부사라서 앞에 to를 쓰지 않습니다: '${w[i - 1].raw} ${n}'.`);
+    else if (p === "from" && w[i - 1].norm === "near") drop(i, "'near'는 전치사라서 바로 장소를 씁니다: 'near the plant'.");
+    else if (p === "to" && /^(call|phone|text|email|contact|meet|tell|ask)$/.test(prevBase) && /^(me|us|him|her|them|you)$/.test(n) && !/^(talk|speak)$/.test(prevBase))
+      drop(i, `'${prevBase}'는 사람을 바로 목적어로 씁니다: '${w[i - 1].raw} ${n}'.`, "verb-object");
+    else if (p === "to" && prevBase === "access" && /^(the|our|your|this|that|my|their)$/.test(n) && w[i - 2] && (SUBJECT_PRONOUNS.has(w[i - 2].norm) || /^(can|could|to|will|cannot|not)$/.test(w[i - 2].norm)))
+      drop(i, "동사 'access'는 목적어를 바로 씁니다: 'access the folder'. (명사로 쓸 때만 'access to')", "verb-object");
+    else if (p === "about" && /^(consider|discuss|mention|describe|explain|emphasize|research)$/.test(prevBase) && !/^(it|this|that)$/.test(w[i - 2]?.norm ?? "x"))
+      drop(i, `'${prevBase}'는 타동사라서 about 없이 목적어를 씁니다.`, "verb-object");
+    else if (p === "into" && prevBase === "enter") drop(i, "'enter'는 타동사라서 into 없이 씁니다: 'enter the area'.", "verb-object");
+    else if (
+      /^(on|in|at)$/.test(p) && /^(next|last)$/.test(n) && /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|week|weekend|month|year|time)$/.test(w[i + 2]?.norm ?? "") &&
+      !/'s$/i.test(w[i + 2].raw) && // "at next week's meeting"
+      !/^(agree|decide|work|focus|depend|count|rely|plan|vote|comment|insist|put|come|go|log|check|fill|hand|sign|call|turn|bring|take)$/.test(prevBase) // "agreed on last time", "put in last month"
+    )
+      drop(i, `'next/last + 시간' 앞에는 전치사를 쓰지 않습니다: '${n} ${w[i + 2].raw}'.`);
+  }
+  return out;
+};
+
+/** "agree your point", "wait us", "replied me", "look this graph": the preposition is missing. */
+const missingPreposition: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    const info = verbInfo(w[i].norm);
+    if (!info || brokenAfter(w, i)) continue;
+    const n = w[i + 1].norm;
+    let prep = "";
+    // "agree your point" → "agree with"; "agree that …" is a clause and fine.
+    if (info.base === "agree" && /^(your|his|her|their|our|you|him|them)$/.test(n)) prep = "with";
+    else if (info.base === "wait" && /^(me|us)$/.test(n)) prep = "for";
+    else if (/^(reply|respond|listen|talk|speak)$/.test(info.base) && /^(me|us|him|her|them)$/.test(n)) prep = "to";
+    else if (info.base === "look" && /^(this|that|these|those|the|my|your|our)$/.test(n) && w[i + 2] && !/^(way|up|over|out|forward|time|morning|week|year)$/.test(w[i + 2].norm) && !/^(is|are|was|were)$/.test(w[i + 2].norm) && w[i - 1]?.norm !== "to" && (i === 0 || /^(please|let's|us|can|could|you|we|i|just|now|and)$/.test(w[i - 1].norm))) prep = "at";
+    if (!prep) continue;
+    out.push({
+      rule: "missing-preposition", from: i + 1, to: i + 1, replacement: prep, category: "preposition", severity: "major", skill: "verb-prep",
+      messageKo: `'${info.base}' 뒤에는 '${prep}'가 필요합니다: '${w[i].raw} ${prep} ${w[i + 1].raw}'.`,
+    });
+  }
+  return out;
+};
+
+/** "during three years" → "for"; "send it until Thursday" → "by" (a deadline, not a duration). */
+const durationDeadline: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 2; i++) {
+    if (w[i].norm === "during" && /^(two|three|four|five|six|seven|eight|nine|ten|several|many|\d+|a)$/.test(w[i + 1].norm) && /^(few|couple)?$/.test(w[i + 1].norm === "a" ? w[i + 2].norm : "") && /^(minutes|hours|days|weeks|months|years)$/.test(w[i + (w[i + 1].norm === "a" ? 3 : 2)]?.norm ?? "")) {
+      out.push({ rule: "during-duration", from: i, to: i + 1, replacement: "for", category: "preposition", severity: "major", skill: "verb-prep", messageKo: "'몇 년/며칠 동안'처럼 기간의 길이는 'for'를 씁니다. 'during'은 'during the meeting'처럼 특정 기간 앞에 씁니다." });
+    }
+    if (w[i].norm === "until") {
+      const clause = w.slice(Math.max(0, i - 7), i).map((x) => verbInfo(x.norm)?.base ?? x.norm);
+      const point = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|tonight|noon|next|\d+)$/.test(w[i + 1].norm) || (w[i + 1].norm === "the" && w[i + 2]?.norm === "end");
+      if (point && clause.some((x) => /^(send|submit|finish|complete|deliver|confirm|return|decide|pay|reply|share|upload|prepare)$/.test(x)) && !clause.some((x) => /^(wait|stay|keep|continue|work|run|last|not|every|each|regularly|daily|weekly)$/.test(x))) {
+        out.push({ rule: "until-deadline", from: i, to: i + 1, replacement: "by", category: "preposition", severity: "major", skill: "verb-prep", messageKo: "마감(그때까지 끝내기)은 'by'입니다. 'until'은 그때까지 계속되는 일에 씁니다(wait until Friday)." });
+      }
+    }
+  }
+  return out;
+};
+
 const RULES: Rule[] = [
   itsContraction,
   lexicalAgreement,
@@ -1577,6 +1677,7 @@ const RULES: Rule[] = [
   progressiveNeedsPassive, oneMorePlural, doModal, doIndefinite, doubleConjunction, tooMuchAdjective, tooToObject, beQuestionBaseVerb, littleBit,
   nounClauseThirdPerson, byTheMeans, pluralSubjectAgreement, modalAdjective, articlePlural, forBaseVerb, sinceWithPast,
   questionWordOrder, embeddedQuestionOrder, recommendPersonThing, keepBaseVerb, talkObject, smallPhrases, passiveWithObject,
+  prepositionCollocation, extraPreposition, missingPreposition, durationDeadline,
 ];
 
 export function runRules(words: Token[]): RuleFinding[] {
