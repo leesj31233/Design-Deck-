@@ -155,6 +155,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "no-be", pattern: "schedule =a? =little|=bit|=slightly|=some? =delayed|=lated|=delay", category: "be-verb", severity: "major", fix: "schedule is a little delayed", messageKo: "상태를 말할 때는 be동사가 필요합니다: 'Our schedule is a little delayed.' be동사 없이 쓰면 문장이 되지 않습니다." },
       { id: "some", pattern: "=some =delayed|=late|=lated|=delay", category: "word-choice", severity: "major", fix: "a little delayed", messageKo: "'some'은 수량(some data)에 쓰고, 정도를 말할 때는 'a little'이나 'slightly'를 씁니다: 'is a little delayed'." },
+      { id: "is-delay", pattern: "=is|=are a? =little|=bit|=slightly? =delay", category: "verb-form", severity: "major", fix: "is a little delayed", messageKo: "지연된 상태는 'be + delayed'(과거분사)입니다. 'is a little delay'는 틀린 형태입니다." },
     ],
     hints: { pattern: "주어 + be + a little / slightly + delayed", skeleton: "Our design schedule __ a ______ delayed.", partial: "Our design schedule is a lit…" },
     explanationKo: "일정이 늦어진 '상태'는 'be + delayed'로 씁니다. '조금'은 some이 아니라 a little / slightly이고, 'lated'는 영어 단어가 아닙니다.",
@@ -177,7 +178,7 @@ export const PHRASES: Question[] = [
     promptKo: "새 펌프는 기동할 준비가 되었습니다.",
     segments: ["새 펌프는", "준비가 된 상태다", "기동을 위한"],
     reference: "The new pump is ready for start-up.",
-    accepted: ["The new pump is ready for startup.", "The new pump is ready to start.", "The new pump is ready to start up."],
+    accepted: ["The new pump is ready for startup.", "The new pump is ready to start.", "The new pump is ready to start up.", "The new pump is ready to be started."],
     meaning: [
       { id: "pump", en: "the new pump", ko: "새 펌프", any: ["pump"], term: true },
       { id: "ready", en: "is ready", ko: "준비가 되었다", any: ["ready", "prepared"], critical: true },
@@ -319,6 +320,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "contact-to", pattern: "contact to|with", category: "preposition", severity: "major", fix: "contact", messageKo: "contact는 타동사라서 'contact + 사람'으로 바로 씁니다. 'contact to / contact with the vendor'가 아니라 'contact the vendor'입니다." },
       { id: "call-to", pattern: "call|phone to", category: "preposition", severity: "major", fix: "call", messageKo: "'~에게 전화하다'는 'call + 사람'입니다. 'call to the vendor'처럼 to를 쓰지 않습니다." },
+      { id: "present", pattern: "i =contact|=call the", category: "tense", severity: "major", fix: "I will contact the", messageKo: "앞으로 할 일을 말할 때는 'I will + 동사원형'입니다. 'I contact'는 '(평소에) 연락한다'는 뜻이 됩니다." },
     ],
     hints: { pattern: "contact + 사람 (전치사 없음)", skeleton: "I will _______ the vendor today.", partial: "I will contact the ven…" },
     explanationKo: "contact, call, email은 사람을 바로 목적어로 받습니다. 한국어 '~에게'를 to / with로 옮기면 틀린 문장이 됩니다.",
@@ -380,8 +382,8 @@ export const PHRASES: Question[] = [
       { id: "friday", en: "by Friday", ko: "금요일까지", any: ["friday"] },
     ],
     pitfalls: [
-      { id: "reply-no-to", pattern: "reply =the", category: "preposition", severity: "major", fix: "reply to the", messageKo: "reply는 자동사라서 대상 앞에 to가 필요합니다: 'reply to the client'. (answer는 to 없이 'answer the client')" },
-      { id: "respond-no-to", pattern: "respond =the", category: "preposition", severity: "major", fix: "respond to the", messageKo: "respond도 대상 앞에 to가 필요합니다: 'respond to the client'." },
+      { id: "reply-no-to", pattern: "re:\\b(reply|respond)(?= (the|our|client|customer|him|her|them)\\b)", category: "preposition", severity: "major", fix: "reply to", messageKo: "reply / respond는 대상 앞에 to가 필요합니다: 'reply to the client'. (answer는 to 없이 'answer the client')" },
+      { id: "reply-for", pattern: "reply|respond for", category: "preposition", severity: "major", fix: "reply to", messageKo: "답장하는 대상 앞에는 for가 아니라 to를 씁니다: 'reply to the client'." },
       { id: "until", pattern: "until friday", category: "preposition", severity: "major", fix: "by Friday", messageKo: "'until'은 '금요일까지 계속'이라는 뜻입니다. 마감(금요일까지 끝내기)은 'by Friday'를 씁니다." },
     ],
     hints: { pattern: "reply to + 사람 + by + 마감일", skeleton: "Please _____ __ the client by Friday.", partial: "Please reply to the…" },
@@ -413,7 +415,7 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "depend-of", pattern: "depend of|from|to|in|at|with", category: "preposition", severity: "major", fix: "depends on", messageKo: "'~에 달려 있다'는 항상 'depend on'입니다. of / from / to를 쓰지 않습니다." },
-      { id: "is-depend", pattern: "is =depend|=depends", category: "verb-form", severity: "major", fix: "depends", messageKo: "depend는 일반동사라서 be동사와 함께 쓰지 않습니다: 'It depends on …'." },
+      { id: "is-depend", pattern: "is =depend|=depends|=depending", category: "verb-form", severity: "major", fix: "depends", messageKo: "depend는 일반동사라서 be동사와 함께 쓰지 않습니다: 'It depends on …'." },
       { id: "it-depend", pattern: "it =depend", category: "agreement", severity: "major", fix: "it depends", skill: "agreement", messageKo: "주어 it은 3인칭 단수라서 'depends'입니다." },
     ],
     hints: { pattern: "주어 + depends on + 명사", skeleton: "It _______ __ the feed composition.", partial: "It depends o…" },
@@ -510,8 +512,8 @@ export const PHRASES: Question[] = [
       { id: "dryer", en: "the dryer", ko: "건조기", any: ["dryer", "drier"], term: true },
     ],
     pitfalls: [
-      { id: "for-select", pattern: "for =select|=selecting", category: "verb-form", severity: "major", fix: "to select", messageKo: "'…하기에 너무 ~하다'는 'too + 형용사 + to + 동사원형'입니다: 'too early to select'." },
-      { id: "for-choose", pattern: "for =choose|=choosing", category: "verb-form", severity: "major", fix: "to choose", messageKo: "'too + 형용사' 뒤의 동사는 'to + 동사원형'입니다: 'too early to choose'." },
+      { id: "for-select", pattern: "for =select|=selecting|=choose|=choosing", category: "verb-form", severity: "major", fix: "to select", messageKo: "'…하기에 너무 ~하다'는 'too + 형용사 + to + 동사원형'입니다: 'too early to select'." },
+      { id: "no-to", pattern: "early|soon =select|=selecting|=choose|=decide", category: "verb-form", severity: "major", fix: "early to select", messageKo: "too + 형용사 뒤에 동사를 이어 쓸 때는 to가 필요합니다: 'too early to select'." },
       { id: "so-early", pattern: "so|very early", category: "word-choice", severity: "major", fix: "too early", messageKo: "'(…하기에) 너무 이르다'는 'too early'입니다. 'so / very early'는 단순히 '매우 이르다'라는 뜻입니다." },
     ],
     hints: { pattern: "It's too + 형용사 + to + 동사원형", skeleton: "It's ___ early __ select the dryer.", partial: "It's too early to sel…" },
@@ -579,6 +581,8 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "again-first", pattern: "send again the? datasheet", category: "word-order", severity: "major", fix: "send the datasheet again", messageKo: "영어는 '동사 + 목적어'를 먼저 붙이고 again 같은 부사는 그 뒤에 둡니다: 'send the datasheet again'." },
+      { id: "again-before-verb", pattern: "=again send the? datasheet", category: "word-order", severity: "major", fix: "send the datasheet again", messageKo: "again은 보통 '동사 + 목적어' 뒤에 둡니다: 'send the datasheet again'." },
+      { id: "double-object", pattern: "send it again the? datasheet", category: "sentence-structure", severity: "major", fix: "send the datasheet again", messageKo: "목적어(the datasheet)가 있는데 it을 또 쓰면 목적어가 두 번 나옵니다: 'send the datasheet again'." },
     ],
     hints: { pattern: "동사 + 목적어 + again", skeleton: "Please ____ the datasheet _____.", partial: "Please send the datasheet ag…" },
     explanationKo: "영어는 '동사 + 목적어 + 부사(again / first / later)' 순서입니다. 한국어 어순대로 'send again the datasheet'라고 하면 어색하게 들립니다.",
@@ -807,7 +811,7 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "are-plan", pattern: "are =plan", category: "verb-form", severity: "major", fix: "are planning", messageKo: "'계획 중이다'는 'are planning'(진행형) 또는 'plan'(현재형)입니다. 'are plan'처럼 be동사와 동사원형을 함께 쓰지 않습니다." },
-      { id: "plan-no-to", pattern: "planning|plan =run|=do|=conduct|=make", category: "verb-form", severity: "major", fix: "planning to run", messageKo: "plan 뒤에 동사가 올 때는 'plan to + 동사원형'입니다: 'planning to run'." },
+      { id: "plan-no-to", pattern: "planning|plan =run|=do|=conduct|=make|=running|=doing", category: "verb-form", severity: "major", fix: "planning to run", messageKo: "plan 뒤에 동사가 올 때는 'plan to + 동사원형'입니다: 'planning to run'." },
       { id: "make-test", pattern: "make ... test", category: "word-choice", severity: "major", fix: "run the pilot test", skill: "collocation", messageKo: "시험을 '하다/진행하다'는 make가 아니라 run / do / conduct를 씁니다." },
     ],
     hints: { pattern: "be planning to / be going to + 동사원형", skeleton: "We are ________ to run the pilot test next week.", partial: "We are planning to run…" },
@@ -873,8 +877,8 @@ export const PHRASES: Question[] = [
       { id: "delayed", en: "be delayed", ko: "지연되다", any: ["delay", "late"], critical: true },
     ],
     pitfalls: [
-      { id: "might-delayed", pattern: "might|may|could =delayed", category: "verb-form", severity: "major", fix: "might be delayed", messageKo: "'지연되다'는 수동 의미라서 조동사 뒤에 'be + 과거분사'가 필요합니다: 'might be delayed'." },
-      { id: "might-delay", pattern: "delivery might|may|could =delay", category: "verb-form", severity: "major", fix: "delivery might be delayed", messageKo: "'The delivery might delay'는 '납품이 (무언가를) 지연시킬 수도 있다'는 능동 의미가 됩니다. 납품 자체가 늦어지는 것은 'might be delayed'입니다." },
+      { id: "might-delayed", pattern: "might|may|could =delayed|=delay", category: "verb-form", severity: "major", fix: "might be delayed", messageKo: "'지연되다'는 수동 의미라서 조동사 뒤에 'be + 과거분사'가 필요합니다: 'might be delayed'. 'might delay'는 '(무언가를) 지연시킬 수도 있다'는 능동 의미가 됩니다." },
+      { id: "be-delay", pattern: "be =delay", category: "verb-form", severity: "major", fix: "be delayed", messageKo: "수동태는 'be + 과거분사'입니다: 'might be delayed'." },
       { id: "will", pattern: "=will be delayed", category: "meaning-shift", severity: "major", fix: "might be delayed", messageKo: "'will be delayed'는 '지연될 것이다'라는 확정입니다. '지연될 수도 있다'는 'might / may be delayed'입니다." },
     ],
     hints: { pattern: "might / may + be + 과거분사", skeleton: "The equipment delivery _____ __ delayed.", partial: "The equipment delivery might be…" },
@@ -978,6 +982,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "dont-have-to", pattern: "not have|need to", category: "meaning-shift", severity: "critical", fix: "must not", messageKo: "'don't have to'는 '할 필요가 없다'(해도 되고 안 해도 됨)라는 뜻입니다. 금지(절대 하면 안 된다)는 'must not'입니다." },
       { id: "must-not-to", pattern: "must not to", category: "verb-form", severity: "major", fix: "must not", messageKo: "must 뒤에는 to 없이 동사원형이 옵니다: 'must not open'." },
+      { id: "must-not-ing", pattern: "must not =opening|=opened", category: "verb-form", severity: "major", fix: "must not open", messageKo: "must not 뒤에는 동사원형이 옵니다: 'must not open'." },
     ],
     hints: { pattern: "must not + 동사원형 (금지)", skeleton: "We ____ ___ open this valve during operation.", partial: "We must not op…" },
     explanationKo: "금지는 'must not + 동사원형'입니다. 'don't have to'는 '할 필요가 없다'라서 안전 규칙에 쓰면 정반대의 뜻이 됩니다.",
@@ -1008,7 +1013,7 @@ export const PHRASES: Question[] = [
       { id: "earlier", en: "earlier", ko: "더 일찍", any: ["earlier", "sooner", "before"] },
     ],
     pitfalls: [
-      { id: "should-ed", pattern: "should =checked|=inspected", category: "verb-form", severity: "major", fix: "should have checked", messageKo: "과거에 하지 않은 일에 대한 후회는 'should have + 과거분사'입니다: 'should have checked'." },
+      { id: "should-ed", pattern: "should =checked|=inspected|=check|=inspect", category: "tense", severity: "major", fix: "should have checked", messageKo: "과거에 하지 않은 일에 대한 후회는 'should have + 과거분사'입니다: 'should have checked'. 'should check'는 '(앞으로) 확인해야 한다'는 뜻입니다." },
       { id: "have-base", pattern: "have =check|=inspect", category: "verb-form", severity: "major", fix: "have checked", messageKo: "'should have' 뒤에는 과거분사가 옵니다: 'should have checked'." },
       { id: "must-have", pattern: "=must have =checked|=inspected", category: "meaning-shift", severity: "major", fix: "should have checked", messageKo: "'must have checked'는 '확인했음이 틀림없다'(추측)라는 뜻입니다. '확인했어야 했다'(후회)는 'should have checked'입니다." },
     ],
@@ -1111,7 +1116,8 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "since", pattern: "since three|3 weeks", category: "preposition", severity: "major", fix: "for three weeks", messageKo: "기간(3주 동안)은 'for', 시작 시점(3월부터)은 'since'입니다: 'for three weeks'." },
-      { id: "are-running-for", pattern: "we =are running|operating", category: "tense", severity: "major", fix: "we have been running", messageKo: "과거에 시작해서 지금까지 계속되는 일은 현재완료진행형 'have been running'입니다. 'are running for three weeks'는 쓰지 않습니다." },
+      { id: "been-base", pattern: "been =run|=operate", category: "verb-form", severity: "major", fix: "been running", messageKo: "현재완료진행형은 'have been + 동사ing'입니다: 'have been running'." },
+      { id: "are-running-for", pattern: "re:\\bwe (are running|are operating|run|operate)\\b", category: "tense", severity: "major", fix: "we have been running", messageKo: "과거에 시작해서 지금까지 계속되는 일은 현재완료진행형 'have been running'입니다. 'are running for three weeks'는 쓰지 않습니다." },
     ],
     hints: { pattern: "have been + 동사ing + for + 기간", skeleton: "We ____ ____ _______ the pilot plant for three weeks.", partial: "We have been run…" },
     explanationKo: "과거에 시작해 지금도 계속되는 일은 'have been + 동사ing + for + 기간'입니다. 한국어 '~째 하고 있다'를 현재진행형(are running)으로 옮기면 기간의 의미가 사라집니다.",
@@ -1144,8 +1150,8 @@ export const PHRASES: Question[] = [
       { id: "design", en: "the design", ko: "설계", any: ["design"] },
     ],
     pitfalls: [
-      { id: "before-complete", pattern: "before =complete", category: "verb-form", severity: "major", fix: "before completing", messageKo: "before가 전치사로 쓰이면 뒤에 동사원형이 올 수 없습니다. 'before completing'(동사ing) 또는 'before we complete'(주어 + 동사)로 쓰세요." },
-      { id: "before-finish", pattern: "before =finish", category: "verb-form", severity: "major", fix: "before finishing", messageKo: "before 뒤에는 동사ing(finishing)나 '주어 + 동사'(we finish)가 옵니다." },
+      { id: "before-complete", pattern: "before =complete|=completed", category: "verb-form", severity: "major", fix: "before completing", messageKo: "before가 전치사로 쓰이면 뒤에 동사원형이 올 수 없습니다. 'before completing'(동사ing) 또는 'before we complete'(주어 + 동사)로 쓰세요." },
+      { id: "before-finish", pattern: "before =finish|=finished", category: "verb-form", severity: "major", fix: "before finishing", messageKo: "before 뒤에는 동사ing(finishing)나 '주어 + 동사'(we finish)가 옵니다." },
       { id: "before-to", pattern: "before to", category: "verb-form", severity: "major", fix: "before", messageKo: "before 뒤에는 to부정사를 쓰지 않습니다: 'before completing'." },
     ],
     hints: { pattern: "before + 동사ing / before + 주어 + 동사", skeleton: "Before __________ the design,", partial: "Before comp…" },
@@ -1179,6 +1185,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "after-base", pattern: "after =review|=check the|our", category: "verb-form", severity: "major", fix: "after reviewing the", messageKo: "전치사 after 뒤에는 동사원형이 올 수 없습니다. 'after reviewing'(동사ing) 또는 'after we review'로 쓰세요." },
       { id: "after-ed", pattern: "after =reviewed|=checked", category: "verb-form", severity: "major", fix: "after reviewing", messageKo: "전치사 after 뒤에는 동사ing가 옵니다. 'after reviewed'는 틀린 형태입니다. 'after reviewing' 또는 'after we review'로 쓰세요." },
+      { id: "after-to", pattern: "after to", category: "verb-form", severity: "major", fix: "after", messageKo: "after 뒤에는 to부정사를 쓰지 않습니다: 'after reviewing'." },
     ],
     hints: { pattern: "after + 동사ing / after + 주어 + 동사", skeleton: "After _________ the P&ID,", partial: "After revi…" },
     explanationKo: "after도 before처럼 전치사로 쓰면 뒤에 동사ing가 옵니다(after reviewing). 주어를 넣으면 'after we review'입니다. 'after reviewed'는 어느 쪽도 아닌 틀린 형태입니다.",
@@ -1211,6 +1218,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "by-base", pattern: "by =increase|=raise", category: "verb-form", severity: "major", fix: "by increasing", messageKo: "'~함으로써'(방법)는 'by + 동사ing'입니다. 전치사 by 뒤에는 동사원형이 올 수 없습니다." },
       { id: "with-ing", pattern: "with =increasing|=raising", category: "preposition", severity: "major", fix: "by increasing", messageKo: "방법을 나타낼 때는 with가 아니라 by를 씁니다: 'by increasing the steam pressure'." },
+      { id: "by-to-ed", pattern: "re:\\bby (to increase|to raise|increased|raised)\\b", category: "verb-form", severity: "major", fix: "by increasing", messageKo: "by 뒤에는 to부정사나 과거형이 아니라 동사ing가 옵니다: 'by increasing'." },
     ],
     hints: { pattern: "By + 동사ing + 목적어 (방법)", skeleton: "By __________ the steam pressure,", partial: "By incr…" },
     explanationKo: "'~함으로써, ~해서'(방법·수단)는 'by + 동사ing'입니다. by는 전치사라 동사원형을 바로 쓰지 않고, with는 도구(with a pump)에 씁니다.",
@@ -1244,6 +1252,7 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "if", pattern: "if we", category: "word-choice", severity: "major", fix: "when we", messageKo: "데이터가 오는 것이 확실하면 'when'(~하면 / ~할 때)을 씁니다. 'if'는 '올지 안 올지 모르지만 만약 온다면'이라는 뜻입니다." },
+      { id: "past", pattern: "when|once we =received|=got", category: "tense", severity: "major", fix: "when we receive", messageKo: "앞으로 일어날 일이므로 시간 부사절에서도 현재시제(receive)를 씁니다. 'received'는 이미 받았다는 과거가 됩니다." },
       { id: "accept", pattern: "accept the? vendor? data", category: "meaning-shift", severity: "major", fix: "receive the vendor data", skill: "collocation", messageKo: "데이터를 '받다'는 receive / get입니다. accept는 '(제안·조건을) 수락하다'라는 뜻입니다." },
     ],
     hints: { pattern: "When + 주어 + 현재동사 (확실한 미래)", skeleton: "When we _______ the vendor data,", partial: "When we rec…" },
@@ -1311,6 +1320,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "accept", pattern: "accept the? test? data|result|results", category: "meaning-shift", severity: "major", fix: "received the test data", messageKo: "'accept'는 '(제안·결과물을) 수락하다'라는 뜻입니다. 데이터를 '받다'는 'receive'입니다." },
       { id: "present", pattern: "we =receive|=get ... yesterday", category: "tense", severity: "major", fix: "we received the test data yesterday", messageKo: "yesterday처럼 끝난 과거 시점이 있으면 과거형(received)을 씁니다." },
+      { id: "perfect-yesterday", pattern: "=have =received|=got ... yesterday", category: "tense", severity: "major", fix: "received the test data yesterday", messageKo: "yesterday처럼 끝난 과거 시점과는 현재완료(have received)를 쓰지 않습니다. 과거형 'received'를 씁니다." },
     ],
     hints: { pattern: "receive + 데이터 / 문서 / 결과", skeleton: "We ________ the test data yesterday.", partial: "We rece…" },
     explanationKo: "데이터·문서·결과를 '받다'는 receive(또는 get)입니다. accept는 제안·조건·결과물을 '수락하다'라는 뜻이라 의미가 달라집니다.",
@@ -1401,7 +1411,7 @@ export const PHRASES: Question[] = [
     promptKo: "펌프 수리가 끝나는 대로",
     segments: ["~하는 대로 (즉시)", "펌프가", "수리되다"],
     reference: "As soon as the pump is repaired,",
-    accepted: ["As soon as the pump is fixed,", "As soon as we repair the pump,", "Once the pump is repaired,"],
+    accepted: ["As soon as the pump is fixed,", "As soon as we repair the pump,", "Once the pump is repaired,", "As soon as the pump has been repaired,"],
     meaning: [
       { id: "as-soon-as", en: "as soon as", ko: "~하는 대로", any: ["as soon as", "once", "right after", "immediately after", "when"], critical: true },
       { id: "pump", en: "the pump", ko: "펌프", any: ["pump"], term: true },
@@ -1410,6 +1420,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "will-be", pattern: "pump will be", category: "tense", severity: "major", fix: "pump is", messageKo: "as soon as / when / after 같은 시간 부사절에서는 미래 일도 현재시제를 씁니다: 'as soon as the pump is repaired'." },
       { id: "is-repair", pattern: "is =repair|=fix", category: "verb-form", severity: "major", fix: "is repaired", messageKo: "수리'되다'는 수동태 'be + 과거분사'입니다: 'is repaired'." },
+      { id: "no-be", pattern: "pump =repaired|=fixed", category: "be-verb", severity: "major", fix: "pump is repaired", messageKo: "펌프는 수리를 '받는' 대상이라 be동사가 필요합니다: 'the pump is repaired'." },
     ],
     hints: { pattern: "As soon as + 주어 + 현재형(수동: is + p.p.)", skeleton: "As soon as the pump __ ________,", partial: "As soon as the pump is…" },
     explanationKo: "as soon as는 시간 부사절이라 미래 일도 현재시제를 씁니다(is repaired, will be ✗). 펌프는 수리를 받는 대상이라 수동태 'is repaired'입니다.",
@@ -1676,8 +1687,8 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "past-simple-if", pattern: "if we =analyzed|=analysed|=tested|=checked", category: "tense", severity: "major", fix: "if we had analyzed", messageKo: "과거 사실과 반대되는 가정은 'If + had + 과거분사'입니다: 'If we had analyzed …'." },
-      { id: "would-found", pattern: "would =found|=find", category: "verb-form", severity: "major", fix: "would have found", messageKo: "과거에 대한 가정의 결과는 'would have + 과거분사'(would have found)입니다." },
-      { id: "would-have-find", pattern: "would have =find", category: "verb-form", severity: "major", fix: "would have found", messageKo: "would have 뒤에는 과거분사가 옵니다. find의 과거분사는 'found'입니다." },
+      { id: "would-found", pattern: "re:\\bwould (have find|found|find)\\b", category: "verb-form", severity: "major", fix: "would have found", messageKo: "과거에 대한 가정의 결과는 'would have + 과거분사'(would have found)입니다." },
+      { id: "have-analyzed", pattern: "if we =have =analyzed|=analysed|=tested|=checked", category: "tense", severity: "major", fix: "if we had analyzed", messageKo: "과거에 대한 가정은 'had + 과거분사'입니다. 'have analyzed'(현재완료)는 쓰지 않습니다." },
     ],
     hints: { pattern: "If + had + p.p., 주어 + would have + p.p.", skeleton: "If we ___ ________ the sample earlier, we _____ ____ found the problem.", partial: "If we had analyzed the sample earlier, we would…" },
     explanationKo: "과거 사실의 반대는 'If + had + 과거분사, would have + 과거분사'입니다. 두 절 모두 과거에 대한 가정이므로 'would find'나 'If we analyzed'처럼 시제를 섞지 않습니다.",
@@ -1810,9 +1821,9 @@ export const PHRASES: Question[] = [
       { id: "moisture", en: "the moisture content", ko: "수분 함량", any: ["moisture", "water content"], term: true },
     ],
     pitfalls: [
-      { id: "for-base", pattern: "for =reduce|=lower|=decrease", category: "verb-form", severity: "major", fix: "to reduce", messageKo: "목적(~하기 위해)은 'to + 동사원형'입니다. 'for + 동사원형'은 쓸 수 없습니다." },
-      { id: "for-ing", pattern: "for =reducing|=lowering|=decreasing", category: "word-choice", severity: "major", fix: "to reduce", messageKo: "'~하기 위해'라는 목적은 'To reduce …' 또는 'In order to reduce …'로 씁니다. 'For reducing'은 어색합니다." },
+      { id: "for-base", pattern: "for to? =reduce|=lower|=decrease|=reducing|=lowering|=decreasing", category: "verb-form", severity: "major", fix: "to reduce", messageKo: "목적(~하기 위해)은 'to + 동사원형'입니다. 'for reduce / for reducing / for to reduce'는 쓰지 않습니다." },
       { id: "to-ing", pattern: "to =reducing|=lowering", category: "verb-form", severity: "major", fix: "to reduce", messageKo: "목적의 to 뒤에는 동사원형이 옵니다: 'to reduce'." },
+      { id: "in-order-for", pattern: "in order for =reduce|=reducing", category: "verb-form", severity: "major", fix: "in order to reduce", messageKo: "'~하기 위해'는 'in order to + 동사원형'입니다." },
     ],
     hints: { pattern: "To / In order to + 동사원형", skeleton: "__ reduce the moisture content,", partial: "To red…" },
     explanationKo: "'~하기 위해'는 'to + 동사원형'(또는 in order to)입니다. 한국어 '~을 위해'를 for로 옮기면 for 뒤에 동사를 쓸 수 없어 틀린 문장이 됩니다.",
@@ -1843,7 +1854,7 @@ export const PHRASES: Question[] = [
       { id: "temperature", en: "the temperature", ko: "온도", any: ["temperature", "temp"] },
     ],
     pitfalls: [
-      { id: "for-check", pattern: "for =check|=checking|=confirm|=confirming", category: "verb-form", severity: "major", fix: "to check", messageKo: "목적(~하러 / ~하기 위해)은 'to + 동사원형'입니다: 'to check the temperature'. 'for check / for checking'은 쓰지 않습니다." },
+      { id: "for-check", pattern: "for to? =check|=checking|=confirm|=confirming", category: "verb-form", severity: "major", fix: "to check", messageKo: "목적(~하러 / ~하기 위해)은 'to + 동사원형'입니다: 'to check the temperature'. 'for check / for checking'은 쓰지 않습니다." },
       { id: "go-site", pattern: "go =site", category: "preposition", severity: "major", fix: "go to the site", messageKo: "장소로 '가다'는 'go to + 장소'입니다: 'go to the site'." },
       { id: "visit-to", pattern: "visit to", category: "preposition", severity: "major", fix: "visit", messageKo: "visit는 타동사라 'visit the site'처럼 to 없이 씁니다." },
     ],
@@ -1914,6 +1925,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "it-possible", pattern: "would it possible", category: "be-verb", severity: "major", fix: "would it be possible", messageKo: "'Would it be possible to …?'에서 be를 빠뜨리면 안 됩니다. would 뒤에는 동사원형 be가 필요합니다." },
       { id: "possible-no-to", pattern: "possible =move|=postpone|=reschedule", category: "verb-form", severity: "major", fix: "possible to move", messageKo: "'possible' 뒤에 동사가 올 때는 'possible to + 동사원형'입니다." },
+      { id: "to-ing", pattern: "to =moving|=postponing|=rescheduling", category: "verb-form", severity: "major", fix: "to move", messageKo: "'possible to' 뒤에는 동사원형이 옵니다: 'possible to move'." },
     ],
     hints: { pattern: "Would it be possible to + 동사원형 …?", skeleton: "Would it __ ________ to move the meeting to next week?", partial: "Would it be possible to…" },
     explanationKo: "'Would it be possible to + 동사원형?'은 상대에게 부담을 덜 주는 정중한 요청입니다. it 뒤의 be와 possible 뒤의 to를 빠뜨리지 않도록 주의하세요.",
@@ -1945,7 +1957,7 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "mind-to", pattern: "mind to", category: "verb-form", severity: "major", fix: "mind", messageKo: "mind 뒤에는 to부정사가 아니라 동사ing가 옵니다: 'Would you mind sending …?'" },
-      { id: "mind-base", pattern: "mind =send|=share|=email", category: "verb-form", severity: "major", fix: "mind sending", messageKo: "mind 뒤에는 동사ing가 옵니다: 'mind sending'." },
+      { id: "mind-base", pattern: "mind =send|=share|=email|=sent", category: "verb-form", severity: "major", fix: "mind sending", messageKo: "mind 뒤에는 동사ing가 옵니다: 'mind sending'." },
     ],
     hints: { pattern: "Would you mind + 동사ing …?", skeleton: "Would you mind _______ the updated datasheet?", partial: "Would you mind sen…" },
     explanationKo: "'Would you mind + 동사ing?'는 '혹시 ~해 주시겠어요?'라는 아주 정중한 요청입니다. mind는 뒤에 동사ing를 받는 동사라 'mind to send'는 틀립니다.",
@@ -1971,7 +1983,7 @@ export const PHRASES: Question[] = [
     promptKo: "건조기 입구 온도를 말씀하시는 건가요?",
     segments: ["~라는 말씀인가요", "건조기 입구 온도"],
     reference: "Do you mean the dryer inlet temperature?",
-    accepted: ["Are you talking about the dryer inlet temperature?", "Do you mean the inlet temperature of the dryer?", "Are you referring to the dryer inlet temperature?"],
+    accepted: ["Are you talking about the dryer inlet temperature?", "Do you mean the inlet temperature of the dryer?", "Are you referring to the dryer inlet temperature?", "You mean the dryer inlet temperature?"],
     meaning: [
       { id: "mean", en: "do you mean", ko: "~라는 말씀인가요", any: ["mean", "talk about", "ask about", "refer"], critical: true },
       { id: "inlet", en: "inlet", ko: "입구", any: ["inlet"], critical: true },
@@ -2012,7 +2024,7 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "what-does", pattern: "what does this abbreviation|acronym =mean", category: "word-order", severity: "major", fix: "what this abbreviation means", messageKo: "문장 안에 들어간 의문문(간접의문문)은 '의문사 + 주어 + 동사' 순서입니다: 'what this abbreviation means'. does를 쓰지 않습니다." },
-      { id: "what-does-it", pattern: "what does it =mean", category: "word-order", severity: "major", fix: "what it means", messageKo: "간접의문문은 평서문 어순입니다: 'Could you tell me what it means?'" },
+      { id: "abbr-mean", pattern: "abbreviation|acronym =mean", category: "agreement", severity: "major", fix: "abbreviation means", messageKo: "간접의문문의 주어 this abbreviation은 3인칭 단수라서 'means'입니다." },
       { id: "what-is-mean", pattern: "what is this abbreviation =mean|=means|=meaning", category: "word-order", severity: "major", fix: "what this abbreviation means", messageKo: "간접의문문은 '의문사 + 주어 + 동사' 순서이고, mean은 일반동사라 is를 쓰지 않습니다: 'what this abbreviation means'." },
     ],
     hints: { pattern: "Could you tell me + 의문사 + 주어 + 동사?", skeleton: "Could you tell me ____ this abbreviation _____?", partial: "Could you tell me what this…" },
@@ -2080,7 +2092,7 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "active", pattern: "pump =replaced|=changed", category: "verb-form", severity: "major", fix: "pump was replaced", messageKo: "펌프는 교체를 '당한' 대상이라 수동태 'was replaced'가 필요합니다. 'The pump replaced'는 '펌프가 (무언가를) 교체했다'는 뜻이 됩니다." },
-      { id: "was-base", pattern: "was =replace|=change", category: "verb-form", severity: "major", fix: "was replaced", messageKo: "수동태는 'be + 과거분사'입니다: 'was replaced'." },
+      { id: "is-yesterday", pattern: "=is =replaced|=changed yesterday", category: "tense", severity: "major", fix: "was replaced yesterday", messageKo: "어제 일어난 일이므로 과거형 be동사 'was'를 씁니다: 'was replaced yesterday'." },
       { id: "has-been-yesterday", pattern: "has been =replaced|=changed yesterday", category: "tense", severity: "major", fix: "was replaced yesterday", messageKo: "yesterday처럼 끝난 과거 시점이 있으면 현재완료(has been)가 아니라 과거시제(was replaced)를 씁니다." },
     ],
     hints: { pattern: "주어 + was / were + 과거분사 (+ 과거 시점)", skeleton: "The pump ___ ________ yesterday.", partial: "The pump was rep…" },
@@ -2246,7 +2258,7 @@ export const PHRASES: Question[] = [
     ],
     pitfalls: [
       { id: "some-higher", pattern: "=some higher", category: "word-choice", severity: "major", fix: "slightly higher", messageKo: "'약간'은 some이 아니라 'slightly / a little / a bit'입니다." },
-      { id: "more-higher", pattern: "more higher", category: "word-choice", severity: "major", fix: "higher", messageKo: "higher는 이미 비교급이라 more를 함께 쓰지 않습니다." },
+      { id: "more-higher", pattern: "very|more higher", category: "word-choice", severity: "major", fix: "slightly higher", messageKo: "higher는 이미 비교급이라 more를 함께 쓰지 않고, very는 비교급 앞에 쓰지 않습니다. '약간 더 높다'는 'slightly higher'입니다." },
       { id: "little-no-a", pattern: "is =little higher", category: "word-choice", severity: "major", fix: "is a little higher", messageKo: "'a little'은 '조금', a 없이 'little'만 쓰면 '거의 ~않다'는 부정적인 뜻이 됩니다. 'a little higher'로 쓰세요." },
     ],
     hints: { pattern: "slightly / a little + 비교급 + than", skeleton: "The outlet temperature is ________ higher than the design value.", partial: "The outlet temperature is slightly…" },
@@ -2381,6 +2393,7 @@ export const PHRASES: Question[] = [
     pitfalls: [
       { id: "said-us", pattern: "said us|me|=them", category: "word-choice", severity: "major", fix: "told us", messageKo: "'say'는 듣는 사람을 바로 목적어로 받지 않습니다. 'said to us' 또는 'told us'로 쓰세요." },
       { id: "told-that", pattern: "told =that", category: "word-choice", severity: "major", fix: "told us that", messageKo: "'tell'은 듣는 사람(us / me)을 꼭 써야 합니다: 'told us that …'. 듣는 사람 없이 말할 때는 'said that …'입니다." },
+      { id: "say-present", pattern: "vendor =say|=says|=tell|=tells", category: "tense", severity: "major", fix: "vendor said", messageKo: "이미 들은 말을 전할 때는 과거형 'said / told'를 씁니다." },
     ],
     hints: { pattern: "주어 + said (that) + 주어 + would … / told + 사람 + (that) …", skeleton: "The vendor ____ that the delivery _____ be two weeks late.", partial: "The vendor said that the delivery…" },
     explanationKo: "들은 말을 전할 때는 'said (that) …' 또는 'told + 사람 + (that) …'입니다. say 뒤에는 사람을 바로 쓰지 않고, tell 뒤에는 사람을 꼭 씁니다. 과거에 들은 미래 일은 보통 would로 바꿉니다.",
@@ -2448,7 +2461,7 @@ export const PHRASES: Question[] = [
       { id: "cost", en: "the cost", ko: "비용", any: ["cost", "price", "capex"] },
     ],
     pitfalls: [
-      { id: "sure-no-about", pattern: "not sure =the cost|price", category: "preposition", severity: "major", fix: "not sure about the cost", messageKo: "'~에 대해 확신이 없다'는 'not sure about + 명사'입니다." },
+      { id: "sure-no-about", pattern: "re:\\bsure (for )?the (cost|price)\\b", category: "preposition", severity: "major", fix: "not sure about the cost", messageKo: "'~에 대해 확신이 없다'는 'not sure about + 명사'입니다." },
       { id: "you-wrong", pattern: "you are wrong", category: "word-choice", severity: "major", fix: "I see your point, but", messageKo: "'You are wrong'은 너무 직접적이라 회의에서 상대를 불편하게 할 수 있습니다. 먼저 'I see your point'로 인정한 뒤 'but …'으로 의견을 말하세요." },
     ],
     hints: { pattern: "I see your point, but + 내 의견", skeleton: "I see your _____, but I'm not ____ about the cost.", partial: "I see your point, but I'm…" },
@@ -2480,7 +2493,7 @@ export const PHRASES: Question[] = [
       { id: "completely", en: "completely", ko: "완전히", any: ["completely|fully|entirely|totally|quite|100"] },
     ],
     pitfalls: [
-      { id: "am-not-agree", pattern: "am not =agree", category: "verb-form", severity: "major", fix: "do not agree", messageKo: "agree는 일반동사라서 be동사와 함께 쓰지 않습니다: 'I don't agree'. 'I am not agree'는 틀린 형태입니다." },
+      { id: "am-not-agree", pattern: "re:\\b(am|is|are) not( completely| fully| totally)? agree\\b", category: "verb-form", severity: "major", fix: "do not completely agree", messageKo: "agree는 일반동사라서 be동사와 함께 쓰지 않습니다: 'I don't agree'. 'I am not agree'는 틀린 형태입니다." },
       { id: "agree-that-end", pattern: "re:agree that$", category: "preposition", severity: "major", fix: "agree with that", messageKo: "'그것에 동의하다'는 'agree with that'입니다. with를 빠뜨리지 마세요." },
       { id: "you-wrong", pattern: "you are wrong", category: "word-choice", severity: "major", fix: "I don't completely agree", messageKo: "'You are wrong'은 너무 직접적이라 회의에서 상대를 불편하게 할 수 있습니다. 'I'm afraid I don't completely agree'처럼 완곡하게 말하세요." },
     ],

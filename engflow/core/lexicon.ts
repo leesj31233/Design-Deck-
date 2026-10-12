@@ -121,10 +121,25 @@ export const UNCOUNTABLE_PLURALS: Record<string, string> = {
 };
 
 /** Learner non-words with their likely intended form. */
-export const NON_WORDS: Record<string, { fix: string; noteKo: string }> = {
-  lated: { fix: "delayed", noteKo: "'lated'는 영어 단어가 아닙니다. 일정이 늦어진 것은 'delayed', 늦은 것은 'late'입니다." },
-  delaied: { fix: "delayed", noteKo: "delay의 과거분사는 'delayed'입니다." },
+export const NON_WORDS: Record<string, { fix: string; noteKo: string; skill?: string }> = {
+  lated: { fix: "delayed", noteKo: "'lated'는 영어 단어가 아닙니다. 일정이 늦어진 것은 'delayed', 늦은 것은 'late'입니다.", skill: "be-adj" },
+  delaied: { fix: "delayed", noteKo: "delay의 과거분사는 'delayed'입니다.", skill: "be-adj" },
   informated: { fix: "informed", noteKo: "inform의 과거분사는 'informed'입니다." },
+  sended: { fix: "sent", noteKo: "send는 불규칙 동사입니다: send – sent – sent." },
+  builded: { fix: "built", noteKo: "build는 불규칙 동사입니다: build – built – built." },
+  buyed: { fix: "bought", noteKo: "buy는 불규칙 동사입니다: buy – bought – bought." },
+  choosed: { fix: "chose", noteKo: "choose는 불규칙 동사입니다: choose – chose – chosen." },
+  maked: { fix: "made", noteKo: "make는 불규칙 동사입니다: make – made – made." },
+  taked: { fix: "took", noteKo: "take는 불규칙 동사입니다: take – took – taken." },
+  gived: { fix: "gave", noteKo: "give는 불규칙 동사입니다: give – gave – given." },
+  writed: { fix: "wrote", noteKo: "write는 불규칙 동사입니다: write – wrote – written." },
+  finded: { fix: "found", noteKo: "find는 불규칙 동사입니다: find – found – found." },
+  spended: { fix: "spent", noteKo: "spend는 불규칙 동사입니다: spend – spent – spent." },
+  teached: { fix: "taught", noteKo: "teach는 불규칙 동사입니다: teach – taught – taught." },
+  meeted: { fix: "met", noteKo: "meet는 불규칙 동사입니다: meet – met – met." },
+  leaved: { fix: "left", noteKo: "leave는 불규칙 동사입니다: leave – left – left." },
+  runned: { fix: "ran", noteKo: "run은 불규칙 동사입니다: run – ran – run." },
+  losed: { fix: "lost", noteKo: "lose는 불규칙 동사입니다: lose – lost – lost." },
 };
 
 /** Words starting with a vowel letter but a consonant sound, and vice versa. */

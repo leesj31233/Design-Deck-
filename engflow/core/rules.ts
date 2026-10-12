@@ -66,7 +66,7 @@ const waitWithoutFor: Rule = (w) => {
     if (!info || info.base !== "wait") continue;
     const next = w[i + 1].norm;
     const after = w[i + 2]?.norm;
-    const isObj = WAIT_OBJECTS.has(next) || (OBJECT_DETERMINERS.has(next) && !!after && !/^(to|until|for|minute|minutes|day|days|week|weeks|while)$/.test(after));
+    const isObj = WAIT_OBJECTS.has(next) || (OBJECT_DETERMINERS.has(next) && !!after && !/^(to|until|for|minute|minutes|day|days|week|weeks|while|few|couple|little|bit|moment|second|hour|hours|month|months)$/.test(after));
     if (!isObj || next === "for" || next === "until") continue;
     out.push({
       rule: "wait-without-for", from: i + 1, to: i + 1, replacement: "for", category: "preposition", severity: "major",
@@ -218,7 +218,7 @@ const doPast: Rule = (w) => {
     const v = w[j];
     if (!v) continue;
     const info = verbInfo(v.norm);
-    if (!info || (info.form !== "past" && info.form !== "3sg") || isSameFormParticiple(info.base)) continue;
+    if (!info || (info.form !== "past" && info.form !== "3sg" && info.form !== "ing") || isSameFormParticiple(info.base)) continue;
     out.push({
       rule: "do-inflected", from: j, to: j + 1, replacement: info.base, category: "verb-form", severity: "major", skill: "agreement",
       messageKo: `do/does/did 뒤에는 동사원형이 옵니다: '${v.raw}' → '${info.base}'. 시제는 do/does/did가 이미 표시합니다.`,
@@ -319,9 +319,74 @@ const nonWords: Rule = (w) =>
   w.flatMap((t, i) => {
     const nw = NON_WORDS[t.norm];
     return nw
-      ? [{ rule: "non-word", from: i, to: i + 1, replacement: nw.fix, category: "verb-form" as const, severity: "major" as const, skill: "be-adj", messageKo: nw.noteKo }]
+      ? [{ rule: "non-word", from: i, to: i + 1, replacement: nw.fix, category: "verb-form" as const, severity: "major" as const, skill: nw.skill ?? "agreement", messageKo: nw.noteKo }]
       : [];
   });
+
+/** we/they/I/you + third-person verb: "we needs" → "we need". */
+const lexicalAgreement: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    if (!/^(we|they|i|you)$/.test(w[i].norm)) continue;
+    // Only "you" can also be an object ("sent you", "for you"); we/they/I are always subjects.
+    if (w[i].norm === "you" && i > 0 && (verbInfo(w[i - 1].norm) || PREP_LIKE.test(w[i - 1].norm))) continue;
+    let j = i + 1;
+    if (/^(also|still|only|always|really|often|usually|just)$/.test(w[j]?.norm ?? "")) j++;
+    const v = w[j];
+    const info = v ? verbInfo(v.norm) : null;
+    if (!info || info.form !== "3sg" || /^(be|have|do)$/.test(info.base)) continue;
+    out.push({
+      rule: "agreement-lexical", from: j, to: j + 1, replacement: info.base, category: "agreement", severity: "major", skill: "agreement",
+      messageKo: `주어 '${w[i].raw}' 뒤에는 동사에 -s를 붙이지 않습니다: '${v.raw}' → '${info.base}'.`,
+    });
+  }
+  return out;
+};
+const PREP_LIKE = /^(for|to|with|from|about|than|of|by|let|make|help)$/;
+
+/** "if … had p.p., … will have p.p." → "would have". */
+const thirdConditionalWill: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  const ifAt = w.findIndex((t) => t.norm === "if");
+  if (ifAt < 0) return out;
+  const hadAt = w.findIndex((t, k) => k > ifAt && t.norm === "had" && verbInfo(w[k + 1]?.norm ?? "")?.form === "pp");
+  if (hadAt < 0) return out;
+  for (let i = hadAt + 2; i < w.length - 2; i++) {
+    if (w[i].norm === "will" && w[i + 1].norm === "have") {
+      out.push({
+        rule: "third-conditional-will", from: i, to: i + 1, replacement: "would", category: "tense", severity: "major", skill: "cond-3",
+        messageKo: "과거 사실과 반대되는 가정(If + had p.p.)의 결과는 'would have + p.p.'입니다. 'will have'가 아니라 'would have'를 씁니다.",
+      });
+      break;
+    }
+  }
+  return out;
+};
+
+/** "as higher as" → "as high as"; "too much higher" → "much higher"; "is little delayed" → "a little"; "running normal" → "normally". */
+const comparisonForms: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  const BASE: Record<string, string> = { higher: "high", lower: "low", faster: "fast", bigger: "big", smaller: "small", larger: "large", longer: "long", shorter: "short", wetter: "wet", drier: "dry", hotter: "hot", colder: "cold", cheaper: "cheap", better: "good", worse: "bad", heavier: "heavy", earlier: "early", later: "late" };
+  for (let i = 0; i < w.length - 2; i++) {
+    const a = w[i].norm;
+    const b = w[i + 1].norm;
+    const c = w[i + 2].norm;
+    if (a === "as" && BASE[b] && c === "as") {
+      out.push({ rule: "as-comparative-as", from: i + 1, to: i + 2, replacement: BASE[b], category: "word-choice", severity: "major", skill: "comparative", messageKo: `'as … as' 사이에는 비교급이 아니라 원급을 씁니다: '${w[i + 1].raw}' → '${BASE[b]}'.` });
+    } else if (a === "too" && b === "much" && (BASE[c] || c === "more")) {
+      out.push({ rule: "too-much-comparative", from: i, to: i + 1, replacement: "", category: "word-choice", severity: "major", skill: "comparative", messageKo: "비교급을 강조할 때는 'much / far + 비교급'입니다. 'too much higher'가 아니라 'much higher'라고 씁니다." });
+    } else if (BE_FORMS.has(a) && b === "little" && /^(delayed|late|behind|higher|lower|bigger|smaller|wet|wetter|dry|drier|longer|shorter|different|unstable|high|low)$/.test(c)) {
+      out.push({ rule: "little-without-a", from: i + 1, to: i + 1, replacement: "a", category: "article", severity: "major", skill: "degree", messageKo: "'조금 ~하다'는 'a little + 형용사'입니다. a가 없는 'little'은 '거의 ~하지 않다'는 반대 뜻이 됩니다." });
+    }
+  }
+  for (let i = 0; i < w.length - 1; i++) {
+    if (/^(running|operating|working|run|operate|work|runs|operates|works)$/.test(w[i].norm) && /^(normal|stable|smooth|good)$/.test(w[i + 1].norm)) {
+      const adv = { normal: "normally", stable: "stably", smooth: "smoothly", good: "well" }[w[i + 1].norm as "normal"];
+      out.push({ rule: "adjective-for-adverb", from: i + 1, to: i + 2, replacement: adv, category: "word-choice", severity: "major", skill: "agreement", messageKo: `동사를 꾸밀 때는 부사를 씁니다: '${w[i + 1].raw}' → '${adv}'.` });
+    }
+  }
+  return out;
+};
 
 /** a/an before vowel/consonant sounds. */
 const articleSound: Rule = (w) => {
@@ -383,6 +448,9 @@ const itsContraction: Rule = (w) => {
 
 const RULES: Rule[] = [
   itsContraction,
+  lexicalAgreement,
+  thirdConditionalWill,
+  comparisonForms,
   missingBeProgressive, waitWithoutFor, prepositionBaseVerb, modalTo, modalInflected, doubleModal, beBaseVerb,
   perfectBaseVerb, doPast, agreement, doubleComparative, willInConditionClause, uncountablePlural, nonWords, articleSound,
   transitivePreposition,

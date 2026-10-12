@@ -15,6 +15,7 @@ export const LOCAL_EVALUATOR_LABEL = "규칙 기반 분석 (오프라인)";
 const PENALTY: Record<Severity, number> = { minor: 8, major: 18, critical: 30 };
 const SPELLING_PENALTY = 3;
 const CLOSE_DISTANCE = 0.45;
+const CONSENSUS_MARGIN = 0.08;
 
 export function defaultBucket(c: ErrorCategory): ScoreBucket {
   if (c === "meaning-shift" || c === "missing-content") return "meaning";
@@ -99,13 +100,15 @@ export function checkMeaning(q: Question, w: Token[]): MeaningCheck[] {
   });
 }
 
-const PREP_SYNONYMS = [new Set(["in", "within"]), new Set(["about", "on", "regarding"]), new Set(["to", "toward", "towards"])];
+const PREP_SYNONYMS = [new Set(["in", "within", "during"]), new Set(["about", "on", "regarding"]), new Set(["to", "toward", "towards"])];
+const APPROX = /^(about|around|approximately|roughly|nearly|almost)$/;
+const QUANTITY_START = /^([0-9]|twice|half|double|three|two|four|five|ten|one)/;
 const MODAL_LIKE = new Set(["can", "could", "may", "might", "must", "should", "will", "would", "shall"]);
 const CONJ_SYNONYMS = [new Set(["because", "since", "as"]), new Set(["so", "therefore", "and"]), new Set(["when", "once", "after"]), new Set(["although", "though", "but"]), new Set(["if", "whether"])];
 const PLACE_PREPS = new Set(["in", "at", "on"]);
 const DEADLINE_PREPS = new Set(["before", "by", "until"]);
 
-function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string): { findings: Finding[]; edits: Edit[] } {
+function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string, raw = false): { findings: Finding[]; edits: Edit[] } {
   const findings: Finding[] = [];
   const edits: Edit[] = [];
   const moves = al.moves.filter((mv) => isMisplacedAdverb(w, mv.li));
@@ -175,7 +178,7 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
   for (let k = 0; k < al.ops.length; k++) {
     const op = al.ops[k];
     if (op.type === "match") continue;
-    if (op.type !== "spell" && !anchored(k)) continue;
+    if (!raw && op.type !== "spell" && !anchored(k)) continue;
     if (op.type === "spell") {
       push(
         { from: op.li, to: op.li + 1, category: "spelling", severity: "minor", fix: tw[op.ti].norm, messageKo: `철자: '${w[op.li].raw}' → '${tw[op.ti].norm}'.`, skill },
@@ -190,6 +193,7 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const vl = verbInfo(lt);
       const isVerb = !!(vt && vl);
       if (isVerb && vt!.form === "base" && (vl!.form === "3sg" || vl!.form === "past" || BE_FORMS.has(lt))) continue;
+      if (BE_FORMS.has(lt) && (tt === "been" || tt === "be")) continue; // "was damaged" vs "may have been damaged": both valid
       // "testing data" vs "test data": an -ing/base swap only matters after to/modals or prepositions.
       if (isVerb && vt!.form === "base" && vl!.form === "ing" && !/^(to|can|could|may|might|must|should|will|would)$/.test(tw[op.ti - 1]?.norm ?? "")) continue;
       const prevT = tw[op.ti - 1]?.norm;
@@ -255,6 +259,9 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const lt = w[op.li].norm;
       const c = wordClass(lt);
       if (c === "content" || c === "conj" || c === "modal" || c === "neg") continue;
+      if (APPROX.test(lt) && QUANTITY_START.test(w[op.li + 1]?.norm ?? "")) continue; // "about twice as high"
+      // Indirect questions end with the verb: "let me know what the design pressure is".
+      if (c === "be" && w.slice(0, op.li).some((x) => /^(what|which|how|where|when|why|who|whether|if)$/.test(x.norm)) && (op.li === w.length - 1 || w[op.li + 1]?.punct)) continue;
       const prevIsVerb = op.li > 0 && !!verbInfo(w[op.li - 1].norm);
       const map: Record<string, [ErrorCategory, Severity, string]> = {
         be: ["be-verb", "major", `불필요한 be동사 '${w[op.li].raw}'가 있습니다.`],
@@ -275,7 +282,7 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const c = wordClass(tt);
       if (c === "content" || c === "modal") continue;
       if (tt === "that") continue; // usually optional
-      if (/^(about|around)$/.test(tt) && /^[0-9]/.test(tw[op.ti + 1]?.norm ?? "")) continue; // "about 20%" is optional precision
+      if (APPROX.test(tt) && QUANTITY_START.test(tw[op.ti + 1]?.norm ?? "")) continue; // "about 20%" is optional precision
       if (c === "pronoun" && /^(than|as)$/.test(tw[op.ti - 1]?.norm ?? "")) continue; // "than (we) expected"
       if (/^(us|them|him|me|it|you)$/.test(tt) && op.at > 0) continue; // optional objects ("send (us)", "tell (you)")
       const nextT = tw[op.ti + 1]?.norm ?? "";
@@ -349,9 +356,9 @@ function sentenceAlignedFindings(q: Question, tokens: Token[], w: Token[], skill
     const best = ranked[0];
     if (!best || best.al.distance > CLOSE_DISTANCE || best.ts.length < 2) continue;
     const r = alignmentFindings(best.al, part, best.ts, skill);
-    const others = ranked.slice(1).filter((o) => o.al.distance <= CLOSE_DISTANCE && o.ts.length >= 2);
+    const others = ranked.slice(1).filter((o) => o.al.distance <= Math.min(CLOSE_DISTANCE, best.al.distance + CONSENSUS_MARGIN) && o.ts.length >= 2);
     const keyOf = (f: { from: number; to: number; category: string }) => `${f.from}:${f.to}:${f.category}`;
-    const agreed = others.map((o) => new Set(alignmentFindings(o.al, part, o.ts, skill).findings.map(keyOf)));
+    const agreed = others.map((o) => new Set(alignmentFindings(o.al, part, o.ts, skill, true).findings.map(keyOf)));
     const kept = r.findings.filter((f) => agreed.every((set) => set.has(keyOf(f))));
     const ranges2 = new Set(kept.map((f) => `${f.from}:${f.to}`));
     findings.push(...kept.map((f) => ({ ...f, from: f.from + a, to: f.to + a })));
@@ -514,9 +521,11 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
     edits.push(...multi.edits);
   } else if (close) {
     const a = alignmentFindings(al, w, tw, primarySkill);
-    const others = ranked.slice(1).filter((r) => r.al.distance <= CLOSE_DISTANCE && r.tw.length >= 2);
+    // Only answers about as close as the best one get a vote (a learner mixing two valid variants).
+    const others = ranked.slice(1).filter((r) => r.al.distance <= Math.min(CLOSE_DISTANCE, al.distance + CONSENSUS_MARGIN) && r.tw.length >= 2);
     const keyOf = (f: { from: number; to: number; category: string }) => `${f.from}:${f.to}:${f.category}`;
-    const agreed = others.map((o) => new Set(alignmentFindings(o.al, w, o.tw, primarySkill).findings.map(keyOf)));
+    // Other targets confirm with their raw differences (no paraphrase filter), so a synonym elsewhere cannot hide a real error.
+    const agreed = others.map((o) => new Set(alignmentFindings(o.al, w, o.tw, primarySkill, true).findings.map(keyOf)));
     const keep = (f: { from: number; to: number; category: string }) => agreed.every((set) => set.has(keyOf(f)));
     const keptFindings = a.findings.filter(keep);
     const keptRanges = new Set(keptFindings.map((f) => `${f.from}:${f.to}`));
