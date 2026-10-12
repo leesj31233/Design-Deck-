@@ -50,10 +50,14 @@ export function bucketPenalties(errors: ErrorSpan[]): Record<ScoreBucket, number
   return { grammar: of("grammar") + spelling, meaning: of("meaning"), organization: of("organization"), terminology: 0 };
 }
 
+/**
+ * Word order and sentence structure ("How long the warranty is?", a missing
+ * subject) are grammar for a learner, so they cost grammar points; the
+ * organization score keeps only completeness (too short / too long).
+ */
 export function defaultBucket(c: ErrorCategory): ScoreBucket {
   if (c === "meaning-shift" || c === "missing-content") return "meaning";
   if (c === "terminology") return "terminology";
-  if (c === "word-order" || c === "sentence-structure") return "organization";
   return "grammar";
 }
 

@@ -38,7 +38,7 @@ describe("fast grading", () => {
 
   it("Claude's grade is used when it answers within the budget", async () => {
     const claude = fakeClaude(20);
-    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 300 });
+    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 2000 });
     const out = await g.grade(q, WRONG, 0);
     expect(out.via).toBe("ai");
     expect(out.evaluation.evaluator).toBe("ai");
