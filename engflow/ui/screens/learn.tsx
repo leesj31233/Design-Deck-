@@ -11,6 +11,7 @@ import { useNav } from "../app";
 import { Card, Eyebrow, cn } from "../kit";
 import { CATEGORY_LABEL } from "../practice/session";
 import { RoleplayList } from "../roleplay";
+import { LadderCard } from "../ladder";
 import { toast } from "sonner";
 
 const MODES: { id: QuestionMode | "mixed"; title: string; body: string }[] = [
@@ -284,6 +285,8 @@ export function LearnScreen() {
           </button>
         </div>
       </Card>
+
+      <LadderCard situation={situation} />
 
       <RoleplayList situation={situation} />
 

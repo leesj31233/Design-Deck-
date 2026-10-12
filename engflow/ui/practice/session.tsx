@@ -25,6 +25,7 @@ import { FeedbackPanel } from "./feedback";
 import { weaknessNote } from "../../core/weakness";
 import { GuideSheet, type GuideTab } from "../guide";
 import { RoleplayReplay } from "../roleplay";
+import { Staircase } from "../ladder";
 
 
 export const CATEGORY_LABEL: Record<string, string> = {
@@ -42,6 +43,8 @@ export interface SessionSpec {
   kind: "lesson" | "review";
   items: SessionItem[];
   note?: string;
+  /** A short-to-long climb: the summary shows the staircase of answers. */
+  ladder?: boolean;
 }
 
 type QueueItem = SessionItem & { retry?: boolean };
@@ -293,7 +296,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       });
     }
     // Significant error → immediate retry with a different sentence for the same grammar.
-    if (result.grade === 1 && !item.retry) {
+    // A ladder keeps its climb: a missed step goes to review later instead of an immediate retry.
+    if (result.grade === 1 && !item.retry && !spec.ladder) {
       const target = result.scheduled[0] ? result.state.items[result.scheduled[0].itemId] : undefined;
       const rq = target ? pickReviewQuestion({ ...target, recentQuestionIds: [...target.recentQuestionIds, q.id] }, app.questions, "mixed") : null;
       if (target && rq && rq.id !== q.id && !queue.some((x, k) => k > idx && x.questionId === rq.id)) {
@@ -707,8 +711,11 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
   // Today's goal reached during this session (counted from the daily log after it).
   const todayAnswered = app.state.daily[localDayKey(app.now())]?.answered ?? 0;
   const goalNow = todayAnswered >= app.state.settings.dailyTarget && todayAnswered - done.length < app.state.settings.dailyTarget;
+  // A short-to-long climb: the first answer per question, in climbing order.
+  const ladder = spec.ladder ? spec.items.map((it) => done.find((d) => d.question.id === it.questionId && !d.item.retry)) : null;
+  const ladderTop = !!ladder && ladder.every((d) => d && !d.result.attempt.skipped && d.result.attempt.overall >= 85);
   // A great session earns a trophy and confetti: every answer clean, or an average of 90+.
-  const trophy = (answered.length >= 3 && (good === done.length || avg >= 90)) || roleplayClean;
+  const trophy = (answered.length >= 3 && (good === done.length || avg >= 90)) || roleplayClean || ladderTop;
   const [party, setParty] = React.useState(trophy && app.state.settings.celebrate !== false);
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-10">
@@ -720,7 +727,7 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
         >
           {trophy ? <Trophy className="size-7" /> : <CheckCircle2 className="size-7" />}
         </div>
-        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{roleplay ? (roleplayClean ? "대화 완주!" : "대화 끝") : trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
+        <h1 className="mt-4 text-[26px] font-semibold tracking-[-.03em]">{roleplay ? (roleplayClean ? "대화 완주!" : "대화 끝") : ladder ? (ladderTop ? "꼭대기까지 올랐어요!" : "계단 오르기 끝") : trophy ? "멋진 세션이었어요!" : spec.kind === "review" ? "복습 완료" : "세션 완료"}</h1>
         <p className="ef-ko mt-1 text-[14px] text-[var(--muted)]">{spec.title}</p>
         {perfects || bestStreak >= 3 || goalNow ? (
           <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[12px]">
@@ -730,6 +737,25 @@ function SessionSummary({ spec, done, bestStreak, onExit }: { spec: SessionSpec;
           </div>
         ) : null}
       </motion.div>
+      {ladder ? (
+        <Card className="mt-6 p-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <Eyebrow>짧은 말 → 긴 말</Eyebrow>
+            <span className="ef-num text-[12px] text-[var(--muted)]">
+              {ladder.filter((d) => d && d.result.attempt.overall >= 85).length}/{ladder.length}계단 통과
+            </span>
+          </div>
+          <Staircase className="mt-5" steps={ladder.map((d, i) => d?.question.difficulty ?? i + 1)} scores={ladder.map((d) => (d && !d.result.attempt.skipped ? d.result.attempt.overall : undefined))} />
+          <p className="ef-ko mt-3 text-[13px] text-[var(--muted)]">
+            {(() => {
+              const firstMiss = ladder.findIndex((d) => !d || d.result.attempt.overall < 85);
+              if (firstMiss < 0) return "한마디부터 긴 설명까지 모두 자연스럽게 말했어요. 다음엔 난이도를 한 단계 올려 보세요.";
+              const dd = ladder[firstMiss]?.question.difficulty;
+              return `난이도 ${dd ?? firstMiss + 1} 계단에서 막혔어요. 그 길이의 문장을 몇 번 더 연습하면 다음 계단이 쉬워집니다.`;
+            })()}
+          </p>
+        </Card>
+      ) : null}
       {roleplay?.length ? (
         <div className="mt-6">
           <RoleplayReplay turns={roleplay.map((d) => ({ question: d.question, evaluation: d.evaluation }))} slow={app.state.settings.slowSpeech} />

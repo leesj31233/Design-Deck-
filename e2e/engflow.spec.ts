@@ -230,6 +230,27 @@ test("role-play: a perfect answer is celebrated, my own line stays in the chat, 
   expect(errors).toEqual([]);
 });
 
+test("short to long: a small-talk ladder climbs from a one-line reply to a long turn and shows the staircase", async ({ page }) => {
+  const errors = await open(page);
+  await nav(page, "학습");
+  await page.getByRole("radio", { name: /^안부·스몰토크/ }).click();
+  await page.getByRole("button", { name: /안부·스몰토크 계단 시작/ }).click();
+  const difficulties: number[] = [];
+  for (let i = 0; i < 8; i++) {
+    const reason = page.getByText(new RegExp(`^계단 ${i + 1}/8 · 난이도 (\\d+)`));
+    await expect(reason).toBeVisible();
+    difficulties.push(Number((await reason.innerText()).match(/난이도 (\d+)/)![1]));
+    // Skipping moves straight on to the next step.
+    await page.getByRole("button", { name: /건너뛰기/ }).first().click();
+  }
+  expect(difficulties[0]).toBeLessThanOrEqual(2);
+  for (let k = 1; k < difficulties.length; k++) expect(difficulties[k]).toBeGreaterThanOrEqual(difficulties[k - 1]);
+  await expect(page.getByRole("heading", { name: "계단 오르기 끝" })).toBeVisible();
+  await expect(page.getByText(/0\/8계단 통과/)).toBeVisible();
+  await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
+
 test("expression notebook: study an expression step by step, then speak it", async ({ page }) => {
   const errors = await open(page);
   await nav(page, "표현 노트");

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { celebrationFor, isSuccess } from "@/engflow/core/celebration";
 import { evaluateLocal } from "@/engflow/core/evaluate";
 import { listScenarios, recommendScenario, scenarioItems } from "@/engflow/core/roleplay";
+import { buildLadder, ladderRange, ladderSteps } from "@/engflow/core/ladder";
+import { situationOf } from "@/engflow/core/situations";
 import { buildSession } from "@/engflow/core/session";
 import { createInitialState } from "@/engflow/core/store";
 import { QUESTIONS, QUESTION_BY_ID } from "@/engflow/content";
@@ -113,6 +115,31 @@ describe("role-play scenarios", () => {
         const x = QUESTION_BY_ID[item.questionId];
         if (x?.scenario) expect(x.scenario.step).toBe(1);
       }
+    }
+  });
+});
+
+describe("short-to-long ladder", () => {
+  it("climbs evenly from a one-line reply to the learner's level plus a stretch", () => {
+    expect(ladderSteps(1, 8, 8)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(ladderSteps(1, 7, 5)).toEqual([1, 3, 4, 6, 7]);
+    expect(ladderRange(5)).toEqual({ from: 1, to: 7 });
+    expect(ladderRange(1)).toEqual({ from: 1, to: 4 });
+    expect(ladderRange(10)).toEqual({ from: 1, to: 10 });
+  });
+
+  it("stays in the scene, never repeats a question and never goes down", () => {
+    const state = createInitialState(NOW);
+    for (const situation of ["smalltalk", "online", "meal", "all"] as const) {
+      const items = buildLadder(state, QUESTIONS, { situation, from: 1, to: 8, size: 8, now: NOW, rng: () => 0.3 });
+      expect(items.length).toBe(8);
+      const qs = items.map((i) => QUESTION_BY_ID[i.questionId]!);
+      expect(new Set(qs.map((x) => x.id)).size).toBe(8);
+      if (situation !== "all") for (const x of qs) expect(situationOf(x)).toBe(situation);
+      for (let k = 1; k < qs.length; k++) expect(qs[k].difficulty).toBeGreaterThanOrEqual(qs[k - 1].difficulty);
+      expect(qs[0].difficulty).toBeLessThanOrEqual(2);
+      expect(qs[7].difficulty).toBeGreaterThanOrEqual(7);
+      expect(items[0].reasonKo).toMatch(/^계단 1\/8/);
     }
   });
 });

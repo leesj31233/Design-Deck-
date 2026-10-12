@@ -403,7 +403,7 @@ const willInConditionClause: Rule = (w) => {
     const v = w[s + 2];
     const info = v ? verbInfo(v.norm) : null;
     const third = /^(he|she|it)$/.test(subj);
-    const repl = info ? (third ? (info.base === "be" ? "is" : info.base === "have" ? "has" : info.base + "s") : info.base === "be" ? (subj === "i" ? "am" : "are") : info.base) : "";
+    const repl = info ? (third ? (info.base === "be" ? "is" : info.base === "have" ? "has" : thirdPersonOf(info.base)) : info.base === "be" ? (subj === "i" ? "am" : "are") : info.base) : "";
     out.push({
       rule: "will-in-time-clause", from: s + 1, to: info ? s + 3 : s + 2, replacement: repl, category: "tense", severity: "major", skill: c === "if" || c === "unless" ? "cond-1" : "time-clause",
       messageKo: `'${c === "soon" ? "as soon as" : w[i].raw}'로 시작하는 조건·시간 부사절에서는 미래 일이라도 현재시제를 씁니다. 'will'을 빼세요.`,
@@ -605,7 +605,8 @@ const missingSubjectIt: Rule = (w) => {
 };
 
 /** "I sorry", "we ready", "they busy" → be + adjective. */
-const PREDICATE_ADJECTIVES = /^(sorry|ready|late|sure|available|busy|happy|glad|afraid|okay|ok|aware|able|unable|careful|sick|hungry|full|fine|right|wrong|serious|free|alright|tired|close|responsible)$/;
+// "close" is left out: "Before we close, …" is the verb.
+const PREDICATE_ADJECTIVES = /^(sorry|ready|late|sure|available|busy|happy|glad|afraid|okay|ok|aware|able|unable|careful|sick|hungry|full|fine|right|wrong|serious|free|alright|tired|responsible)$/;
 const missingBeAdjective: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 0; i < w.length - 1; i++) {

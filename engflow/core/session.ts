@@ -81,7 +81,8 @@ export function pickReviewQuestion(item: ReviewItem, bank: Question[], mode: Que
   if (!candidates.length) {
     const wantMode: QuestionMode = level <= 1 ? "phrase" : "sentence";
     candidates = bank
-      .filter((q) => q.skills.includes(item.skill))
+      // A later role-play turn needs the conversation before it; never serve it alone.
+      .filter((q) => q.skills.includes(item.skill) && !(q.scenario && q.scenario.step > 1))
       .map((q) => ({
         q,
         score: (q.skills[0] === item.skill ? 4 : 1) + (q.mode === wantMode ? 2 : 0) + (q.variation ? -1 : 0),
