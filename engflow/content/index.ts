@@ -34,6 +34,8 @@ import { TALK_DAILY_2 } from "./bank/talk-daily-2";
 import { TALK_OFFICE_2 } from "./bank/talk-office-2";
 import { TALK_FEELINGS_2 } from "./bank/talk-feelings-2";
 import { ROLEPLAY_MIXED } from "./bank/roleplay-mixed";
+import { TALK_MEETING } from "./bank/talk-meeting";
+import { TALK_SHORT_LONG } from "./bank/talk-short-long";
 import { DIALOGUE_OVERLAY } from "./bank/dialogue-overlay";
 
 export { SKILLS, SKILL_BY_ID, SKILL_GROUPS, skillName } from "./skills";
@@ -78,6 +80,8 @@ export const MIXED_BANKS: Record<string, Question[]> = {
   "talk-long": TALK_LONG,
   "talk-phrasal": TALK_PHRASAL,
   "talk-idioms": TALK_IDIOMS,
+  "talk-meeting": TALK_MEETING,
+  "talk-short-long": TALK_SHORT_LONG,
 };
 
 /** Scene of a talk-<scene>[-n] file. */
