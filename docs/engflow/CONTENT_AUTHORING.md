@@ -124,11 +124,14 @@ Conversation questions live in `engflow/content/bank/talk-<situation>.ts`, one f
 | `phone` | Calls & messaging | answering and making calls, bad line, calling back, leaving and answering voice messages, chat messages |
 | `negotiation` | Negotiating | price, schedule and scope, conditions (*If you can …, we can …*), polite push-back, meeting halfway, closing a deal |
 | `trouble` | Problems & apologies | reporting a delay or mistake, apologizing, explaining the cause, proposing a fix, handling a complaint |
+| `daily` | Everyday life & travel | ordering at a café or restaurant, taxis and directions, hotel check-in and problems, shopping and returns, pharmacy and clinic, airport, public transport |
+| `office` | Office life | asking a colleague for help, offering help, saying no politely, asking for leave or to leave early, covering for someone, lunch plans, welcoming a new hire, heading home |
+| `feelings` | Feelings & empathy | congratulating, comforting, sympathy, worry, relief, surprise, excitement, disappointment, encouragement, reacting to someone's news |
 
 Required fields, on top of the normal schema:
 
-- `situation` — the file's scene. `category`: `meeting` for online/presentation/discussion, `collab` for smalltalk/meal/visit.
-- `dialogue` — 1–3 earlier lines, `{ speaker, en, ko }`. Speakers are recurring colleagues (Budi and Sari from Jakarta, Mr. Tan from a Malaysian client, Linh from Vietnam, Priya from a vendor in India, Daniel from a European licensor). Their English is natural and simple. The learner (Minsu) always speaks next.
+- `situation` — the file's scene. `category`: `meeting` for online/presentation/discussion, `collab` for smalltalk/meal/visit/daily/office/feelings.
+- `dialogue` — 1–3 earlier lines, `{ speaker, en, ko }`. Speakers are recurring colleagues (Budi and Sari from Jakarta, Mr. Tan from a Malaysian client, Linh from Vietnam, Priya from a vendor in India, Daniel from a European licensor). In `daily` they are also the people met on a trip or living abroad (a barista, a taxi driver, a hotel clerk, a pharmacist, a shop assistant, a neighbour, a friend such as Emma or Jake); name them by role when there is no name (`"Barista"`, `"Hotel clerk"`). Their English is natural and simple. The learner (Minsu) always speaks next.
 - `expression` — the key spoken expression the turn practises, e.g. `"Let me share my screen."`.
 - `promptKo` — what the learner wants to say, in natural Korean. `segments` — Korean meaning chunks in English word order.
 - `reference` — the most common native phrasing. `accepted` — other common, fully correct ways (≥2 for sentences).

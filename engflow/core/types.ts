@@ -14,8 +14,8 @@ export type Category = "process" | "pilot" | "meeting" | "collab" | "operation" 
  * turns in one of these scenes; engineering discussion is one scene among them.
  */
 export type Situation =
-  | "online" | "presentation" | "discussion" | "reaction" | "smalltalk" | "meal" | "phone" | "negotiation" | "trouble" | "visit" | "technical";
-export const SITUATIONS: Situation[] = ["online", "presentation", "discussion", "reaction", "smalltalk", "meal", "phone", "negotiation", "trouble", "visit", "technical"];
+  | "online" | "presentation" | "discussion" | "reaction" | "smalltalk" | "daily" | "office" | "feelings" | "meal" | "phone" | "negotiation" | "trouble" | "visit" | "technical";
+export const SITUATIONS: Situation[] = ["online", "presentation", "discussion", "reaction", "smalltalk", "daily", "office", "feelings", "meal", "phone", "negotiation", "trouble", "visit", "technical"];
 
 /** One earlier line in the conversation; the learner speaks next. */
 export interface DialogueTurn {

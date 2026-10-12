@@ -42,7 +42,7 @@ function Pill({ active, onClick, children, label }: { active: boolean; onClick: 
 /** Scene for a generated question's category field. */
 function categoryFor(situation: Situation | "all", techCat: Category | "all"): Category {
   if (situation === "online" || situation === "presentation" || situation === "discussion") return "meeting";
-  if (situation === "smalltalk" || situation === "meal" || situation === "visit") return "collab";
+  if (situation === "smalltalk" || situation === "meal" || situation === "visit" || situation === "daily" || situation === "office" || situation === "feelings") return "collab";
   if (techCat !== "all") return techCat;
   return (["process", "pilot", "operation"] as Category[])[Math.floor(Math.random() * 3)];
 }
