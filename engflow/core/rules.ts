@@ -229,6 +229,8 @@ const beBaseVerb: Rule = (w) => {
       j++;
     }
     const v = w[j];
+    // "All we need to do is confirm …", "All I did was ask": the base verb is right after "do is/was".
+    if (/^(do|did|does)$/.test(w[i - 1]?.norm ?? "")) continue;
     // After I/we/they/you, also common verbs that double as nouns: "I am plan to…", "we are need…", "I'm look forward…".
     const personal = /^(i|we|they|you)$/.test(w[i - 1]?.norm ?? "") && /^(am|are|was|were)$/.test(w[i].norm);
     if (v && personal && v.norm === "worry" && !negated) {
@@ -2064,6 +2066,8 @@ const agreementMore: Rule = (w) => {
   // "Do your boss know …?" / "Does your kids go …?"
   for (let i = 0; i < w.length - 3; i++) {
     if (!/^(do|does)$/.test(w[i].norm) || !/^(your|my|our|his|her|their|the|this|that)$/.test(w[i + 1].norm)) continue;
+    // A question starts its clause: "planning to do the pilot test" is not "Do the pilot test …?".
+    if (!(i === 0 || brokenAfter(w, i - 1) || /^(so|and|but|then|also|okay|ok|well|sorry|now)$/.test(w[i - 1].norm))) continue;
     const n = w[i + 2].norm;
     const vi = verbInfo(w[i + 3].norm);
     if (!vi || vi.form !== "base" || verbInfo(n)) continue;

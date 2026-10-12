@@ -157,7 +157,7 @@ const VERB_PREPS: Record<string, string[]> = {
   come: ["back", "up", "to", "from"], check: ["on", "with", "in", "out"], follow: ["up"], complain: ["about", "to"], dream: ["about", "of"],
   forget: ["about"], hope: ["for"], read: ["about"], write: ["about", "to"], tell: ["about"], remind: ["about", "of"], warn: ["about", "of"],
   arrive: ["at", "in"], stay: ["at", "in", "with"], meet: ["with", "up"], plan: ["for", "on"], prepare: ["for"], search: ["for"], vote: ["for", "on"],
-  thank: ["for"], apologize: ["for", "to"], apologise: ["for", "to"], consist: ["of"], succeed: ["in"], believe: ["in"], participate: ["in"],
+  send: ["over", "out", "back"], thank: ["for"], apologize: ["for", "to"], apologise: ["for", "to"], consist: ["of"], succeed: ["in"], believe: ["in"], participate: ["in"],
   insist: ["on"], comment: ["on"], concentrate: ["on"], rely: ["on"], count: ["on"], result: ["in", "from"], invest: ["in"], specialize: ["in"],
   cooperate: ["with"], communicate: ["with"], cope: ["with"], help: ["with"], start: ["with", "on"], finish: ["with"], share: ["with"],
   catch: ["up"], set: ["up"], sort: ["out"], figure: ["out"], find: ["out"], point: ["out"], fill: ["in", "out"], hand: ["over", "in"], run: ["out", "into"],
@@ -176,7 +176,7 @@ const PARTICLES = new Set(["on", "off", "up", "down", "out", "in", "over", "back
 /** Verbs of thinking and wanting: "I plan to" and "I'm planning to" are both natural. */
 const STATE_VERBS = new Set(["plan", "hope", "think", "wonder", "look", "consider", "expect", "intend", "feel", "want", "need", "mean", "like", "love", "wish", "guess", "try"]);
 /** Verbs of change: "went up (by) 5%" — "by" before the amount is optional. */
-const CHANGE_VERBS = new Set(["increase", "decrease", "rise", "drop", "fall", "grow", "reduce", "cut", "raise", "improve", "climb", "jump", "go", "come", "lower"]);
+const CHANGE_VERBS = new Set(["increase", "decrease", "rise", "drop", "fall", "grow", "reduce", "cut", "raise", "improve", "climb", "jump", "go", "come", "lower", "delay", "postpone", "extend", "shorten"]);
 /** -ing / -ed feeling adjectives: "I'm interesting in" means "interested". */
 const FEELING_ADJ = /^(interest|bor|excit|confus|tir|surpris|disappoint|worr|embarrass|amaz|annoy|frustrat|satisf|exhaust|shock|relax|please|terrify|frighten)(ed|ing|ied|ying)$/;
 
