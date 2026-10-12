@@ -197,7 +197,7 @@ export function MeaningCheckList({ items }: { items: MeaningCheck[] }) {
 
 const AVATAR_TINTS = ["#0a84ff", "#30b158", "#f2a516", "#8e4ec6", "#e5484d", "#0aa5a5"];
 
-function tintFor(name: string): string {
+export function tintFor(name: string): string {
   let h = 0;
   for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return AVATAR_TINTS[h % AVATAR_TINTS.length];

@@ -1,4 +1,5 @@
 import type { AttemptRecord, Evaluation, LearnerState, Question } from "../core/types";
+import type { TalkReply } from "../core/freetalk";
 import { readLocal, writeLocal, clearLocal } from "./local";
 import { AIUnavailableError, type AIService, type Platform, type StorageService, type StorageStatus, NO_AI } from "./types";
 
@@ -195,6 +196,7 @@ export function serverAI(model: string | null): AIService {
         return text;
       }),
     generate: (req, signal) => call(async () => (await api<{ question: Question }>("/api/engflow/generate", { json: req, signal })).question),
+    talk: (topicId, lines, turn, signal) => call(async () => (await api<{ reply: TalkReply }>("/api/engflow/talk", { json: { topicId, lines, turn }, signal })).reply),
   };
 }
 

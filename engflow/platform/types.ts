@@ -1,4 +1,5 @@
 import type { ExplainKind, GenerateRequest } from "../core/ai";
+import type { TalkLine, TalkReply } from "../core/freetalk";
 import type { Evaluation, LearnerState, Question } from "../core/types";
 
 export type StorageKind = "artifact-db" | "server" | "local";
@@ -44,6 +45,8 @@ export interface AIService {
   evaluate(q: Question, answer: string, local: Evaluation, depth: "quick" | "default", signal?: AbortSignal): Promise<Evaluation>;
   explain(kind: ExplainKind, q: Question, ev: Evaluation, question: string | undefined, onText: (text: string) => void, signal?: AbortSignal): Promise<string>;
   generate(req: GenerateRequest, signal?: AbortSignal): Promise<Question>;
+  /** Free talk: grade the learner's latest line and reply as the partner (core/freetalk.ts). */
+  talk(topicId: string, lines: Pick<TalkLine, "who" | "en">[], turn: number, signal?: AbortSignal): Promise<TalkReply>;
 }
 
 export interface Platform {
@@ -59,4 +62,5 @@ export const NO_AI: AIService = {
   evaluate: () => Promise.reject(new AIUnavailableError("unavailable", "AI 분석을 사용할 수 없습니다.", true)),
   explain: () => Promise.reject(new AIUnavailableError("unavailable", "AI 설명을 사용할 수 없습니다.", true)),
   generate: () => Promise.reject(new AIUnavailableError("unavailable", "AI 문제 생성을 사용할 수 없습니다.", true)),
+  talk: () => Promise.reject(new AIUnavailableError("unavailable", "자유 대화는 Claude 연결이 필요합니다.", true)),
 };

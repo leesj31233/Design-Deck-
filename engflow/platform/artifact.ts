@@ -3,6 +3,7 @@ import {
   parseGeneratedQuestion,
 } from "../core/ai";
 import type { AttemptRecord, LearnerState, Question } from "../core/types";
+import { TALK_TOPIC_BY_ID, buildTalkPrompt, parseTalkReply } from "../core/freetalk";
 import { SKILLS, skillName } from "../content/skills";
 import { QUESTIONS } from "../content";
 import { clearLocal, readLocal, writeLocal } from "./local";
@@ -333,6 +334,19 @@ export function artifactAI(): AIService & { ready: Promise<boolean> } {
         }
         if (!r.question) throw new AIFormatError(`생성된 문제가 검증을 통과하지 못했습니다: ${r.problems.slice(0, 2).join("; ")}`);
         return r.question;
+      }),
+    talk: (topicId, lines, turn, signal) =>
+      guard(async () => {
+        await ready;
+        const topic = TALK_TOPIC_BY_ID[topicId];
+        if (!topic) throw new AIFormatError("알 수 없는 대화 주제입니다.");
+        const last = [...lines].reverse().find((l) => l.who === "me")?.en ?? "";
+        const raw = await need().json(buildTalkPrompt(topic, lines, turn), { modelTier: "quick", signal, cache: false });
+        try {
+          return parseTalkReply(raw, last);
+        } catch {
+          throw new AIFormatError("Claude 응답을 해석하지 못했습니다.");
+        }
       }),
   };
 }

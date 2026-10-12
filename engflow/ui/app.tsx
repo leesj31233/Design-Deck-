@@ -18,6 +18,7 @@ import { ProgressScreen } from "./screens/progress";
 import { SettingsScreen } from "./screens/settings";
 import { GuideSheet } from "./guide";
 import { ExpressionStudy } from "./expressions";
+import { FreeTalk } from "./freetalk";
 
 export type Route = "today" | "learn" | "review" | "mistakes" | "test" | "progress" | "settings";
 const ROUTES: Route[] = ["today", "learn", "review", "mistakes", "test", "progress", "settings"];
@@ -33,6 +34,8 @@ export interface Nav {
   setFocus: (on: boolean) => void;
   /** Open the study flow for one expression (grammar point). */
   openExpression: (skill: string) => void;
+  /** Free talk with Claude on one topic (core/freetalk.ts). */
+  startTalk: (topicId: string) => void;
 }
 
 export const NavContext = React.createContext<Nav | null>(null);
@@ -64,6 +67,7 @@ function Shell() {
   const [session, setSession] = React.useState<SessionSpec | null>(null);
   const [guideSkill, setGuideSkill] = React.useState<string | null>(null);
   const [study, setStudy] = React.useState<string | null>(null);
+  const [talk, setTalk] = React.useState<{ id: string; key: number } | null>(null);
   const [focus, setFocus] = React.useState(false);
   const desktop = useMediaQuery("(min-width: 1024px)");
   const mainRef = React.useRef<HTMLDivElement>(null);
@@ -100,6 +104,12 @@ function Shell() {
       setStudy(skill);
       window.scrollTo({ top: 0 });
     },
+    startTalk: (topicId) => {
+      setGuideSkill(null);
+      setStudy(null);
+      setTalk({ id: topicId, key: Date.now() });
+      window.scrollTo({ top: 0 });
+    },
     practiceSkill: (skill) => {
       import("../core/session").then(({ buildSession }) => {
         const plan = buildSession(app.state, app.questions, { size: 6, mode: "mixed", skill, now: app.now() });
@@ -119,6 +129,17 @@ function Shell() {
         <div className="ef-root min-h-[100dvh]">
           {offset ? <TimeBanner /> : null}
           <SessionRunner key={session.id} spec={session} onExit={() => setSession(null)} onPracticeSkill={nav.practiceSkill} />
+        </div>
+      </NavContext.Provider>
+    );
+  }
+
+  if (talk) {
+    return (
+      <NavContext.Provider value={nav}>
+        <div className="ef-root min-h-[100dvh]">
+          {offset ? <TimeBanner /> : null}
+          <FreeTalk key={talk.key} topicId={talk.id} onExit={() => setTalk(null)} />
         </div>
       </NavContext.Provider>
     );

@@ -13,6 +13,7 @@ import { CATEGORY_LABEL } from "../practice/session";
 import { ExpressionCollection } from "../expressions";
 import { RoleplayShortcut } from "../roleplay";
 import { LadderCard, SpeedCard } from "../ladder";
+import { TalkCard } from "../freetalk";
 import { situationOf } from "../../core/situations";
 import { SITUATIONS } from "../../core/types";
 import { SITUATION_INFO } from "../../content";
@@ -223,6 +224,7 @@ export function TodayScreen() {
       <RoleplayShortcut />
       <LadderCard situation="all" compact />
       <SpeedCard />
+      <TalkCard compact />
       <SceneShortcuts />
       <ExpressionCollection limit={4} />
     </div>

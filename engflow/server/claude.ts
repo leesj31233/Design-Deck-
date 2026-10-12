@@ -5,6 +5,7 @@ import {
   parseGeneratedQuestion, type ExplainKind, type GenerateRequest,
 } from "../core/ai";
 import { aiEvaluationSchema } from "../core/schema";
+import { TALK_TOPIC_BY_ID, buildTalkPrompt, parseTalkReply, talkReplySchema, type TalkLine, type TalkReply } from "../core/freetalk";
 import type { Evaluation, Question } from "../core/types";
 import { QUESTIONS } from "../content";
 import { SKILLS, skillName } from "../content/skills";
@@ -131,6 +132,30 @@ export async function generateWithClaude(req: GenerateRequest, signal?: AbortSig
   if (!r.question) r = parseGeneratedQuestion(await ask(buildRepairPrompt(raw, r.problems)), ctx);
   if (!r.question) throw new AIFormatError(`generated question failed validation: ${r.problems.slice(0, 3).join("; ")}`);
   return r.question;
+}
+
+/** Free talk: one fast structured call grades the learner's line and writes the partner's reply. */
+export async function talkWithClaude(topicId: string, lines: Pick<TalkLine, "who" | "en">[], turn: number, signal?: AbortSignal): Promise<TalkReply> {
+  const topic = TALK_TOPIC_BY_ID[topicId];
+  if (!topic) throw new AIFormatError("unknown topic");
+  const last = [...lines].reverse().find((l) => l.who === "me")?.en ?? "";
+  const msg = await getClient().beta.messages.parse(
+    {
+      model: EVAL_MODEL,
+      max_tokens: 1200,
+      betas: [FALLBACK_BETA],
+      fallbacks: "default",
+      output_config: { format: betaZodOutputFormat(talkReplySchema) },
+      messages: [{ role: "user", content: buildTalkPrompt(topic, lines, turn) }],
+    },
+    { signal, timeout: 20_000, maxRetries: 0 },
+  );
+  if (msg.stop_reason === "refusal") throw new AIRefusalError("Claude declined this conversation turn.");
+  try {
+    return parseTalkReply(msg.parsed_output, last);
+  } catch {
+    throw new AIFormatError("talk reply failed validation");
+  }
 }
 
 export function describeAIError(e: unknown): { status: number; code: string; message: string } {

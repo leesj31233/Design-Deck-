@@ -351,3 +351,73 @@ test("navigation adapts: bottom tabs on phones, sidebar on desktop", async ({ pa
     await expect(page.locator("nav[aria-label='주요 메뉴']").last()).toBeVisible();
   }
 });
+
+/** A stand-in for Claude that plays the free-talk partner (and grades anything else as correct). */
+async function fakeTalkClaude(page: Page) {
+  await page.addInitScript(() => {
+    let turns = 0;
+    const json = async (prompt: string) => {
+      if (prompt.includes("spoken-English practice conversation")) {
+        turns++;
+        const line = /grade exactly this text\): """([\s\S]*?)"""/.exec(prompt)?.[1] ?? "";
+        const bad = /I am agree/i.test(line);
+        return {
+          feedback: bad
+            ? { score: 70, notes: [{ text: "I am agree", fix: "I agree", whyKo: "agree는 동사라서 be동사 없이 씁니다." }], corrected: line.replace(/I am agree/i, "I agree"), natural: "" }
+            : { score: 100, notes: [], corrected: "", natural: "" },
+          reply: turns >= 2 ? { en: "Sounds like a plan. Have a great week!", ko: "좋아요. 한 주 잘 보내요!" } : { en: "Nice! Where did you go hiking?", ko: "좋네요! 어디로 등산 갔어요?" },
+          done: turns >= 2,
+        };
+      }
+      return { meaning: 95, comprehensibility: 95, errors: [], corrected: "" };
+    };
+    const sample = Object.assign(async () => ({ text: "" }), { json });
+    (window as unknown as { claude: unknown }).claude = { use: async (name: string) => (name === "sample" ? sample : null) };
+  });
+}
+
+test("free talk: Claude plays the partner, every line gets feedback, and the talk ends with what to say next time", async ({ page }) => {
+  await fakeTalkClaude(page);
+  const errors = await open(page);
+  await nav(page, "학습");
+  const start = page.getByRole("button", { name: "월요일 아침 주말 이야기 자유 대화 시작" });
+  await expect(start).toBeEnabled();
+  await start.click();
+  const talk = page.getByRole("list", { name: "자유 대화" });
+  await expect(talk.getByText("Morning, Minsu! How was your weekend?")).toBeVisible();
+  const input = page.getByRole("textbox", { name: "내 대답" });
+  await input.fill("It was great. I went hiking with my family.");
+  await input.press("Enter");
+  await expect(talk.getByText("자연스러워요")).toBeVisible();
+  await expect(talk.getByText("Nice! Where did you go hiking?")).toBeVisible();
+  await input.fill("I am agree, it was really fun.");
+  await input.press("Enter");
+  await expect(talk.getByText("이렇게 고쳐요")).toBeVisible();
+  await expect(page.getByText("대화 완료!")).toBeVisible();
+  await expect(page.getByRole("list", { name: "고칠 표현" }).getByText("I agree, it was really fun.")).toBeVisible();
+  await noHorizontalOverflow(page);
+  await page.getByRole("button", { name: /다른 주제 고르기/ }).click();
+  await expect(page.getByRole("button", { name: "월요일 아침 주말 이야기 자유 대화 시작" })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("badges: the Progress screen shows every badge family and the first 100 earns one", async ({ page }) => {
+  const errors = await open(page);
+  await nav(page, "학습");
+  await page.getByRole("button", { name: "롤플레이 주간 화상회의 시작 시작" }).click();
+  await page.locator("#ef-answer").fill("Yes, I can hear you clearly.");
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByRole("status").filter({ hasText: /100점|완벽/ }).first()).toBeVisible();
+  await page.getByRole("button", { name: /^다음/ }).click();
+  await page.getByRole("button", { name: /세션 종료|닫기/ }).first().click();
+  const confirm = page.getByRole("button", { name: /종료|나가기/ }).last();
+  if (await confirm.isVisible().catch(() => false)) await confirm.click();
+  await nav(page, "진도");
+  const shelf = page.getByRole("list", { name: "배지 목록" });
+  await expect(shelf).toBeVisible();
+  await expect(shelf.getByRole("listitem")).toHaveCount(12);
+  await expect(shelf.getByText("첫 100점")).toBeVisible();
+  await expect(shelf.getByLabel("브론즈 달성").first()).toBeVisible();
+  await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
