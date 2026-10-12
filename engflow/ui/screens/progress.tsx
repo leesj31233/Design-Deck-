@@ -11,6 +11,11 @@ import { useApp } from "../store";
 import { useNav } from "../app";
 import { Card, Eyebrow, StatusChip, cn, dateKo, relTimeKo } from "../kit";
 import { Heatmap, TrendLine } from "../charts";
+import { SITUATIONS } from "../../core/types";
+import { situationOf } from "../../core/situations";
+import { listScenarios } from "../../core/roleplay";
+import { SITUATION_INFO } from "../../content";
+import { useStartLesson } from "./today";
 
 export function ProgressScreen() {
   const app = useApp();
@@ -102,6 +107,8 @@ export function ProgressScreen() {
           </div>
         </Card>
       </div>
+
+      <SceneMap />
 
       <Card className="p-4 md:p-5">
         <Eyebrow>복습 꾸준함 · 최근 12주</Eyebrow>
@@ -198,5 +205,67 @@ export function ProgressScreen() {
         </div>
       </section>
     </div>
+  );
+}
+
+/**
+ * Scene × difficulty map: which difficulties of each scene the learner can
+ * already handle (best 85+ on at least one question there), which were tried,
+ * and a one-tap "next step" one difficulty above the highest one reached.
+ */
+function SceneMap() {
+  const app = useApp();
+  const start = useStartLesson();
+  const bank = app.questions.filter((q) => !q.variation && !q.id.startsWith("dg-"));
+  const rows = SITUATIONS.map((sc) => {
+    const qs = bank.filter((q) => situationOf(q) === sc);
+    const cells = Array.from({ length: 10 }, (_, k) => {
+      const at = qs.filter((q) => q.difficulty === k + 1);
+      const best = Math.max(0, ...at.map((q) => app.state.seen[q.id]?.best ?? 0));
+      const tried = at.some((q) => app.state.seen[q.id]);
+      return { d: k + 1, n: at.length, state: best >= 85 ? "done" : tried ? "tried" : at.length ? "open" : "none" } as const;
+    });
+    const reached = Math.max(0, ...cells.filter((c) => c.state === "done").map((c) => c.d));
+    return { sc, cells, reached };
+  });
+  const scenarios = listScenarios(app.questions, app.state);
+  const finished = scenarios.filter((x) => x.best.every((b) => b >= 85)).length;
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <Eyebrow>상황별 도달 난이도</Eyebrow>
+        <span className="ef-num text-[12px] text-[var(--muted)]">롤플레이 완주 {finished}/{scenarios.length}</span>
+      </div>
+      <p className="ef-ko mt-1 text-[12px] text-[var(--muted)]">초록 = 85점 이상으로 말해 본 난이도 · 노랑 = 시도함 · 회색 = 아직</p>
+      <ul className="mt-3 space-y-2">
+        {rows.map(({ sc, cells, reached }) => {
+          const next = Math.min(10, reached + 1);
+          return (
+            <li key={sc} className="flex items-center gap-2">
+              <span className="w-[86px] shrink-0 truncate text-[12px] font-medium sm:w-[120px] sm:text-[13px]">{SITUATION_INFO[sc].ko}</span>
+              <span className="grid flex-1 grid-cols-10 gap-[3px]" aria-label={`${SITUATION_INFO[sc].ko} 도달 난이도 ${reached}`}>
+                {cells.map((c) => (
+                  <span
+                    key={c.d}
+                    title={`난이도 ${c.d} · ${c.n}문항`}
+                    className={cn(
+                      "h-3.5 rounded-[3px]",
+                      c.state === "done" ? "bg-[var(--ef-ok-fill)]" : c.state === "tried" ? "bg-[var(--ef-warn-fill)]" : c.state === "open" ? "bg-[var(--ef-track)]" : "bg-transparent",
+                    )}
+                  />
+                ))}
+              </span>
+              <button
+                onClick={() => start({ size: 6, situation: sc, difficulty: next, title: `${SITUATION_INFO[sc].ko} · 난이도 ${next} 도전` })}
+                className="dd-focus ef-num h-7 shrink-0 rounded-lg border border-[var(--line)] px-2 text-[11px] font-semibold"
+                aria-label={`${SITUATION_INFO[sc].ko} 난이도 ${next} 도전`}
+              >
+                {next}단계 도전
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </Card>
   );
 }
