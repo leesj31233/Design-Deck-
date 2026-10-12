@@ -1,6 +1,13 @@
 # EngFlow — Engineering English, Built for Real Meetings
 
-EngFlow helps Korean process and R&D engineers say clear, correct English in international online meetings and business conversations. Most practice is a turn in a conversation: a colleague says something, and the learner writes what they want to say in the phrasing native speakers commonly use. Scenes cover running an online meeting, presenting, meeting discussion, greetings and small talk, meals, business trips and technical discussion, each at difficulty 1–10. EngFlow collects the expressions the learner keeps getting wrong into an expression notebook with a short study flow, schedules reviews of each mistake with new sentences, and estimates the learner's written-English level with an adaptive, CEFR-aligned test.
+EngFlow helps Korean process and R&D engineers say clear, correct English in international online meetings and business conversations. Most practice is a turn in a conversation: a colleague says something, and the learner writes what they want to say in the phrasing native speakers commonly use. Eleven scenes each run at difficulty 1–10, from one-line replies (*Sounds good.*) to long, diplomatic turns:
+
+- running an online meeting, presenting, meeting discussion
+- quick replies, greetings and small talk, meals
+- calls and messages, negotiation, problems and apologies
+- business trips, technical discussion
+
+Role-plays carry one conversation over several turns. A "short to long" ladder climbs from one-line replies to multi-sentence explanations. EngFlow collects the expressions the learner keeps getting wrong into an expression notebook with a short study flow. It schedules reviews of each mistake with new sentences, celebrates progress, and estimates the learner's written-English level with an adaptive, CEFR-aligned test.
 
 It is built on Design Deck (tokens, primitives, motion rules) and runs in two places from one codebase:
 
@@ -61,7 +68,7 @@ Each answer is graded **once** (`engflow/core/grader.ts`). Close answers are gra
 
 - **Instant.** An exact match, or a close answer in which nothing but spelling differs, is graded by the rule-based grader at once (about 1 ms; 20 ms at worst on a laptop). Claude adds nothing there.
 - **Graded while typing.** When the learner pauses on a fairly complete sentence (450 ms, or 150 ms after a final period), Claude starts grading that text in the background. Submitting the same text (a final period or extra spaces may differ) shows that grade at once. A question allows at most five background requests, and a newer one cancels the previous one.
-- **Wait by trust ("auto", the default).** Otherwise Claude gets 1 second when the answer is close to an expected one, 2.5 seconds when it is partly reworded, and up to 8 seconds when it is worded very differently. The rule-based grader compares against expected answers, so it can miss errors in a sentence it has never seen (an iPhone test scored "This suggestion is not satisfy the requirements of customer." 100 under a flat 1-second cap). Settings also offers "always 1 second" and "accuracy first" (9 seconds). If Claude has not answered in time, the rule-based grade is shown and the late reply is ignored, so the score never jumps; a reworded answer graded only by rules is labelled "확인 못 함", never "정확해요", and never counts as an Easy review.
+- **Wait by trust ("auto", the default).** Otherwise Claude gets 1 second when the answer is close to an expected one. A partly reworded answer waits up to 2.5 seconds and a very different one up to 8 seconds. Once the device has five measured Claude response times, those two waits shrink to Claude's 90th/95th percentile plus a margin, so a fast connection never waits the full cap. The rule-based grader compares against expected answers, so it can miss errors in a sentence it has never seen (an iPhone test scored "This suggestion is not satisfy the requirements of customer." 100 under a flat 1-second cap). Settings also offers "always 1 second" and "accuracy first" (9 seconds). If Claude has not answered in time, the rule-based grade is shown and the late reply is ignored, so the score never jumps; a reworded answer graded only by rules is labelled "확인 못 함", never "정확해요", and never counts as an Easy review.
 - **Short replies.** Claude returns only the scores, the errors with one-sentence explanations, the minimal correction and the native phrasing. The app writes the verdict and grammar note from the error list, because reply length is what sets the wait.
 
 Each result shows how long grading took ("Claude 채점 · 0.4초"). Settings shows the device's average over the last 20 answers, how often Claude graded, and Claude's own median response time on this device (requests that finished after the cut-off are still timed).
@@ -81,8 +88,16 @@ The rule-based grader works offline:
 
 1. **Meaning units.** Lenient patterns check each Korean meaning chunk. A term slot counts only when the message cannot work without it.
 2. **Question pitfalls.** Curated patterns catch known Korean-speaker mistakes for that item and carry the best explanation.
-3. **Grammar rules.** 22 context-checked rule groups, each firing only when the word class is known: missing *be* in the progressive, *wait* without *for*, *before* + base verb, modal + *to*, agreement, *will* in if/when clauses, *every* + plural, a missing article before a singular countable noun (*of customer*), *be* + feeling verb (*is satisfy with*), uncountable plurals, a/an, irregular past forms, third-conditional *will have*, and more.
-4. **Alignment.** The answer is aligned against the closest correct answer, sentence by sentence for long answers. A difference counts only when it sits next to shared words and is not part of a rephrased phrase. Another equally close correct answer can veto it only if it accepts the learner's word as it is.
+3. **Grammar rules.** About 90 context-checked rules for the mistakes Korean speakers make. They run one sentence at a time and need no reference answer, so they also protect reworded answers. On an independent corpus of 220 one-mistake sentences they flag 90%, with no false alarm on 220 tricky correct sentences. Examples: *is not satisfy*, *Is called japchae*, *I sorry*, *married with*, *suggest to stay*, *How your wife is doing?*, *Because …, so …*, *since 2015* with the present, *I'm interesting in*, *more high*, *a good news*. See [GRADER_BENCH.md](./GRADER_BENCH.md) for the measurements.
+4. **Alignment.** The answer is aligned against the closest correct answer, sentence by sentence for long answers. A difference counts only when it sits next to shared words and is not part of a rephrased phrase. Another equally close correct answer can veto it only if it accepts the learner's word as it is. Common correct rewordings are recognized and not counted as errors:
+   - *Is it possible…* / *Would it be possible…*
+   - *I plan to* / *I'm planning to*
+   - *before deciding* / *before we decide*
+   - *turn your cameras on*
+   - *decide on the date*
+   - *(on that)*
+
+   A different preposition or tense nuance is a note, not an error.
 5. **Minimal correction.** Only the detected errors are fixed, so the learner's own words (including site terms) are kept. A correction is rejected if it breaks a rule or moves away from every correct answer.
 
 Claude's output must pass a zod schema (small slips such as an unknown category name are tidied first). Its quoted error spans must exist in the answer, terminology notes become non-scoring suggestions, and curated pitfalls are kept.
@@ -92,6 +107,17 @@ Claude's output must pass a zod schema (small slips such as an unknown category 
 Every question belongs to a scene (`situation`): running an online meeting, presenting, meeting discussion, greetings and small talk, meals, business trips and site visits, or technical discussion. Older questions derive it from their category. Conversation questions show 1–3 earlier lines as chat bubbles (translation on request) and the learner's turn as their own bubble. Every older question also has conversation context, added by id in `dialogue-overlay`.
 
 Difficulty runs from 1 (a fixed 3–6 word expression) to 10 (a long, diplomatic turn). The learner sets it per scene on the Learn screen, and EngFlow remembers each scene's choice. An explicit difficulty keeps new questions within ±1, or ±2 when the bank is thin. Without a choice, the target comes from the level estimate. Mixed sessions cap each scene at about 30% of new questions, so everyday conversation is mixed in with engineering talk, and conversation turns rank first.
+
+### Role-play, ladder and celebrations
+
+- **Role-play** (`core/roleplay.ts`, `ui/roleplay.tsx`): 20 scenarios of 3–5 turns, at work and around work. Examples include a vendor kickoff, a bad connection, pilot results and a hard question, a discount request, a late report, airport pickup, dinner with a client, and paying the bill. From the second turn, the learner's own previous line (grammar-corrected and labelled as such) stays in the chat. The session ends with the whole conversation: the learner's lines with scores, the natural version under each, and *전체 듣기* to hear it all read aloud.
+- **Short to long** (`core/ladder.ts`, `ui/ladder.tsx`): eight answers in one scene, climbing from difficulty 1 to two steps above the learner's level. The summary shows the staircase coloured by score and where the climb got hard. A missed step goes to review instead of an immediate retry.
+- **Celebrations** (`core/celebration.ts`): each answer gets one moment, decided before it is recorded so it never changes.
+  - perfect (confetti), a streak in the session, a weak point cleared, +10 on the best score, a comeback on the same grammar
+  - today's goal reached, practice-day streaks (3, 7, 14, 30…)
+  - "N sentences you can say" milestones
+  - Chime and vibration are optional, and the effects respect reduced motion.
+- **Read aloud** (`ui/speech.tsx`): the colleague's lines and the recommended sentence can be read with the device's English voice (Web Speech; no permission needed). Auto-read and a slower speed are in Settings.
 
 ### Expression notebook
 
@@ -127,20 +153,23 @@ The TOEIC Speaking panel shows the ETS **minimum scores** per CEFR level (Speaki
 
 | Bank | Items |
 | --- | --- |
-| Conversation turns (6 scenes × 15, covering difficulty 1–10) | 90 |
+| Conversation turns (11 scenes, each covering difficulty 1–10; quick replies 1–5) | 330 |
+| Long multi-sentence turns (difficulty 8–10) | 30 |
+| Phrasal verbs in conversation | 32 |
+| Role-play scenarios | 20 (82 turns) |
 | Full-sentence construction (Mode A) | 48 |
 | Phrase & structure quiz (Mode B) | 75 |
 | Review variation ladders (7 imported mistakes × 4 levels × 2) | 56 |
 | Diagnostic items | 40 |
-| Grammar guide entries | 37 (one per skill, incl. 7 conversation skills) |
+| Grammar guide entries | 42 (one per skill, incl. 12 conversation skills) |
 | Dialogue context added to older questions | 179 |
-| QC probes (expected pass/fail answers) | 800 |
+| QC probes (expected pass/fail answers) | 1,841 |
 
 See [CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md) for the authoring rules, the pattern syntax and the QC contract.
 
 ## Known limitations
 
-- The rule-based grader is precise on the patterns it knows, but it can miss new kinds of errors in free paraphrases. It flags this with low confidence; with Claude available, Claude grades instead.
+- The rule-based grader is precise on the patterns it knows. On blind reworded answers, though, it still marks about 1 in 9 correct paraphrases with an error, mostly meaning-unit synonyms. It also leaves about 7% of mistakes without a note: long-distance agreement, pronoun reference, and errors that depend on context. Such answers get low confidence, so Claude grades them when available.
 - Claude's own response time depends on the tier the host provides. Reworded answers therefore take as long as Claude needs (up to 8 seconds) unless grading already started while typing; Settings shows the measured time.
 - Speaking (recording, transcription, pronunciation) is not implemented.
 - The web app's sync key is device-held identity, not authentication.

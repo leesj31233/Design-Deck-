@@ -4,8 +4,9 @@
  * differently from the stored ones, and reworded answers with one real
  * grammar mistake each.
  *
- *   npx tsx scripts/bench/blind.ts            # summary
+ *   npx tsx scripts/bench/blind.ts            # summary (set A)
  *   npx tsx scripts/bench/blind.ts --list     # also list every miss and false alarm
+ *   npx tsx scripts/bench/blind.ts --set b    # held-out set B (paraphrase-corpus-b.ts)
  *
  * "Shown at once" means the app would show the rule-based grade without
  * waiting for Claude (core/grader.ts ruleBasedIsEnough). A wrong answer shown
@@ -15,15 +16,15 @@ import { evaluateLocal, scoredErrors } from "../../engflow/core/evaluate";
 import { ruleBasedIsEnough } from "../../engflow/core/grader";
 import { QUESTION_BY_ID } from "../../engflow/content";
 import type { Evaluation } from "../../engflow/core/types";
-import { PARAPHRASES } from "./paraphrase-corpus";
+import { PARAPHRASES, type ParaphraseItem } from "./paraphrase-corpus";
 
 const majorOrLow = (ev: Evaluation) => ev.scores.overall < 85 || scoredErrors(ev.errors).some((e) => e.severity !== "minor");
 const anyGrammar = (ev: Evaluation) => scoredErrors(ev.errors).some((e) => e.category !== "spelling");
 
-export function runBlind() {
+export function runBlind(items: ParaphraseItem[] = PARAPHRASES) {
   const right: { qid: string; text: string; ev: Evaluation }[] = [];
   const wrong: { qid: string; text: string; error: string; ev: Evaluation }[] = [];
-  for (const item of PARAPHRASES) {
+  for (const item of items) {
     const q = QUESTION_BY_ID[item.qid];
     if (!q) continue;
     for (const text of item.right) right.push({ qid: item.qid, text, ev: evaluateLocal(q, text) });
@@ -52,7 +53,8 @@ export function runBlind() {
 }
 
 if (process.argv[1]?.endsWith("blind.ts")) {
-  const r = runBlind();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const r = runBlind(process.argv.includes("--set") && process.argv[process.argv.indexOf("--set") + 1] === "b" ? (require("./paraphrase-corpus-b").PARAPHRASES as ParaphraseItem[]) : PARAPHRASES);
   console.log(r.lines.join("\n"));
   if (process.argv.includes("--list")) {
     console.log("\nFalse alarms (correct answers marked wrong):");
