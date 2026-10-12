@@ -137,7 +137,12 @@ const PREP_SYNONYMS = [new Set(["in", "within", "during"]), new Set(["about", "o
 const APPROX = /^(about|around|approximately|roughly|nearly|almost)$/;
 const QUANTITY_START = /^([0-9]|twice|half|double|three|two|four|five|ten|one)/;
 const MODAL_LIKE = new Set(["can", "could", "may", "might", "must", "should", "will", "would", "shall"]);
-const CONJ_SYNONYMS = [new Set(["because", "since", "as"]), new Set(["so", "therefore", "and"]), new Set(["when", "once", "after"]), new Set(["although", "though", "but"]), new Set(["if", "whether"])];
+const CONJ_SYNONYMS = [
+  new Set(["because", "since", "as"]), new Set(["so", "therefore", "and"]), new Set(["when", "once", "after", "while"]),
+  new Set(["although", "though", "but"]), new Set(["if", "whether"]), new Set(["that", "which", "who"]),
+];
+/** "made with/of/from rice": all natural. */
+const MATERIAL_PREPS = new Set(["of", "with", "from"]);
 const PLACE_PREPS = new Set(["in", "at", "on"]);
 const DEADLINE_PREPS = new Set(["before", "by", "until"]);
 
@@ -265,6 +270,10 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         msg = `be동사 형태가 주어/시제와 맞지 않습니다: '${w[op.li].raw}' → '${tt}'.`;
       } else if (tc === "prep" && lc === "prep" && PREP_SYNONYMS.some((g) => g.has(tt) && g.has(lt))) {
         continue;
+      } else if (MATERIAL_PREPS.has(tt) && MATERIAL_PREPS.has(lt) && tw[op.ti - 1]?.norm === "made") {
+        continue;
+      } else if (/^(do|does|would|could|can|will)$/.test(lt) && /^(do|does|would|could|can|will)$/.test(tt) && SUBJECT_PRONOUNS.has(w[op.li + 1]?.norm ?? "")) {
+        continue; // "Do you want …?" vs "Would you like …?": politeness, not tense
       } else if (tc === "prep" && lc === "prep") {
         category = "preposition";
         severity = (PLACE_PREPS.has(tt) && PLACE_PREPS.has(lt)) || (DEADLINE_PREPS.has(tt) && DEADLINE_PREPS.has(lt)) ? "minor" : "major";
@@ -331,6 +340,7 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       const c = wordClass(tt);
       if (c === "content" || c === "modal") continue;
       if (tt === "that") continue; // usually optional
+      if (tt === "at" && tw[op.ti + 1]?.norm === "all") continue; // "(not spicy) at all" is optional emphasis
       if (APPROX.test(tt) && QUANTITY_START.test(tw[op.ti + 1]?.norm ?? "")) continue; // "about 20%" is optional precision
       if (c === "pronoun" && /^(than|as)$/.test(tw[op.ti - 1]?.norm ?? "")) continue; // "than (we) expected"
       if (/^(us|them|him|me|it|you)$/.test(tt) && op.at > 0) continue; // optional objects ("send (us)", "tell (you)")

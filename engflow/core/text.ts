@@ -131,6 +131,16 @@ export function tokenize(text: string): Token[] {
       t.stem = stem("had");
     }
   }
+  // "'s" is "has" before been/got/gone ("it's been a while", "she's gone home"), otherwise "is".
+  for (let i = 0; i < tokens.length - 1; i++) {
+    const t = tokens[i];
+    if (!t.expanded || t.norm !== "is" || !/'s$/i.test(t.raw.replace(/’/g, "'"))) continue;
+    const next = tokens.slice(i + 1).find((x) => !x.punct && x.norm !== "not" && x.norm !== "already" && x.norm !== "just" && x.norm !== "never" && x.norm !== "always");
+    if (next && /^(been|got|gotten|gone|had|become)$/.test(next.norm)) {
+      t.norm = "has";
+      t.stem = stem("has");
+    }
+  }
   return tokens;
 }
 

@@ -177,3 +177,33 @@ describe("grammar-centred scoring (learner feedback from iPhone testing)", () =>
     expect(bad.errors.some((x) => x.text === "flanges" && x.fix === "flange" && x.severity === "major")).toBe(true);
   });
 });
+
+describe("everyday-conversation false positives", () => {
+  it("'It's been' is read as 'it has been', so 'It has been …' is not an error", () => {
+    const t = q({ reference: "It's been a long time.", accepted: ["Long time no see."], meaning: [{ id: "long", en: "a long time", ko: "오랜만", any: ["long time"] }] });
+    const e = evaluateLocal(t, "It has been a long time.");
+    expect(e.errors.filter((x) => x.severity !== "minor")).toEqual([]);
+    expect(e.scores.overall).toBeGreaterThanOrEqual(95);
+  });
+  it("that/which and when/while are interchangeable connectors", () => {
+    const t = q({
+      skills: ["relative-clause"],
+      reference: "This is the restaurant that serves vegetarian food.",
+      accepted: ["This is the restaurant which has vegetarian food."],
+      meaning: [{ id: "veg", en: "vegetarian food", ko: "채식", any: ["vegetarian"] }],
+    });
+    expect(evaluateLocal(t, "This is the restaurant which serves vegetarian food.").errors.filter((x) => x.severity !== "minor")).toEqual([]);
+  });
+  it("leaving out 'at all' is not a missing preposition", () => {
+    const t = q({ reference: "It's not spicy at all.", accepted: ["It isn't spicy at all."], meaning: [{ id: "spicy", en: "not spicy", ko: "안 맵다", any: ["not spicy"] }] });
+    const e = evaluateLocal(t, "It's not spicy.");
+    expect(e.errors.some((x) => x.category === "preposition")).toBe(false);
+  });
+  it("'made with' vs 'made of', and 'Do you want to' vs 'Would you like to', are both fine", () => {
+    const made = q({ reference: "Japchae is made with sweet potato noodles.", accepted: ["Japchae is made from sweet potato noodles."], meaning: [{ id: "noodle", en: "noodles", ko: "당면", any: ["noodle"] }] });
+    expect(evaluateLocal(made, "Japchae is made of sweet potato noodles.").errors.filter((x) => x.severity !== "minor")).toEqual([]);
+    const offer = q({ reference: "Would you like to try some kimchi?", accepted: ["Do you want to try some kimchi?"], meaning: [{ id: "try", en: "try kimchi", ko: "김치 먹어 보다", any: ["try ... kimchi"] }] });
+    expect(evaluateLocal(offer, "Do you want to try some kimchi?").scores.overall).toBe(100);
+    expect(evaluateLocal(offer, "Would you want to try some kimchi?").errors.filter((x) => x.category === "tense")).toEqual([]);
+  });
+});
