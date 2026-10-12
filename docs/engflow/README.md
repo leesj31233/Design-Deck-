@@ -58,7 +58,7 @@ engflow/
   ui/          React app shared by both targets (Design Deck components and tokens)
   server/      Next.js server modules: Claude client, Drizzle schema, repository, HTTP helpers
   artifact/    Vite single-file build entry
-app/engflow, app/api/engflow/*   Next.js route and API (status, state, evaluate, explain, generate)
+app/engflow, app/api/engflow/*   Next.js route and API (status, state, evaluate, explain, generate, talk)
 db/migrations                    SQL migrations (PostgreSQL)
 ```
 
@@ -69,7 +69,9 @@ Each answer is graded **once** (`engflow/core/grader.ts`). Close answers are gra
 - **Instant.** An exact match, or a close answer in which nothing but spelling differs, is graded by the rule-based grader at once (about 1 ms; 20 ms at worst on a laptop). Claude adds nothing there.
 - **Graded while typing.** When the learner pauses on a fairly complete sentence (450 ms, or 150 ms after a final period), Claude starts grading that text in the background. Submitting the same text (a final period or extra spaces may differ) shows that grade at once. A question allows at most five background requests, and a newer one cancels the previous one.
 - **Wait by trust ("auto", the default).** Otherwise Claude gets 1 second when the answer is close to an expected one. A partly reworded answer waits up to 2.5 seconds and a very different one up to 8 seconds. Once the device has five measured Claude response times, those two waits shrink to Claude's 90th/95th percentile plus a margin, so a fast connection never waits the full cap. The rule-based grader compares against expected answers, so it can miss errors in a sentence it has never seen (an iPhone test scored "This suggestion is not satisfy the requirements of customer." 100 under a flat 1-second cap). Settings also offers "always 1 second" and "accuracy first" (9 seconds). If Claude has not answered in time, the rule-based grade is shown and the late reply is ignored, so the score never jumps; a reworded answer graded only by rules is labelled "확인 못 함", never "정확해요", and never counts as an Easy review.
-- **Short replies.** Claude returns only the scores, the errors with one-sentence explanations, the minimal correction and the native phrasing. The app writes the verdict and grammar note from the error list, because reply length is what sets the wait.
+- **Short replies.** Claude returns only the scores, the errors with one-sentence explanations and the minimal correction (empty when nothing is wrong); the question's curated reference is shown as the native phrasing. The app writes the verdict and grammar note from the error list, because reply length is what sets the wait.
+- **Learns from Claude** (`core/learned.ts`). When Claude grades one of the learner's own wordings fully correct (95+, nothing to fix), the grader keeps it for that question (up to three). The same answer later, contractions and punctuation aside, is graded at once and labelled *Claude 확인한 내 표현*. A close variant is not marked down for a meaning chunk the approved wording also said in other words. Approved wordings never make a reworded answer count as "close", so a new mistake in them still waits for Claude. In the learning bench, repeating an approved wording went from 67% to 100% shown at once, with no new false alarm and no new wrong answer shown as fine.
+- **Reversed meaning.** A close answer that adds or drops the verb's *not*/*never* ("We don't need to update the PFD" for "We need to update the PFD") is a major meaning error. Questions, reassuring commands (*Don't worry*), if-clauses and words that carry negation themselves (*unable*, *missed*, *broken*) are left to Claude; it fires on none of about 5,000 correct answers.
 
 Each result shows how long grading took ("Claude 채점 · 0.4초"). Settings shows the device's average over the last 20 answers, how often Claude graded, and Claude's own median response time on this device (requests that finished after the cut-off are still timed).
 
@@ -104,7 +106,7 @@ Claude's output must pass a zod schema (small slips such as an unknown category 
 
 ### Scenes and difficulty
 
-Every question belongs to a scene (`situation`): running an online meeting, presenting, meeting discussion, greetings and small talk, meals, business trips and site visits, or technical discussion. Older questions derive it from their category. Conversation questions show 1–3 earlier lines as chat bubbles (translation on request) and the learner's turn as their own bubble. Every older question also has conversation context, added by id in `dialogue-overlay`.
+Every question belongs to a scene (`situation`): running an online meeting, presenting, meeting discussion, quick replies, greetings and small talk, everyday life and travel, office life, feelings and empathy, meals, calls and messaging, negotiating, problems and apologies, business trips and site visits, or technical discussion. Older questions derive it from their category. Conversation questions show 1–3 earlier lines as chat bubbles (translation on request) and the learner's turn as their own bubble. Every older question also has conversation context, added by id in `dialogue-overlay`.
 
 Difficulty runs from 1 (a fixed 3–6 word expression) to 10 (a long, diplomatic turn). The learner sets it per scene on the Learn screen, and EngFlow remembers each scene's choice. An explicit difficulty keeps new questions within ±1, or ±2 when the bank is thin. Without a choice, the target comes from the level estimate. Mixed sessions cap each scene at about 30% of new questions, so everyday conversation is mixed in with engineering talk, and conversation turns rank first.
 
@@ -112,11 +114,14 @@ Difficulty runs from 1 (a fixed 3–6 word expression) to 10 (a long, diplomatic
 
 - **Role-play** (`core/roleplay.ts`, `ui/roleplay.tsx`): 20 scenarios of 3–5 turns, at work and around work. Examples include a vendor kickoff, a bad connection, pilot results and a hard question, a discount request, a late report, airport pickup, dinner with a client, and paying the bill. From the second turn, the learner's own previous line (grammar-corrected and labelled as such) stays in the chat. The session ends with the whole conversation: the learner's lines with scores, the natural version under each, and *전체 듣기* to hear it all read aloud.
 - **Short to long** (`core/ladder.ts`, `ui/ladder.tsx`): eight answers in one scene, climbing from difficulty 1 to two steps above the learner's level. The summary shows the staircase coloured by score and where the climb got hard. A missed step goes to review instead of an immediate retry.
-- **Celebrations** (`core/celebration.ts`): each answer gets one moment, decided before it is recorded so it never changes.
-  - perfect (confetti), a streak in the session, a weak point cleared, +10 on the best score, a comeback on the same grammar
-  - today's goal reached, practice-day streaks (3, 7, 14, 30…)
-  - "N sentences you can say" milestones
-  - Chime and vibration are optional, and the effects respect reduced motion.
+- **Celebrations** (`core/celebration.ts`, `ui/celebrate.tsx`): each answer gets one moment, decided before it is recorded so it never changes.
+  - 100 points sets off fireworks (rockets that burst into rings of sparks); 100 on a question never seen before (with the time when it was quick) and 100 on a long explanation (14+ words, six rockets) have their own lines
+  - a streak in the session, the third clean answer in a row on the same sentence (*완전히 내 표현*), a short reply at conversation speed (*번개 같은 대답*), a weak point cleared, +10 on the best score, a comeback on the same grammar
+  - today's goal reached, practice-day streaks (3, 7, 14, 30…), "N sentences you can say" milestones
+  - a session without a single miss ends in fireworks
+  - Chime, pops and vibration are optional, and the effects respect reduced motion.
+- **Badges** (`core/badges.ts`, `ui/badges.tsx`): twelve families with bronze, silver and gold tiers (100-point answers, practice-day streaks, sentences said at 85+, role-plays finished, perfect long sentences, quick replies, scenes, difficulty 8+, reviews, daily goals, wordings Claude approved, answers given). Progress shows each medal with its progress to the next tier, and the session summary announces new ones. They are derived from the learning record, so they need no storage and sync with it.
+- **Free talk with Claude** (`core/freetalk.ts`, `ui/freetalk.tsx`): an open conversation in one of 14 scenes. Claude plays the other person; after each line, one fast request returns a short grade of that line and the partner's next line. Each line gets the correction as a word diff, one Korean note per error, a more natural version with read-aloud, and a score; major grammar-rule findings are shown while typing and kept even if Claude leaves them out. After about six lines the talk closes with what to say next time.
 - **Read aloud** (`ui/speech.tsx`): the colleague's lines and the recommended sentence can be read with the device's English voice (Web Speech; no permission needed). Auto-read and a slower speed are in Settings.
 
 ### Expression notebook
