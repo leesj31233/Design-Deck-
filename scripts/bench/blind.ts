@@ -12,7 +12,8 @@
  * waiting for Claude (core/grader.ts ruleBasedIsEnough). A wrong answer shown
  * at once as fine is the failure that matters most.
  */
-import { evaluateLocal, scoredErrors } from "../../engflow/core/evaluate";
+import { evaluateLocal, rankTargets, scoredErrors } from "../../engflow/core/evaluate";
+import { tokenize, words } from "../../engflow/core/text";
 import { ruleBasedIsEnough } from "../../engflow/core/grader";
 import { QUESTION_BY_ID } from "../../engflow/content";
 import type { Evaluation } from "../../engflow/core/types";
@@ -56,6 +57,17 @@ if (process.argv[1]?.endsWith("blind.ts")) {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const r = runBlind(process.argv.includes("--set") && process.argv[process.argv.indexOf("--set") + 1] === "b" ? (require("./paraphrase-corpus-b").PARAPHRASES as ParaphraseItem[]) : PARAPHRASES);
   console.log(r.lines.join("\n"));
+  if (process.argv.includes("--bands")) {
+    // Where would a different "close enough to trust" cut-off put right and wrong answers that show nothing?
+    const bands = [0.1, 0.2, 0.25, 0.3, 0.35, 0.45, 1];
+    const rows = bands.map((b) => ({ b, right: 0, rightClean: 0, wrong: 0, wrongClean: 0 }));
+    const clean = (ev: Evaluation) => !anyGrammar(ev) && ev.scores.overall >= 85;
+    const dist = (qid: string, text: string) => rankTargets(QUESTION_BY_ID[qid]!, words(tokenize(text)))[0].al.distance;
+    for (const x of r.right) { const row = rows.find((k) => dist(x.qid, x.text) <= k.b)!; row.right++; if (clean(x.ev)) row.rightClean++; }
+    for (const x of r.wrong) { const row = rows.find((k) => dist(x.qid, x.text) <= k.b)!; row.wrong++; if (clean(x.ev)) row.wrongClean++; }
+    console.log("\n| distance ≤ | right | right, nothing found | wrong | wrong, nothing found |\n| ---: | ---: | ---: | ---: | ---: |");
+    for (const k of rows) console.log(`| ${k.b} | ${k.right} | ${k.rightClean} | ${k.wrong} | ${k.wrongClean} |`);
+  }
   if (process.argv.includes("--list")) {
     console.log("\nFalse alarms (correct answers marked wrong):");
     for (const x of r.falseAlarm) console.log(`  ${x.ev.scores.overall} ${x.ev.confidence.padEnd(6)} ${x.qid.padEnd(40)} ${x.text}\n      ${scoredErrors(x.ev.errors).filter((e) => e.category !== "spelling").map((e) => `${e.severity} ${e.category} [${e.source}] '${e.text}'→'${e.fix}'`).join("; ")}`);
