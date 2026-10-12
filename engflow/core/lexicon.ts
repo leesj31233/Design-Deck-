@@ -150,6 +150,8 @@ export function isSameFormParticiple(base: string): boolean {
 export const ING_NOUNS = new Set([
   "during", "something", "nothing", "anything", "everything", "morning", "evening", "meeting", "building", "engineering",
   "piping", "drawing", "drawings", "training", "spring", "string", "ceiling", "bring", "thing", "king", "ring", "sing",
+  // Nouns only (never a verb in these lessons): "my cousin's wedding" is not "cousin is wedding".
+  "wedding", "weddings", "clothing", "housing", "earring", "earrings", "pudding", "sibling", "siblings", "dumpling", "dumplings",
 ]);
 
 /** Uncountable nouns frequently pluralized by learners. */
