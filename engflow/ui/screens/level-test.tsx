@@ -22,7 +22,14 @@ import { MeaningChunks } from "../practice/parts";
 
 export function LevelTestScreen() {
   const app = useApp();
+  const nav = useNav();
   const [view, setView] = React.useState<{ kind: "home" } | { kind: "run"; length: DiagnosticLength } | { kind: "result"; r: DiagnosticResultRecord }>({ kind: "home" });
+  // The test runs in focus mode: no navigation chrome to tap by accident.
+  React.useEffect(() => {
+    nav.setFocus(view.kind === "run");
+    return () => nav.setFocus(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view.kind]);
   if (view.kind === "run")
     return (
       <TestRunner
@@ -208,7 +215,7 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
         <div className="min-w-0 flex-1">
           <div className="flex justify-between text-[12px]">
             <span className="font-semibold">Part {part} · {PART_NAMES_KO[(part ?? 1) - 1]}</span>
-            <span className="ef-num text-[var(--muted)]">{n + 1} / {total}</span>
+            <span className="ef-num text-[var(--muted)]" data-testid="test-progress">{n + 1} / {total}</span>
           </div>
           <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-[var(--ef-track)]">
             <div className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-300" style={{ width: `${(n / total) * 100}%` }} />
@@ -247,7 +254,7 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
                 {order.length ? (
                   <div className="flex flex-wrap gap-1.5">
                     {order.map((c, i) => (
-                      <button key={`${c}-${i}`} onClick={() => setOrder((o) => o.filter((_, k) => k !== i))} className="dd-focus ef-en rounded-xl bg-[var(--foreground)] px-3 py-2 text-[15px] text-[var(--background)]">
+                      <button key={`${c}-${i}`} data-chunk="placed" aria-label={`${c} (빼기)`} onClick={() => setOrder((o) => o.filter((_, k) => k !== i))} className="dd-focus ef-en rounded-xl bg-[var(--foreground)] px-3 py-2 text-[15px] text-[var(--background)]">
                         {c}
                       </button>
                     ))}
@@ -260,7 +267,7 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
                 {shuffleFor(item.id, item.chunks!)
                   .filter((c) => !order.includes(c))
                   .map((c, i) => (
-                    <button key={c} onClick={() => setOrder((o) => [...o, c])} className="dd-focus ef-en inline-flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-2 text-[15px]">
+                    <button key={c} data-chunk="pool" onClick={() => setOrder((o) => [...o, c])} className="dd-focus ef-en inline-flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-2 text-[15px]">
                       <Kbd className="ef-kbd-hint">{i + 1}</Kbd>
                       {c}
                     </button>

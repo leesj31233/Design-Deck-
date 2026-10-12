@@ -68,6 +68,10 @@ Public design references such as Awwwards, Behance, Land-book and accessible pro
 
 See `docs/REFERENCE_WORKFLOW.md` and `docs/COMPONENT_SOURCES.md` for the integration model for Mobbin, Land-book, Refero, SaaSFrame, Aceternity UI, Magic UI, React Bits and 21st.dev.
 
+## Products built on Design Deck
+
+- **EngFlow** (`/engflow`, `engflow/`) — engineering-English learning platform for Korean process engineers: full-sentence construction, phrase drills, FSRS review with generalization, mistake notebook and an adaptive CEFR level test. Also ships as a single-file claude.ai artifact for iPhone and iPad. See [docs/engflow/README.md](docs/engflow/README.md).
+
 ## Repository role
 
 Treat this repository as the **design engine** shared by future products. New projects can copy individual components, consume the system as a source package, or use it as the visual baseline when implementing a Figma design.

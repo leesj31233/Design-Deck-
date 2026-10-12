@@ -179,6 +179,8 @@
 .ef-scroll-x::-webkit-scrollbar { display: none; }
 
 .ef-safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); }
+/* The artifact host already pads :root by the safe areas: sticky headers stick below the inset instead of padding it again. */
+.ef-artifact .ef-topbar { padding-top: 0; top: env(safe-area-inset-top, 0px); }
 
 @keyframes ef-pop {
   0% { transform: scale(.6); opacity: 0; }

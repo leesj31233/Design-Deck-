@@ -137,7 +137,9 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
   const contentSub = (o: AlignOp | undefined) => !!o && o.type === "sub" && !(isFunctionWord(w[o.li].norm) && isFunctionWord(tw[o.ti].norm));
   const solid = (o: AlignOp | undefined) => !o || o.type === "match" || o.type === "spell" || o.type === "inflect";
   const rephrased = (o: AlignOp | undefined) =>
-    contentSub(o) || (!!o && o.type === "ins" && !isFunctionWord(tw[o.ti].norm)) || (!!o && o.type === "del" && !isFunctionWord(w[o.li].norm));
+    contentSub(o) ||
+    (!!o && o.type === "ins" && !movedT.has(o.ti) && !isFunctionWord(tw[o.ti].norm)) ||
+    (!!o && o.type === "del" && !movedL.has(o.li) && !isFunctionWord(w[o.li].norm));
   // A run of consecutive insertions (or deletions) that contains a content word is an
   // inserted/omitted phrase ("at the site", "to us", "Could you"): rephrasing, not an error.
   const runOf = (k: number, type: "ins" | "del") => {
@@ -150,7 +152,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
   const phraseRun = (k: number) => {
     const op = al.ops[k];
     if (op.type !== "ins" && op.type !== "del") return false;
-    const run = runOf(k, op.type);
+    // Moved words are reported as word-order errors; they do not make a run "rephrased".
+    const run = runOf(k, op.type).filter((o) => !(o.type === "del" && movedL.has(o.li)) && !(o.type === "ins" && movedT.has(o.ti)));
     if (run.length < 2) return false;
     const wordsInRun = run.map((o) => (o.type === "ins" ? tw[o.ti].norm : o.type === "del" ? w[o.li].norm : ""));
     return wordsInRun.some((x) => !isFunctionWord(x) || /^(us|them|him|me|please)$/.test(x)) || wordsInRun.some((x) => MODALS.has(x) || AUXILIARIES.has(x));

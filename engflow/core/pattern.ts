@@ -1,4 +1,5 @@
 import { isSpellingVariant, stem, type Token } from "./text";
+import { ingOf, pastOf } from "./lexicon";
 
 /**
  * Compiles the pattern mini-language documented in types.ts and matches it
@@ -79,6 +80,8 @@ function tokenMatches(alt: Alt, tok: Token): "exact" | "fuzzy" | null {
   if (alt.exact) return tok.norm === alt.value ? "exact" : null;
   if (tok.norm === alt.value || tok.stem === alt.stem) return "exact";
   if (isSpellingVariant(tok.norm, alt.value)) return "fuzzy";
+  // A misspelled inflected form ("wating" for wait → waiting).
+  if (/^[a-z]+$/.test(alt.value) && [ingOf(alt.value), pastOf(alt.value), alt.value + "s"].some((f) => isSpellingVariant(tok.norm, f))) return "fuzzy";
   return null;
 }
 

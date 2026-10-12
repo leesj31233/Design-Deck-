@@ -160,6 +160,7 @@ export function artifactStorage(): StorageService & { ready: Promise<boolean> } 
 
   async function flush(s: LearnerState): Promise<void> {
     writeLocal(s);
+    await ready;
     if (!db || readOnly) return;
     const docs = splitState(s);
     // Content docs first, the head ("state") last, so a reader never sees a head that points at missing chunks.

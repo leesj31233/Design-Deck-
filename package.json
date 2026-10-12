@@ -11,7 +11,8 @@
     "dev:artifact": "vite --config engflow/artifact/vite.config.mts",
     "content:check": "tsx scripts/check-content.ts",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "npm run build:artifact && tsx scripts/preview-artifact.ts && playwright test",
+    "db:seed": "tsx scripts/db-seed.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

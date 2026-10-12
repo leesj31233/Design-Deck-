@@ -59,7 +59,7 @@ export async function openPglite(dataDir?: string): Promise<DbHandle> {
 }
 
 export function migrationsDir(): string {
-  return process.env.ENGFLOW_MIGRATIONS_DIR || path.join(process.cwd(), "db", "migrations");
+  return process.env.ENGFLOW_MIGRATIONS_DIR || path.join(/*turbopackIgnore: true*/ process.cwd(), "db", "migrations");
 }
 
 /** Apply db/migrations/*.sql in order, once each. */
@@ -89,7 +89,7 @@ export function getDb(): Promise<DbHandle | null> {
     shared = (async () => {
       const kind = configuredDbKind();
       if (kind === "none") return null;
-      const h = kind === "postgres" ? await openPostgres(process.env.DATABASE_URL!) : await openPglite(process.env.ENGFLOW_PGLITE_DIR || path.join(process.cwd(), ".data", "pglite"));
+      const h = kind === "postgres" ? await openPostgres(process.env.DATABASE_URL!) : await openPglite(process.env.ENGFLOW_PGLITE_DIR || path.join(/*turbopackIgnore: true*/ process.cwd(), ".data", "pglite"));
       await migrate(h);
       return h;
     })().catch((e) => {

@@ -28,6 +28,8 @@ export interface Nav {
   openGuide: (skill: string) => void;
   /** Practice one skill right away (from the guide, notebook or progress). */
   practiceSkill: (skill: string) => void;
+  /** Hide navigation chrome (level test in progress). */
+  setFocus: (on: boolean) => void;
 }
 
 export const NavContext = React.createContext<Nav | null>(null);
@@ -58,6 +60,7 @@ function Shell() {
   const [route, setRoute] = React.useState<Route>(readHash);
   const [session, setSession] = React.useState<SessionSpec | null>(null);
   const [guideSkill, setGuideSkill] = React.useState<string | null>(null);
+  const [focus, setFocus] = React.useState(false);
   const desktop = useMediaQuery("(min-width: 1024px)");
   const mainRef = React.useRef<HTMLDivElement>(null);
 
@@ -86,6 +89,7 @@ function Shell() {
       window.scrollTo({ top: 0 });
     },
     openGuide: (skill) => setGuideSkill(skill),
+    setFocus,
     practiceSkill: (skill) => {
       import("../core/session").then(({ buildSession }) => {
         const plan = buildSession(app.state, app.questions, { size: 6, mode: "mixed", skill, now: app.now() });
@@ -125,7 +129,7 @@ function Shell() {
       <div className="ef-root min-h-[100dvh]">
         {offset ? <TimeBanner /> : null}
         <div className="flex">
-          {desktop ? (
+          {desktop && !focus ? (
             <aside className="sticky top-0 flex h-[100dvh] w-[248px] shrink-0 flex-col border-r border-[var(--line)] bg-[var(--surface)] px-3 py-4 backdrop-blur-xl">
               <Brand />
               <nav className="mt-6 flex flex-col gap-0.5" aria-label="주요 메뉴">
@@ -146,8 +150,8 @@ function Shell() {
             </aside>
           ) : null}
           <div ref={mainRef} className="min-w-0 flex-1">
-            {!desktop ? (
-              <header className="sticky top-0 z-30 border-b border-[var(--line)] bg-[var(--background)]/85 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
+            {!desktop && !focus ? (
+              <header className="ef-topbar sticky top-0 z-30 border-b border-[var(--line)] bg-[var(--background)]/85 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
                 <div className="flex h-14 items-center gap-2 px-4">
                   <Brand compact />
                   <div className="ml-auto flex items-center gap-1.5">
@@ -162,12 +166,12 @@ function Shell() {
                 </div>
               </header>
             ) : null}
-            <main className={cn("mx-auto w-full max-w-5xl px-4 pt-5 md:px-6 lg:px-10 lg:pt-10", desktop ? "pb-16" : "pb-[calc(84px+env(safe-area-inset-bottom,0px))]")}>
+            <main className={cn("mx-auto w-full max-w-5xl px-4 pt-5 md:px-6 lg:px-10 lg:pt-10", desktop || focus ? "pb-16" : "pb-[calc(84px+env(safe-area-inset-bottom,0px))]")}>
               <Screen />
             </main>
           </div>
         </div>
-        {!desktop ? (
+        {!desktop && !focus ? (
           <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line)] bg-[var(--surface-strong)]/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-xl" aria-label="주요 메뉴">
             <div className="mx-auto flex max-w-xl">
               {NAV_ITEMS.filter((n) => n.mobile).map((n) => {
