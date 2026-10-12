@@ -784,11 +784,17 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   const scoredMissing = missingUnits.filter((m) => !m.term || m.critical);
   let summaryKo: string;
   if ((!scored.length || spellingOnly) && !scoredMissing.length) {
-    summaryKo = spellingOnly
-      ? "문법은 정확합니다. 철자 실수만 있어 점수에는 거의 영향이 없습니다."
-      : "기준 답안과 표현은 다르지만 문법과 의미 모두 문제를 찾지 못했습니다.";
+    summaryKo = !close
+      ? "규칙 기반 검사에서는 오류를 찾지 못했지만, 기준 답안과 표현이 많이 달라 문법을 모두 확인하지는 못했습니다."
+      : spellingOnly
+        ? "문법은 정확합니다. 철자 실수만 있어 점수에는 거의 영향이 없습니다."
+        : "기준 답안과 표현은 다르지만 문법과 의미 모두 문제를 찾지 못했습니다.";
   } else {
-    const lead = !grammarErrors.length ? "문법은 정확합니다." : M >= 85 ? "의미는 잘 전달되지만 문법을 고쳐야 합니다." : "문법과 의미 모두 다시 확인하세요.";
+    const lead = !grammarErrors.length
+      ? close
+        ? "문법은 정확합니다."
+        : "규칙 기반 검사에서는 문법 오류를 찾지 못했지만, 표현이 기준 답안과 많이 달라 모두 확인하지는 못했습니다."
+      : M >= 85 ? "의미는 잘 전달되지만 문법을 고쳐야 합니다." : "문법과 의미 모두 다시 확인하세요.";
     const issue = mainError && mainError.category !== "spelling" ? mainError.messageKo.split(/(?<=[.。])\s/)[0] : "";
     const parts = [lead];
     if (issue) parts.push(`핵심: ${issue}`);
@@ -812,7 +818,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   const confidence: Evaluation["confidence"] = close ? (al.distance <= 0.2 ? "high" : "medium") : "low";
   const confidenceNoteKo =
     confidence === "low"
-      ? "기준 답안과 표현이 많이 달라 의미 단위와 일반 문법 규칙만으로 검사했습니다. 새로운 오류는 놓칠 수 있으니 Claude 분석으로 확인하세요."
+      ? "기준 답안과 표현이 많이 달라 의미 단위와 일반 문법 규칙으로만 검사했습니다. 이 방식은 처음 보는 문장의 오류를 놓칠 수 있습니다."
       : confidence === "medium"
         ? "가장 가까운 기준 답안과 비교한 결과입니다."
         : undefined;

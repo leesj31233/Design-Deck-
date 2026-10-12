@@ -57,14 +57,14 @@ db/migrations                    SQL migrations (PostgreSQL)
 
 ### Evaluation
 
-Each answer is graded **once**, and the grade appears within about a second of submitting (`engflow/core/grader.ts`):
+Each answer is graded **once** (`engflow/core/grader.ts`). Close answers are graded within about a second; answers worded very differently wait for Claude, because that is where the rule-based grader cannot be trusted:
 
 - **Instant.** An exact match, or a close answer in which nothing but spelling differs, is graded by the rule-based grader at once (about 1 ms; 20 ms at worst on a laptop). Claude adds nothing there.
 - **Graded while typing.** When the learner pauses on a fairly complete sentence (450 ms, or 150 ms after a final period), Claude starts grading that text in the background. Submitting the same text (a final period or extra spaces may differ) shows that grade at once. A question allows at most five background requests, and a newer one cancels the previous one.
-- **One-second cap.** Otherwise Claude gets 1 second after submit (3 or 9 seconds if chosen in Settings). If it has not answered, the rule-based grade is shown and the late reply is discarded, so the score never jumps.
+- **Wait by trust ("auto", the default).** Otherwise Claude gets 1 second when the answer is close to an expected one, 2.5 seconds when it is partly reworded, and up to 8 seconds when it is worded very differently. The rule-based grader compares against expected answers, so it can miss errors in a sentence it has never seen (an iPhone test scored "This suggestion is not satisfy the requirements of customer." 100 under a flat 1-second cap). Settings also offers "always 1 second" and "accuracy first" (9 seconds). If Claude has not answered in time, the rule-based grade is shown and the late reply is ignored, so the score never jumps; a reworded answer graded only by rules is labelled "확인 못 함", never "정확해요", and never counts as an Easy review.
 - **Short replies.** Claude returns only the scores, the errors with one-sentence explanations, the minimal correction and the native phrasing. The app writes the verdict and grammar note from the error list, because reply length is what sets the wait.
 
-Each result shows how long grading took ("Claude 채점 · 0.4초"), and Settings shows the device's average over the last 20 answers.
+Each result shows how long grading took ("Claude 채점 · 0.4초"). Settings shows the device's average over the last 20 answers, how often Claude graded, and Claude's own median response time on this device (requests that finished after the cut-off are still timed).
 
 **Scoring is grammar-centred** and identical for both graders: the score is computed from the error list with one penalty table.
 
@@ -81,7 +81,7 @@ The rule-based grader works offline:
 
 1. **Meaning units.** Lenient patterns check each Korean meaning chunk. A term slot counts only when the message cannot work without it.
 2. **Question pitfalls.** Curated patterns catch known Korean-speaker mistakes for that item and carry the best explanation.
-3. **Grammar rules.** 21 context-checked rule groups, each firing only when the word class is known: missing *be* in the progressive, *wait* without *for*, *before* + base verb, modal + *to*, agreement, *will* in if/when clauses, *every* + plural, uncountable plurals, a/an, irregular past forms, third-conditional *will have*, and more.
+3. **Grammar rules.** 22 context-checked rule groups, each firing only when the word class is known: missing *be* in the progressive, *wait* without *for*, *before* + base verb, modal + *to*, agreement, *will* in if/when clauses, *every* + plural, a missing article before a singular countable noun (*of customer*), *be* + feeling verb (*is satisfy with*), uncountable plurals, a/an, irregular past forms, third-conditional *will have*, and more.
 4. **Alignment.** The answer is aligned against the closest correct answer, sentence by sentence for long answers. A difference counts only when it sits next to shared words and is not part of a rephrased phrase. Another equally close correct answer can veto it only if it accepts the learner's word as it is.
 5. **Minimal correction.** Only the detected errors are fixed, so the learner's own words (including site terms) are kept. A correction is rejected if it breaks a rule or moves away from every correct answer.
 
@@ -141,7 +141,7 @@ See [CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md) for the authoring rules, the 
 ## Known limitations
 
 - The rule-based grader is precise on the patterns it knows, but it can miss new kinds of errors in free paraphrases. It flags this with low confidence; with Claude available, Claude grades instead.
-- Claude's own response time depends on the tier the host provides. When Claude is slower than the 1-second cap and the learner submits right after typing, the rule-based grade is used for that answer; Settings shows how often Claude made it in time.
+- Claude's own response time depends on the tier the host provides. Reworded answers therefore take as long as Claude needs (up to 8 seconds) unless grading already started while typing; Settings shows the measured time.
 - Speaking (recording, transcription, pronunciation) is not implemented.
 - The web app's sync key is device-held identity, not authentication.
 - The TOEIC Speaking figures need manual verification against ETS/YBM (see above).

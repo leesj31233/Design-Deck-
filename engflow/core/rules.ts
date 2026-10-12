@@ -168,17 +168,34 @@ const beBaseVerb: Rule = (w) => {
   for (let i = 0; i < w.length - 1; i++) {
     if (!BE_FORMS.has(w[i].norm) || w[i].norm === "be" || w[i].norm === "been" || w[i].norm === "being") continue;
     let j = i + 1;
-    if (w[j]?.norm === "not") j++;
+    let negated = false;
+    while (j < w.length && /^(not|really|also|still|just|always|never|usually|actually)$/.test(w[j].norm)) {
+      if (w[j].norm === "not" || w[j].norm === "never") negated = true;
+      j++;
+    }
     const v = w[j];
     if (!v || !UNAMBIGUOUS_VERBS.has(v.norm) || isSameFormParticiple(v.norm) || BE_ADJECTIVE_OK.has(v.norm)) continue;
     if (w[j + 1]?.norm === "to" && v.norm === "able") continue;
+    // "is" after a question word or "there" is not this pattern ("What is meet?" is not a learner sentence).
+    if (i > 0 && /^(there|what|where|how|why|who)$/.test(w[i - 1].norm)) continue;
+    // "be satisfy with" → "be satisfied with": feelings and states take the past participle.
+    if (/^(satisfy|disappoint|interest|involve|concern|worry|surprise|please|confuse|excite|bore|tire|prepare|qualify|relate|base|locate)$/.test(v.norm) && /^(with|about|in|by|for|on|to|at)$/.test(w[j + 1]?.norm ?? "")) {
+      const pp = participleOf(v.norm);
+      out.push({
+        rule: "be-participle", from: j, to: j + 1, replacement: pp, category: "verb-form", severity: "major", skill: "be-adj",
+        messageKo: `상태·감정은 'be + 과거분사'로 말합니다: '${w[i].raw} ${v.raw} ${w[j + 1].raw}' → '${w[i].raw} ${pp} ${w[j + 1].raw}'.`,
+      });
+      continue;
+    }
     const subj = w[i - 1]?.norm ?? "";
-    const third = /^(he|she|it|this|that)$/.test(subj);
+    // A singular subject ("this suggestion", "the plan", "it") takes does/-s; plural or I/you/we/they take do.
+    const third = /^(he|she|it|this|that)$/.test(subj) || (/^(is|was|isn't|wasn't)$/.test(w[i].norm) && !/^(i|you|we|they)$/.test(subj));
+    void negated;
     const fix = v.norm === "agree" || !third ? v.norm : v.norm + "s";
     out.push({
-      rule: "be-base-verb", from: i, to: j + 1, replacement: (j > i + 1 ? (third ? "does not " : "do not ") : "") + (j > i + 1 ? v.norm : fix),
+      rule: "be-base-verb", from: i, to: j + 1, replacement: (j > i + 1 ? `${third ? "does" : "do"} ${w.slice(i + 1, j).map((x) => x.norm).join(" ")} ` : "") + (j > i + 1 ? v.norm : fix),
       category: "verb-form", severity: "major", skill: "agreement",
-      messageKo: `be동사와 일반동사를 함께 쓸 수 없습니다. '${w[i].raw} ${v.raw}' → '${j > i + 1 ? (third ? "does not " : "do not ") + v.norm : fix}'. (예: I agree / We understand)`,
+      messageKo: `be동사와 일반동사를 함께 쓸 수 없습니다. '${w.slice(i, j + 1).map((x) => x.raw).join(" ")}' → '${j > i + 1 ? `${third ? "does" : "do"} ${w.slice(i + 1, j).map((x) => x.norm).join(" ")} ${v.norm}` : fix}'. 부정은 do/does + not + 동사원형입니다. (예: It does not meet … / We do not agree.)`,
     });
   }
   return out;
@@ -459,6 +476,82 @@ const everyPlural: Rule = (w) =>
     }];
   });
 
+/**
+ * Singular countable nouns need a determiner: "the requirements of customer" →
+ * "of the customer". Only nouns that are almost always countable and rarely
+ * used without an article in idioms are checked, and only when the noun heads
+ * its phrase (not "customer requirements").
+ */
+const COUNTABLE_NOUNS = new Set([
+  "customer", "client", "vendor", "supplier", "contractor", "consultant", "engineer", "operator", "manager", "colleague",
+  "proposal", "report", "problem", "question", "suggestion", "decision", "solution", "idea", "option", "reason",
+  "sample", "pump", "valve", "dryer", "tank", "reactor", "vessel", "compressor", "boiler", "heater", "plant", "factory",
+  "company", "office", "department", "document", "drawing", "presentation", "slide", "chart", "graph", "agenda",
+  "flight", "hotel", "restaurant", "airport", "contract", "quotation", "invoice", "requirement", "specification",
+  "datasheet", "mistake", "project", "meeting", "deadline", "proposal", "machine", "laptop", "microphone",
+]);
+const NP_DETERMINERS = new Set([
+  ...DETERMINERS, "my", "one", "two", "three", "first", "second", "last", "next", "which", "what", "whose", "such", "many",
+  "either", "neither", "per", "each", "every", "same",
+]);
+const bareSingularCountable: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  for (let i = 0; i < w.length; i++) {
+    const n = w[i];
+    if (!COUNTABLE_NOUNS.has(n.norm) || n.expanded) continue;
+    // Heads its phrase only: followed by the end, a function word or a verb (not by another noun or an object).
+    const next = w[i + 1];
+    if (next) {
+      const nn = next.norm;
+      const isVerb = !!verbInfo(nn) && !COUNTABLE_NOUNS.has(nn);
+      const isFunction = /^(of|for|to|in|on|at|with|from|about|by|and|or|but|because|so|that|which|who|is|was|has|had|will|would|can|could|should|must|may|might|does|did|do|are|were)$/.test(nn);
+      if (!isVerb && !isFunction) continue;
+      // "meeting the client", "drawing a line": a gerund, not a noun.
+      if (/ing$/.test(n.norm) && (DETERMINERS.has(nn) || SUBJECT_PRONOUNS.has(nn))) continue;
+    }
+    // Walk back over modifiers ("new", "revised", "control", "Malaysian") to find a determiner or a possessive.
+    let k = i - 1;
+    let ok = false;
+    let uncertain = false;
+    let start = i;
+    while (k >= 0 && i - k <= 4) {
+      const t = w[k];
+      if (NP_DETERMINERS.has(t.norm) || /^\d/.test(t.norm) || /'s$|s'$/i.test(t.raw.replace(/’/g, "'"))) {
+        ok = true;
+        break;
+      }
+      const functional = /^(of|for|to|in|on|at|with|from|about|by|into|than|as|and|or|but|because|so|if|when|is|was|are|were|be|been|not|will|would|can|could|should|must|may|might|do|does|did|have|has|had)$/.test(t.norm) || SUBJECT_PRONOUNS.has(t.norm);
+      if (functional) break;
+      const vi = verbInfo(t.norm);
+      if (vi) {
+        const before = w[k - 1]?.norm ?? "";
+        const afterSubject = SUBJECT_PRONOUNS.has(before) || COUNTABLE_NOUNS.has(before);
+        // "revised quotation", "updated datasheet", "leaking valve": a participle used as an adjective.
+        if ((vi.form === "pp" || vi.form === "past" || vi.form === "ing") && !afterSubject) {
+          start = k;
+          k--;
+          continue;
+        }
+        // A real verb ends the noun phrase: "satisfy (the) customer", "we sent (the) quotation".
+        if (UNAMBIGUOUS_VERBS.has(vi.base) || vi.form === "3sg" || vi.form === "past") break;
+        // "control valve", "test report": maybe a noun modifier — keep looking, but never guess.
+        uncertain = true;
+      }
+      start = k;
+      k--;
+    }
+    if (!ok && uncertain) continue;
+    if (ok) continue;
+    // "kind of problem", "type of valve": the bare noun is idiomatic.
+    if (w[start - 1]?.norm === "of" && /^(kind|type|sort|form|lack|piece)$/.test(w[start - 2]?.norm ?? "")) continue;
+    out.push({
+      rule: "missing-article", from: start, to: start, replacement: "the", category: "article", severity: "minor", skill: "articles",
+      messageKo: `셀 수 있는 단수 명사 '${n.raw}' 앞에는 관사(a/the)나 소유격(our, their 등)이 필요합니다. 여기서는 'the ${w.slice(start, i + 1).map((x) => x.raw).join(" ")}'가 자연스럽습니다.`,
+    });
+  }
+  return out;
+};
+
 const RULES: Rule[] = [
   itsContraction,
   lexicalAgreement,
@@ -466,7 +559,7 @@ const RULES: Rule[] = [
   comparisonForms,
   missingBeProgressive, waitWithoutFor, prepositionBaseVerb, modalTo, modalInflected, doubleModal, beBaseVerb,
   perfectBaseVerb, doPast, agreement, doubleComparative, willInConditionClause, uncountablePlural, everyPlural, nonWords, articleSound,
-  transitivePreposition,
+  transitivePreposition, bareSingularCountable,
 ];
 
 export function runRules(words: Token[]): RuleFinding[] {

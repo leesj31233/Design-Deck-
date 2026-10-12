@@ -84,3 +84,11 @@ describe("grade derivation", () => {
     expect(deriveGrade({ evaluation: ev(0), hint: 0, responseMs: 1000, expectedMs: 20000, skipped: true }).grade).toBe(1);
   });
 });
+
+describe("unconfirmed grades", () => {
+  it("a rule-based grade of a reworded answer never counts as Easy", () => {
+    const base = { scores: { overall: 100 } as never, errors: [] };
+    expect(deriveGrade({ evaluation: { ...base, evaluator: "ai", confidence: "high" }, hint: 0, responseMs: 5000, expectedMs: 20000 }).grade).toBe(4);
+    expect(deriveGrade({ evaluation: { ...base, evaluator: "local", confidence: "low" }, hint: 0, responseMs: 5000, expectedMs: 20000 }).grade).toBe(3);
+  });
+});

@@ -17,6 +17,11 @@ const IRREGULAR: Record<string, [past: string, pp: string]> = {
   think: ["thought", "thought"], understand: ["understood", "understood"], write: ["wrote", "written"],
   rise: ["rose", "risen"], fall: ["fell", "fallen"], grow: ["grew", "grown"], feel: ["felt", "felt"],
   hear: ["heard", "heard"], shake: ["shook", "shaken"], break: ["broke", "broken"], feed: ["fed", "fed"],
+  teach: ["taught", "taught"], catch: ["caught", "caught"], drive: ["drove", "driven"], eat: ["ate", "eaten"],
+  drink: ["drank", "drunk"], fly: ["flew", "flown"], forgive: ["forgave", "forgiven"], lend: ["lent", "lent"],
+  seek: ["sought", "sought"], sit: ["sat", "sat"], sleep: ["slept", "slept"], throw: ["threw", "thrown"],
+  wear: ["wore", "worn"], win: ["won", "won"], let: ["let", "let"], spread: ["spread", "spread"], fight: ["fought", "fought"],
+  steal: ["stole", "stolen"], wake: ["woke", "woken"], withdraw: ["withdrew", "withdrawn"],
 };
 
 /** Verbs common in engineering meetings (base forms). */
@@ -36,6 +41,17 @@ export const BASE_VERBS = new Set<string>([
   "want", "wash", "work", "explore", "postpone", "prioritize", "record", "remove", "repeat", "return", "scale",
   "separate", "specify", "transfer", "visit", "warn", "assess", "check", "secure", "handle", "align", "reach",
   "cause", "prevent", "affect", "happen", "occur", "exceed", "drop", "consume", "achieve", "maintain", "perform", "reject", "trip",
+  // Everyday meeting and conversation verbs.
+  "satisfy", "fulfill", "fulfil", "attend", "appreciate", "apologize", "apologise", "belong", "borrow", "complain",
+  "connect", "contain", "create", "depend", "describe", "determine", "develop", "disagree", "enjoy", "exist", "imagine",
+  "introduce", "join", "listen", "obtain", "participate", "persuade", "prefer", "pretend", "prove", "realize", "realise",
+  "recognize", "recognise", "refer", "refuse", "rely", "remember", "represent", "seem", "solve", "succeed", "suppose",
+  "survive", "translate", "wonder", "arrive", "believe", "discover", "encourage", "expand", "fail", "invite", "involve",
+  "learn", "manage", "organize", "organise", "protect", "react", "serve", "stay", "suffer", "thank", "add", "advise",
+  "announce", "appear", "argue", "celebrate", "coordinate", "download", "eliminate", "emphasize", "enable", "examine",
+  "gather", "generate", "highlight", "implement", "indicate", "integrate", "interpret", "interrupt", "locate", "minimize",
+  "negotiate", "predict", "preserve", "promote", "raise", "register", "remain", "reserve", "restore", "resume", "retain",
+  "simplify", "stabilize", "strengthen", "supervise", "troubleshoot", "utilize", "weigh",
 ]);
 
 /** Verbs that are rarely nouns — safe for rules like "have + base verb". */
@@ -45,10 +61,20 @@ export const UNAMBIGUOUS_VERBS = new Set<string>([
   "clarify", "identify", "modify", "postpone", "propose", "recommend", "resolve", "simulate", "validate", "explain",
   "choose", "understand", "give", "take", "write", "begin", "bring", "buy", "find", "forget", "know", "see", "speak",
   "tell", "think", "agree", "assume", "ensure", "deliver", "reduce", "improve", "inspect", "replace", "revise",
+  "satisfy", "fulfill", "fulfil", "meet", "attend", "appreciate", "apologize", "apologise", "belong", "borrow", "complain",
+  "connect", "contain", "create", "depend", "describe", "determine", "develop", "disagree", "enjoy", "exist", "imagine",
+  "introduce", "join", "listen", "obtain", "participate", "persuade", "prefer", "pretend", "prove", "realize", "realise",
+  "recognize", "recognise", "refuse", "rely", "remember", "represent", "seem", "solve", "succeed", "suppose", "survive",
+  "translate", "wonder", "arrive", "believe", "discover", "encourage", "expand", "fail", "invite", "involve", "learn",
+  "manage", "organize", "organise", "protect", "react", "serve", "suffer", "thank", "accept", "achieve", "maintain",
+  "perform", "require", "provide", "operate", "consider", "continue", "expect", "follow", "happen", "include", "mention",
+  "occur", "prevent", "reject", "respond", "want", "teach", "eat", "drink", "drive", "forgive", "lend", "advise",
+  "announce", "appear", "argue", "coordinate", "eliminate", "emphasize", "enable", "examine", "generate", "implement",
+  "indicate", "integrate", "interpret", "interrupt", "locate", "negotiate", "predict", "remain", "simplify", "supervise",
 ]);
 
 /** Past participles identical to the base form; excluded from "be + base verb". */
-const SAME_FORM = new Set(["put", "set", "cut", "shut", "read", "run", "come"]);
+const SAME_FORM = new Set(["put", "set", "cut", "shut", "read", "run", "come", "let", "spread"]);
 
 export function isBaseVerb(w: string): boolean {
   return BASE_VERBS.has(w);

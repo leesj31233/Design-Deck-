@@ -225,3 +225,23 @@ describe("spoken-English false positives (round 2)", () => {
     expect(evaluateLocal(t, "I'll check it and get back to you.").errors.filter((x) => x.severity !== "minor")).toEqual([]);
   });
 });
+
+describe("reworded answers (iPhone report: 'is not satisfy … of customer' scored 100)", () => {
+  const rq = QUESTION_BY_ID["ph-collocation-meet-requirements"];
+  const answer = "This suggestion is not satisfy the requirements of customer.";
+  it("catches 'is not satisfy' and the missing article even far from the reference wording", () => {
+    const e = evaluateLocal(rq, answer);
+    expect(e.confidence).toBe("low");
+    const be = e.errors.find((x) => x.text === "is not satisfy");
+    expect(be?.severity).toBe("major");
+    expect(be?.fix).toBe("does not satisfy");
+    expect(e.errors.some((x) => x.category === "article" && x.fix === "the")).toBe(true);
+    expect(e.corrected).toBe("This suggestion does not satisfy the requirements of the customer.");
+    expect(e.scores.overall).toBeLessThan(85);
+  });
+  it("a reworded answer with no error found is reported as unconfirmed, not as correct", () => {
+    const e = evaluateLocal(rq, "Honestly, this idea does not really work for what the client asked.");
+    expect(e.confidence).toBe("low");
+    expect(e.summaryKo).toMatch(/모두 확인하지는 못했습니다/);
+  });
+});

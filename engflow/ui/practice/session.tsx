@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, X } from "lucide-react";
 import { Kbd } from "@/components/ui/kbd";
 import { evaluateLocal } from "../../core/evaluate";
-import { GRADE_WAIT_MS, createGrader, type GradeVia } from "../../core/grader";
+import { createGrader, gradeBudgetMs, type GradeVia } from "../../core/grader";
+import { recordClaudeLatency } from "../latency";
 import { pickReviewQuestion, type SessionItem } from "../../core/session";
 import type { RecordResult } from "../../core/store";
 import type { Evaluation, HintLevel, Question } from "../../core/types";
@@ -130,16 +131,19 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const q = item ? app.qIndex[item.questionId] : undefined;
   const settings = app.state.settings;
   const aiPossible = app.ai.available && settings.ai !== "off";
-  const budgetMs = GRADE_WAIT_MS[settings.gradeWait ?? "fast"];
-  const live = React.useRef({ aiPossible, budgetMs });
-  live.current = { aiPossible, budgetMs };
+  const gradeMode = settings.gradeMode ?? "auto";
+  const live = React.useRef({ aiPossible, gradeMode });
+  live.current = { aiPossible, gradeMode };
+  // While grading: how long the bar runs, and whether the wait is because the answer is reworded.
+  const [wait, setWait] = React.useState<{ budgetMs: number; reworded: boolean } | null>(null);
   // One grader per session: background grading while typing, one result per submit within the budget.
   const grader = React.useMemo(
     () =>
       createGrader({
         evaluate: (question, text, local, signal) => app.platform.ai.evaluate(question, text, local, "quick", signal),
         aiEnabled: () => live.current.aiPossible,
-        budgetMs: () => live.current.budgetMs,
+        budgetMs: (local) => gradeBudgetMs(live.current.gradeMode, local),
+        onLatency: recordClaudeLatency,
       }),
     [app.platform.ai],
   );
@@ -213,8 +217,11 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       return;
     }
     const token = ++gradeToken.current;
+    const local = evaluateLocal(q, text, { hintLevel: hint });
+    const budget = gradeBudgetMs(gradeMode, local);
+    setWait({ budgetMs: budget, reworded: local.confidence !== "high" });
     setPhase("grading");
-    const slowTimer = budgetMs > 1500 ? setTimeout(() => token === gradeToken.current && setSlow(true), 1200) : null;
+    const slowTimer = budget > 1500 ? setTimeout(() => token === gradeToken.current && setSlow(true), 1500) : null;
     grader.grade(q, text, hint).then((out) => {
       if (slowTimer) clearTimeout(slowTimer);
       if (token !== gradeToken.current) return;
@@ -537,14 +544,17 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                     )}
                   </button>
                 </div>
-                {phase === "grading" ? (
+                {phase === "grading" && wait ? (
                   <div className="mt-2" aria-live="polite">
                     <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--ef-track)]">
-                      <div className="ef-grade-bar h-full rounded-full bg-[var(--accent)]" style={{ animationDuration: `${budgetMs}ms` }} />
+                      <div className="ef-grade-bar h-full rounded-full bg-[var(--accent)]" style={{ animationDuration: `${wait.budgetMs}ms` }} />
                     </div>
+                    {wait.reworded && wait.budgetMs > 1500 ? (
+                      <p className="ef-ko mt-1.5 text-[12px] text-[var(--muted)]">표현이 기준 답안과 달라 Claude가 문법을 확인하고 있습니다.</p>
+                    ) : null}
                     {slow ? (
-                      <button type="button" onClick={() => grader.skip()} className="dd-focus mt-1.5 text-[12px] text-[var(--muted)] underline underline-offset-4">
-                        기다리지 않고 바로 보기 (규칙 기반)
+                      <button type="button" onClick={() => grader.skip()} className="dd-focus mt-1 text-[12px] text-[var(--muted)] underline underline-offset-4">
+                        기다리지 않고 바로 보기 (규칙 기반 — 놓친 오류가 있을 수 있음)
                       </button>
                     ) : null}
                   </div>

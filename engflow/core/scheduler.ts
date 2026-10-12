@@ -15,7 +15,7 @@ export function expectedResponseMs(mode: QuestionMode, targetWords: number): num
 }
 
 export interface GradeInput {
-  evaluation: Pick<Evaluation, "scores" | "errors">;
+  evaluation: Pick<Evaluation, "scores" | "errors"> & Partial<Pick<Evaluation, "evaluator" | "confidence">>;
   hint: HintLevel;
   responseMs: number;
   expectedMs: number;
@@ -43,6 +43,11 @@ export function deriveGrade(input: GradeInput): { grade: Grade; reasons: string[
   } else if (hasMajor && g > 2) {
     g = 2;
     reasons.push("주요 문법 오류");
+  }
+  // Reworded answers the rule-based grader could not fully check never count as "Easy".
+  if (input.evaluation.evaluator === "local" && input.evaluation.confidence === "low" && g > 3) {
+    g = 3;
+    reasons.push("규칙 기반으로만 확인한 답");
   }
   if (input.hint === 2 && g > 2) {
     g = 2;

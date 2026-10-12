@@ -136,16 +136,30 @@ test("fast grading: Claude's grade appears within about a second, once, and neve
   expect(errors).toEqual([]);
 });
 
-test("a slow Claude never blocks: after 1 second the rule-based grade stands, and stays", async ({ page }) => {
+test("reworded answers wait for Claude instead of a rule-based guess", async ({ page }) => {
+  await fakeClaude(page, 2500);
+  const errors = await open(page);
+  await startSentenceLesson(page);
+  await page.locator("#ef-answer").fill(WRONG);
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByText("표현이 기준 답안과 달라 Claude가 문법을 확인하고 있습니다.")).toBeVisible();
+  await expect(page.getByText(/Claude 채점 · \d\.\d초/)).toBeVisible({ timeout: 6000 });
+  await expect(page.getByText(/규칙 기반 · /)).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("'always 1 second' in Settings: a slow Claude never blocks, and the rule-based grade stays", async ({ page }) => {
   await fakeClaude(page, 60_000);
   await open(page);
+  await nav(page, "설정");
+  await page.getByRole("radiogroup", { name: "채점 대기 시간" }).getByRole("radio", { name: "항상 1초" }).click();
   await startSentenceLesson(page);
   await page.locator("#ef-answer").fill(WRONG);
   const t0 = Date.now();
   await page.getByRole("button", { name: /제출/ }).click();
   await expect(page.getByText(/규칙 기반 · \d\.\d초/)).toBeVisible();
   expect(Date.now() - t0).toBeLessThan(2000);
-  await expect(page.getByText(/1초 안에 Claude 응답이 없어 규칙 기반으로 채점했습니다/)).toBeVisible();
+  await expect(page.getByText(/1초 안에 Claude 응답이 없어 규칙 기반으로 채점했습니다\. 표현이 기준 답안과 많이 달라 놓친 오류가 있을 수 있습니다/)).toBeVisible();
   const ring = page.getByRole("img", { name: /종합/ });
   const first = await ring.getAttribute("aria-label");
   await page.waitForTimeout(1000);
@@ -166,11 +180,9 @@ test("grading starts while typing: submitting after a pause shows Claude's grade
   expect(await page.evaluate(() => (window as unknown as { __claudeCalls: number }).__claudeCalls)).toBe(1);
 });
 
-test("with a longer wait chosen in Settings, the learner can still skip to the rule-based grade", async ({ page }) => {
+test("while waiting for Claude, the learner can still take the rule-based grade", async ({ page }) => {
   await fakeClaude(page, 60_000);
   await open(page);
-  await nav(page, "설정");
-  await page.getByRole("radiogroup", { name: "채점 대기 시간" }).getByRole("radio", { name: "3초" }).click();
   await startSentenceLesson(page);
   await page.locator("#ef-answer").fill(WRONG);
   await page.getByRole("button", { name: /제출/ }).click();

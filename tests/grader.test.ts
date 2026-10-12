@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createGrader, looksComplete, ruleBasedIsEnough } from "@/engflow/core/grader";
+import { createGrader, gradeBudgetMs, looksComplete, ruleBasedIsEnough } from "@/engflow/core/grader";
 import { evaluateLocal } from "@/engflow/core/evaluate";
 import { QUESTION_BY_ID } from "@/engflow/content";
 import type { Evaluation, Question } from "@/engflow/core/types";
@@ -45,17 +45,36 @@ describe("fast grading", () => {
     expect(out.noteKo).toBeNull();
   });
 
-  it("past the budget the rule-based grade is shown, and the late reply cannot replace it", async () => {
+  it("past the budget the rule-based grade is shown; the late reply is only timed, never shown", async () => {
     const claude = fakeClaude(200);
-    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 40 });
+    const latencies: number[] = [];
+    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 40, onLatency: (ms) => latencies.push(ms) });
     const out = await g.grade(q, WRONG, 0);
     expect(out.via).toBe("local-timeout");
     expect(out.evaluation.evaluator).toBe("local");
     expect(out.ms).toBeLessThan(150);
     expect(out.noteKo).toMatch(/규칙 기반/);
-    // The aborted request never lands in the cache for a later submit of the same text.
     await sleep(250);
-    expect(g.peek(q, WRONG, 0)).toBeNull();
+    // Claude's real response time is still measured for the speed figure in Settings.
+    expect(latencies.length).toBe(1);
+    expect(latencies[0]).toBeGreaterThanOrEqual(150);
+  });
+
+  it("the wait depends on how far the rule-based grade can be trusted", () => {
+    expect(gradeBudgetMs("auto", { confidence: "high" })).toBe(1000);
+    expect(gradeBudgetMs("auto", { confidence: "medium" })).toBe(2500);
+    expect(gradeBudgetMs("auto", { confidence: "low" })).toBe(8000);
+    expect(gradeBudgetMs("fast", { confidence: "low" })).toBe(1000);
+    expect(gradeBudgetMs("accurate", { confidence: "high" })).toBe(9000);
+  });
+
+  it("a reworded answer waits for Claude instead of taking an unreliable rule-based grade", async () => {
+    const claude = fakeClaude(120);
+    const reworded = "This suggestion is not satisfy the requirements of customer.";
+    const rq = QUESTION_BY_ID["ph-collocation-meet-requirements"];
+    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: (local) => (local.confidence === "high" ? 30 : 1000) });
+    const out = await g.grade(rq, reworded, 0);
+    expect(out.via).toBe("ai");
   });
 
   it("grading that started while typing is ready the moment the learner submits", async () => {

@@ -373,7 +373,13 @@ export interface Settings {
   ai: "auto" | "on-request" | "off";
   /** Legacy (grading is always the fast tier now). */
   aiDepth?: "quick" | "default";
-  /** How long a submit waits for Claude before the rule-based grade is shown: 1 s / 3 s / 9 s. */
+  /**
+   * How long a submit waits for Claude. "auto": 1 s when the answer is close to an expected one (the
+   * rule-based grade is reliable there), longer when it is worded differently; "fast": always 1 s;
+   * "accurate": up to 9 s.
+   */
+  gradeMode?: "auto" | "fast" | "accurate";
+  /** Legacy (replaced by gradeMode). */
   gradeWait?: "fast" | "balanced" | "accurate";
   /** Preferred difficulty (1–10) per situation; missing = automatic from the level estimate. */
   difficulty?: Partial<Record<Situation | "all", number>>;

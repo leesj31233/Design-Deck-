@@ -15,7 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
   dailyTarget: 12,
   scheduler: "adaptive",
   ai: "auto",
-  gradeWait: "fast",
+  gradeMode: "auto",
   autocorrect: false,
   showNaturalKorean: false,
   reducedMotion: "system",
@@ -333,6 +333,7 @@ function normalizeSettings(stored: Partial<Settings> | undefined): Settings {
   const merged: Settings = { ...DEFAULT_SETTINGS, ...stored };
   if (merged.ai === "on-request") merged.ai = "auto"; // grading is one fast pass now; there is no second, on-request pass
   delete merged.aiDepth;
+  delete merged.gradeWait; // the fixed 1-second wait made reworded answers fall back to rules; "auto" replaces it
   return merged;
 }
 

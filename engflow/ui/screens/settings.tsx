@@ -7,7 +7,14 @@ import { SITUATIONS, type Settings } from "../../core/types";
 import { SITUATION_INFO } from "../../content";
 import { learnerKey, setLearnerKey } from "../../platform/web";
 import { clock, useApp } from "../store";
+import { claudeLatencyStats } from "../latency";
 import { Card, ConfirmDialog, Eyebrow, cn } from "../kit";
+
+/** Claude's own response time on this device (from grading requests, including ones that finished late). */
+function claudeSpeed(): string {
+  const st = claudeLatencyStats();
+  return st ? ` 이 기기에서 Claude 응답: 최근 ${st.n}회 중앙값 ${(Math.round(st.medianMs / 100) / 10).toFixed(1)}초.` : "";
+}
 
 /** Measured grading time on this device: "최근 20회 평균 0.6초 · Claude 채점 70%". */
 function gradeStats(attempts: { gradeMs?: number; evaluator: "local" | "ai" }[]): string {
@@ -133,12 +140,15 @@ export function SettingsScreen() {
         <Row label="채점 방식" hint="제출하면 한 번만 채점합니다. 입력하다 멈추면 Claude가 미리 채점을 시작해 제출하자마자 결과가 나오는 경우가 많습니다. 한번 나온 점수는 바뀌지 않습니다. 철자와 현장 용어(raw/feed 등)는 점수에 거의 또는 전혀 반영하지 않습니다.">
           <Choice value={s.ai === "off" ? "off" : "auto"} label="채점 방식" options={[{ v: "auto", label: "Claude 빠른 채점" }, { v: "off", label: "규칙 기반만" }]} onChange={(v) => set({ ai: v })} />
         </Row>
-        <Row label="채점 대기 시간" hint={`제출 후 Claude를 기다리는 최대 시간입니다. 넘으면 규칙 기반 결과(즉시)를 보여 줍니다. ${gradeStats(app.state.attempts)}`}>
+        <Row
+          label="채점 대기 시간"
+          hint={`자동(권장): 기준 답안과 비슷한 답은 1초 안에, 표현이 많이 다른 답은 Claude 확인을 기다립니다(최대 8초). 규칙 기반 검사는 처음 보는 문장의 오류를 놓칠 수 있기 때문입니다. 항상 1초: 더 빠르지만 다르게 쓴 답은 정확도가 떨어질 수 있습니다. ${gradeStats(app.state.attempts)}${claudeSpeed()}`}
+        >
           <Choice
-            value={s.gradeWait ?? "fast"}
+            value={s.gradeMode ?? "auto"}
             label="채점 대기 시간"
-            options={[{ v: "fast", label: "1초" }, { v: "balanced", label: "3초" }, { v: "accurate", label: "9초" }]}
-            onChange={(v) => set({ gradeWait: v })}
+            options={[{ v: "auto", label: "자동" }, { v: "fast", label: "항상 1초" }, { v: "accurate", label: "정확도 우선" }]}
+            onChange={(v) => set({ gradeMode: v })}
           />
         </Row>
         <Row label="상황별 난이도" hint="학습 화면에서 상황마다 고른 난이도(1–10)입니다. 고르지 않은 상황은 레벨에 맞춰 자동으로 정합니다.">
@@ -209,7 +219,7 @@ export function SettingsScreen() {
         <ul className="ef-ko mt-2 space-y-1.5 text-[13px] text-[var(--ef-ink-2)]">
           <li>· 점수는 문법 중심입니다: 문법 정확도 55% · 핵심 의미·표현 35% · 어순·문장 구조 10%. 회의 전달력은 따로 표시합니다.</li>
           <li>· 철자 실수는 1개에 1점, 최대 3점만 감점합니다. raw/feed composition처럼 현장마다 다른 용어 선택은 감점하지 않고 참고로만 보여 줍니다.</li>
-          <li>· 제출하면 한 번만 채점하고, 기본 1초 안에 결과를 보여 줍니다. 입력하다 멈추면 Claude가 미리 채점을 시작하고, 제출 후 1초 안에 Claude 결과가 없으면 규칙 기반 결과(즉시)를 보여 줍니다. 한번 표시된 점수는 바뀌지 않습니다.</li>
+          <li>· 제출하면 한 번만 채점합니다. 기준 답안과 비슷한 답은 1초 안에 결과가 나오고, 표현이 많이 다른 답은 Claude 확인을 기다립니다(입력하다 멈추면 미리 채점을 시작해 대기가 짧아집니다). 한번 표시된 점수는 바뀌지 않습니다.</li>
           <li>· Claude 결과는 형식 검증(JSON 스키마)을 통과해야 쓰이고, 점수는 Claude가 찾은 오류 목록에 규칙 기반과 같은 감점표를 적용해 계산합니다.</li>
           <li>· 추천 문장은 원어민 엔지니어가 회의에서 자주 쓰는 말투를 기준으로 합니다.</li>
           <li>· 자주 틀리는 문법(문법 × 오류 종류)은 내 실수 예문과 함께 기록되고, 다음 세션에서 같은 문법 함정이 있는 문제를 먼저 냅니다. 시간이 지나거나 힌트 없이 맞히면 약해집니다.</li>

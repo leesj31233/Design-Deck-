@@ -33,7 +33,9 @@ export function FeedbackPanel({
   const tone = scoreTone(s.overall);
   const scored = e.errors.filter((x) => !x.advisory);
   const mainSkill = scored.find((x) => x.severity !== "minor")?.skill ?? question.skills[0];
-  const correct = e.exact || (scored.every((x) => x.category === "spelling") && s.overall >= 90);
+  // A reworded answer that only the rule-based grader saw cannot be called correct: it may hide errors.
+  const unverified = e.evaluator === "local" && e.confidence === "low";
+  const correct = !unverified && (e.exact || (scored.every((x) => x.category === "spelling") && s.overall >= 90));
   // Grammar first, then spelling, then site-wording suggestions.
   const rank = (x: (typeof e.errors)[number]) => (x.advisory ? 2 : x.category === "spelling" ? 1 : 0);
   const listed = [...e.errors].sort((a, b) => rank(a) - rank(b) || a.start - b.start);
@@ -48,7 +50,9 @@ export function FeedbackPanel({
             <ScoreRing score={s.overall} size={compact ? 64 : 84} label="종합" />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                {correct ? (
+                {unverified && !scored.some((x) => x.severity !== "minor") ? (
+                  <span className="text-[14px] font-semibold text-[var(--ef-warn)]">규칙 검사만 통과 · 확인 못 함</span>
+                ) : correct ? (
                   <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-[var(--ef-ok)]">
                     <CheckCircle2 className="size-4" style={{ animation: reduced ? undefined : "ef-pop .4s ease" }} /> 정확해요
                   </span>
@@ -130,7 +134,9 @@ export function FeedbackPanel({
               })}
             </ul>
           ) : (
-            <p className="ef-ko mt-3 text-[14px] text-[var(--ef-ok)]">문법 오류를 찾지 못했습니다.</p>
+            <p className={cn("ef-ko mt-3 text-[14px]", unverified ? "text-[var(--muted)]" : "text-[var(--ef-ok)]")}>
+              {unverified ? "규칙 기반 검사로는 오류를 찾지 못했습니다(처음 보는 문장이라 모든 오류를 확인하지는 못했습니다)." : "문법 오류를 찾지 못했습니다."}
+            </p>
           )}
           {e.confidenceNoteKo ? (
             <p className="ef-ko mt-3 flex items-start gap-1.5 text-[12px] text-[var(--muted)]">
