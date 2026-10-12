@@ -975,39 +975,58 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
       ws.some(
         (t) =>
           /^(un|im|in|dis)(able|sure|clear|available|possible|likely|aware|happy|comfortable|agree|agrees|agreed|like|likes)$/.test(t.norm) ||
-          /^(nothing|nobody|none|neither|nor|without|hardly|barely|fail|fails|failed|lack|lacks|instead|rather|unless|until|no|miss|missed|missing|forget|forgot|forgotten|lose|lost|refuse|refused|avoid|avoided|doubt|skip|skipped|cancel|cancelled|canceled|postpone|postponed|wrong|late|behind|short|less|fewer|still|anymore|longer)$/.test(t.norm),
+          /^(nothing|nobody|none|neither|nor|without|hardly|barely|fail|fails|failed|lack|lacks|instead|rather|unless|until|no|miss|missed|missing|forget|forgot|forgotten|lose|lost|refuse|refused|avoid|avoided|doubt|skip|skipped|cancel|cancelled|canceled|postpone|postponed|wrong|late|behind|short|less|fewer|still|anymore|longer|broken|stopped|dead|down|out|off|empty|closed|shut|nope|nah)$/.test(t.norm),
       );
     // Polarity of statements only: questions ("Why don't we …?", "…, aren't we?"), commands ("Don't worry") and
     // conditions ("If that doesn't work, …") are paraphrased with either polarity.
-    const counted = (ws: Token[]) => {
-      const q: boolean[] = new Array(ws.length).fill(false);
+    const sentencesOf = (ws: Token[]) => {
+      const out: Token[][] = [];
       for (let i = 0, from = 0; i < ws.length; i++) {
         if (!ws[i].sentenceEnd && i < ws.length - 1) continue;
-        for (let k = from; k <= i; k++) q[k] = !!ws[i].question;
+        out.push(ws.slice(from, i + 1));
         from = i + 1;
       }
+      return out;
+    };
+    const negCount = (ws: Token[], statementsOnly: boolean) => {
       let n = 0;
-      for (let i = 0; i < ws.length; i++) {
-        const t = ws[i];
-        if (q[i] || !(t.norm === "never" || (t.norm === "not" && i > 0 && (AUXILIARIES.has(ws[i - 1].norm) || MODALS.has(ws[i - 1].norm) || BE_FORMS.has(ws[i - 1].norm) || /^(need|dare|could|can)$/.test(ws[i - 1].norm))))) continue;
-        let c = i - 1;
-        while (c > 0 && !brokenAfterW(ws, c - 1)) c--;
-        // "Don't worry", "Don't forget …": a command added to the answer ("Don't think so." is a statement without "I").
-        if (ws[i - 1]?.norm === "do" && c === i - 1 && /^(worry|hesitate|forget|rush|panic|mention|bother|touch|be|get|take|let|go|miss|wait|stress)$/.test(ws[i + 1]?.norm ?? "")) continue;
-        if (ws.slice(c, i).some((x) => /^(if|unless|whether|or|when|before|until)$/.test(x.norm))) continue;
-        n++;
+      for (const sent of sentencesOf(ws)) {
+        if (statementsOnly && sent[sent.length - 1]?.question) continue;
+        for (let i = 0; i < sent.length; i++) {
+          const t = sent[i];
+          if (!(t.norm === "never" || (t.norm === "not" && i > 0 && (AUXILIARIES.has(sent[i - 1].norm) || MODALS.has(sent[i - 1].norm) || BE_FORMS.has(sent[i - 1].norm) || /^(need|dare|could|can)$/.test(sent[i - 1].norm))))) continue;
+          let c = i - 1;
+          while (c > 0 && !brokenAfterW(sent, c - 1)) c--;
+          // "Don't worry", "Don't forget …": a command added to the answer ("Don't think so." is a statement without "I").
+          if (sent[i - 1]?.norm === "do" && c === i - 1 && /^(worry|hesitate|forget|rush|panic|mention|bother|touch|be|get|take|let|go|miss|wait|stress)$/.test(sent[i + 1]?.norm ?? "")) continue;
+          if (sent.slice(c, i).some((x) => /^(if|unless|whether|or|when|before|until)$/.test(x.norm))) continue;
+          n++;
+        }
       }
       return n;
     };
     if (lexical(w) || lexical(tw)) return null;
-    const mine = counted(w);
-    const theirs = counted(tw);
-    // Only a full flip: one side says it, the other says the opposite.
-    if ((mine === 0) === (theirs === 0)) return null;
+    // 1) The whole answer and the closest answer differ in polarity, counting every negation (a "never" inside
+    //    "…, but why not?" still counts) …
+    if ((negCount(w, false) === 0) === (negCount(tw, false) === 0)) return null;
     const near = ranked.filter((r) => r.al.distance <= CLOSE_DISTANCE && r.tw.length >= 4);
-    if (near.some((r) => (counted(r.tw) === 0) === (mine === 0) || lexical(r.tw))) return null;
-    const at = w.findIndex((t, i) => t.norm === "never" || (t.norm === "not" && i > 0));
-    return { extra: mine > 0, at };
+    if (near.some((r) => lexical(r.tw) || (negCount(r.tw, false) === 0) === (negCount(w, false) === 0))) return null;
+    // 2) … and one statement of the answer says the opposite of the matching statement of a close answer
+    //    (an extra sentence the stored answers do not have is not compared).
+    const targetSentences = near.flatMap((r) => sentencesOf(r.tw)).filter((ts) => ts.length >= 3 && !ts[ts.length - 1]?.question);
+    for (const sent of sentencesOf(w)) {
+      if (sent.length < 3 || sent[sent.length - 1]?.question) continue;
+      const scored = targetSentences.map((ts) => ({ ts, d: align(sent, ts).distance })).sort((a, b) => a.d - b.d);
+      const best = scored[0];
+      if (!best || best.d > CLOSE_DISTANCE) continue;
+      const mine = negCount(sent, true);
+      if ((mine === 0) === (negCount(best.ts, true) === 0)) continue;
+      if (scored.some((x) => x.d <= best.d + CONSENSUS_MARGIN && (negCount(x.ts, true) === 0) === (mine === 0))) continue;
+      const offset = w.indexOf(sent[0]);
+      const k = sent.findIndex((t, i) => t.norm === "never" || (t.norm === "not" && i > 0));
+      return { extra: mine > 0, at: k >= 0 ? offset + k : -1 };
+    }
+    return null;
   })();
   if (negationFlip) {
     const i = negationFlip.extra ? negationFlip.at : -1;

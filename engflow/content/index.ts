@@ -24,6 +24,7 @@ import { ROLEPLAY_WORK } from "./bank/roleplay-work";
 import { ROLEPLAY_SOCIAL } from "./bank/roleplay-social";
 import { TALK_LONG } from "./bank/talk-long";
 import { TALK_PHRASAL } from "./bank/talk-phrasal";
+import { TALK_IDIOMS } from "./bank/talk-idioms";
 import { DIALOGUE_OVERLAY } from "./bank/dialogue-overlay";
 
 export { SKILLS, SKILL_BY_ID, SKILL_GROUPS, skillName } from "./skills";
@@ -58,6 +59,7 @@ export const MIXED_BANKS: Record<string, Question[]> = {
   "roleplay-social": ROLEPLAY_SOCIAL,
   "talk-long": TALK_LONG,
   "talk-phrasal": TALK_PHRASAL,
+  "talk-idioms": TALK_IDIOMS,
 };
 
 /** Scene of a talk-<scene>[-n] file. */
