@@ -1120,24 +1120,27 @@ const timePreposition: Rule = (w) => {
 };
 
 /** Fixed phrases that need "the": "at the latest", "at the moment", "on the other hand", "in the meantime". */
-const IDIOM_THE: [RegExp, string][] = [
-  [/^at latest$/, "at the latest"], [/^at earliest$/, "at the earliest"], [/^at moment$/, "at the moment"],
-  [/^in meantime$/, "in the meantime"], [/^on other hand$/, "on the other hand"], [/^at same time$/, "at the same time"],
-  [/^for first time$/, "for the first time"], [/^in middle of$/, "in the middle of"], [/^at end of$/, "at the end of"], [/^by end of$/, "by the end of"],
+/** Phrases that need "the" ("at the latest"), keyed by the words without it. */
+const IDIOM_THE = new Map<string, string>([
+  ["at latest", "at the latest"], ["at earliest", "at the earliest"], ["at moment", "at the moment"],
+  ["in meantime", "in the meantime"], ["on other hand", "on the other hand"], ["at same time", "at the same time"],
+  ["for first time", "for the first time"], ["in middle of", "in the middle of"], ["at end of", "at the end of"], ["by end of", "by the end of"],
   // "brings me to end of my presentation", "for rest of the day", "from beginning of the list".
   ...["to", "until", "till", "near", "toward", "towards", "from", "before", "after", "since", "for", "at", "by", "in"].flatMap((p) =>
     ["end", "beginning", "middle", "start", "rest", "bottom"]
       .filter((n) => !(/^(at|by)$/.test(p) && n === "end") && !(p === "in" && n === "middle"))
-      .map((n): [RegExp, string] => [new RegExp(`^${p} ${n} of$`), `${p} the ${n} of`]),
+      .map((n): [string, string] => [`${p} ${n} of`, `${p} the ${n} of`]),
   ),
-];
+]);
+const IDIOM_LENGTHS = [...new Set([...IDIOM_THE.keys()].map((k) => k.split(" ").length))];
 const idiomArticle: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 0; i < w.length - 1; i++) {
-    for (const [re, fix] of IDIOM_THE) {
-      const n = fix.split(" ").length - 1;
+    for (const n of IDIOM_LENGTHS) {
+      if (i + n > w.length) continue;
       const phrase = w.slice(i, i + n).map((t) => t.norm).join(" ");
-      if (!re.test(phrase)) continue;
+      const fix = IDIOM_THE.get(phrase);
+      if (!fix) continue;
       // "by end of day" (EOD) is common business English.
       if (/end of$/.test(phrase) && /^(day|business)$/.test(w[i + n]?.norm ?? "")) continue;
       out.push({
@@ -1228,8 +1231,11 @@ const oneMorePlural: Rule = (w) => {
 };
 
 /** Known plural nouns → singular ("tests" → "test"), else null. */
+let SINGULAR_OF: Map<string, string> | null = null;
 function PLURAL_NOUN_SINGULAR(x: string): string | null {
-  for (const [sg, pl] of Object.entries(PLURAL_OF)) if (pl === x) return sg;
+  SINGULAR_OF ??= new Map(Object.entries(PLURAL_OF).map(([sg, pl]) => [pl, sg]));
+  const irregular = SINGULAR_OF.get(x);
+  if (irregular) return irregular;
   if (/ies$/.test(x) && COUNTABLE_NOUNS.has(x.replace(/ies$/, "y"))) return x.replace(/ies$/, "y");
   if (/s$/.test(x) && COUNTABLE_NOUNS.has(x.replace(/s$/, ""))) return x.replace(/s$/, "");
   return null;
@@ -3604,7 +3610,8 @@ const learnerSlips: Rule = (w) => {
 };
 const NOT_A_MODIFIER = /^(it|them|us|me|him|her|you|this|that|what|which|so|some|any|more|less|many|few|several|enough|another|other|no|each|every|one|two|three|four|five|again|not|also|just|still|really|well|better|all|both|either|neither|such|out|up|down|over|the|a|an|my|our|your|his|their|its)$/;
 
-const RULES: Rule[] = [
+/** All rules in the order they run (exported for the speed profile in scripts/bench). */
+export const RULES: Rule[] = [
   itsContraction,
   lexicalAgreement,
   thirdConditionalWill,
