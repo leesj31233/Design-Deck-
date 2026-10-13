@@ -393,6 +393,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       if (DETERMINERS_NP.has(lprev) || /^(the|a|an)$/.test(lprev)) continue;
       // "is pouring" (progressive) vs "pours": the learner's verb group is correct either way.
       if (/ing$/.test(lt) && !FEELING_ADJ.test(lt) && (BE_FORMS.has(lprev) || BE_FORMS.has(w[op.li - 2]?.norm ?? "") && /^(still|also|just|now|really|not)$/.test(lprev))) continue;
+      // "started to vibrate" ↔ "started vibrating": these verbs take either form.
+      if (/ing$/.test(tt) && w[op.li - 1]?.norm === "to" && /^(start|begin|continue|like|love|hate|prefer|intend|try)$/.test(verbInfo(w[op.li - 2]?.norm ?? "")?.base ?? "")) continue;
       // …and the other way round: "I fly home on Saturday" for "I'm flying home on Saturday" (a plan either way;
       // the rules check that the simple form agrees with its subject).
       if (/ing$/.test(tt) && !FEELING_ADJ.test(tt) && isVerb && (vl!.form === "base" || vl!.form === "3sg") && vl!.base === vt!.base && !BE_FORMS.has(lprev) && (BE_FORMS.has(tw[op.ti - 1]?.norm ?? "") || BE_FORMS.has(tw[op.ti - 2]?.norm ?? ""))) continue;
@@ -620,6 +622,14 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         if (CHANGE_VERBS.has(verbInfo(pv)?.base ?? pv) || /^(up|down)$/.test(pv)) continue;
       }
       if (tt === "that") continue; // usually optional
+      // "Usually, I go" ↔ "I usually go": the subject is there, after a sentence adverb.
+      if (c === "pronoun" && w.slice(op.at, op.at + 3).some((x) => x.norm === tt) && /^(usually|sometimes|often|normally|generally|always|never|actually|honestly|basically|luckily|unfortunately|personally)$/.test(w[op.at]?.norm ?? "")) continue;
+      // "two samples" ↔ "two of our samples".
+      if (tt === "of" && (w[op.at - 1]?.num !== undefined || /^(some|many|most|all|both|few|several)$/.test(w[op.at - 1]?.norm ?? ""))) continue;
+      // "if he hears it from someone else" ↔ "hears about it".
+      if (tt === "about" && /^(hear|hears|heard|hearing)$/.test(w[op.at - 1]?.norm ?? "") && /^(it|this|that|them)$/.test(w[op.at]?.norm ?? "")) continue;
+      // "Everyone okay?" ↔ "Is everyone okay?": a spoken question may drop its opening be.
+      if (c === "be" && op.ti === 0 && op.at === 0 && w[w.length - 1]?.question) continue;
       if (tt === "at" && tw[op.ti + 1]?.norm === "all") continue; // "(not spicy) at all" is optional emphasis
       // "I('d) suggest …": would softens the suggestion; leaving it out is not a grammar error.
       if (tt === "would" && /^(suggest|recommend|propose|say|think|advise|prefer|imagine|guess)$/.test(tw[op.ti + 1]?.norm ?? "")) continue;

@@ -51,6 +51,10 @@ const RIGHT: [string, string[], string][] = [
   ["I spoke to her yesterday.", [], "I spoke with her yesterday."],
   ["Can we discuss it over the phone?", [], "Can we discuss it on the phone?"],
   ["I'm flying home on Saturday.", [], "I fly home on Saturday."],
+  ["I usually go to work by subway.", [], "Usually, I go to work by subway."],
+  ["The fan started vibrating after ten minutes.", [], "The fan started to vibrate after ten minutes."],
+  ["The lab has lost two of our samples.", [], "The lab has lost two samples."],
+  ["If he hears about it from someone else, he'll be upset.", [], "If he hears it from someone else, he'll be upset."],
   ["She's leaving for Busan tomorrow.", [], "She leaves for Busan tomorrow."],
   ["We're meeting the client at three.", [], "We meet the client at three."],
 ];
