@@ -42,3 +42,12 @@ describe("reversed meaning with negation-carrying words", () => {
     expect(isSuccess(evaluateLocal(q, flipped), 0)).toBe(false);
   });
 });
+
+describe("rewordings around a shared 'not'", () => {
+  it("'our food isn't here yet' for 'our food hasn't come yet' is not a tense error", async () => {
+    const { QUESTION_BY_ID } = await import("@/engflow/content");
+    const q = QUESTION_BY_ID["tk-daily-food-not-come"];
+    const ev = evaluateLocal(q, q.reference.replace("hasn't come", "isn't here"));
+    expect(ev.errors.filter((e) => e.category === "tense")).toEqual([]);
+  });
+});

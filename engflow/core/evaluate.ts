@@ -438,7 +438,10 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       if (/^(be|aux|modal)$/.test(lc) && /^(be|aux|modal)$/.test(tc) && op.li === clauseStart(op.li) && isSubjectWord(w[op.li + 1])) continue;
       // A tense/voice difference only shows when the same verb follows ("is changed" vs "has changed");
       // "when you're free" vs "when you have a moment", "do the call" vs "have the call" are rewordings.
-      const nextOp = al.ops[k + 1];
+      // ("isn't here" vs "hasn't come": past a shared "not"/"still", the verbs differ, so it is a rewording.)
+      let nk = k + 1;
+      while (al.ops[nk]?.type === "match" && /^(not|never|still|just|already|also|yet|really)$/.test(w[(al.ops[nk] as { li: number }).li]?.norm ?? "")) nk++;
+      const nextOp = al.ops[nk];
       const sameNext = !!nextOp && (nextOp.type === "match" || nextOp.type === "inflect" || nextOp.type === "spell");
       const verbNext = /^(not|been|being)$/.test(w[op.li + 1]?.norm ?? "") || !!verbInfo(w[op.li + 1]?.norm ?? "");
       if ((lc === "be" || lc === "aux") && (tc === "be" || tc === "aux") && lc !== tc && !sameNext) continue;
