@@ -1004,6 +1004,8 @@ const thirdPersonBase: Rule = (w) => {
     const prev = w[i - 1]?.norm ?? "";
     if (/^(let|make|makes|made|help|helps|see|saw|watch|hear|have|has|had|do|does|did|will|would|can|could|should|may|might|must|to|let's|if|that|which|whether)$/.test(prev)) continue;
     const prev2 = w[i - 2]?.norm ?? "";
+    // "Do I just eat it like this?": "it" after a verb is its object, not a subject.
+    if (w[i].norm === "it" && i > 0 && verbInfo(prev) && !/^(is|was|does|did|has|think|guess|hope|believe|know|feel|say|said|bet|suppose|mean|hear|heard|sure)$/.test(prev)) continue;
     // "Doesn't he know?", "Won't she come?": an inverted negative question keeps the base form.
     if (prev === "not" && /^(do|does|did|will|would|can|could|should|may|might|must|shall|is|are|was|were|am|have|has|had)$/.test(prev2)) continue;
     // "Is she free?" (an inverted be-question), "he or she" (two people), "I'd rather she stay".
