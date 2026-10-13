@@ -40,6 +40,9 @@ import { TALK_REACTION_3 } from "./bank/talk-reaction-3";
 import { TALK_ONLINE_3 } from "./bank/talk-online-3";
 import { TALK_TROUBLE_3 } from "./bank/talk-trouble-3";
 import { TALK_FEELINGS_3 } from "./bank/talk-feelings-3";
+import { TALK_PHONE_3 } from "./bank/talk-phone-3";
+import { TALK_NEGOTIATION_3 } from "./bank/talk-negotiation-3";
+import { ROLEPLAY_WORK_2 } from "./bank/roleplay-work-2";
 import { TALK_MEETING } from "./bank/talk-meeting";
 import { TALK_PHONE_2 } from "./bank/talk-phone-2";
 import { TALK_TROUBLE_2 } from "./bank/talk-trouble-2";
@@ -80,6 +83,8 @@ export const TALK_BANKS: Record<string, Question[]> = {
   "talk-online-3": TALK_ONLINE_3,
   "talk-trouble-3": TALK_TROUBLE_3,
   "talk-feelings-3": TALK_FEELINGS_3,
+  "talk-phone-3": TALK_PHONE_3,
+  "talk-negotiation-3": TALK_NEGOTIATION_3,
   "talk-daily": TALK_DAILY,
   "talk-daily-2": TALK_DAILY_2,
   "talk-office": TALK_OFFICE,
@@ -105,6 +110,7 @@ export const MIXED_BANKS: Record<string, Question[]> = {
   "roleplay-daily": ROLEPLAY_DAILY,
   "roleplay-mixed": ROLEPLAY_MIXED,
   "roleplay-life": ROLEPLAY_LIFE,
+  "roleplay-work-2": ROLEPLAY_WORK_2,
   "talk-long": TALK_LONG,
   "talk-phrasal": TALK_PHRASAL,
   "talk-idioms": TALK_IDIOMS,
