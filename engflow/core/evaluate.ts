@@ -394,7 +394,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       // "is pouring" (progressive) vs "pours": the learner's verb group is correct either way.
       if (/ing$/.test(lt) && !FEELING_ADJ.test(lt) && (BE_FORMS.has(lprev) || BE_FORMS.has(w[op.li - 2]?.norm ?? "") && /^(still|also|just|now|really|not)$/.test(lprev))) continue;
       // "started to vibrate" ↔ "started vibrating": these verbs take either form.
-      if (/ing$/.test(tt) && w[op.li - 1]?.norm === "to" && /^(start|begin|continue|like|love|hate|prefer|intend|try)$/.test(verbInfo(w[op.li - 2]?.norm ?? "")?.base ?? "")) continue;
+      // ("a pleasure to work with you" ↔ "a pleasure working with you" too.)
+      if (/ing$/.test(tt) && w[op.li - 1]?.norm === "to" && (/^(start|begin|continue|like|love|hate|prefer|intend|try)$/.test(verbInfo(w[op.li - 2]?.norm ?? "")?.base ?? "") || /^(pleasure|fun|great|nice|good|honor|honour)$/.test(w[op.li - 2]?.norm ?? ""))) continue;
       // …and the other way round: "I fly home on Saturday" for "I'm flying home on Saturday" (a plan either way;
       // the rules check that the simple form agrees with its subject).
       if (/ing$/.test(tt) && !FEELING_ADJ.test(tt) && isVerb && (vl!.form === "base" || vl!.form === "3sg") && vl!.base === vt!.base && !BE_FORMS.has(lprev) && (BE_FORMS.has(tw[op.ti - 1]?.norm ?? "") || BE_FORMS.has(tw[op.ti - 2]?.norm ?? ""))) continue;

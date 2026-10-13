@@ -1445,6 +1445,8 @@ const pluralSubjectAgreement: Rule = (w) => {
       });
       continue;
     }
+    // Unpunctuated speech: "I just saw your missed calls is everything all right" — "is everything …" is a new question.
+    if (/^(is|was|does|has)$/.test(w[v].norm) && /^(everything|everyone|anything|anyone|there|it|this|that|he|she)$/.test(w[v + 1]?.norm ?? "")) continue;
     const fix = { was: "were", is: "are", has: "have", does: "do" }[w[v].norm as "was"];
     if (!fix || w[v].expanded && w[v].norm === "is" && /'s$/i.test(w[v].raw)) continue;
     out.push({
