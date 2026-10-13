@@ -86,3 +86,9 @@ describe("possessives in exact matching", () => {
     expect(normalizeForMatch("That's great")).toBe(normalizeForMatch("That is great"));
   });
 });
+
+describe("accented letters", () => {
+  it("'café' is one word that matches 'cafe'", () => {
+    expect(words(tokenize("Let's meet at the café.")).map((t) => t.norm)).toContain("cafe");
+  });
+});

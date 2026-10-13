@@ -118,7 +118,8 @@ const WORD_RE = /[A-Za-z0-9]+(?:[’'&./-][A-Za-z0-9]+)*(?:’|')?|[^\sA-Za-z0-9
 /** Tokenize an answer keeping offsets; contractions expand into several tokens sharing one span. */
 export function tokenize(text: string): Token[] {
   const tokens: Token[] = [];
-  const src = text.replace(/[‘’]/g, "'");
+  // "café" reads as "cafe" (one letter for one letter, so offsets stay valid).
+  const src = text.replace(/[‘’]/g, "'").replace(/[À-ÖØ-öø-ÿ]/g, (c) => c.normalize("NFD")[0]);
   let m: RegExpExecArray | null;
   WORD_RE.lastIndex = 0;
   while ((m = WORD_RE.exec(src))) {
