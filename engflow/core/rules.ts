@@ -1379,6 +1379,10 @@ const byTheMeans: Rule = (w) =>
   );
 
 /** "All the tests was carried out", "Both of them is good" → plural verb. */
+/** Plural nouns the countable list leaves out (it also drives article checks, where these would be noisy). */
+const SUBJECT_PLURALS = /^(results|tests|numbers|figures|plans|shipments|orders|products|parts|costs|prices|levels|values|readings|samples|conditions|changes|issues|problems|items|files|documents|emails|messages|meetings|guests|visitors|members|people|children|kids|friends|students|workers|employees|prices|sales|rooms|tickets|reports|slides|drawings|specs|specifications|suppliers|vendors|clients|customers|engineers|operators|colleagues|managers|pumps|valves|dryers|tanks|machines|units|lines|trains|flights|buses|cars)$/;
+const isPluralNoun = (x: string) => !!PLURAL_NOUN_SINGULAR(x) || SUBJECT_PLURALS.test(x);
+const PLURAL_SUBJECT_VERB = /^(show|need|want|work|look|seem|take|make|give|goe|come|say|know|think|use|require|include|depend|cost|run|help|mean|happen|matter|sound|feel|cause|affect|contain|produce|indicate|suggest|remain|stay|keep|get)s$/;
 const pluralSubjectAgreement: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 0; i < w.length - 1; i++) {
@@ -1387,11 +1391,21 @@ const pluralSubjectAgreement: Rule = (w) => {
     else if (/^(the|these|those|our|their|all|both|my|your)$/.test(w[i].norm) && i + 1 < w.length) {
       let n = i + 1;
       if (w[n].norm === "the" && w[i].norm === "all") n++;
-      if (w[n] && !PLURAL_NOUN_SINGULAR(w[n].norm) && w[n + 1] && PLURAL_NOUN_SINGULAR(w[n + 1].norm)) n++; // "the pressure tests"
-      if (w[n] && PLURAL_NOUN_SINGULAR(w[n].norm) && w[n].norm !== "news") v = n + 1;
+      if (w[n] && !isPluralNoun(w[n].norm) && w[n + 1] && isPluralNoun(w[n + 1].norm)) n++; // "the pressure tests"
+      if (w[n] && isPluralNoun(w[n].norm) && w[n].norm !== "news") v = n + 1;
     }
     if (v < 0 || !w[v] || brokenAfter(w, v - 1)) continue;
     if (w[i - 1]?.norm === "of") continue; // "one of the boilers is", "each of the tests was"
+    // "The results shows a clear trend": a common verb with -s, followed by what it does (an object or adverb).
+    const lexical = PLURAL_SUBJECT_VERB.exec(w[v].norm);
+    if (lexical && w[v + 1] && !brokenAfter(w, v) && (DETERMINERS.has(w[v + 1].norm) || /^(that|to|on|for|like|good|great|fine|well|very|really|so|more|less|much|about|it|them|us|me|him|her|everything|something|nothing)$/.test(w[v + 1].norm))) {
+      out.push({
+        rule: "agreement-plural-noun", from: v, to: v + 1, replacement: lexical[1] === "goe" ? "go" : lexical[1] === "doe" ? "do" : lexical[1] === "say" ? "say" : lexical[1],
+        category: "agreement", severity: "major", skill: "agreement",
+        messageKo: `주어가 복수라서 동사에 -s를 붙이지 않습니다: '${lexical[1] === "goe" ? "go" : lexical[1]}'.`,
+      });
+      continue;
+    }
     const fix = { was: "were", is: "are", has: "have", does: "do" }[w[v].norm as "was"];
     if (!fix || w[v].expanded && w[v].norm === "is" && /'s$/i.test(w[v].raw)) continue;
     out.push({
@@ -1417,7 +1431,7 @@ const modalAdjective: Rule = (w) => {
     const a = w[j];
     if (
       !a ||
-      !/^(ready|late|available|sure|able|busy|happy|sorry|careful|possible|necessary|enough|free|done|okay|ok|fine|different|similar|difficult|expensive|cheaper|higher|bigger|smaller|larger|faster|slower|wetter|drier|hotter|colder|longer|shorter|worse|easier|harder|safer|riskier|ready|useful|helpful|important|impossible|unlikely|likely)$/.test(a.norm)
+      !/^(ready|late|available|sure|able|busy|happy|sorry|careful|possible|necessary|enough|free|done|okay|ok|fine|different|similar|difficult|expensive|cheaper|higher|bigger|smaller|larger|faster|slower|wetter|drier|hotter|colder|longer|shorter|worse|easier|harder|safer|riskier|ready|useful|helpful|important|impossible|unlikely|likely|tired|exhausted|hungry|thirsty|sad|worried|excited|interested|surprised|bored|confused|nervous|glad|upset|angry|sick|ill|here|full|early|jealous|proud|afraid|scared|lucky|right)$/.test(a.norm)
     )
       continue;
     // "could longer" never happens, but "no longer"/"any longer" after a modal is an adverb: "can no longer run".
@@ -1539,11 +1553,30 @@ const embeddedQuestionOrder: Rule = (w) => {
     // "Sure, what do you need?" said without the comma is a reply and a direct question; "I'm not sure what …" is not.
     const sureIntro = (k: number) => before[k] === "sure" && /^(not|am|is|are|be|make|was|were|so|really|quite)$/.test(before[k - 1] ?? w[from - 1]?.norm ?? "");
     if (!before.some((x, k) => (x === "sure" ? sureIntro(k) : /^(tell|know|wonder|wondering|ask|asking|idea|explain|check|confirm|remember|understand|show|out|find|learn|decide|forget|see)$/.test(x)))) continue;
-    if (!/^(is|are|was|were|do|does|did|can|could|will|would|has|have)$/.test(w[i + 1].norm) || w[i + 1].expanded) continue;
-    if (!(SUBJECT_PRONOUNS.has(w[i + 2].norm) || /^(there|the|this|that|your|our|my|their)$/.test(w[i + 2].norm))) continue;
+    // "what time does it start", "how much does it cost", "which gate is it": the question word can bring a word along.
+    let a = i + 1;
+    if (/^(what|which)$/.test(w[i].norm) && /^(time|day|date|kind|sort|type|size|color|colour|room|gate|floor|platform|one|way|part|line)$/.test(w[a]?.norm ?? "")) a++;
+    else if (w[i].norm === "how" && /^(much|many|long|often|far|old|soon|big|late|early)$/.test(w[a]?.norm ?? "")) {
+      a++;
+      if (/^(much|many)$/.test(w[a - 1].norm) && w[a] && !/^(is|are|was|were|do|does|did|can|could|will|would|has|have)$/.test(w[a].norm) && /^[a-z]+s?$/.test(w[a].norm) && !verbInfo(w[a].norm)) a++;
+    }
+    if (a + 1 >= w.length || !/^(is|are|was|were|do|does|did|can|could|will|would|has|have)$/.test(w[a].norm) || w[a].expanded) continue;
+    if (!(SUBJECT_PRONOUNS.has(w[a + 1].norm) || /^(there|the|this|that|your|our|my|their)$/.test(w[a + 1].norm))) continue;
+    // "what time does it start" → "what time it starts": drop do/does/did and put the tense on the verb.
+    const v = w[a + 2];
+    const vi = v ? verbInfo(v.norm) : null;
+    const doSupport = /^(do|does|did)$/.test(w[a].norm) && SUBJECT_PRONOUNS.has(w[a + 1].norm) && vi && vi.form === "base" && v!.norm === vi.base && !brokenAfter(w, a + 1);
+    if (doSupport) {
+      const verb = w[a].norm === "did" ? pastOf(vi!.base) : w[a].norm === "does" ? thirdPersonOf(vi!.base) : vi!.base;
+      out.push({
+        rule: "embedded-question-order", from: a, to: a + 3, replacement: `${w[a + 1].raw} ${verb}`, category: "word-order", severity: "major", skill: "question-form",
+        messageKo: `문장 속 의문문(간접의문문)은 평서문 순서이고 do/does/did를 쓰지 않습니다: '${w.slice(i, a).map((x) => x.raw).join(" ")} ${w[a + 1].raw} ${verb}'.`,
+      });
+      continue;
+    }
     out.push({
-      rule: "embedded-question-order", from: i + 1, to: i + 2, replacement: "", category: "word-order", severity: "major", skill: "question-form",
-      messageKo: `문장 속 의문문(간접의문문)은 평서문 순서입니다: '${w[i].raw} ${w[i + 2].raw} … ${w[i + 1].raw}'.`,
+      rule: "embedded-question-order", from: a, to: a + 1, replacement: "", category: "word-order", severity: "major", skill: "question-form",
+      messageKo: `문장 속 의문문(간접의문문)은 평서문 순서입니다: '${w.slice(i, a).map((x) => x.raw).join(" ")} ${w[a + 1].raw} … ${w[a].raw}'.`,
     });
   }
   return out;
@@ -1822,8 +1855,8 @@ const infinitiveNeeded: Rule = (w) => {
       if (/^(i|we|you|they|he|she|it)$/.test(w[i - 1]?.norm ?? "") === false && !/^(will|would|may|might|can|could|should|must|really|also|just|not|still|to|and)$/.test(w[i - 1]?.norm ?? "")) continue;
       out.push({ rule: "missing-to", from: i + 1, to: i + 1, replacement: "to", category: "verb-form", severity: "major", skill: "purpose-to", messageKo: `'${info.base}' 뒤에 동사가 오면 'to + 동사원형'입니다: '${w[i].raw} to ${v.raw}'.` });
     }
-    // "My hobby is play golf", "The plan is reduce …" → -ing / to.
-    if (/^(hobby|job|plan|goal|dream|idea|job|task|role)$/.test(w[i - 1]?.norm ?? "") && /^(is|was)$/.test(w[i].norm) && vi && vi.form === "base" && v.norm === vi.base && (CLEAR.test(v.norm) || /^(play|watch|read|cook|travel|swim|hike|run|draw|sing|dance|fish|camp|shop|walk)$/.test(v.norm))) {
+    // "The plan is reduce …" → -ing / to ("My hobby is play golf" has its own message: hobby-ing).
+    if (/^(job|plan|goal|dream|idea|task|role)$/.test(w[i - 1]?.norm ?? "") && /^(is|was)$/.test(w[i].norm) && vi && vi.form === "base" && v.norm === vi.base && (CLEAR.test(v.norm) || /^(play|watch|read|cook|travel|swim|hike|run|draw|sing|dance|fish|camp|shop|walk)$/.test(v.norm))) {
       out.push({ rule: "missing-to", from: i + 1, to: i + 2, replacement: ingOf(v.norm), category: "verb-form", severity: "major", skill: "prep-gerund", messageKo: `be동사 뒤에 동사를 쓸 때는 동사ing(또는 to + 동사원형)입니다: '${w[i].raw} ${ingOf(v.norm)}'.` });
     }
   }
@@ -2257,7 +2290,8 @@ const miscPatterns: Rule = (w) => {
   // "I'm living in Ulsan since 2015" → "I've lived / I've been living"
   const sinceAt = w.findIndex((t, k) => t.norm === "since" && /^(\d{4}|last|then|monday|tuesday|wednesday|thursday|friday|january|february|march|april|june|july|august|september|october|november|december|yesterday|morning)$/.test(w[k + 1]?.norm ?? ""));
   if (sinceAt > 1 && !w.slice(0, sinceAt).some((t) => /^(have|has|had|been)$/.test(t.norm))) {
-    const be = w.findIndex((t, k) => k < sinceAt && /^(am|is|are)$/.test(t.norm) && verbInfo(w[k + 1]?.norm ?? "")?.form === "ing");
+    // "I'm living …" (a contraction) is rewritten with its subject by sinceWithPresent.
+    const be = w.findIndex((t, k) => k < sinceAt && /^(am|is|are)$/.test(t.norm) && !t.expanded && verbInfo(w[k + 1]?.norm ?? "")?.form === "ing");
     const simple = w.findIndex((t, k) => k < sinceAt && SUBJECT_PRONOUNS.has(w[k - 1]?.norm ?? "") && /^(base|3sg)$/.test(verbInfo(t.norm)?.form ?? "") && /^(live|work|know|stay|use|study|teach|run|manage|lead)$/.test(verbInfo(t.norm)!.base));
     const at = be >= 0 ? be : simple;
     if (at >= 0) push("since-present", at, at + 1, be >= 0 ? (w[at].norm === "is" ? "has been" : "have been") : `have ${participleOf(verbInfo(w[at].norm)!.base)}`, "tense", "present-perfect", "'since + 시점'(그때부터 지금까지)은 현재완료(have + p.p. / have been + ing)와 씁니다.");
@@ -2354,7 +2388,7 @@ const toInflected: Rule = (w) => {
     if ((info.form === "pp" || info.form === "past") && isSameFormParticiple(info.base)) continue;
     if (info.form === "3sg" && g === "going") continue;
     out.push({
-      rule: "to-inflected", from: i + 1, to: i + 2, replacement: info.base, category: "verb-form", severity: "major", skill: "infinitive",
+      rule: "to-inflected", from: i + 1, to: i + 2, replacement: info.base, category: "verb-form", severity: "major", skill: "purpose-to",
       messageKo: `'${g} to' 뒤에는 동사원형이 옵니다: '${v.raw}' → '${info.base}'.`,
     });
   }
@@ -2416,7 +2450,7 @@ const becauseOf: Rule = (w) => {
     }
     if (verb || k - i < 2 || k - i > 6) continue;
     out.push({
-      rule: "because-of", from: i + 1, to: i + 1, replacement: "of", category: "preposition", severity: "major", skill: "conjunction",
+      rule: "because-of", from: i + 1, to: i + 1, replacement: "of", category: "preposition", severity: "major", skill: "cause-effect",
       messageKo: "because 뒤에는 '주어 + 동사'가 옵니다. 명사만 올 때는 'because of + 명사'입니다: 'because of the higher steam flow'.",
     });
   }
@@ -2478,7 +2512,7 @@ const everydaySlips: Rule = (w) => {
       const v = w[i + 2];
       if (v && HOBBY_VERBS.test(v.norm) && (UNAMBIGUOUS_VERBS.has(v.norm) || !brk(i + 2))) {
         push({
-          rule: "hobby-ing", from: i + 2, to: i + 3, replacement: ingOf(v.norm), category: "verb-form", severity: "major", skill: "gerund-infinitive",
+          rule: "hobby-ing", from: i + 2, to: i + 3, replacement: ingOf(v.norm), category: "verb-form", severity: "major", skill: "prep-gerund",
           messageKo: `'취미는 ~하는 것이다'는 동명사입니다: 'My hobby is ${ingOf(v.norm)}…'.`,
         });
       }
@@ -2541,7 +2575,7 @@ const everydaySlips: Rule = (w) => {
       const vi = verbInfo(n1);
       if (!timePhrase && vi && vi.form === "base" && !before.some((x) => /^(thank|thanks|sorry|apologize|apologise|apologies|excuse|forgive|blame|grateful|thankful|ready|time|responsible|reason|need|chance|way)$/.test(x))) {
         push({
-          rule: "for-purpose", from: i, to: i + 1, replacement: "to", category: "verb-form", severity: "major", skill: "gerund-infinitive",
+          rule: "for-purpose", from: i, to: i + 1, replacement: "to", category: "verb-form", severity: "major", skill: "prep-gerund",
           messageKo: `'~하려고'(목적)는 'to + 동사원형'입니다: 'to ${w[i + 1].raw} …'. 'for' 뒤에는 동사원형이 올 수 없습니다.`,
         });
       }
@@ -2555,7 +2589,7 @@ const everydaySlips: Rule = (w) => {
       const before = w.slice(Math.max(0, i - 3), i).map((x) => x.norm);
       if (v && vi && vi.form === "ing" && !ING_NOUNS.has(v.norm) && OBJECT_START(n2) && !before.some((x) => /^(never|not|can|cannot|could|will|won|ever)$/.test(x))) {
         push({
-          rule: "forget-to", from: i + 1, to: i + 2, replacement: `to ${vi.base}`, category: "verb-form", severity: "major", skill: "gerund-infinitive",
+          rule: "forget-to", from: i + 1, to: i + 2, replacement: `to ${vi.base}`, category: "verb-form", severity: "major", skill: "prep-gerund",
           messageKo: `해야 할 일을 잊었다면 'forget to + 동사원형'입니다: '${w[i].raw} to ${vi.base}'. ('forget + -ing'는 '전에 한 일을 잊다'라는 뜻입니다.)`,
         });
       }
@@ -2753,7 +2787,7 @@ const everydaySlips: Rule = (w) => {
       const vi = verbInfo(v.norm);
       if (vi && vi.base === v.norm && !ING_NOUNS.has(v.norm) && !COUNTABLE_NOUNS.has(v.norm) && (UNAMBIGUOUS_VERBS.has(v.norm) || OBJECT_START(w[i + 3]?.norm ?? "") || /^(it|them)$/.test(w[i + 3]?.norm ?? ""))) {
         push({
-          rule: "how-about-ing", from: i + 2, to: i + 3, replacement: ingOf(v.norm), category: "verb-form", severity: "major", skill: "gerund-infinitive",
+          rule: "how-about-ing", from: i + 2, to: i + 3, replacement: ingOf(v.norm), category: "verb-form", severity: "major", skill: "prep-gerund",
           messageKo: `'How about' 뒤에는 동사ing가 옵니다: 'How about ${ingOf(v.norm)} …?'`,
         });
       }
@@ -3092,7 +3126,7 @@ const basicForms: Rule = (w) => {
 const HANDED: Record<string, string> = {
   number: "the", address: "the", link: "the", file: "the", report: "the", name: "the", location: "the", password: "the", schedule: "the",
   agenda: "the", invoice: "the", quote: "the", quotation: "the", contract: "the", document: "the", photo: "the", picture: "the", map: "the",
-  way: "the", call: "a", hand: "a", minute: "a", moment: "a", chance: "a", hint: "a", ride: "a", lift: "a",
+  way: "the", copy: "a", call: "a", hand: "a", minute: "a", moment: "a", chance: "a", hint: "a", ride: "a", lift: "a",
 };
 const HANDED_FIRST = /^(phone|email|contact|room|flight|order|tracking|home|delivery|meeting|zoom|teams|file|office|hotel|account)$/;
 const HANDED_SECOND = /^(number|address|link|name|location)$/;
@@ -3175,6 +3209,245 @@ const conversationSlips: Rule = (w) => {
   return out;
 };
 const TEST_NOUN = /^(test|trial|check|inspection|experiment|simulation|demo|presentation|survey|walkthrough|walk-through)$/;
+
+const LANGUAGES = /^(english|korean|japanese|chinese|spanish|french|german|vietnamese|indonesian|malay|thai|hindi|italian|russian|arabic)$/;
+const SOUND_ADJ = /^(great|good|nice|interesting|amazing|perfect|wonderful|terrible|bad|delicious|exciting|easy|hard|difficult|lovely|fantastic|awesome|expensive|cheap|boring|reasonable|fair|tough|serious|dangerous|strange|weird|familiar|busy|tiring|relaxing|healthy|crazy|cool|funny|beautiful|scary|stressful|complicated|simple|useful|helpful|fine|okay|ok)$/;
+const WEATHER_WORD = /^(raining|snowing|windy|sunny|cloudy|foggy|rainy|snowy|humid|freezing|hot|cold|warm|chilly)$/;
+const GERUND_VERBS = /^(enjoy|enjoys|enjoyed|enjoying|finish|finishes|finished|avoid|avoids|avoided|mind|minds|minded|imagine|imagined|quit|quits|deny|denied|risk|risked)$/;
+const TAKE_NOUN = /^(break|look|decision|mistake|walk|nap|seat|shower|step|photo|picture|call|chance|try|guess|choice|bath|trip|day)$/;
+const MODIFIER_ADJ = /^(short|quick|long|little|big|good|final|hard|tough|wise|smart|great|nice|quick|brief|careful|close|real|bad|wrong|right|second|first|new|different|better)$/;
+const BE_ADJ_NOUN = /^(experience|idea|day|week|trip|meeting|question|point|choice|plan|decision|opportunity|job|time|suggestion|option|game|movie|party|night|year)$/;
+
+/**
+ * More slips Korean speakers make, found with a battery of typical mistakes: missing prepositions
+ * ("depends the weather", "looking forward meeting"), verb patterns ("would like going", "mind send",
+ * "enjoy to cook", "thinking to change"), "There is raining", "sounds like great", "I really like." and others.
+ */
+const learnerSlips: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  const end = (k: number) => k >= w.length - 1 || brokenAfter(w, k);
+  const ends = (k: number) => end(k) || AFTER_NOUN_PHRASE.test(w[k + 1].norm);
+  const anOf = (x: string) => (/^[aeiou]/.test(x) && !CONSONANT_SOUND_VOWEL_START.test(x) ? "an" : "a");
+  const insert = (k: number, word: string, category: ErrorCategory, severity: Severity, skill: string, messageKo: string, rule = "missing-preposition") =>
+    out.push({ rule, from: k, to: k, replacement: word, category, severity, skill, messageKo });
+  const baseVerbAt = (k: number) => {
+    const v = w[k];
+    const vi = v ? verbInfo(v.norm) : null;
+    return !!vi && vi.form === "base" && v!.norm === vi.base && !/^(be|have|do)$/.test(vi.base) ? vi.base : null;
+  };
+  for (let i = 0; i < w.length - 1; i++) {
+    const t = w[i].norm;
+    const n1 = w[i + 1].norm;
+    if (end(i)) continue;
+
+    // "It depends the weather" → "depends on"; "responsible the budget" → "responsible for".
+    if (/^(depend|depends|depended|depending)$/.test(t) && (DETERMINERS.has(n1) || /^(how|what|whether|when|where|who|which|this|that|it|them|him|her|me|us|you|your|my|our|their)$/.test(n1)) && !(n1 === "a" && /^(lot|bit|little|great)$/.test(w[i + 2]?.norm ?? ""))) {
+      insert(i + 1, "on", "preposition", "major", "verb-prep", `'~에 달려 있다'는 'depend on'입니다: '${w[i].raw} on ${w[i + 1].raw}'.`);
+      continue;
+    }
+    if (t === "responsible" && (DETERMINERS.has(n1) || /^(this|that|it|all|everything|them)$/.test(n1) || (verbInfo(n1)?.form === "ing" && !ING_NOUNS.has(n1)))) {
+      insert(i + 1, "for", "preposition", "major", "verb-prep", `'~을 책임지다/담당하다'는 'responsible for'입니다: 'responsible for ${w[i + 1].raw}'.`);
+      continue;
+    }
+    // "I'm looking forward meeting you" → "looking forward to meeting you".
+    if (t === "forward" && i > 0 && /^(look|looks|looking|looked)$/.test(w[i - 1].norm) && n1 !== "to" && (DETERMINERS.has(n1) || /^(it|this|that|seeing|hearing|meeting|working|your|our|my)$/.test(n1) || (verbInfo(n1)?.form === "ing" && !ING_NOUNS.has(n1)))) {
+      insert(i + 1, "to", "preposition", "major", "verb-prep", "'~을 기대하다'는 'look forward to + 명사/-ing'입니다: 'looking forward to meeting you'.");
+      continue;
+    }
+    // "I'll arrive Jakarta on Monday" → "arrive in Jakarta"; "arrive the airport" → "arrive at the airport".
+    if (/^(arrive|arrives|arrived|arriving)$/.test(t)) {
+      if (/^[A-Z][a-z]/.test(w[i + 1].raw) && !/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|May|June|July|August|September|October|November|December)$/.test(w[i + 1].raw)) {
+        insert(i + 1, "in", "preposition", "major", "verb-prep", `도시·나라에 도착할 때는 'arrive in + 장소'입니다: 'arrive in ${w[i + 1].raw}'.`);
+        continue;
+      }
+      if (n1 === "the" && /^(airport|station|office|hotel|plant|site|venue|gate|terminal|meeting|restaurant|building|factory|port|reception)$/.test(w[i + 2]?.norm ?? "")) {
+        insert(i + 1, "at", "preposition", "major", "verb-prep", `건물·장소에 도착할 때는 'arrive at + 장소'입니다: 'arrive at the ${w[i + 2].raw}'.`);
+        continue;
+      }
+    }
+    // "Let's talk it later" → "talk about it later" ("talk it over" is fine).
+    if (/^(talk|talked|talking|talks|discuss)$/.test(t) && t !== "discuss" && /^(it|this|that)$/.test(n1) && (end(i + 1) || /^(later|tomorrow|next|again|now|today|soon|first|with|when|after|before)$/.test(w[i + 2]?.norm ?? ""))) {
+      insert(i + 1, "about", "preposition", "major", "verb-prep", `talk는 목적어를 바로 받지 않습니다: 'talk about ${w[i + 1].raw}'.`);
+      continue;
+    }
+
+    // "I would like going home" → "would like to go".
+    if (t === "like" && i > 0 && /^(would|should)$/.test(w[i - 1].norm) && verbInfo(n1)?.form === "ing" && !ING_NOUNS.has(n1)) {
+      const base = verbInfo(n1)!.base;
+      out.push({ rule: "would-like-to", from: i + 1, to: i + 2, replacement: `to ${base}`, category: "verb-form", severity: "major", skill: "prep-gerund", messageKo: `'would like' 뒤에는 'to + 동사원형'이 옵니다: 'would like to ${base}'.` });
+      continue;
+    }
+    // "Would you mind send me the file?" → "mind sending".
+    if (/^(mind|minds)$/.test(t) && i > 0 && /^(you|i|we|they|he|she)$/.test(w[i - 1].norm)) {
+      const base = baseVerbAt(i + 1);
+      if (base && (UNAMBIGUOUS_VERBS.has(base) || /^(send|check|wait|close|open|help|move|call|repeat|share|turn|say|tell|give|show|take|bring|speak|sign|pick|hold|come|join|explain)$/.test(base))) {
+        out.push({ rule: "mind-ing", from: i + 1, to: i + 2, replacement: ingOf(base), category: "verb-form", severity: "major", skill: "prep-gerund", messageKo: `'mind' 뒤에는 -ing가 옵니다: 'mind ${ingOf(base)}'.` });
+        continue;
+      }
+    }
+    // "I enjoy to cook" → "enjoy cooking"; "Do you mind to wait?" → "mind waiting".
+    if (GERUND_VERBS.test(t) && n1 === "to") {
+      const base = baseVerbAt(i + 2);
+      if (base) {
+        out.push({ rule: "gerund-not-to", from: i + 1, to: i + 3, replacement: ingOf(base), category: "verb-form", severity: "major", skill: "prep-gerund", messageKo: `'${w[i].raw}' 뒤에는 -ing가 옵니다: '${w[i].raw} ${ingOf(base)}'.` });
+        continue;
+      }
+    }
+    // "I'm thinking to change jobs" → "thinking of changing".
+    if (t === "thinking" && n1 === "to") {
+      const base = baseVerbAt(i + 2);
+      if (base) {
+        out.push({ rule: "thinking-of", from: i + 1, to: i + 3, replacement: `of ${ingOf(base)}`, category: "verb-form", severity: "major", skill: "prep-gerund", messageKo: `'~할까 생각 중이다'는 'thinking of/about + -ing'입니다: 'thinking of ${ingOf(base)}'.` });
+        continue;
+      }
+    }
+    // "Is it possible finish today?" → "possible to finish".
+    // Only as a predicate ("Is it possible …", "it's important …"), not before a noun ("the most important test points").
+    const predicate = i > 0 && (/^(is|was|be|are|were|it|not)$/.test(w[i - 1].norm) || (/^(very|really|so|quite|also|absolutely|still)$/.test(w[i - 1].norm) && /^(is|was|be|are|were|it|not)$/.test(w[i - 2]?.norm ?? "")));
+    if (/^(possible|impossible|necessary|important)$/.test(t) && predicate) {
+      const base = baseVerbAt(i + 1);
+      if (base && (UNAMBIGUOUS_VERBS.has(base) || /^(finish|check|send|get|go|come|meet|call|change|find|make|take|see|tell|buy|pay|leave|stay|keep|start|stop|visit|book|order|move|use|test|fix|run)$/.test(base))) {
+        insert(i + 1, "to", "verb-form", "major", "purpose-to", `'${w[i].raw}' 뒤에 동사가 오면 'to + 동사원형'입니다: '${w[i].raw} to ${w[i + 1].raw}'.`, "infinitive-needed");
+        continue;
+      }
+    }
+    // "It makes me to happy" → "makes me happy".
+    if (/^(make|makes|made|making)$/.test(t) && /^(me|you|him|her|us|them|everyone)$/.test(n1) && w[i + 2]?.norm === "to" && /^(happy|sad|tired|nervous|angry|upset|excited|bored|sick|feel|laugh|cry|worry|smile|think)$/.test(w[i + 3]?.norm ?? "")) {
+      out.push({ rule: "let-make-to", from: i + 2, to: i + 3, replacement: "", category: "verb-form", severity: "major", skill: "verb-object", messageKo: `'make + 사람 + 형용사/동사원형'에는 to를 쓰지 않습니다: '${w[i].raw} ${w[i + 1].raw} ${w[i + 3].raw}'.` });
+      continue;
+    }
+
+    // "The meeting will hold next week" → "will be held"; "The meeting is holding" → "is being held".
+    if (/^(meeting|meetings|conference|event|party|ceremony|workshop|seminar|session|training|exhibition|festival|wedding|competition|interview|briefing|call)$/.test(t)) {
+      let k = i + 1;
+      if (/^(will|would|can|could|should|must|may|might)$/.test(w[k].norm)) {
+        k++;
+        if (w[k]?.norm === "not") k++;
+        if (/^(hold)$/.test(w[k]?.norm ?? "") && (end(k) || !DETERMINERS.has(w[k + 1].norm))) {
+          out.push({ rule: "passive-needed", from: k, to: k + 1, replacement: "be held", category: "verb-form", severity: "major", skill: "passive", messageKo: `회의·행사는 '열리는' 것이라 수동태입니다: '${w[i].raw} ${w.slice(i + 1, k).map((x) => x.raw).join(" ")} be held'.` });
+          continue;
+        }
+      }
+    }
+    // "This dish calls bibimbap" → "is called bibimbap".
+    if (/^(calls|call)$/.test(n1) && /^(this|that|it|dish|food|place|area|machine|tool|process|method|word|thing|game|dance|song|drink|soup|snack|city|town|street|station|restaurant|team|unit|system|software|app|program)$/.test(t) && (t === "it" || t === "this" || t === "that" || (i > 0 && /^(this|that|the|our|my)$/.test(w[i - 1].norm))) && w[i + 2] && (/^[A-Z]/.test(w[i + 2].raw) || (end(i + 2) && !/^(me|you|him|her|us|them|back|in|off|out|it)$/.test(w[i + 2].norm))) && !/^(for|me|you|him|her|us|them|the|a|an|on|back|in|off|out|it)$/.test(w[i + 2].norm)) {
+      out.push({ rule: "passive-needed", from: i + 1, to: i + 2, replacement: "is called", category: "verb-form", severity: "major", skill: "passive", messageKo: `이름이 '~라고 불린다'는 수동태입니다: '${w[i].raw} is called ${w[i + 2].raw}'.` });
+      continue;
+    }
+
+    // "There is raining a lot" → "It is raining": weather takes "it".
+    if (t === "there" && /^(is|was)$/.test(n1) && WEATHER_WORD.test(w[i + 2]?.norm ?? "") && !end(i + 1)) {
+      out.push({ rule: "it-for-weather", from: i, to: i + 1, replacement: /^[A-Z]/.test(w[i].raw) ? "It" : "it", category: "sentence-structure", severity: "major", skill: "be-adj", messageKo: `날씨는 'it'을 주어로 씁니다: 'It ${w[i + 1].raw} ${w[i + 2].raw}'.` });
+      continue;
+    }
+    // "That sounds like great." → "That sounds great" (like + a noun: "sounds like a great idea").
+    if (/^(sound|sounds|sounded)$/.test(t) && n1 === "like" && SOUND_ADJ.test(w[i + 2]?.norm ?? "") && end(i + 2)) {
+      out.push({ rule: "sound-like-adjective", from: i + 1, to: i + 2, replacement: "", category: "word-choice", severity: "major", skill: "be-adj", messageKo: `형용사 앞에서는 like 없이 'sound + 형용사'입니다: '${w[i].raw} ${w[i + 2].raw}' (명사 앞에서는 'sounds like a great idea').` });
+      continue;
+    }
+    // "She speaks well English" → "speaks English well".
+    if (/^(speak|speaks|spoke|speaking)$/.test(t) && /^(well|fluently)$/.test(n1) && LANGUAGES.test(w[i + 2]?.norm ?? "")) {
+      out.push({ rule: "adverb-position", from: i + 1, to: i + 3, replacement: `${w[i + 2].raw} ${w[i + 1].raw}`, category: "word-order", severity: "major", skill: "word-order", messageKo: `부사는 목적어 뒤에 둡니다: '${w[i].raw} ${w[i + 2].raw} ${w[i + 1].raw}'.` });
+      continue;
+    }
+    // "I always am late" → "I am always late": frequency adverbs go after be.
+    if (/^(always|usually|often|never|sometimes|rarely|seldom|normally|generally)$/.test(t) && /^(am|is|are|was|were)$/.test(n1) && !w[i + 1].expanded && i > 0 && SUBJECT_PRONOUNS.has(w[i - 1].norm) && !end(i + 1)) {
+      out.push({ rule: "adverb-position", from: i, to: i + 2, replacement: `${w[i + 1].raw} ${w[i].raw}`, category: "word-order", severity: "minor", skill: "word-order", messageKo: `빈도 부사(${w[i].raw})는 be동사 뒤에 둡니다: '${w[i - 1].raw} ${w[i + 1].raw} ${w[i].raw}'.` });
+      continue;
+    }
+    // "I really like." → "I really like it": like/love need an object ("if you like" is fine).
+    // The subject must start its clause: "the Italian place you like" is a relative clause (its object is "place").
+    const subj = SUBJECT_PRONOUNS.has(t) ? i : /^(really|also|just|so|both|all|definitely|actually)$/.test(t) && i > 0 && SUBJECT_PRONOUNS.has(w[i - 1].norm) ? i - 1 : -1;
+    const clauseStart = subj === 0 || (subj > 0 && (brokenAfter(w, subj - 1) || /^(and|but|so|because|yes|yeah|oh|well|honestly|actually|really)$/.test(w[subj - 1].norm)));
+    if (/^(like|love|liked|loved|likes|loves)$/.test(n1) && end(i + 1) && subj >= 0 && clauseStart) {
+      const before = w.slice(0, i).map((x) => x.norm);
+      if (!before.some((x) => /^(if|as|what|whatever|anything|anyone|how|when|where|who|which|whichever|wherever|whenever|much|whatever|would|do|did|does|you'd)$/.test(x)) && !/^(would|do|did|does)$/.test(t)) {
+        out.push({ rule: "like-object", from: i + 2, to: i + 2, replacement: "it", category: "sentence-structure", severity: "major", skill: "verb-object", messageKo: `like/love는 목적어가 필요합니다: '${w[i + 1].raw} it'.` });
+        continue;
+      }
+    }
+
+    // "Let's take short break" → "take a short break"; "We need to make decision" → "make a decision".
+    if (/^(take|takes|took|taking|taken|make|makes|made|making|have|has|had|having|give|gives|gave|giving)$/.test(t)) {
+      let k = i + 1;
+      if (MODIFIER_ADJ.test(w[k].norm) && !end(k)) k++;
+      const n = w[k]?.norm ?? "";
+      const fits = TAKE_NOUN.test(n);
+      // "have lunch", "take care", "make sense" are not in the list; "had look" / "have chance to" are.
+      if (fits && ends(k) && !(/^(have|has|had|having)$/.test(t) && /^(break|day|trip|step|try|bath)$/.test(n) && k === i + 1)) {
+        insert(i + 1, anOf(w[i + 1].norm), "article", "minor", "articles", `'${w[k].raw}'는 셀 수 있는 명사라서 관사가 필요합니다: '${w[i].raw} ${anOf(w[i + 1].norm)} ${w.slice(i + 1, k + 1).map((x) => x.raw).join(" ")}'.`, "missing-article");
+        continue;
+      }
+    }
+    // "I'm in meeting right now" → "in a meeting"; "I'll be there in hour" → "in an hour".
+    if (t === "in" && /^(meeting|hurry|rush|minute|moment|second|hour|while|bit|week|day|month|year)$/.test(n1) && ends(i + 1) && !/^(room|rooms|minutes|notes|point|points|time)$/.test(w[i + 2]?.norm ?? "")) {
+      insert(i + 1, anOf(n1), "article", "minor", "articles", `'${w[i + 1].raw}'는 셀 수 있는 명사라서 'in ${anOf(n1)} ${w[i + 1].raw}'처럼 관사가 필요합니다.`, "missing-article");
+      continue;
+    }
+    // "It was great experience" → "a great experience".
+    if (/^(is|was)$/.test(t) && /^(great|good|nice|wonderful|amazing|interesting|bad|terrible|big|long|short|busy|productive|useful|lovely|tough|hard|difficult|fun|fantastic|perfect|real)$/.test(n1) && BE_ADJ_NOUN.test(w[i + 2]?.norm ?? "") && !/^(point|idea|question|suggestion|plan|choice|option)$/.test(w[i + 2].norm) && ends(i + 2)) {
+      insert(i + 1, anOf(n1), "article", "minor", "articles", `'${w[i + 2].raw}'는 셀 수 있는 명사라서 '${anOf(n1)} ${w[i + 1].raw} ${w[i + 2].raw}'처럼 관사가 필요합니다.`, "missing-article");
+      continue;
+    }
+    // "One of the pumps need repair" → "needs"; "One of my friends are" → "is".
+    if (t === "one" && n1 === "of" && /^(the|my|our|your|these|those|their|his|her)$/.test(w[i + 2]?.norm ?? "") && isPluralNoun(w[i + 3]?.norm ?? "") && w[i + 4] && !brokenAfter(w, i + 3)) {
+      const v = w[i + 4];
+      const be = { are: "is", were: "was", have: "has" }[v.norm as "are"];
+      const base = !be && !v.expanded ? baseVerbAt(i + 4) : null;
+      if (be || (base && (UNAMBIGUOUS_VERBS.has(base) || PLURAL_SUBJECT_VERB.test(thirdPersonOf(base))))) {
+        const fix = be ?? thirdPersonOf(base!);
+        out.push({ rule: "agreement-one-of", from: i + 4, to: i + 5, replacement: fix, category: "agreement", severity: "major", skill: "agreement", messageKo: `주어는 'one'(하나)이라서 단수 동사입니다: 'One of the ${w[i + 3].raw} ${fix}'.` });
+        continue;
+      }
+    }
+    // "Everyone in the team are ready" → "is": everyone/each is singular, whatever group follows.
+    if (/^(everyone|everybody|someone|somebody|nobody|anyone|anybody|each|everything|nothing)$/.test(t) && /^(in|on|at|of|from)$/.test(n1)) {
+      let k = i + 2;
+      if (/^(the|our|my|your|this|that|these|those|their|us|them|you)$/.test(w[k]?.norm ?? "")) k++;
+      if (w[k] && !/^(is|are|was|were|have|has)$/.test(w[k].norm)) k++;
+      const v = w[k];
+      const fix = v && !v.expanded ? { are: "is", were: "was", have: "has" }[v.norm as "are"] : undefined;
+      if (fix && !brokenAfter(w, k - 1)) {
+        out.push({ rule: "agreement-indefinite", from: k, to: k + 1, replacement: fix, category: "agreement", severity: "major", skill: "agreement", messageKo: `'${w[i].raw}'는 단수 취급이라 '${fix}'를 씁니다.` });
+        continue;
+      }
+    }
+    // "The people who works here" → "who work": the verb agrees with the noun before who/that.
+    if (/^(who|that)$/.test(n1) && (SUBJECT_PLURALS.test(t) || /^(people|children|men|women|they|those)$/.test(t)) && w[i + 2] && !w[i + 2].expanded) {
+      const v = w[i + 2];
+      const be = { is: "are", was: "were", has: "have" }[v.norm as "is"];
+      const vi = verbInfo(v.norm);
+      const lexical = !be && vi && vi.form === "3sg" && PLURAL_SUBJECT_VERB.test(v.norm) ? vi.base : null;
+      if ((be && t !== "that") || lexical) {
+        const fix = be ?? lexical!;
+        out.push({ rule: "relative-agreement", from: i + 2, to: i + 3, replacement: fix, category: "agreement", severity: "major", skill: "relative-clause", messageKo: `${w[i + 1].raw}는 앞의 '${w[i].raw}'(복수)를 가리키므로 동사도 복수형입니다: '${w[i].raw} ${w[i + 1].raw} ${fix}'.` });
+        continue;
+      }
+    }
+    // "The meeting going well" → "is going well"; "The report almost ready" → "is almost ready".
+    if ((i === 0 || brokenAfter(w, i - 1)) && /^(the|our|my|your|this|that|his|her|their)$/.test(t) && /^[a-z]+$/.test(n1) && (!/^(ing|pp|past)$/.test(verbInfo(n1)?.form ?? "") || ING_NOUNS.has(n1)) && w[i + 2]) {
+      const k = i + 2;
+      const vi = verbInfo(w[k].norm);
+      const going = vi && vi.form === "ing" && !ING_NOUNS.has(w[k].norm) && /^(well|fine|smoothly|okay|ok|great|badly|according|now|slowly|fast)$/.test(w[k + 1]?.norm ?? "") && end(k + 1 < w.length - 1 && /^(according)$/.test(w[k + 1].norm) ? w.length - 1 : k + 1);
+      const ready = /^(almost|nearly|already|now|still|finally)$/.test(w[k].norm) && /^(ready|done|finished|completed)$/.test(w[k + 1]?.norm ?? "") && end(k + 1) && !/^(meeting|game|class|show|movie|session|call|match|concert|party)$/.test(n1);
+      if (going || ready) {
+        insert(k, "is", "be-verb", "major", "be-adj", `주어(${w[i].raw} ${w[i + 1].raw}) 뒤에 동사가 없습니다. be동사가 필요합니다: '${w[i].raw} ${w[i + 1].raw} is ${w[k].raw} ${w[k + 1].raw}'.`, "missing-be");
+        continue;
+      }
+    }
+    // "We need fewer water" → "less water": fewer is for things you count.
+    if (t === "fewer" && UNCOUNTABLE.test(n1)) {
+      out.push({ rule: "fewer-less", from: i, to: i + 1, replacement: "less", category: "countability", severity: "minor", skill: "countability", messageKo: `셀 수 없는 명사(${w[i + 1].raw}) 앞에서는 fewer가 아니라 less를 씁니다.` });
+      continue;
+    }
+    // "Was a long day." → "It was a long day": a sentence needs a subject.
+    if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
+      out.push({ rule: "missing-subject-it", from: i, to: i + 1, replacement: /^[A-Z]/.test(w[i].raw) ? `It ${t}` : `it ${t}`, category: "sentence-structure", severity: "major", skill: "be-adj", messageKo: `영어 문장에는 주어가 필요합니다: 'It ${t} ${w.slice(i + 1, i + 4).map((x) => x.raw).join(" ")}'.` });
+      continue;
+    }
+  }
+  return out;
+};
 const NOT_A_MODIFIER = /^(it|them|us|me|him|her|you|this|that|what|which|so|some|any|more|less|many|few|several|enough|another|other|no|each|every|one|two|three|four|five|again|not|also|just|still|really|well|better|all|both|either|neither|such|out|up|down|over|the|a|an|my|our|your|his|their|its)$/;
 
 const RULES: Rule[] = [
@@ -3195,7 +3468,7 @@ const RULES: Rule[] = [
   pluralNeeded, determinerNumber, uncountableDeterminer, theNeeded, extraArticle,
   feelingAdjective, adverbAdjectiveMore, agreementMore, wordOrderMore, miscPatterns, missingBeMore,
   invertedModalForm, toInflected, pleaseForm, beDiffer, becauseOf, thinkMissingIt,
-  everydaySlips, sinceWithPresent, articleBeforeNumber, basicForms, conversationSlips,
+  everydaySlips, sinceWithPresent, articleBeforeNumber, basicForms, conversationSlips, learnerSlips,
 ];
 
 export function runRules(words: Token[]): RuleFinding[] {

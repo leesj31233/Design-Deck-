@@ -31,6 +31,10 @@ export const BASE_VERBS = new Set<string>([
   "leak", "drip", "overheat", "vibrate", "crack", "rust", "slip", "melt", "boil", "spill", "flood", "clog", "jam", "recap",
   "smell", "burn", "taste", "pour", "grill", "toast", "celebrate", "congratulate", "recommend", "order", "book", "pay",
   "save", "rejoin", "reopen", "swim", "hike", "relax", "enjoy", "invite", "introduce", "welcome", "miss", "pick", "drop", "fill",
+  // Everyday verbs for hobbies and home life ("I enjoy cooking", "she live in Busan").
+  "cook", "bake", "sing", "jog", "climb", "study", "chop", "stir", "fry", "wrap", "pack", "unpack", "laugh", "cry", "marry",
+  "hurry", "greet", "decorate", "shave", "tidy", "sew", "fold", "knit", "sneeze", "whisper", "shout", "yell", "scream", "play",
+  "dance", "live", "practice", "practise", "exercise",
   "enter", "access", "reply", "respond", "listen", "die", "belong", "consist", "occur", "happen", "exist", "appear", "disappear", "remain", "message",
   "accept", "adjust", "agree", "allow", "analyze", "analyse", "answer", "apply", "approve", "arrange", "ask", "assign",
   "assume", "attach", "avoid", "calculate", "call", "cancel", "change", "check", "clarify", "clean", "close", "collect",

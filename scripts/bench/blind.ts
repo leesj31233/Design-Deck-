@@ -7,6 +7,7 @@
  *   npx tsx scripts/bench/blind.ts            # summary (set A)
  *   npx tsx scripts/bench/blind.ts --list     # also list every miss and false alarm
  *   npx tsx scripts/bench/blind.ts --set b    # held-out set B (paraphrase-corpus-b.ts)
+ *   npx tsx scripts/bench/blind.ts --set b --causes   # counts by cause only (no items: keeps B held out)
  *
  * "Shown at once" means the app would show the rule-based grade without
  * waiting for Claude (core/grader.ts ruleBasedIsEnough). A wrong answer shown
@@ -67,6 +68,25 @@ if (process.argv[1]?.endsWith("blind.ts")) {
     for (const x of r.wrong) { const row = rows.find((k) => dist(x.qid, x.text) <= k.b)!; row.wrong++; if (clean(x.ev)) row.wrongClean++; }
     console.log("\n| distance ≤ | right | right, nothing found | wrong | wrong, nothing found |\n| ---: | ---: | ---: | ---: | ---: |");
     for (const k of rows) console.log(`| ${k.b} | ${k.right} | ${k.rightClean} | ${k.wrong} | ${k.wrongClean} |`);
+  }
+  if (process.argv.includes("--causes")) {
+    // Counts only (safe for the held-out set): why correct answers were marked wrong, and which kinds of mistakes slip through.
+    const tally = (keys: string[]) => Object.entries(keys.reduce<Record<string, number>>((m, k) => ((m[k] = (m[k] ?? 0) + 1), m), {})).sort((a, b) => b[1] - a[1]);
+    const causes = r.falseAlarm.flatMap((x) => {
+      const out = scoredErrors(x.ev.errors).filter((e) => e.severity !== "minor").map((e) => `${e.severity} ${e.category} [${e.source}]`);
+      const missing = x.ev.meaning.filter((m) => !m.present);
+      if (missing.some((m) => m.critical)) out.push("critical meaning chunk missing");
+      else if (missing.length) out.push("meaning chunk missing (not critical)");
+      if (!out.length) out.push(`only minor notes (score ${x.ev.scores.overall < 80 ? "<80" : "80-84"})`);
+      return [...new Set(out)];
+    });
+    console.log("\nFalse alarm causes (an answer can have several):");
+    for (const [k, n] of tally(causes)) console.log(`  ${String(n).padStart(3)}  ${k}`);
+    const bankOf = (qid: string) => qid.replace(/-[^-]+(-[^-]+)*$/, (m) => m.split("-").slice(0, 2).join("-")).split("-").slice(0, 2).join("-");
+    console.log("\nFalse alarms by question family (id prefix):");
+    for (const [k, n] of tally(r.falseAlarm.map((x) => bankOf(x.qid)))) console.log(`  ${String(n).padStart(3)}  ${k}`);
+    console.log("\nMissed mistakes by kind (no grammar note):");
+    for (const [k, n] of tally(r.wrong.filter((w) => !r.caughtAny.includes(w)).map((w) => w.error))) console.log(`  ${String(n).padStart(3)}  ${k}`);
   }
   if (process.argv.includes("--list")) {
     console.log("\nFalse alarms (correct answers marked wrong):");

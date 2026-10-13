@@ -21,6 +21,36 @@ const WRONG: [string, string, string?][] = [
   ["That's good idea.", "missing-article", "a"],
   ["That brings me to end of my presentation.", "idiom-the", "the"],
   ["I'll be busy for rest of the day.", "idiom-the", "the"],
+  ["Do you know what time does it start?", "embedded-question-order", "it starts"],
+  ["Could you tell me how much does it cost?", "embedded-question-order", ""],
+  ["The results shows a clear trend.", "agreement-plural-noun", "show"],
+  ["One of the pumps need repair.", "agreement-one-of", "needs"],
+  ["Everyone in the team are ready.", "agreement-indefinite", "is"],
+  ["The people who works here are nice.", "relative-agreement", "work"],
+  ["The meeting going well.", "missing-be", "is"],
+  ["You must tired.", "modal-adjective", "be"],
+  ["It depends the weather.", "missing-preposition", "on"],
+  ["She is responsible the budget.", "missing-preposition", "for"],
+  ["I'm looking forward meeting you.", "missing-preposition", "to"],
+  ["I'll arrive Jakarta on Monday.", "missing-preposition", "in"],
+  ["Let's talk it later.", "missing-preposition", "about"],
+  ["I would like going home early.", "would-like-to", "to go"],
+  ["Would you mind send me the file?", "mind-ing", "sending"],
+  ["I enjoy to cook.", "verb-gerund-to", "cooking"],
+  ["We avoid to drive at night.", "verb-gerund-to", "driving"],
+  ["I'm thinking to change jobs.", "thinking-of", "of changing"],
+  ["Is it possible finish today?", "infinitive-needed", "to"],
+  ["The meeting will hold next week.", "passive-needed", "be held"],
+  ["This dish calls bibimbap.", "passive-needed", "is called"],
+  ["There is raining a lot.", "it-for-weather", "It"],
+  ["That sounds like great.", "sound-like-adjective", ""],
+  ["She speaks well English.", "adverb-position", "English well"],
+  ["I really like.", "like-object", "it"],
+  ["Let's take short break.", "missing-article", "a"],
+  ["I'm in meeting right now.", "missing-article", "a"],
+  ["It was great experience.", "missing-article", "a"],
+  ["Was a long day.", "missing-subject-it", "It was"],
+  ["We need fewer water.", "fewer-less", "less"],
   ["He call me every day.", "third-person-s", "calls"],
   ["She visit her parents on Sundays.", "third-person-s", "visits"],
   ["The pressure could higher than expected.", "modal-adjective", "be"],
@@ -182,6 +212,27 @@ const RIGHT = [
   "On top of that, it's cheaper.",
   "We fought from start to finish.",
   "The point is that it works.",
+  "It depends a lot on the company.",
+  "Let's talk it over.",
+  "I'd like the meeting room.",
+  "Never mind, I'll do it.",
+  "Keep to the schedule.",
+  "If possible send it today.",
+  "We will discuss the most important test points.",
+  "We will hold the meeting next week.",
+  "This dish calls for garlic.",
+  "There is rain in the forecast.",
+  "That sounds like a great idea.",
+  "That sounds like fun.",
+  "I'll book that Italian place you like.",
+  "Do whatever you like.",
+  "I'll take note of that.",
+  "We met in meeting room 3.",
+  "It was great fun.",
+  "The sales figures are good.",
+  "The study shows a clear trend.",
+  "We watched a live show.",
+  "The meeting almost finished at five.",
   // Look like the wave-2 slips but are right.
   "That's sound advice.",
   "My hobby is traveling.",
@@ -372,4 +423,13 @@ describe("grammar rules: no false alarms on correct everyday English", () => {
       expect(fired(s)).toEqual([]);
     });
   }
+});
+
+describe("rule skills", () => {
+  it("every finding names a skill from the skill list", async () => {
+    const { SKILLS } = await import("@/engflow/content/skills");
+    const ids = new Set(SKILLS.map((k) => k.id));
+    const sentences = [...WRONG.map((x) => x[0]), "I enjoy to cook.", "She speaks well English.", "Would you mind send me the file?"];
+    for (const s of sentences) for (const f of runRules(words(tokenize(s)))) expect(ids.has(f.skill), `${f.rule}: ${f.skill}`).toBe(true);
+  });
 });
