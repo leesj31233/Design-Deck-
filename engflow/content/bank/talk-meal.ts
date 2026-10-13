@@ -211,7 +211,7 @@ export const TALK_MEAL: Question[] = [
     meaning: [
       { id: "dish", en: "this dish", ko: "이 음식", any: ["this|dish|it|one"] },
       { id: "pork", en: "pork", ko: "돼지고기", any: ["pork"], critical: true },
-      { id: "asking", en: "does this dish …?", ko: "~이 들어가나요?", any: ["re:\\b(does|do|is|are|has|have|did) (this|that|it|there|the)\\b"], critical: true },
+      { id: "asking", en: "does this dish …?", ko: "~이 들어가나요?", any: ["re:\\b(does|do|is|are|has|have|did) (this|that|it|there|the)\\b", "re:\\b(tell|know|ask|check|wonder|wondering|sure) (me |us )?(if|whether)\\b"], critical: true },
       { id: "have", en: "have / contain / is there", ko: "들어가나요", any: ["have|has|contain|contains|there|with|include|includes|use"], critical: true },
     ],
     pitfalls: [

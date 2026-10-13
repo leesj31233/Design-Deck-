@@ -2403,7 +2403,7 @@ const missingBeMore: Rule = (w) => {
   if (w.length >= 4 && /^(the|this|that|my|our|your|it)$/.test(w[0].norm)) {
     let k = w[0].norm === "it" ? 1 : 2;
     if (w[0].norm !== "it" && w[k] && !verbInfo(w[k].norm) && /^(too|very|so|really)$/.test(w[k + 1]?.norm ?? "")) k++;
-    if (/^(too|very|so|really)$/.test(w[k]?.norm ?? "") && /^(high|low|expensive|cheap|big|small|late|early|hot|cold|long|short|heavy|busy|difficult|hard|far|close|slow|fast|good|bad|nice|spicy|salty|loud|noisy|tight)$/.test(w[k + 1]?.norm ?? "") && !verbInfo(w[k - 1].norm)) {
+    if (/^(too|very|so|really)$/.test(w[k]?.norm ?? "") && /^(high|low|expensive|cheap|big|small|late|early|hot|cold|long|short|heavy|busy|difficult|hard|far|close|slow|fast|good|bad|nice|spicy|salty|loud|noisy|tight)$/.test(w[k + 1]?.norm ?? "") && !verbInfo(w[k - 1].norm) && !w.slice(1, k).some((x) => BE_FORMS.has(x.norm))) {
       out.push({ rule: "missing-be-adjective", from: k, to: k, replacement: "is", category: "be-verb", severity: "major", skill: "be-adj", messageKo: `주어 뒤에 be동사가 필요합니다: '${w.slice(0, k).map((x) => x.raw).join(" ")} is ${w[k].raw} ${w[k + 1].raw}'.` });
     }
   }
@@ -3872,6 +3872,53 @@ const learnerSlips: Rule = (w) => {
         out.push({ rule: "be-base-verb", from: i, to: i + 1, replacement: "", category: "verb-form", severity: "major", skill: "agreement", messageKo: `be동사와 일반동사(${w[i + 2].raw})를 함께 쓰지 않습니다: '… ${n1} ${w[i + 2].raw}'.` });
         continue;
       }
+    }
+    // "It's go well", "You were freeze" → be + a bare verb.
+    if (/^(is|was|are|were|am)$/.test(t) && i > 0 && /^(it|you|he|she|we|they|i|that|this)$/.test(w[i - 1].norm)) {
+      const b = baseVerbAt(i + 1);
+      if (b && /^(go|freeze|work|come|happen|break|stop|start|run|look|seem|need|want|know|get)$/.test(b) && w[i + 1].norm === b && !(b === "work" && end(i + 1))) {
+        out.push({ rule: "be-base-verb", from: i + 1, to: i + 2, replacement: b === "freeze" ? "frozen" : ingOf(b), category: "verb-form", severity: "major", skill: "progressive", messageKo: `be동사 뒤에 동사원형을 쓰지 않습니다: '${w[i].raw} ${b === "freeze" ? "frozen" : ingOf(b)}'.` });
+        continue;
+      }
+    }
+    // "Let me helps you" → "help"; "would you like to goes" → "go".
+    if ((t === "me" && i > 0 && /^(let|lets)$/.test(w[i - 1].norm)) || t === "to") {
+      const v = w[i + 1];
+      const vi = v ? verbInfo(v.norm) : null;
+      if (vi && vi.form === "3sg" && !v!.expanded && (UNAMBIGUOUS_VERBS.has(vi.base) || /^(go|help|come|make|take|get|see|know|tell|say|ask|check|send|call|show|give|try|start|finish|meet|have|do)$/.test(vi.base)) && !(t === "to" && i > 0 && /^(next|close|due|according|thanks|compared|up|down|back|similar|related|in|on|from|go|went|goes|listen|talk|speak|reply|respond)$/.test(w[i - 1].norm))) {
+        out.push({ rule: "to-inflected", from: i + 1, to: i + 2, replacement: vi.base, category: "verb-form", severity: "major", skill: "purpose-to", messageKo: `'${w[i].raw}' 뒤에는 동사원형입니다: '${vi.base}'.` });
+        continue;
+      }
+    }
+    // "Have you ever be to Korea?" → "been".
+    if (/^(have|has)$/.test(t) && SUBJECT_PRONOUNS.has(n1) && /^(ever|never|already|just)?$/.test(w[i + 2]?.norm ?? "") && (i === 0 || brokenAfter(w, i - 1))) {
+      const k = /^(ever|never|already|just)$/.test(w[i + 2]?.norm ?? "") ? i + 3 : i + 2;
+      const b = w[k]?.norm === "be" ? "be" : baseVerbAt(k);
+      if (b && participleOf(b) !== b && !isSameFormParticiple(b) && w[k].norm === b && (b === "be" || UNAMBIGUOUS_VERBS.has(b) || /^(go|eat|see|try|visit|meet|hear|do|make|take|get)$/.test(b))) {
+        out.push({ rule: "perfect-base-verb", from: k, to: k + 1, replacement: participleOf(b), category: "verb-form", severity: "major", skill: "present-perfect", messageKo: `have + 과거분사입니다: 'Have you ever ${participleOf(b)} …?'` });
+        continue;
+      }
+    }
+    // "If there are any mistake" → "mistakes".
+    if (/^(are|were)$/.test(t) && i > 0 && w[i - 1].norm === "there" && /^(any|some|many|several|no)$/.test(n1) && COUNTABLE_NOUNS.has(w[i + 2]?.norm ?? "") && ends(i + 2)) {
+      const n = w[i + 2].norm;
+      const pl = PLURAL_OF[n] ?? `${n}s`;
+      out.push({ rule: "plural-needed", from: i + 2, to: i + 3, replacement: pl, category: "countability", severity: "minor", skill: "countability", messageKo: `'there are ${n1}' 뒤의 셀 수 있는 명사는 복수형입니다: '${pl}'.` });
+      continue;
+    }
+    // "I shared it to everyone" → "with everyone".
+    if (/^(share|shared|sharing|shares)$/.test(t) && /^(it|this|that|them|the)$/.test(n1)) {
+      let k = i + 2;
+      if (n1 === "the") k++;
+      if (w[k]?.norm === "to" && /^(everyone|everybody|me|you|us|them|him|her|the|all)$/.test(w[k + 1]?.norm ?? "")) {
+        out.push({ rule: "preposition-collocation", from: k, to: k + 1, replacement: "with", category: "preposition", severity: "major", skill: "verb-prep", messageKo: "'~와 공유하다'는 'share … with + 사람'입니다." });
+        continue;
+      }
+    }
+    // "What time starts the plant tour?" → "does the plant tour start".
+    if (t === "time" && i > 0 && w[i - 1].norm === "what" && /^(starts|begins|ends|opens|closes|leaves|arrives|finishes)$/.test(n1) && /^(the|your|our|this)$/.test(w[i + 2]?.norm ?? "")) {
+      out.push({ rule: "question-word-order", from: i + 1, to: i + 2, replacement: "does", category: "word-order", severity: "major", skill: "question-form", messageKo: `의문문은 'What time does + 주어 + 동사원형?'입니다: 'What time does … ${verbInfo(n1)?.base ?? n1}?'` });
+      continue;
     }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
     if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
