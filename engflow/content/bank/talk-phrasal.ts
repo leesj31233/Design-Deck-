@@ -141,13 +141,14 @@ export const TALK_PHRASAL: Question[] = [
       "Don't worry. We'll figure out the cause together.",
     ],
     meaning: [
-      { id: "figure-out", en: "figure it out", ko: "알아내다", any: ["re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )(?<!\\bnot be able to )\\b(figure|work|sort|find)(s|ed|ing)?( \\w+){0,3} (out|cause|reason|solution)\\b", "re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )(?<!\\bnot be able to )\\b(solve|fix|resolve)\\b"], critical: true },
+      { id: "figure-out", en: "figure it out", ko: "알아내다", any: ["re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )(?<!\\bnot be able to )\\b(figure|work|sort|find)(s|ed|ing)?( \\w+){0,3} (out|cause|reason|solution)\\b", "re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )(?<!\\bnot be able to )\\b(solve|fix|resolve)\\b", "re:(?<!\\bnot )\\bget to the bottom\\b"], critical: true },
       { id: "together", en: "together", ko: "함께", any: ["together", "help"] },
       { id: "dont-worry", en: "don't worry", ko: "걱정 마세요", any: ["worry|worries"] },
     ],
     pitfalls: [
       { id: "figure-out-it", pattern: "figure out =it", category: "word-order", severity: "major", fix: "figure it out", messageKo: "목적어가 it이면 'figure it out'처럼 figure와 out 사이에 넣습니다. 'figure out it'은 틀린 어순입니다." },
       { id: "figure-it-no-out", pattern: "re:\\bfigure it(?! out\\b)", category: "preposition", severity: "major", fix: "figure it out", messageKo: "'알아내다, 해결하다'는 'figure out'입니다. out을 빼고 'figure it'이라고 하면 뜻이 통하지 않습니다." },
+      { id: "figure-out-nothing", pattern: "re:\\bfigure out together\\b", category: "missing-content", severity: "major", fix: "figure it out together", messageKo: "figure out은 목적어가 필요합니다. 무엇을 알아낼지 it을 넣어 'figure it out together'라고 합니다." },
     ],
     hints: { pattern: "We'll + figure + it + out", skeleton: "Don't worry. We'll ______ __ ___ together.", partial: "Don't worry. We'll figure…" },
     explanationKo: "'(원인이나 방법을) 알아내다, 해결하다'는 회화에서 'figure out'을 아주 많이 씁니다. 목적어가 it이면 'figure it out'처럼 가운데에 넣고, out을 빠뜨리면 뜻이 통하지 않습니다.",
@@ -460,7 +461,7 @@ export const TALK_PHRASAL: Question[] = [
       "I understand. I'm sure we can work it out.",
     ],
     meaning: [
-      { id: "work-out", en: "work something out", ko: "방법을 찾아내다", any: ["re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )\\b(work|sort)( \\w+)? out\\b", "re:(?<!\\bno )(?<!\\bnot find a )(?<!\\bnot think there is a )\\b(solution|compromise|way|agreement|deal|arrangement)\\b", "re:(?<!\\bnot )\\b(resolve|solve)\\b"], critical: true },
+      { id: "work-out", en: "work something out", ko: "방법을 찾아내다", any: ["re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )\\b(work|sort|figure)( \\w+)? out\\b", "re:(?<!\\bno )(?<!\\bnot find a )(?<!\\bnot think there is a )\\b(solution|compromise|way|agreement|deal|arrangement)\\b", "re:(?<!\\bnot )\\b(resolve|solve)\\b"], critical: true },
       { id: "sure", en: "I'm sure", ko: "확신해요", any: ["re:(?<!\\bnot )(?<!\\bnot very )(?<!\\bnot so )\\b(sure|confident|certain|believe|think)\\b"] },
       { id: "understand", en: "I understand", ko: "이해합니다", any: ["understand|see"] },
       { id: "can", en: "we can", ko: "~할 수 있다", any: ["can|could|will|able"] },
@@ -626,7 +627,7 @@ export const TALK_PHRASAL: Question[] = [
       "He's at the site today, so I'm here instead of him.",
     ],
     meaning: [
-      { id: "fill-in", en: "filling in for him", ko: "대신하다", any: ["re:(?<!\\bnobody is )(?<!\\bno one is )(?<!\\bnot )\\b(fill|filling|filled|stand|standing|stood)( \\w+)? in\\b", "re:(?<!\\bnobody is )(?<!\\bno one is )(?<!\\bnot )\\b(cover|covering|instead|replace|replacing|behalf|substitute|substituting)\\b", "re:(?<!\\bnot )\\bhere for (him|mr)\\b"], critical: true },
+      { id: "fill-in", en: "filling in for him", ko: "대신하다", any: ["re:(?<!\\bnobody is )(?<!\\bno one is )(?<!\\bnot )\\b(fill|filling|filled|stand|standing|stood)( \\w+)? in\\b", "re:(?<!\\bnobody is )(?<!\\bno one is )(?<!\\bnobody will )(?<!\\bno one will )(?<!\\bnot )\\b(cover|covering|instead|replace|replacing|behalf|substitute|substituting)\\b", "re:(?<!\\bnot )\\bhere for (him|mr)\\b"], critical: true },
       { id: "site", en: "at the site", ko: "현장에", any: ["site|plant|field"], critical: true },
       { id: "so", en: "so", ko: "그래서", any: ["so|because|since"] },
     ],
@@ -1003,6 +1004,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "make-it-up-for-you", pattern: "re:(?<=\\bmake it up )for(?= (you|her|him|them)\\b)", category: "preposition", severity: "major", fix: "to", messageKo: "사람에게 '보상하다'는 'make it up to + 사람'이고, 일을 '만회하다'는 'make up for + 일'입니다. 'make it up for you'는 둘을 섞은 표현입니다." },
       { id: "for-make", pattern: "for =make =up", category: "verb-form", severity: "major", fix: "to make up", messageKo: "'~하기 위해'는 'to + 동사원형'입니다. 'for make up'이 아니라 'to make up for it'입니다.", skill: "purpose-to" },
       { id: "make-up-for-nothing", pattern: "re:\\bmake up for$", category: "missing-content", severity: "major", fix: "make up for it", messageKo: "'make up for' 뒤에는 무엇을 만회하는지(it)가 와야 합니다: 'to make up for it'." },
+      { id: "make-it-up-for-it", pattern: "make it up for it", category: "preposition", severity: "major", fix: "make up for it", messageKo: "'make up for it' 또는 'make it up to you' 중 하나를 씁니다. 두 표현을 섞어 'make it up for it'이라고 하지 않습니다." },
     ],
     hints: { pattern: "Let me + 동사원형 … + to make up for it", skeleton: "I'm so sorry I couldn't make it. Let me buy you lunch this week to ____ __ ___ it.", partial: "I'm so sorry I couldn't make it. Let me buy you lunch this week to make…" },
     explanationKo: "잘못이나 손해를 '만회하다, 보상하다'는 'make up for + 명사'입니다. for를 빼면 틀리고, '~하기 위해'는 'to make up for it'처럼 to + 동사원형을 씁니다. 'make it up to you'도 같은 뜻으로 자주 씁니다.",

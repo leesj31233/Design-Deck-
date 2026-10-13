@@ -64,6 +64,7 @@ export const TALK_VISIT: Question[] = [
       { id: "help-your-bags", pattern: "help your|the|those bag|bags|luggage|suitcase", category: "preposition", severity: "major", fix: "help you with your bags", messageKo: "help의 목적어는 사람입니다. '가방을 도와주다'는 'help you with your bags'처럼 '사람 + with + 물건'으로 씁니다." },
       { id: "let-me-to", pattern: "let me to", category: "verb-form", severity: "major", fix: "let me", messageKo: "'let me' 뒤에는 동사원형이 바로 옵니다: 'let me help'. to를 넣지 않습니다." },
       { id: "hand-for-base", pattern: "hand for =carry|=carrying|=take|=help", category: "preposition", severity: "major", fix: "hand with", messageKo: "'~을 도와주다'는 'give you a hand with + 명사'입니다: 'let me give you a hand with your bags'." },
+      { id: "let-me-helps", pattern: "let me =helps|=carries|=takes|=helped", category: "verb-form", severity: "major", fix: "let me help", messageKo: "let me 뒤에는 동사원형이 옵니다: 'Let me help you with your bags.'" },
     ],
     hints: { pattern: "Let me help + 사람 + with + 물건", skeleton: "Let me ____ you ____ your bags.", partial: "Let me help you…" },
     explanationKo: "'제가 ~해 드릴게요'는 'Let me + 동사원형'입니다. help는 사람을 목적어로 받아서 'help you with your bags'라고 하고, 'help your bags'(가방을 돕다)라고 하지 않습니다.",
@@ -325,6 +326,7 @@ export const TALK_VISIT: Question[] = [
       { id: "direct-no-do", pattern: "re:^(so |sorry |and |okay |ok )?(what time|when) the (plant |factory )?(tour|visit) (starts|start|begins|begin)\\b", category: "word-order", severity: "major", fix: "what time does the plant tour start", messageKo: "직접 묻는 의문문에는 do/does가 필요합니다: 'What time does the tour start?'. 'Could you tell me' 뒤에서만 평서문 어순(the tour starts)을 씁니다." },
       { id: "embedded-does", pattern: "tell me what|when time? does|=do", category: "word-order", severity: "major", fix: "tell me what time", messageKo: "'Could you tell me ~' 안에 들어간 질문은 평서문 어순(주어 + 동사)입니다: 'what time the tour starts'. does를 쓰지 않습니다." },
       { id: "embedded-start", pattern: "re:(?<=\\bme (what time|when) the (plant |factory )?)tour start\\b", category: "agreement", severity: "major", fix: "tour starts", messageKo: "간접 의문문 안은 평서문이므로 주어(the tour)에 맞춰 'starts'로 씁니다." },
+      { id: "what-time-starts-the", pattern: "re:\\b(what time|when) (starts|begins|start|begin) the\\b", category: "word-order", severity: "major", fix: "what time the plant tour starts", messageKo: "'몇 시에 ~가 시작하는지'는 '의문사 + 주어 + 동사' 순서입니다: 'what time the plant tour starts'. 동사를 주어 앞에 두지 않습니다." },
     ],
     hints: { pattern: "Could you tell me + what time + 주어 + 동사?", skeleton: "Could you tell me what time the plant tour ______?", partial: "Could you tell me what time…" },
     explanationKo: "'Could you tell me …?' 안에 질문을 넣으면 그 부분은 평서문 어순(what time the tour starts)이 됩니다. 'what time does the tour start'처럼 does를 넣지 않고, 주어에 맞춰 starts로 씁니다.",
@@ -404,7 +406,7 @@ export const TALK_VISIT: Question[] = [
     meaning: [
       { id: "new-dryer", en: "the new dryer", ko: "새 건조기", any: ["dryer|drier"], critical: true },
       { id: "new", en: "new", ko: "새", any: ["new"] },
-      { id: "installed", en: "was installed", ko: "설치되었다", any: ["install|installation", "set up", "put in"], critical: true },
+      { id: "installed", en: "was installed", ko: "설치되었다", any: ["re:(?<!\\bnot )(?<!\\bnot been )(?<!\\bnot yet )(?<!\\bnever )\\b(install|installed|installation)\\b", "set up", "put in"], critical: true },
       { id: "last-month", en: "last month", ko: "지난달에", any: ["last month"] },
     ],
     pitfalls: [
