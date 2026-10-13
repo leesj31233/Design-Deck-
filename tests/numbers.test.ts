@@ -72,6 +72,9 @@ describe("everyday synonyms in meaning chunks", () => {
     expect(matchAny(["great|perfect"], w("That would be fantastic."), 2, true)).not.toBeNull();
     expect(matchAny(["=great"], w("That would be fantastic."), 2, true)).toBeNull();
     expect(matchPattern(compilePattern("take ... taxi"), w("Let's take a cab."))).toBeNull();
+    expect(matchAny(["children"], w("How are the kids?"), 2, true)).not.toBeNull();
+    expect(matchAny(["soon"], w("I'll get back to you shortly."), 2, true)).not.toBeNull();
+    expect(matchAny(["recommend"], w("I'd suggest the bulgogi."), 2, true)).not.toBeNull();
   });
 });
 
