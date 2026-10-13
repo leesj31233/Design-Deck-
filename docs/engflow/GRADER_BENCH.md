@@ -42,6 +42,67 @@ set-B item (only its summary and distance bands were read). The gap between A an
 expected cost of tuning on A; B's gains come from the content passes on other questions and the
 new rules, so they generalize.
 
+## Results of the second 12-hour run
+
+| Measure | Start of run 2 | Now |
+| --- | ---: | ---: |
+| Blind A: correct answers marked wrong | 13 / 291 (4.5%) | 12 / 291 (4.1%) |
+| Blind A: wrong answers flagged (any grammar note) | 92.3% | 96.9% |
+| Blind A: flagged as a major error or below 85 | 76.3% | 77.8% |
+| Blind A: wrong answers shown at once as fine | 2 | 1 |
+| **Blind B (held out): correct answers marked wrong** | 31 / 312 (9.9%) | 31 / 312 (9.9%) |
+| **Blind B (held out): wrong answers flagged (any note)** | 80.8% | 80.8% |
+| **Blind B (held out): wrong answers shown at once as fine** | 7 | 7 |
+| Learner corpus, rules alone: mistakes flagged | 90.5% | 99.1% |
+| Learner corpus, rules alone: correct sentences flagged | 0.0% | 0.0% |
+| Wrong number swapped in (word / digit form), caught | 54 / 89, 28 / 40 | 89 / 90, 40 / 40 |
+| Correct answers rewritten digit ↔ word, marked wrong | — | 0 / 228 |
+| Correct answers said without punctuation, marked wrong | 18 / 6,175 | 5 / 6,211 |
+| Mutation bench: recall / no false alarm | 98.3% / 100% | ~98% / 100% (on a bank of 1,030+ questions; unchanged on the same content) |
+| Rule-based grading time, p95 / p99 / slowest | 15 / 38 / 80 ms | 8 / 20 / 29 ms |
+
+What this round says, honestly: the new rules came from the learner corpus, set A and the mutation
+bench, so those numbers are in-sample. Held-out set B did not move — its remaining misses are
+not the patterns these rules target — but it did not get worse either, and content QC (about
+3,000 probes plus every reference and accepted answer) found no new false alarm. The gains that
+generalize are the mechanisms: numbers, synonyms, unpunctuated answers and learning from late
+grades.
+
+- **Numbers** (`core/numbers.ts`, `core/numwords.ts`). Every token carries a canonical number
+  ("three" = "3", "twenty-five" = "25", "four-week" = "4-week", ordinals kept apart: "third" =
+  "3th"), used by alignment and meaning patterns; "90,000" is one token. A number no correct
+  answer has, where the closest one counts the same thing differently (same word after it or
+  before it), is a major meaning error. Units that convert ("24 months" / "two years"), clock
+  times ("17:00" / "5 pm") and ordinals are not compared; equal numbers are paired by context so
+  "at 4" pairs with "at 4", not with "4 pm".
+- **Everyday synonyms** in meaning chunks only (28 groups: *cab/taxi*, *great/fantastic*,
+  *issue/problem* …). Set A: one false alarm fewer; B and the mutation bench unchanged.
+- **Said without punctuation.** Voice answers arrive without commas or question marks. Inverted
+  questions and suggestions ("why don't we …", "can't we …") and "please don't …" no longer count
+  as reversed meaning; an "if" more than six words back no longer hides a main-clause negation;
+  "Sure what do you need", "I did the match was …", "it do you know", "after work my treat",
+  "10 am" are read correctly.
+- **About 30 new rules**, each tested on look-alike correct sentences: *That's sound great*,
+  *My hobby is play golf*, *I really enjoyed.*, *Have you ever eat*, *calling for check*, *forgot
+  closing*, *the level of the samples were*, *the new one use*, *is not work/need/get/open*,
+  *is almost die*, *living here since 2015*, *a 18%*, *in morning*, *on way*, *of year*, *a clinic
+  that take*, *How about put*, *reduce size of*, *after the meeting finish*, *previous one*,
+  *answer it* (questions), *long time*, *accept 10% increase*, *a moments*, *Friday morning also
+  fine* …
+- **Learning from late grades.** A Claude grade that arrives after the rule-based one was shown
+  is no longer thrown away: an approved wording is remembered (accepted at once next time), and a
+  short note tells the learner when Claude's verdict differs. The shown score never changes.
+- **Faster long answers.** Word-pair alignment costs are memoized and stored answers are
+  tokenized once.
+
+### Should a clear rule error skip the wait?
+
+When the rules already find a major error, waiting up to 2.5–8 s for Claude seems pointless.
+Measured before deciding: on set A no correct answer has a major rule or pitfall error, but on
+held-out set B 2 correct answers have a pitfall error and 6 a rule error (against 60 and 61
+wrong answers). Skipping the wait would turn those into false alarms whenever Claude takes more
+than a second, so the wait stays as it is; pitfall-only skipping (2 of 312) was also rejected.
+
 ### Should "close enough to trust" be wider?
 
 On set A, raising the high-confidence cut-off from 0.2 to 0.25 looked free: 37 more correct
