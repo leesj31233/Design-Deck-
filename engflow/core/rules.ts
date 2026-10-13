@@ -114,7 +114,7 @@ const prepositionBaseVerb: Rule = (w) => {
     if (p === "by" && !UNAMBIGUOUS_VERBS.has(v.norm)) continue;
     // "before start-up", "before test results" — only fire when an object/determiner or end follows, or the verb is unambiguous.
     const next = w[k + 1]?.norm;
-    const objectFollows = !!next && (DETERMINERS.has(next) || OBJECT_DETERMINERS.has(next) || /^(me|him|us|them)$/.test(next));
+    const objectFollows = !!next && (DETERMINERS.has(next) || OBJECT_DETERMINERS.has(next) || /^(me|him|us|them|it)$/.test(next));
     // Bare motion and everyday verbs are wrong here whatever follows ("before go into", "after arrive at").
     const clearVerb = /^(go|come|get|take|make|send|leave|arrive|enter|start|begin|meet|talk|eat|drink|sign|run|move|visit|finish)$/.test(v.norm) && p !== "by";
     if (!UNAMBIGUOUS_VERBS.has(v.norm) && !objectFollows && !clearVerb) continue;

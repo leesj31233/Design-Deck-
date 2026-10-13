@@ -35,7 +35,7 @@ export const BASE_VERBS = new Set<string>([
   "cook", "bake", "sing", "jog", "climb", "study", "chop", "stir", "fry", "wrap", "pack", "unpack", "laugh", "cry", "marry",
   "hurry", "greet", "decorate", "shave", "tidy", "sew", "fold", "knit", "sneeze", "whisper", "shout", "yell", "scream", "play",
   "dance", "live", "practice", "practise", "exercise", "trip", "crash", "stall", "overflow",
-  "ignore", "misunderstand", "misread", "notice", "notify", "admit", "drain", "switch", "suit", "fit",
+  "ignore", "misunderstand", "misread", "notice", "notify", "admit", "drain", "switch", "suit", "fit", "sign", "escalate",
   "enter", "access", "reply", "respond", "listen", "die", "belong", "consist", "occur", "happen", "exist", "appear", "disappear", "remain", "message",
   "accept", "adjust", "agree", "allow", "analyze", "analyse", "answer", "apply", "approve", "arrange", "ask", "assign",
   "assume", "attach", "avoid", "calculate", "call", "cancel", "change", "check", "clarify", "clean", "close", "collect",

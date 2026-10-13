@@ -195,7 +195,7 @@ export function tokenize(text: string): Token[] {
     if (!t.expanded || t.norm !== "is" || !/'s$/i.test(t.raw.replace(/’/g, "'"))) continue;
     const next = tokens.slice(i + 1).find((x) => !x.punct && x.norm !== "not" && x.norm !== "already" && x.norm !== "just" && x.norm !== "never" && x.norm !== "always");
     // A change-of-state verb after "'s" is the present perfect: "the schedule's changed", "the price's gone up".
-    const change = next && verbInfo(next.norm)?.form !== "base" && /^(change|increase|decrease|drop|rise|improve|arrive|start|happen|grow|fall|worsen|double|shift|slow|leave|come|move|become)$/.test(verbInfo(next.norm)?.base ?? "");
+    const change = next && verbInfo(next.norm)?.form !== "base" && /^(change|increase|decrease|drop|rise|improve|arrive|start|happen|grow|fall|worsen|double|shift|slow|leave|come|move|become|stop|fail|crash|trip|leak)$/.test(verbInfo(next.norm)?.base ?? "");
     // A participle with an object after it is active, so "'s" is "has": "he's already made lots of friends",
     // "she's finished the report" ("it's made of steel", "it's called bibimbap" stay "is").
     const info = next ? verbInfo(next.norm) : null;
