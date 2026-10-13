@@ -12,7 +12,7 @@ import { WeekBars } from "../charts";
 import { CATEGORY_LABEL } from "../practice/session";
 import { ExpressionCollection } from "../expressions";
 import { RoleplayShortcut } from "../roleplay";
-import { LadderCard, SpeedCard } from "../ladder";
+import { LadderCard, MeetingCard, SpeedCard } from "../ladder";
 import { TalkCard } from "../freetalk";
 import { situationOf } from "../../core/situations";
 import { SITUATIONS } from "../../core/types";
@@ -221,6 +221,7 @@ export function TodayScreen() {
         </Card>
       </div>
 
+      <MeetingCard />
       <RoleplayShortcut />
       <LadderCard situation="all" compact />
       <SpeedCard />

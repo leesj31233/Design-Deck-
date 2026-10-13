@@ -255,3 +255,22 @@ describe("expression notebook", () => {
     }
   });
 });
+
+describe("meeting essentials", () => {
+  it("picks short-to-medium turns from the meeting scenes, unseen ones first, short ones first", async () => {
+    const { buildMeetingRound } = await import("@/engflow/core/ladder");
+    const { QUESTIONS, QUESTION_BY_ID } = await import("@/engflow/content");
+    const { situationOf } = await import("@/engflow/core/situations");
+    let r = 0;
+    const rng = () => ((r = (r * 9301 + 49297) % 233280) / 233280);
+    const items = buildMeetingRound({ seen: {} }, QUESTIONS, { size: 8, now: Date.UTC(2026, 9, 13), rng });
+    expect(items).toHaveLength(8);
+    const qs = items.map((it) => QUESTION_BY_ID[it.questionId]);
+    expect(new Set(qs.map((q) => q.id)).size).toBe(8);
+    for (const q of qs) {
+      expect(["online", "discussion", "presentation"]).toContain(situationOf(q));
+      expect(q.difficulty).toBeLessThanOrEqual(5);
+    }
+    expect(qs.map((q) => q.difficulty)).toEqual([...qs.map((q) => q.difficulty)].sort((a, b) => a - b));
+  });
+});

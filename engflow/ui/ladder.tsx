@@ -1,8 +1,8 @@
 "use client";
 import * as React from "react";
 import { motion } from "motion/react";
-import { ArrowRight, Timer, TrendingUp } from "lucide-react";
-import { buildLadder, buildSpeedRound, ladderRange, ladderSteps } from "../core/ladder";
+import { ArrowRight, Presentation, Timer, TrendingUp } from "lucide-react";
+import { buildLadder, buildMeetingRound, buildSpeedRound, ladderRange, ladderSteps } from "../core/ladder";
 import { sceneDifficulty } from "../core/situations";
 import type { Situation } from "../core/types";
 import { SITUATION_INFO } from "../content";
@@ -83,6 +83,34 @@ export function LadderCard({ situation, compact }: { situation: Situation | "all
             시작 <ArrowRight className="size-4" />
           </button>
         </div>
+      </div>
+    </Card>
+  );
+}
+
+/** Meeting essentials: the most frequent interactive-meeting expressions, short to medium. */
+export function MeetingCard() {
+  const app = useApp();
+  const nav = useNav();
+  const start = () => {
+    const items = buildMeetingRound(app.state, app.questions, { size: 8, now: app.now() });
+    if (!items.length) return;
+    nav.startSession({ id: `meeting-${app.now()}`, title: "회의 필수 표현", kind: "lesson", items, note: "회의에서 가장 많이 쓰는 표현 8개" });
+  };
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="flex items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <Presentation className="size-4 text-[var(--ef-accent-ink)]" />
+            <Eyebrow>회의 필수 표현</Eyebrow>
+          </div>
+          <div className="mt-1 text-[16px] font-semibold">실제 회의에서 가장 자주 쓰는 말 8개</div>
+          <p className="ef-ko mt-1 text-[13px] text-[var(--muted)]">회의 시작, 끼어들기, 다시 묻기, 동의·반대, 정리와 마무리까지. 짧은 말부터 조금 긴 말 순서로 연습합니다.</p>
+        </div>
+        <button onClick={start} className="dd-focus inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]" aria-label="회의 필수 표현 시작">
+          시작 <ArrowRight className="size-4" />
+        </button>
       </div>
     </Card>
   );

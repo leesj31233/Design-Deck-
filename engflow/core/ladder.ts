@@ -82,3 +82,28 @@ export function buildSpeedRound(state: Pick<LearnerState, "seen">, bank: Questio
     .slice(0, opts.size)
     .map(({ q }, k) => ({ kind: "new" as const, questionId: q.id, reasonKo: `순발력 ${k + 1}/${Math.min(opts.size, pool.length)} · 바로 대답해 보세요` }));
 }
+
+const MEETING_SCENES = new Set<Situation>(["online", "discussion", "presentation"]);
+
+/**
+ * Meeting essentials: the expressions people use most in interactive meetings (opening, turn-taking,
+ * clarifying, agreeing and disagreeing, summing up, closing), short to medium, the learner's unseen and
+ * weak ones first. The dedicated meeting bank (tk-meeting-*) is preferred over the scene banks.
+ */
+export function buildMeetingRound(state: Pick<LearnerState, "seen">, bank: Question[], opts: { size: number; now: number; rng?: () => number }): SessionItem[] {
+  const rng = opts.rng ?? Math.random;
+  const recent = opts.now - DAY_MS;
+  const pool = bank.filter((q) => !q.variation && !q.scenario && !q.id.startsWith("dg-") && q.difficulty <= 5 && q.dialogue?.length && MEETING_SCENES.has(situationOf(q)));
+  const score = (q: Question) => {
+    const seen = state.seen[q.id];
+    return (q.id.startsWith("tk-meeting-") ? 2 : 0) + (seen ? (seen.lastAt > recent ? -3 : seen.best >= 85 ? -1 : 1) : 1) + rng() * 1.5;
+  };
+  const picked = pool
+    .map((q) => ({ q, s: score(q) }))
+    .sort((a, b) => b.s - a.s)
+    .slice(0, opts.size)
+    .map(({ q }) => q)
+    // Short ones first, then longer: the round warms up like a real meeting.
+    .sort((a, b) => a.difficulty - b.difficulty);
+  return picked.map((q, k) => ({ kind: "new" as const, questionId: q.id, reasonKo: `회의 필수 표현 ${k + 1}/${picked.length}` }));
+}

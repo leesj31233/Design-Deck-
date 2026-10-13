@@ -11,7 +11,7 @@ import { useNav } from "../app";
 import { Card, Eyebrow, cn } from "../kit";
 import { CATEGORY_LABEL } from "../practice/session";
 import { RoleplayList } from "../roleplay";
-import { LadderCard, SpeedCard } from "../ladder";
+import { LadderCard, MeetingCard, SpeedCard } from "../ladder";
 import { TalkCard } from "../freetalk";
 import { toast } from "sonner";
 
@@ -290,6 +290,7 @@ export function LearnScreen() {
 
       <LadderCard situation={situation} />
       {situation === "reaction" || situation === "all" ? <SpeedCard /> : null}
+      {situation === "online" || situation === "discussion" || situation === "presentation" || situation === "all" ? <MeetingCard /> : null}
       <TalkCard scene={situation} />
 
       <RoleplayList situation={situation} />

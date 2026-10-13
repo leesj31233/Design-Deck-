@@ -539,3 +539,13 @@ test("a late Claude grade still teaches: an approved wording is accepted at once
   await expect(page.getByText("Claude 확인한 내 표현")).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("meeting essentials: Today starts eight meeting expressions, short ones first", async ({ page }) => {
+  const errors = await open(page);
+  await page.getByRole("button", { name: "회의 필수 표현 시작" }).click();
+  await expect(page.locator("#ef-answer")).toBeVisible();
+  await expect(page.getByText(/회의 필수 표현 1\/8/)).toBeVisible();
+  await expect(page.getByText(/온라인 미팅 진행|회의 대화|발표/).first()).toBeVisible();
+  await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
