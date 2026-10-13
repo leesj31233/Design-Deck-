@@ -860,7 +860,7 @@ const COUNTABLE_NOUNS = new Set([
   "message", "discount", "opinion", "helmet", "person", "reply", "ticket", "receipt", "seat", "passport", "visa", "car",
   // Everyday life ("I need taxi", "I have headache", "Is there bank near here?").
   "taxi", "cab", "table", "headache", "bank", "pharmacy", "umbrella", "menu", "reservation", "appointment", "interview",
-  "area", "terminal", "concert", "museum",
+  "area", "terminal", "concert", "museum", "printer", "cabinet",
   "apartment", "doctor", "dentist", "map", "suitcase", "souvenir", "sandwich", "toothache", "stomachache", "fever", "friend",
 ]);
 const NP_DETERMINERS = new Set([
@@ -964,7 +964,8 @@ const bareSingularCountable: Rule = (w) => {
  */
 const PASSIVE_PERFECT = new Set([
   "delayed", "postponed", "cancelled", "canceled", "repaired", "fixed", "approved", "installed", "replaced", "rejected",
-  "finalized", "finalised", "shipped", "damaged", "updated", "revised", "tested", "inspected", "scheduled", "rescheduled",
+  // ("the pumps have shipped" is fine in American business English, so "shipped" is not listed.)
+  "finalized", "finalised", "underestimated", "overestimated", "damaged", "updated", "revised", "tested", "inspected", "scheduled", "rescheduled",
 ]);
 const PERSON_NOUNS = new Set([
   "vendor", "client", "customer", "team", "company", "contractor", "supplier", "engineer", "manager", "operator", "licensor",
@@ -1157,7 +1158,7 @@ const timePreposition: Rule = (w) => {
 const IDIOM_THE = new Map<string, string>([
   ["at latest", "at the latest"], ["at earliest", "at the earliest"], ["at moment", "at the moment"],
   ["in meantime", "in the meantime"], ["on other hand", "on the other hand"], ["at same time", "at the same time"],
-  ["for first time", "for the first time"], ["in middle of", "in the middle of"], ["at end of", "at the end of"], ["by end of", "by the end of"],
+  ["for first time", "for the first time"], ["at end", "at the end"], ["in middle of", "in the middle of"], ["at end of", "at the end of"], ["by end of", "by the end of"],
   // "brings me to end of my presentation", "for rest of the day", "from beginning of the list".
   ...["to", "until", "till", "near", "toward", "towards", "from", "before", "after", "since", "for", "at", "by", "in"].flatMap((p) =>
     ["end", "beginning", "middle", "start", "rest", "bottom"]
@@ -1174,6 +1175,8 @@ const idiomArticle: Rule = (w) => {
       const phrase = w.slice(i, i + n).map((t) => t.norm).join(" ");
       const fix = IDIOM_THE.get(phrase);
       if (!fix) continue;
+      // "at end of …" is matched by its own longer entry; "at end" alone needs a clause end after it.
+      if (phrase === "at end" && !(i + 2 >= w.length || brokenAfter(w, i + 1))) continue;
       // "by end of day" (EOD) is common business English.
       if (/end of$/.test(phrase) && /^(day|business)$/.test(w[i + n]?.norm ?? "")) continue;
       out.push({
@@ -3813,6 +3816,15 @@ const learnerSlips: Rule = (w) => {
     // "That sounds great plan" → "sounds like a great plan".
     if (/^(sound|sounds|sounded)$/.test(t) && SOUND_ADJ.test(n1) && /^(plan|idea|place|time|deal|trip|choice|option|weekend|day)$/.test(w[i + 2]?.norm ?? "")) {
       out.push({ rule: "sound-like-noun", from: i + 1, to: i + 1, replacement: `like ${anOf(n1)}`, category: "word-choice", severity: "major", skill: "reaction", messageKo: `명사가 오면 'sound like + a + 명사'입니다: '${w[i].raw} like ${anOf(n1)} ${n1} ${w[i + 2].raw}'.` });
+      continue;
+    }
+    // "you'll make friends quick", "it went by so quick" → "quickly" (spoken American English allows it: a minor note).
+    if (/^(so|really|very|pretty)?$/.test(t) === false && n1 === "quick" && end(i + 1) && verbInfo(t) && !/^(be|is|am|are|was|were|been|look|looks|seem|seems|sound|sounds|get|got|stay|keep)$/.test(t)) {
+      out.push({ rule: "adverb-needed", from: i + 1, to: i + 2, replacement: "quickly", category: "word-choice", severity: "minor", skill: "degree", messageKo: "동사를 꾸밀 때는 부사 quickly를 씁니다(quick은 회화체)." });
+      continue;
+    }
+    if (/^(went|go|goes|gone|passed|pass|fly|flies|flew)$/.test(t) && n1 === "by" && /^(so|really|very|too)$/.test(w[i + 2]?.norm ?? "") && w[i + 3]?.norm === "quick") {
+      out.push({ rule: "adverb-needed", from: i + 3, to: i + 4, replacement: "quickly", category: "word-choice", severity: "minor", skill: "degree", messageKo: "동사를 꾸밀 때는 부사 quickly를 씁니다(quick은 회화체)." });
       continue;
     }
     // "Could I get a box for rest?" → "for the rest".
