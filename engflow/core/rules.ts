@@ -1,5 +1,6 @@
 import type { ErrorCategory, Severity } from "./types";
 import { type Token, BE_FORMS, SUBJECT_PRONOUNS, DETERMINERS, MODALS, PREPOSITIONS } from "./text";
+import { wordKind } from "./numwords";
 
 import {
   CONSONANT_SOUND_VOWEL_START, ING_NOUNS, NON_WORDS, UNAMBIGUOUS_VERBS, UNCOUNTABLE_PLURALS,
@@ -374,7 +375,8 @@ const agreement: Rule = (w) => {
         rule: "agreement-plural", from: i + 1, to: i + 2, replacement: plural[v], category: "agreement", severity: "major", skill: "agreement",
         messageKo: `주어 '${w[i].raw}'는 복수라서 '${w[i + 1].raw}' 대신 '${plural[v]}'를 씁니다.`,
       });
-    } else if (s === "i" && (v === "is" || v === "are" || v === "has")) {
+    } else if (s === "i" && (v === "is" || v === "are" || v === "has") && !(v === "are" && /^(and|or)$/.test(w[i - 1]?.norm ?? ""))) {
+      // ("Mina and I are having a baby": a compound subject is plural.)
       const fix = v === "has" ? "have" : "am";
       out.push({
         rule: "agreement-i", from: i + 1, to: i + 2, replacement: fix, category: "agreement", severity: "major", skill: "agreement",
@@ -916,7 +918,9 @@ const bareSingularCountable: Rule = (w) => {
     // "Good question.", "Great idea!": a short reply that is only a noun phrase stands without an article.
     if ((start === 0 || brokenAfter(w, start - 1)) && (i === w.length - 1 || brokenAfter(w, i)) && start < i) continue;
     // "kind of problem", "type of valve": the bare noun is idiomatic.
-    if (w[start - 1]?.norm === "of" && /^(kind|type|sort|form|lack|piece)$/.test(w[start - 2]?.norm ?? "")) continue;
+    if (w[start - 1]?.norm === "of" && /^(kind|type|sort|form|lack|piece|size|model|brand|make|grade|variety|class|category|style)$/.test(w[start - 2]?.norm ?? "")) continue;
+    // "promoted to plant manager", "appointed as project lead": a job title after these takes no article.
+    if (/^(to|as)$/.test(w[start - 1]?.norm ?? "") && /^(promoted|appointed|elected|named|made|became|become|becomes)$/.test(w[start - 2]?.norm ?? "")) continue;
     out.push({
       rule: "missing-article", from: start, to: start, replacement: "the", category: "article", severity: "minor", skill: "articles",
       messageKo: `셀 수 있는 단수 명사 '${n.raw}' 앞에는 관사(a/the)나 소유격(our, their 등)이 필요합니다. 여기서는 'the ${w.slice(start, i + 1).map((x) => x.raw).join(" ")}'가 자연스럽습니다.`,
@@ -1217,7 +1221,7 @@ const oneMorePlural: Rule = (w) => {
     if (!/^(one|another|single)$/.test(w[i].norm)) continue;
     let j = i + 1;
     if (w[j]?.norm === "more") j++;
-    if (/^(of|or|and|by|\d+|two|three|four|five|six|ten|few|couple)$/.test(w[j]?.norm ?? "")) continue; // "one of the tests", "another two days"
+    if (/^(of|or|and|by|\d+|few|couple)$/.test(w[j]?.norm ?? "") || (w[j] && wordKind(w[j].norm))) continue; // "one of the tests", "another forty minutes"
     let n = w[j];
     if (n && !PLURAL_NOUN_SINGULAR(n.norm) && w[j + 1] && PLURAL_NOUN_SINGULAR(w[j + 1].norm) && !DETERMINERS.has(n.norm)) n = w[++j]; // one modifier
     const single = n ? PLURAL_NOUN_SINGULAR(n.norm) : null;
@@ -1416,7 +1420,8 @@ const pluralSubjectAgreement: Rule = (w) => {
       if (w[n] && isPluralNoun(w[n].norm) && w[n].norm !== "news") v = n + 1;
     }
     if (v < 0 || !w[v] || brokenAfter(w, v - 1)) continue;
-    if (w[i - 1]?.norm === "of") continue; // "one of the boilers is", "each of the tests was"
+    // "one of the boilers is", "the delivery time for these pumps is": the noun after a preposition is not the subject.
+    if (w[i - 1] && PREPOSITIONS.has(w[i - 1].norm)) continue;
     // "The results shows a clear trend": a common verb with -s, followed by what it does (an object or adverb).
     const lexical = PLURAL_SUBJECT_VERB.exec(w[v].norm);
     if (lexical && w[v + 1] && !brokenAfter(w, v) && (DETERMINERS.has(w[v + 1].norm) || /^(that|to|on|for|like|good|great|fine|well|very|really|so|more|less|much|about|it|them|us|me|him|her|everything|something|nothing|in|at|with|near|here|there|together)$/.test(w[v + 1].norm))) {
@@ -2218,7 +2223,8 @@ const agreementMore: Rule = (w) => {
 const wordOrderMore: Rule = (w) => {
   const out: RuleFinding[] = [];
   const push = (k: number, to: number, fix: string, msg: string) => out.push({ rule: "word-order", from: k, to, replacement: fix, category: "word-order", severity: "major", skill: "word-order", messageKo: msg });
-  if (w.length > 2 && /^(always|usually|often|sometimes|never|normally|generally)$/.test(w[0].norm) && /^(i|we|you|they|he|she)$/.test(w[1].norm) && verbInfo(w[2].norm)) {
+  // ("Sometimes I wonder", "Usually we meet" are fine at the start; "Always I check" is not.)
+  if (w.length > 2 && /^(always|never)$/.test(w[0].norm) && /^(i|we|you|they|he|she)$/.test(w[1].norm) && verbInfo(w[2].norm)) {
     push(0, 3, `${w[1].raw} ${w[0].norm} ${w[2].raw}`, `빈도 부사(${w[0].raw})는 주어 뒤, 일반동사 앞에 둡니다: '${w[1].raw} ${w[0].norm} ${w[2].raw}'.`);
   }
   for (let i = 0; i < w.length - 3; i++) {
@@ -2289,7 +2295,8 @@ const miscPatterns: Rule = (w) => {
     }
   }
   // Present tense with a finished past time: "Last weekend I go hiking"; perfect with a finished time: "I have visited it last year".
-  const pastTime = w.findIndex((t, k) => t.norm === "yesterday" || (t.norm === "last" && /^(week|weekend|month|year|night|monday|tuesday|wednesday|thursday|friday|saturday|sunday|time)$/.test(w[k + 1]?.norm ?? "")) || (t.norm === "ago" && k > 0) || (t.norm === "in" && /^(19|20)\d\d$/.test(w[k + 1]?.norm ?? "") && Number(w[k + 1].norm) < 2026));
+  // ("in last week's log" is a possessive, not when something happened.)
+  const pastTime = w.findIndex((t, k) => t.norm === "yesterday" || (t.norm === "last" && /^(week|weekend|month|year|night|monday|tuesday|wednesday|thursday|friday|saturday|sunday|time)$/.test(w[k + 1]?.norm ?? "") && !/['’]s$/.test(w[k + 1]?.raw ?? "")) || (t.norm === "ago" && k > 0) || (t.norm === "in" && /^(19|20)\d\d$/.test(w[k + 1]?.norm ?? "") && Number(w[k + 1].norm) < 2026));
   if (pastTime >= 0 && !w.some((t) => /^(will|would|usually|always|every|often|normally|since|going|next|tomorrow)$/.test(t.norm))) {
     for (let k = 0; k < w.length - 1; k++) {
       if (/^(have|has)$/.test(w[k].norm) && !w[k].expanded && SUBJECT_PRONOUNS.has(w[k - 1]?.norm ?? "") && verbInfo(w[k + 1]?.norm ?? "")?.form?.match(/^(pp|past)$/) && w[k + 1].norm !== "to" && Math.abs(pastTime - k) < 8) {
@@ -2304,6 +2311,8 @@ const miscPatterns: Rule = (w) => {
       const sameClause = hi - lo < 9 && !w.slice(lo, hi).some((t, m) => brokenAfter(w, lo + m) && lo + m !== pastTime + 1 && pastTime > k) && !w.slice(lo + 1, hi).some((t) => /^(what|that|which|who|when|before|after|if|because|let|until|while)$/.test(t.norm));
       // "We cut energy use … last year": cut/put/set are their own past forms.
       if (vi && (isSameFormParticiple(vi.base) || pastOf(vi.base) === vi.base)) continue;
+      // "I see the washing conditions changed last week": a past verb in between carries the past time.
+      if (k < pastTime && w.slice(k + 1, pastTime).some((x) => verbInfo(x.norm)?.form === "past")) continue;
       if (vi && sameClause && /^(base|3sg)$/.test(vi.form) && (/^(i|we|they|he|she|nobody|everyone|someone)$/.test(w[k - 1]?.norm ?? "")) && !/^(to|can|will|would|should|must|might|may|could|do|does|did|not|let)$/.test(w[k - 2]?.norm ?? "x") && !/^(be|have|do|think|hope|know|want|need|guess|believe|mean|remember|say)$/.test(vi.base)) {
         push("present-for-past", k, k + 1, verbInfo(w[k].norm)!.base === "go" ? "went" : pastOf(vi.base), "tense", "agreement", "끝난 과거의 일(yesterday, last week, ~ago)은 과거형으로 말합니다.");
         break;
@@ -2468,6 +2477,7 @@ const becauseOf: Rule = (w) => {
       else if (info && (info.form === "past" || info.form === "3sg") && !/s$/.test(w[k - 1]?.norm ?? "") && k > i + 1) verb = true;
       else if (info && info.form === "base" && k > i + 2 && /s$/.test(w[k - 1].norm) && !/ss$/.test(w[k - 1].norm)) verb = true; // "because the pumps leak"
       else if (info && info.form === "pp" && /ed$/.test(t.norm) && k > i + 2) verb = true;
+      else if (!info && /^[a-z]{3,}ed$/.test(t.norm) && k > i + 2) verb = true; // "because the power supply tripped"
       if (verb || brokenAfter(w, k)) break;
       k++;
     }
@@ -3361,7 +3371,7 @@ const learnerSlips: Rule = (w) => {
       }
     }
     // "This dish calls bibimbap" → "is called bibimbap".
-    if (/^(calls|call)$/.test(n1) && /^(this|that|it|dish|food|place|area|machine|tool|process|method|word|thing|game|dance|song|drink|soup|snack|city|town|street|station|restaurant|team|unit|system|software|app|program)$/.test(t) && (t === "it" || t === "this" || t === "that" || (i > 0 && /^(this|that|the|our|my)$/.test(w[i - 1].norm))) && w[i + 2] && (/^[A-Z]/.test(w[i + 2].raw) || (end(i + 2) && !/^(me|you|him|her|us|them|back|in|off|out|it)$/.test(w[i + 2].norm))) && !/^(for|me|you|him|her|us|them|the|a|an|on|back|in|off|out|it)$/.test(w[i + 2].norm)) {
+    if (/^(calls|call)$/.test(n1) && !end(i + 1) && /^(this|that|it|dish|food|place|area|machine|tool|process|method|word|thing|game|dance|song|drink|soup|snack|city|town|street|station|restaurant|team|unit|system|software|app|program)$/.test(t) && (t === "it" || t === "this" || t === "that" || (i > 0 && /^(this|that|the|our|my)$/.test(w[i - 1].norm))) && w[i + 2] && (/^[A-Z]/.test(w[i + 2].raw) || (end(i + 2) && !/^(me|you|him|her|us|them|back|in|off|out|it)$/.test(w[i + 2].norm))) && !/^(for|me|you|him|her|us|them|the|a|an|on|back|in|off|out|it)$/.test(w[i + 2].norm)) {
       out.push({ rule: "passive-needed", from: i + 1, to: i + 2, replacement: "is called", category: "verb-form", severity: "major", skill: "passive", messageKo: `이름이 '~라고 불린다'는 수동태입니다: '${w[i].raw} is called ${w[i + 2].raw}'.` });
       continue;
     }
@@ -3490,7 +3500,8 @@ const learnerSlips: Rule = (w) => {
       continue;
     }
     // "Please reply my email" → "reply to"; "This bag belongs me" → "belongs to".
-    if (/^(reply|replies|replied|replying|belong|belongs|belonged|listen|listens|listened|listening)$/.test(t) && (/^(my|your|his|her|our|their|this|that|these|those|the|me|him|them|us|it|everyone)$/.test(n1))) {
+    // ("Thanks for listening everyone" said without a comma: "everyone" is who you speak to.)
+    if (/^(reply|replies|replied|replying|belong|belongs|belonged|listen|listens|listened|listening)$/.test(t) && /^(my|your|his|her|our|their|this|that|these|those|the|me|him|them|us|it)$/.test(n1) && !(/^(it|that|this)$/.test(n1) && /^(is|was|will|would|can|could|has|have|had|does|did|might|must|may|should)$/.test(w[i + 2]?.norm ?? ""))) {
       insert(i + 1, "to", "preposition", "major", "verb-prep", `'${w[i].raw}'는 목적어 앞에 to가 필요합니다: '${w[i].raw} to ${w[i + 1].raw}'.`);
       continue;
     }
@@ -3500,7 +3511,8 @@ const learnerSlips: Rule = (w) => {
       insert(i + 1, PREP_AFTER[t], "preposition", "major", "verb-prep", `'${w[i].raw} ${PREP_AFTER[t]} + 명사'입니다: '${w[i].raw} ${PREP_AFTER[t]} ${w[i + 1].raw}'.`);
       continue;
     }
-    if (((t === "you" && i > 0 && w[i - 1].norm === "thank") || t === "thanks") && /^(your|the|this|that|our|his|her|their|everything)$/.test(n1)) {
+    // ("Thank you that's very helpful" said without a comma: "that's …" starts a new sentence.)
+    if (((t === "you" && i > 0 && w[i - 1].norm === "thank") || t === "thanks") && /^(your|the|this|that|our|his|her|their|everything)$/.test(n1) && !(/^(this|that|everything)$/.test(n1) && /^(is|was|will|would|can|could|has|have|had|does|did|might|must|may|should|sounds|looks|seems|really|makes|helps|works)$/.test(w[i + 2]?.norm ?? ""))) {
       insert(i + 1, "for", "preposition", "major", "verb-prep", `'~에 감사하다'는 'thank you for + 명사'입니다: '${w[i].raw} for ${w[i + 1].raw}'.`);
       continue;
     }

@@ -34,7 +34,7 @@ export const BASE_VERBS = new Set<string>([
   // Everyday verbs for hobbies and home life ("I enjoy cooking", "she live in Busan").
   "cook", "bake", "sing", "jog", "climb", "study", "chop", "stir", "fry", "wrap", "pack", "unpack", "laugh", "cry", "marry",
   "hurry", "greet", "decorate", "shave", "tidy", "sew", "fold", "knit", "sneeze", "whisper", "shout", "yell", "scream", "play",
-  "dance", "live", "practice", "practise", "exercise",
+  "dance", "live", "practice", "practise", "exercise", "trip", "crash", "stall", "overflow",
   "enter", "access", "reply", "respond", "listen", "die", "belong", "consist", "occur", "happen", "exist", "appear", "disappear", "remain", "message",
   "accept", "adjust", "agree", "allow", "analyze", "analyse", "answer", "apply", "approve", "arrange", "ask", "assign",
   "assume", "attach", "avoid", "calculate", "call", "cancel", "change", "check", "clarify", "clean", "close", "collect",

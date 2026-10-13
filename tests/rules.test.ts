@@ -286,6 +286,17 @@ const RIGHT = [
   "It was great fun.",
   "We had great fun.",
   "It's very good news.",
+  "Can we have a quick sync after this call, Sari?",
+  "Thanks a lot for listening everyone",
+  "thank you that's very helpful",
+  "Sometimes I wonder if I'm good enough for this job.",
+  "Mina and I are having a baby!",
+  "The next train isn't for another forty minutes.",
+  "Our normal delivery time for these pumps is fourteen weeks.",
+  "Linh has been promoted to plant manager!",
+  "The pump stopped because the power supply tripped.",
+  "I see the washing conditions changed last week.",
+  "What size of dryer do we need for our plant?",
   // Look like the wave-2 slips but are right.
   "That's sound advice.",
   "My hobby is traveling.",
@@ -485,4 +496,16 @@ describe("rule skills", () => {
     const sentences = [...WRONG.map((x) => x[0]), "I enjoy to cook.", "She speaks well English.", "Would you mind send me the file?"];
     for (const s of sentences) for (const f of runRules(words(tokenize(s)))) expect(ids.has(f.skill), `${f.rule}: ${f.skill}`).toBe(true);
   });
+});
+
+describe("rules on native lines", () => {
+  // The other speaker's lines in every conversation are correct English the learner never types: a rule that
+  // fires on one is a false alarm waiting to happen on a learner's answer.
+  it("no rule fires on any dialogue line in the question bank", async () => {
+    const { QUESTIONS } = await import("@/engflow/content");
+    const lines = new Set<string>();
+    for (const q of QUESTIONS) for (const d of q.dialogue ?? []) if (d.speaker !== "Minsu" && d.en) lines.add(d.en);
+    const flagged = [...lines].map((en) => ({ en, f: rulesOn(en).map((r) => r.rule) })).filter((x) => x.f.length);
+    expect(flagged).toEqual([]);
+  }, 60_000);
 });

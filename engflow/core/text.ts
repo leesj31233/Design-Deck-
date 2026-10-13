@@ -194,7 +194,17 @@ export function tokenize(text: string): Token[] {
     const next = tokens.slice(i + 1).find((x) => !x.punct && x.norm !== "not" && x.norm !== "already" && x.norm !== "just" && x.norm !== "never" && x.norm !== "always");
     // A change-of-state verb after "'s" is the present perfect: "the schedule's changed", "the price's gone up".
     const change = next && verbInfo(next.norm)?.form !== "base" && /^(change|increase|decrease|drop|rise|improve|arrive|start|happen|grow|fall|worsen|double|shift|slow|leave|come|move|become)$/.test(verbInfo(next.norm)?.base ?? "");
-    if (next && (/^(been|got|gotten|gone|had|become|come)$/.test(next.norm) || (change && /^(pp|past)$/.test(verbInfo(next.norm)?.form ?? "")))) {
+    // A participle with an object after it is active, so "'s" is "has": "he's already made lots of friends",
+    // "she's finished the report" ("it's made of steel", "it's called bibimbap" stay "is").
+    const info = next ? verbInfo(next.norm) : null;
+    const at = tokens.indexOf(next!);
+    const objectAfter = tokens[at + 1];
+    // Unpunctuated speech: "what's included it'll be easier" — a pronoun that starts the next clause is no object.
+    const startsClause = !!objectAfter && /^(it|that|this|they|we|he|she|i|you)$/.test(objectAfter.norm) && !!tokens[at + 2] && (tokens[at + 2].expanded || /^(is|was|are|were|will|would|can|could|should|has|have|had|do|does|did|might|must|may)$/.test(tokens[at + 2].norm));
+    const withObject =
+      !!info && /^(pp|past)$/.test(info.form) && !/^(call|name|consider|elect|appoint|label|title|term|dub|base|locate|situate|mean|suppose)$/.test(info.base) &&
+      !!objectAfter && !objectAfter.punct && !startsClause && /^(a|an|the|lots|some|any|my|your|his|her|our|their|its|it|them|me|us|him|this|that|these|those|many|much|several|no|every|all|two|three|four|five|everything|something)$/.test(objectAfter.norm);
+    if (next && (/^(been|got|gotten|gone|had|become|come)$/.test(next.norm) || (change && /^(pp|past)$/.test(verbInfo(next.norm)?.form ?? "")) || withObject)) {
       t.norm = "has";
       t.stem = stem("has");
     }
