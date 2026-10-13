@@ -50,6 +50,10 @@ const WRONG: [string, string, string?][] = [
   ["I'm in meeting right now.", "missing-article", "a"],
   ["It was great experience.", "missing-article", "a"],
   ["Was a long day.", "missing-subject-it", "It was"],
+  ["We agreed the price.", "missing-preposition", "on"],
+  ["I graduated Seoul University.", "missing-preposition", "from"],
+  ["The order delivered yesterday.", "passive-missing-be", "was"],
+  ["The samples sent today.", "passive-missing-be", "were"],
   ["We need fewer water.", "fewer-less", "less"],
   ["I need taxi to the airport.", "missing-article", "the"],
   ["Is there bank near here?", "missing-article", "the"],
@@ -296,6 +300,8 @@ const WRONG: [string, string, string?][] = [
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
 const RIGHT = [
+  "We agree the plan is good.", "We agreed on the price.", "I graduated from Seoul University.", "She graduated last year.",
+  "The parts shipped on Monday.", "The issue resolved itself.", "Our team delivered the report.", "The order was delivered yesterday.",
   "Doesn't he know?",
   "Won't she need it?",
   "Why doesn't she call?",

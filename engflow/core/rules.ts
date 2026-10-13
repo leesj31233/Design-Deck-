@@ -4010,6 +4010,22 @@ const learnerSlips: Rule = (w) => {
       out.push({ rule: "adverb-needed", from: i + 2, to: i + 3, replacement: "well", category: "word-choice", severity: "major", skill: "degree", messageKo: `동사를 꾸밀 때는 good이 아니라 well입니다: '${w[i].raw} ${n1} well'.` });
       continue;
     }
+    // "We agreed the price" → "agreed on the price"; "agree the terms" is British but not what a learner means.
+    if (/^(agree|agreed|agrees|agreeing)$/.test(t) && /^(the|a|our|your|their|this|that)$/.test(n1) && /^(price|prices|deal|date|dates|schedule|terms|budget|plan|timeline|deadline|discount|amount|fee|rate|details|time|venue|contract)$/.test(w[i + 2]?.norm ?? "") && !(w[i + 3] && (/^(is|are|was|were|will|would|should|can|could|has|have|looks|sounds|works|seems|makes|needs)$/.test(w[i + 3].norm)))) {
+      insert(i + 1, "on", "preposition", "major", "verb-prep", `'~에 합의하다'는 'agree on + 명사'입니다: '${w[i].raw} on ${n1} ${w[i + 2].raw}'.`);
+      continue;
+    }
+    // "I graduated Seoul University" → "graduated from".
+    if (/^(graduate|graduated|graduating|graduates)$/.test(t) && i > 0 && !DETERMINERS.has(w[i - 1].norm) && (/^[A-Z][a-z]/.test(w[i + 1].raw) || /^(university|college|school|high|the|my|a)$/.test(n1)) && !/^(in|from|with|last|this|next|early|soon)$/.test(n1)) {
+      insert(i + 1, "from", "preposition", "major", "verb-prep", `'~를 졸업하다'는 'graduate from + 학교'입니다: '${w[i].raw} from ${w[i + 1].raw}'.`);
+      continue;
+    }
+    // "The order delivered yesterday." → "was delivered": a thing cannot deliver itself.
+    if (i >= 1 && /^(the|my|our|your|their|this|that)$/.test(w[i - 1].norm) && (i === 1 || brokenAfter(w, i - 2)) && /^(order|package|parcel|parts|part|shipment|delivery|report|file|email|invoice|contract|machine|pump|issue|problem|bug|meeting|event|samples|sample|room|car|laptop)$/.test(t) && /^(delivered|sent|fixed|repaired|cancelled|canceled|postponed|signed|approved|booked|installed|replaced|solved|resolved)$/.test(n1) && (end(i + 1) || /^(yesterday|today|already|last|this|on|at|by|in|this|early|late|two|three|an|a)$/.test(w[i + 2]?.norm ?? "")) && !(w[i + 2] && /^(it|itself|themselves|them|me|us|him|her|the|my|our|your)$/.test(w[i + 2].norm))) {
+      const plural = t === "parts" || t === "samples";
+      out.push({ rule: "passive-missing-be", from: i + 1, to: i + 1, replacement: plural ? "were" : "was", category: "verb-form", severity: "major", skill: "passive", messageKo: `사물이 '~되었다'는 수동태 'be + p.p.'입니다: '${w[i - 1].raw} ${w[i].raw} ${plural ? "were" : "was"} ${w[i + 1].raw}'.` });
+      continue;
+    }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
     if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
       out.push({ rule: "missing-subject-it", from: i, to: i + 1, replacement: /^[A-Z]/.test(w[i].raw) ? `It ${t}` : `it ${t}`, category: "sentence-structure", severity: "major", skill: "be-adj", messageKo: `영어 문장에는 주어가 필요합니다: 'It ${t} ${w.slice(i + 1, i + 4).map((x) => x.raw).join(" ")}'.` });
