@@ -1030,7 +1030,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
       ws.filter(
         (t) =>
           /^(un|im|in|dis)(able|sure|clear|available|possible|likely|aware|happy|comfortable|agree|agrees|agreed|like|likes)$/.test(t.norm) ||
-          /^(nothing|nobody|none|neither|nor|without|hardly|barely|fail|fails|failed|lack|lacks|instead|rather|unless|until|no|miss|missed|missing|forget|forgot|forgotten|lose|lost|refuse|refused|avoid|avoided|doubt|skip|skipped|cancel|cancelled|canceled|postpone|postponed|wrong|late|behind|short|less|fewer|still|anymore|longer|broken|stop|stops|stopped|dead|down|out|off|empty|closed|shut|nope|nah)$/.test(t.norm),
+          /^(nothing|nobody|none|neither|nor|without|hardly|barely|fail|fails|failed|lack|lacks|instead|rather|unless|until|no|miss|missed|missing|forget|forgot|forgotten|lose|lost|refuse|refused|avoid|avoided|doubt|skip|skipped|cancel|cancelled|canceled|postpone|postponed|wrong|late|behind|short|less|fewer|still|anymore|longer|broken|stop|stops|stopped|dead|down|out|off|empty|closed|shut|nope|nah|badly|poorly|worse|worst)$/.test(t.norm),
       ).map((t) => t.stem).sort().join(" ");
     // Polarity of statements only: questions ("Why don't we …?", "…, aren't we?"), commands ("Don't worry") and
     // conditions ("If that doesn't work, …") are paraphrased with either polarity.
