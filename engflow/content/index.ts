@@ -35,6 +35,11 @@ import { TALK_OFFICE_2 } from "./bank/talk-office-2";
 import { TALK_FEELINGS_2 } from "./bank/talk-feelings-2";
 import { ROLEPLAY_MIXED } from "./bank/roleplay-mixed";
 import { TALK_MEETING } from "./bank/talk-meeting";
+import { TALK_PHONE_2 } from "./bank/talk-phone-2";
+import { TALK_TROUBLE_2 } from "./bank/talk-trouble-2";
+import { TALK_SMALLTALK_3 } from "./bank/talk-smalltalk-3";
+import { TALK_DISCUSSION_3 } from "./bank/talk-discussion-3";
+import { TALK_NEGOTIATION_2 } from "./bank/talk-negotiation-2";
 import { TALK_SHORT_LONG } from "./bank/talk-short-long";
 import { DIALOGUE_OVERLAY } from "./bank/dialogue-overlay";
 
@@ -52,10 +57,12 @@ export const TALK_BANKS: Record<string, Question[]> = {
   "talk-presentation-2": TALK_PRESENTATION_2,
   "talk-discussion": TALK_DISCUSSION,
   "talk-discussion-2": TALK_DISCUSSION_2,
+  "talk-discussion-3": TALK_DISCUSSION_3,
   "talk-reaction": TALK_REACTION,
   "talk-reaction-2": TALK_REACTION_2,
   "talk-smalltalk": TALK_SMALLTALK,
   "talk-smalltalk-2": TALK_SMALLTALK_2,
+  "talk-smalltalk-3": TALK_SMALLTALK_3,
   "talk-daily": TALK_DAILY,
   "talk-daily-2": TALK_DAILY_2,
   "talk-office": TALK_OFFICE,
@@ -65,8 +72,11 @@ export const TALK_BANKS: Record<string, Question[]> = {
   "talk-meal": TALK_MEAL,
   "talk-meal-2": TALK_MEAL_2,
   "talk-phone": TALK_PHONE,
+  "talk-phone-2": TALK_PHONE_2,
   "talk-negotiation": TALK_NEGOTIATION,
+  "talk-negotiation-2": TALK_NEGOTIATION_2,
   "talk-trouble": TALK_TROUBLE,
+  "talk-trouble-2": TALK_TROUBLE_2,
   "talk-visit": TALK_VISIT,
   "talk-visit-2": TALK_VISIT_2,
 };
