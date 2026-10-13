@@ -37,6 +37,9 @@ import { ROLEPLAY_MIXED } from "./bank/roleplay-mixed";
 import { ROLEPLAY_LIFE } from "./bank/roleplay-life";
 import { TALK_OFFICE_3 } from "./bank/talk-office-3";
 import { TALK_REACTION_3 } from "./bank/talk-reaction-3";
+import { TALK_ONLINE_3 } from "./bank/talk-online-3";
+import { TALK_TROUBLE_3 } from "./bank/talk-trouble-3";
+import { TALK_FEELINGS_3 } from "./bank/talk-feelings-3";
 import { TALK_MEETING } from "./bank/talk-meeting";
 import { TALK_PHONE_2 } from "./bank/talk-phone-2";
 import { TALK_TROUBLE_2 } from "./bank/talk-trouble-2";
@@ -74,6 +77,9 @@ export const TALK_BANKS: Record<string, Question[]> = {
   "talk-visit-3": TALK_VISIT_3,
   "talk-office-3": TALK_OFFICE_3,
   "talk-reaction-3": TALK_REACTION_3,
+  "talk-online-3": TALK_ONLINE_3,
+  "talk-trouble-3": TALK_TROUBLE_3,
+  "talk-feelings-3": TALK_FEELINGS_3,
   "talk-daily": TALK_DAILY,
   "talk-daily-2": TALK_DAILY_2,
   "talk-office": TALK_OFFICE,
