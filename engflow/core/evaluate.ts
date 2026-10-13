@@ -553,6 +553,10 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       // A clause-final particle ("the meeting is over", "hang up") is not an extra preposition.
       if (c === "prep" && (op.li === w.length - 1 || w[op.li].breakAfter)) continue;
       if (APPROX.test(lt) && QUANTITY_START.test(w[op.li + 1]?.norm ?? "")) continue; // "about twice as high"
+      // "have about the same level": about before "the same" is approximation too.
+      if (lt === "about" && w[op.li + 1]?.norm === "the" && w[op.li + 2]?.norm === "same") continue;
+      // "come over and get it", "drop by": a particle that adds no new meaning.
+      if (/^(over|by|along|round|around)$/.test(lt) && /^(come|comes|came|coming|drop|drops|dropped|pop|stop)$/.test(w[op.li - 1]?.norm ?? "")) continue;
       // Indirect questions end with the verb: "let me know what the design pressure is".
       if (c === "be" && w.slice(0, op.li).some((x) => /^(what|which|how|where|when|why|who|whether|if)$/.test(x.norm)) && (op.li === w.length - 1 || w[op.li + 1]?.punct)) continue;
       // "decide on the date", "wait for a few minutes", "known about it": the verb takes this preposition.
@@ -629,6 +633,8 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         if (CHANGE_VERBS.has(verbInfo(pv)?.base ?? pv) || /^(up|down)$/.test(pv)) continue;
       }
       if (tt === "that") continue; // usually optional
+      // "the PFD we sent the client": send/give/show + person + thing needs no "to".
+      if (tt === "to" && /^(send|sent|sends|sending|give|gave|given|gives|show|showed|shown|shows|offer|offered|tell|told|email|emailed)$/.test(w[op.at - 1]?.norm ?? "") && /^(the|our|your|their|him|her|them|us|me|you)$/.test(w[op.at]?.norm ?? "")) continue;
       // "Usually, I go" ↔ "I usually go": the subject is there, after a sentence adverb.
       if (c === "pronoun" && w.slice(op.at, op.at + 3).some((x) => x.norm === tt) && /^(usually|sometimes|often|normally|generally|always|never|actually|honestly|basically|luckily|unfortunately|personally)$/.test(w[op.at]?.norm ?? "")) continue;
       // "two samples" ↔ "two of our samples".
