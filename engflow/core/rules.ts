@@ -441,7 +441,8 @@ const willInConditionClause: Rule = (w) => {
       }
     }
     // "If you ever will want to …": an adverb between the subject and will.
-    if (SUBJECT_PRONOUNS.has(subj) && /^(ever|really|still|also|just|actually)$/.test(w[s + 1]?.norm ?? "") && w[s + 2]?.norm === "will") s++;
+    // ("If it still won't work" is a refusal: "will not" is left alone.)
+    if (SUBJECT_PRONOUNS.has(subj) && /^(ever|really|also|just|actually)$/.test(w[s + 1]?.norm ?? "") && w[s + 2]?.norm === "will" && w[s + 3]?.norm !== "not") s++;
     if (!SUBJECT_PRONOUNS.has(subj) || w[s + 1]?.norm !== "will") continue;
     if (w[s + 2]?.norm === "be" && w[s + 3]?.norm === "able") continue;
     const v = w[s + 2];
@@ -783,6 +784,13 @@ const articleSound: Rule = (w) => {
     if (!/^[a-z]/.test(n)) continue;
     const raw = w[i + 1].raw;
     // Acronyms are read letter by letter ("an RFQ"), except those read as words ("a SIM card", "a PIN").
+    // A single capital letter is read as a letter: "an H", "an F", "a B".
+    if (/^[A-Z]$/.test(raw)) {
+      const vs = /^[AEFHILMNORSX]$/.test(raw);
+      if (a === "a" && vs) out.push({ rule: "article-an", from: i, to: i + 1, replacement: "an", category: "article", severity: "minor", skill: "articles", messageKo: `'${raw}'는 모음 소리로 읽으므로 'an'을 씁니다.` });
+      if (a === "an" && !vs) out.push({ rule: "article-a", from: i, to: i + 1, replacement: "a", category: "article", severity: "minor", skill: "articles", messageKo: `'${raw}'는 자음 소리로 읽으므로 'a'를 씁니다.` });
+      continue;
+    }
     const acronym = /^[A-Z][A-Z0-9&]+$/.test(raw.replace(/[^A-Za-z0-9&]/g, "")) && !/^(SIM|PIN|NASA|SCADA|LASER|RADAR|COVID|ASAP|LAN|WAN|RAM|ROM|PET)$/.test(raw.replace(/[^A-Za-z]/g, ""));
     const vowelLetter = /^[aeiou]/.test(n);
     // Acronyms are read letter by letter: "an RFQ", "an MOU", "a PFD".
@@ -1007,7 +1015,7 @@ const thirdPersonBase: Rule = (w) => {
     if (/^(let|make|makes|made|help|helps|see|saw|watch|hear|have|has|had|do|does|did|will|would|can|could|should|may|might|must|to|let's|if|that|which|whether)$/.test(prev)) continue;
     const prev2 = w[i - 2]?.norm ?? "";
     // "Do I just eat it like this?": "it" after a verb is its object, not a subject.
-    if (w[i].norm === "it" && i > 0 && verbInfo(prev) && !/^(is|was|does|did|has|think|guess|hope|believe|know|feel|say|said|bet|suppose|mean|hear|heard|sure)$/.test(prev)) continue;
+    if (w[i].norm === "it" && i > 0 && verbInfo(prev) && !/^(is|was|does|did|has|think|guess|hope|believe|know|feel|say|said|bet|suppose|hear|heard|sure)$/.test(prev)) continue;
     // "Doesn't he know?", "Won't she come?": an inverted negative question keeps the base form.
     if (prev === "not" && /^(do|does|did|will|would|can|could|should|may|might|must|shall|is|are|was|were|am|have|has|had)$/.test(prev2)) continue;
     // "Is she free?" (an inverted be-question), "he or she" (two people), "I'd rather she stay".
@@ -1771,6 +1779,8 @@ const prepositionCollocation: Rule = (w) => {
     const entry = PREP_FIX[base] ?? PREP_FIX[w[i].norm];
     if (!entry || !entry.wrong.includes(w[i + 1].norm) || brokenAfter(w, i)) continue;
     if (base === "good" && w[i - 1]?.norm !== "am" && !BE_FORMS.has(w[i - 1]?.norm ?? "")) continue; // "a good in-house team"
+    // "worried for my dad": worried for + a person is fine (concern for someone's safety).
+    if (w[i].norm === "worried" && w[i + 1].norm === "for" && /^(my|your|his|her|our|their|him|her|them|you|me|us|the)$/.test(w[i + 2]?.norm ?? "") && !/^(the)$/.test(w[i + 2]?.norm ?? "")) continue;
     if (base === "arrive" && /^(a|an|the)$/.test(w[i + 2]?.norm ?? "") === false && !/^[A-Z]/.test(w[i + 2]?.raw ?? "")) continue;
     const right = base === "arrive" && /^[A-Z]/.test(w[i + 2]?.raw ?? "") ? "in" : entry.right;
     out.push({
