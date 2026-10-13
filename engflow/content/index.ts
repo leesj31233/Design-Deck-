@@ -38,6 +38,9 @@ import { TALK_MEETING } from "./bank/talk-meeting";
 import { TALK_PHONE_2 } from "./bank/talk-phone-2";
 import { TALK_TROUBLE_2 } from "./bank/talk-trouble-2";
 import { TALK_SMALLTALK_3 } from "./bank/talk-smalltalk-3";
+import { TALK_PRESENTATION_3 } from "./bank/talk-presentation-3";
+import { TALK_MEAL_3 } from "./bank/talk-meal-3";
+import { TALK_VISIT_3 } from "./bank/talk-visit-3";
 import { TALK_DISCUSSION_3 } from "./bank/talk-discussion-3";
 import { TALK_NEGOTIATION_2 } from "./bank/talk-negotiation-2";
 import { TALK_SHORT_LONG } from "./bank/talk-short-long";
@@ -63,6 +66,9 @@ export const TALK_BANKS: Record<string, Question[]> = {
   "talk-smalltalk": TALK_SMALLTALK,
   "talk-smalltalk-2": TALK_SMALLTALK_2,
   "talk-smalltalk-3": TALK_SMALLTALK_3,
+  "talk-presentation-3": TALK_PRESENTATION_3,
+  "talk-meal-3": TALK_MEAL_3,
+  "talk-visit-3": TALK_VISIT_3,
   "talk-daily": TALK_DAILY,
   "talk-daily-2": TALK_DAILY_2,
   "talk-office": TALK_OFFICE,
