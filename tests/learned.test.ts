@@ -102,3 +102,21 @@ describe("the grader learns answers Claude approved", () => {
     expect(calls).toEqual([]);
   });
 });
+
+describe("learning from a late Claude grade", () => {
+  it("an approved wording that arrived after the rule-based grade is remembered without recording an attempt", async () => {
+    const { rememberApproved, createInitialState } = await import("@/engflow/core/store");
+    const { QUESTIONS } = await import("@/engflow/content");
+    const { evaluateLocal } = await import("@/engflow/core/evaluate");
+    const q = QUESTIONS.find((x) => !x.variation && x.mode === "sentence")!;
+    const st = createInitialState(0);
+    const said = "This wording was never stored anywhere before.";
+    const approved = { ...evaluateLocal(q, q.reference), answer: said, evaluator: "ai" as const };
+    const next = rememberApproved(st, q, approved, 1000);
+    expect(next.seen[q.id]?.ok).toEqual([said]);
+    expect(next.attempts).toHaveLength(0);
+    // A grade with errors teaches nothing.
+    const wrong = { ...approved, scores: { ...approved.scores, overall: 70 } };
+    expect(rememberApproved(st, q, wrong, 1000)).toBe(st);
+  });
+});

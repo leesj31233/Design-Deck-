@@ -39,12 +39,20 @@ export interface GraderOptions {
   onLatency?: (ms: number) => void;
   /** Answers Claude approved earlier for this learner (core/learned.ts); accepted at once like stored answers. */
   learned?: (q: Question) => string[] | undefined;
+  /**
+   * Claude's grade for a submitted answer that arrived after the rule-based grade was shown (the wait ran out or
+   * the learner skipped it). The shown grade stays; the app can still learn from it (an approved wording is
+   * remembered) and tell the learner what Claude found.
+   */
+  onLate?: (q: Question, text: string, ev: Evaluation) => void;
   /** Background grading requests allowed per question. */
   maxPrefetch?: number;
   clock?: () => number;
 }
 
 interface Pending {
+  /** A submitted answer is still waiting for Claude's late grade: a new question does not cancel it. */
+  late?: boolean;
   key: string;
   ctl: AbortController;
   promise: Promise<Evaluation | null>;
@@ -158,7 +166,14 @@ export function createGrader(opts: GraderOptions) {
       skipWaiting = null;
       const ms = Math.round(clock() - t0);
       if (winner === "ai" && p.result) return { evaluation: asSubmitted(p.result, t), ms, via: "ai", noteKo: null };
-      // The request may still finish (its time is still measured), but the score shown now is final.
+      // The request may still finish (its time is still measured), but the score shown now is final; a late grade
+      // is handed to onLate so the app can still learn from it.
+      if (winner !== "error" && !p.done && opts.onLate) {
+        p.late = true;
+        void p.promise.then((ev) => {
+          if (ev) opts.onLate!(q, t, asSubmitted(ev, t));
+        });
+      }
       const secs = Math.round(budget / 100) / 10;
       const caveat = local.confidence === "low" ? " 표현이 기준 답안과 많이 달라 놓친 오류가 있을 수 있습니다." : "";
       const noteKo =
@@ -175,9 +190,9 @@ export function createGrader(opts: GraderOptions) {
       skipWaiting?.();
     },
 
-    /** New question: forget background work. */
+    /** New question: forget background work (a submitted answer's late grade may still arrive). */
     reset(): void {
-      pending?.ctl.abort();
+      if (!pending?.late) pending?.ctl.abort();
       pending = null;
       finished.clear();
       prefetches = 0;

@@ -508,3 +508,34 @@ test("voice answers in free talk: with 'send at once' in Settings, a spoken line
   await noHorizontalOverflow(page);
   expect(errors).toEqual([]);
 });
+
+test("a late Claude grade still teaches: an approved wording is accepted at once next time", async ({ page }) => {
+  // Claude approves every answer, but only after 1.6 s; Settings say "always 1 second".
+  await page.addInitScript(() => {
+    const sample = Object.assign(async () => ({ text: "" }), {
+      json: (_p: string, opts?: { signal?: AbortSignal }) =>
+        new Promise((resolve, reject) => {
+          const t = setTimeout(() => resolve({ meaning: 100, comprehensibility: 100, errors: [], corrected: "" }), 1600);
+          opts?.signal?.addEventListener("abort", () => (clearTimeout(t), reject(Object.assign(new Error("aborted"), { name: "AbortError" }))));
+        }),
+    });
+    (window as unknown as { claude: unknown }).claude = { use: async (name: string) => (name === "sample" ? sample : null) };
+  });
+  const errors = await open(page);
+  await nav(page, "설정");
+  await page.getByRole("radiogroup", { name: "채점 대기 시간" }).getByRole("radio", { name: "항상 1초" }).click();
+  await startSentenceLesson(page);
+  const mine = "We have to run the process simulation one more time since the feed composition has changed.";
+  await page.locator("#ef-answer").fill(mine);
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByText(/규칙 기반 · \d\.\d초/)).toBeVisible();
+  const ring = page.getByRole("img", { name: /종합/ });
+  const first = await ring.getAttribute("aria-label");
+  await page.waitForTimeout(1500); // Claude's late approval arrives
+  expect(await ring.getAttribute("aria-label")).toBe(first); // the shown grade never changes
+  await page.getByRole("button", { name: /다시 풀기/ }).click();
+  await page.locator("#ef-answer").fill(mine);
+  await page.getByRole("button", { name: /제출/ }).click();
+  await expect(page.getByText("Claude 확인한 내 표현")).toBeVisible();
+  expect(errors).toEqual([]);
+});

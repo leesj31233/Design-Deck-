@@ -2,9 +2,9 @@
 import * as React from "react";
 import { QUESTIONS } from "../content";
 import {
-  applyDiagnostic as applyDiag, createInitialState, migrateState, recordAttempt, recordTalkLine, type RecordInput, type RecordResult,
+  applyDiagnostic as applyDiag, createInitialState, migrateState, recordAttempt, recordTalkLine, rememberApproved, type RecordInput, type RecordResult,
 } from "../core/store";
-import type { DiagnosticResultRecord, LearnerState, Profile, Question, Settings } from "../core/types";
+import type { DiagnosticResultRecord, Evaluation, LearnerState, Profile, Question, Settings } from "../core/types";
 import type { AIStatus, Platform, StorageStatus } from "../platform/types";
 
 /* ───────────── Clock (with a labeled test-only offset for verifying review scheduling) ───────────── */
@@ -44,6 +44,8 @@ export interface AppContextValue {
   record: (input: Omit<RecordInput, "now">) => RecordResult;
   /** One line said in free talk (counts as practice for the day). */
   recordTalk: () => void;
+  /** Claude approved a wording after the rule-based grade was shown: accept it at once next time. */
+  learnApproved: (q: Question, ev: Evaluation) => void;
   applyDiagnostic: (r: DiagnosticResultRecord) => void;
   updateSettings: (patch: Partial<Settings>) => void;
   updateProfile: (patch: Partial<Profile>) => void;
@@ -131,6 +133,12 @@ export function AppProvider({ platform, children }: { platform: Platform; childr
     },
     recordTalk: () => {
       const next = recordTalkLine(stateRef.current, clock.now());
+      stateRef.current = next;
+      setState(next);
+    },
+    learnApproved: (q, ev) => {
+      const next = rememberApproved(stateRef.current, q, ev, clock.now());
+      if (next === stateRef.current) return;
       stateRef.current = next;
       setState(next);
     },

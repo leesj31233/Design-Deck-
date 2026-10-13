@@ -80,6 +80,27 @@ describe("fast grading", () => {
     expect(latencies[0]).toBeGreaterThanOrEqual(150);
   });
 
+  it("a late reply is handed to onLate (the shown grade stays), even after moving to the next question", async () => {
+    const claude = fakeClaude(150);
+    const late: string[] = [];
+    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 30, onLate: (_q, text, ev) => late.push(`${ev.evaluator}:${text}`) });
+    const out = await g.grade(q, WRONG, 0);
+    expect(out.via).toBe("local-timeout");
+    g.reset(); // the learner already moved on
+    await sleep(220);
+    expect(late).toEqual([`ai:${WRONG}`]);
+  });
+
+  it("background grading of a half-typed answer is still cancelled on a new question", async () => {
+    const claude = fakeClaude(150);
+    const late: string[] = [];
+    const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 30, onLate: (_q, text) => late.push(text) });
+    g.prefetch(q, WRONG, 0);
+    g.reset();
+    await sleep(220);
+    expect(late).toEqual([]);
+  });
+
   it("the wait depends on how far the rule-based grade can be trusted", () => {
     expect(gradeBudgetMs("auto", { confidence: "high" })).toBe(1000);
     expect(gradeBudgetMs("auto", { confidence: "medium" })).toBe(2500);

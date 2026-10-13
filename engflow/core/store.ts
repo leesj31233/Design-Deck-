@@ -286,6 +286,15 @@ export function recordAttempt(prev: LearnerState, input: RecordInput, questionIn
   return { state, attempt, grade, gradeReasons: reasons, scheduled, masteryChanges };
 }
 
+/** Claude approved a wording after its grade was already shown: remember it for next time (no attempt is recorded). */
+export function rememberApproved(prev: LearnerState, q: Question, ev: Evaluation, now: number): LearnerState {
+  if (!claudeApproved(ev)) return prev;
+  const seen = prev.seen[q.id];
+  const ok = rememberAnswer(q, seen?.ok, ev.answer);
+  if (!ok || ok === seen?.ok) return prev;
+  return { ...prev, seen: { ...prev.seen, [q.id]: { ...(seen ?? { count: 0, lastAt: now, best: 0 }), ok } }, updatedAt: now };
+}
+
 export function applyDiagnostic(prev: LearnerState, result: DiagnosticResultRecord): LearnerState {
   return {
     ...prev,

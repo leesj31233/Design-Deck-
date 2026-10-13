@@ -1,9 +1,10 @@
 "use client";
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, Trophy, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, Sparkles, Trophy, X } from "lucide-react";
 import { Kbd } from "@/components/ui/kbd";
-import { evaluateLocal } from "../../core/evaluate";
+import { evaluateLocal, scoredErrors } from "../../core/evaluate";
+import { claudeApproved } from "../../core/learned";
 import { createGrader, gradeBudgetMs, type GradeVia } from "../../core/grader";
 import { claudeLatencyQuantiles, recordClaudeLatency } from "../latency";
 import { celebrationFor, isSuccess, type Celebration } from "../../core/celebration";
@@ -120,6 +121,9 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   // The one result shown for this answer. It is set once and never replaced.
   const [evaluation, setEvaluation] = React.useState<Evaluation | null>(null);
   const [gradeNote, setGradeNote] = React.useState<string | null>(null);
+  // Claude's grade that arrived after the rule-based one was shown: the score stays, but the learner hears what it found.
+  const [lateCheck, setLateCheck] = React.useState<{ kind: "ok" } | { kind: "fix"; corrected: string; whyKo: string } | null>(null);
+  const shownRef = React.useRef<{ qid: string; ev: Evaluation } | null>(null);
   const [gradeInfo, setGradeInfo] = React.useState<{ ms: number; via: GradeVia } | null>(null);
   const [slow, setSlow] = React.useState(false);
   const [committed, setCommitted] = React.useState<RecordResult | null>(null);
@@ -170,6 +174,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const settings = app.state.settings;
   const aiPossible = app.ai.available && settings.ai !== "off";
   const gradeMode = settings.gradeMode ?? "auto";
+  const appRef = React.useRef(app);
+  appRef.current = app;
   const live = React.useRef({ aiPossible, gradeMode, seen: app.state.seen });
   live.current = { aiPossible, gradeMode, seen: app.state.seen };
   // While grading: how long the bar runs, and whether the wait is because the answer is reworded.
@@ -183,6 +189,20 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
         budgetMs: (local) => gradeBudgetMs(live.current.gradeMode, local, claudeLatencyQuantiles()),
         onLatency: recordClaudeLatency,
         learned: (question) => live.current.seen[question.id]?.ok,
+        onLate: (question, _text, ev) => {
+          // Learn from it either way; speak up only when it changes what the learner was told.
+          appRef.current.learnApproved(question, ev);
+          const shown = shownRef.current;
+          if (!shown || shown.qid !== question.id) return;
+          if (claudeApproved(ev)) {
+            if (!isSuccess(shown.ev, 0)) setLateCheck({ kind: "ok" });
+            return;
+          }
+          const major = scoredErrors(ev.errors).filter((e) => e.severity !== "minor");
+          if (major.length && !scoredErrors(shown.ev.errors).some((e) => e.severity !== "minor") && ev.corrected) {
+            setLateCheck({ kind: "fix", corrected: ev.corrected, whyKo: major[0].messageKo });
+          }
+        },
       }),
     [app.platform.ai],
   );
@@ -196,6 +216,8 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     setPhase("answer");
     setEvaluation(null);
     setGradeNote(null);
+    setLateCheck(null);
+    shownRef.current = null;
     setGradeInfo(null);
     setSlow(false);
     setShowKo(false);
@@ -261,6 +283,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
         : null,
     );
     setEvaluation(ev);
+    if (q) shownRef.current = { qid: q.id, ev };
     setGradeInfo(info);
     setGradeNote(note);
     setSlow(false);
@@ -685,6 +708,29 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                 onGuide={(skill, tab) => setGuide({ skill, tab })}
                 scheduleNote={committed?.scheduled[0]?.note ?? null}
               />
+              {lateCheck ? (
+                <motion.div
+                  role="status"
+                  initial={reduced ? false : { opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={cn(
+                    "ef-ko mt-3 flex items-start gap-2 rounded-2xl border p-3 text-[13px] leading-5",
+                    lateCheck.kind === "ok" ? "border-[var(--ef-ok)]/30 bg-[var(--ef-ok-soft)]" : "border-[var(--ef-warn)]/30 bg-[var(--ef-warn-soft)]",
+                  )}
+                >
+                  <Sparkles className={cn("mt-0.5 size-4 shrink-0", lateCheck.kind === "ok" ? "text-[var(--ef-ok)]" : "text-[var(--ef-warn)]")} />
+                  {lateCheck.kind === "ok" ? (
+                    <span>
+                      <b>Claude 확인:</b> 방금 답도 정확한 표현이에요. 다음부터는 이 답을 바로 정답으로 인정합니다.
+                    </span>
+                  ) : (
+                    <span>
+                      <b>Claude가 이어서 확인한 결과:</b> {lateCheck.whyKo}{" "}
+                      <span className="ef-en font-medium">→ {lateCheck.corrected}</span>
+                    </span>
+                  )}
+                </motion.div>
+              ) : null}
             </div>
           ) : null}
         </motion.main>
