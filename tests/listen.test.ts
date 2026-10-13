@@ -29,3 +29,16 @@ describe("voice answers", () => {
     expect(missed).toEqual([]);
   });
 });
+
+describe("reversed meaning with negation-carrying words", () => {
+  it("an inserted 'not' is caught even when 'out', 'still' or 'late' are in the sentence", async () => {
+    const { QUESTIONS } = await import("@/engflow/content");
+    const { isSuccess } = await import("@/engflow/core/celebration");
+    // (A question whose accepted answers include a negative paraphrase — "we haven't received it yet" — is left to Claude.)
+    const q = QUESTIONS.find((x) => x.id === "ph-progressive-still-waiting-data")!;
+    expect(q).toBeTruthy();
+    const flipped = q.reference.replace(/\b(are|is|'re)\b/, (m) => `${m} not`);
+    expect(isSuccess(evaluateLocal(q, q.reference), 0)).toBe(true);
+    expect(isSuccess(evaluateLocal(q, flipped), 0)).toBe(false);
+  });
+});
