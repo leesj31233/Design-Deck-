@@ -1169,7 +1169,14 @@ const progressiveNeedsPassive: Rule = (w) => {
     const info = verbInfo(v.norm);
     if (!info || info.form !== "ing" || !PASSIVE_PERFECT.has(participleOf(info.base))) continue;
     const next = w[i + 2]?.norm ?? "";
-    if (DETERMINERS.has(next) || /^(it|them|us|me|him|her|everything|something)$/.test(next)) continue; // "the vendor is delaying the shipment"
+    // "is delaying a little / a bit / a few days" is how long, not an object ("is delaying a few shipments" is one).
+    const n3 = w[i + 3]?.norm ?? "";
+    const howLong =
+      next === "a" &&
+      ((/^(little|bit|lot)$/.test(n3) && w[i + 4]?.norm !== "of") ||
+        /^(week|day|month|while)$/.test(n3) ||
+        (/^(few|couple)$/.test(n3) && /^(of )?(days|weeks|months|hours|minutes)$/.test([w[i + 4]?.norm, w[i + 5]?.norm].filter(Boolean).join(" ").replace(/^(days|weeks|months|hours|minutes).*/, "$1"))));
+    if (!howLong && (DETERMINERS.has(next) || /^(it|them|us|me|him|her|everything|something)$/.test(next))) continue; // "the vendor is delaying the shipment"
     const pp = participleOf(info.base);
     out.push({
       rule: "progressive-needs-passive", from: i + 1, to: i + 2, replacement: pp, category: "verb-form", severity: "major", skill: "passive",
@@ -3075,6 +3082,81 @@ const basicForms: Rule = (w) => {
   return out;
 };
 
+/** Things handed over that take "the" (or "a"): "text me phone number" → "text me the phone number". */
+const HANDED: Record<string, string> = {
+  number: "the", address: "the", link: "the", file: "the", report: "the", name: "the", location: "the", password: "the", schedule: "the",
+  agenda: "the", invoice: "the", quote: "the", quotation: "the", contract: "the", document: "the", photo: "the", picture: "the", map: "the",
+  way: "the", call: "a", hand: "a", minute: "a", moment: "a", chance: "a", hint: "a", ride: "a", lift: "a",
+};
+const HANDED_FIRST = /^(phone|email|contact|room|flight|order|tracking|home|delivery|meeting|zoom|teams|file|office|hotel|account)$/;
+const HANDED_SECOND = /^(number|address|link|name|location)$/;
+const AFTER_NOUN_PHRASE = /^(of|for|to|again|now|today|tomorrow|please|when|by|before|after|later|soon|asap|if|so|and|as|in|on|at|with|too|right|first|once|twice|yesterday|later|one|this|every|because|but|together)$/;
+
+/** Slips from the blind test: "do drying test", "text me phone number", "Who calls?", "Do you enjoy your weekend?" (on Monday). */
+const conversationSlips: Rule = (w) => {
+  const out: RuleFinding[] = [];
+  const end = (k: number) => k >= w.length - 1 || brokenAfter(w, k);
+  const ends = (k: number) => end(k) || AFTER_NOUN_PHRASE.test(w[k + 1].norm);
+  const anOf = (x: string) => (/^[aeiou]/.test(x) && !CONSONANT_SOUND_VOWEL_START.test(x) ? "an" : "a");
+  for (let i = 0; i < w.length - 1; i++) {
+    const t = w[i].norm;
+
+    // "we'll do drying test one more time" → "do the drying test"; "let's run quick check" → "a quick check".
+    if (/^(do|does|did|doing|run|runs|ran|running|conduct|conducts|conducted|conducting|perform|performs|performed|performing|repeat|repeats|repeated|repeating|redo|redid|redoing)$/.test(t) && !end(i)) {
+      let k = i + 1;
+      const mods: number[] = [];
+      while (k < w.length && mods.length < 2 && !TEST_NOUN.test(w[k].norm) && /^[a-z]+(-[a-z]+)?$/.test(w[k].norm) && !DETERMINERS.has(w[k].norm) && !NOT_A_MODIFIER.test(w[k].norm) && !end(k)) {
+        mods.push(k);
+        k++;
+      }
+      if (k < w.length && TEST_NOUN.test(w[k].norm) && ends(k) && !(mods.length && end(mods[mods.length - 1]))) {
+        const again = w.slice(k + 1).some((x, n, all) => x.norm === "again" || x.norm === "once" && all[n + 1]?.norm === "more" || x.norm === "more" && all[n + 1]?.norm === "time");
+        const art = again ? "the" : anOf(w[i + 1].norm);
+        out.push({
+          rule: "missing-article", from: i + 1, to: i + 1, replacement: art, category: "article", severity: "minor", skill: "articles",
+          messageKo: `'${w[k].raw}'는 셀 수 있는 명사라서 관사가 필요합니다: '${w[i].raw} ${art} ${w.slice(i + 1, k + 1).map((x) => x.raw).join(" ")}'.`,
+        });
+      }
+    }
+
+    // "Would you mind texting me phone number of the engineer?" → "me the phone number".
+    if (/^(send|sends|sent|sending|give|gives|gave|giving|text|texts|texted|texting|tell|tells|told|telling|show|shows|showed|showing|forward|forwards|forwarded|forwarding|email|emails|emailed|emailing|bring|brings|brought|bringing|pass|passes|passed|passing|lend|lends|lent)$/.test(t) && /^(me|us|him|her|them|you)$/.test(w[i + 1]?.norm ?? "") && !end(i) && !end(i + 1)) {
+      const k = i + 2;
+      const n = w[k]?.norm ?? "";
+      const single = n in HANDED && ends(k);
+      const compound = HANDED_FIRST.test(n) && HANDED_SECOND.test(w[k + 1]?.norm ?? "") && !end(k) && ends(k + 1);
+      if (w[k] && (single || compound)) {
+        const art = single ? HANDED[n] : "the";
+        const phrase = compound ? `${w[k].raw} ${w[k + 1].raw}` : w[k].raw;
+        out.push({
+          rule: "missing-article", from: k, to: k, replacement: art, category: "article", severity: "minor", skill: "articles",
+          messageKo: `'${phrase}'는 셀 수 있는 명사라서 관사가 필요합니다: '${w[i].raw} ${w[i + 1].raw} ${art} ${phrase}'.`,
+        });
+      }
+    }
+
+    // "May I ask who calls?" → "who's calling": on the phone the call is happening now.
+    if (t === "who" && /^(calls|speaks)$/.test(w[i + 1].norm) && end(i + 1) && (i === 0 || brokenAfter(w, i - 1) || /^(ask|know|see|check|tell)$/.test(w[i - 1].norm))) {
+      const ing = w[i + 1].norm === "calls" ? "calling" : "speaking";
+      out.push({
+        rule: "progressive-now", from: i, to: i + 2, replacement: `who's ${ing}`, category: "tense", severity: "major", skill: "progressive",
+        messageKo: `전화를 건 사람을 물을 때는 지금 일어나는 일이라 진행형입니다: 'May I ask who's ${ing}?'`,
+      });
+    }
+
+    // "Do you enjoy your weekend?" on Monday → "Did you enjoy …": the weekend is over ("Do you enjoy …" asks about habits).
+    if (t === "do" && w[i + 1].norm === "you" && w[i + 2]?.norm === "enjoy" && /^(your|the)$/.test(w[i + 3]?.norm ?? "") && /^(weekend|trip|holiday|holidays|vacation|flight|meal|dinner|lunch|party|evening|break|concert|game|match)$/.test(w[i + 4]?.norm ?? "") && (i === 0 || brokenAfter(w, i - 1))) {
+      out.push({
+        rule: "tense-did", from: i, to: i + 1, replacement: w[i].raw[0] === "D" ? "Did" : "did", category: "tense", severity: "major", skill: "agreement",
+        messageKo: `이미 끝난 ${w[i + 4].raw}에 대해 묻는 것이라 과거형입니다: 'Did you enjoy your ${w[i + 4].raw}?' ('Do you enjoy …?'는 '평소에 즐기나요?'라는 뜻입니다.)`,
+      });
+    }
+  }
+  return out;
+};
+const TEST_NOUN = /^(test|trial|check|inspection|experiment|simulation|demo|presentation|survey|walkthrough|walk-through)$/;
+const NOT_A_MODIFIER = /^(it|them|us|me|him|her|you|this|that|what|which|so|some|any|more|less|many|few|several|enough|another|other|no|each|every|one|two|three|four|five|again|not|also|just|still|really|well|better|all|both|either|neither|such|out|up|down|over|the|a|an|my|our|your|his|their|its)$/;
+
 const RULES: Rule[] = [
   itsContraction,
   lexicalAgreement,
@@ -3093,7 +3175,7 @@ const RULES: Rule[] = [
   pluralNeeded, determinerNumber, uncountableDeterminer, theNeeded, extraArticle,
   feelingAdjective, adverbAdjectiveMore, agreementMore, wordOrderMore, miscPatterns, missingBeMore,
   invertedModalForm, toInflected, pleaseForm, beDiffer, becauseOf, thinkMissingIt,
-  everydaySlips, sinceWithPresent, articleBeforeNumber, basicForms,
+  everydaySlips, sinceWithPresent, articleBeforeNumber, basicForms, conversationSlips,
 ];
 
 export function runRules(words: Token[]): RuleFinding[] {
