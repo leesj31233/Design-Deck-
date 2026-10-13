@@ -53,7 +53,7 @@ export function TodayScreen() {
     <div className="space-y-4">
       <div>
         <Eyebrow>{dateKo(now)} · 오늘</Eyebrow>
-        <h1 className="mt-1.5 text-[28px] font-semibold tracking-[-.04em] md:text-[34px]">회의에서 바로 쓰는 한 문장씩.</h1>
+        <h1 className="mt-1.5 text-[28px] font-semibold tracking-[-.04em] md:text-[34px]">회의와 일상에서 바로 쓰는 한마디씩.</h1>
       </div>
 
       {!s.profile.onboarded ? (
