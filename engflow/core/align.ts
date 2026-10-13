@@ -38,6 +38,23 @@ function pairCost(a: Token, b: Token): { cost: number; type: "match" | "spell" |
   return { cost: sameClass ? 0.6 : bothFunction ? 0.9 : 1.1, type: "sub" };
 }
 
+/**
+ * The cost alone, memoized by the two words: it depends only on their normalized forms (stems and number
+ * keys are derived from them), and the same answer is aligned against the same targets several times.
+ */
+const COST_CACHE = new Map<string, number>();
+function costOf(a: Token, b: Token): number {
+  if (a.norm === b.norm) return 0;
+  const key = a.norm + "\u0000" + b.norm;
+  let c = COST_CACHE.get(key);
+  if (c === undefined) {
+    if (COST_CACHE.size > 50_000) COST_CACHE.clear();
+    c = pairCost(a, b).cost;
+    COST_CACHE.set(key, c);
+  }
+  return c;
+}
+
 /** Needleman–Wunsch style alignment over word tokens. */
 export function align(learner: Token[], target: Token[]): Alignment {
   const n = learner.length;
@@ -54,7 +71,7 @@ export function align(learner: Token[], target: Token[]): Alignment {
   }
   for (let i = 1; i <= n; i++) {
     for (let j = 1; j <= m; j++) {
-      const diag = D[i - 1][j - 1] + pairCost(learner[i - 1], target[j - 1]).cost;
+      const diag = D[i - 1][j - 1] + costOf(learner[i - 1], target[j - 1]);
       const up = D[i - 1][j] + 1;
       const left = D[i][j - 1] + 1;
       if (diag <= up && diag <= left) {

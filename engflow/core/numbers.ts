@@ -4,7 +4,7 @@
  * The word alignment treats a number like any other content word, so this is what catches a wrong
  * one ("Line 4" for "Line 5", "twenty" for "thirty") — and lets "3 pm" stand for "three pm".
  */
-import { tokenize, words, type Token } from "./text";
+import { tokenize, words, wordsOf, type Token } from "./text";
 import { COMPOUND_ORDINALS, canFollow, digitValue, wordKind, type NumberKind } from "./numwords";
 
 export interface NumberMention {
@@ -160,7 +160,7 @@ export function numberSlip(
   if (!mineRaw.length) return null;
   const mine = mineRaw.map((m) => ({ m, v: clockValue(m, answerWords, answer), ctx: contextOf(m, answerWords) }));
   const sets = targets.map((t) => {
-    const tw = words(tokenize(t));
+    const tw = wordsOf(t);
     return { t, nums: numbersOf(tw, t).map((m) => ({ m, v: clockValue(m, tw, t), ctx: contextOf(m, tw) })) };
   });
   // Fine when any correct answer says every number the learner said (as many times).

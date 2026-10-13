@@ -223,6 +223,31 @@ export function words(tokens: Token[]): Token[] {
   return tokens.filter((t) => !t.punct);
 }
 
+const TOKENS_CACHE = new Map<string, Token[]>();
+const WORDS_CACHE = new Map<string, Token[]>();
+/**
+ * Tokens of a stored text (a reference, an accepted answer, an approved wording), memoized: the same targets
+ * are compared with every answer. The arrays are shared — never mutate them.
+ */
+export function tokensOf(text: string): Token[] {
+  let hit = TOKENS_CACHE.get(text);
+  if (!hit) {
+    if (TOKENS_CACHE.size > 5000) TOKENS_CACHE.clear();
+    hit = tokenize(text);
+    TOKENS_CACHE.set(text, hit);
+  }
+  return hit;
+}
+export function wordsOf(text: string): Token[] {
+  let hit = WORDS_CACHE.get(text);
+  if (!hit) {
+    if (WORDS_CACHE.size > 5000) WORDS_CACHE.clear();
+    hit = words(tokensOf(text));
+    WORDS_CACHE.set(text, hit);
+  }
+  return hit;
+}
+
 /** Normalized comparison key for exact-match detection. */
 export function normalizeForMatch(text: string): string {
   return words(tokenize(text)).map((t) => t.norm).join(" ");

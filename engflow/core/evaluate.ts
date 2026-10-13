@@ -4,7 +4,7 @@ import { runRules } from "./rules";
 import { numberSlip } from "./numbers";
 import {
   ARTICLES, AUXILIARIES, BE_FORMS, CONJUNCTIONS, DETERMINERS, MODALS, NEGATIONS, PREPOSITIONS, SUBJECT_PRONOUNS,
-  capitalizeSentence, isFunctionWord, joinWords, normalizeForMatch, tokenize, words, type Token,
+  capitalizeSentence, isFunctionWord, joinWords, normalizeForMatch, tokenize, tokensOf, words, wordsOf, type Token,
 } from "./text";
 import { isBaseVerb, participleOf, verbInfo } from "./lexicon";
 import type {
@@ -123,7 +123,7 @@ export function correctTargets(q: Question): string[] {
 export function rankTargets(q: Question, w: Token[]): { target: string; tw: Token[]; al: Alignment }[] {
   return correctTargets(q)
     .map((t) => {
-      const tw = words(tokenize(t));
+      const tw = wordsOf(t);
       return { target: t, tw, al: align(w, tw) };
     })
     .sort((a, b) => a.al.distance - b.al.distance);
@@ -727,8 +727,8 @@ function sentenceAlignedFindings(q: Question, tokens: Token[], w: Token[], skill
   const ranges = sentenceRanges(tokens, w);
   if (ranges.length < 2) return null;
   const targetSentences = correctTargets(q).flatMap((t) => {
-    const tt = tokenize(t);
-    const tw = words(tt);
+    const tt = tokensOf(t);
+    const tw = wordsOf(t);
     return sentenceRanges(tt, tw).map(([a, b]) => tw.slice(a, b));
   });
   const findings: Finding[] = [];
@@ -934,7 +934,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   let usedLearned = false;
   const here = new Set(w.map((t) => t.norm));
   for (const t of learned) {
-    const ltw = words(tokenize(t));
+    const ltw = wordsOf(t);
     if (align(w, ltw).distance > CLOSE_DISTANCE) continue;
     const listed = new Set<number>();
     for (const u of q.meaning) {
@@ -1170,7 +1170,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
   };
   const closer = (text: string) => {
     const cw = words(tokenize(text));
-    return Math.min(...correctTargets(q).map((t) => align(cw, words(tokenize(t))).distance)) <= al.distance + 1e-9;
+    return Math.min(...correctTargets(q).map((t) => align(cw, wordsOf(t)).distance)) <= al.distance + 1e-9;
   };
   // Advisory word-choice notes keep the learner's own (site) wording in the correction.
   const advisoryRanges = new Set(kept.filter((f) => f.category === "terminology").map((f) => `${f.from}:${f.to}`));

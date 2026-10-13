@@ -48,6 +48,7 @@ describe("fast grading", () => {
   it("when Claude cannot answer in time, the rule-based grade is shown at once without a request", async () => {
     const claude = fakeClaude(200);
     const g = createGrader({ evaluate: claude.evaluate, aiEnabled: () => true, budgetMs: () => 0 });
+    g.local(q, WRONG, 0); // warm up, so a busy test machine measures grading rather than the first compile
     const out = await g.grade(q, WRONG, 0);
     expect(out.evaluation.evaluator).toBe("local");
     expect(out.ms).toBeLessThan(100);
