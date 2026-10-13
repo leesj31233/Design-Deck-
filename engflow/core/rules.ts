@@ -4055,6 +4055,81 @@ const learnerSlips: Rule = (w) => {
       out.push({ rule: "visit-there", from: i, to: i + 2, replacement: t === "visit" ? "go there" : `${w[i].raw} it`, category: "word-choice", severity: "minor", skill: "collocation", messageKo: "'there'는 부사라 visit의 목적어가 될 수 없습니다: 'go there' 또는 'visit it/the place'." });
       continue;
     }
+    // "Let's discuss it on next meeting" → "at the next meeting"; "in next week" → "next week".
+    if (/^(on|in|at)$/.test(t) && n1 === "next" && w[i + 2] && !w[i + 2].poss && !/^(s|'s)$/.test(w[i + 3]?.norm ?? "") && !(i > 0 && /^(the|a)$/.test(w[i - 1].norm)) && !(t !== "at" && i > 0 && /^(move|check|come|log|sign|hand|turn|plug|drop|fill|kick|carry|go|try|put|switch|call|clock|hold|keep|pass|send|bring|get)$/.test(verbInfo(w[i - 1].norm)?.base ?? ""))) {
+      const n2 = w[i + 2].norm;
+      if (/^(week|month|year|monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekend|quarter|time)$/.test(n2)) {
+        out.push({ rule: "extra-preposition", from: i, to: i + 1, replacement: "", category: "preposition", severity: "major", skill: "time-clause", messageKo: `'next ${w[i + 2].raw}' 앞에는 전치사를 쓰지 않습니다: 'next ${w[i + 2].raw}'.` });
+        continue;
+      }
+      if (/^(meeting|call|session|visit)$/.test(n2)) {
+        insert(i + 1, "the", "article", "major", "articles", `'다음 회의에서'는 'at/in the next ${w[i + 2].raw}'입니다.`, "missing-article");
+        continue;
+      }
+    }
+    // "I will be late about 10 minutes" → "about 10 minutes late".
+    if (t === "late" && i > 0 && /^(be|am|is|are|was|were|been|running)$/.test(w[i - 1].norm) && (/^(about|around|maybe|like)$/.test(n1) ? /^(\d+|five|ten|fifteen|twenty|thirty|a|an|two|three)$/.test(w[i + 2]?.norm ?? "") : /^(\d+|five|ten|fifteen|twenty|thirty|two|three)$/.test(n1)) && /^(minutes|minute|min|mins|hour|hours)$/.test(w[i + (/^(about|around|maybe|like)$/.test(n1) ? 3 : 2)]?.norm ?? "")) {
+      const span = /^(about|around|maybe|like)$/.test(n1) ? 3 : 2;
+      const amount = w.slice(i + 1, i + 1 + span).map((x) => x.raw).join(" ");
+      out.push({ rule: "word-order-late", from: i, to: i + 1 + span, replacement: `${amount} late`, category: "word-order", severity: "minor", skill: "word-order", messageKo: `'~분 늦다'는 시간이 먼저 옵니다: '${amount} late'.` });
+      continue;
+    }
+    // "Sorry for late" → "Sorry I'm late" / "Sorry for being late".
+    if (t === "for" && i > 0 && /^(sorry|apologize|apologise)$/.test(w[i - 1].norm) && n1 === "late") {
+      insert(i + 1, "being", "verb-form", "major", "apology", "'늦어서 미안해요'는 'Sorry for being late' 또는 'Sorry I'm late'입니다.", "missing-verb");
+      continue;
+    }
+    // "I will inform you the result" → "inform you of the result".
+    if (/^(inform|informed|informs|informing)$/.test(t) && /^(you|me|us|him|her|them|everyone)$/.test(n1) && w[i + 2] && /^(the|a|our|my|your|its|this)$/.test(w[i + 2].norm)) {
+      insert(i + 2, "of", "preposition", "major", "verb-prep", `'~에게 …을 알리다'는 'inform + 사람 + of + 내용'입니다: '${w[i].raw} ${w[i + 1].raw} of ${w[i + 2].raw} …'.`);
+      continue;
+    }
+    // "I'm not sure if I can make it or no" → "or not".
+    if (t === "or" && n1 === "no" && end(i + 1) && w.slice(0, i).some((x) => /^(if|whether)$/.test(x.norm))) {
+      out.push({ rule: "or-not", from: i + 1, to: i + 2, replacement: "not", category: "word-choice", severity: "major", skill: "clarify-question", messageKo: "'~인지 아닌지'는 'or not'입니다: '… or not'." });
+      continue;
+    }
+    // "I have a question to you" → "a question for you".
+    if (/^(question|questions)$/.test(t) && n1 === "to" && /^(you|him|her|them)$/.test(w[i + 2]?.norm ?? "") && end(i + 2) && i > 0 && /^(a|one|some|two|few|quick|small|another|more)$/.test(w[i - 1].norm)) {
+      out.push({ rule: "preposition-collocation", from: i + 1, to: i + 2, replacement: "for", category: "preposition", severity: "major", skill: "clarify-question", messageKo: `'~에게 질문이 있다'는 'a question for ${w[i + 2].raw}'입니다.` });
+      continue;
+    }
+    // "I prefer coffee than tea" → "to tea" (or "rather than").
+    if (/^(prefer|prefers|preferred)$/.test(t)) {
+      for (let k = i + 2; k <= Math.min(i + 5, w.length - 2); k++) {
+        if (brokenAfter(w, k - 1)) break;
+        if (w[k].norm === "than" && !w.slice(i + 1, k).some((x) => /^(more|less|better|rather|other|way|much|fewer|bigger|smaller|cheaper|faster)$/.test(x.norm) || /er$/.test(x.norm) && x.norm.length > 4 && !COUNTABLE_NOUNS.has(x.norm))) {
+          out.push({ rule: "prefer-to", from: k, to: k + 1, replacement: "to", category: "preposition", severity: "major", skill: "comparative", messageKo: "'B보다 A를 선호하다'는 'prefer A to B' (또는 'A rather than B')입니다." });
+          break;
+        }
+      }
+    }
+    // "I can't join to the call" → "join the call".
+    if (/^(join|joined|joining|joins)$/.test(t) && n1 === "to" && /^(the|our|my|your|this|a|us|them)$/.test(w[i + 2]?.norm ?? "")) {
+      out.push({ rule: "extra-preposition", from: i + 1, to: i + 2, replacement: "", category: "preposition", severity: "major", skill: "verb-object", messageKo: `join은 목적어를 바로 받습니다: '${w[i].raw} ${w[i + 2].raw} …'.` });
+      continue;
+    }
+    // "in these days" → "these days".
+    if (t === "in" && n1 === "these" && w[i + 2]?.norm === "days" && end(i + 2)) {
+      out.push({ rule: "extra-preposition", from: i, to: i + 1, replacement: "", category: "preposition", severity: "minor", skill: "small-talk", messageKo: "'요즘'은 전치사 없이 'these days'입니다." });
+      continue;
+    }
+    // "He suggested me to wait" → "suggested (that) I wait".
+    if (/^(suggest|suggested|suggests)$/.test(t) && /^(me|us|him|her|them)$/.test(n1) && w[i + 2]?.norm === "to" && baseVerbAt(i + 3)) {
+      const subj = { me: "I", us: "we", him: "he", her: "she", them: "they" }[n1 as "me"];
+      out.push({ rule: "suggest-that", from: i + 1, to: i + 3, replacement: `(that) ${subj}`, category: "sentence-structure", severity: "major", skill: "opinion", messageKo: `'suggest' 뒤에는 '사람 + to'를 쓰지 않습니다: '${w[i].raw} (that) ${subj} ${w[i + 3].raw}'.` });
+      continue;
+    }
+    // "My boss gave me many works" → "a lot of work".
+    if (/^(many|several|few|lots)$/.test(t) && n1 === "works" && ends(i + 1)) {
+      out.push({ rule: "uncountable-plural", from: i, to: i + 2, replacement: "a lot of work", category: "countability", severity: "major", skill: "countability", messageKo: "'일'이라는 뜻의 work는 셀 수 없습니다: 'a lot of work'." });
+      continue;
+    }
+    // "I'm in charge for the project" → "in charge of".
+    if (t === "charge" && i > 0 && w[i - 1].norm === "in" && /^(for|about|on|to)$/.test(n1)) {
+      out.push({ rule: "preposition-collocation", from: i + 1, to: i + 2, replacement: "of", category: "preposition", severity: "major", skill: "verb-prep", messageKo: "'~을 담당하다'는 'in charge of'입니다." });
+      continue;
+    }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
     if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
       out.push({ rule: "missing-subject-it", from: i, to: i + 1, replacement: /^[A-Z]/.test(w[i].raw) ? `It ${t}` : `it ${t}`, category: "sentence-structure", severity: "major", skill: "be-adj", messageKo: `영어 문장에는 주어가 필요합니다: 'It ${t} ${w.slice(i + 1, i + 4).map((x) => x.raw).join(" ")}'.` });
