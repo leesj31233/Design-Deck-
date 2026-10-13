@@ -223,6 +223,7 @@ const RIGHT = [
   "We have left the office.",
   "I'm head of the sales team.",
   "These days I work from home.",
+  "I'm in 1204 room.",
   "We will have to update the PFD.",
   "Would you mind sending me the file?",
   "We have to keep updating the schedule.",

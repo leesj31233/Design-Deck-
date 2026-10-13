@@ -17,6 +17,7 @@ describe("reading numbers", () => {
     expect(values("two hundred and fifty people, twenty-five minutes, an eight-year-old")).toEqual([250, 25, 8]);
     expect(values("Let's meet at 5:30 on March 15th, or five thirty on the fifteenth.")).toEqual([5, 30, 15, 5, 30, 15]);
     expect(values("nineteen hundred, two thousand twenty-five")).toEqual([1900, 2025]);
+    expect(values("I'm in room twelve oh four.")).toEqual([1204]);
   });
 
   it("'one' counts only when something is counted, and 'first'/'second' alone never", () => {

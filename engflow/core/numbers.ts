@@ -100,7 +100,13 @@ export function numbersOf(w: Token[], text: string): NumberMention[] {
       end = i;
       i++;
     }
-    const value = total + cur;
+    let value = total + cur;
+    // Room and flight numbers read digit by digit: "twelve oh four" = 1204, "five zero two" = 502.
+    while (parts[i] && /^(oh|o|zero)$/.test(parts[i].s) && parts[i + 1] && /^(zero|one|two|three|four|five|six|seven|eight|nine)$/.test(parts[i + 1].s) && value > 0 && value < 100) {
+      value = value * 100 + (wordKind(parts[i + 1].s)?.[0] ?? 0);
+      end = i + 1;
+      i += 2;
+    }
     const single = end === start;
     // "one" on its own counts only next to something counted or a time.
     if (single && p.s === "one") {

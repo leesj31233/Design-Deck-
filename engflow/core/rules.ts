@@ -1898,6 +1898,8 @@ const pluralNeeded: Rule = (w) => {
     const next = w[j + 1]?.norm ?? "";
     const headEnds = !next || brokenAfter(w, j) || /^(of|for|to|in|on|at|with|from|and|or|but|so|that|which|ago|later|left|before|after|is|are|was|were|will|can|should|would|have|has|had|now|this|next|last|today|tomorrow|share|and|than)$/.test(next);
     if (!headEnds) continue;
+    // "1204 room", "line 5 bus": a number used as a label, not a count.
+    if (/^\d{3,}$/.test(q) && /^(room|floor|gate|line|bus|number|page|platform|exit|terminal|seat|row|track)$/.test(n.norm)) continue;
     const bigNumber = /^(two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|several|many|both)$/.test(q) || (/^\d+$/.test(q) && Number(q) > 1);
     if (bigNumber && !(q === "many" && n.norm === "time")) push(j, pl, `'${w[i].raw}' 뒤의 셀 수 있는 명사는 복수형입니다: '${pl}'.`);
     else if (q === "few" && w[i - 1]?.norm === "a") push(j, pl, `'a few' 뒤에는 복수형이 옵니다: '${pl}'.`);
