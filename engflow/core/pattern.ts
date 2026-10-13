@@ -147,6 +147,8 @@ function tokenMatches(alt: Alt, tok: Token, synonyms = false): "exact" | "fuzzy"
   if (alt.exact) return tok.norm === alt.value ? "exact" : null;
   if (tok.norm === alt.value || tok.stem === alt.stem) return "exact";
   if (alt.num !== undefined && tok.num === alt.num) return "exact";
+  // "five" in a pattern matches "a five-minute walk" ("5-minute"): the number is said either way.
+  if (alt.num !== undefined && !alt.num.includes("-") && tok.num?.startsWith(`${alt.num}-`)) return "exact";
   if (synonyms && SYNONYM_OF.has(alt.stem) && SYNONYM_OF.get(alt.stem) === SYNONYM_OF.get(tok.stem)) return "exact";
   if (isSpellingVariant(tok.norm, alt.value)) return "fuzzy";
   // A misspelled inflected form ("wating" for wait → waiting).

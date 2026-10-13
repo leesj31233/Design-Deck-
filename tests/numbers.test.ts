@@ -92,3 +92,11 @@ describe("accented letters", () => {
     expect(words(tokenize("Let's meet at the café.")).map((t) => t.norm)).toContain("cafe");
   });
 });
+
+describe("hyphenated numbers in meaning chunks", () => {
+  it("'five' matches 'a five-minute walk'", async () => {
+    const { matchAny } = await import("@/engflow/core/pattern");
+    expect(matchAny(["five ... walk"], words(tokenize("It's a five-minute walk.")), 2)).not.toBeNull();
+    expect(matchAny(["six"], words(tokenize("It's a five-minute walk.")), 2)).toBeNull();
+  });
+});
