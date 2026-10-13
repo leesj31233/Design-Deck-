@@ -2733,6 +2733,14 @@ const everydaySlips: Rule = (w) => {
       }
     }
 
+    // "my friend birthday" → "my friend's birthday": people and what belongs to them ("my company car" is a compound).
+    if (/^(friend|mother|father|mom|dad|mum|brother|sister|wife|husband|son|daughter|cousin|uncle|aunt|grandmother|grandfather|boss|colleague|coworker|neighbor|neighbour|roommate|girlfriend|boyfriend)$/.test(t) && !brk(i) && i > 0 && /^(my|your|our|his|her|their|a|the)$/.test(w[i - 1].norm) && !/['’]s?$/.test(w[i].raw) && /^(birthday|wedding|house|home|car|name|phone|number|idea|party|office|desk|family|kids|children|parents|dog|cat|place|room|email|bag|laptop|son|daughter|husband|wife)$/.test(n1) && !w[i + 1].expanded) {
+      push({
+        rule: "missing-possessive", from: i, to: i + 1, replacement: `${w[i].raw}'s`, category: "word-order", severity: "minor", skill: "articles",
+        messageKo: `'~의'(소유)는 'X's Y'입니다: '${w[i].raw}'s ${w[i + 1].raw}'.`,
+      });
+    }
+
     // "My battery is almost die" → "is almost dead".
     if (BE_FORMS.has(t) && n1 === "almost" && n2 === "die") {
       push({

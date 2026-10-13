@@ -30,6 +30,8 @@ export interface Token {
   question?: boolean;
   /** The number this word says, spelled canonically ("three" and "3" → "3"; "four-week" → "4-week"). */
   num?: string;
+  /** A possessive ("Sari's", "the engineers'"): matched like the bare word, but exact matching keeps the 's. */
+  poss?: boolean;
 }
 
 /** Words whose trailing dot is an abbreviation, not the end of a sentence. */
@@ -195,6 +197,7 @@ export function tokenize(text: string): Token[] {
       t.stem = stem("has");
     }
   }
+  for (const t of tokens) if (!t.punct && !t.expanded && /(['’]s|s['’])$/i.test(t.raw)) t.poss = true;
   for (let i = 0; i < tokens.length - 1; i++) {
     if (!tokens[i].punct && tokens[i + 1].punct && /^[.,;:!?…—–()]$/.test(tokens[i + 1].norm)) {
       tokens[i].breakAfter = true;
@@ -250,7 +253,8 @@ export function wordsOf(text: string): Token[] {
 
 /** Normalized comparison key for exact-match detection. */
 export function normalizeForMatch(text: string): string {
-  return words(tokenize(text)).map((t) => t.norm).join(" ");
+  // "my friend birthday" is not the same answer as "my friend's birthday".
+  return words(tokenize(text)).map((t) => (t.poss ? `${t.norm}'s` : t.norm)).join(" ");
 }
 
 /** Damerau–Levenshtein distance (optimal string alignment), bounded. */

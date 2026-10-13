@@ -73,3 +73,12 @@ describe("everyday synonyms in meaning chunks", () => {
     expect(matchPattern(compilePattern("take ... taxi"), w("Let's take a cab."))).toBeNull();
   });
 });
+
+describe("possessives in exact matching", () => {
+  it("'my friend birthday' is not an exact match for 'my friend's birthday'; contractions still are", async () => {
+    const { normalizeForMatch } = await import("@/engflow/core/text");
+    expect(normalizeForMatch("my friend birthday")).not.toBe(normalizeForMatch("my friend's birthday"));
+    expect(normalizeForMatch("It's my cousin's wedding.")).toBe(normalizeForMatch("it is my cousin's wedding"));
+    expect(normalizeForMatch("That's great")).toBe(normalizeForMatch("That is great"));
+  });
+});

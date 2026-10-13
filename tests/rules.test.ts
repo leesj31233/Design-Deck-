@@ -115,6 +115,7 @@ const WRONG: [string, string, string?][] = [
   ["Does the shuttle runs every hour?", "do-inflected", "run"],
   ["I stayed there during a week.", "during-duration", "for"],
   ["Is Thursday okay for you? If not, Friday morning also fine.", "missing-be-adjective", "is"],
+  ["I'm going to my friend birthday party.", "missing-possessive", "friend's"],
 ];
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
@@ -176,6 +177,9 @@ const RIGHT = [
   "Friday morning is also fine.",
   "see you friday morning okay",
   "Thanks, Friday works fine.",
+  "My company car is in the shop.",
+  "My friend and I went hiking.",
+  "A friend of mine called.",
   "We will have to update the PFD.",
   "Would you mind sending me the file?",
   "We have to keep updating the schedule.",
