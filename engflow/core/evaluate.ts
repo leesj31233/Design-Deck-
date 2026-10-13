@@ -401,6 +401,12 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       if (/ing$/.test(tt) && !FEELING_ADJ.test(tt) && isVerb && (vl!.form === "base" || vl!.form === "3sg") && vl!.base === vt!.base && !BE_FORMS.has(lprev) && (BE_FORMS.has(tw[op.ti - 1]?.norm ?? "") || BE_FORMS.has(tw[op.ti - 2]?.norm ?? ""))) continue;
       // Feeling adjectives: "I'm interesting in" means "interested" — a real error, whatever the lexicon knows.
       if (FEELING_ADJ.test(lt) && FEELING_ADJ.test(tt) && lt.replace(/(ed|ing|ied|ying)$/, "") === tt.replace(/(ed|ing|ied|ying)$/, "")) {
+        // Who is described decides: a person feels (-ed), a thing causes (-ing). "Going out is much more relaxing"
+        // is right whatever the stored answer says; "I'm relaxing" about a feeling is the classic slip.
+        let s0 = op.li - 1;
+        while (s0 >= 0 && !brokenAfterW(w, s0) && !/^(i|we|you|he|she|they|it|this|that|everyone|everybody)$/.test(w[s0].norm) && !(PERSON_NOUNS_EVAL.test(w[s0].norm))) s0--;
+        const person = s0 >= 0 && !brokenAfterW(w, s0) && (/^(i|we|you|he|she|they|everyone|everybody)$/.test(w[s0].norm) || PERSON_NOUNS_EVAL.test(w[s0].norm));
+        if (!person && /ing$/.test(lt)) continue;
         push(
           {
             from: op.li, to: op.li + 1, category: "verb-form", severity: "major", fix: tt, skill: "be-adj",
@@ -713,6 +719,9 @@ function consensusFilter(
     });
   });
 }
+
+/** People nouns that can feel something (for -ed / -ing feeling adjectives). */
+const PERSON_NOUNS_EVAL = /^(people|guests|visitors|team|colleagues|everyone|customers|clients|kids|children|friends|family|staff|operators|engineers|students|manager|boss)$/;
 
 const MOVABLE_ADVERBS = new Set(["first", "later", "also", "only", "already", "still", "yet", "again", "now", "today", "tomorrow", "together", "soon", "then", "carefully", "quickly", "again", "immediately", "regularly", "every", "next"]);
 
