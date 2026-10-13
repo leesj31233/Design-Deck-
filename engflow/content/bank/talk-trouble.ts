@@ -25,6 +25,7 @@ export const TALK_TROUBLE: Question[] = [
       { id: "my-mistake", en: "my mistake", ko: "제 실수", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ )?)\\b(?:mistake|mistakes|fault|error)\\b", "re:(?<!\\b(?:not|never) )\\bmy bad\\b", "re:\\b(?:that|this|it) is (?:all )?on me\\b"], critical: true },
     ],
     pitfalls: [
+      { id: "mine-mistake", pattern: "mine mistake|fault|error", category: "word-choice", severity: "major", fix: "my mistake", messageKo: "명사 앞에는 소유격 'my'를 씁니다: 'my mistake'. 'mine'은 '내 것'이라는 뜻으로 혼자 씁니다(It's mine)." },
       { id: "my-miss", pattern: "my =miss", category: "word-choice", severity: "major", fix: "my mistake", messageKo: "영어 'miss'는 '실수'라는 명사로 쓰지 않습니다(한국식 표현 '미스'). 'My mistake.' 또는 'My bad.'라고 합니다." },
       { id: "i-am-mistake", pattern: "i am =mistake", category: "sentence-structure", severity: "major", fix: "It's my mistake", messageKo: "'I'm mistake'는 '나는 실수다'라는 뜻이 됩니다. 'My mistake.' 또는 'I made a mistake.'라고 합니다." },
       { id: "do-a-mistake", pattern: "=did|=do|=does a? mistake|mistakes", category: "word-choice", severity: "major", fix: "made a mistake", messageKo: "'실수하다'는 do가 아니라 make를 써서 'make a mistake'라고 합니다: 'I made a mistake.' 짧게는 'My mistake.'라고 합니다." },
@@ -59,7 +60,7 @@ export const TALK_TROUBLE: Question[] = [
       { id: "delay", en: "the delay", ko: "늦어진 것", any: ["delay|delayed", "late", "wait|waiting"], critical: true },
     ],
     pitfalls: [
-      { id: "sorry-for-late", pattern: "for|to =late|=lately", category: "verb-form", severity: "major", fix: "for the delay", messageKo: "'late'는 형용사라서 전치사 for/to 뒤에 바로 올 수 없습니다. 'Sorry for the delay' 또는 'Sorry it's late'라고 합니다." },
+      { id: "sorry-for-late", pattern: "re:\\b(?:for|to) (?:the )?(?:late|lately)\\b(?! (?:report|reply|response|delivery|answer|notice|submission|email|message|shipment|arrival|start))", category: "verb-form", severity: "major", fix: "for the delay", messageKo: "'late'는 형용사라서 전치사 for/to 뒤에 바로 올 수 없습니다. 'Sorry for the delay' 또는 'Sorry it's late'라고 합니다." },
       { id: "for-delay-no-the", pattern: "for|about =delay", category: "article", severity: "minor", fix: "for the delay", messageKo: "이번에 늦어진 바로 그 일을 가리키므로 'the delay'처럼 the를 붙입니다." },
       { id: "being-delay", pattern: "being =delay", category: "word-choice", severity: "major", fix: "being late", messageKo: "delay는 '지연'이라는 명사라서 'being delay'라고 하지 않습니다. 'Sorry for being late' 또는 'Sorry for the delay'라고 합니다." },
     ],
@@ -91,9 +92,10 @@ export const TALK_TROUBLE: Question[] = [
     accepted: ["Thanks for telling me. I'll look into it.", "Thanks for letting me know. I'll look into it right away.", "Thank you for letting me know. I'll look into it.", "Thanks for letting me know. I'll check it.", "Thanks for letting me know. Let me look into it."],
     meaning: [
       { id: "thanks", en: "thanks for letting me know", ko: "알려 줘서 고마워요", any: ["thank|thanks", "appreciate"] },
-      { id: "look-into", en: "I'll look into it", ko: "알아볼게요", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\b(?:look|looking|looked|check|checking|investigate|investigating|find|finding|figure|figuring)\\b"], critical: true },
+      { id: "look-into", en: "I'll look into it", ko: "알아볼게요", any: ["re:(?<!\\bno need to )(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\b(?:look|looking|looked|check|checking|investigate|investigating|find|finding|figure|figuring)\\b"], critical: true },
     ],
     pitfalls: [
+      { id: "look-into-no-it", pattern: "re:\\b(?:look|looking) into(?= (?:right|now|today|asap|soon|first)\\b|$)", category: "missing-content", severity: "major", fix: "look into it", messageKo: "'look into'는 목적어가 꼭 필요한 구동사입니다. 무엇을 알아볼지 'it'을 붙여 'I'll look into it.'이라고 합니다." },
       { id: "look-it-into", pattern: "look|looking it|this into", category: "word-order", severity: "major", fix: "look into it", messageKo: "'look into(조사하다)'는 떼어 쓸 수 없는 구동사라서 목적어를 뒤에 둡니다: 'look into it'. 'look it into'라고 하지 않습니다." },
       { id: "for-let", pattern: "for =let|=tell", category: "verb-form", severity: "major", fix: "for letting", messageKo: "'Thanks for' 뒤에 동작이 오면 동사ing를 씁니다: 'Thanks for letting me know'.", skill: "prep-gerund" },
       { id: "thanks-to-let", pattern: "thanks|thank to =let|=tell|=inform", category: "preposition", severity: "major", fix: "thanks for letting", messageKo: "'알려 줘서 고마워요'는 'Thanks for + 동사ing'입니다: 'Thanks for letting me know'. 'thanks to'는 '~덕분에'라는 뜻이고 뒤에 동사원형을 쓰지 않습니다.", skill: "prep-gerund" },
@@ -126,10 +128,10 @@ export const TALK_TROUBLE: Question[] = [
     accepted: ["Thanks for your patience.", "Thank you for your understanding.", "Thank you for being so patient.", "Thanks for your understanding.", "Thank you for your patience, Mr. Tan."],
     meaning: [
       { id: "thanks", en: "thank you", ko: "감사합니다", any: ["thank|thanks", "appreciate"], critical: true },
-      { id: "patience", en: "your patience", ko: "기다려 주셔서", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ )?)\\b(?:patience|patient|patiently|understanding|waiting|wait|bearing|bear)\\b"], critical: true },
+      { id: "patience", en: "your patience", ko: "기다려 주셔서", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,2})\\b(?:patience|patient|patiently|understanding|waiting|wait|bearing|bear)\\b"], critical: true },
     ],
     pitfalls: [
-      { id: "your-patient", pattern: "your =patient", category: "word-choice", severity: "major", fix: "your patience", messageKo: "'patient'는 '참을성 있는'(형용사) 또는 '환자'(명사)입니다. '인내'는 명사 'patience'를 써서 'Thank you for your patience.'라고 합니다." },
+      { id: "your-patient", pattern: "your =patient|=patiently|=wait", category: "word-choice", severity: "major", fix: "your patience", messageKo: "'patient'는 '참을성 있는'(형용사) 또는 '환자'(명사)입니다. '인내'는 명사 'patience'를 써서 'Thank you for your patience.'라고 합니다." },
       { id: "for-your-waiting", pattern: "for your =waiting", category: "word-choice", severity: "minor", fix: "for waiting", messageKo: "'기다려 주셔서'는 'Thank you for waiting' 또는 'Thank you for your patience'라고 합니다. 'your waiting'은 어색합니다." },
       { id: "for-wait", pattern: "for =wait", category: "verb-form", severity: "major", fix: "for waiting", messageKo: "for는 전치사라서 뒤에 동사원형이 올 수 없습니다: 'Thank you for waiting'.", skill: "prep-gerund" },
       { id: "thanks-you", pattern: "re:\\bthanks you (?:for|so|very)\\b", category: "word-choice", severity: "major", fix: "thank you for", messageKo: "'Thanks'는 그 자체로 '고마워요'라서 you를 붙이지 않습니다: 'Thank you for …' 또는 'Thanks for …'라고 합니다." },
@@ -157,10 +159,10 @@ export const TALK_TROUBLE: Question[] = [
     promptKo: "펌프에서 물이 새고 있는 것 같아요.",
     segments: ["제 생각에", "펌프가", "새고 있어요"],
     reference: "I think the pump is leaking.",
-    accepted: ["I think there's a leak in the pump.", "I think the pump is leaking water.", "It looks like the pump is leaking.", "I think the feed pump is leaking.", "I think the pump has a leak."],
+    accepted: ["I think there's a leak in the pump.", "I think the pump is leaking water.", "It looks like the pump is leaking.", "I think the feed pump is leaking.", "I think the pump has a leak.", "Looks like the pump is leaking."],
     meaning: [
       { id: "pump", en: "the pump", ko: "펌프", any: ["pump"], critical: true },
-      { id: "leaking", en: "is leaking", ko: "새고 있다", any: ["leak|leaking|leaks"], critical: true },
+      { id: "leaking", en: "is leaking", ko: "새고 있다", any: ["re:(?<!\\bnot )(?<!\\bnot really )\\b(?:leak|leaking|leaks|leaked|leakage)\\b"], critical: true },
       { id: "think", en: "I think", ko: "~인 것 같아요", any: ["think|looks|seems|maybe|probably"] },
     ],
     pitfalls: [
@@ -352,6 +354,7 @@ export const TALK_TROUBLE: Question[] = [
       { id: "end-of-day", en: "by the end of the day", ko: "오늘 중으로", any: ["end ... day|today", "today|tonight"], critical: true },
     ],
     pitfalls: [
+      { id: "until-today", pattern: "until|till today|tonight", category: "preposition", severity: "major", fix: "by the end of today", messageKo: "'오늘 중으로(마감)'는 'by the end of the day' 또는 'later today'입니다. until은 '그때까지 계속'이라는 뜻이라 맞지 않습니다." },
       { id: "until-end", pattern: "until|till the? end", category: "preposition", severity: "major", fix: "by the end", messageKo: "'오늘 중으로(마감)'는 'by the end of the day'입니다. 'until the end of the day'는 '하루가 끝날 때까지 계속'이라는 뜻이 됩니다.", skill: "time-clause" },
       { id: "back-you", pattern: "back =you", category: "preposition", severity: "major", fix: "back to you", messageKo: "'~에게 다시 연락하다'는 'get back to + 사람'입니다. to를 빼고 'get back you'라고 하지 않습니다." },
       { id: "in-the-end-of", pattern: "in the end of", category: "preposition", severity: "major", fix: "by the end of", messageKo: "'오늘 중으로'는 마감을 뜻하는 'by the end of the day'입니다. 'in the end'는 '결국'이라는 뜻입니다.", skill: "time-clause" },
@@ -393,9 +396,10 @@ export const TALK_TROUBLE: Question[] = [
       { id: "few-days", en: "a few more days", ko: "며칠 더", any: ["few|couple|more|two|three ... day|days", "days"], critical: true },
     ],
     pitfalls: [
-      { id: "few-no-a", pattern: "re:(?<!\\b(?:a|very|quite) )\\bfew(?= (?:more )?days?\\b)", category: "article", severity: "major", fix: "a few", messageKo: "a 없이 'few days'라고 하면 '며칠 안 되는(거의 없는)'이라는 뜻이 됩니다. '며칠 더'는 'a few more days'처럼 a를 붙입니다." },
+      { id: "few-no-a", pattern: "re:(?<!\\b(?:a|very|quite|another|the|these|those|next|last|first) )\\bfew(?= (?:more )?days?\\b)", category: "article", severity: "major", fix: "a few", messageKo: "a 없이 'few days'라고 하면 '며칠 안 되는(거의 없는)'이라는 뜻이 됩니다. '며칠 더'는 'a few more days'처럼 a를 붙입니다." },
       { id: "bear-us", pattern: "bear =us|=me", category: "preposition", severity: "major", fix: "bear with us", messageKo: "'참고 기다려 주다'는 구동사 'bear with + 사람'입니다. with를 빼고 'bear us'라고 하면 '우리를 견디다'처럼 엉뚱한 뜻이 됩니다." },
       { id: "please-bearing", pattern: "please =bearing", category: "verb-form", severity: "major", fix: "please bear", messageKo: "please 뒤에는 동사원형을 씁니다: 'Please bear with us.'" },
+      { id: "doing-best-no-our", pattern: "re:\\bdoing best\\b", category: "word-choice", severity: "major", fix: "doing our best", messageKo: "'최선을 다하다'는 소유격을 넣어 'do our best'라고 합니다: 'We're doing our best.'" },
       { id: "we-do-best", pattern: "we =do our best", category: "tense", severity: "major", fix: "we are doing our best", messageKo: "지금 애쓰고 있는 상황은 현재진행형 'We're doing our best'로 말합니다. 'We do our best'는 '평소에 늘 최선을 다한다'는 뜻입니다.", skill: "progressive" },
     ],
     hints: { pattern: "We're doing our best. Please bear with + 사람 + for + 기간.", skeleton: "We're doing our best. Please ____ ____ us for a few more days.", partial: "We're doing our best. Please bear…" },
@@ -691,6 +695,7 @@ export const TALK_TROUBLE: Question[] = [
       "Unfortunately, the report won't be ready until Thursday, because the lab data came in late.",
       "I'm afraid the report won't be ready before Thursday, because the lab data came in late.",
       "I'm afraid the report won't be ready until Thursday. The lab data came in late.",
+      "I'm afraid the report will only be ready on Thursday, because the lab data came in late.",
     ],
     meaning: [
       { id: "afraid", en: "I'm afraid", ko: "죄송하지만", any: ["afraid|unfortunately|sorry"], critical: true },
@@ -791,6 +796,7 @@ export const TALK_TROUBLE: Question[] = [
     ],
     pitfalls: [
       { id: "delivery-delayed-active", pattern: "delivery|motor =delayed|=delays", category: "verb-form", severity: "major", fix: "delivery has been delayed", messageKo: "납품은 '지연되는' 쪽이므로 수동태 'has been delayed'를 씁니다. 'The motor delivery delayed'는 납품이 무언가를 지연시켰다는 뜻이 됩니다." },
+      { id: "move-until", pattern: "re:\\b(?:move|moving|moved|push|pushing) (?:the )?(?:start-up|startup|commissioning)(?: back)? (?:until|till)\\b", category: "preposition", severity: "major", fix: "move the start-up to", messageKo: "일정을 '~로 옮기다'는 'move A to + 시점'입니다. until은 '~까지 계속'이라는 뜻이라 move와 함께 쓰지 않습니다." },
       { id: "because-a-problem", pattern: "because a|the problem", category: "preposition", severity: "major", fix: "because of a problem", messageKo: "because 뒤에 명사만 올 때는 'because of + 명사'입니다: 'because of a problem at the vendor's factory'.", skill: "cause-effect" },
     ],
     hints: { pattern: "주어 + has been delayed by + 기간 + because of + 명사. Could we + move A to B?", skeleton: "Unfortunately, the motor delivery ___ ____ _______ by two weeks because __ a problem at the vendor's factory. …", partial: "Unfortunately, the motor delivery has been delayed by two weeks…" },
@@ -826,7 +832,7 @@ export const TALK_TROUBLE: Question[] = [
     ],
     meaning: [
       { id: "sorry", en: "I'm really sorry", ko: "정말 죄송합니다", any: ["sorry|apologize|apologise|apologies"], critical: true },
-      { id: "send-valves", en: "we'll send three new valves", ko: "새 밸브 세 개를 보내다", any: ["send|ship|deliver|dispatch ... valve|valves|replacement|replacements"], critical: true },
+      { id: "send-valves", en: "we'll send three new valves", ko: "새 밸브 세 개를 보내다", any: ["send|ship|deliver|dispatch|express|courier ... valve|valves|replacement|replacements"], critical: true },
       { id: "express", en: "by express", ko: "특송으로", any: ["express|courier|air|urgent|fast|quickly"] },
       { id: "this-week", en: "this week", ko: "이번 주에", any: ["this week", "week"], critical: true },
       { id: "dont-have-to", en: "you don't have to wait", ko: "기다릴 필요가 없다", any: ["not ... have|need ... to ... wait", "not ... wait", "no need"], critical: true },
@@ -868,6 +874,7 @@ export const TALK_TROUBLE: Question[] = [
       "Yes, we found the cause. The temperature sensor was installed in the wrong place, so it showed a reading that was too high. We've moved it, and the dryer has been running normally since yesterday.",
       "Yes, we've found the cause. The temperature sensor was installed in the wrong place, so its reading was too high. We've moved it, and the dryer has been running normally since yesterday.",
       "Yes, we've found the cause. The temperature sensor was installed in the wrong place, so it showed a reading that was too high. We've relocated it, and the dryer has been working normally since yesterday.",
+      "Yes, we found the cause. The temperature sensor had been installed in the wrong place, so it showed a reading that was too high. We've moved it, and the dryer has been running normally since yesterday.",
     ],
     meaning: [
       { id: "found-cause", en: "we've found the cause", ko: "원인을 찾았다", any: ["find|found ... cause|reason|problem", "cause"], critical: true },
@@ -916,7 +923,7 @@ export const TALK_TROUBLE: Question[] = [
     meaning: [
       { id: "should-have", en: "we should have checked", ko: "확인했어야 했다", any: ["should ... have ... check|checked|measure|measured|test|tested"], critical: true },
       { id: "moisture", en: "the feed moisture", ko: "원료 수분", any: ["moisture|water"], term: true, critical: true },
-      { id: "if-had", en: "if we had done that", ko: "그랬더라면", any: ["if ... had"], critical: true },
+      { id: "if-had", en: "if we had done that", ko: "그랬더라면", any: ["if ... had", "then|otherwise ... would ... have", "if ... =done|so"], critical: true },
       { id: "would-have", en: "we would have found it earlier", ko: "더 일찍 발견했을 것이다", any: ["would|could ... have ... found|noticed|seen|caught|known|detected", "earlier"], critical: true },
       { id: "every-morning", en: "we'll check it every morning", ko: "매일 아침 확인하겠다", any: ["every|each ... morning|day", "daily"], critical: true },
     ],

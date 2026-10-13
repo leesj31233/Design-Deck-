@@ -25,7 +25,7 @@ export const TALK_PHONE: Question[] = [
       { id: "i-am-minsu", pattern: "i am minsu", category: "word-choice", severity: "major", fix: "this is Minsu", messageKo: "전화에서 자기를 밝힐 때는 'I am Minsu'가 아니라 'This is Minsu (speaking).'라고 합니다. 'I am ~'은 얼굴을 보고 처음 자기소개할 때 씁니다." },
       { id: "i-am-speaking", pattern: "re:\\bi am speaking$", category: "word-choice", severity: "major", fix: "this is Minsu speaking", messageKo: "'I'm speaking.'은 '저 지금 말하는 중이에요'라는 뜻입니다. 전화를 받은 사람이 본인이면 'Speaking.' 또는 'This is Minsu speaking.'이라고 합니다." },
       { id: "minsu-is-speaking", pattern: "minsu =is speaking", category: "sentence-structure", severity: "major", fix: "Minsu speaking", messageKo: "전화 표현은 'This is Minsu speaking.' 또는 'Minsu speaking.'입니다. 'This is Minsu is speaking'처럼 is를 두 번 쓰지 않습니다." },
-      { id: "minsu-not-here", pattern: "re:\\bminsu is not\\b", category: "meaning-shift", severity: "critical", fix: "this is Minsu", messageKo: "'Minsu is not here.'는 '민수 씨는 없어요'라는 반대 뜻입니다. 본인이 받았을 때는 'This is Minsu.' 또는 'Speaking.'이라고 합니다." },
+      { id: "minsu-not-here", pattern: "re:\\bminsu is (?:not|out|away|off|busy)\\b", category: "meaning-shift", severity: "critical", fix: "this is Minsu", messageKo: "'Minsu is not here.'는 '민수 씨는 없어요'라는 반대 뜻입니다. 본인이 받았을 때는 'This is Minsu.' 또는 'Speaking.'이라고 합니다." },
       { id: "here-is-minsu", pattern: "here is? minsu", category: "word-choice", severity: "major", fix: "this is Minsu", messageKo: "'Here is Minsu'는 영어 전화 표현이 아닙니다. 전화를 받은 사람이 본인이면 'This is Minsu.' 또는 'Speaking.'이라고 합니다." },
     ],
     hints: { pattern: "This is + 이름 (+ speaking)", skeleton: "Yes, ____ __ Minsu speaking.", partial: "Yes, this is…" },
@@ -53,10 +53,11 @@ export const TALK_PHONE: Question[] = [
     segments: ["~해도 될까요", "제가 묻다", "누가 전화하고 있는지"],
     reference: "May I ask who's calling?",
     accepted: ["Who's calling, please?", "May I ask who is calling?", "Can I ask who's calling?", "Could I ask who's calling, please?", "Sure, may I ask who's calling?"],
-    meaning: [{ id: "who-calling", en: "who's calling", ko: "누구신지", any: ["who ... calling", "who ... speaking", "your name"], critical: true }],
+    meaning: [{ id: "who-calling", en: "who's calling", ko: "누구신지", any: ["who ... calling", "who ... speaking", "your name", "who is this|it", "who this|it is", "who ... line"], critical: true }],
     pitfalls: [
       { id: "who-are-you", pattern: "who are you", category: "word-choice", severity: "major", fix: "may I ask who's calling", messageKo: "'Who are you?'는 '당신 누구예요?'처럼 따지는 말로 들려 무례합니다. 전화에서는 'May I ask who's calling?' 또는 'Who's calling, please?'라고 묻습니다." },
       { id: "not-need-know", pattern: "re:\\b(do|does) not (need|want) to know\\b", category: "meaning-shift", severity: "major", fix: "may I ask", messageKo: "'알 필요 없다'는 반대 뜻이 됩니다. 누구인지 정중하게 물을 때는 'May I ask who's calling?'이라고 합니다." },
+      { id: "calling-you", pattern: "re:\\bwho is calling you\\b", category: "meaning-shift", severity: "major", fix: "who's calling", messageKo: "'Who is calling you?'는 '누가 당신에게 전화하나요?'라는 뜻입니다. 전화 건 사람이 누구인지 물을 때는 'Who's calling, please?'라고 합니다." },
       { id: "who-is-it-calling", pattern: "who is it calling", category: "sentence-structure", severity: "major", fix: "who's calling", messageKo: "'누구세요?'는 'Who's calling?'입니다. 'Who is it calling?'은 '그것이 누구에게 전화하나요?'라는 뜻이 됩니다." },
       { id: "who-is-speak", pattern: "re:(?<=\\bwho is )speak\\b", category: "verb-form", severity: "major", fix: "speaking", messageKo: "be동사 뒤에는 동사원형이 올 수 없습니다: 'Who's speaking?' / 'Who's calling?'" },
     ],
@@ -85,8 +86,8 @@ export const TALK_PHONE: Question[] = [
     promptKo: "죄송한데, 소리가 끊겨요.",
     segments: ["죄송한데,", "당신(의 소리)이", "끊기고 있어요"],
     reference: "Sorry, you're breaking up.",
-    accepted: ["Sorry, you're breaking up a bit.", "Sorry, I think you're breaking up.", "Sorry, you're cutting out.", "Sorry, the line is breaking up.", "Sorry, you're breaking up a little."],
-    meaning: [{ id: "breaking-up", en: "breaking up / cutting out", ko: "소리가 끊기다", any: ["break|breaking ... up", "cut|cutting ... out", "bad|poor|weak ... line|connection|signal|reception"], critical: true }],
+    accepted: ["Sorry, you're breaking up a bit.", "Sorry, I think you're breaking up.", "Sorry, you're cutting out.", "Sorry, the line is breaking up.", "Sorry, you're breaking up a little.", "Sorry, you're cutting in and out."],
+    meaning: [{ id: "breaking-up", en: "breaking up / cutting out", ko: "소리가 끊기다", any: ["break|breaking ... up", "cut|cutting ... out", "bad|poor|weak ... line|connection|signal|reception", "re:\\b(line|connection|signal|reception|sound|audio)\\b( \\w+){0,3} (?<!\\bnot )(?<!\\bnot really )(?<!\\bnot that )(bad|poor|weak|terrible|choppy|unstable)\\b"], critical: true }],
     pitfalls: [
       { id: "voice-broken", pattern: "voice|sound is =broken|=cut", category: "word-choice", severity: "major", fix: "you are breaking up", messageKo: "'Your voice is broken'은 '목소리가 망가졌다(쉬었다)'는 뜻처럼 들립니다. 통화 중 소리가 끊길 때는 'You're breaking up.' 또는 'You're cutting out.'이라고 합니다." },
       { id: "you-broken", pattern: "you are =broken", category: "word-choice", severity: "major", fix: "you are breaking up", messageKo: "'You are broken'은 '당신이 고장 났다'는 뜻이 됩니다. 소리가 끊길 때는 진행형으로 'You're breaking up.'이라고 합니다." },
@@ -116,8 +117,8 @@ export const TALK_PHONE: Question[] = [
     reference: "Sorry, can I call you back in ten minutes?",
     accepted: ["Sorry, could I call you back in ten minutes?", "Sorry, can I call you back in 10 minutes?", "Sorry, can I call you back in about ten minutes?", "Sorry, I'll call you back in ten minutes.", "Sorry, let me call you back in ten minutes."],
     meaning: [
-      { id: "call-back", en: "call you back", ko: "다시 전화하다", any: ["call ... back", "call ... again|later", "give ... call", "ring ... back"], critical: true },
-      { id: "ten-min", en: "in ten minutes", ko: "10분 후에", any: ["ten|10 ... minute|minutes"], critical: true },
+      { id: "call-back", en: "call you back", ko: "다시 전화하다", any: ["call ... back", "call ... again|later", "give ... call", "ring ... back", "get back", "talk|speak|chat ... again|later"], critical: true },
+      { id: "ten-min", en: "in ten minutes", ko: "10분 후에", any: ["ten|10 ... minute|minutes|=min|=mins"], critical: true },
     ],
     pitfalls: [
       { id: "call-back-you", pattern: "call back you", category: "word-order", severity: "major", fix: "call you back", messageKo: "'call back'의 목적어가 대명사(you)일 때는 'call you back'처럼 call과 back 사이에 넣습니다. 'call back you'라고 하지 않습니다." },
@@ -153,7 +154,7 @@ export const TALK_PHONE: Question[] = [
     accepted: ["I'll send you the address.", "Let me text you the address.", "I'll text the address to you.", "I'll message you the address.", "I'll send you the address by text."],
     meaning: [
       { id: "text", en: "text / send", ko: "문자로 보내다", any: ["text|message|send|=sent|whatsapp|kakao"], critical: true },
-      { id: "address", en: "the address", ko: "주소", any: ["address|location"], critical: true },
+      { id: "address", en: "the address", ko: "주소", any: ["address|location", "where ... is"], critical: true },
     ],
     pitfalls: [
       { id: "text-to-you-the", pattern: "text|send|message to you the", category: "word-order", severity: "major", fix: "text you the", messageKo: "'~에게 …을 보내다'는 'text + 사람 + 물건'(text you the address) 또는 'text + 물건 + to + 사람'(text the address to you)입니다. 'text to you the address'라고 하지 않습니다." },
@@ -304,12 +305,12 @@ export const TALK_PHONE: Question[] = [
     ],
     meaning: [
       { id: "minsu", en: "this is Minsu", ko: "민수입니다", any: ["minsu"] },
-      { id: "calling", en: "I'm calling", ko: "전화드렸어요", any: ["call|calling|=ring|=ringing", "talk|speak ... about", "question|questions ... about"], critical: true },
+      { id: "calling", en: "I'm calling", ko: "전화드렸어요", any: ["call|calling|=ring|=ringing|=phoning|=phone", "talk|speak ... about", "question|questions ... about"], critical: true },
       { id: "about", en: "about", ko: "~ 건으로", any: ["about|regarding|concerning|re"] },
-      { id: "quotation", en: "the pump quotation", ko: "펌프 견적서", any: ["quotation|quote|offer|price|proposal"], critical: true },
+      { id: "quotation", en: "the pump quotation", ko: "펌프 견적서", any: ["re:(?<!\\bnot )(?<!\\bnot the )(?<!\\bnot your )(?<!\\bnot the pump )(?<!\\bnot your pump )\\b(quotation|quote|offer|price|proposal)s?\\b"], critical: true },
     ],
     pitfalls: [
-      { id: "i-call-about", pattern: "i =call about|regarding|for", category: "tense", severity: "major", fix: "I'm calling about", messageKo: "지금 전화한 용건은 현재진행형 'I'm calling about ~'으로 말합니다. 'I call about'은 '평소에 ~ 일로 전화한다'는 뜻이 됩니다.", skill: "progressive" },
+      { id: "i-call-about", pattern: "re:\\bi call (?:you )?(?:about|regarding|for)\\b", category: "tense", severity: "major", fix: "I'm calling about", messageKo: "지금 전화한 용건은 현재진행형 'I'm calling about ~'으로 말합니다. 'I call about'은 '평소에 ~ 일로 전화한다'는 뜻이 됩니다.", skill: "progressive" },
       { id: "calling-the-quotation", pattern: "calling|call the|your pump? quotation|quote", category: "preposition", severity: "major", fix: "calling about the pump quotation", messageKo: "'~ 건으로 전화하다'는 'call about + 명사'입니다. 'calling the quotation'은 '견적서에게 전화한다'는 뜻이 됩니다.", skill: "verb-prep" },
       { id: "i-am-minsu", pattern: "i am minsu", category: "word-choice", severity: "major", fix: "this is Minsu", messageKo: "전화에서 자기를 밝힐 때는 'I am Minsu'가 아니라 'This is Minsu.' 또는 'It's Minsu.'라고 합니다." },
       { id: "quotation-what", pattern: "re:(?<=\\b(quotation|quote) )what(?= (you|we|they|she|he)\\b)", category: "word-choice", severity: "major", fix: "that", messageKo: "명사를 뒤에서 꾸밀 때는 what이 아니라 that(또는 생략)을 씁니다: 'the quotation (that) you sent'." },
@@ -348,11 +349,13 @@ export const TALK_PHONE: Question[] = [
     ],
     meaning: [
       { id: "could-you", en: "could you", ko: "~해 주시겠어요", any: ["could|can|would you", "please"], critical: true },
-      { id: "ask-him", en: "ask him", ko: "그에게 부탁하다", any: ["ask|tell|have|get ... him|budi"], critical: true },
-      { id: "call-back", en: "to call me back", ko: "다시 전화하다", any: ["call ... back", "call ... me", "contact|ring ... me", "return ... call", "give ... call"], critical: true },
+      { id: "ask-him", en: "ask him", ko: "그에게 부탁하다", any: ["re:(?<!\\bnot )(?<!\\bnot please )\\b(ask|asking|asked|tell|telling|have|having|get|getting)( \\w+){0,2} (him|budi)\\b", "re:(?<!\\bnot )\\blet (him|budi) know\\b"], critical: true },
+      { id: "call-back", en: "to call me back", ko: "다시 전화하다", any: ["call ... back", "call ... me", "contact|ring ... me", "return ... call", "give ... call", "get back ... me", "get in touch"], critical: true },
     ],
     pitfalls: [
       { id: "ask-him-call", pattern: "ask|tell him|budi =call", category: "verb-form", severity: "major", fix: "ask him to call", messageKo: "'~에게 ~해 달라고 부탁하다'는 'ask + 사람 + to + 동사원형'입니다: 'ask him to call me back'. to를 빼지 않습니다." },
+      { id: "call-back-to-me", pattern: "call back to me", category: "word-order", severity: "major", fix: "call me back", messageKo: "'다시 전화하다'는 'call me back'입니다. to 없이 대명사를 call과 back 사이에 넣습니다." },
+      { id: "him-calling", pattern: "re:\\b(?:ask|tell) (?:him|budi) calling\\b", category: "verb-form", severity: "major", fix: "ask him to call", messageKo: "'~에게 …해 달라고 부탁하다'는 'ask/tell + 사람 + to + 동사원형'입니다: 'ask him to call me back'." },
       { id: "call-back-me", pattern: "call back me", category: "word-order", severity: "major", fix: "call me back", messageKo: "'call back'의 목적어가 대명사(me)일 때는 'call me back'처럼 call과 back 사이에 넣습니다." },
       { id: "say-him", pattern: "say him|budi", category: "word-choice", severity: "major", fix: "tell him", messageKo: "'say'는 사람을 바로 목적어로 받지 않습니다. '그에게 전해 주세요'는 'tell him' 또는 'ask him'이라고 합니다." },
     ],
@@ -386,10 +389,11 @@ export const TALK_PHONE: Question[] = [
       "Sorry, you have the wrong number. There's no Hoang here.",
       "I'm sorry, I think you've dialed the wrong number. There's no Hoang here.",
       "Sorry, I'm afraid you have the wrong number. There's no Hoang here.",
+      "Sorry, I think it's the wrong number. There's no Hoang here.",
     ],
     meaning: [
       { id: "wrong-number", en: "the wrong number", ko: "잘못된 번호", any: ["wrong ... number", "wrong person"], critical: true },
-      { id: "no-hoang", en: "there's no Hoang here", ko: "호앙이라는 사람이 없다", any: ["no|nobody|not|=isn't ... hoang", "hoang ... not"] },
+      { id: "no-hoang", en: "there's no Hoang here", ko: "호앙이라는 사람이 없다", any: ["no|nobody|not|=isn't ... hoang", "hoang ... not", "no|nobody|=noone ... that|this name", "no|nobody|=noone ... named|called|by"] },
     ],
     pitfalls: [
       { id: "you-are-wrong-number", pattern: "you are the|a? wrong", category: "sentence-structure", severity: "major", fix: "you have the wrong", messageKo: "'You are wrong number'는 '당신이 틀린 번호다'라는 뜻이 됩니다. 'You have the wrong number' 또는 'You've got the wrong number'라고 합니다." },
@@ -434,6 +438,7 @@ export const TALK_PHONE: Question[] = [
       "Hi Budi, sorry for missing your call. I was driving, so I couldn't pick up.",
       "Hi Budi, sorry I missed your call. I couldn't pick up because I was driving.",
       "Hi Budi, sorry I missed your call earlier. I was driving, so I couldn't take it.",
+      "Hi Budi, sorry I missed your call. I was driving and couldn't pick up.",
     ],
     meaning: [
       { id: "sorry", en: "sorry", ko: "죄송해요", any: ["sorry", "apologize|apologise"], critical: true },
@@ -485,7 +490,7 @@ export const TALK_PHONE: Question[] = [
       { id: "not-yet", en: "not yet", ko: "아직이요", any: ["yet", "still"] },
       { id: "taxi", en: "in the taxi", ko: "택시 안", any: ["taxi|cab|car|grab|uber"] },
       { id: "text", en: "I'll text you", ko: "메시지 보낼게요", any: ["text|message|call|send", "let ... know"], critical: true },
-      { id: "as-soon-as", en: "as soon as", ko: "~하자마자", any: ["as soon as", "when|once", "right after"], critical: true },
+      { id: "as-soon-as", en: "as soon as", ko: "~하자마자", any: ["as soon as", "when|once", "right after", "the moment|minute|second", "right|straight away"], critical: true },
       { id: "hotel", en: "get to the hotel", ko: "호텔에 도착하다", any: ["get|arrive|reach|=got ... hotel", "hotel", "arrive|there", "check in"], critical: true },
     ],
     pitfalls: [
@@ -579,7 +584,7 @@ export const TALK_PHONE: Question[] = [
       { id: "no-worries", en: "no worries", ko: "괜찮아요", any: ["worry|worries|problem", "okay|ok|fine"] },
       { id: "trying", en: "I've been trying to reach you", ko: "계속 연락하려고 했다", any: ["try|tried|trying ... reach|call|contact|get", "been calling|ringing|phoning|texting|messaging"], critical: true },
       { id: "since-morning", en: "since this morning", ko: "아침부터", any: ["morning"], critical: true },
-      { id: "minute", en: "do you have a minute?", ko: "잠깐 시간 있나요?", any: ["minute|minutes|moment|second|time", "free|available"], critical: true },
+      { id: "minute", en: "do you have a minute?", ko: "잠깐 시간 있나요?", any: ["minute|minutes|moment|second|seconds|sec|secs|time", "free|available", "talk|speak|chat ... now"], critical: true },
     ],
     pitfalls: [
       { id: "from-morning", pattern: "from this? morning", category: "preposition", severity: "major", fix: "since this morning", messageKo: "'아침부터 (지금까지)'처럼 지금까지 이어지는 일의 시작점은 since를 씁니다. 현재완료와 함께 'from this morning'이라고 하지 않습니다." },
@@ -624,7 +629,7 @@ export const TALK_PHONE: Question[] = [
     meaning: [
       { id: "how-about", en: "how about …?", ko: "~어때요?", any: ["how|what about", "would|could|can ... thursday", "shall we"] },
       { id: "thursday", en: "Thursday afternoon", ko: "목요일 오후", any: ["thursday"], critical: true },
-      { id: "if-not", en: "if that doesn't work", ko: "그때가 안 되면", any: ["if ... not|=isn't|difficult|busy", "otherwise"], critical: true },
+      { id: "if-not", en: "if that doesn't work", ko: "그때가 안 되면", any: ["if ... not|=isn't|difficult|busy|no|bad", "otherwise", "if ... can not"], critical: true },
       { id: "friday", en: "Friday morning", ko: "금요일 오전", any: ["friday"], critical: true },
       { id: "fine", en: "is also fine", ko: "괜찮아요", any: ["fine|okay|ok|good|work|works|possible|available|do"] },
     ],
@@ -670,7 +675,7 @@ export const TALK_PHONE: Question[] = [
     meaning: [
       { id: "minsu", en: "it's Minsu", ko: "민수입니다", any: ["minsu"] },
       { id: "check", en: "calling to check if", ko: "확인하려고", any: ["check|see|confirm|ask|know|find", "wonder|wondering", "re:\\b(have|has) (the |your |our )?(pumps?|they|it|order) (already |yet |now )?(been )?(shipped|sent|dispatched|delivered|left)\\b"], critical: true },
-      { id: "shipped", en: "have been shipped", ko: "출고되었다", any: ["ship|shipped|dispatch|dispatched|sent|send|deliver|delivered"], critical: true },
+      { id: "shipped", en: "have been shipped", ko: "출고되었다", any: ["ship|shipped|dispatch|dispatched|sent|send|deliver|delivered", "=gone|=went out", "=left"], critical: true },
       { id: "pumps", en: "the pumps", ko: "펌프", any: ["pump|pumps"], term: true },
       { id: "call-back", en: "please call me back", ko: "다시 전화해 주세요", any: ["call ... back", "call ... me", "get back", "contact me", "give ... call"], critical: true },
       { id: "when-get", en: "when you get this", ko: "메시지를 받으면", any: ["when|once|after ... get|hear|receive|listen", "as soon as", "chance"] },
@@ -953,7 +958,7 @@ export const TALK_PHONE: Question[] = [
       { id: "checked-most", en: "we've checked most of them", ko: "대부분 검토했다", any: ["check|checked|review|reviewed|go|gone|went|look|looked ... most", "most"], critical: true },
       { id: "two-points", en: "two points to discuss", ko: "논의할 두 가지", any: ["two|2 ... point|points|issue|issues|item|items|question|questions|thing|things"], critical: true },
       { id: "before-revise", en: "before we revise the design", ko: "설계를 수정하기 전에", any: ["before ... revise|revising|change|changing|update|updating|modify|modifying|finalize|finalizing"], critical: true },
-      { id: "call-back", en: "could you call me back", ko: "다시 전화해 주시겠어요", any: ["call ... back", "call ... me", "get back"], critical: true },
+      { id: "call-back", en: "could you call me back", ko: "다시 전화해 주시겠어요", any: ["call ... back", "call ... me", "get back", "give ... call|ring", "get in touch|contact", "ring ... me"], critical: true },
     ],
     pitfalls: [
       { id: "almost-of", pattern: "almost of|=all", category: "word-choice", severity: "major", fix: "most of", messageKo: "'대부분'은 'most of them'입니다. almost는 부사라서 'almost of them'이라고 하지 않습니다." },
@@ -997,10 +1002,10 @@ export const TALK_PHONE: Question[] = [
       { id: "happy", en: "I'm happy to discuss it now", ko: "지금 이야기하는 건 좋다", any: ["happy|glad|fine|okay|ok", "sure"] },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
       { id: "worried", en: "I'm a bit worried", ko: "조금 걱정된다", any: ["worried|worry|concerned|afraid", "not sure"], critical: true },
-      { id: "miss-details", en: "we might miss some details", ko: "세부 사항을 놓칠 수도 있다", any: ["miss|lose|forget ... detail|details|something|number|numbers", "mistake|mistakes|error|errors"], critical: true },
+      { id: "miss-details", en: "we might miss some details", ko: "세부 사항을 놓칠 수도 있다", any: ["miss|lose|forget ... detail|details|something|number|numbers", "mistake|mistakes|error|errors", "detail|details|something|number|numbers ... =lost|missed|=missing"], critical: true },
       { id: "numbers", en: "a lot of numbers", ko: "숫자가 많다", any: ["number|numbers|figures|data"] },
       { id: "summary", en: "send you a short summary", ko: "요약을 보내다", any: ["summary|summarize|summarise|recap|minutes", "email|mail ... you"], critical: true },
-      { id: "would-you-mind", en: "would you mind if I …?", ko: "~해도 될까요?", any: ["would you mind", "would|is it ... okay|ok|alright|fine", "could|can|may i", "let me"], critical: true },
+      { id: "would-you-mind", en: "would you mind if I …?", ko: "~해도 될까요?", any: ["would|do you mind", "would|is it ... okay|ok|alright|fine", "could|can|may i", "let me"], critical: true },
       { id: "same-numbers", en: "we'll both have the same numbers", ko: "같은 숫자를 갖게 된다", any: ["same", "both", "agree|aligned|confirm"] },
     ],
     pitfalls: [

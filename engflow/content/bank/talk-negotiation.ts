@@ -21,11 +21,12 @@ export const TALK_NEGOTIATION: Question[] = [
     reference: "What's your best price?",
     accepted: ["What's the best price you can offer?", "What's your best price for the decanter?", "What's the best price you can give us?", "What's your best offer?"],
     meaning: [
-      { id: "best-price", en: "your best price", ko: "최대한 낮춘 가격", any: ["best|lowest|final|bottom ... price|offer|deal"], critical: true },
-      { id: "what", en: "what's", ko: "얼마예요", any: ["what", "tell|know"] },
+      { id: "best-price", en: "your best price", ko: "최대한 낮춘 가격", any: ["best|lowest|final|bottom ... price|offer|deal", "how low", "best ... you ... do|offer|give", "lowest|best ... can|could ... go|do"], critical: true },
+      { id: "what", en: "what's", ko: "얼마예요", any: ["what", "tell|know|give", "is that|this|it", "how"] },
     ],
     pitfalls: [
       { id: "how-much-price", pattern: "how much ... price|offer", category: "word-choice", severity: "major", fix: "what's your best price", messageKo: "price는 이미 '금액'이라서 'How much is the price?'처럼 how much와 함께 쓰지 않습니다. 가격은 'What's your best price?'처럼 what으로 묻습니다." },
+      { id: "double-is", pattern: "re:\\bwhat is (?:your|the) (?:\\S+ ){0,3}(?:price|offer) is\\b", category: "sentence-structure", severity: "major", fix: "what's your best price", messageKo: "의문문에서는 be동사를 주어 앞으로 한 번만 씁니다: 'What's your best price?' 끝에 is를 다시 붙이지 않습니다." },
       { id: "you-best", pattern: "re:(?<=\\bwhat (?:is|are) )you(?= (?:best|lowest|final|last)\\b)", category: "word-choice", severity: "major", fix: "your", messageKo: "'당신의 (최대한의) 가격'은 소유격 your를 씁니다: 'What's your best price?'" },
     ],
     hints: { pattern: "What's + your best + price?", skeleton: "What's your ____ _____?", partial: "What's your best…" },
@@ -52,7 +53,7 @@ export const TALK_NEGOTIATION: Question[] = [
     segments: ["~할 수 있을까요", "우리가", "중간에서 타협하다"],
     reference: "Can we meet halfway?",
     accepted: ["Can we meet in the middle?", "How about meeting halfway?", "Why don't we meet halfway?", "Can we meet halfway on this?", "Shall we meet halfway?"],
-    meaning: [{ id: "meet-halfway", en: "meet halfway", ko: "중간에서 타협하다", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bmeet(?:ing|s)? (?:\\S+ ){0,2}?(?:halfway|half way|in the middle)\\b", "re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bsplit(?:ting)? (?:the )?difference\\b"], critical: true }],
+    meaning: [{ id: "meet-halfway", en: "meet halfway", ko: "중간에서 타협하다", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bmeet(?:ing|s)? (?:\\S+ ){0,2}?(?:halfway|half way|in the middle)\\b", "re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\bsplit(?:ting)? (?:the )?difference\\b", "re:(?<!\\bnot )(?<!\\bnot to )\\b(middle ground|compromise)\\b"], critical: true }],
     pitfalls: [
       { id: "meet-in-half", pattern: "meet in the? half", category: "word-choice", severity: "major", fix: "meet halfway", messageKo: "'중간에서 타협하다'는 'meet halfway' 또는 'meet in the middle'입니다. 한국어 '반반'을 옮긴 'meet in half'는 영어에서 쓰지 않습니다." },
       { id: "modal-meeting", pattern: "re:(?<=\\b(?:can|could|shall|should|not|would|will) we )meeting\\b", category: "verb-form", severity: "major", fix: "meet", messageKo: "can/could/shall 같은 조동사 뒤에는 동사원형이 옵니다: 'Can we meet halfway?'" },
@@ -84,8 +85,8 @@ export const TALK_NEGOTIATION: Question[] = [
     reference: "Hmm, the price is a bit too high for us.",
     accepted: ["The price is a bit too high for us.", "Hmm, that's a bit too high for us.", "Hmm, the price is a little too high for us.", "Hmm, it's a bit too expensive for us.", "Hmm, that price is a bit too high for us."],
     meaning: [
-      { id: "too-high", en: "too high", ko: "너무 높다", any: ["too ... high|expensive|much"], critical: true },
-      { id: "bit", en: "a bit", ko: "조금", any: ["bit|little|slightly|rather"], weight: 0.5 },
+      { id: "too-high", en: "too high", ko: "너무 높다", any: ["re:(?<!\\bnot )\\btoo (\\w+ )?(high|expensive|much|pricey|steep|costly)\\b", "re:(?<!\\bnot )\\b(a bit|a little|slightly|rather|quite) (high|expensive|pricey|steep|costly)\\b", "re:(?<!\\bnot )\\b(over|above|beyond|exceeds?) (\\w+ ){0,2}budget\\b", "re:(?<!\\bnot )\\bmore than (we|i) can (pay|afford|spend)\\b"], critical: true },
+      { id: "bit", en: "a bit", ko: "조금", any: ["bit|little|slightly|rather|quite", "more than"], weight: 0.5 },
     ],
     pitfalls: [
       { id: "price-expensive", pattern: "price =is|=was ... expensive", category: "word-choice", severity: "major", fix: "price is a bit too high", messageKo: "price(가격)는 'high/low'로 말합니다. 'The price is expensive'는 어색하고, expensive는 물건에 씁니다(The tanks are expensive)." },
@@ -118,11 +119,12 @@ export const TALK_NEGOTIATION: Question[] = [
     reference: "Does the price include shipping?",
     accepted: ["Does that include shipping?", "Is shipping included in the price?", "Is shipping included?", "Does the price include delivery?", "Does that price include shipping?"],
     meaning: [
-      { id: "include", en: "include", ko: "포함하다", any: ["include", "cover"], critical: true },
+      { id: "include", en: "include", ko: "포함하다", any: ["re:(?<!\\bnot )\\b(include|includes|included|including|cover|covers|covered)\\b"], critical: true },
       { id: "shipping", en: "shipping", ko: "운송비", any: ["shipping|delivery|transport|transportation|freight"], critical: true },
     ],
     pitfalls: [
-      { id: "is-include", pattern: "=is|=are the? price|that|it|this =include|=including", category: "verb-form", severity: "major", fix: "does the price include", messageKo: "include는 일반동사라서 의문문을 be동사가 아니라 does로 만듭니다: 'Does the price include …?'. be동사와 일반동사를 함께 쓰지 않습니다." },
+      { id: "is-include", pattern: "=is|=are the? price|that|it|this =include", category: "verb-form", severity: "major", fix: "does the price include", messageKo: "include는 일반동사라서 의문문을 be동사가 아니라 does로 만듭니다: 'Does the price include …?'. be동사와 일반동사를 함께 쓰지 않습니다." },
+      { id: "including-included", pattern: "re:\\bincluding (?:\\S+ ){0,3}included\\b", category: "sentence-structure", severity: "major", fix: "include", messageKo: "include를 두 번 쓰지 않습니다. 'Does the price include shipping?' 또는 'Is shipping included in the price?' 중 하나로 말합니다." },
       { id: "does-includes", pattern: "re:(?<=\\bdoes (the price|that|it|this|this price|that price) )includes\\b", category: "verb-form", severity: "major", fix: "include", messageKo: "does가 이미 3인칭 단수를 표시하므로 뒤의 동사는 원형입니다: 'Does the price include …?'" },
     ],
     hints: { pattern: "Does + 주어 + include + 명사?", skeleton: "____ the price _______ shipping?", partial: "Does the price…" },
@@ -153,6 +155,7 @@ export const TALK_NEGOTIATION: Question[] = [
     meaning: [{ id: "get-back", en: "get back to you", ko: "다시 연락드리다", any: ["get back", "come back to", "let ... know", "reply|respond|answer"], critical: true }],
     pitfalls: [
       { id: "let-me-to", pattern: "let me to", category: "verb-form", severity: "major", fix: "let me", messageKo: "'let me' 뒤에는 to 없이 동사원형이 옵니다: 'Let me get back to you.'" },
+      { id: "back-you", pattern: "get|come back =you", category: "preposition", severity: "major", fix: "get back to you", messageKo: "'다시 연락드리다'는 'get back to you'입니다. back 뒤에 to를 빼지 않습니다." },
       { id: "reply-you", pattern: "reply|respond =you", category: "preposition", severity: "major", fix: "get back to you", messageKo: "reply와 respond는 사람 앞에 to가 필요합니다(reply to you). 회의에서는 'I'll get back to you'가 더 자연스럽습니다." },
     ],
     hints: { pattern: "Let me + get back to + 사람 (+ on that)", skeleton: "Let me ___ ____ to you on that.", partial: "Let me get back…" },
@@ -183,12 +186,13 @@ export const TALK_NEGOTIATION: Question[] = [
     reference: "Hmm, that's a bit higher than we expected.",
     accepted: ["That's a bit higher than we expected.", "Hmm, that's a little higher than we expected.", "Hmm, that's slightly higher than we expected.", "Hmm, that's a bit more than we expected.", "Hmm, it's a bit higher than we expected."],
     meaning: [
-      { id: "higher", en: "higher", ko: "더 높다", any: ["higher|more"], critical: true },
-      { id: "than-expected", en: "than we expected", ko: "예상했던 것보다", any: ["than ... expect|expectation|expectations|thought|planned|budgeted"], critical: true },
+      { id: "higher", en: "higher", ko: "더 높다", any: ["higher|more", "above|over|beyond"], critical: true },
+      { id: "than-expected", en: "than we expected", ko: "예상했던 것보다", any: ["than ... expect|expectation|expectations|thought|planned|budgeted", "what ... expect|expected|expecting|thought|planned|budgeted"], critical: true },
       { id: "bit", en: "a bit", ko: "조금", any: ["bit|little|slightly|somewhat"], weight: 0.5 },
     ],
     pitfalls: [
       { id: "more-higher", pattern: "more higher", category: "word-choice", severity: "major", fix: "higher", messageKo: "higher는 이미 비교급이라 more를 함께 쓰지 않습니다: 'a bit higher than …'." },
+      { id: "than-our-expect", pattern: "than our =expect", category: "word-choice", severity: "major", fix: "than we expected", messageKo: "expect는 동사라서 'our expect'처럼 명사로 쓸 수 없습니다. 'than we expected' 또는 'than our expectations'라고 합니다." },
       { id: "than-expect", pattern: "than we =expect", category: "tense", severity: "major", fix: "than we expected", messageKo: "예상은 견적을 받기 전에 이미 한 일이므로 과거형 'than we expected'를 씁니다." },
     ],
     hints: { pattern: "That's a bit + 비교급 + than we expected.", skeleton: "Hmm, that's a bit ______ ____ we expected.", partial: "Hmm, that's a bit higher…" },
@@ -217,8 +221,8 @@ export const TALK_NEGOTIATION: Question[] = [
     reference: "Could you lower the price a little?",
     accepted: ["Could you lower the price a bit?", "Could you reduce the price a little?", "Can you lower the price a little?", "Could you bring the price down a little?", "Is there any way you could lower the price a little?"],
     meaning: [
-      { id: "could-you", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "please", "possible", "any way"] },
-      { id: "lower", en: "lower the price", ko: "가격을 낮추다", any: ["lower|reduce|cut|decrease ... price", "price ... down|lower|cheaper", "bring|knock ... down", "discount", "cheaper"], critical: true },
+      { id: "could-you", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "please", "possible", "any way|chance|room"] },
+      { id: "lower", en: "lower the price", ko: "가격을 낮추다", any: ["lower|reduce|cut|decrease ... price", "price ... down|lower|cheaper", "bring|knock ... down", "discount", "cheaper", "come|go ... down|lower", "knock|take ... off"], critical: true },
     ],
     pitfalls: [
       { id: "down-the-price", pattern: "re:(?<!\\b(bring|come|go|get|knock|push|cut) )\\bdown (the|your|this) price", category: "word-choice", severity: "major", fix: "lower the price", messageKo: "'가격을 다운하다'를 옮긴 'down the price'는 영어에서 쓰지 않습니다. 'lower the price' 또는 'bring the price down'이라고 합니다." },
@@ -249,10 +253,10 @@ export const TALK_NEGOTIATION: Question[] = [
     promptKo: "좋아요, 그럼 합의된 것 같네요.",
     segments: ["좋아요,", "제 생각엔", "우리는 ~가 됐네요", "합의"],
     reference: "Great, I think we have a deal.",
-    accepted: ["Great, we have a deal.", "Great, it's a deal.", "Okay, I think we have a deal.", "Great, I think we've got a deal.", "Sounds good. I think we have a deal."],
-    meaning: [{ id: "deal", en: "we have a deal", ko: "합의가 됐다", any: ["deal", "agreement", "agree|agreed"], critical: true }],
+    accepted: ["Great, we have a deal.", "Great, it's a deal.", "Okay, I think we have a deal.", "Great, I think we've got a deal.", "Sounds good. I think we have a deal.", "Great, I think that's a deal."],
+    meaning: [{ id: "deal", en: "we have a deal", ko: "합의가 됐다", any: ["re:(?<!\\bnot (?:\\S+ ){0,3})\\b(?:deal|agreement|agree|agreed)\\b"], critical: true }],
     pitfalls: [
-      { id: "are-agree", pattern: "=am|=are agree", category: "be-verb", severity: "major", fix: "agree", messageKo: "agree는 일반동사라서 be동사 없이 'We agree'라고 합니다. 협상을 마무리할 때는 'I think we have a deal.'이 자연스럽습니다." },
+      { id: "are-agree", pattern: "=am|=are =agree", category: "be-verb", severity: "major", fix: "agree", messageKo: "agree는 일반동사라서 be동사 없이 'We agree'라고 합니다. 협상을 마무리할 때는 'I think we have a deal.'이 자연스럽습니다." },
       { id: "have-contract", pattern: "have|=got a? contract", category: "meaning-shift", severity: "major", fix: "have a deal", messageKo: "contract는 서명한 계약서를 뜻합니다. 말로 조건에 합의했을 때는 'We have a deal.'이라고 합니다." },
     ],
     hints: { pattern: "I think we have + a deal.", skeleton: "Great, I think we ____ _ ____.", partial: "Great, I think we have…" },
@@ -287,6 +291,7 @@ export const TALK_NEGOTIATION: Question[] = [
       "Then can you include two years of spare parts in the price?",
       "Then could you include two years of spare parts at no extra cost?",
       "Then could you include two years of spare parts for free?",
+      "Then could you include two years' spare parts in the price?",
     ],
     meaning: [
       { id: "could-you", en: "could you", ko: "~해 주실 수 있나요", any: ["could|can|would you", "possible"] },
@@ -329,10 +334,10 @@ export const TALK_NEGOTIATION: Question[] = [
     ],
     meaning: [
       { id: "can-you", en: "can you", ko: "~해 주실 수 있나요", any: ["can|could|would you", "possible", "able"] },
-      { id: "deliver", en: "deliver", ko: "납품하다", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\b(?:deliver|delivered|delivery|ship|shipped|send|sent|supply|supplied|get|bring)\\b"], critical: true },
+      { id: "deliver", en: "deliver", ko: "납품하다", any: ["re:(?<!(?<!\\bwhy )\\b(?:not|never) (?!(?:we|you|i|they|he|she|it) )(?:(?!(?:we|i|they|he|she) )\\S+ ){0,3})\\b(?:deliver|delivered|delivery|ship|shipped|send|sent|supply|supplied|get|bring)\\b", "re:(?<!\\bnot )\\b(have|get)\\b( \\S+){0,3} (on|at|to) (the )?site\\b"], critical: true },
       { id: "pumps", en: "the pumps", ko: "펌프", any: ["pump|pumps|them"], term: true },
       { id: "site", en: "to the site", ko: "현장에", any: ["site"] },
-      { id: "end-may", en: "by the end of May", ko: "5월 말까지", any: ["end ... may", "late may"], critical: true },
+      { id: "end-may", en: "by the end of May", ko: "5월 말까지", any: ["end ... may", "late may", "re:\\bmay (31|31st|thirty-first)\\b", "re:\\b(31|31st|thirty-first) (of )?may\\b"], critical: true },
     ],
     pitfalls: [
       { id: "until-end", pattern: "until|till the? end", category: "preposition", severity: "major", fix: "by the end", messageKo: "납품 마감은 'by the end of May'입니다. until은 '그때까지 계속'이라는 뜻이라 한 번에 끝나는 납품에는 쓰지 않습니다." },
@@ -371,11 +376,12 @@ export const TALK_NEGOTIATION: Question[] = [
       "Yes, how long is the dryer warranty?",
     ],
     meaning: [
-      { id: "how-long", en: "how long", ko: "얼마나", any: ["how long", "how many years|months", "what ... period"], critical: true },
+      { id: "how-long", en: "how long", ko: "얼마나", any: ["how long", "how many years|months", "what ... period", "what =is the? warranty|guarantee"], critical: true },
       { id: "warranty", en: "the warranty", ko: "보증", any: ["warranty|guarantee"], critical: true },
       { id: "dryer", en: "on the dryer", ko: "건조기", any: ["dryer"], term: true },
     ],
     pitfalls: [
+      { id: "how-long-is-is", pattern: "re:\\bhow long is (?:the|this|your|its) (?:\\S+ ){0,4}?is\\b", category: "sentence-structure", severity: "major", fix: "how long is the warranty", messageKo: "의문문에서는 is를 how long 바로 뒤에 한 번만 씁니다: 'How long is the warranty on the dryer?' 끝에 is를 다시 붙이지 않습니다." },
       { id: "how-long-the-is", pattern: "re:(?<!\\b(?:me|us|know|ask|asking|asked|wonder|wondering|check|confirm|sure|idea|out|understand|tell) )\\bhow long (?:the|this|your) (?:\\S+ ){0,4}?is\\b", category: "word-order", severity: "major", fix: "how long is the warranty", messageKo: "직접 묻는 의문문은 'How long is + 주어?' 어순입니다. 'How long the warranty is?'는 평서문 어순이라 질문이 되지 않습니다. (Could you tell me how long the warranty is?처럼 다른 문장 안에 넣을 때만 평서문 어순을 씁니다.)" },
       { id: "how-long-does-no-verb", pattern: "re:\\bhow long (?:does|do) the (?:\\S+ )?(?:warranty|guarantee)(?: (?:on|for|of) the (?:\\S+ )?dryer)?$", category: "sentence-structure", severity: "major", fix: "how long does the warranty last", messageKo: "'How long does …?'로 물을 때는 동사가 필요합니다: 'How long does the warranty last?'. 동사 없이 물으려면 'How long is the warranty?'라고 합니다." },
       { id: "a-s", pattern: "re:\\b(a/s|after service)\\b", category: "word-choice", severity: "major", fix: "warranty", messageKo: "'A/S'는 한국식 표현이라 외국 회의에서는 통하지 않습니다. 보증은 'warranty', 사후 서비스는 'after-sales service'라고 합니다." },
@@ -411,6 +417,7 @@ export const TALK_NEGOTIATION: Question[] = [
       "I'm afraid we can't pay more than 90,000 dollars, because that's our total budget for this package.",
       "Sorry, but we can't go over 90,000 dollars, because that's our whole budget for this package.",
       "I'm afraid our total budget for this package is 90,000 dollars, so we can't go any higher.",
+      "I'm afraid 90,000 dollars is our limit, because that's our total budget for this package.",
     ],
     meaning: [
       { id: "afraid", en: "I'm afraid", ko: "죄송하지만", any: ["afraid|sorry|unfortunately"] },
@@ -454,10 +461,10 @@ export const TALK_NEGOTIATION: Question[] = [
       "Since we'll do the installation ourselves, could you take it out of the quotation?",
     ],
     meaning: [
-      { id: "ourselves", en: "we'll do it ourselves", ko: "저희가 직접 한다", any: ["ourselves", "our own", "our team|people|staff|technicians|engineers|side"], critical: true },
+      { id: "ourselves", en: "we'll do it ourselves", ko: "저희가 직접 한다", any: ["ourselves", "our own", "our team|people|staff|technicians|engineers|side", "in-house|inhouse", "in house"], critical: true },
       { id: "installation", en: "the installation", ko: "설치", any: ["install|installation"], critical: true },
       { id: "so", en: "so", ko: "그래서", any: ["so|because|since|as"] },
-      { id: "take-out", en: "take it out of", ko: "빼다", any: ["take ... out", "remove|exclude|delete|drop", "leave ... out"], critical: true },
+      { id: "take-out", en: "take it out of", ko: "빼다", any: ["take ... out|off", "remove|exclude|delete|drop", "leave ... out"], critical: true },
       { id: "quote", en: "the quote", ko: "견적", any: ["quote|quotation|offer|price|scope"] },
     ],
     pitfalls: [
@@ -540,7 +547,7 @@ export const TALK_NEGOTIATION: Question[] = [
       { id: "if", en: "if", ko: "만약 ~라면", any: ["if|provided|providing", "as long as"], critical: true },
       { id: "deliver", en: "you can deliver", ko: "납품할 수 있다", any: ["deliver|delivery|ship"], critical: true },
       { id: "may", en: "by May", ko: "5월까지", any: ["may"], critical: true },
-      { id: "accept", en: "we can accept the price", ko: "가격을 받아들이다", any: ["accept|agree|take", "okay|ok|fine ... price", "go with"], critical: true },
+      { id: "accept", en: "we can accept the price", ko: "가격을 받아들이다", any: ["accept|agree|take", "okay|ok|fine ... price", "go with", "re:\\bprice\\b( \\w+){0,3} (?<!\\bnot )(fine|okay|ok|acceptable|good)\\b"], critical: true },
     ],
     pitfalls: [
       { id: "if-you-will", pattern: "re:(?<=\\bif you )will\\b", category: "tense", severity: "major", fix: "can", messageKo: "if 조건절에서는 미래 일도 현재시제로 씁니다: 'If you can deliver by May'. 'If you will deliver'라고 하지 않습니다.", skill: "cond-1" },
@@ -576,11 +583,12 @@ export const TALK_NEGOTIATION: Question[] = [
       "We've already lowered our price twice, so I'm afraid we can't reduce it any further.",
       "I'm afraid we can't go any lower, because we've already lowered our price twice.",
       "We've already cut our price twice, so I'm afraid we can't go any lower.",
+      "We've already lowered our price twice, so I'm afraid this is as low as we can go.",
     ],
     meaning: [
       { id: "already", en: "already", ko: "이미", any: ["already"] },
-      { id: "lowered", en: "lowered our price", ko: "가격을 낮췄다", any: ["lower|reduce|cut|drop|discount ... price|fee", "price|fee ... down|lower|lowered|reduced|cut|dropped|discounted"], critical: true },
-      { id: "twice", en: "twice", ko: "두 번", any: ["twice", "two times"], critical: true },
+      { id: "lowered", en: "lowered our price", ko: "가격을 낮췄다", any: ["lower|reduce|cut|drop|discount ... price|fee", "price|fee ... down|lower|lowered|reduced|cut|dropped|discounted", "give|given|offer|offered ... discount|discounts"], critical: true },
+      { id: "twice", en: "twice", ko: "두 번", any: ["twice", "two times", "two|2 discounts|reductions|cuts"], critical: true },
       { id: "afraid", en: "I'm afraid", ko: "죄송하지만", any: ["afraid|sorry|unfortunately"] },
       { id: "cant-lower", en: "we can't go any lower", ko: "더 낮출 수 없다", any: ["not ... lower|further|more|less", "not ... reduce|cut", "as low as", "lowest|final|bottom|best ... price|offer|line"], critical: true },
     ],
@@ -630,6 +638,7 @@ export const TALK_NEGOTIATION: Question[] = [
     ],
     pitfalls: [
       { id: "possible-pay", pattern: "possible =pay", category: "verb-form", severity: "major", fix: "possible to pay", messageKo: "'Would it be possible' 뒤에 동사를 쓸 때는 'to + 동사원형'이 필요합니다: 'Would it be possible to pay …?'" },
+      { id: "after-commissioning-finish", pattern: "re:\\bafter (the )?commissioning (finish|end|complete)\\b", category: "agreement", severity: "major", fix: "after commissioning", messageKo: "'after commissioning'만으로 '시운전이 끝난 뒤'라는 뜻이 됩니다. 동사를 쓰려면 3인칭 단수에 맞춰 'after commissioning finishes' 또는 'after commissioning is finished'라고 합니다." },
       { id: "in-advanced", pattern: "in =advanced", category: "word-choice", severity: "major", fix: "in advance", messageKo: "'선금으로/미리'는 'in advance'입니다. advanced(고급의, 발전된)와 혼동하지 마세요." },
     ],
     hints: { pattern: "Would it be possible to + 동사원형 … and the rest after + 명사?", skeleton: "Would it be ________ to pay 30% in _______ and the rest after commissioning?", partial: "Would it be possible to pay…" },
@@ -704,13 +713,14 @@ export const TALK_NEGOTIATION: Question[] = [
       "Any change to the payment terms has to be approved by our finance team, so I'll let you know by Friday.",
       "I'm afraid any change to the payment terms has to be approved by our finance team, so I'll get back to you by Friday.",
       "Any change in the payment terms has to be approved by our finance team, so I'll get back to you by Friday.",
+      "Any changes to the payment terms need to be approved by our finance team, so I'll get back to you by Friday.",
     ],
     meaning: [
       { id: "change", en: "any change to the payment terms", ko: "지급 조건 변경", any: ["change|changes|revision ... payment", "payment ... change|changes"], critical: true },
       { id: "approved", en: "has to be approved", ko: "승인되어야 한다", any: ["approve|approval", "sign off", "signed off"], critical: true },
       { id: "finance", en: "by our finance team", ko: "재무팀", any: ["finance|financial|accounting|cfo"], critical: true },
       { id: "so", en: "so", ko: "그래서", any: ["so|therefore|because|since"] },
-      { id: "get-back", en: "I'll get back to you", ko: "다시 연락드리겠다", any: ["get back", "let ... know", "confirm|reply|answer|respond|update"], critical: true },
+      { id: "get-back", en: "I'll get back to you", ko: "다시 연락드리겠다", any: ["get|come back", "let ... know", "confirm|reply|answer|respond|update"], critical: true },
       { id: "friday", en: "by Friday", ko: "금요일까지", any: ["friday"] },
     ],
     pitfalls: [
@@ -801,7 +811,7 @@ export const TALK_NEGOTIATION: Question[] = [
       { id: "could-you", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would you", "please"] },
       { id: "send", en: "send / put", ko: "보내다", any: ["send|put|share|email|confirm"], critical: true },
       { id: "offer", en: "the final offer", ko: "최종 제안", any: ["offer|quote|quotation|price|terms|proposal"], critical: true },
-      { id: "writing", en: "in writing", ko: "서면으로", any: ["in writing", "by email|e-mail", "written"], critical: true },
+      { id: "writing", en: "in writing", ko: "서면으로", any: ["in writing", "by email|e-mail", "written", "email|e-mail"], critical: true },
       { id: "director", en: "our director", ko: "이사님", any: ["director|manager|boss|management"] },
       { id: "approve", en: "needs to approve it", ko: "승인해야 하다", any: ["approve|approval", "sign off", "check|review"], critical: true },
       { id: "before-sign", en: "before we sign the contract", ko: "계약서에 서명하기 전에", any: ["before ... sign|signing|contract|order"] },
@@ -845,7 +855,7 @@ export const TALK_NEGOTIATION: Question[] = [
       "If we placed a single order for twelve pumps for both phases, would you give us a 10% discount? That would make internal approval much easier.",
     ],
     meaning: [
-      { id: "if-ordered", en: "if we ordered", ko: "주문한다고 가정하면", any: ["if|suppose|supposing ... order|ordered|buy|bought|purchase|purchased"], critical: true },
+      { id: "if-ordered", en: "if we ordered", ko: "주문한다고 가정하면", any: ["if|suppose|supposing ... order|ordered|buy|bought|purchase|purchased", "say ... order|ordered|buy|bought|purchase|purchased"], critical: true },
       { id: "twelve", en: "twelve pumps", ko: "펌프 12대", any: ["twelve|12"], critical: true },
       { id: "at-once", en: "at once", ko: "한꺼번에", any: ["at once", "together", "one|single ... order", "same time"] },
       { id: "both-phases", en: "for both phases", ko: "두 단계 모두", any: ["both ... phase|phases", "second phase", "phase 2|two"] },
@@ -894,7 +904,7 @@ export const TALK_NEGOTIATION: Question[] = [
       { id: "director", en: "our director", ko: "이사님", any: ["director|boss|manager|management"] },
       { id: "price-fine", en: "the price was fine", ko: "가격은 괜찮다", any: ["price ... fine|okay|ok|acceptable|good|happy", "fine|okay|ok|happy ... price"], critical: true },
       { id: "asked", en: "he asked whether", ko: "물었다", any: ["ask|asked|wonder|wondered|want|wanted"], critical: true },
-      { id: "extend", en: "extend the on-site support", ko: "현장 지원을 늘리다", any: ["extend|increase|longer|add ... support", "support ... longer|extended"], critical: true },
+      { id: "extend", en: "extend the on-site support", ko: "현장 지원을 늘리다", any: ["extend|increase|longer|add ... support", "support ... longer|extended", "instead of four|4", "make ... support ... six|6"], critical: true },
       { id: "six", en: "from four to six weeks", ko: "4주에서 6주로", any: ["six|6"], critical: true },
       { id: "if", en: "if you can do that", ko: "그렇게 해 주시면", any: ["if", "as long as"], critical: true },
       { id: "sign", en: "we can sign the contract", ko: "계약서에 서명하다", any: ["sign|signing|signature"], critical: true },
@@ -933,12 +943,13 @@ export const TALK_NEGOTIATION: Question[] = [
       "I understand that your costs have gone up, but a 15% increase is hard for us to accept. We've been working together for five years, and we'd like to continue. Would you consider a 5% increase with a two-year contract instead?",
       "I understand your costs have gone up, but it's difficult for us to accept a 15% increase. We've worked together for five years, and we'd like to keep working with you. Would you consider a 5% increase with a two-year contract instead?",
       "I understand that your costs have increased, but a 15% increase is difficult for us to accept. We've worked together for five years, and we want to continue. Instead, would you consider a 5% increase if we sign a two-year contract?",
+      "I understand that your costs went up, but a 15% increase is difficult for us to accept. We've worked together for five years, and we'd like to continue. Would you consider a 5% increase with a two-year contract instead?",
     ],
     meaning: [
       { id: "understand", en: "I understand", ko: "이해해요", any: ["understand|see|know|appreciate"] },
       { id: "costs-up", en: "your costs have gone up", ko: "비용이 올랐다", any: ["cost|costs ... up|increase|increased|higher|risen|rise"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
-      { id: "difficult", en: "difficult for us to accept", ko: "받아들이기 어렵다", any: ["difficult|hard|tough", "not ... accept", "too much|high"], critical: true },
+      { id: "difficult", en: "difficult for us to accept", ko: "받아들이기 어렵다", any: ["difficult|hard|tough", "not ... accept", "too much|high", "=lot|=lots ... for us"], critical: true },
       { id: "fifteen", en: "a 15% increase", ko: "15% 인상", any: ["15|fifteen"], critical: true },
       { id: "together", en: "we've worked together for five years", ko: "5년 동안 함께 일해 왔다", any: ["together|relationship|partner|partners|partnership"] },
       { id: "five-percent", en: "a 5% increase", ko: "5% 인상", any: ["5|five ... increase|raise", "consider ... 5|five"], critical: true },
@@ -947,6 +958,7 @@ export const TALK_NEGOTIATION: Question[] = [
     pitfalls: [
       { id: "accept-it", pattern: "increase =is|=was difficult|hard for? us? to accept it", category: "sentence-structure", severity: "major", fix: "increase is difficult for us to accept", messageKo: "'A is difficult to accept' 구조에서는 A(15% 인상)가 이미 accept의 목적어라서 뒤에 it을 다시 쓰지 않습니다." },
       { id: "since-years", pattern: "since five|5 years", category: "preposition", severity: "major", fix: "for five years", messageKo: "기간(5년 동안)은 for를 씁니다. since는 시작 시점(since 2021) 앞에 씁니다.", skill: "present-perfect" },
+      { id: "are-working-for", pattern: "re:\\bwe (?:are working|work) together (?:for|since)\\b", category: "tense", severity: "major", fix: "we've worked together", messageKo: "과거부터 지금까지 이어진 기간(for five years)은 현재완료로 말합니다: 'We've worked together for five years.' 또는 'We've been working together for five years.'" },
       { id: "worked-past", pattern: "re:\\bwe(?= worked together (?:for|since)\\b)", category: "tense", severity: "major", fix: "we've", messageKo: "지금까지 5년째 이어지는 관계는 현재완료로 말합니다: 'We've worked together for five years'. 과거형 'We worked'는 지금은 함께 일하지 않는다는 뜻이 됩니다.", skill: "present-perfect" },
       { id: "difficult-to-us", pattern: "re:(?<=\\b(?:difficult|hard|tough) )to(?= us to\\b)", category: "preposition", severity: "major", fix: "for", messageKo: "'우리가 ~하기 어렵다'는 'difficult for us to + 동사원형'입니다. 사람 앞에는 for를 씁니다." },
     ],
