@@ -398,7 +398,7 @@ const doubleComparative: Rule = (w) => {
     if (ER_NOUNS.test(n)) continue;
     if (n === "better" || n === "worse" || (/er$/.test(n) && /^(fast|high|low|early|earli|late|big|small|easi|cheap|safe|short|long|quick|slow|strong|weak|large|wide|hot|cold|dry|wet|loud|quiet|clear|warm|cool|nice|busi|heavi|happi|simple|smooth|tight|clean|light|bright|deep|near|close|fresh|soft|hard|thick|thin|young|old|new|great|rich|poor|tall)/.test(n) && n.length > 4)) {
       out.push({
-        rule: "double-comparative", from: i, to: i + 1, replacement: "", category: "word-choice", severity: "minor", skill: "comparative",
+        rule: "double-comparative", from: i, to: i + 1, replacement: "", category: "word-choice", severity: "major", skill: "comparative",
         messageKo: `'${w[i + 1].raw}'는 이미 비교급이라 'more'를 함께 쓰지 않습니다.`,
       });
     }
@@ -3918,6 +3918,32 @@ const learnerSlips: Rule = (w) => {
     // "What time starts the plant tour?" → "does the plant tour start".
     if (t === "time" && i > 0 && w[i - 1].norm === "what" && /^(starts|begins|ends|opens|closes|leaves|arrives|finishes)$/.test(n1) && /^(the|your|our|this)$/.test(w[i + 2]?.norm ?? "")) {
       out.push({ rule: "question-word-order", from: i + 1, to: i + 2, replacement: "does", category: "word-order", severity: "major", skill: "question-form", messageKo: `의문문은 'What time does + 주어 + 동사원형?'입니다: 'What time does … ${verbInfo(n1)?.base ?? n1}?'` });
+      continue;
+    }
+    // "What does people usually eat?" → "do": does goes with a singular subject.
+    if (/^(does|doesn't)$/.test(t) && (n1 === "people" || isPluralNoun(n1) || (/^(the|your|our|these|those|my)$/.test(n1) && isPluralNoun(w[i + 2]?.norm ?? "")))) {
+      out.push({ rule: "agreement-plural", from: i, to: i + 1, replacement: "do", category: "agreement", severity: "major", skill: "agreement", messageKo: "주어가 복수라서 does가 아니라 do를 씁니다." });
+      continue;
+    }
+    // "nobody mind" → "minds": nobody/everybody/someone take a singular verb.
+    if (/^(nobody|everybody|everyone|someone|somebody|anyone|no-one)$/.test(t) && !(i > 0 && /^(if|whether|let|make|help|see|saw|hear|do|does|did|will|would|can|could|should|may|might|must|shall)$/.test(w[i - 1].norm))) {
+      const b = baseVerbAt(i + 1);
+      if (b && w[i + 1].norm === b && /^(mind|know|care|want|need|like|think|work|live|come|go|say|understand|agree|remember|wants)$/.test(b)) {
+        out.push({ rule: "agreement-indefinite", from: i + 1, to: i + 2, replacement: thirdPersonOf(b), category: "agreement", severity: "major", skill: "agreement", messageKo: `'${w[i].raw}'는 단수 취급이라 '${thirdPersonOf(b)}'입니다.` });
+        continue;
+      }
+    }
+    // "Can everyone reads the numbers?" → "read".
+    if (MODALS.has(t) && /^(everyone|everybody|anyone|anybody|someone|somebody|he|she|it)$/.test(n1) && w[i + 2]) {
+      const vi = verbInfo(w[i + 2].norm);
+      if (vi && vi.form === "3sg" && !w[i + 2].expanded) {
+        out.push({ rule: "modal-inflected", from: i + 2, to: i + 3, replacement: vi.base, category: "verb-form", severity: "major", skill: "modal-possibility", messageKo: `조동사(${w[i].raw}) 뒤에는 동사원형입니다: '${vi.base}'.` });
+        continue;
+      }
+    }
+    // "It works quite good" → "quite well".
+    if (/^(works|worked|work|working|went|goes|go|runs|ran|run|performs|performed)$/.test(t) && /^(quite|really|very|pretty|so|too)$/.test(n1) && w[i + 2]?.norm === "good" && end(i + 2)) {
+      out.push({ rule: "adverb-needed", from: i + 2, to: i + 3, replacement: "well", category: "word-choice", severity: "major", skill: "degree", messageKo: `동사를 꾸밀 때는 good이 아니라 well입니다: '${w[i].raw} ${n1} well'.` });
       continue;
     }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
