@@ -9,6 +9,9 @@ const fired = (s: string) => rulesOn(s).map((r) => r.rule);
 const WRONG: [string, string, string?][] = [
   // [sentence, rule, replacement]
   ["We will must update the PFD.", "double-modal", "have to"],
+  ["She leave for Busan tomorrow.", "third-person-s", "leaves"],
+  ["He call me every day.", "third-person-s", "calls"],
+  ["She visit her parents on Sundays.", "third-person-s", "visits"],
   ["The pressure could higher than expected.", "modal-adjective", "be"],
   ["The result could different next time.", "modal-adjective", "be"],
   ["We have to updating the schedule.", "to-inflected", "update"],
@@ -149,6 +152,12 @@ const WRONG: [string, string, string?][] = [
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
 const RIGHT = [
+  "Doesn't he know?",
+  "Won't she need it?",
+  "Why doesn't she call?",
+  "Is she free tomorrow?",
+  "She last saw him in May.",
+  "Will he or she need a visa?",
   // Look like the wave-2 slips but are right.
   "That's sound advice.",
   "My hobby is traveling.",

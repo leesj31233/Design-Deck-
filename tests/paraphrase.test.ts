@@ -50,6 +50,9 @@ const RIGHT: [string, string[], string][] = [
   ["I don't drink, but I'll have a soda.", [], "I don't drink, so I'll have a soda."],
   ["I spoke to her yesterday.", [], "I spoke with her yesterday."],
   ["Can we discuss it over the phone?", [], "Can we discuss it on the phone?"],
+  ["I'm flying home on Saturday.", [], "I fly home on Saturday."],
+  ["She's leaving for Busan tomorrow.", [], "She leaves for Busan tomorrow."],
+  ["We're meeting the client at three.", [], "We meet the client at three."],
 ];
 
 const WRONG: [string, string[], string][] = [
@@ -63,6 +66,8 @@ const WRONG: [string, string[], string][] = [
   ["Could you send me the report?", [], "Could you send to me the report?"],
   ["Is it possible to finish it by Friday?", [], "Is it possible finish it by Friday?"],
   ["I'm interested in the new design.", [], "I'm interesting in the new design."],
+  ["She's leaving for Busan tomorrow.", [], "She leave for Busan tomorrow."],
+  ["We're meeting the client at three.", [], "We meets the client at three."],
 ];
 
 describe("reworded correct answers are not marked wrong", () => {

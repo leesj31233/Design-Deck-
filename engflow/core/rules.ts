@@ -944,6 +944,9 @@ const perfectNeedsPassive: Rule = (w) => {
   return out;
 };
 
+/** Words that are verbs too but after "he/she" are usually an adverb or adjective ("she last saw it", "he still works"). */
+const NOT_VERB_AFTER_SUBJECT = /^(last|still|even|better|well|free|clean|clear|close|open|ready|fine|right|wrong|home|back|near|slow|fast|early|late|hard|alone|later|once|first|second|sure|kind|sort|quiet|quite|calm|cool|warm|dry|empty|full|busy|safe|short|long|light|round|down|up|out|over|off|in|on|yet|soon|then|now|today|together)$/;
+
 /** "it look good", "he need it" → third person -s (not after let/make/help or in questions). */
 const thirdPersonBase: Rule = (w) => {
   const out: RuleFinding[] = [];
@@ -951,12 +954,19 @@ const thirdPersonBase: Rule = (w) => {
     if (!/^(he|she|it)$/.test(w[i].norm)) continue;
     const prev = w[i - 1]?.norm ?? "";
     if (/^(let|make|makes|made|help|helps|see|saw|watch|hear|have|has|had|do|does|did|will|would|can|could|should|may|might|must|to|let's|if|that|which|whether)$/.test(prev)) continue;
+    const prev2 = w[i - 2]?.norm ?? "";
+    // "Doesn't he know?", "Won't she come?": an inverted negative question keeps the base form.
+    if (prev === "not" && /^(do|does|did|will|would|can|could|should|may|might|must|shall|is|are|was|were|am|have|has|had)$/.test(prev2)) continue;
+    // "Is she free?" (an inverted be-question), "he or she" (two people), "I'd rather she stay".
+    if (/^(is|was|are|were|am|rather)$/.test(prev) || (/^(or|and)$/.test(prev) && /^(he|she|i|you|we|they)$/.test(prev2))) continue;
     // "I got it. Thank you": the pronoun ends one sentence and the verb starts the next.
     if (brokenAfter(w, i)) continue;
     const v = w[i + 1];
     const info = verbInfo(v.norm);
     if (!info || info.form !== "base" || v.norm !== info.base || isSameFormParticiple(info.base) || /^(be|have|do)$/.test(info.base)) continue;
-    if (!UNAMBIGUOUS_VERBS.has(info.base) && !/^(look|seem|need|want|work|take|make|mean|depend|cost|sound|feel|happen|matter|go|come|get|run|say|know|think|like|take|give)$/.test(info.base)) continue;
+    // After he/she the next word is the verb unless it is an adverb or adjective that is also a verb ("she last saw").
+    const anyVerb = w[i].norm !== "it" && !NOT_VERB_AFTER_SUBJECT.test(v.norm);
+    if (!anyVerb && !UNAMBIGUOUS_VERBS.has(info.base) && !/^(look|seem|need|want|work|take|make|mean|depend|cost|sound|feel|happen|matter|go|come|get|run|say|know|think|like|take|give)$/.test(info.base)) continue;
     const fix = thirdPersonOf(info.base);
     out.push({
       rule: "third-person-s", from: i + 1, to: i + 2, replacement: fix, category: "agreement", severity: "major", skill: "agreement",

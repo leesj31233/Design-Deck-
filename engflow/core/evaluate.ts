@@ -385,6 +385,9 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
       if (DETERMINERS_NP.has(lprev) || /^(the|a|an)$/.test(lprev)) continue;
       // "is pouring" (progressive) vs "pours": the learner's verb group is correct either way.
       if (/ing$/.test(lt) && !FEELING_ADJ.test(lt) && (BE_FORMS.has(lprev) || BE_FORMS.has(w[op.li - 2]?.norm ?? "") && /^(still|also|just|now|really|not)$/.test(lprev))) continue;
+      // …and the other way round: "I fly home on Saturday" for "I'm flying home on Saturday" (a plan either way;
+      // the rules check that the simple form agrees with its subject).
+      if (/ing$/.test(tt) && !FEELING_ADJ.test(tt) && isVerb && (vl!.form === "base" || vl!.form === "3sg") && vl!.base === vt!.base && !BE_FORMS.has(lprev) && (BE_FORMS.has(tw[op.ti - 1]?.norm ?? "") || BE_FORMS.has(tw[op.ti - 2]?.norm ?? ""))) continue;
       // Feeling adjectives: "I'm interesting in" means "interested" — a real error, whatever the lexicon knows.
       if (FEELING_ADJ.test(lt) && FEELING_ADJ.test(tt) && lt.replace(/(ed|ing|ied|ying)$/, "") === tt.replace(/(ed|ing|ied|ying)$/, "")) {
         push(
@@ -566,6 +569,10 @@ function alignmentFindings(al: Alignment, w: Token[], tw: Token[], skill: string
         let a = op.at;
         while (a < w.length && /^(really|also|still|just|always|usually|actually|truly|certainly|already)$/.test(w[a].norm)) a++;
         if (simpleState.has(a)) continue; // "I (am) really looking forward" ↔ "I really look forward"
+        // "I (am) flying home on Saturday" ↔ "I fly home on Saturday": the learner's simple form is a full verb group.
+        const lv = verbInfo(w[a]?.norm ?? "");
+        const tv = verbInfo(tw[op.ti + 1]?.norm ?? "");
+        if (lv && tv && tv.form === "ing" && (lv.form === "base" || lv.form === "3sg") && lv.base === tv.base) continue;
       }
       // "when you have a moment" ↔ "when you're free": an inserted have/do followed by a noun is a main verb (rewording).
       if (c === "aux") {
