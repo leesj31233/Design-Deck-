@@ -21,7 +21,7 @@ const IRREGULAR: Record<string, [past: string, pp: string]> = {
   drink: ["drank", "drunk"], fly: ["flew", "flown"], forgive: ["forgave", "forgiven"], lend: ["lent", "lent"],
   seek: ["sought", "sought"], sit: ["sat", "sat"], sleep: ["slept", "slept"], throw: ["threw", "thrown"],
   wear: ["wore", "worn"], win: ["won", "won"], let: ["let", "let"], spread: ["spread", "spread"], fight: ["fought", "fought"],
-  steal: ["stole", "stolen"], wake: ["woke", "woken"], withdraw: ["withdrew", "withdrawn"],
+  steal: ["stole", "stolen"], swim: ["swam", "swum"], wake: ["woke", "woken"], withdraw: ["withdrew", "withdrawn"],
 };
 
 /** Verbs common in engineering meetings (base forms). */
@@ -35,7 +35,7 @@ export const BASE_VERBS = new Set<string>([
   "cook", "bake", "sing", "jog", "climb", "study", "chop", "stir", "fry", "wrap", "pack", "unpack", "laugh", "cry", "marry",
   "hurry", "greet", "decorate", "shave", "tidy", "sew", "fold", "knit", "sneeze", "whisper", "shout", "yell", "scream", "play",
   "dance", "live", "practice", "practise", "exercise", "trip", "crash", "stall", "overflow",
-  "ignore", "misunderstand", "misread", "notice", "notify", "admit", "drain", "switch", "suit", "fit", "sign", "escalate", "zoom", "mix", "mind", "scroll", "unmute", "mute", "upload",
+  "ignore", "misunderstand", "misread", "notice", "notify", "admit", "drain", "switch", "suit", "fit", "sign", "escalate", "zoom", "mix", "mind", "skip", "scroll", "unmute", "mute", "upload",
   "enter", "access", "reply", "respond", "listen", "die", "belong", "consist", "occur", "happen", "exist", "appear", "disappear", "remain", "message",
   "accept", "adjust", "agree", "allow", "analyze", "analyse", "answer", "apply", "approve", "arrange", "ask", "assign",
   "assume", "attach", "avoid", "calculate", "call", "cancel", "change", "check", "clarify", "clean", "close", "collect",
@@ -104,7 +104,7 @@ export function participleOf(base: string): string {
 function regularEd(base: string): string {
   if (base.endsWith("e")) return base + "d";
   if (/[^aeiou]y$/.test(base)) return base.slice(0, -1) + "ied";
-  if (/^(stop|plan|ship|drop|scrap|trim|commit|submit|admit|transfer|occur|refer|prefer)$/.test(base)) return base + base.slice(-1) + "ed";
+  if (/^(stop|plan|ship|drop|scrap|trim|commit|submit|admit|transfer|occur|refer|prefer|skip|chop|wrap|shop|jog|stir|plug|chat|hug|nod|knit|trip|grab|drag|fit|swap|tap|mop|zip|clap|beg|hop)$/.test(base)) return base + base.slice(-1) + "ed";
   return base + "ed";
 }
 
@@ -113,7 +113,7 @@ export function ingOf(base: string): string {
   if (base.endsWith("ie")) return base.slice(0, -2) + "ying";
   if (base.endsWith("ee")) return base + "ing";
   if (base.endsWith("e") && base.length > 2) return base.slice(0, -1) + "ing";
-  if (/^(stop|plan|ship|drop|scrap|trim|commit|submit|admit|transfer|occur|refer|prefer|run|put|set|cut|get|begin|shut)$/.test(base)) return base + base.slice(-1) + "ing";
+  if (/^(stop|plan|ship|drop|scrap|trim|commit|submit|admit|transfer|occur|refer|prefer|skip|chop|wrap|shop|jog|stir|plug|chat|hug|nod|knit|trip|grab|drag|fit|swap|tap|mop|zip|clap|beg|hop|run|put|set|cut|get|begin|shut|swim|sit)$/.test(base)) return base + base.slice(-1) + "ing";
   return base + "ing";
 }
 

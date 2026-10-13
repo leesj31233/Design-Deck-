@@ -3933,6 +3933,21 @@ const learnerSlips: Rule = (w) => {
         continue;
       }
     }
+    // "we might have skip the warehouse" → "have skipped".
+    if (MODALS.has(t) && n1 === "have" && w[i + 2]) {
+      const b = baseVerbAt(i + 2);
+      if (b && w[i + 2].norm === b && participleOf(b) !== b && !isSameFormParticiple(b) && !/^(to|got)$/.test(w[i + 2].norm) && (UNAMBIGUOUS_VERBS.has(b) || /^(skip|miss|go|see|forget|leave|take|make|lose|break|do|eat|meet|call|tell)$/.test(b))) {
+        out.push({ rule: "perfect-base-verb", from: i + 2, to: i + 3, replacement: participleOf(b), category: "verb-form", severity: "major", skill: "present-perfect", messageKo: `'${w[i].raw} have' 뒤에는 과거분사입니다: '${w[i].raw} have ${participleOf(b)}'.` });
+        continue;
+      }
+    }
+    // "Would you like have some coffee?" → "like to have".
+    if (t === "like" && i > 0 && (w[i - 1].norm === "would" || (SUBJECT_PRONOUNS.has(w[i - 1].norm) && w[i - 2]?.norm === "would"))) {
+      if (/^(have|go|come|see|try|join|ask|order|eat|drink|take|make|talk|check|start|book|visit|meet|know|get|stay|sit|leave)$/.test(n1)) {
+        insert(i + 1, "to", "verb-form", "major", "purpose-to", `'would like' 뒤에 동사가 오면 'to + 동사원형'입니다: 'like to ${w[i + 1].raw}'.`, "missing-to");
+        continue;
+      }
+    }
     // "Can everyone reads the numbers?" → "read".
     if (MODALS.has(t) && /^(everyone|everybody|anyone|anybody|someone|somebody|he|she|it)$/.test(n1) && w[i + 2]) {
       const vi = verbInfo(w[i + 2].norm);
