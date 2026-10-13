@@ -51,6 +51,11 @@ const WRONG: [string, string, string?][] = [
   ["It was great experience.", "missing-article", "a"],
   ["Was a long day.", "missing-subject-it", "It was"],
   ["We agreed the price.", "missing-preposition", "on"],
+  ["Please let me know if you have any question.", "any-plural", "questions"],
+  ["Could you borrow me your pen?", "borrow-lend", "lend"],
+  ["How do you think about it?", "what-think", "What"],
+  ["I'm used to work late.", "used-to-ing", "working"],
+  ["I have a plan to visit there.", "visit-there", "go there"],
   ["I graduated Seoul University.", "missing-preposition", "from"],
   ["The order delivered yesterday.", "passive-missing-be", "was"],
   ["The samples sent today.", "passive-missing-be", "were"],
@@ -300,6 +305,8 @@ const WRONG: [string, string, string?][] = [
 
 /** Correct sentences that earlier versions of the rules flagged, plus tricky everyday English. */
 const RIGHT = [
+  "Is there any problem?", "How do you think we should fix it?", "The tool is used to measure flow.", "He was used to make the point.",
+  "Can I borrow your pen?", "Any questions?", "I'm used to working late.", "I used to work late.",
   "We agree the plan is good.", "We agreed on the price.", "I graduated from Seoul University.", "She graduated last year.",
   "The parts shipped on Monday.", "The issue resolved itself.", "Our team delivered the report.", "The order was delivered yesterday.",
   "Doesn't he know?",

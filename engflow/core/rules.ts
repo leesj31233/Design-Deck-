@@ -4026,6 +4026,35 @@ const learnerSlips: Rule = (w) => {
       out.push({ rule: "passive-missing-be", from: i + 1, to: i + 1, replacement: plural ? "were" : "was", category: "verb-form", severity: "major", skill: "passive", messageKo: `사물이 '~되었다'는 수동태 'be + p.p.'입니다: '${w[i - 1].raw} ${w[i].raw} ${plural ? "were" : "was"} ${w[i + 1].raw}'.` });
       continue;
     }
+    // "if you have any question" → "any questions": 'any' with a countable noun in a question or if-clause is plural.
+    if (t === "any" && i > 0 && (/^(have|has|had)$/.test(w[i - 1].norm) || (w[i - 1].norm === "there" && w[i - 2]?.norm === "are")) && /^(question|problem|issue|comment|suggestion|concern|update|change)$/.test(n1) && ends(i + 1)) {
+      out.push({ rule: "any-plural", from: i + 1, to: i + 2, replacement: `${n1}s`, category: "countability", severity: "minor", skill: "countability", messageKo: `'any' 뒤의 셀 수 있는 명사는 보통 복수형입니다: 'any ${n1}s'.` });
+      continue;
+    }
+    // "Could you borrow me your pen?" → "lend me": borrow is taking, lend is giving.
+    if (/^(borrow|borrows|borrowed)$/.test(t) && /^(me|us|him|her|them)$/.test(n1) && w[i + 2] && (DETERMINERS.has(w[i + 2].norm) || /^(some|your|his|her|their|our)$/.test(w[i + 2].norm))) {
+      const lend = t === "borrowed" ? "lent" : t === "borrows" ? "lends" : "lend";
+      out.push({ rule: "borrow-lend", from: i, to: i + 1, replacement: lend, category: "word-choice", severity: "major", skill: "collocation", messageKo: `빌려주는 것은 'lend', 빌리는 것은 'borrow'입니다: '${lend} ${n1} …' 또는 'Can I borrow …?'.` });
+      continue;
+    }
+    // "How do you think about it?" → "What do you think about it?".
+    if (t === "how" && /^(do|did|does)$/.test(n1) && w[i + 2] && /^(you|they|we|he|she)$/.test(w[i + 2].norm) && w[i + 3]?.norm === "think" && (end(i + 3) || /^(about|of)$/.test(w[i + 4]?.norm ?? ""))) {
+      out.push({ rule: "what-think", from: i, to: i + 1, replacement: /^[A-Z]/.test(w[i].raw) ? "What" : "what", category: "word-choice", severity: "major", skill: "opinion", messageKo: "의견을 물을 때는 'How do you think?'가 아니라 'What do you think (about it)?'입니다." });
+      continue;
+    }
+    // "I'm used to work late" → "used to working": 'be used to' takes -ing.
+    if (t === "used" && i > 1 && /^(am|is|are|was|were|be|been|getting|get|got)$/.test(w[i - 1].norm) && /^(i|we|you|they|he|she)$/.test(w[i - 2].norm) && n1 === "to") {
+      const base = baseVerbAt(i + 2);
+      if (base && !/^(be|make|build|clean|cut|check|measure|test|open|close|fix|cover|store|hold|move|carry|connect|support|run|keep|mark|find|show|help|process|monitor|control|calculate|save|reduce|prevent|remove|seal|cool|heat|dry|mix|transport|track|treat|replace|protect)$/.test(base)) {
+        out.push({ rule: "used-to-ing", from: i + 2, to: i + 3, replacement: ingOf(base), category: "verb-form", severity: "major", skill: "prep-gerund", messageKo: `'~에 익숙하다'는 'be used to + -ing'입니다: '${w[i - 1].raw} used to ${ingOf(base)}'.` });
+        continue;
+      }
+    }
+    // "I have a plan to visit there" → "visit it / go there": visit takes an object, 'there' is an adverb.
+    if (/^(visit|visited|visiting|visits)$/.test(t) && n1 === "there") {
+      out.push({ rule: "visit-there", from: i, to: i + 2, replacement: t === "visit" ? "go there" : `${w[i].raw} it`, category: "word-choice", severity: "minor", skill: "collocation", messageKo: "'there'는 부사라 visit의 목적어가 될 수 없습니다: 'go there' 또는 'visit it/the place'." });
+      continue;
+    }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
     if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
       out.push({ rule: "missing-subject-it", from: i, to: i + 1, replacement: /^[A-Z]/.test(w[i].raw) ? `It ${t}` : `it ${t}`, category: "sentence-structure", severity: "major", skill: "be-adj", messageKo: `영어 문장에는 주어가 필요합니다: 'It ${t} ${w.slice(i + 1, i + 4).map((x) => x.raw).join(" ")}'.` });
