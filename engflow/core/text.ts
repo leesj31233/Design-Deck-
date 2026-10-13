@@ -174,7 +174,10 @@ export function tokenize(text: string): Token[] {
     const after = tokens[i + 2];
     const pp = !!verbInfo(next.norm) && /^(pp|past)$/.test(verbInfo(next.norm)!.form) && /ed$/.test(next.norm) && (!after || after.punct || /^(by|for|yet|now|already|today|tomorrow|and|but|so|at|in|on)$/.test(after.norm));
     // A possessive never comes before an article or an adverb of degree: "the room's a bit cold", "the tank's nearly full".
-    if (pronounLike || pp || next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|nearly|quite|pretty|totally|completely|fully|currently|probably|definitely|usually|actually|clearly|a|an|the|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away|right|wrong|correct|sure|busy|sick|ill|available|absent|early|upset|angry|aware|unable|able|alright|safe)$/.test(next.norm)) {
+    // "My name's Minsu", "the weather's clear": a name or a predicate adjective after 's.
+    const nameIs = /^(name|surname)$/.test(t.norm) && /^[A-Z]/.test(next.raw);
+    const predicate = /^(clear|amazing|great|good|nice|bad|beautiful|cold|hot|warm|cool|sunny|rainy|perfect|open|closed|full|free|expensive|cheap|big|small|important|due|similar|different|true|lovely|terrible|awful|quiet|noisy|crowded|empty|easy|hard|difficult|great|fantastic|wonderful|delicious|spicy|fresh|new|old|long|short|high|low|fast|slow|ok)$/.test(next.norm) && (!after || after.punct || /^(and|but|so|today|now|tonight|tomorrow|again|too|enough|here|there|for|to|in|at|this|than)$/.test(after.norm));
+    if (pronounLike || pp || nameIs || predicate || next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|nearly|quite|pretty|totally|completely|fully|currently|probably|definitely|usually|actually|clearly|a|an|the|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away|right|wrong|correct|sure|busy|sick|ill|available|absent|early|upset|angry|aware|unable|able|alright|safe)$/.test(next.norm)) {
       t.expanded = true;
       tokens.splice(i + 1, 0, { norm: "is", raw: t.raw, start: t.start, end: t.end, stem: stem("is"), punct: false, expanded: true });
     }

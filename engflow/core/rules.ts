@@ -1059,6 +1059,8 @@ const sinceDuration: Rule = (w) => {
     else continue;
     if (w[j]?.norm === "of") j++;
     if (!/^(seconds|minutes|hours|days|weeks|months|years|decades)$/.test(w[j]?.norm ?? "")) continue;
+    // "since six months is a long time": "since" means "because" when a verb follows the amount.
+    if (/^(is|was|are|were|will|would|seems|sounds|feels)$/.test(w[j + 1]?.norm ?? "")) continue;
     out.push({
       rule: "since-duration", from: i, to: i + 1, replacement: "for", category: "preposition", severity: "major", skill: "present-perfect",
       messageKo: `기간(얼마 동안)은 'for'를 씁니다: 'for ${w.slice(i + 1, j + 1).map((x) => x.raw).join(" ")}'. 'since'는 시작 시점과 함께 씁니다(since Monday, since 2020).`,
@@ -1667,6 +1669,8 @@ const keepBaseVerb: Rule = (w) => {
   for (let i = 0; i < w.length - 1; i++) {
     const base = verbInfo(w[i].norm)?.base;
     if (!base || !/^(keep|stop|finish|enjoy|avoid|mind|quit)$/.test(base)) continue;
+    // "Great minds think alike": the plural noun "minds".
+    if (w[i].norm === "minds" && i > 0 && !SUBJECT_PRONOUNS.has(w[i - 1].norm)) continue;
     const v = w[i + 1];
     const info = verbInfo(v.norm);
     if (!info || info.form !== "base" || v.norm !== info.base || COUNTABLE_NOUNS.has(v.norm)) continue;
