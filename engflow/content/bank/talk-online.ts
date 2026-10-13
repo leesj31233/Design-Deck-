@@ -26,6 +26,8 @@ export const TALK_ONLINE: Question[] = [
     pitfalls: [
       { id: "let-me-to", pattern: "let me to", category: "verb-form", severity: "major", fix: "let me", messageKo: "'let me' 뒤에는 동사원형이 바로 옵니다: 'let me share'. 'to'를 넣지 않습니다." },
       { id: "show-screen-share", pattern: "i share ... screen", category: "tense", severity: "major", fix: "I'll share", messageKo: "지금 막 하려는 일을 말할 때는 'I share'(평소에 공유한다)가 아니라 'Let me share' 또는 'I'll share'를 씁니다." },
+      { id: "share-to-you", pattern: "re:\\bshare (my |the )?screen to (you|everyone|all|them)\\b", category: "preposition", severity: "major", fix: "share my screen with you", messageKo: "'~와 공유하다'는 'share with + 사람'입니다. 'share to you'가 아니라 'share my screen with you'라고 하거나, 보통은 'Let me share my screen.'만 말합니다." },
+      { id: "share-screen-no-my", pattern: "re:\\bshare screen\\b", category: "article", severity: "minor", fix: "share my screen", messageKo: "screen은 셀 수 있는 명사라서 앞에 my가 필요합니다: 'share my screen'." },
     ],
     hints: { pattern: "Let me + 동사원형 (지금 제가 할게요)", skeleton: "Sure, let me _____ my ______.", partial: "Sure, let me share…" },
     explanationKo: "회의에서 '제가 지금 ~할게요'는 'Let me + 동사원형'이 가장 자연스럽습니다. 'Let me to share'처럼 to를 넣거나 'I share'(평소 습관)로 말하지 않습니다.",
@@ -53,7 +55,7 @@ export const TALK_ONLINE: Question[] = [
     reference: "Can you hear me okay?",
     accepted: ["Can you hear me?", "Can you hear me all right?", "Can everyone hear me?"],
     meaning: [
-      { id: "hear-me", en: "hear me", ko: "제 목소리가 들리다", any: ["hear ... me", "hear ... my voice", "audio|sound|voice|mic ... okay|ok|clear|fine|good|working", "come through"], critical: true },
+      { id: "hear-me", en: "hear me", ko: "제 목소리가 들리다", any: ["re:(?<!\\bnobody (can|could) )(?<!\\bno one (can|could) )(?<!\\bnot )\\bhear( \\w+){0,2} (me|my voice)\\b", "audio|sound|voice|mic ... okay|ok|clear|fine|good|working", "come through"], critical: true },
       { id: "can", en: "can you …?", ko: "~할 수 있나요?", any: ["can|could", "is|are ... okay|ok|clear|fine|good|working", "is ... come through"] },
     ],
     pitfalls: [
@@ -91,7 +93,7 @@ export const TALK_ONLINE: Question[] = [
     reference: "Sari, I think you're on mute.",
     accepted: ["Sari, you're on mute.", "Sari, I think you're muted.", "Sari, I think you're still on mute."],
     meaning: [
-      { id: "mute", en: "on mute", ko: "음소거 상태", any: ["mute|muted"], critical: true },
+      { id: "mute", en: "on mute", ko: "음소거 상태", any: ["re:(?<!\\bnot )(?<!\\bnot on )(?<!\\bno longer )(?<!\\bno longer on )\\b(mute|muted)\\b"], critical: true },
       { id: "you", en: "you're", ko: "당신은 ~예요", any: ["you|your"] },
     ],
     pitfalls: [
@@ -246,6 +248,8 @@ export const TALK_ONLINE: Question[] = [
       { id: "freezed", pattern: "=freezed", category: "verb-form", severity: "major", fix: "froze", messageKo: "'freeze'의 과거형은 불규칙 변화 'froze'입니다. 'freezed'라고 쓰지 않습니다." },
       { id: "could-you-to", pattern: "could|can|would you to", category: "verb-form", severity: "major", fix: "could you", messageKo: "조동사 could 뒤에는 to 없이 동사원형이 바로 옵니다: 'Could you repeat …?'" },
       { id: "repeat-again", pattern: "repeat ... again", category: "word-choice", severity: "minor", fix: "repeat", messageKo: "'repeat'에 이미 '다시'라는 뜻이 있어서 'again'을 붙이지 않습니다. 'Could you repeat the last part?' 또는 'Could you say that again?'이라고 합니다." },
+      { id: "repeat-me", pattern: "repeat =me", category: "word-choice", severity: "major", fix: "repeat", messageKo: "repeat은 사람을 목적어로 받지 않습니다. 'repeat me the last part'가 아니라 'repeat the last part'라고 합니다." },
+      { id: "were-freeze", pattern: "was|were =freeze", category: "verb-form", severity: "major", fix: "froze", messageKo: "be 동사 뒤에 동사원형 freeze를 쓰지 않습니다. 'You froze' 또는 'You were frozen'이라고 합니다." },
     ],
     hints: { pattern: "Could you + 동사원형 + 목적어?", skeleton: "Sorry, you _____ for a moment. Could you ______ the last part?", partial: "Sorry, you froze for a moment. Could you…" },
     explanationKo: "정중한 요청은 'Could you + 동사원형?'으로 합니다. 'Repeat the last part.'처럼 명령문으로 말하면 무례하게 들리고, freeze의 과거형은 'froze'이며 'repeat again'은 의미가 중복됩니다.",
@@ -328,6 +332,7 @@ export const TALK_ONLINE: Question[] = [
       { id: "like-go", pattern: "like =go|=going", category: "verb-form", severity: "major", fix: "like to go", messageKo: "'would you like' 뒤에 동사가 오면 'to + 동사원형'입니다: 'Would you like to go next?'" },
       { id: "to-taking", pattern: "to =taking", category: "verb-form", severity: "major", fix: "to take", messageKo: "'would like to' 뒤에는 동사원형이 옵니다: 'Would you like to take it from here?'" },
       { id: "want-go", pattern: "want =go|=going", category: "verb-form", severity: "major", fix: "want to go", messageKo: "'want' 뒤에 동사가 오면 'to + 동사원형'입니다: 'Do you want to go next?'" },
+      { id: "go-to-next", pattern: "go to =next", category: "preposition", severity: "major", fix: "go next", messageKo: "'다음 차례로 하다'는 'go next'입니다. next는 부사라서 앞에 to를 붙이지 않습니다." },
     ],
     hints: { pattern: "Would you like to + 동사원형?", skeleton: "That's all from my side. Budi, would you ____ __ go next?", partial: "That's all from my side. Budi, would you…" },
     explanationKo: "다음 사람에게 순서를 넘길 때는 'Would you like to + 동사원형?'으로 정중하게 권합니다. like와 want 뒤에 동사가 오면 반드시 to가 필요해서 'would you like go'는 틀립니다.",
@@ -412,6 +417,7 @@ export const TALK_ONLINE: Question[] = [
       { id: "recording-will-share", pattern: "recording will =share|=send", category: "verb-form", severity: "major", fix: "recording will be shared", messageKo: "녹화 파일은 '공유되는' 대상이므로 수동태 'will be shared'를 씁니다. 'will share'는 녹화 파일이 무언가를 공유한다는 뜻이 됩니다." },
       { id: "be-share", pattern: "be =share|=send", category: "verb-form", severity: "major", fix: "be shared", messageKo: "수동태는 'be + 과거분사'입니다: 'will be share'가 아니라 'will be shared'입니다." },
       { id: "meeting-is-recording", pattern: "meeting|call is =recording", category: "verb-form", severity: "major", fix: "meeting is being recorded", messageKo: "'The meeting is recording'은 회의가 무언가를 녹화한다는 뜻이 됩니다. 회의는 녹화'되는' 것이므로 'is being recorded'를 씁니다." },
+      { id: "will-be-sharing", pattern: "recording will be =sharing|=sending|=uploading", category: "verb-form", severity: "major", fix: "recording will be shared", messageKo: "녹화 파일은 '공유되는' 대상이라서 수동태 'will be shared'를 씁니다. 'will be sharing'은 녹화 파일이 직접 공유한다는 뜻이 됩니다." },
     ],
     hints: { pattern: "is being + p.p. (지금 ~되고 있다) / will be + p.p. (~될 것이다)", skeleton: "Don't worry. This meeting is _____ ________, and the recording will __ ______ with everyone after the call.", partial: "Don't worry. This meeting is being recorded, and…" },
     explanationKo: "회의와 녹화 파일은 '되는' 대상이므로 수동태를 씁니다: 지금 진행 중이면 'is being recorded', 앞으로는 'will be shared'. 'The meeting is recording'이나 'will share'라고 하면 회의나 파일이 직접 행동하는 뜻이 됩니다.",
@@ -446,7 +452,7 @@ export const TALK_ONLINE: Question[] = [
       "No, that's all from our side. Thank you all for joining today. Looking forward to seeing the lab results next week.",
     ],
     meaning: [
-      { id: "thats-all", en: "that's all", ko: "그게 다입니다", any: ["that ... all|everything|it", "nothing"] },
+      { id: "thats-all", en: "that's all", ko: "그게 다입니다", any: ["that ... all|everything|it", "nothing", "no ... more|else"], critical: true },
       { id: "thanks", en: "thank you for", ko: "감사합니다", any: ["thank|thanks", "appreciate"], critical: true },
       { id: "joining", en: "joining", ko: "참석해 주셔서", any: ["join|joining|time|attend|attending|come|coming", "=being here|there"] },
       { id: "look-forward", en: "looking forward to", ko: "기대하다", any: ["look|looking forward"], critical: true },
@@ -534,7 +540,7 @@ export const TALK_ONLINE: Question[] = [
       { id: "sum-up", en: "to sum up", ko: "정리하면", any: ["sum|summarize|summarise|summary|recap|wrap", "so"] },
       { id: "budi-check", en: "Budi will check the data", ko: "부디 씨는 데이터를 확인", any: ["budi ... check|review|confirm|look|verify"], critical: true },
       { id: "sari-update", en: "Sari will update the schedule", ko: "사리 씨는 일정을 업데이트", any: ["sari ... update|revise|change|modify"], critical: true },
-      { id: "send-minutes", en: "send the minutes", ko: "회의록을 보내다", any: ["send|email|share|circulate ... minute|minutes|summary|notes"], critical: true },
+      { id: "send-minutes", en: "send the minutes", ko: "회의록을 보내다", any: ["re:(?<!\\bnot )(?<!\\bnot need to )(?<!\\bnobody needs to )(?<!\\bno one needs to )\\b(send|sends|sent|sending|email|emailing|emailed|share|sharing|circulate|circulating)( \\w+){0,4} (minute|minutes|summary|notes)\\b"], critical: true },
       { id: "if-mistakes", en: "if there are any mistakes", ko: "틀린 부분이 있으면", any: ["if ... mistake|mistakes|error|errors|wrong|missing|incorrect", "if ... anything"], critical: true },
       { id: "let-know", en: "let me know", ko: "알려 주세요", any: ["let ... know", "tell me|us", "inform"] },
       { id: "friday", en: "by Friday", ko: "금요일까지", any: ["friday"] },

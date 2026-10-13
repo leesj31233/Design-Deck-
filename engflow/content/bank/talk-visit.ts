@@ -58,7 +58,7 @@ export const TALK_VISIT: Question[] = [
     accepted: ["Let me help you with those bags.", "Let me take your bags.", "Here, let me carry your bags."],
     meaning: [
       { id: "let-me", en: "let me / I'll", ko: "제가 ~할게요", any: ["let me", "i will", "can i"], critical: true },
-      { id: "help-bags", en: "help you with your bags", ko: "가방을 들어 주다", any: ["help ... bag|bags|luggage|suitcase", "take|carry ... bag|bags|luggage|suitcase", "help ... with those|them|these", "hand ... bag|bags|luggage|suitcase|those|them|these", "grab|get|hold ... bag|bags|luggage|suitcase"], critical: true },
+      { id: "help-bags", en: "help you with your bags", ko: "가방을 들어 주다", any: ["help ... bag|bags|luggage|suitcase", "take|carry ... bag|bags|luggage|suitcase|those|them|these", "help ... with those|them|these", "hand ... bag|bags|luggage|suitcase|those|them|these", "grab|get|hold ... bag|bags|luggage|suitcase"], critical: true },
     ],
     pitfalls: [
       { id: "help-your-bags", pattern: "help your|the|those bag|bags|luggage|suitcase", category: "preposition", severity: "major", fix: "help you with your bags", messageKo: "help의 목적어는 사람입니다. '가방을 도와주다'는 'help you with your bags'처럼 '사람 + with + 물건'으로 씁니다." },
@@ -127,13 +127,14 @@ export const TALK_VISIT: Question[] = [
     reference: "Have you been to Korea before?",
     accepted: ["Have you ever been to Korea before?", "Have you visited Korea before?", "Is this your first time in Korea?", "Have you ever been to Korea?"],
     meaning: [
-      { id: "been", en: "have you been", ko: "와 본 적 있다", any: ["have you", "first time|visit|trip"], critical: true },
+      { id: "been", en: "have you been", ko: "와 본 적 있다", any: ["have you", "re:\\byour first (time|visit|trip)\\b"], critical: true },
       { id: "korea", en: "to Korea", ko: "한국에", any: ["korea"] },
-      { id: "before", en: "before", ko: "전에", any: ["before|ever", "first time|visit|trip"] },
+      { id: "before", en: "before", ko: "전에", any: ["before|ever", "re:\\byour first (time|visit|trip)\\b"] },
     ],
     pitfalls: [
       { id: "have-you-base-past", pattern: "have you ever? =visit|=go|=went|=came", category: "verb-form", severity: "major", fix: "have you been", messageKo: "현재완료 의문문은 'Have you + 과거분사?'입니다. '가 본 적 있다'는 보통 'Have you been to …?'라고 합니다." },
       { id: "did-you-been", pattern: "did you ever? =been", category: "verb-form", severity: "major", fix: "have you ever been", messageKo: "been은 have와 함께 씁니다: 'Have you (ever) been to Korea?'. 'Did you been'은 틀린 형태입니다." },
+      { id: "have-you-be", pattern: "have you ever? =be to", category: "verb-form", severity: "major", fix: "have you been to", messageKo: "현재완료는 'have + 과거분사'입니다. 'Have you ever be'가 아니라 'Have you ever been to Korea?'입니다." },
     ],
     hints: { pattern: "Have you been to + 장소 + before?", skeleton: "____ you ____ to Korea before?", partial: "Have you been…" },
     explanationKo: "지금까지의 경험(~해 본 적 있다)은 현재완료 'Have you been to + 장소?'로 묻습니다. 'Have you went'나 'Did you ever been'처럼 have와 과거형을 섞지 않습니다.",
@@ -281,7 +282,7 @@ export const TALK_VISIT: Question[] = [
     meaning: [
       { id: "when", en: "when", ko: "~하면", any: ["when|once|after", "as soon as"], critical: true },
       { id: "arrive", en: "we get to the site", ko: "현장에 도착하다", any: ["get|arrive|reach ... site|plant", "get there"], critical: true },
-      { id: "briefing", en: "a short safety briefing", ko: "간단한 안전 교육", any: ["safety", "briefing"], critical: true },
+      { id: "briefing", en: "a short safety briefing", ko: "간단한 안전 교육", any: ["re:(?<!\\b(no|without|skip|skip the)( \\w+){0,2} )\\b(safety|briefing)\\b"], critical: true },
       { id: "give", en: "I'll give you", ko: "해 드릴게요", any: ["give|do|have|run|explain", "start|begin with"] },
       { id: "first", en: "first", ko: "먼저", any: ["first", "before", "start|begin with"] },
     ],
@@ -316,6 +317,7 @@ export const TALK_VISIT: Question[] = [
     accepted: ["Can you tell me what time the plant tour starts?", "Could you tell me when the plant tour starts?", "What time does the plant tour start?"],
     meaning: [
       { id: "what-time", en: "what time", ko: "몇 시에", any: ["what time", "when"], critical: true },
+      { id: "asking", en: "could you tell me", ko: "알려 주실 수 있나요", any: ["could|can|would|will you", "do you know", "what|when ... does|do|will ... start|begin", "please ... tell|let", "like to know", "=wondering"], critical: true },
       { id: "tour", en: "the plant tour", ko: "공장 견학", any: ["tour|visit"] },
       { id: "start", en: "starts", ko: "시작하다", any: ["start|begin"], critical: true },
     ],
@@ -408,6 +410,7 @@ export const TALK_VISIT: Question[] = [
     pitfalls: [
       { id: "that-installed", pattern: "dryer that|which installed", category: "verb-form", severity: "major", fix: "dryer that was installed", messageKo: "건조기는 설치를 '받은' 쪽이므로 수동태 'was installed'가 필요합니다. 'the dryer that installed'는 건조기가 무언가를 설치했다는 뜻이 됩니다." },
       { id: "is-installed-last", pattern: "=is installed last month", category: "tense", severity: "major", fix: "was installed last month", messageKo: "'지난달'은 끝난 과거이므로 be동사도 과거형 'was installed'를 씁니다." },
+      { id: "dryer-who", pattern: "dryer|unit who", category: "word-choice", severity: "major", fix: "dryer that", messageKo: "사물을 꾸미는 관계대명사는 that이나 which입니다. who는 사람에게만 씁니다: 'the new dryer that was installed'." },
     ],
     hints: { pattern: "This is the + 명사 + that was + 과거분사 + 시간", skeleton: "This is the new dryer that ___ _________ last month.", partial: "This is the new dryer that was…" },
     explanationKo: "명사(dryer)를 뒤에서 설명할 때는 'that/which + 동사'를 쓰고, 건조기가 설치를 '받은' 것이므로 수동태 'was installed'입니다. was를 빼면 건조기가 설치한 것처럼 들리고, 지난달 일이므로 is가 아니라 was입니다.",
@@ -442,7 +445,7 @@ export const TALK_VISIT: Question[] = [
     meaning: [
       { id: "thank", en: "thank you", ko: "감사해요", any: ["thank|thanks|appreciate"], critical: true },
       { id: "show-around", en: "for showing us around", ko: "구경시켜 준 것", any: ["show ... around", "tour", "visit"] },
-      { id: "looking-forward", en: "looking forward to", ko: "기대하고 있다", any: ["look ... forward"], critical: true },
+      { id: "looking-forward", en: "looking forward to", ko: "기대하고 있다", any: ["re:(?<!\\bnot )(?<!\\bnot really )(?<!\\bnot so )\\blook(s|ed|ing)?( \\w+){0,2} forward\\b"], critical: true },
       { id: "working", en: "working with your team", ko: "함께 일하는 것", any: ["work|working|cooperation|collaboration|partnership"] },
     ],
     pitfalls: [
@@ -485,7 +488,7 @@ export const TALK_VISIT: Question[] = [
       { id: "two-hours", en: "it takes about two hours", ko: "두 시간쯤 걸린다", any: ["two|2 hour|hours", "two-hour|2-hour"], critical: true },
       { id: "site", en: "to get to the site", ko: "현장까지", any: ["site|plant"] },
       { id: "suggest", en: "why don't we", ko: "~하는 게 어때요", any: ["why ... not", "shall|could|can|should we", "how|what about", "let us|=let's"], critical: true },
-      { id: "leave", en: "leave the hotel", ko: "호텔에서 출발하다", any: ["leave|start|depart|go"], critical: true },
+      { id: "leave", en: "leave the hotel", ko: "호텔에서 출발하다", any: ["re:(?<!\\bnot )\\b(leave|leaving|start|starting|depart|departing|go|going|head|heading|set)\\b"], critical: true },
       { id: "seven", en: "at seven", ko: "7시에", any: ["seven|7|7am"], critical: true },
     ],
     pitfalls: [

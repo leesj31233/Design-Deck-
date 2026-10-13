@@ -21,12 +21,13 @@ export const TALK_MEAL: Question[] = [
     reference: "Wow, this looks delicious!",
     accepted: ["Wow, this looks really good!", "Wow, it looks delicious!", "Wow, everything looks delicious!"],
     meaning: [
-      { id: "looks", en: "looks", ko: "~해 보여요", any: ["look|looks"], critical: true },
+      { id: "looks", en: "looks", ko: "~해 보여요", any: ["re:(?<!\\bnot )(?<!\\bnot really )\\blooks?\\b"], critical: true },
       { id: "delicious", en: "delicious", ko: "맛있는", any: ["delicious|good|great|tasty|amazing|yummy|nice|fantastic|incredible|wonderful|lovely|awesome|appetizing|excellent|perfect"], critical: true },
     ],
     pitfalls: [
       { id: "looks-like-adj", pattern: "look like =delicious|=tasty|=yummy|=good|=great", category: "word-choice", severity: "major", fix: "looks delicious", messageKo: "'~해 보이다' 뒤에 형용사가 오면 'look + 형용사'(looks delicious)입니다. 'look like'는 뒤에 명사가 올 때 씁니다." },
       { id: "is-look", pattern: "is =look|=looks", category: "verb-form", severity: "major", fix: "looks", messageKo: "look이 이미 동사이므로 be동사를 함께 쓰지 않습니다: 'This looks delicious!'" },
+      { id: "looks-adverb", pattern: "look|looks =deliciously|=nicely|=greatly|=tastily", category: "word-choice", severity: "major", fix: "looks delicious", messageKo: "look(~해 보이다) 뒤에는 부사가 아니라 형용사가 옵니다: 'This looks delicious!'" },
     ],
     hints: { pattern: "주어 + look(s) + 형용사", skeleton: "Wow, this ______ delicious!", partial: "Wow, this looks…" },
     explanationKo: "'~해 보이다'는 'look + 형용사'입니다. 형용사(delicious) 앞에는 like를 쓰지 않고, look 자체가 동사이므로 'is look'처럼 be동사를 함께 쓰지 않습니다.",
@@ -90,8 +91,8 @@ export const TALK_MEAL: Question[] = [
     reference: "You're welcome. What would you like to drink?",
     accepted: ["My pleasure. What would you like to drink?", "You're welcome. What do you want to drink?", "You're welcome. What can I get you to drink?"],
     meaning: [
-      { id: "welcome", en: "you're welcome", ko: "천만에요", any: ["welcome|pleasure|problem|mention"] },
-      { id: "what-drink", en: "what would you like to drink", ko: "음료는 뭐로", any: ["what ... drink|drinks", "something|anything to drink"], critical: true },
+      { id: "welcome", en: "you're welcome", ko: "천만에요", any: ["welcome|pleasure|problem|mention|glad|enjoy"] },
+      { id: "what-drink", en: "what would you like to drink", ko: "음료는 뭐로", any: ["what ... drink|drinks", "re:(?<!\\bnot want )(?<!\\bnot need )\\b(something|anything) to drink\\b"], critical: true },
     ],
     pitfalls: [
       { id: "like-drink", pattern: "would you like =drink", category: "verb-form", severity: "major", fix: "would you like to drink", messageKo: "'would you like' 뒤에 동사가 오면 'to + 동사원형'이 필요합니다: 'What would you like to drink?'" },
@@ -138,7 +139,7 @@ export const TALK_MEAL: Question[] = [
     ],
     pitfalls: [
       { id: "rices", pattern: "=rices", category: "countability", severity: "major", fix: "bowls of rice", messageKo: "rice는 셀 수 없는 명사라서 'two rices'라고 하지 않습니다. 개수는 'two bowls of rice'처럼 그릇(bowl)으로 셉니다.", skill: "countability" },
-      { id: "two-rice", pattern: "two|2 more? =rice", category: "countability", severity: "major", fix: "two more bowls of rice", messageKo: "셀 수 없는 rice 앞에 숫자를 바로 붙이지 않습니다. 'two bowls of rice'처럼 단위를 넣어 셉니다.", skill: "countability" },
+      { id: "two-rice", pattern: "re:\\b(two|2) (more )?rice\\b(?! bowls\\b)", category: "countability", severity: "major", fix: "two more bowls of rice", messageKo: "셀 수 없는 rice 앞에 숫자를 바로 붙이지 않습니다. 'two bowls of rice'처럼 단위를 넣어 셉니다.", skill: "countability" },
     ],
     hints: { pattern: "Could we have + 숫자 + more + bowls of + 셀 수 없는 명사, please?", skeleton: "Excuse me, could we have two more ______ __ rice, please?", partial: "Excuse me, could we have two more…" },
     explanationKo: "rice는 셀 수 없는 명사라서 'two rices'나 'two rice'라고 하지 않고 'two bowls of rice'처럼 담는 그릇을 셉니다. 주문할 때는 'Could we have …, please?'가 정중합니다.",
@@ -167,12 +168,14 @@ export const TALK_MEAL: Question[] = [
     accepted: ["Have you tried bibimbap?", "Have you ever had bibimbap?", "Have you ever eaten bibimbap?"],
     meaning: [
       { id: "tried", en: "tried", ko: "먹어 보다", any: ["try|tried|had|have|eat|eaten|ate"], critical: true },
+      { id: "asking", en: "have you", ko: "~해 본 적 있어요?", any: ["have|did|do ... you"], critical: true },
       { id: "bibimbap", en: "bibimbap", ko: "비빔밥", any: ["bibimbap|bibimbab|bibimbop"], critical: true },
     ],
     pitfalls: [
-      { id: "did-ever-past", pattern: "=did you ever? =tried|=ate|=eaten|=had", category: "tense", severity: "major", fix: "have you ever tried", messageKo: "did 뒤에는 동사원형이 옵니다. 먹어 본 경험은 현재완료로 묻습니다: 'Have you ever tried …?'", skill: "present-perfect" },
+      { id: "did-ever-past", pattern: "re:\\bdid you (ever )?(tried|ate|eaten|had)\\b", category: "tense", severity: "major", fix: "have you ever tried", messageKo: "did 뒤에는 동사원형이 옵니다. 먹어 본 경험은 현재완료로 묻습니다: 'Have you ever tried …?'", skill: "present-perfect" },
       { id: "ever-base", pattern: "have you ever? =try|=eat|=ate", category: "verb-form", severity: "major", fix: "have you ever tried", messageKo: "현재완료 의문문은 'Have you (ever) + 과거분사?'입니다. try의 과거분사는 tried, eat은 eaten입니다." },
-      { id: "do-ever", pattern: "do you ever =try|=eat", category: "tense", severity: "major", fix: "have you ever tried", messageKo: "'Do you ever eat …?'은 '평소에 가끔 먹나요?'라는 뜻입니다. 지금까지의 경험은 현재완료 'Have you ever tried …?'로 묻습니다." },
+      { id: "do-ever", pattern: "=do you ever =try|=eat", category: "tense", severity: "major", fix: "have you ever tried", messageKo: "'Do you ever eat …?'은 '평소에 가끔 먹나요?'라는 뜻입니다. 지금까지의 경험은 현재완료 'Have you ever tried …?'로 묻습니다." },
+      { id: "did-ever-base", pattern: "re:\\bdid you ever (try|eat|have)\\b", category: "tense", severity: "minor", fix: "have you ever tried", messageKo: "'Did you ever try …?'도 틀린 문장은 아니지만, 지금까지의 경험을 물을 때는 현재완료 'Have you ever tried …?'가 가장 자연스럽습니다.", skill: "present-perfect" },
     ],
     hints: { pattern: "Have you (ever) + 과거분사 + 명사?", skeleton: "Have you ____ ______ bibimbap?", partial: "Have you ever…" },
     explanationKo: "'~해 본 적 있어요?'는 지금까지의 경험을 묻는 현재완료 'Have you ever + 과거분사?'입니다. have 뒤에는 동사원형(try)이 아니라 과거분사(tried)가 옵니다.",
@@ -208,11 +211,14 @@ export const TALK_MEAL: Question[] = [
     meaning: [
       { id: "dish", en: "this dish", ko: "이 음식", any: ["this|dish|it|one"] },
       { id: "pork", en: "pork", ko: "돼지고기", any: ["pork"], critical: true },
+      { id: "asking", en: "does this dish …?", ko: "~이 들어가나요?", any: ["re:\\b(does|do|is|are|has|have|did) (this|that|it|there|the)\\b"], critical: true },
       { id: "have", en: "have / contain / is there", ko: "들어가나요", any: ["have|has|contain|contains|there|with|include|includes|use"], critical: true },
     ],
     pitfalls: [
       { id: "is-have", pattern: "is this dish? =have|=has|=contain|=contains|=include|=includes", category: "sentence-structure", severity: "major", fix: "does this dish have", messageKo: "일반동사 have가 있는 의문문은 be동사가 아니라 does로 만듭니다: 'Does this dish have …?' 또는 'Is there any pork in …?'" },
       { id: "does-has", pattern: "does this dish? =has|=contains|=includes", category: "agreement", severity: "major", fix: "does this dish have", messageKo: "does가 이미 3인칭 단수를 표시하므로 뒤의 동사는 원형을 씁니다: 'Does this dish have …?'" },
+      { id: "porks", pattern: "=porks", category: "countability", severity: "major", fix: "pork", messageKo: "pork(돼지고기)는 셀 수 없는 명사라서 -s를 붙이지 않습니다: 'any pork'." },
+      { id: "a-pork", pattern: "a =pork", category: "countability", severity: "minor", fix: "any pork", messageKo: "pork는 셀 수 없는 명사라서 a를 붙이지 않습니다: 'any pork' 또는 그냥 'pork'." },
     ],
     hints: { pattern: "Does + 주어 + have + 명사 (+ in it)? / Is there + 명사 + in …?", skeleton: "Excuse me, ____ this dish ____ any pork in it?", partial: "Excuse me, does this dish…" },
     explanationKo: "have가 본동사인 의문문은 does로 시작하고, does 뒤에는 동사원형 have를 씁니다. 'Is this dish have …?'처럼 be동사와 have를 섞지 않으며, 'Is there any pork in this dish?'도 자연스럽습니다.",
@@ -296,6 +302,7 @@ export const TALK_MEAL: Question[] = [
       { id: "recommend-you-to", pattern: "recommend|suggest you to =try", category: "verb-form", severity: "major", fix: "recommend trying", messageKo: "'recommend you to try'는 틀린 형태입니다. 'I'd recommend the bulgogi' 또는 'I'd recommend trying the bulgogi'처럼 씁니다." },
       { id: "doesnt-spicy", pattern: "=does|=do not =spicy|=hot", category: "be-verb", severity: "major", fix: "is not spicy", messageKo: "spicy는 형용사라서 do로 부정하지 않고 be동사로 부정합니다: 'it isn't spicy'." },
       { id: "no-spicy", pattern: "is =no spicy|hot", category: "word-choice", severity: "major", fix: "is not spicy", messageKo: "형용사를 부정할 때는 no가 아니라 not을 씁니다: 'it isn't spicy'." },
+      { id: "recommend-to-you-the", pattern: "recommend|suggest to you the|this", category: "word-order", severity: "major", fix: "recommend the", messageKo: "recommend는 '사람에게 무엇을' 순서로 쓰지 않습니다. 'I'd recommend the bulgogi'처럼 추천하는 것을 바로 씁니다." },
     ],
     hints: { pattern: "I'd recommend + 명사 + because + 주어 + 동사", skeleton: "Then I'd ______ the bulgogi because it ____ spicy at all.", partial: "Then I'd recommend the bulgogi because…" },
     explanationKo: "메뉴를 추천할 때는 'I'd recommend + 명사' 또는 'You should try + 명사'를 씁니다. 'recommend you to try'는 틀린 형태이고, because 뒤에는 '주어 + 동사'(it isn't spicy)가 옵니다.",
@@ -457,12 +464,13 @@ export const TALK_MEAL: Question[] = [
       { id: "no-problem", en: "no problem at all", ko: "전혀 문제없어요", any: ["problem", "fine|okay|ok"] },
       { id: "booked", en: "I've booked", ko: "예약해 뒀어요", any: ["book|booked|reserve|reserved|chose|choose|found|picked"], critical: true },
       { id: "restaurant", en: "a restaurant", ko: "식당", any: ["restaurant|place"], critical: true },
-      { id: "vegetarian", en: "vegetarian dishes", ko: "채식 메뉴", any: ["re:(?<!\\bnot (?:\\w+ ){0,2})\\b(vegetarian|veggie|vegan)\\b"], critical: true },
+      { id: "vegetarian", en: "vegetarian dishes", ko: "채식 메뉴", any: ["re:(?<!\\bno )(?<!\\bnothing )(?<!\\bnot (?:\\w+ ){0,2})\\b(vegetarian|veggie|vegan)\\b"], critical: true },
       { id: "a-lot", en: "a lot of", ko: "많이", any: ["lot|lots|many|plenty|several|good|great"] },
     ],
     pitfalls: [
       { id: "that-have", pattern: "restaurant|place that|which =have", category: "agreement", severity: "major", fix: "restaurant that has", messageKo: "관계절의 동사는 앞의 명사(단수 restaurant)에 맞춰 'that has'로 씁니다.", skill: "agreement" },
       { id: "no-relative", pattern: "restaurant|place =has|=have", category: "sentence-structure", severity: "major", fix: "restaurant that has", messageKo: "'채식 메뉴가 많은 식당'처럼 명사를 문장으로 꾸밀 때는 'a restaurant that has …'처럼 that/which가 필요합니다." },
+      { id: "restaurant-who", pattern: "restaurant|place who", category: "word-choice", severity: "major", fix: "restaurant that", messageKo: "장소를 꾸미는 관계대명사는 that이나 which입니다. who는 사람에게만 씁니다: 'a restaurant that has …'." },
     ],
     hints: { pattern: "명사 + that/which + 동사 (명사를 뒤에서 꾸미기)", skeleton: "No problem at all. I've ______ a restaurant ____ ____ a lot of vegetarian dishes.", partial: "No problem at all. I've booked a restaurant that…" },
     explanationKo: "'채식 메뉴가 많은 식당'처럼 명사를 문장으로 꾸밀 때는 'a restaurant that has …'처럼 관계대명사 that/which를 씁니다. 관계절의 동사는 앞의 명사(단수 restaurant)에 맞춰 has를 씁니다.",
@@ -499,7 +507,7 @@ export const TALK_MEAL: Question[] = [
       { id: "thanks", en: "thank you", ko: "감사합니다", any: ["thank|thanks"], critical: true },
       { id: "coming", en: "for coming all the way", ko: "멀리 와 주셔서", any: ["come|coming|came|visit|visiting|travel"], critical: true },
       { id: "korea", en: "to Korea", ko: "한국까지", any: ["korea|seoul|here"] },
-      { id: "toast", en: "let's have a toast", ko: "건배합시다", any: ["toast|cheers|glass|glasses|drink"], critical: true },
+      { id: "toast", en: "let's have a toast", ko: "건배합시다", any: ["re:(?<!\\bnot )(?<!\\bnot have a )(?<!\\bnot make a )(?<!\\bnot raise a )\\b(toast|cheers|glass|glasses|drink)\\b"], critical: true },
       { id: "success", en: "to the success of our project", ko: "프로젝트의 성공", any: ["success|successful", "project"] },
     ],
     pitfalls: [
@@ -539,7 +547,7 @@ export const TALK_MEAL: Question[] = [
     ],
     meaning: [
       { id: "both-good", en: "both are good", ko: "둘 다 맛있어요", any: ["both", "either"] },
-      { id: "if-you", en: "if I were you", ko: "제가 당신이라면", any: ["if ... you", "were you"], critical: true },
+      { id: "if-you", en: "if I were you", ko: "제가 당신이라면", any: ["if ... you", "were you", "your shoes|place"], critical: true },
       { id: "would-try", en: "I'd try", ko: "먹어 볼 거예요", any: ["would|will ... try|get|have|order|choose|go|pick"], critical: true },
       { id: "cold-noodles", en: "the cold noodles", ko: "냉면", any: ["noodle|noodles", "naengmyeon|naengmyun"], critical: true },
       { id: "hot", en: "it's really hot today", ko: "오늘 정말 덥다", any: ["hot|warm|humid"] },

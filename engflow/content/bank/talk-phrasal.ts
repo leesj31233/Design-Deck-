@@ -27,6 +27,8 @@ export const TALK_PHRASAL: Question[] = [
     pitfalls: [
       { id: "hold-no-on", pattern: "re:\\bhold(?= (a|one) (second|sec|moment|minute)\\b)", category: "preposition", severity: "major", fix: "hold on", messageKo: "'잠깐 기다리다'는 구동사 'hold on'입니다. on을 빼고 'hold a second'라고 하지 않습니다: 'Hold on a second.'" },
       { id: "wait-me", pattern: "wait =me", category: "preposition", severity: "major", fix: "wait for me", messageKo: "wait는 기다리는 대상 앞에 for가 필요합니다('wait for me'). 전화에서 '잠깐만요'는 보통 'Hold on a second.'나 'Just a second.'라고 합니다." },
+      { id: "hold-me", pattern: "re:\\bhold me(?= (a|one) (second|sec|moment|minute)\\b)", category: "word-choice", severity: "major", fix: "hold on", messageKo: "'hold me'는 '나를 붙잡아 주세요'라는 뜻이 됩니다. 잠깐 기다려 달라고 할 때는 'Hold on a second.'라고 합니다." },
+      { id: "holding-on", pattern: "re:^((sure|yes|okay|ok|yeah) )?holding on\\b", category: "verb-form", severity: "major", fix: "hold on", messageKo: "'잠깐 기다려 주세요'는 명령문이라서 동사원형 'Hold on a second.'로 말합니다. 'Holding on'이라고 하지 않습니다." },
     ],
     hints: { pattern: "Hold on + a second / a moment", skeleton: "Sure, ____ __ a second.", partial: "Sure, hold…" },
     explanationKo: "전화나 대화 중 '잠깐만 기다려 주세요'는 구동사 'hold on'을 써서 'Hold on a second.'라고 합니다. on을 빼면 뜻이 통하지 않고, wait를 쓸 때는 'wait for me'처럼 for가 필요합니다.",
@@ -55,7 +57,7 @@ export const TALK_PHRASAL: Question[] = [
     reference: "Thanks, I'll look into it.",
     accepted: ["Thank you, I'll look into it.", "Thanks, I'll look into it right away.", "Thanks, I'll investigate it.", "Thanks, let me look into it."],
     meaning: [
-      { id: "look-into", en: "look into it", ko: "알아보다", any: ["look ... into", "look ... at", "investigate", "check|examine"], critical: true },
+      { id: "look-into", en: "look into it", ko: "알아보다", any: ["re:(?<!\\bnot )(?<!\\btime to )(?<!\\bnot able to )\\blook(s|ed|ing)?( \\w+){0,2} (into|at)\\b", "re:(?<!\\bnot )(?<!\\btime to )(?<!\\bnot able to )\\b(investigate|check|checking|examine|find out)\\b"], critical: true },
       { id: "will", en: "I'll", ko: "제가 ~할게요", any: ["will", "let", "going"] },
       { id: "thanks", en: "thanks", ko: "고마워요", any: ["thank|thanks|appreciate"] },
     ],
@@ -105,6 +107,8 @@ export const TALK_PHRASAL: Question[] = [
       { id: "set-up-it", pattern: "set up =it", category: "word-order", severity: "major", fix: "set it up", messageKo: "구동사의 목적어가 it·them 같은 대명사면 동사와 up 사이에 넣습니다. 'set up it'이 아니라 'set it up'입니다." },
       { id: "setup-it", pattern: "re:\\bsetup it\\b", category: "word-order", severity: "major", fix: "set it up", messageKo: "동사는 띄어서 'set up'이고, 목적어 it은 가운데에 넣어 'set it up'이라고 합니다." },
       { id: "setup-verb", pattern: "re:(?<=\\b(will|to|can|could|i|we) )setup\\b", category: "spelling", severity: "minor", fix: "set up", messageKo: "붙여 쓴 'setup'은 명사(설정, 준비)입니다. 동사는 띄어서 'set up'이라고 씁니다." },
+      { id: "and-sending", pattern: "re:\\band sending (you|everyone|the|it)\\b", category: "verb-form", severity: "major", fix: "and send", messageKo: "'I'll set it up and send ~'처럼 and 뒤의 동사도 will에 이어지는 원형이어야 합니다. 'and sending'이 아니라 'and send'입니다." },
+      { id: "send-to-you-the", pattern: "re:\\bsend to (you|everyone|them|him|her) (the|a)\\b", category: "word-order", severity: "major", fix: "send you the", messageKo: "'~에게 …을 보내다'는 'send you the link' 또는 'send the link to you'입니다. 'send to you the link'라고 하지 않습니다." },
     ],
     hints: { pattern: "I'll + set + it + up (대명사는 가운데)", skeleton: "Sure, I'll ___ __ __ and send you the link.", partial: "Sure, I'll set it…" },
     explanationKo: "회의나 통화를 '잡다, 준비하다'는 구동사 'set up'을 씁니다. 목적어가 it 같은 대명사면 'set it up'처럼 가운데에 넣고, 'set up it'이라고 하지 않습니다. 명사는 'set up the call'처럼 뒤에 둘 수도 있습니다.",
@@ -137,7 +141,7 @@ export const TALK_PHRASAL: Question[] = [
       "Don't worry. We'll figure out the cause together.",
     ],
     meaning: [
-      { id: "figure-out", en: "figure it out", ko: "알아내다", any: ["figure ... out", "work ... out", "find ... out|cause|reason|solution", "solve|fix"], critical: true },
+      { id: "figure-out", en: "figure it out", ko: "알아내다", any: ["re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )(?<!\\bnot be able to )\\b(figure|work|sort|find)(s|ed|ing)?( \\w+){0,3} (out|cause|reason|solution)\\b", "re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )(?<!\\bnot be able to )\\b(solve|fix|resolve)\\b"], critical: true },
       { id: "together", en: "together", ko: "함께", any: ["together", "help"] },
       { id: "dont-worry", en: "don't worry", ko: "걱정 마세요", any: ["worry|worries"] },
     ],
@@ -177,6 +181,7 @@ export const TALK_PHRASAL: Question[] = [
     pitfalls: [
       { id: "catch-up-you", pattern: "re:(?<=\\b(catch|caught|catching) )up(?= you\\b)", category: "preposition", severity: "major", fix: "up with", messageKo: "'(오랜만에) 근황을 나누다'는 'catch up with + 사람'입니다. with를 빼고 'catch up you'라고 하지 않습니다." },
       { id: "good-catch-up", pattern: "re:(?<=\\b(good|great|nice) )catch(?= up\\b)", category: "verb-form", severity: "major", fix: "to catch", messageKo: "'~해서 좋았다'는 'It was good to catch up …'처럼 to부정사(또는 catching)를 씁니다. 동사원형만 쓰지 않습니다." },
+      { id: "to-catching", pattern: "re:(?<=\\b(good|great|nice|glad|lovely) )to catching\\b", category: "verb-form", severity: "major", fix: "to catch", messageKo: "'good to + 동사원형' 또는 'good + -ing' 중 하나를 씁니다. 'good to catching'이 아니라 'good to catch up' 또는 'good catching up'입니다." },
     ],
     hints: { pattern: "It was good + to catch up with + 사람", skeleton: "It was really good to _____ __ ____ you.", partial: "It was really good to catch…" },
     explanationKo: "오랜만에 만나거나 통화해서 그동안의 이야기를 나누는 것을 'catch up with + 사람'이라고 합니다. with를 빼면 틀리고, 'It was good' 뒤에는 'to catch up' 또는 'catching up'을 씁니다.",
@@ -209,7 +214,7 @@ export const TALK_PHRASAL: Question[] = [
       "Yes, what time should I check out on Friday?",
     ],
     meaning: [
-      { id: "check-out", en: "check out", ko: "체크아웃하다", any: ["check ... out", "check-out|checkout"], critical: true },
+      { id: "check-out", en: "check out", ko: "체크아웃하다", any: ["check ... out", "check-out|checkout", "leave ... hotel|room"], critical: true },
       { id: "what-time", en: "what time", ko: "몇 시에", any: ["what ... time", "when"], critical: true },
       { id: "friday", en: "on Friday", ko: "금요일에", any: ["friday"] },
     ],
@@ -252,7 +257,7 @@ export const TALK_PHRASAL: Question[] = [
     meaning: [
       { id: "calling", en: "I'm calling", ko: "전화드렸어요", any: ["call|calling|phone|ring"] },
       { id: "follow-up", en: "follow up on", ko: "확인하다 (후속 조치)", any: ["follow ... up", "=follow-up", "check ... on|about", "about|regarding"], critical: true },
-      { id: "quotation", en: "the revised quotation", ko: "수정 견적서", any: ["quotation|quote|offer|proposal"], critical: true },
+      { id: "quotation", en: "the revised quotation", ko: "수정 견적서", any: ["re:(?<!\\bnot )(?<!\\bnot the )(?<!\\bnot your )\\b(quotation|quote|offer|proposal)s?\\b"], critical: true },
       { id: "revised", en: "revised", ko: "수정된", any: ["revise|revised|updated|new|corrected|amended"] },
     ],
     pitfalls: [
@@ -291,7 +296,7 @@ export const TALK_PHRASAL: Question[] = [
       "You're right, thanks for pointing that out. I'll update the slide.",
     ],
     meaning: [
-      { id: "point-out", en: "pointing that out", ko: "지적해 주셔서", any: ["point ... out", "mention|mentioning|notice|noticing|spot|spotting|catch|catching"], critical: true },
+      { id: "point-out", en: "pointing that out", ko: "지적해 주셔서", any: ["point ... out", "mention|mentioning|notice|noticing|spot|spotting|catch|catching|flag|flagging", "tell|telling ... me", "let ... know"], critical: true },
       { id: "thanks", en: "thanks", ko: "감사해요", any: ["thank|thanks|appreciate"] },
       { id: "fix", en: "I'll fix the slide", ko: "슬라이드를 고칠게요", any: ["fix|correct|update|change|revise|edit ... slide|chart|it"], critical: true },
       { id: "right", en: "you're right", ko: "맞아요", any: ["right|correct|true|catch"] },
@@ -300,6 +305,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "thanks-to", pattern: "re:(?<=\\bthanks? (you )?)to(?= (point|pointing)\\b)", category: "preposition", severity: "major", fix: "for", messageKo: "'~해 줘서 고맙다'는 'Thanks for + 동사ing'입니다. 'thanks to'는 '~ 덕분에'라는 다른 뜻입니다." },
       { id: "for-point", pattern: "for =point", category: "verb-form", severity: "major", fix: "for pointing", messageKo: "전치사 for 뒤에는 동사ing가 옵니다: 'Thanks for pointing that out'.", skill: "prep-gerund" },
       { id: "point-out-it", pattern: "re:(?<=\\bpoint(ing|ed)? )out it\\b", category: "word-order", severity: "major", fix: "it out", messageKo: "목적어가 it·that 같은 대명사면 'point it out'처럼 point와 out 사이에 넣습니다. 'pointing out it'은 틀린 어순입니다." },
+      { id: "point-out-that", pattern: "re:\\bpoint(ing|ed)? out (that|it)(?= (i will|i am|i would|let|we will)\\b|$)", category: "word-order", severity: "major", fix: "pointing that out", messageKo: "대명사 목적어(that, it)는 구동사 가운데에 들어갑니다. 'pointing out that'이 아니라 'pointing that out'입니다." },
     ],
     hints: { pattern: "Thanks for + pointing + that + out", skeleton: "You're right, thanks for ________ ____ ___. I'll fix the slide.", partial: "You're right, thanks for pointing…" },
     explanationKo: "'지적해 주셔서 감사해요'는 'Thanks for pointing that out.'이라고 합니다. for 뒤에는 동사ing가 오고, 목적어가 that·it 같은 대명사면 'point that out'처럼 가운데에 넣습니다.",
@@ -372,7 +378,7 @@ export const TALK_PHRASAL: Question[] = [
     ],
     meaning: [
       { id: "going-well", en: "it's going well", ko: "잘 되고 있어요", any: ["well|good|great|fine"] },
-      { id: "get-along", en: "get along with", ko: "잘 지내다", any: ["get ... along|on", "relationship", "work|working ... well"], critical: true },
+      { id: "get-along", en: "get along with", ko: "잘 지내다", any: ["re:(?<!\\bnot )(?<!\\bnot really )(?<!\\bnever )\\b(get|gets|getting|got)( \\w+){0,2} (along|on)\\b", "relationship", "work|working ... well"], critical: true },
       { id: "budi-sari", en: "with Budi and Sari", ko: "부디 씨, 사리 씨와", any: ["budi|sari|team|everyone|them"] },
     ],
     pitfalls: [
@@ -380,6 +386,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "well-no-with", pattern: "re:(?<=\\b(along|on) (really |very |so )?)well(?= (budi|sari|them|everyone|the|my)\\b)", category: "preposition", severity: "major", fix: "well with", messageKo: "사람과 '잘 지내다'는 'get along well with + 사람'입니다. well 뒤에 with를 빼지 마세요." },
       { id: "well-along", pattern: "re:(?<=\\b(get|gets|getting|got) )well along\\b", category: "word-order", severity: "major", fix: "along well", messageKo: "'잘 지내다'는 'get along well (with)' 순서입니다. well은 along 뒤에 둡니다." },
       { id: "along-good", pattern: "re:(?<=\\balong (really |very |so |quite )?)good\\b", category: "word-choice", severity: "major", fix: "well", messageKo: "'잘 지내다'는 부사 well을 써서 'get along well'입니다. good은 형용사라서 동사를 꾸미지 못합니다." },
+      { id: "is-go-well", pattern: "re:\\b(it|things|everything) is go well\\b", category: "verb-form", severity: "major", fix: "it is going well", messageKo: "'잘 되고 있어요'는 진행형 'It's going well.'입니다. be 동사 뒤에는 동사원형 go가 아니라 going을 씁니다." },
     ],
     hints: { pattern: "I get along (really) well with + 사람", skeleton: "It's going well. I ___ _____ really well ____ Budi and Sari.", partial: "It's going well. I get along…" },
     explanationKo: "사람과 '잘 지내다, 사이가 좋다'는 'get along (well) with + 사람'이라고 합니다. with를 빠뜨리지 않도록 주의하고, '잘'은 형용사 good이 아니라 부사 well을 씁니다.",
@@ -412,7 +419,7 @@ export const TALK_PHRASAL: Question[] = [
       "Our driver will take you to the airport after lunch.",
     ],
     meaning: [
-      { id: "drop-off", en: "drop you off", ko: "내려 주다", any: ["drop ... off", "take|drive ... airport"], critical: true },
+      { id: "drop-off", en: "drop you off", ko: "내려 주다", any: ["drop ... off", "drop ... airport", "take|drive =you ... airport"], critical: true },
       { id: "driver", en: "our driver", ko: "저희 기사님", any: ["driver|car|we|i"] },
       { id: "airport", en: "at the airport", ko: "공항에", any: ["airport"], critical: true },
       { id: "after-lunch", en: "after lunch", ko: "점심 후에", any: ["lunch"] },
@@ -453,8 +460,8 @@ export const TALK_PHRASAL: Question[] = [
       "I understand. I'm sure we can work it out.",
     ],
     meaning: [
-      { id: "work-out", en: "work something out", ko: "방법을 찾아내다", any: ["work ... out", "solution|compromise|way|agreement"], critical: true },
-      { id: "sure", en: "I'm sure", ko: "확신해요", any: ["sure|confident|certain|believe|think"] },
+      { id: "work-out", en: "work something out", ko: "방법을 찾아내다", any: ["re:(?<!\\bnot )(?<!\\bnot think we (can|will|could) )\\b(work|sort)( \\w+)? out\\b", "re:(?<!\\bno )(?<!\\bnot find a )(?<!\\bnot think there is a )\\b(solution|compromise|way|agreement|deal|arrangement)\\b", "re:(?<!\\bnot )\\b(resolve|solve)\\b"], critical: true },
+      { id: "sure", en: "I'm sure", ko: "확신해요", any: ["re:(?<!\\bnot )(?<!\\bnot very )(?<!\\bnot so )\\b(sure|confident|certain|believe|think)\\b"] },
       { id: "understand", en: "I understand", ko: "이해합니다", any: ["understand|see"] },
       { id: "can", en: "we can", ko: "~할 수 있다", any: ["can|could|will|able"] },
     ],
@@ -491,9 +498,10 @@ export const TALK_PHRASAL: Question[] = [
       "Great, I'm really looking forward to seeing you in person.",
       "Great. I can't wait to meet you in person.",
       "Great. I'm looking forward to meeting you in person.",
+      "Great. Looking forward to meeting you in person.",
     ],
     meaning: [
-      { id: "look-forward", en: "looking forward to", ko: "기대하다", any: ["look ... forward", "can not wait", "excited"], critical: true },
+      { id: "look-forward", en: "looking forward to", ko: "기대하다", any: ["re:(?<!\\bnot )(?<!\\bnot really )(?<!\\bnot that )(?<!\\bnot so )\\blook(s|ed|ing)? forward\\b", "can not wait", "re:(?<!\\bnot )(?<!\\bnot really )\\bexcited\\b"], critical: true },
       { id: "meet", en: "meeting you", ko: "만나는 것", any: ["meet|meeting|see|seeing"], critical: true },
       { id: "in-person", en: "in person", ko: "직접", any: ["person|face|finally"] },
     ],
@@ -501,6 +509,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "forward-to-meet", pattern: "forward to =meet", category: "verb-form", severity: "major", fix: "forward to meeting", messageKo: "'look forward to'의 to는 전치사라서 뒤에 동사ing가 옵니다: 'looking forward to meeting you'.", skill: "thanks-looking-forward" },
       { id: "forward-to-see", pattern: "forward to =see", category: "verb-form", severity: "major", fix: "forward to seeing", messageKo: "'look forward to'의 to는 전치사라서 뒤에 동사ing가 옵니다: 'looking forward to seeing you'.", skill: "thanks-looking-forward" },
       { id: "forward-no-to", pattern: "re:\\bforward(?= (meeting|seeing|meet|see)\\b)", category: "preposition", severity: "major", fix: "forward to", messageKo: "'~을 기대하다'는 'look forward to + 명사/동사ing'입니다. to를 빼지 마세요." },
+      { id: "in-personal", pattern: "in =personal", category: "word-choice", severity: "major", fix: "in person", messageKo: "'직접 만나다'는 'in person'입니다. 'in personal'은 쓰지 않습니다." },
     ],
     hints: { pattern: "I'm looking forward to + 동사ing", skeleton: "Great. I'm really _______ _______ __ meeting you in person.", partial: "Great. I'm really looking forward…" },
     explanationKo: "'~하는 것이 기대된다'는 'I'm looking forward to + 동사ing'입니다. 여기서 to는 전치사라서 'to meet'이 아니라 'to meeting'이고, to를 빠뜨리지 않도록 주의합니다.",
@@ -531,9 +540,10 @@ export const TALK_PHRASAL: Question[] = [
       "I'm okay, thanks. I'm trying to cut back on alcohol these days.",
       "No more for me, thank you. I'm trying to drink less these days.",
       "No more for me, thanks. I'm trying to cut back on drinking these days.",
+      "Not for me, thanks. I'm trying to cut back on alcohol these days.",
     ],
     meaning: [
-      { id: "cut-back", en: "cut back on", ko: "줄이다", any: ["cut ... back|down", "less", "reduce|reducing"], critical: true },
+      { id: "cut-back", en: "cut back on", ko: "줄이다", any: ["cut ... back|down", "less", "reduce|reducing|limit|limiting|avoid|avoiding", "not ... drink|drinking"], critical: true },
       { id: "alcohol", en: "alcohol", ko: "술", any: ["alcohol|drinking|drink|drinks|wine|beer"], critical: true },
       { id: "trying", en: "I'm trying to", ko: "~하려고 하고 있어요", any: ["try|trying"] },
       { id: "no-more", en: "no more for me, thanks", ko: "그만 마실게요, 고마워요", any: ["thank|thanks", "no ... more"] },
@@ -616,13 +626,14 @@ export const TALK_PHRASAL: Question[] = [
       "He's at the site today, so I'm here instead of him.",
     ],
     meaning: [
-      { id: "fill-in", en: "filling in for him", ko: "대신하다", any: ["fill ... in", "stand ... in", "cover|covering", "instead|replace|replacing|behalf"], critical: true },
+      { id: "fill-in", en: "filling in for him", ko: "대신하다", any: ["re:(?<!\\bnobody is )(?<!\\bno one is )(?<!\\bnot )\\b(fill|filling|filled|stand|standing|stood)( \\w+)? in\\b", "re:(?<!\\bnobody is )(?<!\\bno one is )(?<!\\bnot )\\b(cover|covering|instead|replace|replacing|behalf|substitute|substituting)\\b", "re:(?<!\\bnot )\\bhere for (him|mr)\\b"], critical: true },
       { id: "site", en: "at the site", ko: "현장에", any: ["site|plant|field"], critical: true },
       { id: "so", en: "so", ko: "그래서", any: ["so|because|since"] },
     ],
     pitfalls: [
       { id: "fill-in-him", pattern: "re:(?<=\\bfill(ing)? )in(?= (him|her|mr)\\b)", category: "preposition", severity: "major", fix: "in for", messageKo: "'~을 대신하다'는 'fill in for + 사람'입니다. for를 빼고 'filling in him'이라고 하면 뜻이 통하지 않습니다." },
       { id: "instead-him", pattern: "re:\\binstead(?= (him|her|mr)\\b)", category: "preposition", severity: "major", fix: "instead of", messageKo: "'~ 대신에'는 'instead of + 사람'입니다. of를 빼지 마세요." },
+      { id: "he-no-be", pattern: "re:^he (at|on|in) (the )?(site|plant|field)\\b", category: "be-verb", severity: "major", fix: "he is at the site", messageKo: "장소를 말할 때도 be 동사가 필요합니다. 'He at the site'가 아니라 'He's at the site'입니다." },
     ],
     hints: { pattern: "…, so I'm + filling in for + 사람", skeleton: "He's at the site today, so I'm _______ __ ___ him.", partial: "He's at the site today, so I'm filling…" },
     explanationKo: "다른 사람의 자리를 잠시 '대신하다'는 'fill in for + 사람'이라고 합니다. for를 빠뜨리기 쉬우니 주의하고, instead를 쓸 때는 'instead of him'처럼 of가 필요합니다.",
@@ -655,7 +666,7 @@ export const TALK_PHRASAL: Question[] = [
       "It's on my way, so I can come and pick you up at your hotel.",
     ],
     meaning: [
-      { id: "pick-up", en: "pick you up", ko: "태우러 가다", any: ["pick ... up", "come ... get", "give ... ride|lift"], critical: true },
+      { id: "pick-up", en: "pick you up", ko: "태우러 가다", any: ["pick ... up", "come ... get", "=get you", "give ... ride|lift", "collect|fetch"], critical: true },
       { id: "on-my-way", en: "it's on my way", ko: "가는 길이라서", any: ["on ... way"], critical: true },
       { id: "hotel", en: "at your hotel", ko: "호텔에서", any: ["hotel|there"] },
       { id: "so", en: "so", ko: "그래서", any: ["so|because|since"] },
@@ -735,10 +746,11 @@ export const TALK_PHRASAL: Question[] = [
       "Sorry, I'm in a meeting right now, but I'll call you back as soon as it finishes.",
       "Sorry, I'm in a meeting at the moment, but I'll get back to you as soon as it ends.",
       "Sorry, I'm in a meeting right now. I'll get back to you as soon as it finishes.",
+      "Sorry, I'm in a meeting right now. I'll get back to you as soon as it's finished.",
     ],
     meaning: [
       { id: "in-meeting", en: "I'm in a meeting", ko: "회의 중이에요", any: ["meeting"], critical: true },
-      { id: "get-back", en: "get back to you", ko: "다시 연락하다", any: ["get ... back", "call ... back", "contact|call"], critical: true },
+      { id: "get-back", en: "get back to you", ko: "다시 연락하다", any: ["get ... back", "re:(?<!\\bnot )(?<!\\bnever )\\b(contact|call|calls|reply|respond|text|message|email)\\b"], critical: true },
       { id: "as-soon-as", en: "as soon as", ko: "~하자마자", any: ["soon", "right after", "when|once|after"] },
       { id: "finish", en: "it finishes", ko: "끝나다", any: ["finish|end|over|done"] },
       { id: "sorry", en: "sorry", ko: "죄송해요", any: ["sorry|apologize|apologise"] },
@@ -821,8 +833,8 @@ export const TALK_PHRASAL: Question[] = [
       "Let me talk to our team and see if we can find a cheaper option.",
     ],
     meaning: [
-      { id: "come-up-with", en: "come up with", ko: "(방안을) 생각해 내다", any: ["come ... up", "find|propose|offer|suggest|develop|prepare|think"], critical: true },
-      { id: "cheaper", en: "a cheaper option", ko: "더 저렴한 방안", any: ["cheaper|less|lower|cheap|cost-effective"], critical: true },
+      { id: "come-up-with", en: "come up with", ko: "(방안을) 생각해 내다", any: ["re:(?<!\\bnot )(?<!\\bnot think we can )\\bcome( \\w+)? up\\b", "re:(?<!\\bnot )(?<!\\bnot think we can )\\b(find|propose|offer|suggest|develop|prepare)\\b", "think ... of"], critical: true },
+      { id: "cheaper", en: "a cheaper option", ko: "더 저렴한 방안", any: ["cheaper|less|lower|cheap|cost-effective|affordable|economical|inexpensive|budget", "lower-cost|low-cost", "lower|low ... cost|price"], critical: true },
       { id: "team", en: "talk to our team", ko: "저희 팀과 이야기하다", any: ["team|colleagues|engineers|management|boss|manager"] },
       { id: "see-if", en: "see if we can", ko: "~할 수 있는지 보다", any: ["see|check ... if|whether", "try"] },
     ],
@@ -861,7 +873,7 @@ export const TALK_PHRASAL: Question[] = [
     ],
     meaning: [
       { id: "end-up", en: "ended up", ko: "결국 ~하게 됐다", any: ["end ... up", "just|finally|instead"] },
-      { id: "home", en: "staying at home", ko: "집에 있다", any: ["home"], critical: true },
+      { id: "home", en: "staying at home", ko: "집에 있다", any: ["home", "re:\\bstay(ed|ing)? (at home|home|in|inside|indoors)\\b", "inside|indoors"], critical: true },
       { id: "rain", en: "it rained all day", ko: "하루 종일 비가 왔다", any: ["rain|rained|raining|rainy|weather"], critical: true },
       { id: "planned", en: "I was planning to", ko: "그럴 계획이었다", any: ["plan|planning|going|want|wanted|intend|meant"] },
     ],
@@ -900,7 +912,7 @@ export const TALK_PHRASAL: Question[] = [
       "We've run out of spare gaskets, so I'm going to order some today.",
     ],
     meaning: [
-      { id: "run-out", en: "run out of", ko: "다 떨어지다", any: ["run ... out", "out of", "no ... spare|gasket|gaskets"], critical: true },
+      { id: "run-out", en: "run out of", ko: "다 떨어지다", any: ["run ... out", "out of", "no ... spare|gasket|gaskets", "none ... left", "no ... more"], critical: true },
       { id: "gaskets", en: "spare gaskets", ko: "예비 개스킷", any: ["gasket|gaskets|spare|spares"], critical: true },
       { id: "order", en: "I'll order some", ko: "주문할게요", any: ["order|buy|purchase|get"], critical: true },
       { id: "today", en: "today", ko: "오늘", any: ["today"] },
@@ -942,7 +954,7 @@ export const TALK_PHRASAL: Question[] = [
     meaning: [
       { id: "leave", en: "I have to leave", ko: "출발해야 해요", any: ["leave|go|head|=going"], critical: true },
       { id: "airport", en: "for the airport", ko: "공항으로", any: ["airport|flight"] },
-      { id: "take-over", en: "take over from here", ko: "이어받아 진행하다", any: ["take ... over", "chair|lead|run|continue|handle"], critical: true },
+      { id: "take-over", en: "take over from here", ko: "이어받아 진행하다", any: ["take ... over", "re:\\btake (it|this|things) from here\\b", "chair|lead|run|continue|handle"], critical: true },
       { id: "could-you", en: "could you", ko: "~해 주실 수 있을까요", any: ["could|can|would|mind|please"] },
     ],
     pitfalls: [
@@ -978,6 +990,7 @@ export const TALK_PHRASAL: Question[] = [
       "I'm so sorry I couldn't come. Let me buy you lunch this week to make up for it.",
       "I'm so sorry I couldn't make it. Let me buy you lunch this week to make it up to you.",
       "I'm so sorry I missed it. Let me take you to lunch this week to make up for it.",
+      "So sorry I couldn't make it! Let me buy you lunch this week to make up for it.",
     ],
     meaning: [
       { id: "sorry", en: "I'm so sorry", ko: "정말 미안해요", any: ["sorry|apologize|apologise"], critical: true },
@@ -989,6 +1002,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "make-up-it", pattern: "make up =it", category: "preposition", severity: "major", fix: "make up for it", messageKo: "'~을 만회하다, 보상하다'는 'make up for + 명사'입니다. for를 빼고 'make up it'이라고 하지 않습니다." },
       { id: "make-it-up-for-you", pattern: "re:(?<=\\bmake it up )for(?= (you|her|him|them)\\b)", category: "preposition", severity: "major", fix: "to", messageKo: "사람에게 '보상하다'는 'make it up to + 사람'이고, 일을 '만회하다'는 'make up for + 일'입니다. 'make it up for you'는 둘을 섞은 표현입니다." },
       { id: "for-make", pattern: "for =make =up", category: "verb-form", severity: "major", fix: "to make up", messageKo: "'~하기 위해'는 'to + 동사원형'입니다. 'for make up'이 아니라 'to make up for it'입니다.", skill: "purpose-to" },
+      { id: "make-up-for-nothing", pattern: "re:\\bmake up for$", category: "missing-content", severity: "major", fix: "make up for it", messageKo: "'make up for' 뒤에는 무엇을 만회하는지(it)가 와야 합니다: 'to make up for it'." },
     ],
     hints: { pattern: "Let me + 동사원형 … + to make up for it", skeleton: "I'm so sorry I couldn't make it. Let me buy you lunch this week to ____ __ ___ it.", partial: "I'm so sorry I couldn't make it. Let me buy you lunch this week to make…" },
     explanationKo: "잘못이나 손해를 '만회하다, 보상하다'는 'make up for + 명사'입니다. for를 빼면 틀리고, '~하기 위해'는 'to make up for it'처럼 to + 동사원형을 씁니다. 'make it up to you'도 같은 뜻으로 자주 씁니다.",
@@ -1019,6 +1033,7 @@ export const TALK_PHRASAL: Question[] = [
       "If you'd like, I can show you around the pilot plant after lunch.",
       "If you're interested, I can give you a tour of the pilot plant after lunch.",
       "If you're interested, I can show you around the pilot plant after we have lunch.",
+      "If you like, I can show you around the pilot plant after lunch.",
     ],
     meaning: [
       { id: "if-interested", en: "if you're interested", ko: "관심 있으시면", any: ["interested", "if ... like|want|wish"] },
@@ -1030,6 +1045,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "show-around-you", pattern: "show around =you", category: "word-order", severity: "major", fix: "show you around", messageKo: "'(장소를) 구경시켜 주다'는 'show + 사람 + around + 장소'입니다. 'show around you'가 아니라 'show you around'입니다." },
       { id: "around-of", pattern: "re:(?<=\\baround )of\\b", category: "preposition", severity: "major", fix: "", messageKo: "'show you around + 장소'에서 around 뒤에 of를 넣지 않습니다: 'show you around the pilot plant'." },
       { id: "interesting", pattern: "you are =interesting", category: "verb-form", severity: "major", fix: "you are interested", messageKo: "사람이 '관심이 있다'는 'interested'입니다. 'interesting'은 '흥미롭다'는 뜻이라 'If you're interesting'은 '당신이 흥미로운 사람이라면'이 됩니다.", skill: "be-adj" },
+      { id: "you-interested", pattern: "if you =interested", category: "be-verb", severity: "major", fix: "if you are interested", messageKo: "'관심이 있다'는 be 동사가 필요합니다: 'If you're interested'. 'If you interested'라고 하지 않습니다." },
     ],
     hints: { pattern: "If + 주어 + 현재형, I can + show + 사람 + around + 장소", skeleton: "If you're __________, I can ____ you ______ the pilot plant after lunch.", partial: "If you're interested, I can show you…" },
     explanationKo: "손님에게 장소를 '구경시켜 주다, 안내하다'는 'show + 사람 + around (+ 장소)'입니다. 'show around you'처럼 사람을 뒤에 두지 않고, 사람이 '관심 있다'는 'interested'(interesting이 아님)라고 합니다.",
@@ -1107,7 +1123,7 @@ export const TALK_PHRASAL: Question[] = [
     ],
     meaning: [
       { id: "afraid", en: "I'm afraid", ko: "죄송하지만", any: ["afraid|sorry|unfortunately"] },
-      { id: "turn-down", en: "turn it down", ko: "거절하다", any: ["turn ... down", "decline|reject|refuse", "not ... accept"], critical: true },
+      { id: "turn-down", en: "turn it down", ko: "거절하다", any: ["turn ... down", "decline|reject|refuse", "not ... accept", "say =no"], critical: true },
       { id: "have-to", en: "we'll have to", ko: "~해야 할 것 같다", any: ["have|need|must"] },
       { id: "too-long", en: "too long", ko: "너무 길다", any: ["too ... long", "long|longer"], critical: true },
       { id: "schedule", en: "for our schedule", ko: "우리 일정에는", any: ["schedule|timeline|plan|project"] },
@@ -1116,6 +1132,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "turn-down-it", pattern: "turn down =it", category: "word-order", severity: "major", fix: "turn it down", messageKo: "목적어가 it이면 'turn it down'처럼 turn과 down 사이에 넣습니다. 'turn down it'은 틀린 어순입니다." },
       { id: "turn-down-nothing", pattern: "re:\\bturn down(?= (that is|because|since|as)\\b|$)", category: "sentence-structure", severity: "major", fix: "turn it down", messageKo: "'turn down'은 목적어가 필요합니다. 제안을 가리키는 it을 넣어 'turn it down'이라고 합니다." },
       { id: "turn-off", pattern: "re:(?<=\\bturn (it )?)off\\b", category: "word-choice", severity: "major", fix: "down", messageKo: "'turn off'는 '(전원을) 끄다'라는 뜻입니다. 제안이나 요청을 '거절하다'는 'turn down'입니다." },
+      { id: "so-long", pattern: "re:\\b(that|it) is so long\\b", category: "word-choice", severity: "major", fix: "that is too long", messageKo: "'(일정에 비해) 너무 길다'는 부정적인 지나침을 나타내는 too를 씁니다. 'so long'은 '아주 길다'는 감탄일 뿐, 받아들일 수 없다는 뜻이 약합니다." },
     ],
     hints: { pattern: "I'm afraid we'll have to + turn + it + down.", skeleton: "I'm afraid we'll have to ____ __ ____. That's too long for our schedule.", partial: "I'm afraid we'll have to turn…" },
     explanationKo: "제안이나 요청을 '거절하다'는 'turn down'(=decline)입니다. 목적어가 it이면 'turn it down'처럼 가운데에 넣고, 'turn off'는 '(전원을) 끄다'라는 다른 뜻입니다. 'I'm afraid …'로 시작하면 거절이 한결 부드러워집니다.",
@@ -1149,7 +1166,7 @@ export const TALK_PHRASAL: Question[] = [
       "I'm afraid they've called it off because of the heavy rain.",
     ],
     meaning: [
-      { id: "called-off", en: "called off", ko: "취소되다", any: ["call ... off", "cancel|cancelled|canceled"], critical: true },
+      { id: "called-off", en: "called off", ko: "취소되다", any: ["call ... off", "cancel|cancelled|canceled", "re:\\b(it|visit|trip) (is|has been) off\\b"], critical: true },
       { id: "rain", en: "the heavy rain", ko: "폭우", any: ["rain|storm|weather|flood|flooding"], critical: true },
       { id: "because", en: "because of", ko: "~ 때문에", any: ["because|due|since"] },
       { id: "afraid", en: "I'm afraid", ko: "아쉽지만", any: ["afraid|sorry|unfortunately"] },
@@ -1191,8 +1208,8 @@ export const TALK_PHRASAL: Question[] = [
       "Quite confident. It's backed up with three months of pilot data.",
     ],
     meaning: [
-      { id: "confident", en: "quite confident", ko: "꽤 확신해요", any: ["confident|sure|certain"], critical: true },
-      { id: "back-up", en: "backed up by", ko: "뒷받침되다", any: ["back ... up", "backed|supported|support|confirmed|based"], critical: true },
+      { id: "confident", en: "quite confident", ko: "꽤 확신해요", any: ["re:(?<!\\bnot )(?<!\\bnot very )(?<!\\bnot that )(?<!\\bnot so )(?<!\\bnot really )\\b(confident|sure|certain)\\b"], critical: true },
+      { id: "back-up", en: "backed up by", ko: "뒷받침되다", any: ["re:(?<!\\bnot )(?<!\\bnever )\\bback(s|ed|ing)? (it |this |that )?up\\b", "re:(?<!\\bnot )(?<!\\bnever )\\b(backed|supported|support|supports|confirmed|based|proven|validated|verified)\\b"], critical: true },
       { id: "three-months", en: "three months of", ko: "3개월간의", any: ["three|3 ... month|months"] },
       { id: "pilot-data", en: "pilot data", ko: "파일럿 데이터", any: ["data|results|tests"], critical: true },
     ],
@@ -1200,6 +1217,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "is-back-up", pattern: "is =back =up", category: "verb-form", severity: "major", fix: "is backed up", messageKo: "수치가 데이터에 의해 '뒷받침되는' 것이라 수동태 'be + 과거분사'인 'is backed up'입니다. -ed를 빼지 마세요.", skill: "passive" },
       { id: "backuped", pattern: "=backuped|=backupped", category: "verb-form", severity: "major", fix: "backed up", messageKo: "'back up'의 과거분사는 'backed up'입니다. backup(한 단어)은 명사입니다." },
       { id: "back-up-it", pattern: "back up =it", category: "word-order", severity: "major", fix: "back it up", messageKo: "목적어가 it이면 'back it up'처럼 back과 up 사이에 넣습니다." },
+      { id: "is-backing-up-by", pattern: "re:\\bis backing up by\\b", category: "verb-form", severity: "major", fix: "is backed up by", messageKo: "'데이터가 뒷받침한다'를 수동태로 말할 때는 과거분사를 써서 'It's backed up by …'라고 합니다. 'backing up by'는 틀린 형태입니다." },
     ],
     hints: { pattern: "It's + backed up + by + 명사 (수동태)", skeleton: "Quite confident. It's ______ __ by three months of pilot data.", partial: "Quite confident. It's backed…" },
     explanationKo: "주장이나 수치를 데이터로 '뒷받침하다'는 'back up'입니다. 수치가 데이터에 의해 '뒷받침되는' 것이므로 수동태 'It's backed up by …'라고 하고, 대명사 목적어는 'back it up'처럼 가운데에 넣습니다.",
@@ -1233,7 +1251,7 @@ export const TALK_PHRASAL: Question[] = [
       "Thank you. Now I'd like to hand over to Budi, who will walk you through the plant layout.",
     ],
     meaning: [
-      { id: "hand-over", en: "hand over to", ko: "넘기다", any: ["hand ... over", "pass ... over|on", "turn ... over"], critical: true },
+      { id: "hand-over", en: "hand over to", ko: "넘기다", any: ["hand ... over", "pass ... over|on", "turn ... over", "over ... budi", "floor"], critical: true },
       { id: "budi", en: "to Budi", ko: "부디 씨에게", any: ["budi"], critical: true },
       { id: "explain", en: "who will explain", ko: "설명할 것이다", any: ["explain|present|show|cover|walk|talk|introduce|go"], critical: true },
       { id: "layout", en: "the plant layout", ko: "플랜트 배치", any: ["layout|plot|arrangement"] },
@@ -1275,7 +1293,7 @@ export const TALK_PHRASAL: Question[] = [
       "I'm afraid we ran into a problem with the decanter, so the start-up might be delayed by a few days.",
     ],
     meaning: [
-      { id: "run-into", en: "run into a problem", ko: "문제가 생기다", any: ["run ... into", "have|had|found|hit|face|faced ... problem|issue|trouble"], critical: true },
+      { id: "run-into", en: "run into a problem", ko: "문제가 생기다", any: ["run ... into", "have|had|got|found|hit|face|faced|=there ... problem|issue|trouble|fault"], critical: true },
       { id: "decanter", en: "with the decanter", ko: "디캔터에", any: ["decanter|centrifuge"] },
       { id: "delayed", en: "might be delayed", ko: "늦어질 수도 있다", any: ["delay|delayed|late|later|postpone|postponed|push|pushed"], critical: true },
       { id: "might", en: "might", ko: "~할 수도 있다", any: ["might|may|could|possibly|probably"] },
