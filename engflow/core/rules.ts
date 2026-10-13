@@ -440,6 +440,8 @@ const willInConditionClause: Rule = (w) => {
         s = k - 1;
       }
     }
+    // "If you ever will want to …": an adverb between the subject and will.
+    if (SUBJECT_PRONOUNS.has(subj) && /^(ever|really|still|also|just|actually)$/.test(w[s + 1]?.norm ?? "") && w[s + 2]?.norm === "will") s++;
     if (!SUBJECT_PRONOUNS.has(subj) || w[s + 1]?.norm !== "will") continue;
     if (w[s + 2]?.norm === "be" && w[s + 3]?.norm === "able") continue;
     const v = w[s + 2];
@@ -675,7 +677,7 @@ const missingBeAdjective: Rule = (w) => {
     // Question order ("Are you ready?") or an object pronoun ("make it ready", "keep you busy").
     if (i > 0 && !brokenAfter(w, i - 1) && (BE_FORMS.has(prev) || /^(do|does|did|have|has|had|will|would|can|could|should|to|than|as)$/.test(prev))) continue;
     // "it"/"you" are also objects ("resend it right away", "get it right"): only a clause-initial one is a subject.
-    if ((s === "it" || s === "you") && i > 0 && !brokenAfter(w, i - 1) && !/^(and|but|so|because|if|when|that|since|or|then|maybe|actually|well|yes|no|oh|okay|ok|sure|hope|think|guess|believe|know)$/.test(prev)) continue;
+    if ((s === "it" || s === "you") && i > 0 && !brokenAfter(w, i - 1) && !/^(and|but|so|because|if|when|that|since|or|then|maybe|actually|well|yes|no|oh|okay|ok|sure|hope|think|guess|believe|know|wonder)$/.test(prev)) continue;
     const a = w[i + 1];
     if (!PREDICATE_ADJECTIVES.test(a.norm)) continue;
     // "You okay?", "You ready?", "You free tonight?": casual spoken questions drop "Are".
@@ -3969,6 +3971,21 @@ const learnerSlips: Rule = (w) => {
         out.push({ rule: "passive-needed", from: i + 1, to: i + 2, replacement: participleOf(b), category: "verb-form", severity: "major", skill: "passive", messageKo: `수동 진행형은 'being + 과거분사'입니다: 'being ${participleOf(b)}'.` });
         continue;
       }
+    }
+    // "Did you ever ate naengmyeon?" → "eat".
+    if (/^(did|didn't)$/.test(t) && SUBJECT_PRONOUNS.has(n1) && /^(ever|really|just|already|actually)$/.test(w[i + 2]?.norm ?? "") && w[i + 3]) {
+      const vi = verbInfo(w[i + 3].norm);
+      if (vi && vi.form === "past" && vi.base !== w[i + 3].norm) {
+        out.push({ rule: "do-past", from: i + 3, to: i + 4, replacement: vi.base, category: "verb-form", severity: "major", skill: "question-form", messageKo: `did 뒤에는 동사원형입니다: '${vi.base}'.` });
+        continue;
+      }
+    }
+    // "at least two spare seal" → "seals": a number with an adjective before the noun.
+    if (/^(two|three|four|five|six|seven|eight|nine|ten|several|many|\d+)$/.test(t) && !(t === "1") && /^(spare|extra|new|more|other|different|small|big|large|main|good|old|additional|free|empty)$/.test(n1) && (COUNTABLE_NOUNS.has(w[i + 2]?.norm ?? "") || /^(seal|part|filter|bolt|gasket|unit|item|box|bag|room|day|week|hour|minute|copy|cup|bottle|chair|table|laptop|screen|monitor|cable|battery)$/.test(w[i + 2]?.norm ?? "")) && ends(i + 2) && w[i + 2].norm !== "staff") {
+      const n = w[i + 2].norm;
+      const pl = PLURAL_OF[n] ?? `${n}s`;
+      out.push({ rule: "number-singular", from: i + 2, to: i + 3, replacement: pl, category: "countability", severity: "major", skill: "countability", messageKo: `둘 이상이면 복수형입니다: '${w[i].raw} ${n1} ${pl}'.` });
+      continue;
     }
     // "Can everyone reads the numbers?" → "read".
     if (MODALS.has(t) && /^(everyone|everybody|anyone|anybody|someone|somebody|he|she|it)$/.test(n1) && w[i + 2]) {
