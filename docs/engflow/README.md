@@ -162,17 +162,23 @@ The TOEIC Speaking panel shows the ETS **minimum scores** per CEFR level (Speaki
 
 | Bank | Items |
 | --- | --- |
-| Conversation turns (11 scenes, each covering difficulty 1–10; quick replies 1–5) | 330 |
+| Conversation turns (13 scenes, each covering difficulty 1–10; quick replies 1–5) | 970 |
+| Meeting essentials (opening, interrupting, checking, agreeing, wrapping up) | 48 |
+| Short and long turns for thin scenes (one-word replies to 3–4 sentence turns) | 36 |
 | Long multi-sentence turns (difficulty 8–10) | 30 |
 | Phrasal verbs in conversation | 32 |
-| Role-play scenarios | 20 (82 turns) |
+| Idioms in conversation | 30 |
+| Role-play scenarios | 44 (199 turns) |
+| Free-talk topics with Claude | 22 |
 | Full-sentence construction (Mode A) | 48 |
 | Phrase & structure quiz (Mode B) | 75 |
 | Review variation ladders (7 imported mistakes × 4 levels × 2) | 56 |
 | Diagnostic items | 40 |
 | Grammar guide entries | 42 (one per skill, incl. 12 conversation skills) |
 | Dialogue context added to older questions | 179 |
-| QC probes (expected pass/fail answers) | 1,841 |
+| **All questions** | **1,524** |
+| Accepted correct answers | 7,894 |
+| QC probes (expected pass/fail answers) | 4,522 |
 
 See [CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md) for the authoring rules, the pattern syntax and the QC contract.
 

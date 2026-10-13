@@ -102,17 +102,18 @@ generalizes, and B moved for the first time:
 
 | Measure (second half of run 2) | Before | After |
 | --- | ---: | ---: |
-| **Blind B (held out): correct answers marked wrong** | 29 / 312 (9.3%) | 22 / 312 (7.1%) |
+| **Blind B (held out): correct answers marked wrong** | 29 / 312 (9.3%) | 21 / 312 (6.7%) |
 | **Blind B (held out): wrong answers flagged as major or below 85** | 67.3% | 72.6% |
 | **Blind B (held out): wrong answers flagged (any note)** | 80.8% | 85.6% |
 | **Blind B (held out): wrong answers shown at once as fine** | 7 | 5 |
 | Blind A: correct answers marked wrong | 12 / 291 | 2 / 291 |
 | Blind A: wrong answers flagged (any note) | 96.9% | 99.5% |
+| Blind A: flagged as a major error or below 85 | 77.8% | 78.9% |
 | Two batteries of typical Korean-speaker mistakes, rules alone | 41 / 86, 45 / 94 | 76 / 86, 90 / 94 |
 | Rules firing on the other speaker's lines (1,314 native lines) | 12 | 0 (now a unit test) |
 | Inserted "not" caught (stored answers with a "not" added) | 122 / 291 | 229 / 319 |
-| Correct answers said without punctuation, marked wrong | 6 / 6,796 | 8 / 8,122 (bank grew by 330 questions) |
-| Mutation bench: recall / right answers left alone | 97.7% / 100% | 98.2% / 100% |
+| Correct answers said without punctuation, marked wrong | 6 / 6,796 | 9 / 9,682 (bank grew by 430 questions) |
+| Mutation bench: recall / right answers left alone | 97.7% / 100% (2,264 / 1,580 rows) | 98.2% / 100% (3,199 / 2,232 rows) |
 | Rule time per sentence (all rules) | 0.90 ms | 0.31 ms |
 
 What did it:
@@ -133,6 +134,9 @@ What did it:
   left out of the comparison instead of switching the check off, and a second "not" in a
   sentence that already has one is caught against a near-identical stored sentence.
 - **Long answers.** A minor alignment note costs less in an answer over 24 words.
+- **Agent reports as a rule source.** Every content agent (17 banks this half) tried 150–400 of its
+  own learner answers and reported the grader's false alarms and gaps; each was turned into a
+  rule fix with a look-alike correct sentence in the tests (about 250 rule tests were added).
 - **Content passes** with fresh rounds against over-fitting (per pass: false alarms 64 → 2 and
   10 → 0 on the agents' own replies; on rounds written after the fixes, 7 → 0 and 3 → 0).
 
