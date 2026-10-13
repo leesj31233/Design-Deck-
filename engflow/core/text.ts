@@ -52,6 +52,8 @@ const CONTRACTIONS: Record<string, string[]> = {
   "who's": ["who", "is"],
   "where's": ["where", "is"],
   "how's": ["how", "is"],
+  "when's": ["when", "is"],
+  "why's": ["why", "is"],
   "he's": ["he", "is"],
   "she's": ["she", "is"],
   "ain't": ["is", "not"],
@@ -169,7 +171,7 @@ export function tokenize(text: string): Token[] {
     const after = tokens[i + 2];
     const pp = !!verbInfo(next.norm) && /^(pp|past)$/.test(verbInfo(next.norm)!.form) && /ed$/.test(next.norm) && (!after || after.punct || /^(by|for|yet|now|already|today|tomorrow|and|but|so|at|in|on)$/.test(after.norm));
     // A possessive never comes before an article or an adverb of degree: "the room's a bit cold", "the tank's nearly full".
-    if (pronounLike || pp || next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|nearly|quite|pretty|totally|completely|fully|currently|probably|definitely|usually|actually|clearly|a|an|the|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away)$/.test(next.norm)) {
+    if (pronounLike || pp || next.norm === "not" || ing || /^(been|gone|got|going|still|already|really|very|too|so|almost|nearly|quite|pretty|totally|completely|fully|currently|probably|definitely|usually|actually|clearly|a|an|the|now|here|there|ready|late|fine|okay|ok|down|done|finished|broken|delayed|over|on|in|at|from|with|for|about|under|near|up|off|out|back|away|right|wrong|correct|sure|busy|sick|ill|available|absent|early|upset|angry|aware|unable|able|alright|safe)$/.test(next.norm)) {
       t.expanded = true;
       tokens.splice(i + 1, 0, { norm: "is", raw: t.raw, start: t.start, end: t.end, stem: stem("is"), punct: false, expanded: true });
     }

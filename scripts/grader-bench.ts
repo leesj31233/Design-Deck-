@@ -97,7 +97,7 @@ export const MUTATIONS: Mutation[] = [
 /** Harmless rewrites that must not be flagged. */
 const REWRITES: { id: string; apply: (s: string) => string | null }[] = [
   { id: "contract", apply: (s) => { const t = s.replace(/\bI will\b/, "I'll").replace(/\bdo not\b/, "don't").replace(/\bwe are\b/i, (m) => (m[0] === "W" ? "We're" : "we're")).replace(/\bit is\b/i, (m) => (m[0] === "I" ? "It's" : "it's")); return t === s ? null : t; } },
-  { id: "expand", apply: (s) => { const t = s.replace(/\bI'll\b/, "I will").replace(/\bdon't\b/, "do not").replace(/\bWe're\b/, "We are").replace(/\bIt's\b(?! (?:been|got|gone)\b)/, "It is").replace(/\bcan't\b/, "cannot"); return t === s ? null : t; } },
+  { id: "expand", apply: (s) => { const t = s.replace(/\bI'll\b/, "I will").replace(/\bdon't\b/, "do not").replace(/\bWe're\b/, "We are").replace(/\bIt's\b(?! (?:(?:never|already|just|always|not|really|also) )?(?:been|got|gone)\b)/, "It is").replace(/\bcan't\b/, "cannot"); return t === s ? null : t; } },
 ];
 
 const caught = (ev: Evaluation) => ev.scores.overall < 85 || scoredErrors(ev.errors).some((e) => e.severity !== "minor") || scoredErrors(ev.errors).some((e) => e.category !== "spelling");
