@@ -68,6 +68,8 @@ const WRONG: [string, string[], string][] = [
   ["I'm interested in the new design.", [], "I'm interesting in the new design."],
   ["She's leaving for Busan tomorrow.", [], "She leave for Busan tomorrow."],
   ["We're meeting the client at three.", [], "We meets the client at three."],
+  ["The steam trap was stuck, so the condensate couldn't drain.", [], "The steam trap wasn't stuck, so the condensate couldn't drain."],
+  ["We need to update the drawings before Friday.", ["We have to finish the drawings before Friday, so we need to update them now."], "We don't need to update the drawings before Friday."],
 ];
 
 describe("reworded correct answers are not marked wrong", () => {

@@ -1056,12 +1056,16 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
       return n;
     };
     const mineLexical = lexicalWords(w);
-    if (mineLexical !== lexicalWords(tw)) return null;
-    // 1) The whole answer and the closest answer differ in polarity, counting every negation (a "never" inside
-    //    "…, but why not?" still counts) …
-    if ((negCount(w, false) === 0) === (negCount(tw, false) === 0)) return null;
-    const near = ranked.filter((r) => r.al.distance <= CLOSE_DISTANCE && r.tw.length >= 4);
-    if (near.some((r) => lexicalWords(r.tw) !== mineLexical || (negCount(r.tw, false) === 0) === (negCount(w, false) === 0))) return null;
+    // Only stored answers with the same negation-carrying words are compared (one variant with "finds out" or
+    // "breaks down" no longer switches the check off for every answer).
+    const near = ranked.filter((r) => r.al.distance <= CLOSE_DISTANCE && r.tw.length >= 4 && lexicalWords(r.tw) === mineLexical);
+    if (!near.length) return null;
+    // 1) The whole answer and the close answers differ in polarity, counting every negation (a "never" inside
+    //    "…, but why not?" still counts), or the answer adds a second negation to one that already has one …
+    const mineAll = negCount(w, false);
+    const polarityDiffers = near.every((r) => (negCount(r.tw, false) === 0) !== (mineAll === 0));
+    const extraNegation = mineAll > 0 && near.every((r) => negCount(r.tw, false) > 0 && negCount(r.tw, false) < mineAll);
+    if (!polarityDiffers && !extraNegation) return null;
     // 2) … and one statement of the answer says the opposite of the matching statement of a close answer
     //    (an extra sentence the stored answers do not have is not compared).
     const targetSentences = near.flatMap((r) => sentencesOf(r.tw)).filter((ts) => ts.length >= 3 && !ts[ts.length - 1]?.question);
@@ -1071,10 +1075,13 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
       const best = scored[0];
       // With negation-carrying words in both ("still", "out", "late"), only a near-identical sentence is compared:
       // "We're still waiting" and "We still haven't received it" say the same thing with different polarity.
-      if (!best || best.d > (mineLexical ? 0.2 : CLOSE_DISTANCE)) continue;
+      if (!best || best.d > (mineLexical || !polarityDiffers ? 0.2 : CLOSE_DISTANCE)) continue;
       const mine = negCount(sent, true);
-      if ((mine === 0) === (negCount(best.ts, true) === 0)) continue;
-      if (scored.some((x) => x.d <= best.d + CONSENSUS_MARGIN && (negCount(x.ts, true) === 0) === (mine === 0))) continue;
+      const theirs = negCount(best.ts, true);
+      // A second "not" is compared only with a near-identical sentence ("the steam trap wasn't stuck, so it couldn't drain").
+      const flips = polarityDiffers ? (mine === 0) !== (theirs === 0) : mine > theirs && theirs > 0;
+      if (!flips) continue;
+      if (scored.some((x) => x.d <= best.d + CONSENSUS_MARGIN && (polarityDiffers ? (negCount(x.ts, true) === 0) === (mine === 0) : negCount(x.ts, true) === mine))) continue;
       const offset = w.indexOf(sent[0]);
       const k = sent.findIndex((t, i) => t.norm === "never" || (t.norm === "not" && i > 0));
       return { extra: mine > 0, at: k >= 0 ? offset + k : -1 };
