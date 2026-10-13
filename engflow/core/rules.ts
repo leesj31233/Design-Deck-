@@ -3789,7 +3789,7 @@ const learnerSlips: Rule = (w) => {
       continue;
     }
     // "How about have lunch?" → "having lunch".
-    if (t === "about" && i > 0 && /^(how|what)$/.test(w[i - 1].norm) && /^(have|be|do|get|make|take)$/.test(n1) && !end(i + 1)) {
+    if (t === "about" && i > 0 && /^(how|what)$/.test(w[i - 1].norm) && /^(have|be|do|get|make|take|order|book|call|check|meet|go|try|eat|ask|send|grab|start|finish|move|ask)$/.test(n1) && !end(i + 1)) {
       out.push({ rule: "how-about-ing", from: i + 1, to: i + 2, replacement: ingOf(n1), category: "verb-form", severity: "major", skill: "offer-suggest", messageKo: `'How about' 뒤에는 -ing가 옵니다: 'How about ${ingOf(n1)} …?'` });
       continue;
     }
@@ -3891,8 +3891,14 @@ const learnerSlips: Rule = (w) => {
       }
     }
     // "Have you ever be to Korea?" → "been".
-    if (/^(have|has)$/.test(t) && SUBJECT_PRONOUNS.has(n1) && /^(ever|never|already|just)?$/.test(w[i + 2]?.norm ?? "") && (i === 0 || brokenAfter(w, i - 1))) {
+    if (/^(have|has)$/.test(t) && SUBJECT_PRONOUNS.has(n1) && w[i + 2] && (i === 0 || brokenAfter(w, i - 1))) {
       const k = /^(ever|never|already|just)$/.test(w[i + 2]?.norm ?? "") ? i + 3 : i + 2;
+      // "Have you saw the notebook?" → "seen": a past form that is not the participle.
+      const pv = w[k] ? verbInfo(w[k].norm) : null;
+      if (pv && pv.form === "past" && participleOf(pv.base) !== w[k].norm) {
+        out.push({ rule: "perfect-base-verb", from: k, to: k + 1, replacement: participleOf(pv.base), category: "verb-form", severity: "major", skill: "present-perfect", messageKo: `have + 과거분사입니다: '${participleOf(pv.base)}'.` });
+        continue;
+      }
       const b = w[k]?.norm === "be" ? "be" : baseVerbAt(k);
       if (b && participleOf(b) !== b && !isSameFormParticiple(b) && w[k].norm === b && (b === "be" || UNAMBIGUOUS_VERBS.has(b) || /^(go|eat|see|try|visit|meet|hear|do|make|take|get)$/.test(b))) {
         out.push({ rule: "perfect-base-verb", from: k, to: k + 1, replacement: participleOf(b), category: "verb-form", severity: "major", skill: "present-perfect", messageKo: `have + 과거분사입니다: 'Have you ever ${participleOf(b)} …?'` });
@@ -3945,6 +3951,18 @@ const learnerSlips: Rule = (w) => {
     if (t === "like" && i > 0 && (w[i - 1].norm === "would" || (SUBJECT_PRONOUNS.has(w[i - 1].norm) && w[i - 2]?.norm === "would"))) {
       if (/^(have|go|come|see|try|join|ask|order|eat|drink|take|make|talk|check|start|book|visit|meet|know|get|stay|sit|leave)$/.test(n1)) {
         insert(i + 1, "to", "verb-form", "major", "purpose-to", `'would like' 뒤에 동사가 오면 'to + 동사원형'입니다: 'like to ${w[i + 1].raw}'.`, "missing-to");
+        continue;
+      }
+    }
+    // "I was wondered if" → "was wondering"; "is being renovate" → "being renovated".
+    if (/^(was|were|am|is|are)$/.test(t) && n1 === "wondered" && /^(if|whether)$/.test(w[i + 2]?.norm ?? "")) {
+      out.push({ rule: "verb-form", from: i + 1, to: i + 2, replacement: "wondering", category: "verb-form", severity: "major", skill: "polite-request", messageKo: "'~할까 해서요'는 'I was wondering if …'입니다." });
+      continue;
+    }
+    if (t === "being") {
+      const b = baseVerbAt(i + 1);
+      if (b && w[i + 1].norm === b && participleOf(b) !== b && i > 0 && /^(is|are|was|were|am)$/.test(w[i - 1].norm)) {
+        out.push({ rule: "passive-needed", from: i + 1, to: i + 2, replacement: participleOf(b), category: "verb-form", severity: "major", skill: "passive", messageKo: `수동 진행형은 'being + 과거분사'입니다: 'being ${participleOf(b)}'.` });
         continue;
       }
     }

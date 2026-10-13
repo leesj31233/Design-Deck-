@@ -126,7 +126,8 @@ export function tokenize(text: string): Token[] {
     const raw = text.slice(m.index, m.index + m[0].length);
     const start = m.index;
     const end = m.index + m[0].length;
-    let norm = m[0].toLowerCase();
+    // "the IT team": IT in capitals (not a shouted sentence) is the department, not the pronoun.
+    let norm = m[0] === "IT" && !/^[^a-z]*$/.test(text) ? "i.t" : m[0].toLowerCase();
     if (!/[a-z0-9]/.test(norm)) {
       tokens.push({ norm, raw, start, end, stem: norm, punct: true });
       continue;

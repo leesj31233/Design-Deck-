@@ -146,6 +146,8 @@ function tokenMatches(alt: Alt, tok: Token, synonyms = false): "exact" | "fuzzy"
   if (alt.any) return "exact";
   if (alt.exact) return tok.norm === alt.value ? "exact" : null;
   if (tok.norm === alt.value || tok.stem === alt.stem) return "exact";
+  // "IT" (the department) is read as "i.t" by the tokenizer; a pattern word "it" still matches it.
+  if (alt.value === "it" && tok.norm === "i.t") return "exact";
   if (alt.num !== undefined && tok.num === alt.num) return "exact";
   // "five" in a pattern matches "a five-minute walk" ("5-minute"): the number is said either way.
   if (alt.num !== undefined && !alt.num.includes("-") && tok.num?.startsWith(`${alt.num}-`)) return "exact";
