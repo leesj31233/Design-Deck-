@@ -162,7 +162,7 @@ const VERB_PREPS: Record<string, string[]> = {
   care: ["about", "for"], worry: ["about"], ask: ["about", "for"], learn: ["about", "from"], speak: ["about", "to", "with"],
   agree: ["with", "on", "to"], decide: ["on", "about"], wait: ["for", "on"], look: ["at", "for", "into", "over", "through", "after", "up"],
   deal: ["with"], work: ["on", "with", "for", "at"], depend: ["on"], focus: ["on"], apply: ["for", "to"], pay: ["for"], listen: ["to"],
-  reply: ["to"], respond: ["to"], refer: ["to"], belong: ["to"], get: ["to", "back", "on", "through", "over"], go: ["over", "through", "on", "to", "with", "ahead", "for"],
+  reply: ["to"], respond: ["to"], send: ["to"], give: ["to"], show: ["to"], explain: ["to"], refer: ["to"], belong: ["to"], get: ["to", "back", "on", "through", "over"], go: ["over", "through", "on", "to", "with", "ahead", "for"],
   come: ["back", "up", "to", "from"], check: ["on", "with", "in", "out"], follow: ["up"], complain: ["about", "to"], dream: ["about", "of"],
   forget: ["about"], hope: ["for"], read: ["about"], write: ["about", "to"], tell: ["about"], remind: ["about", "of"], warn: ["about", "of"],
   arrive: ["at", "in"], stay: ["at", "in", "with"], meet: ["with", "up"], plan: ["for", "on"], prepare: ["for"], search: ["for"], vote: ["for", "on"],

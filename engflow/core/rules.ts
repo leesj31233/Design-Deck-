@@ -908,7 +908,11 @@ const bareSingularCountable: Rule = (w) => {
           continue;
         }
         // A real verb ends the noun phrase: "satisfy (the) customer", "we sent (the) quotation", "take (a) message".
-        if (UNAMBIGUOUS_VERBS.has(vi.base) || vi.form === "3sg" || vi.form === "past" || /^(take|give|wear|make|get|need|want|find|book|use|buy|bring|leave|open|close|fix|see|repeat|answer|have)$/.test(t.norm)) break;
+        // ("open drain valve": after a real verb, the next verb-like word is a noun modifier, so the guess is safe.)
+        if (UNAMBIGUOUS_VERBS.has(vi.base) || vi.form === "3sg" || vi.form === "past" || /^(take|give|wear|make|get|need|want|find|book|use|buy|bring|leave|open|close|fix|see|repeat|answer|have)$/.test(t.norm)) {
+          if (uncertain && k === start - 1 && start === i - 1) uncertain = false;
+          break;
+        }
         // "control valve", "test report": maybe a noun modifier — keep looking, but never guess.
         uncertain = true;
       }
@@ -1701,11 +1705,13 @@ const smallPhrases: Rule = (w) => {
 const passiveWithObject: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 1; i < w.length - 2; i++) {
-    if (!/^(i|we|they|he|she|you)$/.test(w[i - 1].norm) || !/^(was|were|am|are|is)$/.test(w[i].norm) || w[i].expanded) continue;
+    // A person does the action: "we were followed the steps", "the operators were followed every step".
+    const person = /^(i|we|they|he|she|you)$/.test(w[i - 1].norm) || PERSON_NOUNS.has(w[i - 1].norm) || /^(operators|engineers|workers|colleagues|people|staff|technicians|managers|customers|clients)$/.test(w[i - 1].norm);
+    if (!person || !/^(was|were|am|are|is)$/.test(w[i].norm) || w[i].expanded) continue;
     const v = w[i + 1];
     const info = verbInfo(v.norm);
     if (!info || !(info.form === "pp" || (info.form === "past" && participleOf(info.base) === v.norm)) || isSameFormParticiple(info.base)) continue;
-    if (!/^(it|them|the|this|that|your|our|my|their|his|her)$/.test(w[i + 2].norm)) continue;
+    if (!/^(it|them|the|this|that|your|our|my|their|his|her|every|each|all)$/.test(w[i + 2].norm)) continue;
     if (/^(given|sent|shown|told|asked|offered|paid|taught|promised|allowed|called|named|elected|considered)$/.test(v.norm)) continue; // "I was given the file", "we were told the date"
     out.push({
       rule: "passive-with-object", from: i, to: i + 1, replacement: "", category: "be-verb", severity: "major", skill: "passive",
@@ -2306,7 +2312,7 @@ const miscPatterns: Rule = (w) => {
   const pastTime = w.findIndex((t, k) => t.norm === "yesterday" || (t.norm === "last" && /^(week|weekend|month|year|night|monday|tuesday|wednesday|thursday|friday|saturday|sunday|time)$/.test(w[k + 1]?.norm ?? "") && !/['’]s$/.test(w[k + 1]?.raw ?? "")) || (t.norm === "ago" && k > 0) || (t.norm === "in" && /^(19|20)\d\d$/.test(w[k + 1]?.norm ?? "") && Number(w[k + 1].norm) < 2026));
   if (pastTime >= 0 && !w.some((t) => /^(will|would|usually|always|every|often|normally|since|going|next|tomorrow)$/.test(t.norm))) {
     for (let k = 0; k < w.length - 1; k++) {
-      if (/^(have|has)$/.test(w[k].norm) && !w[k].expanded && SUBJECT_PRONOUNS.has(w[k - 1]?.norm ?? "") && verbInfo(w[k + 1]?.norm ?? "")?.form?.match(/^(pp|past)$/) && w[k + 1].norm !== "to" && Math.abs(pastTime - k) < 8) {
+      if (/^(have|has)$/.test(w[k].norm) && (!w[k].expanded || /['’]ve$/i.test(w[k].raw)) && SUBJECT_PRONOUNS.has(w[k - 1]?.norm ?? "") && verbInfo(w[k + 1]?.norm ?? "")?.form?.match(/^(pp|past)$/) && w[k + 1].norm !== "to" && Math.abs(pastTime - k) < 8 && !w.slice(Math.min(k, pastTime), Math.max(k, pastTime)).some((_, m) => brokenAfter(w, Math.min(k, pastTime) + m))) {
         push("perfect-past-time", k, k + 1, "", "tense", "present-perfect", "'yesterday, last year, ~ago, in 2023'처럼 끝난 과거 시점과는 현재완료가 아니라 과거형을 씁니다.");
         break;
       }
@@ -3642,6 +3648,35 @@ const learnerSlips: Rule = (w) => {
         out.push({ rule: "agreement-plural-noun", from: k + 1, to: k + 2, replacement: base, category: "agreement", severity: "major", skill: "agreement", messageKo: `주어 '${w.slice(i + 1, k + 1).map((x) => x.raw).join(" ")}'가 복수라서 동사에 -s를 붙이지 않습니다: '${base}'.` });
         continue;
       }
+    }
+    // "It was not go well" → "did not go": be + not + a verb is a do-question/negative.
+    if (/^(is|was|are|were|am)$/.test(t) && !w[i].expanded && n1 === "not") {
+      const b = baseVerbAt(i + 2);
+      if (b && (UNAMBIGUOUS_VERBS.has(b) || /^(go|come|know|get|happen|arrive|agree|understand|see|hear|say|think|believe|seem|expect|remember|forget)$/.test(b)) && !end(i + 1) && !end(i + 2)) {
+        const fix = /^(was|were)$/.test(t) ? "did" : t === "is" ? "does" : "do";
+        out.push({ rule: "be-not-verb", from: i, to: i + 1, replacement: fix, category: "verb-form", severity: "major", skill: "agreement", messageKo: `일반동사의 부정은 be동사가 아니라 do/does/did + not입니다: '${fix} not ${w[i + 2].raw}'.` });
+        continue;
+      }
+    }
+    // "The fan is started vibrating" → "started vibrating": start/stop/keep + -ing is active.
+    if (/^(is|was|are|were)$/.test(t) && !w[i].expanded && /^(started|stopped|finished|kept|continued|began)$/.test(n1) && w[i + 2] && verbInfo(w[i + 2].norm)?.form === "ing" && !ING_NOUNS.has(w[i + 2].norm)) {
+      out.push({ rule: "be-active-verb", from: i, to: i + 1, replacement: "", category: "be-verb", severity: "major", skill: "agreement", messageKo: `'${n1} + -ing'는 능동이라 be동사가 필요 없습니다: '${w[i + 1].raw} ${w[i + 2].raw}' (또는 'has ${w[i + 1].raw} …').` });
+      continue;
+    }
+    // "I would rather not restarting it" → "not restart"; "Sorry to keeping you waiting" → "to keep".
+    if ((t === "rather" && i > 0 && /^(would|had)$/.test(w[i - 1].norm)) || (t === "to" && i > 0 && /^(sorry|nice|happy|glad|pleased|sad|ready|able|willing|unable|excited|hard|easy)$/.test(w[i - 1].norm))) {
+      const k = n1 === "not" && t === "rather" ? i + 2 : i + 1;
+      const v = w[k];
+      if (v && verbInfo(v.norm)?.form === "ing" && !ING_NOUNS.has(v.norm) && !brokenAfter(w, k - 1)) {
+        const b = verbInfo(v.norm)!.base;
+        out.push({ rule: t === "to" ? "to-inflected" : "rather-base", from: k, to: k + 1, replacement: b, category: "verb-form", severity: "major", skill: "purpose-to", messageKo: `'${t === "to" ? "to" : "would rather"}' 뒤에는 동사원형이 옵니다: '${b}'.` });
+        continue;
+      }
+    }
+    // "a little time more" → "a little more time".
+    if (t === "a" && /^(little|few|couple)$/.test(n1) && /^(time|days|minutes|weeks|hours|money|help|information|patience|people|questions|details)$/.test(w[i + 2]?.norm ?? "") && w[i + 3]?.norm === "more") {
+      out.push({ rule: "word-order", from: i + 2, to: i + 4, replacement: `more ${w[i + 2].raw}`, category: "word-order", severity: "major", skill: "word-order", messageKo: `'조금 더 ~'는 'a ${n1} more ${w[i + 2].raw}' 순서입니다.` });
+      continue;
     }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
     if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
