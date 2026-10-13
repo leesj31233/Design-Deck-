@@ -95,6 +95,50 @@ grades.
 - **Faster long answers.** Word-pair alignment costs are memoized and stored answers are
   tokenized once.
 
+### Second half of run 2: general rules, native lines and the held-out set
+
+The first half of run 2 left held-out set B where it was. The second half went after what
+generalizes, and B moved for the first time:
+
+| Measure (second half of run 2) | Before | After |
+| --- | ---: | ---: |
+| **Blind B (held out): correct answers marked wrong** | 29 / 312 (9.3%) | 22 / 312 (7.1%) |
+| **Blind B (held out): wrong answers flagged as major or below 85** | 67.3% | 72.6% |
+| **Blind B (held out): wrong answers flagged (any note)** | 80.8% | 85.6% |
+| **Blind B (held out): wrong answers shown at once as fine** | 7 | 5 |
+| Blind A: correct answers marked wrong | 12 / 291 | 2 / 291 |
+| Blind A: wrong answers flagged (any note) | 96.9% | 99.5% |
+| Two batteries of typical Korean-speaker mistakes, rules alone | 41 / 86, 45 / 94 | 76 / 86, 90 / 94 |
+| Rules firing on the other speaker's lines (1,314 native lines) | 12 | 0 (now a unit test) |
+| Inserted "not" caught (stored answers with a "not" added) | 122 / 291 | 229 / 319 |
+| Correct answers said without punctuation, marked wrong | 6 / 6,796 | 8 / 8,122 (bank grew by 330 questions) |
+| Mutation bench: recall / right answers left alone | 97.7% / 100% | 98.2% / 100% |
+| Rule time per sentence (all rules) | 0.90 ms | 0.31 ms |
+
+What did it:
+
+- **Counting causes on the held-out set without looking at it.** `blind.ts --set b --causes`
+  prints only counts: why correct answers were marked wrong (18 of 29: a critical meaning chunk
+  missing) and which kinds of mistakes slip through, plus the question families they come from.
+  That pointed the content passes at the oldest banks (phone, negotiation, trouble, phrasal verbs,
+  online, visit, meal) and the rules at the missing kinds.
+- **Batteries written from the kinds, not from the items.** For each kind B misses (missing
+  article, missing preposition, agreement, embedded questions, passives …) a set of typical
+  sentences with matching correct look-alikes; about 120 rules were added or widened from them.
+- **Native lines as a false-alarm detector.** Every grammar rule now runs on the other speaker's
+  dialogue lines (correct English the learner never types); 12 real false alarms were found and
+  fixed ("Mina and I are", "Sometimes I wonder", "another forty minutes", "delivery time for these
+  pumps is", "promoted to plant manager").
+- **Reversed meaning, generalized.** Stored answers with different negation-carrying words are
+  left out of the comparison instead of switching the check off, and a second "not" in a
+  sentence that already has one is caught against a near-identical stored sentence.
+- **Long answers.** A minor alignment note costs less in an answer over 24 words.
+- **Content passes** with fresh rounds against over-fitting (per pass: false alarms 64 → 2 and
+  10 → 0 on the agents' own replies; on rounds written after the fixes, 7 → 0 and 3 → 0).
+
+The cut-off for showing a grade at once was checked again with the new rules: set B's 0.2–0.25
+band still holds 4 wrong answers with nothing found, so it stays at 0.2.
+
 ### Should a clear rule error skip the wait?
 
 When the rules already find a major error, waiting up to 2.5–8 s for Claude seems pointless.
