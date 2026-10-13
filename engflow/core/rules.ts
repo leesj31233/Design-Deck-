@@ -108,7 +108,8 @@ const prepositionBaseVerb: Rule = (w) => {
     const v = w[k];
     if (!v || !isBaseVerb(v.norm)) continue;
     // "after work", "before lunch": everyday nouns.
-    if (/^(work|school|class|practice|use|lunch|dinner|breakfast|sleep|rest)$/.test(v.norm) && /^(before|after|without)$/.test(p)) continue;
+    // ("before use it" still needs "using": an object follows.)
+    if (/^(work|school|class|practice|use|lunch|dinner|breakfast|sleep|rest|shutdown|startup|maintenance|commissioning)$/.test(v.norm) && /^(before|after|without)$/.test(p) && !/^(it|them|this|that)$/.test(w[k + 1]?.norm ?? "")) continue;
     // "by email the next day": after "by", a word that is also a noun is usually that noun.
     if (p === "by" && !UNAMBIGUOUS_VERBS.has(v.norm)) continue;
     // "before start-up", "before test results" — only fire when an object/determiner or end follows, or the verb is unambiguous.
@@ -585,7 +586,7 @@ const moreShortAdjective: Rule = (w) => {
     const next = w[i + 2];
     const prev = w[i - 1]?.norm ?? "";
     // "more big dryers", "more good news": more counts the noun phrase, which is fine.
-    const clauseEnds = !next || brokenAfter(w, i + 1) || /^(than|in|on|at|for|to|because|so|and|but|or|if|when|now|today|tonight|tomorrow|this|next|during|after|before|with|from|by|until|please|enough|then|again|soon|later|already|still|too|overall|anyway|these|every)$/.test(next.norm);
+    const clauseEnds = !next || brokenAfter(w, i + 1) || /^(than|in|on|at|for|to|because|so|and|but|or|if|when|now|today|tonight|tomorrow|this|next|during|after|before|with|from|by|until|please|enough|then|again|soon|later|already|still|too|overall|anyway|these|every|over|about)$/.test(next.norm);
     const article = /^(a|an|the|much|even|far|bit|little|lot|slightly|no)$/.test(prev);
     if (!clauseEnds && !article) continue;
     out.push({
@@ -645,7 +646,11 @@ const missingSubjectIt: Rule = (w) => {
     const predicate =
       (info && (info.form === "ing" || info.form === "pp" || (info.form === "past" && participleOf(info.base) === n.norm)) && !ING_NOUNS.has(n.norm)) ||
       /^(still|too|so|very|really|already|not|just|quite|pretty|fine|okay|ok|good|great|nice|ready|done|important|possible|necessary|difficult|easy|hard|hot|cold|warm|true|better|worse|late|early|delicious|expensive|cheap|interesting|raining|snowing|sunny|cloudy|windy|freezing|humid|normal|totally|completely|absolutely|definitely|probably|always|never|usually|perfect|amazing|beautiful|wonderful|terrible|strange|weird|funny|on|in|at|for|from|over|up|down|about|black|white|blank|empty|dark|frozen|broken|stuck|full|closed|open|off)$/.test(n.norm);
-    if (!predicate) continue;
+    // A statement (it ends with "." or "!") that starts with is/was has lost its subject: "Is a small world!", "Is nearly done."
+    const sentEnd = w.slice(i).find((t) => t.sentenceEnd);
+    // (A question typed with a full stop still has its subject: "Is that right.", "Is the room ready.")
+    const statement = !!sentEnd && !sentEnd.question && !/^(there|here|this|that|it|he|she|you|we|they|everything|everyone|anything|anyone|someone|something|the|your|my|our|his|her|their|its)$/.test(n.norm);
+    if (!predicate && !statement) continue;
     // "Is early check-in possible?", "Is hot water available?": the adjective begins the subject of a question.
     const nn = w[i + 2];
     if (nn && !brokenAfter(w, i + 1) && /^[a-z]/.test(nn.norm) && !verbInfo(nn.norm) && !/^(to|that|than|and|or|but|so|for|with|in|on|at|of|now|today|here|there|enough|yet|again|outside|inside)$/.test(nn.norm) && w.slice(i + 2).some((t) => /^(possible|available|necessary|okay|ok|fine|included|ready|allowed|free)$/.test(t.norm))) continue;
@@ -771,6 +776,8 @@ const articleSound: Rule = (w) => {
     const n = w[i + 1].norm;
     if (a !== "a" && a !== "an") continue;
     if (w[i].raw === "A" && i > 0) continue; // a label: "Option A is cheaper"
+    // "A is cheaper to buy, but B uses less steam": option A as the subject, not an article.
+    if (w[i].raw === "A" && /^(is|was|has|uses|costs|needs|will|would|can|could|looks|seems|gives|takes|and|or)$/.test(n)) continue;
     if (!/^[a-z]/.test(n)) continue;
     const raw = w[i + 1].raw;
     // Acronyms are read letter by letter ("an RFQ"), except those read as words ("a SIM card", "a PIN").
@@ -853,6 +860,7 @@ const COUNTABLE_NOUNS = new Set([
   "message", "discount", "opinion", "helmet", "person", "reply", "ticket", "receipt", "seat", "passport", "visa", "car",
   // Everyday life ("I need taxi", "I have headache", "Is there bank near here?").
   "taxi", "cab", "table", "headache", "bank", "pharmacy", "umbrella", "menu", "reservation", "appointment", "interview",
+  "area", "terminal", "concert", "museum",
   "apartment", "doctor", "dentist", "map", "suitcase", "souvenir", "sandwich", "toothache", "stomachache", "fever", "friend",
 ]);
 const NP_DETERMINERS = new Set([
@@ -874,6 +882,8 @@ const bareSingularCountable: Rule = (w) => {
     // "in person", "per person": fixed phrases.
     if (n.norm === "person" && /^(in|per|to)$/.test(before)) continue;
     // "by train", "by email": transport and means take no article; "an increase in price" is uncountable use.
+    // "too far apart on price", "Price is our main concern": price in general takes no article.
+    if (n.norm === "price" && (/^(on|about|over)$/.test(before) || i === 0 || brokenAfter(w, i - 1))) continue;
     if (before === "by" || (n.norm === "price" && before === "in" && /^(increase|decrease|rise|drop|change|difference|increases|changes)$/.test(w[i - 2]?.norm ?? ""))) continue;
     if (verbInfo(n.norm) && /^(to|will|would|can|could|should|must|may|might|please|let's|lets|i|we|you|they|not|also|then|and|or|just|always|usually|often)$/.test(before)) continue;
     // Heads its phrase only: followed by the end, a function word or a verb (not by another noun or an object).
@@ -911,6 +921,12 @@ const bareSingularCountable: Rule = (w) => {
         }
         // A real verb ends the noun phrase: "satisfy (the) customer", "we sent (the) quotation", "take (a) message".
         // ("open drain valve": after a real verb, the next verb-like word is a noun modifier, so the guess is safe.)
+        // ("the only open question": a verb-like word after a determiner or "only" is an adjective.)
+        if (vi.form === "base" && /^(the|a|an|only|this|that|our|your|their|my|one)$/.test(w[k - 1]?.norm ?? "")) {
+          start = k;
+          k--;
+          continue;
+        }
         if (UNAMBIGUOUS_VERBS.has(vi.base) || vi.form === "3sg" || vi.form === "past" || /^(take|give|wear|make|get|need|want|find|book|use|buy|bring|leave|open|close|fix|see|repeat|answer|have)$/.test(t.norm)) {
           if (uncertain && k === start - 1 && start === i - 1) uncertain = false;
           break;
@@ -1418,9 +1434,9 @@ const byTheMeans: Rule = (w) =>
 
 /** "All the tests was carried out", "Both of them is good" → plural verb. */
 /** Plural nouns the countable list leaves out (it also drives article checks, where these would be noisy). */
-const SUBJECT_PLURALS = /^(questions|answers|emails|calls|decisions|parents|grandparents|brothers|sisters|cousins|neighbors|neighbours|coworkers|bosses|teachers|guys|boys|girls|results|tests|numbers|figures|plans|shipments|orders|products|parts|costs|prices|levels|values|readings|samples|conditions|changes|issues|problems|items|files|documents|emails|messages|meetings|guests|visitors|members|people|children|kids|friends|students|workers|employees|prices|sales|rooms|tickets|reports|slides|drawings|specs|specifications|suppliers|vendors|clients|customers|engineers|operators|colleagues|managers|pumps|valves|dryers|tanks|machines|units|lines|trains|flights|buses|cars)$/;
+const SUBJECT_PLURALS = /^(suppliers|vendors|competitors|questions|answers|emails|calls|decisions|parents|grandparents|brothers|sisters|cousins|neighbors|neighbours|coworkers|bosses|teachers|guys|boys|girls|results|tests|numbers|figures|plans|shipments|orders|products|parts|costs|prices|levels|values|readings|samples|conditions|changes|issues|problems|items|files|documents|emails|messages|meetings|guests|visitors|members|people|children|kids|friends|students|workers|employees|prices|sales|rooms|tickets|reports|slides|drawings|specs|specifications|suppliers|vendors|clients|customers|engineers|operators|colleagues|managers|pumps|valves|dryers|tanks|machines|units|lines|trains|flights|buses|cars)$/;
 const isPluralNoun = (x: string) => !!PLURAL_NOUN_SINGULAR(x) || SUBJECT_PLURALS.test(x);
-const PLURAL_SUBJECT_VERB = /^(show|need|want|work|look|seem|take|make|give|goe|come|say|know|think|use|require|include|depend|cost|run|help|mean|happen|matter|sound|feel|cause|affect|contain|produce|indicate|suggest|remain|stay|keep|get|live|like|love|play|visit|call|speak|eat|drink|enjoy|travel)s$/;
+const PLURAL_SUBJECT_VERB = /^(show|need|want|work|look|seem|take|make|give|offer|charge|pay|ask|expect|goe|come|say|know|think|use|require|include|depend|cost|run|help|mean|happen|matter|sound|feel|cause|affect|contain|produce|indicate|suggest|remain|stay|keep|get|live|like|love|play|visit|call|speak|eat|drink|enjoy|travel)s$/;
 const pluralSubjectAgreement: Rule = (w) => {
   const out: RuleFinding[] = [];
   for (let i = 0; i < w.length - 1; i++) {
@@ -3641,6 +3657,15 @@ const learnerSlips: Rule = (w) => {
       out.push({ rule: "let-make-base", from: i + 2, to: i + 3, replacement: b, category: "verb-form", severity: "major", skill: "verb-object", messageKo: `'${w[i].raw} + 사람 + 동사원형'입니다: '${w[i].raw} ${w[i + 1].raw} ${b}'.` });
       continue;
     }
+    // "Other suppliers usually gives us 8%" → "give": an adverb between a plural subject and its verb.
+    if (isPluralNoun(t) && /^(usually|always|often|normally|sometimes|never|also|still|really|just|already)$/.test(n1) && w[i + 2] && !end(i + 1) && !(i > 0 && /^(of|for|with|to|from|in|on|at|by|about)$/.test(w[i - 1].norm))) {
+      const m = PLURAL_SUBJECT_VERB.exec(w[i + 2].norm);
+      if (m) {
+        const base = m[1] === "goe" ? "go" : m[1];
+        out.push({ rule: "agreement-plural-noun", from: i + 2, to: i + 3, replacement: base, category: "agreement", severity: "major", skill: "agreement", messageKo: `주어 '${w[i].raw}'가 복수라서 동사에 -s를 붙이지 않습니다: '${base}'.` });
+        continue;
+      }
+    }
     // "If technical questions goes through me" → "go": a plural subject without a determiner.
     if (/^(if|when|because|since|once|unless|and|but|so)$/.test(t)) {
       let k = i + 1;
@@ -3789,6 +3814,50 @@ const learnerSlips: Rule = (w) => {
     if (/^(sound|sounds|sounded)$/.test(t) && SOUND_ADJ.test(n1) && /^(plan|idea|place|time|deal|trip|choice|option|weekend|day)$/.test(w[i + 2]?.norm ?? "")) {
       out.push({ rule: "sound-like-noun", from: i + 1, to: i + 1, replacement: `like ${anOf(n1)}`, category: "word-choice", severity: "major", skill: "reaction", messageKo: `명사가 오면 'sound like + a + 명사'입니다: '${w[i].raw} like ${anOf(n1)} ${n1} ${w[i + 2].raw}'.` });
       continue;
+    }
+    // "Could I get a box for rest?" → "for the rest".
+    if (/^(for|of|with|about)$/.test(t) && n1 === "rest" && end(i + 1)) {
+      insert(i + 1, "the", "article", "minor", "articles", "'나머지'는 'the rest'입니다.", "missing-article");
+      continue;
+    }
+    // "I should have read it more careful" → "carefully": a verb is described by an adverb.
+    if (/^(read|check|checked|drive|drove|speak|spoke|listen|explain|write|handle|handled|think)$/.test(t) && !end(i)) {
+      let k = i + 1;
+      if (/^(it|them|this|that)$/.test(w[k].norm) && !end(k)) k++;
+      if (/^(more|very|so|really|too)$/.test(w[k]?.norm ?? "") && !end(k)) k++;
+      if (/^(careful|clear|slow|quiet|careless|polite)$/.test(w[k]?.norm ?? "") && (end(k) || /^(next|this|from|please|because)$/.test(w[k + 1]?.norm ?? ""))) {
+        out.push({ rule: "adverb-needed", from: k, to: k + 1, replacement: `${w[k].norm}ly`.replace(/lely$/, "ly"), category: "word-choice", severity: "minor", skill: "degree", messageKo: `동사를 꾸밀 때는 부사(-ly)를 씁니다: '${w[k].norm}ly'.` });
+        continue;
+      }
+    }
+    // "What would that means in practice?" → "mean": the verb after a modal is the base form, also in a question.
+    if (/^(what|how|why|where|when|who|which)$/.test(t) && MODALS.has(n1) && /^(that|this|it|he|she|they|we|you|i)$/.test(w[i + 2]?.norm ?? "") && w[i + 3]) {
+      const vi = verbInfo(w[i + 3].norm);
+      if (vi && vi.form === "3sg" && !w[i + 3].expanded) {
+        out.push({ rule: "modal-inflected", from: i + 3, to: i + 4, replacement: vi.base, category: "verb-form", severity: "major", skill: "modal-possibility", messageKo: `조동사(${w[i + 1].raw}) 뒤에는 동사원형입니다: '${vi.base}'.` });
+        continue;
+      }
+    }
+    // "the noise level already checked by the vendor" → "was already checked": a thing done by someone needs be.
+    if (/^(the|our|this|that|your|their|my)$/.test(t) && /^[a-z]+$/.test(n1) && !verbInfo(n1)) {
+      let k = i + 2;
+      if (w[k] && !verbInfo(w[k].norm) && /^[a-z]+$/.test(w[k].norm) && !/^(already|just|also|still)$/.test(w[k].norm)) k++;
+      const adv = /^(already|just|also|recently)$/.test(w[k]?.norm ?? "") ? 1 : 0;
+      const v = w[k + adv];
+      const vi = v ? verbInfo(v.norm) : null;
+      if (v && vi && /^(pp|past)$/.test(vi.form) && /ed$/.test(v.norm) && w[k + adv + 1]?.norm === "by" && /^(the|a|an|our|their|your|his|her|my)$/.test(w[k + adv + 2]?.norm ?? "") && (i === 0 || brokenAfter(w, i - 1) || /^(and|but|so|because|that)$/.test(w[i - 1].norm))) {
+        const be = isPluralNoun(w[k - 1].norm) ? "were" : "was";
+        insert(k, be, "be-verb", "major", "passive", `'~에 의해 …되었다'는 수동태(be + p.p.)입니다: '… ${be} ${adv ? `${w[k].raw} ` : ""}${v.raw} by …'.`, "passive-missing-be");
+        continue;
+      }
+    }
+    // "we are all agree" → "we all agree": be + all/both + a verb.
+    if (/^(are|is|am|were|was)$/.test(t) && !w[i].expanded && /^(all|both)$/.test(n1)) {
+      const b = baseVerbAt(i + 2);
+      if (b && /^(agree|need|want|like|think|know|feel|understand|believe|hope|see)$/.test(b)) {
+        out.push({ rule: "be-base-verb", from: i, to: i + 1, replacement: "", category: "verb-form", severity: "major", skill: "agreement", messageKo: `be동사와 일반동사(${w[i + 2].raw})를 함께 쓰지 않습니다: '… ${n1} ${w[i + 2].raw}'.` });
+        continue;
+      }
     }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
     if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
