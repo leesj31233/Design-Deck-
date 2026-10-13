@@ -53,7 +53,7 @@ export const TALK_VISIT_2: Question[] = [
     segments: ["이쪽으로", "와 주세요"],
     reference: "This way, please.",
     accepted: ["Please come this way.", "Come this way, please.", "Follow me, please.", "Right this way, please."],
-    meaning: [{ id: "this-way", en: "this way", ko: "이쪽으로", any: ["this way", "follow ... me"], critical: true }],
+    meaning: [{ id: "this-way", en: "this way", ko: "이쪽으로", any: ["this way", "follow ... me", "re:(?<!\\bnot )\\bcome with me\\b"], critical: true }],
     pitfalls: [
       { id: "this-side", pattern: "re:(?<=\\bthis )side\\b", category: "word-choice", severity: "major", fix: "way", messageKo: "길을 안내하는 '이쪽으로'는 방향이므로 'this way'라고 합니다. 'this side'는 '이쪽 면, 이쪽 편'이라는 뜻이라 안내할 때 쓰지 않습니다." },
       { id: "come-here", pattern: "re:^(please )?come here\\b", category: "word-choice", severity: "minor", fix: "This way", messageKo: "'Come here'는 상대를 내 쪽으로 부르는 말이라 손님에게는 명령처럼 들릴 수 있습니다. 함께 이동하며 안내할 때는 'This way, please.' 또는 'Follow me, please.'라고 합니다." },
@@ -119,7 +119,7 @@ export const TALK_VISIT_2: Question[] = [
     reference: "Let me call you a taxi.",
     accepted: ["Let me call a taxi for you.", "I'll call you a taxi.", "I'll get you a taxi.", "Let me get you a taxi."],
     meaning: [
-      { id: "let-me", en: "let me / I'll", ko: "제가 ~할게요", any: ["let me", "i will", "i can"], critical: true },
+      { id: "let-me", en: "let me / I'll", ko: "제가 ~할게요", any: ["let me", "i will", "i can", "why do not i", "shall i", "want me to"], critical: true },
       { id: "taxi", en: "call you a taxi", ko: "택시를 부르다", any: ["call|get|book|order ... taxi|cab"], critical: true },
     ],
     pitfalls: [
@@ -683,10 +683,10 @@ export const TALK_VISIT_2: Question[] = [
     ],
     meaning: [
       { id: "didnt-know", en: "I didn't know that", ko: "몰랐어요", any: ["not know", "see|oh"] },
-      { id: "had-known", en: "if we had known earlier", ko: "더 일찍 알았더라면", any: ["if ... know"], critical: true },
+      { id: "had-known", en: "if we had known earlier", ko: "더 일찍 알았더라면", any: ["if ... know", "had ... known"], critical: true },
       { id: "would-have", en: "we would have planned", ko: "계획했을 거예요", any: ["would|will ... plan|change|arrange|schedule|book|have"], critical: true },
       { id: "differently", en: "differently", ko: "다르게", any: ["differently|different|change|another|other"] },
-      { id: "possible", en: "would it be possible", ko: "가능할까요", any: ["possible", "could|can we", "would ... okay|ok"], critical: true },
+      { id: "possible", en: "would it be possible", ko: "가능할까요", any: ["possible", "able to", "could|can we", "would ... okay|ok"], critical: true },
       { id: "friday", en: "visit on Friday", ko: "금요일에 방문", any: ["friday"], critical: true },
     ],
     pitfalls: [

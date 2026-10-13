@@ -287,7 +287,7 @@ export const TALK_MEAL: Question[] = [
       "Then I'd recommend the bulgogi because it's not spicy.",
     ],
     meaning: [
-      { id: "recommend", en: "I'd recommend", ko: "추천해요", any: ["recommend|suggest", "should|could ... try|have|get|order", "try", "go with|for", "good|best|safe|great choice|option|bet"], critical: true },
+      { id: "recommend", en: "I'd recommend", ko: "추천해요", any: ["recommend|suggest", "should|could ... try|have|get|order", "try", "go with|for", "good|best|safe|great choice|option|bet", "how|what about"], critical: true },
       { id: "bulgogi", en: "the bulgogi", ko: "불고기", any: ["bulgogi|bulgoki|pulgogi"], critical: true },
       { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as|so"] },
       { id: "not-spicy", en: "isn't spicy at all", ko: "전혀 맵지 않다", any: ["not ... spicy|hot", "mild"], critical: true },

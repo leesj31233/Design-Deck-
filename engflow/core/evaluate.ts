@@ -40,14 +40,22 @@ export function scoredErrors<T extends { advisory?: boolean }>(errors: T[]): T[]
   return errors.filter((e) => !e.advisory);
 }
 
-/** Penalty points per bucket; spelling is nearly free, heuristic alignment findings are capped. */
-export function bucketPenalties(errors: ErrorSpan[]): Record<ScoreBucket, number> {
+/** Up to this many words a minor alignment note costs its full penalty; in longer answers proportionally less. */
+const ALIGN_FULL_WORDS = 24;
+
+/**
+ * Penalty points per bucket; spelling is nearly free, heuristic alignment findings are capped. In a long
+ * answer (`answerWords`), each minor alignment note costs less: a 50-word turn with three small wording
+ * differences from the model answer is still a good answer.
+ */
+export function bucketPenalties(errors: ErrorSpan[], answerWords = 0): Record<ScoreBucket, number> {
   const scored = scoredErrors(errors);
   const spelling = Math.min(SPELLING_CAP, scored.filter((e) => e.category === "spelling").length * SPELLING_PENALTY);
+  const scale = answerWords > ALIGN_FULL_WORDS ? ALIGN_FULL_WORDS / answerWords : 1;
   const of = (bucket: ScoreBucket) => {
     const list = scored.filter((e) => e.bucket === bucket && e.category !== "spelling");
     const firm = list.filter((e) => e.source !== "alignment").reduce((sum, e) => sum + PENALTY[e.severity], 0);
-    const heuristic = Math.min(ALIGN_CAP, list.filter((e) => e.source === "alignment").reduce((sum, e) => sum + PENALTY[e.severity], 0));
+    const heuristic = Math.min(ALIGN_CAP, list.filter((e) => e.source === "alignment").reduce((sum, e) => sum + PENALTY[e.severity] * (e.severity === "minor" ? scale : 1), 0));
     return firm + heuristic;
   };
   return { grammar: of("grammar") + spelling, meaning: of("meaning"), organization: of("organization"), terminology: 0 };
@@ -1158,7 +1166,7 @@ export function evaluateLocal(q: Question, answer: string, opts: LocalEvalOption
     if (!total) return 1;
     return list.filter((m) => m.present).reduce((s, m) => s + weight(m.id), 0) / total;
   };
-  const pen = bucketPenalties(errors);
+  const pen = bucketPenalties(errors, w.length);
   // A missing unit and a meaning-shift error usually describe the same problem: take the worse, never the sum.
   let meaningScore = 100 * cover(scoredUnits);
   if (scoredUnits.some((m) => m.critical && !m.present)) meaningScore = Math.min(meaningScore, 45);

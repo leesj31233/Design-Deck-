@@ -88,7 +88,7 @@ export const TALK_REACTION: Question[] = [
     segments: ["일리 있네요"],
     reference: "Makes sense.",
     accepted: ["That makes sense.", "Yeah, that makes sense.", "Right, makes sense.", "Good point.", "That's a good point.", "Good idea.", "Fair enough.", "Agreed."],
-    meaning: [{ id: "makes-sense", en: "makes sense", ko: "일리 있다", any: ["make ... sense", "good|fair|valid point", "good|great idea", "fair enough", "agree|agreed", "right|true|exactly", "think so", "reasonable"], critical: true }],
+    meaning: [{ id: "makes-sense", en: "makes sense", ko: "일리 있다", any: ["make ... sense", "good|fair|valid point", "good|great idea", "fair enough", "agree|agreed", "right|true|exactly", "think so", "reasonable", "re:(?<!\\bnot )\\bhave (a )?point\\b"], critical: true }],
     pitfalls: [
       { id: "is-make-sense", pattern: "is make|makes sense", category: "verb-form", severity: "major", fix: "makes sense", messageKo: "make sense는 일반동사라서 be동사와 함께 쓰지 않습니다: 'That's make sense' → 'That makes sense.'" },
       { id: "not-make-sense", pattern: "re:\\b(do|does|did|will|would|can|could) not (\\w+ ){0,2}makes? sense", category: "meaning-shift", severity: "critical", fix: "makes sense", messageKo: "'doesn't make sense'는 '말이 안 돼요'라는 반대 뜻입니다. 수긍할 때는 'That makes sense.'라고 합니다." },

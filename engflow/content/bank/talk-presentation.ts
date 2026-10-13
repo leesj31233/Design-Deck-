@@ -334,7 +334,7 @@ export const TALK_PRESENTATION: Question[] = [
     ],
     meaning: [
       { id: "end", en: "that's all", ko: "여기까지입니다", any: ["that ... all|it|everything|end|last", "finish|finished|done"] },
-      { id: "if-questions", en: "if you have any questions", ko: "질문이 있으시면", any: ["if ... question|questions"], critical: true },
+      { id: "if-questions", en: "if you have any questions", ko: "질문이 있으시면", any: ["if ... question|questions", "any ... question|questions"], critical: true },
       { id: "answer", en: "happy to answer them", ko: "기꺼이 답하다", any: ["answer|take|respond|discuss|help|ask"], critical: true },
     ],
     pitfalls: [

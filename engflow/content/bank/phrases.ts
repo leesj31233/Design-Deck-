@@ -2382,12 +2382,13 @@ export const PHRASES: Question[] = [
     meaning: [
       { id: "wetter", en: "wetter", ko: "더 젖은", any: ["wetter", "more wet", "more moisture", "higher moisture", "more water"], critical: true },
       { id: "expected", en: "than expected", ko: "예상보다", any: ["expect", "estimate", "design", "think|anticipate|assume"] },
-      { id: "which-means", en: "which means", ko: "이는 ~라는 뜻이다", any: ["which ... mean", "this|that|it ... mean", "so", "therefore"], critical: true },
+      { id: "which-means", en: "which means", ko: "이는 ~라는 뜻이다", any: ["which ... mean", "this|that|it ... mean", "so", "therefore", "meaning"], critical: true },
       { id: "steam", en: "more steam", ko: "더 많은 스팀", any: ["more|additional|extra ... steam", "steam"], term: true },
     ],
     pitfalls: [
       { id: "which-is-mean", pattern: "which is =mean|=meaning", category: "verb-form", severity: "major", fix: "which means", messageKo: "관계대명사 which가 주어이므로 바로 동사 'means'가 옵니다. 'which is mean'은 be동사와 일반동사를 섞은 형태입니다." },
       { id: "which-mean", pattern: "which =mean", category: "agreement", severity: "major", fix: "which means", messageKo: "앞 문장 전체를 받는 which는 단수 취급하므로 'which means'입니다." },
+      { id: "less-steam", pattern: "less|lower|fewer steam", category: "meaning-shift", severity: "critical", fix: "more steam", messageKo: "젖은 원료를 말리려면 스팀이 '더' 필요합니다. less steam은 반대 뜻입니다: 'we need more steam'." },
       { id: "more-wetter", pattern: "more wetter", category: "word-choice", severity: "major", fix: "wetter", messageKo: "wetter는 이미 비교급이라 more를 함께 쓰지 않습니다." },
     ],
     hints: { pattern: "문장, which means + 주어 + 동사", skeleton: "The feed is ______ than expected, _____ means we need more steam.", partial: "The feed is wetter than expected, which…" },

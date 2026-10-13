@@ -1109,6 +1109,12 @@ const IDIOM_THE: [RegExp, string][] = [
   [/^at latest$/, "at the latest"], [/^at earliest$/, "at the earliest"], [/^at moment$/, "at the moment"],
   [/^in meantime$/, "in the meantime"], [/^on other hand$/, "on the other hand"], [/^at same time$/, "at the same time"],
   [/^for first time$/, "for the first time"], [/^in middle of$/, "in the middle of"], [/^at end of$/, "at the end of"], [/^by end of$/, "by the end of"],
+  // "brings me to end of my presentation", "for rest of the day", "from beginning of the list".
+  ...["to", "until", "till", "near", "toward", "towards", "from", "before", "after", "since", "for", "at", "by", "in"].flatMap((p) =>
+    ["end", "beginning", "middle", "start", "rest", "bottom"]
+      .filter((n) => !(/^(at|by)$/.test(p) && n === "end") && !(p === "in" && n === "middle"))
+      .map((n): [RegExp, string] => [new RegExp(`^${p} ${n} of$`), `${p} the ${n} of`]),
+  ),
 ];
 const idiomArticle: Rule = (w) => {
   const out: RuleFinding[] = [];
@@ -3133,6 +3139,20 @@ const conversationSlips: Rule = (w) => {
           messageKo: `'${phrase}'는 셀 수 있는 명사라서 관사가 필요합니다: '${w[i].raw} ${w[i + 1].raw} ${art} ${phrase}'.`,
         });
       }
+    }
+
+    // "You have point there" → "a point"; "That's good idea" → "a good idea".
+    if (/^(have|has|had|got)$/.test(t) && w[i + 1].norm === "point" && (end(i + 1) || /^(there|here|too|actually|though)$/.test(w[i + 2]?.norm ?? ""))) {
+      out.push({
+        rule: "missing-article", from: i + 1, to: i + 1, replacement: "a", category: "article", severity: "minor", skill: "articles",
+        messageKo: "point(일리, 요점)는 셀 수 있는 명사라서 'You have a point.'처럼 a가 필요합니다.",
+      });
+    }
+    if (/^(is|was)$/.test(t) && /^(good|fair|great|valid|interesting|excellent|nice|smart|brilliant|tough|difficult|hard)$/.test(w[i + 1].norm) && /^(point|idea|question|suggestion|plan|choice|option)$/.test(w[i + 2]?.norm ?? "") && ends(i + 2)) {
+      out.push({
+        rule: "missing-article", from: i + 1, to: i + 1, replacement: "a", category: "article", severity: "minor", skill: "articles",
+        messageKo: `'${w[i + 2].raw}'는 셀 수 있는 명사라서 'a ${w[i + 1].raw} ${w[i + 2].raw}'처럼 a가 필요합니다.`,
+      });
     }
 
     // "May I ask who calls?" → "who's calling": on the phone the call is happening now.

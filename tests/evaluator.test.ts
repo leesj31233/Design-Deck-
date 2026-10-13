@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateLocal } from "@/engflow/core/evaluate";
+import { bucketPenalties, evaluateLocal } from "@/engflow/core/evaluate";
 import { tokenize, words } from "@/engflow/core/text";
 import { QUESTION_BY_ID } from "@/engflow/content";
 import { SEEDS } from "@/engflow/content/seeds";
@@ -243,5 +243,16 @@ describe("reworded answers (iPhone report: 'is not satisfy … of customer' scor
     const e = evaluateLocal(rq, "Honestly, this idea does not really work for what the client asked.");
     expect(e.confidence).toBe("low");
     expect(e.summaryKo).toMatch(/모두 확인하지는 못했습니다/);
+  });
+});
+
+describe("long answers", () => {
+  const note = (id: string, source: "alignment" | "rule", severity: "minor" | "major" = "minor") =>
+    ({ id, category: "article", severity, bucket: "grammar", start: 0, end: 0, text: "", fix: "the", messageKo: "", source }) as const;
+  it("minor alignment notes cost less in a long answer, firm findings do not", () => {
+    const notes = [note("a", "alignment"), note("b", "alignment"), note("c", "alignment")];
+    expect(bucketPenalties([...notes], 20).grammar).toBe(30);
+    expect(bucketPenalties([...notes], 48).grammar).toBe(15);
+    expect(bucketPenalties([note("r", "rule"), note("m", "alignment", "major")], 48).grammar).toBe(40);
   });
 });
