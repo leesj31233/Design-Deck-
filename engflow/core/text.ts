@@ -108,7 +108,8 @@ export function stem(word: string): string {
 }
 
 function undouble(s: string): string {
-  if (s.length > 2 && s[s.length - 1] === s[s.length - 2] && !/[lsz]/.test(s[s.length - 1])) return s.slice(0, -1);
+  // ("added" → "add", not "ad": a three-letter base keeps its double letter.)
+  if (s.length > 3 && s[s.length - 1] === s[s.length - 2] && !/[lsz]/.test(s[s.length - 1])) return s.slice(0, -1);
   return s;
 }
 

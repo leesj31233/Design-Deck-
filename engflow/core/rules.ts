@@ -413,7 +413,9 @@ const willInConditionClause: Rule = (w) => {
     const isTime = /^(if|when|before|after|until|unless|once)$/.test(c) || (c === "soon" && w[i - 1]?.norm === "as" && w[i + 1]?.norm === "as");
     if (!isTime) continue;
     // Noun clauses ("I don't know when they will…", "not sure if they will…") may take will.
-    if ((c === "if" || c === "when") && /^(know|sure|ask|asked|asking|wonder|wondering|wondered|check|checking|confirm|tell|clear|decide|understand|see|unclear|certain|idea|whether|about|out|me|us|him|her|them|learn|guess|predict|say|said|note|update)$/.test(w[i - 1]?.norm ?? "")) continue;
+    // ("tell me when it will …" asks a question; "call me when you will get a chance" is a time clause.)
+    const objectOf = /^(me|us|him|her|them)$/.test(w[i - 1]?.norm ?? "") && !/^(tell|told|ask|asked|show|remind|update|inform|teach|email|text|message|let)$/.test(w[i - 2]?.norm ?? "");
+    if ((c === "if" || c === "when") && !objectOf && /^(know|sure|ask|asked|asking|wonder|wondering|wondered|check|checking|confirm|tell|clear|decide|understand|see|unclear|certain|idea|whether|about|out|me|us|him|her|them|learn|guess|predict|say|said|note|update)$/.test(w[i - 1]?.norm ?? "")) continue;
     let s = c === "soon" ? i + 2 : i + 1;
     let subj = w[s]?.norm ?? "";
     // "when Mr. Park will join": a name is a third-person subject.
@@ -421,6 +423,11 @@ const willInConditionClause: Rule = (w) => {
     else if (/^[A-Z]/.test(w[s]?.raw ?? "") && !SUBJECT_PRONOUNS.has(subj) && w[s + 1]?.norm === "will" && i + 1 === s) subj = "he";
     // A noun-phrase subject ("the pump", "our vendor") stands where a pronoun would.
     // "After the meeting, I will…" and "after that we will…" are adverbials before the main clause, not subjects.
+    // "If something really urgent will come up": an indefinite pronoun with words after it.
+    if (/^(something|someone|somebody|anything|anyone|anybody|everyone|everybody|nothing|nobody)$/.test(subj) && w[s + 1]?.norm !== "will") {
+      const k = w.findIndex((x, m) => m > s && m <= s + 3 && x.norm === "will");
+      if (k > 0 && !w.slice(s, k).some((_, m) => brokenAfter(w, s + m))) { subj = "it"; s = k - 1; }
+    } else if (/^(something|someone|somebody|anything|anyone|anybody|everyone|everybody|nothing|nobody)$/.test(subj)) subj = "it";
     if (!SUBJECT_PRONOUNS.has(subj) && /^(the|our|your|their|this|that|my|his|her|its)$/.test(subj)) {
       let k = s + 1;
       while (
@@ -1405,7 +1412,7 @@ const byTheMeans: Rule = (w) =>
 
 /** "All the tests was carried out", "Both of them is good" → plural verb. */
 /** Plural nouns the countable list leaves out (it also drives article checks, where these would be noisy). */
-const SUBJECT_PLURALS = /^(parents|grandparents|brothers|sisters|cousins|neighbors|neighbours|coworkers|bosses|teachers|guys|boys|girls|results|tests|numbers|figures|plans|shipments|orders|products|parts|costs|prices|levels|values|readings|samples|conditions|changes|issues|problems|items|files|documents|emails|messages|meetings|guests|visitors|members|people|children|kids|friends|students|workers|employees|prices|sales|rooms|tickets|reports|slides|drawings|specs|specifications|suppliers|vendors|clients|customers|engineers|operators|colleagues|managers|pumps|valves|dryers|tanks|machines|units|lines|trains|flights|buses|cars)$/;
+const SUBJECT_PLURALS = /^(questions|answers|emails|calls|decisions|parents|grandparents|brothers|sisters|cousins|neighbors|neighbours|coworkers|bosses|teachers|guys|boys|girls|results|tests|numbers|figures|plans|shipments|orders|products|parts|costs|prices|levels|values|readings|samples|conditions|changes|issues|problems|items|files|documents|emails|messages|meetings|guests|visitors|members|people|children|kids|friends|students|workers|employees|prices|sales|rooms|tickets|reports|slides|drawings|specs|specifications|suppliers|vendors|clients|customers|engineers|operators|colleagues|managers|pumps|valves|dryers|tanks|machines|units|lines|trains|flights|buses|cars)$/;
 const isPluralNoun = (x: string) => !!PLURAL_NOUN_SINGULAR(x) || SUBJECT_PLURALS.test(x);
 const PLURAL_SUBJECT_VERB = /^(show|need|want|work|look|seem|take|make|give|goe|come|say|know|think|use|require|include|depend|cost|run|help|mean|happen|matter|sound|feel|cause|affect|contain|produce|indicate|suggest|remain|stay|keep|get|live|like|love|play|visit|call|speak|eat|drink|enjoy|travel)s$/;
 const pluralSubjectAgreement: Rule = (w) => {
@@ -3610,6 +3617,30 @@ const learnerSlips: Rule = (w) => {
           out.push({ rule: "present-perfect-duration", from: i + 1, to: i + 2, replacement: fix, category: "tense", severity: "major", skill: "present-perfect", messageKo: `'(지금까지) ~동안 해 왔다'는 현재완료입니다: '${w[i].raw} ${fix} … for …'.` });
           continue;
         }
+      }
+    }
+    // "We can both talking after lunch" → "both talk": after a modal (and an adverb) comes the base form.
+    if (MODALS.has(t) && /^(both|also|just|really|still|all|probably|definitely|certainly|easily|always|never)$/.test(n1) && w[i + 2] && verbInfo(w[i + 2].norm)?.form === "ing" && !ING_NOUNS.has(w[i + 2].norm) && !end(i + 1)) {
+      const b = verbInfo(w[i + 2].norm)!.base;
+      out.push({ rule: "modal-base", from: i + 2, to: i + 3, replacement: b, category: "verb-form", severity: "major", skill: "modal-possibility", messageKo: `조동사(${w[i].raw}) 뒤에는 동사원형이 옵니다: '${w[i].raw} ${w[i + 1].raw} ${b}'.` });
+      continue;
+    }
+    // "I'll let you going" → "let you go".
+    if (/^(let|lets|make|makes|made)$/.test(t) && /^(me|you|him|her|us|them|it)$/.test(n1) && w[i + 2] && verbInfo(w[i + 2].norm)?.form === "ing" && !ING_NOUNS.has(w[i + 2].norm) && !end(i + 1)) {
+      const b = verbInfo(w[i + 2].norm)!.base;
+      out.push({ rule: "let-make-base", from: i + 2, to: i + 3, replacement: b, category: "verb-form", severity: "major", skill: "verb-object", messageKo: `'${w[i].raw} + 사람 + 동사원형'입니다: '${w[i].raw} ${w[i + 1].raw} ${b}'.` });
+      continue;
+    }
+    // "If technical questions goes through me" → "go": a plural subject without a determiner.
+    if (/^(if|when|because|since|once|unless|and|but|so)$/.test(t)) {
+      let k = i + 1;
+      if (w[k + 1] && !verbInfo(w[k].norm) && /^[a-z]+$/.test(w[k].norm) && isPluralNoun(w[k + 1].norm) && !isPluralNoun(w[k].norm)) k++;
+      const v = w[k + 1];
+      const m = v ? PLURAL_SUBJECT_VERB.exec(v.norm) : null;
+      if (isPluralNoun(w[k]?.norm ?? "") && !end(k) && m && !end(k + 1)) {
+        const base = m[1] === "goe" ? "go" : m[1];
+        out.push({ rule: "agreement-plural-noun", from: k + 1, to: k + 2, replacement: base, category: "agreement", severity: "major", skill: "agreement", messageKo: `주어 '${w.slice(i + 1, k + 1).map((x) => x.raw).join(" ")}'가 복수라서 동사에 -s를 붙이지 않습니다: '${base}'.` });
+        continue;
       }
     }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
