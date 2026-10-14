@@ -158,17 +158,21 @@ The test uses 5 parts: grammar and construction, phrase translation, full senten
 
 The TOEIC Speaking panel shows the ETS **minimum scores** per CEFR level (Speaking A1 50, A2 90, B1 120, B2 160, C1 180; Writing A1 30, A2 70, B1 120, B2 150, C1 180) and the Korean score-report labels. It is clearly marked as a contextual, non-official comparison. These figures were collected from search excerpts of ETS and YBM pages, because the build environment could not open those hosts. **Check them against the official PDFs linked in the app before relying on them.**
 
+## Speak first
+
+Sentence practice trains saying what you think in a meeting, not assembling long written sentences. Korean hint chips are meaning-sized chunks in speaking order (2 under 10 words, 3 under 16, 4 under 24, at most 6). Model answers lead with the main point, then the reason, then extra detail, and two or three short sentences count as fully correct. The complex one-sentence form stays available as an accepted or advanced answer. See "Speak first" in CONTENT_AUTHORING.md and GRADER_BENCH.md.
+
 ## Content
 
 | Bank | Items |
 | --- | --- |
-| Conversation turns (13 scenes, each covering difficulty 1–10; quick replies 1–5) | 970 |
+| Conversation turns (13 scenes, each covering difficulty 1–10; quick replies 1–5) | 1,030 |
 | Meeting essentials (opening, interrupting, checking, agreeing, wrapping up) | 48 |
 | Short and long turns for thin scenes (one-word replies to 3–4 sentence turns) | 36 |
 | Long multi-sentence turns (difficulty 8–10) | 30 |
 | Phrasal verbs in conversation | 32 |
 | Idioms in conversation | 30 |
-| Role-play scenarios | 44 (199 turns) |
+| Role-play scenarios | 51 (234 turns) |
 | Free-talk topics with Claude | 22 |
 | Full-sentence construction (Mode A) | 48 |
 | Phrase & structure quiz (Mode B) | 75 |
@@ -176,9 +180,9 @@ The TOEIC Speaking panel shows the ETS **minimum scores** per CEFR level (Speaki
 | Diagnostic items | 40 |
 | Grammar guide entries | 42 (one per skill, incl. 12 conversation skills) |
 | Dialogue context added to older questions | 179 |
-| **All questions** | **1,524** |
-| Accepted correct answers | 7,894 |
-| QC probes (expected pass/fail answers) | 4,522 |
+| **All questions** | **1,619** |
+| Accepted correct answers | 8,433 |
+| QC probes (expected pass/fail answers) | 4,786 |
 
 See [CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md) for the authoring rules, the pattern syntax and the QC contract.
 
