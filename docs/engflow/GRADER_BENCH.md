@@ -278,6 +278,28 @@ rule-based grades) and asks for an empty correction when nothing is wrong. A
 correct answer, the most common case, now needs only two scores and an empty error
 list.
 
+## Speak first: short sentences are correct
+
+The learner asked that sentence practice train speaking in meetings: main point
+first, then the reason, then extra detail, and 2–3 short sentences instead of one
+"Although …, … because …" sentence. The grader follows that:
+
+- A meaning unit made only of linking words (*although, because, so, but …*) counts as
+  said when the answer links its ideas some other way — separate sentences or another
+  linking word. "I don't think we should scale up yet. The lab results look promising,
+  but the feed composition at the site could be different." scores 100 against an
+  *Although … because …* reference (it scored 94 before, with "because" missing).
+- A *critical* linking unit (the "but" that carries polite disagreement) is excused
+  only by separate sentences, where the order sets the ideas against each other; in a
+  single run-on sentence it still needs its word.
+- A comma run-on with no link at all still gets the note.
+- Claude's grading prompt says the same (rule 7, "Speak first"): splitting into
+  short sentences or putting the point first is never an error.
+
+Cost on the benches: blind B "caught as a major error or below 85" 72.6% → 72.1%
+(one item now gets a minor note only; "any grammar note" unchanged at 85.6%).
+Blind A, the rules corpus and the mutation bench are unchanged.
+
 ## How to run
 
 ```bash
