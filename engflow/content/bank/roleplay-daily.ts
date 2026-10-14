@@ -201,7 +201,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Barista", en: "Sure, just tap it here. … And here's your latte. Have a great day!", ko: "네, 여기에 대 주세요. … 라떼 나왔습니다. 좋은 하루 보내세요!" },
     ],
     promptKo: "저기요, 뭔가 착오가 있었던 것 같아요. 일반 우유 말고 귀리 우유로 주문했거든요.",
-    segments: ["저기요,", "제 생각에", "착오가 있었어요.", "저는 주문했어요", "그것을", "귀리 우유로,", "일반 우유가 아니라"],
+    segments: ["저기요, 뭔가 착오가 있었던 것 같아요", "귀리 우유로 주문했거든요", "일반 우유가 아니라요"],
     reference: "Excuse me, I think there's been a mistake. I ordered it with oat milk, not regular milk.",
     accepted: [
       "Excuse me, I think there's been a mistake. I asked for oat milk, not regular milk.",
@@ -608,7 +608,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Hotel clerk", en: "I'm sorry about that, sir. Have you tried changing the batteries in the remote?", ko: "불편을 드려 죄송합니다, 손님. 리모컨 배터리는 바꿔 보셨나요?" },
     ],
     promptKo: "네, 벌써 해 봤는데 그래도 안 켜져요.",
-    segments: ["네,", "저는 이미 해 봤어요", "그것을,", "하지만", "그것이 여전히", "켜지지 않아요"],
+    segments: ["네, 벌써 해 봤어요", "그런데 그래도 안 켜져요"],
     reference: "Yes, I've already tried that, but it still won't turn on.",
     accepted: [
       "Yes, I've already tried that, but it still doesn't turn on.",
@@ -658,7 +658,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Hotel clerk", en: "I see. I'm very sorry. Our technician is busy right now, but he can come up in about an hour.", ko: "그렇군요. 정말 죄송합니다. 기술자가 지금 바빠서 한 시간쯤 뒤에 올라갈 수 있어요." },
     ],
     promptKo: "죄송하지만 한 시간은 너무 길어요. 방이 너무 더워서 그런데, 다른 방으로 옮길 수 있을까요?",
-    segments: ["유감이지만", "그건 너무 길어요.", "정말 더워요", "여기 안은,", "그래서", "제가 옮길 수 있을까요", "다른 방으로?"],
+    segments: ["죄송하지만 한 시간은 너무 길어요", "방 안이 정말 더워요", "그래서 다른 방으로 옮길 수 있을까요?"],
     reference: "I'm afraid that's too long. It's really hot in here, so could I move to another room?",
     accepted: [
       "I'm afraid an hour is too long. It's really hot in here, so could I move to another room?",
@@ -932,7 +932,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Shop assistant", en: "Sure. Is there a problem with it?", ko: "네. 셔츠에 무슨 문제가 있나요?" },
     ],
     promptKo: "어제 샀는데, 저한테 너무 작아요.",
-    segments: ["저는 그것을 샀어요", "어제,", "하지만", "그것은 너무 작아요", "저에게"],
+    segments: ["어제 샀는데", "저한테 너무 작아요"],
     reference: "I bought it yesterday, but it's too small for me.",
     accepted: [
       "I bought it here yesterday, but it's too small for me.",
@@ -978,7 +978,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Shop assistant", en: "No problem. Do you have the receipt?", ko: "괜찮아요. 영수증 있으세요?" },
     ],
     promptKo: "죄송하지만 영수증을 잃어버렸어요. 그래도 카드로 결제했는데, 찾아봐 주실 수 있나요?",
-    segments: ["유감이지만", "저는 영수증을 잃어버렸어요,", "하지만", "저는 카드로 결제했어요.", "찾아봐 주실 수 있나요", "그것을?"],
+    segments: ["죄송하지만 영수증을 잃어버렸어요", "그래도 카드로 결제했어요", "찾아봐 주실 수 있나요?"],
     reference: "I'm afraid I lost the receipt, but I paid by card. Could you look it up?",
     accepted: [
       "I'm afraid I lost the receipt, but I paid by card. Can you look it up?",
@@ -1196,7 +1196,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Passer-by", en: "Sure. Green line to City Hall. Then the red line. Central Station is three stops from City Hall.", ko: "그럼요. 초록 노선으로 시청역까지 가세요. 그다음 빨간 노선이요. 센트럴역은 시청역에서 세 정거장이에요." },
     ],
     promptKo: "그러니까 초록 노선을 타고 가다가 시청역에서 빨간 노선으로 갈아타면 되는 거죠?",
-    segments: ["그러니까", "저는 타요", "초록 노선을", "그리고 갈아타요", "빨간 노선으로", "시청역에서,", "맞죠?"],
+    segments: ["그러니까 초록 노선을 타고", "시청역에서 빨간 노선으로 갈아타면 되는 거죠?"],
     reference: "So I take the green line and change to the red line at City Hall, right?",
     accepted: [
       "So I take the green line and transfer to the red line at City Hall, right?",

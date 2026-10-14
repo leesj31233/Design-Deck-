@@ -169,7 +169,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Doctor", en: "Thanks for telling me. I'll give you something for the pain and some tablets for your stomach.", ko: "말씀해 주셔서 고마워요. 통증 약이랑 위장약을 드릴게요." },
     ],
     promptKo: "식전에 먹어야 하나요, 식후에 먹어야 하나요? 그리고 먹으면 졸린가요?",
-    segments: ["제가 먹어야 하나요", "그것들을", "식전에 아니면 식후에?", "그리고", "그것들이 만드나요", "저를 졸리게?"],
+    segments: ["식전에 먹어야 하나요, 식후에 먹어야 하나요?", "그리고 먹으면 졸린가요?"],
     reference: "Should I take them before or after meals? And will they make me sleepy?",
     accepted: [
       "Should I take them before or after meals? Also, will they make me sleepy?",
@@ -218,7 +218,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Doctor", en: "Take them after meals. They might make you a little sleepy, so you should rest for a day or two.", ko: "식후에 드세요. 조금 졸릴 수 있으니 하루 이틀은 쉬는 게 좋아요." },
     ],
     promptKo: "회사에 낼 진단서를 받을 수 있을까요? 내일 쉬면 하나 필요할 거예요.",
-    segments: ["제가 받을 수 있을까요", "진단서를", "회사에 낼?", "저는 필요할 거예요", "하나가", "만약 제가 쉬면", "내일"],
+    segments: ["회사에 낼 진단서를 받을 수 있을까요?", "하나 필요할 거예요", "내일 쉬게 되면요"],
     reference: "Could I get a sick note for work? I'll need one if I take tomorrow off.",
     accepted: [
       "Could I get a doctor's note for work? I'll need one if I take tomorrow off.",
@@ -406,7 +406,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Dewi", en: "I love it, but everything is still a bit confusing. I can't even read the menus yet!", ko: "너무 좋아요. 그런데 아직은 다 좀 헷갈려요. 메뉴판도 아직 못 읽겠어요!" },
     ],
     promptKo: "걱정 마요, 금방 익숙해질 거예요. 도움이 필요한 게 있으면 그냥 저한테 물어봐요.",
-    segments: ["걱정 마요,", "당신은 익숙해질 거예요", "그것에", "금방.", "만약 당신이 도움이 필요하면", "무엇이든,", "그냥 저에게 물어봐요"],
+    segments: ["걱정 마요", "금방 익숙해질 거예요", "도움이 필요한 게 있으면", "그냥 저한테 물어봐요"],
     reference: "Don't worry, you'll get used to it soon. If you need help with anything, just ask me.",
     accepted: [
       "Don't worry, you'll get used to it quickly. If you need help with anything, just ask me.",
@@ -549,7 +549,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Airline agent", en: "I'm sorry about that. Your flight from Seoul landed two hours late, and the Hanoi flight has already left.", ko: "죄송합니다. 서울발 비행기가 두 시간 늦게 도착해서 하노이행은 이미 출발했어요." },
     ],
     promptKo: "내일 아침에 하노이에서 중요한 회의가 있어서요. 다음 비행기로 바꿔 주실 수 있나요?",
-    segments: ["저는 있어요", "중요한 회의가", "하노이에서", "내일 아침에,", "그래서", "저를 태워 주실 수 있나요", "다음 비행기에?"],
+    segments: ["내일 아침에 하노이에서 중요한 회의가 있어요", "그래서 다음 비행기로 바꿔 주실 수 있나요?"],
     reference: "I have an important meeting in Hanoi tomorrow morning, so could you put me on the next flight?",
     accepted: [
       "I have an important meeting in Hanoi tomorrow morning, so could you book me on the next flight?",
@@ -599,7 +599,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Airline agent", en: "Of course. The next flight leaves at 7:30 tomorrow morning, and I've booked you on it.", ko: "물론이죠. 다음 비행기는 내일 아침 7시 30분에 출발하고, 그 편으로 예약해 드렸어요." },
     ],
     promptKo: "감사합니다. 여기서 하룻밤 묵어야 하니까, 호텔 바우처를 받을 수 있을까요?",
-    segments: ["감사합니다.", "제가 ~해야 하니까", "묵다", "여기서", "하룻밤,", "제가 받을 수 있을까요", "호텔 바우처를?"],
+    segments: ["감사합니다", "여기서 하룻밤 묵어야 하니까", "호텔 바우처를 받을 수 있을까요?"],
     reference: "Thank you. Since I have to stay here overnight, could I get a hotel voucher?",
     accepted: [
       "Thanks. Since I have to stay here overnight, could I get a hotel voucher?",
@@ -647,7 +647,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Airline agent", en: "Certainly. Here's a voucher for the airport hotel. Dinner and breakfast are included.", ko: "물론입니다. 공항 호텔 바우처 여기 있습니다. 저녁과 아침 식사가 포함돼 있어요." },
     ],
     promptKo: "부친 짐은 어떻게 되나요? 내일 비행기로 자동으로 옮겨지나요, 아니면 제가 찾아가야 하나요?",
-    segments: ["어떻게 되나요", "제 부친 짐은?", "그것이 옮겨지나요", "내일 비행기로", "자동으로,", "아니면", "제가 찾아가야 하나요", "그것을?"],
+    segments: ["부친 짐은 어떻게 되나요?", "내일 비행기로 자동으로 옮겨지나요", "아니면 제가 찾아가야 하나요?"],
     reference: "What about my checked bag? Will it be transferred to tomorrow's flight automatically, or do I need to pick it up?",
     accepted: [
       "What about my checked bag? Will it be moved to tomorrow's flight automatically, or do I need to pick it up?",
@@ -696,7 +696,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Linh", en: "Hi Minsu! Have you landed in Hanoi yet?", ko: "민수 씨, 안녕하세요! 하노이에 벌써 도착했어요?" },
     ],
     promptKo: "아직요. 싱가포르에서 연결편을 놓쳐서 내일 아침에야 도착해요. 회의를 오후로 옮길 수 있을까요?",
-    segments: ["아직이요.", "저는 놓쳤어요", "제 연결편을", "싱가포르에서,", "그래서", "저는 도착하지 못해요", "내일 아침이 되어서야.", "우리가 옮길 수 있을까요", "우리 회의를", "오후로?"],
+    segments: ["아직요", "싱가포르에서 연결편을 놓쳤어요", "그래서 내일 아침에야 도착해요", "회의를 오후로 옮길 수 있을까요?"],
     reference: "Not yet. I missed my connection in Singapore, so I won't get there until tomorrow morning. Could we move our meeting to the afternoon?",
     accepted: [
       "Not yet. I missed my connection in Singapore, so I won't arrive until tomorrow morning. Could we move our meeting to the afternoon?",
@@ -745,7 +745,7 @@ export const ROLEPLAY_MIXED: Question[] = [
     contextKo: "어제 김 팀장님께 펠릿 공장 운영비 보고서를 드렸는데, 오늘 아침 계산 실수를 발견했습니다. 팀장님이 표정이 안 좋다며 무슨 일 있냐고 묻습니다.",
     dialogue: [{ speaker: "Ms. Kim (manager)", en: "Morning, Minsu. You look a bit worried. Is everything okay?", ko: "좋은 아침이에요, 민수 씨. 좀 걱정이 있어 보이네요. 별일 없어요?" }],
     promptKo: "사실 비용 보고서에서 실수를 발견해서 바로 말씀드리려고요.",
-    segments: ["사실,", "저는 발견했어요", "실수를", "비용 보고서에서,", "그래서", "저는 말씀드리고 싶었어요", "바로"],
+    segments: ["사실 비용 보고서에서 실수를 발견했어요", "그래서 바로 말씀드리려고요"],
     reference: "Actually, I found a mistake in the cost report, so I wanted to tell you right away.",
     accepted: [
       "Actually, I found a mistake in the cost report, so I wanted to let you know right away.",
@@ -839,7 +839,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Ms. Kim (manager)", en: "Hmm. How big is the impact?", ko: "음. 영향이 얼마나 커요?" },
     ],
     promptKo: "그 결과 운영비가 약 8% 낮게 계산됐는데, 그게 투자 회수 기간에 영향을 줄 수 있어요.",
-    segments: ["그 결과,", "운영비가", "낮게 계산되었어요", "약 8%만큼,", "그리고 그것은", "영향을 줄 수 있어요", "투자 회수 기간에"],
+    segments: ["그 결과 운영비가 약 8% 낮게 계산됐어요", "그게 투자 회수 기간에 영향을 줄 수 있어요"],
     reference: "As a result, the operating cost was underestimated by about 8%, which could affect the payback period.",
     accepted: [
       "As a result, the operating cost was underestimated by around 8%, which could affect the payback period.",
@@ -888,7 +888,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Ms. Kim (manager)", en: "I see. The client is expecting the final report on Friday.", ko: "그렇군요. 고객사는 금요일에 최종 보고서를 받기로 되어 있는데요." },
     ],
     promptKo: "오늘 계산을 고치고 내일 정오까지 보고서를 업데이트할게요. 그러면 금요일 전에 검토할 시간이 충분할 거예요.",
-    segments: ["제가 고칠게요", "계산을", "오늘", "그리고 업데이트할게요", "보고서를", "내일 정오까지.", "그러면,", "우리는 충분한 시간이 있을 거예요", "그것을 검토할", "금요일 전에"],
+    segments: ["오늘 계산을 고치고", "내일 정오까지 보고서를 업데이트할게요", "그러면 금요일 전에 검토할 시간이 충분할 거예요"],
     reference: "I'll fix the calculation today and update the report by noon tomorrow. That way, we'll have enough time to review it before Friday.",
     accepted: [
       "I'll correct the calculation today and update the report by noon tomorrow. That way, we'll have enough time to review it before Friday.",
@@ -936,7 +936,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Ms. Kim (manager)", en: "Okay, that works. And thanks for telling me so quickly.", ko: "좋아요, 그렇게 해요. 그리고 이렇게 빨리 말해 줘서 고마워요." },
     ],
     promptKo: "이해해 주셔서 감사합니다. 고객사에 보내기 전에 수정한 보고서를 한번 검토해 주실 수 있을까요? 이번에는 다른 사람이 숫자를 확인해 주면 훨씬 마음이 놓일 것 같아요.",
-    segments: ["이해해 주셔서 감사합니다.", "검토해 주실 수 있을까요", "수정한 보고서를", "제가 보내기 전에", "그것을 고객사에?", "저는 훨씬 마음이 놓일 것 같아요", "만약 다른 사람이 확인해 준다면", "숫자를", "이번에는"],
+    segments: ["이해해 주셔서 감사합니다", "수정한 보고서를 한번 검토해 주실 수 있을까요?", "고객사에 보내기 전에요", "훨씬 마음이 놓일 것 같아요", "이번에는 다른 사람이 숫자를 확인해 주면"],
     reference: "Thank you for understanding. Would you mind reviewing the revised report before I send it to the client? I'd feel much better if someone else checked the numbers this time.",
     accepted: [
       "Thank you for understanding. Could you review the revised report before I send it to the client? I'd feel much better if someone else checked the numbers this time.",
@@ -1268,7 +1268,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Neighbour", en: "Oh, nice to meet you! What's up?", ko: "아, 반가워요! 무슨 일이에요?" },
     ],
     promptKo: "어젯밤에 음악 소리가 좀 커서 잠을 못 잤어요.",
-    segments: ["음악 소리가", "좀 컸어요", "어젯밤에,", "그래서", "저는 잘 수 없었어요"],
+    segments: ["어젯밤에 음악 소리가 좀 컸어요", "그래서 잠을 못 잤어요"],
     reference: "The music was a bit loud last night, so I couldn't sleep.",
     accepted: [
       "The music was a little loud last night, so I couldn't sleep.",
@@ -1315,7 +1315,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Neighbour", en: "Oh no, I'm so sorry! It was my birthday party. I didn't realize it was that loud.", ko: "어머, 정말 죄송해요! 제 생일 파티였어요. 그렇게 시끄러운 줄 몰랐어요." },
     ],
     promptKo: "괜찮아요. 전에는 한 번도 문제가 된 적 없으니까 너무 신경 쓰지 마세요. 그나저나 생일 축하해요!",
-    segments: ["괜찮아요.", "그건 문제였던 적이 없어요", "한 번도", "전에는,", "그러니까", "신경 쓰지 마세요.", "생일 축하해요,", "그나저나!"],
+    segments: ["괜찮아요", "전에는 한 번도 문제가 된 적 없어요", "그러니까 너무 신경 쓰지 마세요", "그나저나 생일 축하해요!"],
     reference: "That's okay. It's never been a problem before, so don't worry about it. Happy birthday, by the way!",
     accepted: [
       "That's all right. It's never been a problem before, so don't worry about it. Happy birthday, by the way!",
@@ -1363,7 +1363,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Neighbour", en: "Thanks! You're very kind. I'll be more careful from now on.", ko: "고마워요! 정말 친절하시네요. 앞으로는 더 조심할게요." },
     ],
     promptKo: "고마워요. 평일에는 밤 11시 이후에 음악 소리를 좀 줄여 주실 수 있을까요? 출근 때문에 6시에 일어나야 하거든요.",
-    segments: ["고마워요.", "~해 주실 수 있을까요", "음악 소리를 줄이는 것", "11시 이후에", "평일 밤에?", "저는 일어나야 해요", "6시에", "출근 때문에"],
+    segments: ["고마워요", "평일 밤 11시 이후에는 음악 소리를 좀 줄여 주실 수 있을까요?", "출근 때문에 6시에 일어나야 하거든요"],
     reference: "Thanks. Would you mind keeping the music down after 11 on weeknights? I have to get up at six for work.",
     accepted: [
       "Thanks. Would you mind keeping the music down after 11 on weeknights? I have to get up at 6 for work.",
@@ -1465,7 +1465,7 @@ export const ROLEPLAY_MIXED: Question[] = [
     contextKo: "POME의 염소 성분 때문에 고객사가 디캔터 재질을 316 스테인리스에서 듀플렉스로 바꾸기로 했습니다. 인도 벤더의 프리야와 화상회의를 시작하자, 프리야가 변경 내용을 정리해 달라고 합니다.",
     dialogue: [{ speaker: "Priya", en: "Hi Minsu. I saw your email about the change, but could you summarize it for me?", ko: "안녕하세요, 민수 씨. 변경 건 메일은 봤는데, 간단히 정리해 주실 수 있을까요?" }],
     promptKo: "네. 고객사가 재질을 316 스테인리스강에서 듀플렉스로 바꾸기로 해서, 저희 주문을 수정해야 해요.",
-    segments: ["네.", "고객사가 결정했어요", "바꾸기로", "재질을", "316 스테인리스강에서", "듀플렉스로,", "그래서", "우리는 수정해야 해요", "우리 주문을"],
+    segments: ["네", "고객사가 재질을 316 스테인리스강에서 듀플렉스로 바꾸기로 했어요", "그래서 저희 주문을 수정해야 해요"],
     reference: "Sure. The client has decided to change the material from 316 stainless steel to duplex, so we need to update our order.",
     accepted: [
       "Sure. The client has decided to change the material from 316 stainless steel to duplex, so we need to revise our order.",
@@ -1562,7 +1562,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Priya", en: "The price will go up by about 18%, and the lead time will be 20 weeks instead of 14.", ko: "가격은 약 18% 오르고, 납기는 14주가 아니라 20주가 될 거예요." },
     ],
     promptKo: "죄송하지만 20주는 저희에게 너무 길어요. 현장 설치가 6월 초에 시작하거든요. 16주로 줄일 수 있는 방법이 있을까요?",
-    segments: ["죄송하지만", "20주는 너무 길어요", "저희에게,", "왜냐하면", "설치가 시작해요", "6월 초에.", "방법이 있을까요", "당신이 그것을 줄일 수 있는", "16주로?"],
+    segments: ["죄송하지만 20주는 저희에게 너무 길어요", "현장 설치가 6월 초에 시작하거든요", "16주로 줄일 수 있는 방법이 있을까요?"],
     reference: "I'm afraid 20 weeks is too long for us, because the installation starts in early June. Is there any way you could shorten it to 16 weeks?",
     accepted: [
       "I'm afraid 20 weeks is too long for us, because installation starts in early June. Is there any way you could shorten it to 16 weeks?",
@@ -1613,7 +1613,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Priya", en: "We could do 16 weeks, but only if we ship by air. That would add about 6,000 dollars.", ko: "16주도 가능은 한데, 항공으로 보내는 경우에만요. 그러면 약 6천 달러가 추가돼요." },
     ],
     promptKo: "그러니까 제가 제대로 이해했다면, 저희가 항공 운송비를 내면 16주 안에 납품할 수 있다는 거죠. 저희에겐 괜찮을 수도 있지만, 먼저 고객사와 확인해야 할 것 같아요.",
-    segments: ["그러니까,", "제가 제대로 이해했다면,", "당신들은 납품할 수 있어요", "16주 안에", "만약 저희가 낸다면", "항공 운송비를.", "그건 괜찮을 수도 있어요", "저희에게,", "하지만 저는 확인해야 할 거예요", "고객사와", "먼저"],
+    segments: ["그러니까 제가 제대로 이해했다면", "16주 안에 납품할 수 있다는 거죠", "저희가 항공 운송비를 내면요", "저희에겐 괜찮을 수도 있어요", "하지만 먼저 고객사와 확인해야 할 것 같아요"],
     reference: "So, if I understand correctly, you can deliver in 16 weeks if we pay for air freight. That might work for us, but I'd need to check with the client first.",
     accepted: [
       "So, if I understand correctly, you can deliver in 16 weeks if we pay for air freight. That might work for us, but I'll need to check with the client first.",
@@ -1663,7 +1663,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Priya", en: "Of course. But could you confirm the change today? We'd like to order the duplex castings this week.", ko: "물론이죠. 그런데 오늘 변경을 확정해 주실 수 있을까요? 이번 주에 듀플렉스 주조품을 발주하고 싶어서요." },
     ],
     promptKo: "죄송하지만 오늘은 확정할 수 없어요. 고객사가 아직 추가 비용을 승인해야 하거든요. 대신 두 가지 옵션을 모두 넣은 수정 견적서를 보내 주실 수 있을까요? 고객사가 승인하고 나면 늦어도 금요일까지 주문을 확정할게요.",
-    segments: ["죄송하지만", "저는 확정할 수 없어요", "그것을", "오늘,", "왜냐하면", "고객사가 아직 승인해야 해요", "추가 비용을.", "대신,", "보내 주실 수 있을까요", "수정 견적서를", "두 가지 옵션을 모두 넣은?", "고객사가 승인하고 나면", "그것을,", "저는 확정할게요", "주문을", "늦어도 금요일까지"],
+    segments: ["죄송하지만 오늘은 확정할 수 없어요", "고객사가 아직 추가 비용을 승인해야 하거든요", "대신 두 가지 옵션을 모두 넣은 수정 견적서를 보내 주실 수 있을까요?", "고객사가 승인하고 나면", "늦어도 금요일까지 주문을 확정할게요"],
     reference: "I'm afraid I can't confirm it today, because the client still needs to approve the extra cost. Instead, could you send us a revised quotation with both options? Once the client has approved it, I'll confirm the order by Friday at the latest.",
     accepted: [
       "I'm afraid I can't confirm it today, because the client still needs to approve the extra cost. Instead, could you send us a revised quote with both options? Once the client has approved it, I'll confirm the order by Friday at the latest.",
@@ -1765,7 +1765,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Sari", en: "Aw, it was my pleasure. We've had some good times together, haven't we?", ko: "에이, 제가 좋아서 한 거죠. 우리 같이 좋은 시간 많이 보냈죠, 그렇죠?" },
     ],
     promptKo: "정말 그랬죠. 건조기 고치려고 자정까지 공장에 남아 있었던 거 기억나요? 살면서 그렇게 열심히 일해 본 적이 없어요!",
-    segments: ["정말 그랬죠.", "기억나요", "우리가 남아 있었던 때", "공장에", "자정까지", "건조기를 고치려고?", "저는 한 번도 일해 본 적이 없어요", "그렇게 열심히", "제 인생에서!"],
+    segments: ["정말 그랬죠", "건조기 고치려고 자정까지 공장에 남아 있었던 거 기억나요?", "살면서 그렇게 열심히 일해 본 적이 없어요!"],
     reference: "We really have. Do you remember when we stayed at the plant until midnight to fix the dryer? I've never worked so hard in my life!",
     accepted: [
       "We really have. Do you remember when we stayed at the plant until midnight to fix the dryer? I've never worked that hard in my life!",
@@ -1814,7 +1814,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Sari", en: "Ha! How could I forget? I'm really going to miss this team.", ko: "하하! 그걸 어떻게 잊겠어요? 이 팀이 정말 그리울 거예요." },
     ],
     promptKo: "저희도 사리 씨가 그리울 거예요. 새 회사는 사리 씨만큼 열심히 일하는 사람을 얻어서 운이 좋네요. 싱가포르에서 행운을 빌어요!",
-    segments: ["우리도 당신을 그리워할 거예요.", "당신의 새 회사는 운이 좋아요", "누군가를 얻어서", "열심히 일하는", "당신만큼.", "행운을 빌어요", "싱가포르에서!"],
+    segments: ["저희도 사리 씨가 그리울 거예요", "새 회사는 운이 좋네요", "사리 씨만큼 열심히 일하는 사람을 얻어서요", "싱가포르에서 행운을 빌어요!"],
     reference: "We'll miss you too. Your new company is lucky to have someone who works as hard as you. Good luck in Singapore!",
     accepted: [
       "We'll miss you too. Your new company is lucky to have someone who works as hard as you do. Good luck in Singapore!",
@@ -1863,7 +1863,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Sari", en: "Thank you, Minsu. That means a lot. Let's keep in touch, okay?", ko: "고마워요, 민수 씨. 그 말 정말 힘이 돼요. 우리 계속 연락해요, 알았죠?" },
     ],
     promptKo: "물론이죠! 자리 잡으면 연락 줘요. 그리고 혹시 싱가포르에 출장 가게 되면 꼭 보러 갈게요.",
-    segments: ["물론이죠!", "저에게 알려 줘요", "당신이 자리 잡으면.", "그리고 만약 제가 언젠가 가면", "싱가포르에", "출장으로,", "저는 꼭 당신을 보러 갈게요"],
+    segments: ["물론이죠!", "자리 잡으면 연락 줘요", "그리고 혹시 싱가포르에 출장 가게 되면", "꼭 보러 갈게요"],
     reference: "Of course! Let me know when you've settled in. And if I ever go to Singapore on business, I'll definitely come and see you.",
     accepted: [
       "Of course! Let me know when you've settled in. And if I ever go to Singapore on business, I'll definitely visit you.",
@@ -1915,7 +1915,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { speaker: "Budi", en: "Okay, everyone! Minsu, would you like to say a few words before we eat?", ko: "자, 여러분! 민수 씨, 식사 전에 한마디 해 주실래요?" },
     ],
     promptKo: "그럼요. 사리 씨, 그동안 정말 좋은 동료였고, 그보다 더 좋은 친구였어요. 모두 사리 씨가 그립겠지만, 정말 잘된 일이라 기뻐요. 다 같이 잔을 들어 주세요. 사리 씨와 싱가포르에서의 새 출발을 위하여!",
-    segments: ["그럼요.", "사리 씨, 당신은 (그동안 쭉) ~였어요", "정말 좋은 동료", "그리고 훨씬 더 좋은 친구.", "우리는 모두 당신을 그리워할 거예요,", "하지만 우리는 정말 기뻐요", "당신에게 잘된 일이라.", "잔을 들어 주세요.", "사리 씨와", "싱가포르에서의 새 출발을 위하여!"],
+    segments: ["그럼요", "사리 씨, 그동안 정말 좋은 동료였고 그보다 더 좋은 친구였어요", "모두 그립겠지만 정말 잘돼서 기뻐요", "다 같이 잔을 들어 주세요", "사리 씨와 싱가포르에서의 새 출발을 위하여!"],
     reference: "Sure. Sari, you've been a great colleague and an even better friend. We'll all miss you, but we're really happy for you. Please raise your glasses. To Sari and her new start in Singapore!",
     accepted: [
       "Sure. Sari, you've been a great colleague and an even better friend. We'll all miss you, but we're really happy for you. Let's raise our glasses to Sari and her new start in Singapore!",

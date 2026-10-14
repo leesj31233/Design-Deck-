@@ -109,7 +109,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rental agent", en: "It's 25 ringgit a day. And how would you like to handle fuel?", ko: "하루에 25링깃입니다. 그리고 연료는 어떻게 하시겠어요?" },
     ],
     promptKo: "기름을 가득 채워서 반납할게요. 그러면 추가 요금을 안 내도 되니까요.",
-    segments: ["저는 반납할게요", "그것을", "가득 찬 탱크로,", "그래서", "저는 낼 필요가 없어요", "추가 요금을"],
+    segments: ["기름을 가득 채워서 반납할게요", "그러면 추가 요금을 안 내도 되니까요"],
     reference: "I'll bring it back with a full tank, so I don't have to pay extra.",
     accepted: [
       "I'll return it with a full tank, so I don't have to pay extra.",
@@ -157,7 +157,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rental agent", en: "Perfect. The car is due back here on Friday at 6 p.m.", ko: "좋습니다. 차는 금요일 오후 6시까지 여기로 반납하셔야 해요." },
     ],
     promptKo: "금요일에 회의가 늦게 끝나면, 6시 이후에 반납해도 되나요?",
-    segments: ["만약", "제 회의가 늦게 끝나면", "금요일에,", "제가 반납해도 되나요", "차를", "6시 이후에?"],
+    segments: ["금요일에 회의가 늦게 끝나면", "6시 이후에 반납해도 되나요?"],
     reference: "If my meeting runs late on Friday, can I return the car after 6?",
     accepted: [
       "If my meeting finishes late on Friday, can I return the car after 6?",
@@ -204,7 +204,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rental agent", en: "You can, but there's a late fee of 50 ringgit. Or you can return it to our city office, which is open until 9 p.m.", ko: "가능하지만 연체료가 50링깃 있어요. 아니면 밤 9시까지 여는 시내 지점에 반납하셔도 돼요." },
     ],
     promptKo: "연체료는 안 내고 싶어요. 시내 지점에 반납할게요. 거기가 호텔에서 더 가깝거든요.",
-    segments: ["저는 차라리 안 내고 싶어요", "연체료를.", "저는 반납할게요", "그것을", "시내 지점에,", "왜냐하면", "그곳이 더 가까워요", "제 호텔에서"],
+    segments: ["연체료는 안 내고 싶어요", "시내 지점에 반납할게요", "거기가 호텔에서 더 가깝거든요"],
     reference: "I'd rather not pay the late fee. I'll drop it off at the city office, because it's closer to my hotel.",
     accepted: [
       "I'd prefer not to pay the late fee. I'll return it to the city office, because it's closer to my hotel.",
@@ -340,7 +340,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Shop assistant", en: "Then this 30-day plan is good. It comes with 20 gigabytes of data and free local calls.", ko: "그럼 이 30일 요금제가 좋아요. 데이터 20기가에 현지 통화가 무료예요." },
     ],
     promptKo: "제가 화상 통화를 많이 해서요. 데이터가 더 많은 요금제가 있나요?",
-    segments: ["저는 해요", "많은 화상 통화를,", "그래서", "있나요", "요금제가", "더 많은 데이터가 있는?"],
+    segments: ["제가 화상 통화를 많이 해서요", "데이터가 더 많은 요금제가 있나요?"],
     reference: "I make a lot of video calls, so do you have a plan with more data?",
     accepted: [
       "I make a lot of video calls, so is there a plan with more data?",
@@ -386,7 +386,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Shop assistant", en: "Yes, this one has 50 gigabytes. Can I see your passport? We need it to register the SIM.", ko: "네, 이건 50기가예요. 여권 좀 볼 수 있을까요? 유심 등록에 필요해서요." },
     ],
     promptKo: "네, 여기 있어요. 제가 뭔가 설정해야 하나요, 아니면 바로 되나요?",
-    segments: ["네,", "여기 있어요.", "제가 해야 하나요", "뭔가 설정을,", "아니면", "그것이 작동할까요", "바로?"],
+    segments: ["네, 여기 있어요", "제가 뭔가 설정해야 하나요", "아니면 바로 되나요?"],
     reference: "Sure, here it is. Do I have to set anything up, or will it work right away?",
     accepted: [
       "Sure, here you go. Do I have to set anything up, or will it work right away?",
@@ -567,7 +567,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Jake", en: "Sounds great. Is it far from my hotel in Myeongdong?", ko: "좋아. 명동에 있는 내 호텔에서 멀어?" },
     ],
     promptKo: "지하철로 15분밖에 안 걸려. 그러니까 9시에 네 호텔로 만나러 갈게.",
-    segments: ["그것은 겨우 15분이야", "지하철로,", "그러니까", "나는 만날게", "너를", "네 호텔에서", "9시에"],
+    segments: ["지하철로 15분밖에 안 걸려", "그러니까 9시에 네 호텔로 만나러 갈게"],
     reference: "It's only 15 minutes by subway, so I'll meet you at your hotel at 9.",
     accepted: [
       "It's only 15 minutes by subway, so I'll come to your hotel at 9.",
@@ -614,7 +614,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Jake", en: "Perfect. And for lunch, I really want to try some real Korean food.", ko: "완벽해. 그리고 점심은 진짜 한국 음식을 꼭 먹어 보고 싶어." },
     ],
     promptKo: "냉면 먹어 본 적 있어? 차가운 국수인데, 더운 날씨에 딱이야.",
-    segments: ["너는 먹어 본 적 있어", "냉면을?", "그것은 차가운 국수야,", "그리고", "그것은 딱이야", "더운 날씨에"],
+    segments: ["냉면 먹어 본 적 있어?", "차가운 국수인데", "더운 날씨에 딱이야"],
     reference: "Have you ever tried naengmyeon? It's cold noodles, and it's perfect for hot weather.",
     accepted: [
       "Have you ever had naengmyeon? It's cold noodles, and it's perfect for hot weather.",
@@ -663,7 +663,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Jake", en: "Never! Let's do it. What about the evening?", ko: "한 번도 없어! 그거 먹자. 저녁엔 뭐 해?" },
     ],
     promptKo: "궁은 6시에 문을 닫으니까 그다음엔 남산타워에 가자. 날씨가 맑으면 야경이 정말 멋져.",
-    segments: ["궁은 문을 닫아", "6시에,", "그러니까", "가자", "남산타워에", "그 후에.", "만약 하늘이 맑으면,", "야경이", "정말 멋져"],
+    segments: ["궁은 6시에 문을 닫아", "그러니까 그다음엔 남산타워에 가자", "날씨가 맑으면", "야경이 정말 멋져"],
     reference: "The palace closes at 6, so let's go to Namsan Tower after that. If the sky is clear, the night view is amazing.",
     accepted: [
       "The palace closes at 6, so let's go to Namsan Tower after that. If it's clear, the night view is amazing.",
@@ -801,7 +801,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Neighbour", en: "Sure, no problem. What time is it coming?", ko: "그럼요, 괜찮아요. 몇 시에 와요?" },
     ],
     promptKo: "2시에서 5시 사이에 온다고 했는데, 정확한 시간은 몰라요.",
-    segments: ["그것은 와요", "2시에서 5시 사이에,", "하지만", "저는 몰라요", "정확한 시간을"],
+    segments: ["2시에서 5시 사이에 온대요", "하지만 정확한 시간은 몰라요"],
     reference: "It's coming between 2 and 5, but I don't know the exact time.",
     accepted: [
       "It's coming sometime between 2 and 5, but I don't know the exact time.",
@@ -985,7 +985,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Priya", en: "Great. As I wrote, we'd like to use SS304 instead of SS316. It would cut the price by about 12 percent.", ko: "좋아요. 메일에 쓴 대로 SS316 대신 SS304를 쓰고 싶어요. 가격이 12% 정도 내려갈 거예요." },
     ],
     promptKo: "꽤 큰 절감이네요. 그런데 원료에 염화물이 들어 있어서 부식이 걱정돼요.",
-    segments: ["그건 큰 절감이네요,", "하지만", "저는 걱정돼요", "부식이", "왜냐하면", "원료가 포함하고 있어요", "염화물을"],
+    segments: ["꽤 큰 절감이네요", "하지만 부식이 걱정돼요", "원료에 염화물이 들어 있거든요"],
     reference: "That's a big saving, but I'm worried about corrosion because the feed contains chlorides.",
     accepted: [
       "That's a big saving, but I'm concerned about corrosion because the feed contains chlorides.",
@@ -1128,7 +1128,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Priya", en: "Probably every six months instead of once a year. That would add some maintenance cost.", ko: "아마 1년에 한 번이 아니라 6개월마다요. 유지보수 비용이 좀 늘겠죠." },
     ],
     promptKo: "그러니까 SS304로 바꾸면 구매 가격은 아끼지만 점검 비용은 더 들겠네요. 결정하기 전에 10년 총비용을 비교해 보고 싶어요.",
-    segments: ["그러니까", "만약 우리가 바꾸면", "SS304로,", "우리는 아끼겠지만", "구매 가격을", "더 쓰겠네요", "점검에.", "저는 비교하고 싶어요", "총비용을", "10년에 걸친", "우리가 결정하기 전에"],
+    segments: ["그러니까 SS304로 바꾸면", "구매 가격은 아끼지만 점검 비용은 더 들겠네요", "10년 총비용을 비교해 보고 싶어요", "결정하기 전에요"],
     reference: "So if we switch to SS304, we'll save on the purchase price but spend more on inspections. I'd like to compare the total cost over 10 years before we decide.",
     accepted: [
       "So if we switch to SS304, we'll save on the purchase price but pay more for inspections. I'd like to compare the total cost over 10 years before we decide.",
@@ -1267,7 +1267,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rizal", en: "Great. Do I need a separate password for it?", ko: "좋아요. 거기 따로 비밀번호가 필요해요?" },
     ],
     promptKo: "네, IT팀에서 이메일로 보내 줄 거니까 오늘 오후에 메일함을 확인해 보세요.",
-    segments: ["네,", "IT팀이 이메일로 보내 줄 거예요", "그것을", "당신에게,", "그러니까", "확인해 보세요", "메일함을", "오늘 오후에"],
+    segments: ["네, IT팀에서 이메일로 보내 줄 거예요", "그러니까 오늘 오후에 메일함을 확인해 보세요"],
     reference: "Yes, IT will email it to you, so please check your inbox this afternoon.",
     accepted: [
       "Yes, IT will send it to you by email, so please check your inbox this afternoon.",
@@ -1314,7 +1314,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rizal", en: "Okay. And what should I work on first?", ko: "알겠어요. 그리고 처음엔 어떤 일부터 하면 될까요?" },
     ],
     promptKo: "먼저 우리가 지난주에 고객에게 보낸 PFD를 검토해 주셨으면 해요.",
-    segments: ["먼저,", "저는 당신이 ~해 주셨으면 해요", "검토하는 것을", "PFD를", "우리가 보낸", "고객에게", "지난주에"],
+    segments: ["먼저 PFD를 검토해 주셨으면 해요", "우리가 지난주에 고객에게 보낸 거요"],
     reference: "First, I'd like you to review the PFD we sent to the client last week.",
     accepted: [
       "First, I'd like you to review the PFD that we sent to the client last week.",
@@ -1361,7 +1361,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rizal", en: "Got it. When do you need my comments by?", ko: "알겠어요. 의견은 언제까지 드리면 될까요?" },
     ],
     promptKo: "급한 건 아니에요. 금요일까지만 의견 보내 주세요. 그리고 모르는 게 있으면 언제든 물어보세요.",
-    segments: ["급한 건 없어요.", "그냥 보내 주세요", "저에게", "의견을", "금요일까지.", "그리고", "편하게 물어보세요", "만약 뭔가 불분명하면"],
+    segments: ["급한 건 아니에요", "금요일까지만 의견 보내 주세요", "그리고 모르는 게 있으면 언제든 물어보세요"],
     reference: "There's no rush. Just send me your comments by Friday, and feel free to ask if anything is unclear.",
     accepted: [
       "There's no rush. Just send me your comments by Friday, and feel free to ask me if anything is unclear.",
@@ -1453,7 +1453,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Ms. Kim", en: "I agree. Your pilot test report was excellent. Was there anything you found difficult?", ko: "동감이에요. 파일럿 시험 보고서는 아주 훌륭했어요. 어려웠던 점이 있었나요?" },
     ],
     promptKo: "회의에서 영어로 말하는 게 아직 어려워요. 그래서 온라인 강의를 듣고 있어요.",
-    segments: ["영어로 말하는 것은", "회의에서", "아직 어려워요", "저에게,", "그래서", "저는 듣고 있어요", "온라인 강의를"],
+    segments: ["회의에서 영어로 말하는 게 아직 어려워요", "그래서 온라인 강의를 듣고 있어요"],
     reference: "Speaking English in meetings is still hard for me, so I'm taking an online course.",
     accepted: [
       "Speaking English in meetings is still difficult for me, so I'm taking an online course.",
@@ -1592,7 +1592,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Ms. Kim", en: "Good. Let's also set one goal for the second half of the year. What would you like to focus on?", ko: "좋아요. 하반기 목표도 하나 정해 봐요. 뭐에 집중하고 싶어요?" },
     ],
     promptKo: "다음 고객 회의를 제가 영어로 진행해 보고 싶습니다. 준비를 잘하면 도움 없이도 할 수 있을 것 같아요. 끝나고 피드백을 주실 수 있을까요?",
-    segments: ["저는 진행하고 싶습니다", "다음 고객 회의를", "영어로.", "만약 제가 준비를 잘하면,", "저는 생각해요", "제가 할 수 있다고", "도움 없이.", "주실 수 있을까요", "저에게", "피드백을", "그 후에?"],
+    segments: ["다음 고객 회의를 영어로 진행해 보고 싶습니다", "준비를 잘하면", "도움 없이도 할 수 있을 것 같아요", "끝나고 피드백을 주실 수 있을까요?"],
     reference: "I'd like to lead the next client meeting in English. If I prepare well, I think I can do it without help. Could you give me feedback afterwards?",
     accepted: [
       "I'd like to run the next client meeting in English. If I prepare well, I think I can do it without help. Could you give me feedback afterwards?",
@@ -1729,7 +1729,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Sari", en: "It's rendang, beef cooked slowly in coconut milk. I hope you like spicy food!", ko: "렌당이에요. 소고기를 코코넛 밀크에 오래 졸인 거예요. 매운 거 좋아하셨으면 좋겠네요!" },
     ],
     promptKo: "매운 음식 정말 좋아해요. 그래서 빨리 먹어 보고 싶어요.",
-    segments: ["저는 정말 좋아해요", "매운 음식을,", "그래서", "저는 기다릴 수 없어요", "그것을 먹어 보는 것을"],
+    segments: ["매운 음식 정말 좋아해요", "그래서 빨리 먹어 보고 싶어요"],
     reference: "I love spicy food, so I can't wait to try it.",
     accepted: [
       "I love spicy food, so I can't wait to try it!",
@@ -1824,7 +1824,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Sari", en: "I'm so glad you liked it! Why don't you stay a little longer and have some tea?", ko: "맛있게 드셨다니 정말 기뻐요! 조금 더 있다가 차라도 한잔하고 가세요." },
     ],
     promptKo: "그러고 싶은데, 내일 아침 일찍 회의가 있어서 이제 가 봐야 할 것 같아요. 멋진 저녁 정말 감사했어요.",
-    segments: ["그러고 싶은데,", "저는 있어요", "이른 회의가", "내일,", "그래서", "저는 가 봐야 할 것 같아요.", "감사해요", "멋진 저녁에"],
+    segments: ["그러고 싶은데", "내일 아침 일찍 회의가 있어요", "그래서 이제 가 봐야 할 것 같아요", "멋진 저녁 정말 감사했어요"],
     reference: "I'd love to, but I have an early meeting tomorrow, so I should get going. Thank you for a lovely evening.",
     accepted: [
       "I'd love to, but I have an early meeting tomorrow, so I should head home. Thank you for a lovely evening.",

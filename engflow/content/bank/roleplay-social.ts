@@ -206,7 +206,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Daniel", en: "Perfect. So, what's the plan for today?", ko: "좋네요. 그럼 오늘 일정은 어떻게 돼요?" },
     ],
     promptKo: "먼저 호텔에 내려 드릴 테니 좀 쉬세요. 그다음에 저녁 식사하러 6시에 모시러 갈게요.",
-    segments: ["제가 내려 드릴게요", "당신을", "호텔에", "먼저", "당신이 좀 쉴 수 있도록.", "그다음에", "제가 데리러 갈게요", "당신을", "6시에", "저녁 식사를 위해"],
+    segments: ["먼저 호텔에 내려 드릴게요", "좀 쉬실 수 있게요", "그다음에 6시에 저녁 식사하러 모시러 갈게요"],
     reference: "I'll drop you off at the hotel first so you can get some rest. Then I'll pick you up at six for dinner.",
     accepted: [
       "I'll drop you off at the hotel first so that you can get some rest. Then I'll pick you up at six for dinner.",
@@ -390,7 +390,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Receptionist", en: "Breakfast is from six to ten on the second floor. Is there anything else I can help you with?", ko: "아침 식사는 2층에서 6시부터 10시까지입니다. 더 도와드릴 일이 있을까요?" },
     ],
     promptKo: "네, 사실 제 비행기가 금요일 밤이라서요. 체크아웃을 늦게 해도 될까요?",
-    segments: ["사실은, 네.", "제 비행기가", "금요일 밤이에요,", "그래서", "~해도 될까요", "체크아웃하다", "늦게?"],
+    segments: ["사실은, 네", "제 비행기가 금요일 밤이에요", "그래서 체크아웃을 늦게 해도 될까요?"],
     reference: "Actually, yes. My flight is on Friday night, so would it be possible to check out late?",
     accepted: [
       "Actually, yes. My flight is on Friday night, so would it be possible to get a late checkout?",
@@ -573,7 +573,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Sari", en: "Thanks. Actually, my family might visit Korea in October. Where should we go?", ko: "고마워요. 사실 10월에 가족이 한국에 올지도 몰라요. 어디 가면 좋을까요?" },
     ],
     promptKo: "강릉에 꼭 가 보세요. 서울에서 KTX로 두 시간밖에 안 걸리고, 해변이 정말 예뻐요.",
-    segments: ["당신은 꼭 가야 해요", "강릉에.", "(그곳은) 두 시간밖에 안 돼요", "서울에서", "KTX로,", "그리고", "해변이", "정말 아름다워요"],
+    segments: ["강릉에 꼭 가 보세요", "서울에서 KTX로 두 시간밖에 안 걸려요", "그리고 해변이 정말 예뻐요"],
     reference: "You should definitely go to Gangneung. It's only two hours from Seoul by KTX, and the beaches are really beautiful.",
     accepted: [
       "You should definitely go to Gangneung. It's only two hours from Seoul by KTX, and the beach is really beautiful.",
@@ -716,7 +716,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Linh", en: "Perfect! How do we get there?", ko: "좋아요! 거기는 어떻게 가요?" },
     ],
     promptKo: "여기서 4호선을 타고 명동역에서 내리면 돼요. 세 정거장밖에 안 돼요.",
-    segments: ["우리는 탈 수 있어요", "4호선을", "여기서", "그리고 내리다", "명동역에서.", "(그곳은) 세 정거장밖에 안 돼요"],
+    segments: ["여기서 4호선을 타고", "명동역에서 내리면 돼요", "세 정거장밖에 안 돼요"],
     reference: "We can take Line 4 from here and get off at Myeongdong Station. It's only three stops.",
     accepted: [
       "We'll take Line 4 from here and get off at Myeongdong Station. It's only three stops.",
@@ -760,7 +760,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Linh", en: "Wow, there are so many food stalls! What should I try first?", ko: "와, 노점이 정말 많네요! 뭐부터 먹어 볼까요?" },
     ],
     promptKo: "떡볶이를 먼저 드셔 보세요. 조금 맵지만 한국에서 가장 인기 있는 길거리 음식 중 하나예요.",
-    segments: ["당신은 먹어 봐야 해요", "떡볶이를", "먼저.", "그것은 조금 매워요,", "하지만", "그것은 ~ 중 하나예요", "가장 인기 있는 길거리 음식들", "한국에서"],
+    segments: ["떡볶이를 먼저 드셔 보세요", "조금 맵지만", "한국에서 가장 인기 있는 길거리 음식 중 하나예요"],
     reference: "You should try tteokbokki first. It's a little spicy, but it's one of the most popular street foods in Korea.",
     accepted: [
       "You should try tteokbokki first. It's a bit spicy, but it's one of the most popular street foods in Korea.",
@@ -940,7 +940,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Mr. Tan", en: "Wow, so many small dishes already! Did you order all of these?", ko: "와, 벌써 작은 접시가 이렇게 많네요! 이걸 다 주문한 거예요?" },
     ],
     promptKo: "아니요, 이건 반찬이라고 해요. 무료라서 원하면 더 달라고 할 수 있어요.",
-    segments: ["아니요,", "이것들은 불려요", "반찬이라고.", "그것들은 무료예요,", "그래서", "당신은 요청할 수 있어요", "더 (달라고)", "원하면"],
+    segments: ["아니요, 이건 반찬이라고 해요", "무료예요", "그래서 원하면 더 달라고 할 수 있어요"],
     reference: "No, these are called banchan. They're free, so you can ask for more if you want.",
     accepted: [
       "No, these are called banchan. They're free, so you can ask for more if you like.",
@@ -1116,7 +1116,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Sari", en: "Thank you, Minsu! It was a tough year, though.", ko: "고마워요, 민수 씨! 정말 힘든 한 해였죠." },
     ],
     promptKo: "정말 그랬죠. 힘든 순간도 있었지만, 여러분이 없었다면 저는 해내지 못했을 거예요.",
-    segments: ["정말 그랬어요.", "우리는 힘든 순간들이 있었어요,", "하지만", "저는 해낼 수 없었을 거예요", "그것을", "여러분 없이는"],
+    segments: ["정말 그랬죠", "힘든 순간도 있었지만", "여러분이 없었다면 해내지 못했을 거예요"],
     reference: "It really was. We had some difficult moments, but I couldn't have done it without you.",
     accepted: [
       "It really was. We had some difficult moments, but I couldn't have done it without all of you.",
@@ -1290,7 +1290,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Priya", en: "My pleasure! By the way, I'll probably be in Seoul in May for the project review.", ko: "천만에요! 그나저나 5월에 프로젝트 검토 회의 때문에 서울에 갈 것 같아요." },
     ],
     promptKo: "잘됐네요! 그럼 서울에 오시면 그때는 제가 살게요. 제가 제일 좋아하는 고깃집에 모시고 갈게요.",
-    segments: ["잘됐네요!", "그럼", "제 차례예요", "당신이 서울에 올 때.", "제가 데려갈게요", "당신을", "제가 가장 좋아하는 고깃집에"],
+    segments: ["잘됐네요!", "그럼 서울에 오시면 제 차례예요", "제가 제일 좋아하는 고깃집에 모시고 갈게요"],
     reference: "Great! Then it's my turn when you come to Seoul. I'll take you to my favorite barbecue place.",
     accepted: [
       "Great! Then it's my treat when you come to Seoul. I'll take you to my favorite barbecue place.",

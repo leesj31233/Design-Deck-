@@ -112,7 +112,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Budi", en: "Sure. The test is going well, but we still haven't received the new moisture sensor from the vendor.", ko: "네. 시험은 잘 되고 있는데, 벤더에서 새 수분 센서를 아직 못 받았어요." },
     ],
     promptKo: "그거 문제가 될 수 있겠네요. 금요일까지 센서가 안 오면 시험을 다음 주로 미뤄야 해요.",
-    segments: ["그건 될 수 있겠네요", "문제가.", "만약 센서가", "안 오면", "금요일까지,", "우리는 미뤄야 할 거예요", "시험을", "다음 주로"],
+    segments: ["그거 문제가 될 수 있겠네요", "금요일까지 센서가 안 오면", "시험을 다음 주로 미뤄야 해요"],
     reference: "That could be a problem. If the sensor doesn't arrive by Friday, we'll have to push the test back to next week.",
     accepted: [
       "That could be a problem. If the sensor doesn't arrive by Friday, we'll have to move the test to next week.",
@@ -160,7 +160,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Linh", en: "Okay. We're almost out of time. Can we go over the action items?", ko: "알겠어요. 시간이 거의 다 됐네요. 할 일 정리하고 갈까요?" },
     ],
     promptKo: "네. 부디 씨는 오늘 벤더에게 납품일을 확인하고, 사리 씨는 날짜를 알게 되면 시험 일정을 업데이트할 거예요.",
-    segments: ["네.", "부디 씨는 확인할 거예요", "납품일을", "벤더에게", "오늘,", "그리고 사리 씨는 업데이트할 거예요", "시험 일정을", "우리가 그것을 알게 되면"],
+    segments: ["네", "부디 씨는 오늘 벤더에게 납품일을 확인할 거예요", "그리고 사리 씨는 시험 일정을 업데이트할 거예요", "날짜를 알게 되면요"],
     reference: "Sure. Budi will check the delivery date with the vendor today, and Sari will update the test schedule once we know it.",
     accepted: [
       "Sure. Budi will confirm the delivery date with the vendor today, and Sari will update the test schedule once we know it.",
@@ -208,7 +208,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Sari", en: "Got it. That's everything from my side.", ko: "알겠어요. 저는 더 없어요." },
     ],
     promptKo: "좋아요, 오늘은 여기까지인 것 같네요. 오늘 오후에 회의록을 보내 드릴 테니, 빠진 게 있으면 수요일까지 알려 주세요.",
-    segments: ["좋아요,", "제 생각에 그게 전부예요", "오늘은.", "제가 보낼게요", "회의록을", "오늘 오후에,", "그러니 알려 주세요", "수요일까지", "만약 뭔가 빠져 있으면"],
+    segments: ["좋아요, 오늘은 여기까지인 것 같네요", "오늘 오후에 회의록을 보내 드릴게요", "그러니 수요일까지 알려 주세요", "빠진 게 있으면요"],
     reference: "Great, I think that's all for today. I'll send out the minutes this afternoon, so please let me know by Wednesday if anything is missing.",
     accepted: [
       "Great, I think that's all for today. I'll send the minutes this afternoon, so please let me know by Wednesday if anything is missing.",
@@ -394,7 +394,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Mr. Tan", en: "That still leaves one week. What about the rest?", ko: "그래도 1주일이 남네요. 나머지는요?" },
     ],
     promptKo: "나머지 1주일은 벤더 최종 데이터를 기다리고 있어서 만회하기가 더 어렵습니다. 배관 부분만 1주일 늦게 보내 드려도 될까요?",
-    segments: ["나머지 1주일은", "더 어렵습니다", "만회하기가", "왜냐하면 우리는 기다리고 있어서", "벤더의 최종 데이터를.", "우리가 보내 드려도 될까요", "배관 부분을", "1주일 늦게?"],
+    segments: ["나머지 1주일은 만회하기가 더 어렵습니다", "아직 벤더 최종 데이터를 기다리고 있거든요", "배관 부분만 1주일 늦게 보내 드려도 될까요?"],
     reference: "The other week is harder to recover because we're still waiting for the vendor's final data. Could we send you the piping section one week later?",
     accepted: [
       "The other week is harder to recover because we're still waiting for the vendor's final data. Would it be okay to send you the piping section one week later?",
@@ -442,7 +442,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Mr. Tan", en: "Okay, that should be fine, as long as the main process sections arrive on time.", ko: "네, 주요 공정 부분만 제때 오면 괜찮을 거예요." },
     ],
     promptKo: "감사합니다. 정리하면, 주요 공정 부분은 원래 마감일까지 보내 드리고, 배관 부분은 1주일 뒤에 보내 드리겠습니다. 오늘 이메일로 확인 드릴게요.",
-    segments: ["감사합니다.", "그럼, 정리하면:", "주요 공정 부분은", "보내질 겁니다", "원래 마감일까지,", "그리고 배관 부분은", "1주일 뒤에 뒤따를 겁니다.", "제가 확인할게요", "이것을", "이메일로", "오늘"],
+    segments: ["감사합니다. 정리하면", "주요 공정 부분은 원래 마감일까지 보내 드리고", "배관 부분은 1주일 뒤에 보내 드리겠습니다", "오늘 이메일로 확인 드릴게요"],
     reference: "Thank you. So, to summarize: the main process sections will be sent by the original deadline, and the piping section will follow one week later. I'll confirm this by email today.",
     accepted: [
       "Thank you. So, to summarize: we'll send the main process sections by the original deadline, and the piping section will follow one week later. I'll confirm this by email today.",
@@ -581,7 +581,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Daniel", en: "That's my concern. Last year's EFB was much drier than what the new mill will produce.", ko: "바로 그게 걱정이에요. 작년 EFB는 새 공장에서 나올 것보다 훨씬 건조했거든요." },
     ],
     promptKo: "좋은 지적이네요. 수분이 더 높으면 건조기가 더 커야 할 수도 있겠어요.",
-    segments: ["그건 좋은 지적이네요.", "만약 수분이", "더 높으면,", "우리는 필요할 수도 있어요", "더 큰 건조기가"],
+    segments: ["좋은 지적이네요", "수분이 더 높으면", "건조기가 더 커야 할 수도 있겠어요"],
     reference: "That's a good point. If the moisture is higher, we might need a bigger dryer.",
     accepted: [
       "Good point. If the moisture is higher, we might need a bigger dryer.",
@@ -677,7 +677,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Daniel", en: "Then I'm not comfortable fixing the dryer size today.", ko: "그렇다면 오늘 건조기 크기를 확정하는 건 좀 불안하네요." },
     ],
     promptKo: "우려는 이해합니다만, 실험 결과를 기다리면 전체 일정이 밀릴 거예요. 최악의 경우로 수분 55%를 기준으로 건조기를 산정하고, 데이터가 나오면 다시 확인하면 어떨까요?",
-    segments: ["저는 이해합니다", "당신의 우려를,", "하지만 만약 우리가 기다리면", "실험 결과를,", "전체 일정이 밀릴 거예요.", "우리가 산정하면 어떨까요", "건조기를", "수분 55%로", "최악의 경우로", "그리고 다시 확인하면", "데이터가 나올 때"],
+    segments: ["우려는 이해합니다", "하지만 실험 결과를 기다리면", "전체 일정이 밀릴 거예요", "최악의 경우로 수분 55% 기준으로 건조기를 산정하면 어떨까요?", "그리고 데이터가 나오면 다시 확인하고요"],
     reference: "I understand your concern, but if we wait for the lab results, the whole schedule will slip. Could we size the dryer for 55% moisture as a worst case and check it again when the data comes in?",
     accepted: [
       "I see your point, but if we wait for the lab results, the whole schedule will slip. Could we size the dryer for 55% moisture as a worst case and check it again when the data comes in?",
@@ -819,7 +819,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "Thirty million? That's a lot. Can't we just repair the old one?", ko: "3천만 원이요? 큰돈인데요. 그냥 기존 걸 수리하면 안 돼요?" },
     ],
     promptKo: "올해 벌써 두 번 수리했고, 시험 중에 또 고장 날 수도 있어요.",
-    segments: ["우리는 이미 수리했어요", "그것을", "두 번", "올해,", "그리고 그것은 고장 날 수도 있어요", "다시", "시험 중에"],
+    segments: ["올해 벌써 두 번 수리했어요", "그리고 시험 중에 또 고장 날 수도 있어요"],
     reference: "We've already repaired it twice this year, and it could break down again during the test.",
     accepted: [
       "We've already repaired it twice this year, and it might break down again during the test.",
@@ -867,7 +867,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "I see. But our budget for this year is already very tight.", ko: "그렇군요. 그런데 올해 예산이 이미 많이 빠듯해요." },
     ],
     promptKo: "이해합니다. 그런데 파일럿 중에 보일러가 고장 나면 최소 2주치 데이터를 잃게 됩니다. 대신 예비비를 쓸 수 있을까요?",
-    segments: ["이해합니다,", "하지만 만약 보일러가 고장 나면", "파일럿 중에,", "우리는 잃게 됩니다", "최소 2주치 데이터를.", "우리가 쓸 수 있을까요", "예비비를", "대신?"],
+    segments: ["이해합니다", "하지만 파일럿 중에 보일러가 고장 나면", "최소 2주치 데이터를 잃게 됩니다", "대신 예비비를 쓸 수 있을까요?"],
     reference: "I understand, but if the boiler breaks down during the pilot, we'll lose at least two weeks of data. Could we use the contingency budget instead?",
     accepted: [
       "I understand, but if the boiler fails during the pilot, we'll lose at least two weeks of data. Could we use the contingency budget instead?",
@@ -916,7 +916,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "Okay. Send me a short proposal, and I'll take it to the director.", ko: "알겠어요. 짧게 제안서 써서 보내 주면 이사님께 올려 볼게요." },
     ],
     promptKo: "감사합니다. 목요일까지 보내 드릴게요. 이사님이 가격을 비교하실 수 있도록 다른 업체 두 곳의 견적서를 첨부하겠습니다.",
-    segments: ["감사합니다.", "제가 그것을 보내 드릴게요", "목요일까지.", "제가 첨부할게요", "견적서 두 개를", "다른 업체들의", "이사님이 비교하실 수 있도록", "가격을"],
+    segments: ["감사합니다", "목요일까지 보내 드릴게요", "다른 업체 두 곳의 견적서를 첨부하겠습니다", "이사님이 가격을 비교하실 수 있도록요"],
     reference: "Thank you. I'll send it to you by Thursday. I'll attach two quotes from different suppliers so that the director can compare the prices.",
     accepted: [
       "Thank you. I'll send it to you by Thursday. I'll attach two quotes from different suppliers so the director can compare the prices.",
@@ -1101,7 +1101,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "That's good to hear. So how did it happen?", ko: "다행이네요. 그럼 어떻게 된 거예요?" },
     ],
     promptKo: "그 배관의 보온재를 지난주 정비 때 떼어 냈는데, 아무도 다시 설치하지 않았어요.",
-    segments: ["보온재가", "그 배관의", "제거되었어요", "정비를 위해", "지난주에,", "그리고 아무도", "그것을 다시 설치하지 않았어요"],
+    segments: ["그 배관의 보온재를 지난주 정비 때 떼어 냈어요", "그런데 아무도 다시 설치하지 않았어요"],
     reference: "The insulation on that pipe was removed for maintenance last week, and nobody put it back.",
     accepted: [
       "The insulation on that pipe was taken off for maintenance last week, and nobody put it back.",
@@ -1149,7 +1149,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "I see. What are you doing to make sure it doesn't happen again?", ko: "그렇군요. 다시 이런 일이 없도록 어떻게 하고 있어요?" },
     ],
     promptKo: "보온재는 이미 다시 설치했고, 오늘 다른 고온 배관도 전부 점검하고 있어요. 앞으로는 정비 작업이 끝날 때마다 교대 조장이 현장을 점검할 거예요.",
-    segments: ["우리는 이미 다시 설치했어요", "보온재를,", "그리고 우리는 점검하고 있어요", "다른 모든 고온 배관을", "오늘.", "앞으로는,", "교대 조장이", "점검할 거예요", "현장을", "모든 정비 작업 후에"],
+    segments: ["보온재는 이미 다시 설치했어요", "그리고 오늘 다른 고온 배관도 전부 점검하고 있어요", "앞으로는 교대 조장이 현장을 점검할 거예요", "정비 작업이 끝날 때마다요"],
     reference: "We've already put the insulation back, and we're checking all the other hot pipes today. From now on, the shift leader will check the area after every maintenance job.",
     accepted: [
       "We've already put the insulation back on, and we're checking all the other hot pipes today. From now on, the shift leader will check the area after every maintenance job.",
@@ -1289,7 +1289,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Priya", en: "That's strange. They all passed our final inspection. Do you have any evidence?", ko: "이상하네요. 전부 저희 최종 검사를 통과했거든요. 증거가 있을까요?" },
     ],
     promptKo: "네, 손상된 씰 사진을 찍어 뒀고, 시험 성적서는 오늘 보내 드릴 수 있어요.",
-    segments: ["네,", "우리는 찍어 뒀어요", "사진을", "손상된 씰의,", "그리고 저는 보내 드릴 수 있어요", "당신에게", "시험 성적서를", "오늘"],
+    segments: ["네, 손상된 씰 사진을 찍어 뒀어요", "그리고 시험 성적서는 오늘 보내 드릴 수 있어요"],
     reference: "Yes, we've taken photos of the damaged seals, and I can send you the test report today.",
     accepted: [
       "Yes, we've taken photos of the damaged seals, and I can email you the test report today.",
@@ -1337,7 +1337,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Priya", en: "Thank you. I'll pass it on to our quality team right away.", ko: "고마워요. 바로 저희 품질팀에 전달할게요." },
     ],
     promptKo: "그래 주시면 감사하죠. 시운전 전에 도착하도록 교체품은 항공으로 보내 주셨으면 해요.",
-    segments: ["그래 주시면 감사하죠.", "우리는 원해요", "교체 씰이", "보내지기를", "항공으로", "그것들이 도착하도록", "시운전 전에"],
+    segments: ["그래 주시면 감사하죠", "교체품은 항공으로 보내 주셨으면 해요", "시운전 전에 도착하도록요"],
     reference: "I'd appreciate that. We'd like the replacement seals to be shipped by air so they arrive before the start-up.",
     accepted: [
       "I'd appreciate that. We'd like the replacement seals to be sent by air so they arrive before the start-up.",
@@ -1384,7 +1384,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Priya", en: "Understood. Is there anything else you need from us?", ko: "알겠습니다. 저희한테 더 필요하신 게 있을까요?" },
     ],
     promptKo: "네, 원인에 대한 짧은 보고서를 보내 주시겠어요? 고객사에서 물어볼 거고, 재발을 어떻게 막으실지도 알아야 해서요.",
-    segments: ["네,", "보내 주시겠어요", "우리에게", "짧은 보고서를", "원인에 대한?", "우리 고객사가 물어볼 거예요", "그것에 대해,", "그리고 우리는 또한 알아야 해요", "어떻게 당신이 막을지", "그것이 다시 일어나는 것을"],
+    segments: ["네, 원인에 대한 짧은 보고서를 보내 주시겠어요?", "고객사에서 물어볼 거예요", "그리고 재발을 어떻게 막으실지도 알아야 해요"],
     reference: "Yes, could you send us a short report on the cause? Our client will ask about it, and we also need to know how you'll prevent it from happening again.",
     accepted: [
       "Yes, could you send us a short report on the root cause? Our client will ask about it, and we also need to know how you'll prevent it from happening again.",
@@ -1611,7 +1611,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Linh", en: "Great. And how can I reach you if something urgent comes up?", ko: "좋아요. 그리고 급한 일이 생기면 어떻게 연락드리면 될까요?" },
     ],
     promptKo: "하루에 한 번 이메일을 확인할 테니 메일 주시면 돼요. 그런데 정말 급하면 휴대폰으로 전화 주세요.",
-    segments: ["저는 확인할 거예요", "이메일을", "하루에 한 번,", "그러니 메일 주시면 돼요.", "그런데 만약 정말 급하면,", "전화 주세요", "제 휴대폰으로"],
+    segments: ["하루에 한 번 이메일을 확인할 거예요", "그러니 메일 주시면 돼요", "그런데 정말 급하면", "휴대폰으로 전화 주세요"],
     reference: "I'll check my email once a day, so you can email me. But if it's really urgent, please call me on my mobile.",
     accepted: [
       "I'll check my email once a day, so you can email me. But if it's really urgent, please call my mobile.",

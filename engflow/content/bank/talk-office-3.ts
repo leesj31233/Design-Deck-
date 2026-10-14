@@ -540,7 +540,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "퇴근 전에 김 팀장님이 내일 아침 팀 회의에 오는지 묻습니다. 내일 아침에 병원 예약이 있습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Will you be at the team meeting at nine tomorrow?", ko: "내일 9시 팀 회의에 올 수 있어요?" }],
     promptKo: "내일 아침에 병원 예약이 있어서 조금 늦을 거예요.",
-    segments: ["저는 조금 늦을 거예요", "왜냐하면", "저는 병원 예약이 있어요", "아침에."],
+    segments: ["조금 늦을 거예요", "내일 아침에 병원 예약이 있거든요"],
     reference: "I'll be a bit late because I have a doctor's appointment in the morning.",
     accepted: [
       "I'll be a little late because I have a doctor's appointment in the morning.",
@@ -629,7 +629,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "신입 톰 씨와 점심을 같이 먹기로 했습니다. 오늘은 행사 때문에 12시에 구내식당이 특히 붐빌 예정입니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "Lunch at twelve, as usual?", ko: "점심 평소처럼 12시에 가요?" }],
     promptKo: "오늘은 좀 더 일찍 가요. 12시에는 구내식당이 정말 붐비거든요.",
-    segments: ["가요", "조금 더 일찍", "오늘은,", "왜냐하면", "구내식당이 정말 붐비게 돼요", "12시에."],
+    segments: ["오늘은 좀 더 일찍 가요", "12시에는 구내식당이 정말 붐비거든요"],
     reference: "Let's go a bit earlier today, because the cafeteria gets really crowded at twelve.",
     accepted: [
       "Let's go a little earlier today, because the cafeteria gets really crowded at twelve.",
@@ -676,7 +676,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "프린터에 종이가 걸려서 20분째 씨름하고 있습니다. 탄 사장님 회의 자료를 뽑아야 하는 지수 씨가 다가옵니다.",
     dialogue: [{ speaker: "Jisoo", en: "Is the printer working again? I need to print the slides for Mr. Tan.", ko: "프린터 다시 돼요? 탄 사장님 회의 자료 뽑아야 하는데." }],
     promptKo: "아직이요. 벌써 껐다가 다시 켜 봤는데, 종이가 아직 걸려 있어요.",
-    segments: ["아직이요.", "저는 이미 껐다가 다시 켰어요", "그것을,", "하지만", "종이가", "아직 걸려 있어요."],
+    segments: ["아직이요", "벌써 껐다가 다시 켜 봤어요", "그런데 종이가 아직 걸려 있어요"],
     reference: "Not yet. I've already turned it off and on again, but the paper is still stuck.",
     accepted: [
       "Not yet. I've already turned it off and back on, but the paper is still stuck.",
@@ -767,7 +767,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "오늘 저녁 팀 회식이 있는데, 내일까지 보낼 보고서가 조금 남아 있습니다. 김 팀장님이 올 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "We're having a team dinner tonight. Can you come?", ko: "오늘 저녁 팀 회식이 있어요. 올 수 있어요?" }],
     promptKo: "6시까지 이 보고서를 끝내면 갈게요.",
-    segments: ["만약", "제가 끝내면", "이 보고서를", "6시까지,", "저는 합류할게요."],
+    segments: ["6시까지 이 보고서를 끝내면", "저도 갈게요"],
     reference: "If I finish this report by six, I'll join you.",
     accepted: [
       "If I finish this report by 6, I'll join you.",
@@ -860,7 +860,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "다음 주에 우리 층 인테리어 공사가 있어서 팀 전체가 잠시 4층으로 옮깁니다. 신입 톰 씨가 다들 왜 짐을 싸는지 묻습니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "Why is everyone packing boxes?", ko: "왜 다들 상자에 짐을 싸고 있어요?" }],
     promptKo: "다음 주에 우리 층이 공사에 들어가서, 한동안 4층으로 옮겨요.",
-    segments: ["우리 층이", "공사될 예정이에요", "다음 주에,", "그래서", "우리는 옮겨요", "4층으로", "한동안."],
+    segments: ["다음 주에 우리 층이 공사에 들어가요", "그래서 한동안 4층으로 옮겨요"],
     reference: "Our floor is being renovated next week, so we're moving to the fourth floor for a while.",
     accepted: [
       "Our floor is going to be renovated next week, so we're moving to the fourth floor for a while.",
@@ -959,7 +959,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "지수 씨가 몸살로 결근했습니다. 베트남의 린 씨가 지수 씨와 2시에 통화가 잡혀 있었다며 메신저로 연락했습니다.",
     dialogue: [{ speaker: "Linh", en: "Hi Minsu, is Jisoo around? We have a call at two.", ko: "민수 씨, 지수 씨 있어요? 2시에 통화가 있거든요." }],
     promptKo: "지수 씨가 오늘 아파서 결근했어요. 그래서 2시 통화는 제가 대신 들어갈게요. 그전에 안건 좀 보내 줄 수 있어요?",
-    segments: ["지수 씨가 아파서 쉬어요", "오늘,", "그래서", "제가 들어갈게요", "2시 통화에", "대신.", "보내 줄 수 있어요", "저에게", "안건을", "그전에?"],
+    segments: ["지수 씨가 오늘 아파서 결근했어요", "그래서 2시 통화는 제가 대신 들어갈게요", "그전에 안건 좀 보내 줄 수 있어요?"],
     reference: "Jisoo is off sick today, so I'll join the two o'clock call instead. Could you send me the agenda before then?",
     accepted: [
       "Jisoo is sick today, so I'll join the two o'clock call instead. Could you send me the agenda before then?",
@@ -1006,7 +1006,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "김 팀장님이 다음 주 수요일에 팀 워크숍을 하자고 합니다. 그런데 그날 탄 사장님이 방문해서 팀원 절반이 바쁩니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "How about having the team workshop next Wednesday?", ko: "팀 워크숍을 다음 주 수요일에 하면 어때요?" }],
     promptKo: "다음 주 수요일에 탄 사장님이 방문하셔서 팀원 절반이 바쁠 거예요. 워크숍을 그다음 주로 옮길 수 있을까요?",
-    segments: ["탄 사장님이 방문해요", "다음 주 수요일에,", "그래서", "팀의 절반이", "바쁠 거예요.", "우리가 옮길 수 있을까요", "워크숍을", "그다음 주로?"],
+    segments: ["다음 주 수요일에 탄 사장님이 방문하세요", "그래서 팀원 절반이 바쁠 거예요", "워크숍을 그다음 주로 옮길 수 있을까요?"],
     reference: "Mr. Tan is visiting next Wednesday, so half the team will be busy. Could we move the workshop to the following week?",
     accepted: [
       "Mr. Tan is visiting next Wednesday, so half of the team will be busy. Could we move the workshop to the following week?",
@@ -1055,7 +1055,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "점심시간에 신입 톰 씨가 늘 가던 1층 한식집이 오늘 문을 닫았다고 알려 줍니다. 오늘은 월요일이고, 그 식당은 월요일마다 쉽니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "The Korean place downstairs is closed today.", ko: "1층 한식집 오늘 문 닫았어요." }],
     promptKo: "아, 맞다. 거기 월요일마다 쉬어요. 길 건너 새로 생긴 베트남 식당 가 보는 거 어때요?",
-    segments: ["아, 맞다,", "거기는 문을 닫아요", "월요일마다.", "~하는 게 어때요", "우리가 가 보다", "새 베트남 식당을", "길 건너편에 있는?"],
+    segments: ["아, 맞다. 거기 월요일마다 쉬어요", "길 건너 새로 생긴 베트남 식당 가 보는 거 어때요?"],
     reference: "Oh, right, it's closed on Mondays. Why don't we try the new Vietnamese restaurant across the street?",
     accepted: [
       "Oh, right, it's always closed on Mondays. Why don't we try the new Vietnamese restaurant across the street?",
@@ -1105,7 +1105,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "한여름에 우리 층 에어컨이 고장 나서 건물 관리인에게 문의했습니다. 김 팀장님이 답을 들었는지 묻습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Did you hear back from the building manager about the air conditioning?", ko: "에어컨 건으로 건물 관리인한테 답 들었어요?" }],
     promptKo: "네, 오늘 아침에 통화했어요. 우리 층 에어컨은 목요일에 수리된대요. 그때까지는 선풍기를 몇 대 갖다주겠대요.",
-    segments: ["네,", "저는 그와 통화했어요", "오늘 아침에.", "그가 말하길", "우리 층 에어컨이", "수리될 거래요", "목요일에.", "그때까지는,", "그들이 가져다줄 거래요", "우리에게", "선풍기 몇 대를."],
+    segments: ["네, 오늘 아침에 통화했어요", "우리 층 에어컨은 목요일에 수리된대요", "그때까지는 선풍기를 몇 대 갖다주겠대요"],
     reference: "Yes, I talked to him this morning. He said the air conditioner on our floor will be repaired on Thursday. Until then, they're going to bring us some fans.",
     accepted: [
       "Yes, I spoke to him this morning. He said the air conditioner on our floor will be repaired on Thursday. Until then, they're going to bring us some fans.",
@@ -1154,7 +1154,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "신입 톰 씨가 현장 방문 때 쓴 택시 영수증을 어떻게 처리하는지 묻습니다. 이번 달까지는 종이 양식을 쓰지만, 다음 달부터는 새 시스템을 써야 하고 금요일에 교육이 있습니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "How do I claim my taxi receipts from the site visit?", ko: "현장 방문 때 쓴 택시 영수증은 어떻게 청구해요?" }],
     promptKo: "이번 달은 아직 종이 양식을 써도 돼요. 그런데 다음 달부터는 모든 경비를 새 시스템으로 제출해야 해요. 인사팀 말로는 금요일에 짧은 교육이 있다고 하니까, 신청해 두는 게 좋아요.",
-    segments: ["당신은 아직 써도 돼요", "종이 양식을", "이번 달은.", "하지만", "다음 달부터는,", "모든 경비가", "제출되어야 해요", "새 시스템을 통해.", "인사팀이 말했어요", "짧은 교육이 있을 거라고", "금요일에,", "그러니", "당신은 신청하는 게 좋아요."],
+    segments: ["이번 달은 아직 종이 양식을 써도 돼요", "하지만 다음 달부터는 모든 경비를 새 시스템으로 제출해야 해요", "인사팀 말로는 금요일에 짧은 교육이 있대요", "그러니까 신청해 두는 게 좋아요"],
     reference: "You can still use the paper form this month. But from next month, all expenses have to be submitted through the new system. HR said there'll be a short training session on Friday, so you should sign up.",
     accepted: [
       "You can still use the paper form this month. But from next month, all expenses must be submitted through the new system. HR said there'll be a short training session on Friday, so you should sign up.",
@@ -1204,7 +1204,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "부디 씨와의 통화가 자카르타 시간 10시(서울 12시)였는데, 서울 시간 10시로 착각해서 놓쳤습니다. 부디 씨가 메신저로 연락했습니다.",
     dialogue: [{ speaker: "Budi", en: "We waited for you on the call this morning. Is everything okay?", ko: "오늘 아침 통화에서 기다렸는데, 무슨 일 있어요?" }],
     promptKo: "정말 죄송해요. 통화가 서울 시간 10시인 줄 알았는데, 자카르타 시간 10시였네요. 초대장을 더 꼼꼼히 확인했더라면 놓치지 않았을 거예요.",
-    segments: ["정말 죄송해요.", "저는 생각했어요", "통화가 10시라고", "서울 시간으로,", "하지만", "그건 10시였어요", "자카르타 시간으로.", "만약 제가 확인했더라면", "초대장을", "더 꼼꼼히,", "저는 놓치지 않았을 거예요", "그것을."],
+    segments: ["정말 죄송해요", "통화가 서울 시간 10시인 줄 알았어요", "그런데 자카르타 시간 10시였네요", "초대장을 더 꼼꼼히 확인했더라면", "놓치지 않았을 거예요"],
     reference: "I'm so sorry. I thought the call was at ten Seoul time, but it was at ten Jakarta time. If I had checked the invitation more carefully, I wouldn't have missed it.",
     accepted: [
       "I'm really sorry. I thought the call was at ten Seoul time, but it was at ten Jakarta time. If I had checked the invitation more carefully, I wouldn't have missed it.",
@@ -1256,7 +1256,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "김 팀장님이 이번 주에 입사한 톰 씨를 바로 자카르타 프로젝트에 투입하자고 합니다. 톰 씨는 아직 회사 시스템도 다 못 익혔습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Let's put Tom on the Jakarta project right away. We really need more people.", ko: "톰 씨를 바로 자카르타 프로젝트에 넣읍시다. 사람이 정말 부족해요." }],
     promptKo: "사람이 더 필요한 건 이해하지만, 입사 첫 주에 바로 넣는 게 좋은 생각인지 잘 모르겠어요. 아직 우리 시스템을 다 못 익혀서 버거워할 수도 있어요. 일주일 동안 먼저 저랑 같이 일하고 나서 프로젝트에 들어가면 어떨까요?",
-    segments: ["저는 이해해요", "우리가 사람이 더 필요하다는 걸,", "하지만", "확신이 없어요", "좋은 생각인지", "그를 넣는 게", "첫 주에.", "그는 아직 익히지 못했어요", "우리 시스템을,", "그래서", "그는 버거워할 수도 있어요.", "~하면 어떨까요", "그가 저와 일하다", "일주일 동안", "먼저", "그리고 나서 합류하다", "프로젝트에?"],
+    segments: ["사람이 더 필요한 건 이해하지만", "첫 주에 바로 넣는 게 좋은 생각인지 잘 모르겠어요", "아직 우리 시스템을 못 익혀서 버거워할 수도 있어요", "일주일 동안 먼저 저랑 같이 일하고 나서", "프로젝트에 들어가면 어떨까요?"],
     reference: "I understand we need more people, but I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. What if he worked with me for a week first and then joined the project?",
     accepted: [
       "I understand we need more people, but I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. Could he work with me for a week first and then join the project?",
@@ -1307,7 +1307,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "다음 주 탄 사장님 방문이 하필 몇 달 전에 잡아 둔 가족 휴가 기간과 겹칩니다. 김 팀장님이 휴가를 미룰 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Mr. Tan is visiting next week, during your vacation. Is there any way you could move your vacation?", ko: "다음 주 탄 사장님 방문이 민수 씨 휴가 기간이에요. 혹시 휴가를 옮길 수 있을까요?" }],
     promptKo: "방문이 중요한 건 알지만, 가족 항공권을 이미 예약했고 환불이 안 돼요. 제가 떠나기 전에 자료를 다 준비해 두고, 지수 씨가 탄 사장님을 맡으면 어떨까요? 필요하면 회의에는 온라인으로 들어갈 수도 있어요.",
-    segments: ["저는 이해해요", "방문이 중요하다는 걸,", "하지만", "저는 이미 예약했어요", "항공권을", "가족을 위한,", "그리고", "그것들은 환불될 수 없어요.", "~하면 어떨까요", "제가 준비하다", "모든 자료를", "제가 떠나기 전에,", "그리고", "지수 씨가 맡다", "탄 사장님을?", "저는 또한 들어갈 수 있어요", "회의에", "온라인으로", "필요하면."],
+    segments: ["방문이 중요한 건 알지만", "가족 항공권을 이미 예약했고 환불이 안 돼요", "제가 떠나기 전에 자료를 다 준비해 두고", "지수 씨가 탄 사장님을 맡으면 어떨까요?", "필요하면 회의에는 온라인으로 들어갈 수도 있어요"],
     reference: "I understand the visit is important, but I've already booked flights for my family, and they can't be refunded. What if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
     accepted: [
       "I know the visit is important, but I've already booked flights for my family, and they can't be refunded. What if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
@@ -1359,7 +1359,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "박 부장님 퇴직 선물을 위해 지수 씨가 한 사람당 5만 원씩 걷자고 합니다. 신입이나 막내 직원들에게는 부담스러울 것 같습니다.",
     dialogue: [{ speaker: "Jisoo", en: "For Mr. Park's retirement gift, I was thinking everyone could put in fifty thousand won.", ko: "박 부장님 퇴직 선물 말인데, 한 사람당 5만 원씩 내면 어떨까 해요." }],
     promptKo: "좋은 생각인데, 다들 5만 원을 낼 여유가 있는지는 잘 모르겠어요. 막내 직원들은 싫다고 말하기 불편할 수도 있어요. 한 사람당 2만 원씩 걷고, 더 내고 싶은 사람은 더 내는 건 어때요?",
-    segments: ["그건 좋은 생각이에요,", "하지만", "확신이 없어요", "모두가 여유가 있는지", "5만 원을.", "막내 직원 몇몇은", "불편하게 느낄 수도 있어요", "싫다고 말하는 것을.", "~하면 어떨까요", "우리가 요청하다", "2만 원을", "한 사람당,", "그리고", "원하는 사람은 누구든", "더 낼 수 있다?"],
+    segments: ["좋은 생각인데", "다들 5만 원을 낼 여유가 있는지는 잘 모르겠어요", "막내 직원들은 싫다고 말하기 불편할 수도 있어요", "한 사람당 2만 원씩 걷으면 어때요?", "더 내고 싶은 사람은 더 내고요"],
     reference: "That's a lovely idea, but I'm not sure everyone can afford fifty thousand won. Some of the junior staff might feel uncomfortable saying no. What if we asked for twenty thousand won each, and anyone who wants to can give more?",
     accepted: [
       "That's a lovely idea, but fifty thousand won might be too much for some people. The junior staff might feel uncomfortable saying no. What if we made it twenty thousand won each, and anyone who wants to can give more?",

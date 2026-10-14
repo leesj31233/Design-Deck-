@@ -499,7 +499,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "부디 씨에게 수정된 P&ID를 보낸다고 메일을 썼는데, 정작 파일을 첨부하지 않았습니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu, your email says 'see attached', but there's no file.", ko: "민수 씨, 메일에는 '첨부 파일 참고'라고 되어 있는데 파일이 없어요." }],
     promptKo: "아, 죄송해요. 파일 첨부하는 걸 깜빡했네요. 지금 다시 보낼게요.",
-    segments: ["아, 죄송해요.", "제가 잊어버렸어요", "첨부하는 것을", "그 파일을.", "제가 다시 보낼게요", "그것을", "지금"],
+    segments: ["아, 죄송해요", "파일 첨부하는 걸 깜빡했네요", "지금 다시 보낼게요"],
     reference: "Oh, sorry. I forgot to attach the file. I'll send it again now.",
     accepted: [
       "Oh, sorry. I forgot to attach the file. I'll resend it now.",
@@ -544,7 +544,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "프리야 씨와의 오전 화상 회의를 놓쳤습니다. 캘린더에 시간을 잘못 넣어서 오후 회의인 줄 알았습니다.",
     dialogue: [{ speaker: "Priya", en: "We waited for you on the call this morning. Is everything okay?", ko: "오늘 아침 통화에서 민수 씨를 기다렸어요. 별일 없으시죠?" }],
     promptKo: "정말 죄송해요. 캘린더에 시간을 잘못 넣어서 회의가 오후인 줄 알았어요.",
-    segments: ["정말 죄송해요.", "제가 넣었어요", "잘못된 시간을", "제 캘린더에,", "그래서", "저는 생각했어요", "회의가 오후라고"],
+    segments: ["정말 죄송해요", "캘린더에 시간을 잘못 넣었어요", "그래서 회의가 오후인 줄 알았어요"],
     reference: "I'm so sorry. I put the wrong time in my calendar, so I thought the meeting was in the afternoon.",
     accepted: [
       "I'm so sorry. I put the wrong time in my calendar, so I thought the call was in the afternoon.",
@@ -590,7 +590,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "어제 건조기 성능 시험 중에 배기 팬이 심하게 진동해서 시험을 중간에 멈췄습니다. 사리 씨가 왜 시험이 일찍 끝났는지 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "Why did the dryer test finish so early yesterday?", ko: "어제 건조기 시험이 왜 그렇게 일찍 끝났어요?" }],
     promptKo: "배기 팬이 심하게 진동하기 시작해서 시험을 멈춰야 했어요.",
-    segments: ["우리는 멈춰야 했어요", "시험을", "왜냐하면", "배기 팬이", "진동하기 시작했어요", "심하게"],
+    segments: ["시험을 멈춰야 했어요", "배기 팬이 심하게 진동하기 시작했거든요"],
     reference: "We had to stop the test because the exhaust fan started vibrating badly.",
     accepted: [
       "We had to stop the test because the exhaust fan started to vibrate badly.",
@@ -635,7 +635,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "오늘 아침 원료 공급 펌프가 고장 났지만 예비 펌프로 바로 전환해서 라인은 계속 돌아가고 있습니다. Mr. Tan이 걱정스럽게 전화했습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "I heard the feed pump failed this morning. Has the line stopped?", ko: "오늘 아침에 원료 펌프가 고장 났다고 들었어요. 라인이 멈췄나요?" }],
     promptKo: "걱정 마세요. 예비 펌프로 바로 바꿔서 라인은 아직 돌아가고 있어요.",
-    segments: ["걱정 마세요.", "우리는 바꿨어요", "예비 펌프로", "바로,", "그래서", "라인은", "아직 돌아가고 있어요"],
+    segments: ["걱정 마세요", "예비 펌프로 바로 바꿨어요", "그래서 라인은 아직 돌아가고 있어요"],
     reference: "Don't worry. We switched to the spare pump right away, so the line is still running.",
     accepted: [
       "Don't worry. We switched to the spare pump right away, so the line's still running.",
@@ -681,7 +681,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "어제 다니엘 씨에게 물질수지를 보냈는데, 오늘 아침 원료 수분 값을 잘못 넣은 것을 발견했습니다. 다니엘 씨가 검토를 시작했다고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Thanks for the mass balance, Minsu. We've started reviewing it.", ko: "물질수지 고마워요, 민수 씨. 저희 검토 시작했어요." }],
     promptKo: "죄송하지만, 제가 물질수지에서 실수를 했어요. 오늘 오후까지 수정본을 보내 드릴게요.",
-    segments: ["죄송하지만,", "제가 실수를 했어요", "물질수지에서.", "제가 보내 드릴게요", "당신에게", "수정본을", "오늘 오후까지"],
+    segments: ["죄송하지만 제가 물질수지에서 실수를 했어요", "오늘 오후까지 수정본을 보내 드릴게요"],
     reference: "I'm afraid I've made a mistake in the mass balance. I'll send you a corrected version by this afternoon.",
     accepted: [
       "I'm afraid I made a mistake in the mass balance. I'll send you a corrected version by this afternoon.",
@@ -726,7 +726,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "건조기 출구 수분이 갑자기 높아진 원인을 찾았습니다. 스팀 트랩이 막혀서 응축수가 빠지지 못했던 것입니다. 부디 씨가 원인을 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "So why did the dryer outlet moisture go up so suddenly?", ko: "그래서 건조기 출구 수분이 왜 그렇게 갑자기 올라간 거예요?" }],
     promptKo: "알고 보니 스팀 트랩이 막혀 있어서 응축수가 제대로 빠지지 못했어요.",
-    segments: ["알고 보니", "스팀 트랩이", "막혀 있었어요,", "그래서", "응축수가", "빠질 수 없었어요", "제대로"],
+    segments: ["알고 보니 스팀 트랩이 막혀 있었어요", "그래서 응축수가 제대로 빠지지 못했어요"],
     reference: "It turns out the steam trap was stuck, so the condensate couldn't drain properly.",
     accepted: [
       "It turns out that the steam trap was stuck, so the condensate couldn't drain properly.",
@@ -774,7 +774,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "외부 실험실에 보낸 회분 분석용 샘플 중 두 개를 실험실에서 잃어버렸다는 연락을 받았습니다. 린 씨가 결과를 묻습니다.",
     dialogue: [{ speaker: "Linh", en: "Did you get the ash results from the lab?", ko: "실험실에서 회분 분석 결과 받았어요?" }],
     promptKo: "아쉽게도 실험실에서 우리 샘플 두 개를 잃어버렸어요. 그래서 새 샘플을 보내야 해요.",
-    segments: ["아쉽게도,", "실험실이", "잃어버렸어요", "우리 샘플 중 두 개를,", "그래서", "우리는 보내야 할 거예요", "새것들을"],
+    segments: ["아쉽게도 실험실에서 우리 샘플 두 개를 잃어버렸어요", "그래서 새 샘플을 보내야 해요"],
     reference: "Unfortunately, the lab has lost two of our samples, so we'll have to send new ones.",
     accepted: [
       "Unfortunately, the lab has lost two of our samples, so we'll need to send new ones.",
@@ -822,7 +822,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "벤더 프리야 씨네 회사가 보낸 펌프 수리비 청구서 금액이 견적서와 다릅니다. 견적은 4,500달러였는데 청구서에는 5,400달러로 되어 있습니다.",
     dialogue: [{ speaker: "Priya", en: "Hi Minsu, did you receive our invoice for the pump repair?", ko: "민수 씨, 펌프 수리 청구서 받으셨어요?" }],
     promptKo: "네, 그런데 죄송하지만 보내 주신 청구서에 실수가 있는 것 같아요. 금액이 견적서와 맞지 않아요.",
-    segments: ["네, 그런데", "죄송하지만", "실수가 있는 것 같아요", "청구서에", "당신이 우리에게 보낸.", "금액이", "맞지 않아요", "당신의 견적서와"],
+    segments: ["네, 그런데 죄송하지만", "보내 주신 청구서에 실수가 있는 것 같아요", "금액이 견적서와 맞지 않아요"],
     reference: "Yes, but I'm afraid there seems to be a mistake in the invoice you sent us. The amount doesn't match your quotation.",
     accepted: [
       "Yes, but I'm afraid there seems to be a mistake in the invoice you sent to us. The amount doesn't match your quotation.",
@@ -917,7 +917,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "건조기 수리로 생산이 이틀 멈췄습니다. Mr. Tan이 이번 일로 펠릿 품질이 나빠지지 않을지 걱정합니다. 품질 시험 결과는 모두 정상입니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "I'm worried. Will this problem affect the quality of the pellets?", ko: "걱정되네요. 이 문제 때문에 펠릿 품질이 나빠지진 않을까요?" }],
     promptKo: "걱정하시는 건 이해하지만, 펠릿 품질에는 영향이 없을 거라고 확실히 말씀드릴 수 있습니다.",
-    segments: ["저는 이해합니다", "당신의 걱정을,", "하지만", "제가 확실히 말씀드릴 수 있어요", "펠릿 품질은", "영향을 받지 않을 거라고"],
+    segments: ["걱정하시는 건 이해하지만", "펠릿 품질에는 영향이 없을 거라고 확실히 말씀드릴 수 있습니다"],
     reference: "I understand your concern, but I can assure you that the pellet quality won't be affected.",
     accepted: [
       "I understand your concern, but I can assure you the pellet quality won't be affected.",
@@ -965,7 +965,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "사리 씨의 시험 데이터에 대해 '데이터가 부족하다'고 짧게 메일을 보냈더니, 사리 씨가 서운해하며 전화했습니다. 데이터가 틀렸다는 뜻이 아니라 시험 포인트가 몇 개 더 필요하다는 뜻이었습니다.",
     dialogue: [{ speaker: "Sari", en: "I read your email. So you think my test data is no good?", ko: "메일 읽었어요. 그러니까 제 시험 데이터가 별로라는 거죠?" }],
     promptKo: "제 메일이 무례하게 들렸다면 미안해요. 시험 포인트가 몇 개 더 필요하다는 뜻이었을 뿐이니, 내일 같이 계획을 세워 볼까요?",
-    segments: ["미안해요", "만약 제 메일이", "무례하게 들렸다면.", "저는 단지 ~라는 뜻이었어요", "우리가 필요하다", "시험 포인트 몇 개가 더,", "그러니", "우리가 계획을 세워 볼까요", "그것들을", "함께", "내일?"],
+    segments: ["제 메일이 무례하게 들렸다면 미안해요", "시험 포인트가 몇 개 더 필요하다는 뜻이었을 뿐이에요", "그러니 내일 같이 계획을 세워 볼까요?"],
     reference: "Sorry if my email sounded rude. I only meant that we need a few more test points, so could we plan them together tomorrow?",
     accepted: [
       "Sorry if my email sounded rude. I just meant that we need a few more test points, so could we plan them together tomorrow?",
@@ -1012,7 +1012,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "우리 쪽 실수로 건조기 부품 납품이 일주일 늦어졌습니다. Mr. Tan이 설치 일정이 걱정이라고 하자, 특송비를 부담하고 설치를 도울 엔지니어를 보내겠다고 제안합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "This delay puts a lot of pressure on our installation schedule.", ko: "이번 지연 때문에 저희 설치 일정이 많이 빠듯해졌어요." }],
     promptKo: "지연은 저희 잘못이었으니 특송 비용은 저희가 부담하겠습니다. 그리고 설치를 돕도록 엔지니어 한 명을 보내 드릴 수도 있어요.",
-    segments: ["지연이 저희 잘못이었으니,", "저희가 부담하겠습니다", "특송 비용을.", "저희는 또한 보낼 수 있어요", "엔지니어 한 명을", "돕도록", "설치를"],
+    segments: ["지연은 저희 잘못이었으니", "특송 비용은 저희가 부담하겠습니다", "그리고 설치를 돕도록 엔지니어 한 명을 보내 드릴 수도 있어요"],
     reference: "Since the delay was our fault, we'll cover the cost of the express shipping. We can also send an engineer to help with the installation.",
     accepted: [
       "Since the delay was our fault, we'll pay for the express shipping. We can also send an engineer to help with the installation.",
@@ -1057,7 +1057,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "펠릿 성형기의 베어링이 손상돼 내일로 예정된 재시험을 할 수 없습니다. 베어링 교체에 이틀 정도 걸려서, 다니엘 씨에게 재시험을 다음 주 화요일로 미루자고 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "So can we still repeat the test tomorrow?", ko: "그래서 내일 재시험은 그대로 할 수 있어요?" }],
     promptKo: "손상된 베어링을 교체해야 하는데, 이틀 정도 걸릴 거예요. 대신 다음 주 화요일에 재시험을 해도 될까요?",
-    segments: ["우리는 교체해야 해요", "손상된 베어링을,", "그런데 그것은", "걸릴 거예요", "이틀 정도.", "~해도 될까요", "우리가 재시험을 하다", "다음 주 화요일에", "대신?"],
+    segments: ["손상된 베어링을 교체해야 해요", "그건 이틀 정도 걸릴 거예요", "대신 다음 주 화요일에 재시험을 해도 될까요?"],
     reference: "We need to replace the damaged bearing, which will take about two days. Could we repeat the test next Tuesday instead?",
     accepted: [
       "We need to replace the damaged bearing, which will take about two days. Could we do the test again next Tuesday instead?",
@@ -1106,7 +1106,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "어제 건조 시험에서 출구 수분이 목표보다 훨씬 높게 나왔습니다. 원료가 너무 젖어 있었던 것 같지만 아직 확실하지 않고, 목요일에 실험실 분석 결과가 나옵니다. 사리 씨가 원인을 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "So why was the outlet moisture so high in yesterday's test?", ko: "그래서 어제 시험에서 출구 수분이 왜 그렇게 높았어요?" }],
     promptKo: "아직 확실하지는 않지만, 원료가 너무 젖어 있었을 수도 있어요. 그렇다면 건조기가 수분을 충분히 제거할 수 없었던 거죠. 목요일에 실험실 결과가 나오면 확실히 알 수 있을 거예요.",
-    segments: ["우리는 확실하지 않아요", "아직,", "하지만", "원료가", "너무 젖어 있었을 수도 있어요.", "만약 그렇다면,", "건조기는", "제거할 수 없었어요", "충분한 수분을.", "우리는 확실히 알게 될 거예요", "실험실 결과가 나오면", "목요일에"],
+    segments: ["아직 확실하지는 않지만", "원료가 너무 젖어 있었을 수도 있어요", "그렇다면 건조기가 수분을 충분히 제거할 수 없었던 거죠", "목요일에 실험실 결과가 나오면 확실히 알 수 있을 거예요"],
     reference: "We're not sure yet, but the feed might have been too wet. If that's the case, the dryer couldn't remove enough water. We'll know for sure when the lab results come back on Thursday.",
     accepted: [
       "We're not sure yet, but the feed may have been too wet. If that's the case, the dryer couldn't remove enough water. We'll know for sure when the lab results come back on Thursday.",
@@ -1156,7 +1156,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "펌프 임펠러가 석 달 만에 닳아 버린 원인을 벤더가 조사했습니다. 오늘 아침 벤더와 통화한 내용을 Mr. Tan에게 전합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Did the vendor find out why the impeller wore out so quickly?", ko: "벤더가 임펠러가 왜 그렇게 빨리 닳았는지 알아냈나요?" }],
     promptKo: "네, 오늘 아침에 벤더와 통화했어요. 임펠러에 잘못된 재질이 사용됐다고 인정했어요. 자기네 비용으로 교체해 주기로 했고, 새 임펠러는 다음 주 수요일에 도착할 거예요.",
-    segments: ["네,", "저는 통화했어요", "벤더와", "오늘 아침에.", "그들은 인정했어요", "잘못된 재질이", "사용됐다고", "임펠러에.", "그들은 동의했어요", "교체하는 것에", "그것을", "그들의 비용으로,", "그리고", "새것은", "도착할 거예요", "다음 주 수요일에"],
+    segments: ["네, 오늘 아침에 벤더와 통화했어요", "임펠러에 잘못된 재질이 사용됐다고 인정했어요", "자기네 비용으로 교체해 주기로 했어요", "그리고 새 임펠러는 다음 주 수요일에 도착할 거예요"],
     reference: "Yes, I talked to the vendor this morning. They admitted that the wrong material was used for the impeller. They've agreed to replace it at their own cost, and the new one should arrive next Wednesday.",
     accepted: [
       "Yes, I spoke to the vendor this morning. They admitted that the wrong material was used for the impeller. They've agreed to replace it at their own cost, and the new one should arrive next Wednesday.",
@@ -1205,7 +1205,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "다니엘 씨가 지적했던 원료 펌프 누설 문제를 지난주 월요일에 기계적 실(seal)을 교체해 해결했습니다. 일주일 동안 지켜본 결과를 다니엘 씨에게 알려 줍니다.",
     dialogue: [{ speaker: "Daniel", en: "Hi Minsu, any news on the feed pump?", ko: "민수 씨, 원료 펌프 관련 소식 있어요?" }],
     promptKo: "원료 펌프 상황을 간단히 알려 드릴게요. 지난주 월요일에 실을 교체한 뒤로 누설 없이 잘 돌아가고 있어요. 이달 말까지 계속 확인하겠지만, 문제는 해결된 것 같아요.",
-    segments: ["간단한 업데이트예요", "원료 펌프에 대한.", "~한 이후로", "우리가 실을 교체했다", "지난 월요일에,", "그것은 계속 돌아가고 있어요", "누설 없이.", "우리는 계속 확인할 거예요", "그것을", "이달 말까지,", "하지만", "~인 것 같아요", "문제가 해결됐다"],
+    segments: ["원료 펌프 상황을 간단히 알려 드릴게요", "지난주 월요일에 실을 교체한 뒤로", "누설 없이 잘 돌아가고 있어요", "이달 말까지 계속 확인하겠지만", "문제는 해결된 것 같아요"],
     reference: "Just a quick update on the feed pump. Since we replaced the seal last Monday, it has been running without any leaks. We'll keep checking it until the end of the month, but it looks like the problem has been solved.",
     accepted: [
       "Just a quick update on the feed pump. Since we replaced the seal last Monday, it's been running without any leaks. We'll keep checking it until the end of the month, but it looks like the problem has been solved.",
@@ -1257,7 +1257,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "지난주 현장에서 아차사고가 있었습니다. 김 팀장님이 고객이 걱정할 테니 Mr. Tan에게는 말하지 말자고 합니다. 당신은 정중하게 반대하고, 이미 취한 조치와 함께 보고하자고 제안합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Let's not mention the near miss to Mr. Tan. It'll only make him worry.", ko: "아차사고 건은 Mr. Tan에게 말하지 맙시다. 괜히 걱정만 할 거예요." }],
     promptKo: "무슨 말씀인지는 알겠지만, 그래도 말씀드리는 게 좋을 것 같아요. 다른 사람한테서 듣게 되면 저희를 신뢰하지 않게 될 수도 있어요. 이미 취한 안전 조치와 함께 보고하면 어떨까요?",
-    segments: ["저는 이해합니다", "무슨 말씀인지,", "하지만", "저는 생각해요", "우리가 말해야 한다고", "그에게.", "만약 그가 듣게 되면", "그것에 대해", "다른 사람에게서,", "그는 잃을 수도 있어요", "우리에 대한 신뢰를.", "어떨까요", "우리가 보고하다", "그것을", "안전 조치와 함께", "우리가 이미 취한?"],
+    segments: ["무슨 말씀인지는 알겠지만", "그래도 말씀드리는 게 좋을 것 같아요", "다른 사람한테서 듣게 되면", "저희를 신뢰하지 않게 될 수도 있어요", "이미 취한 안전 조치와 함께 보고하면 어떨까요?"],
     reference: "I see your point, but I think we should tell him. If he hears about it from someone else, he might lose trust in us. Why don't we report it together with the safety measures we've already taken?",
     accepted: [
       "I see your point, but I think we should tell him. If he hears it from someone else, he might lose trust in us. Why don't we report it together with the safety measures we've already taken?",
@@ -1310,7 +1310,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "디캔터 베어링이 과열돼 운전을 멈췄습니다. 부디 씨는 일정이 밀렸으니 오늘 밤 바로 재가동하자고 합니다. 당신은 원인을 먼저 확인해야 한다고 정중하게 반대하고 대안을 제시합니다.",
     dialogue: [{ speaker: "Budi", en: "We're already behind schedule. Let's restart the decanter tonight.", ko: "이미 일정이 밀렸어요. 오늘 밤에 디캔터를 다시 돌립시다." }],
     promptKo: "일정이 밀린 건 알지만, 베어링이 왜 과열됐는지 알기 전까지는 재가동하지 않는 게 좋겠어요. 또 고장 나면 시간을 훨씬 더 잃을 수 있어요. 내일 아침에 점검하고 그때 결정하는 게 어때요?",
-    segments: ["저는 알아요", "우리가 일정보다 늦었다는 것을,", "하지만", "저는 재가동하지 않는 게 좋겠어요", "그것을", "~할 때까지", "우리가 알다", "왜 베어링이 과열됐는지.", "만약 그것이 또 고장 나면,", "우리는 잃을 수 있어요", "훨씬 더 많은 시간을.", "어때요", "우리가 점검하다", "그것을", "내일 아침에", "그리고 그때 결정하다?"],
+    segments: ["일정이 밀린 건 알지만", "재가동하지 않는 게 좋겠어요", "베어링이 왜 과열됐는지 알기 전까지는요", "또 고장 나면 시간을 훨씬 더 잃을 수 있어요", "내일 아침에 점검하고 그때 결정하는 게 어때요?"],
     reference: "I know we're behind schedule, but I'd rather not restart it until we know why the bearing overheated. If it fails again, we could lose a lot more time. Why don't we inspect it tomorrow morning and decide then?",
     accepted: [
       "I know we're behind schedule, but I'd rather not restart it until we know why the bearing overheated. If it breaks down again, we could lose a lot more time. Why don't we inspect it tomorrow morning and decide then?",
@@ -1363,7 +1363,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "건조기 시운전 중 원료 공급이 계속 끊기자, 라이선서 다니엘 씨가 운전원들이 시작 절차를 지키지 않았다고 말합니다. 운전 기록을 보면 절차는 정확히 지켜졌고, 오히려 공급 스크루 설계가 문제일 수 있습니다.",
     dialogue: [{ speaker: "Daniel", en: "I think your operators didn't follow our start-up procedure.", ko: "그쪽 운전원들이 저희 시작 절차를 안 지킨 것 같아요." }],
     promptKo: "왜 그렇게 보이는지는 이해합니다. 하지만 운전 기록을 보면 운전원들은 모든 단계를 지켰어요. 오히려 공급 스크루 설계가 문제일 수도 있다고 생각해요. 결론을 내리기 전에 데이터를 같이 검토해 주실 수 있을까요?",
-    segments: ["저는 이해할 수 있어요", "왜 그렇게 보이는지,", "하지만", "우리 운전 기록에 따르면,", "운전원들은 지켰어요", "모든 단계를.", "저는 생각해요", "문제가", "~일 수도 있다고", "공급 스크루 설계.", "~해 주실 수 있을까요", "검토하다", "데이터를", "우리와 함께", "~하기 전에", "우리가 결론을 내리다?"],
+    segments: ["왜 그렇게 보이는지는 이해합니다", "하지만 운전 기록을 보면 운전원들은 모든 단계를 지켰어요", "오히려 공급 스크루 설계가 문제일 수도 있어요", "데이터를 같이 검토해 주실 수 있을까요?", "결론을 내리기 전에요"],
     reference: "I can see why it might look that way, but according to our logs, the operators followed every step. I think the problem might be the design of the feed screw. Would you be willing to review the data with us before we draw any conclusions?",
     accepted: [
       "I can see why it might look that way, but according to our logs, the operators followed every step. I think the problem might be the feed screw design. Would you be willing to review the data with us before we draw any conclusions?",
