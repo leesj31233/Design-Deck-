@@ -302,7 +302,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "원료 수분 관리가 왜 중요한지 설명하는 슬라이드. 지난달 원료가 너무 젖어서 건조기가 두 번 멈춘 일을 예로 들려 합니다.",
     dialogue: [{ speaker: "Linh", en: "Is feed moisture really that important?", ko: "원료 수분이 정말 그렇게 중요한가요?" }],
     promptKo: "네. 예를 들어, 지난달에는 원료가 너무 젖어서 건조기가 두 번 멈췄습니다.",
-    segments: ["네.", "예를 들어,", "지난달에", "건조기가 멈췄다", "두 번", "왜냐하면", "원료가 너무 젖어 있었다"],
+    segments: ["네. 예를 들어", "지난달에 건조기가 두 번 멈췄어요", "왜냐하면 원료가 너무 젖어 있었어요"],
     reference: "Yes. For example, last month the dryer stopped twice because the feed was too wet.",
     accepted: [
       "Yes. For example, the dryer stopped twice last month because the feed was too wet.",
@@ -345,7 +345,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "고객 앞에서 공정 시뮬레이션 프로그램을 시연하려는데 프로그램이 열리지 않습니다. 미리 준비한 화면 캡처를 대신 보여 주려 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Hmm, I think the screen is still loading.", ko: "음, 화면이 아직 로딩 중인 것 같네요." }],
     promptKo: "죄송합니다, 데모가 작동하지 않네요. 대신 스크린샷 몇 장을 보여 드릴게요.",
-    segments: ["죄송합니다,", "데모가", "작동하지 않고 있다", "그래서", "제가 보여 드릴게요", "스크린샷 몇 장을", "대신"],
+    segments: ["죄송합니다, 데모가 작동하지 않네요", "그래서 대신 스크린샷 몇 장을 보여 드릴게요"],
     reference: "Sorry, the demo isn't working, so let me show you some screenshots instead.",
     accepted: [
       "Sorry, the demo isn't working, so I'll show you some screenshots instead.",
@@ -389,7 +389,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "에너지 절감 방안 발표의 첫마디. 청중의 관심을 끌기 위해 질문으로 시작하려 합니다. 공장 건조기들이 증기를 아주 많이 쓰고 있습니다.",
     dialogue: [{ speaker: "Daniel", en: "Okay, Minsu, over to you.", ko: "자, 민수 씨, 시작하세요." }],
     promptKo: "우리 건조기들이 왜 그렇게 증기를 많이 쓰는지 궁금해 보신 적 있나요? 오늘은 그걸 20% 줄이는 방법을 보여 드리겠습니다.",
-    segments: ["궁금해 보신 적 있나요", "왜", "우리 건조기들이", "그렇게 많은 증기를 쓰는지", "오늘", "제가 보여 드리겠습니다", "방법을", "그것을 20% 줄이는"],
+    segments: ["우리 건조기들이 왜 그렇게 증기를 많이 쓰는지", "궁금해 보신 적 있나요?", "오늘은 그걸 20% 줄이는 방법을 보여 드릴게요"],
     reference: "Have you ever wondered why our dryers use so much steam? Today, I'll show you a way to reduce it by 20%.",
     accepted: [
       "Have you ever wondered why our dryers use so much steam? Today, I'll show you how to reduce it by 20%.",
@@ -476,7 +476,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "파일럿 결과 발표 중. 결과는 좋지만, 모든 시험을 절반 부하에서만 했기 때문에 최대 부하 데이터는 아직 없습니다.",
     dialogue: [{ speaker: "Daniel", en: "These results look very promising.", ko: "결과가 아주 유망해 보이네요." }],
     promptKo: "네, 다만 한계가 하나 있다는 점을 말씀드려야겠습니다. 모든 시험이 절반 부하에서만 진행되어서, 아직 최대 부하 데이터는 없습니다.",
-    segments: ["네, 다만", "저는 짚어야 합니다", "한계 하나를", "모든 시험은", "진행되었다", "절반 부하에서", "그래서", "우리는 아직 없습니다", "최대 부하 데이터가"],
+    segments: ["네, 다만 한계를 하나 짚어야겠어요", "모든 시험이 절반 부하에서만 진행됐어요", "그래서 아직 최대 부하 데이터는 없어요"],
     reference: "Yes, but I should point out one limitation. All the tests were done at half load, so we don't have any data at full load yet.",
     accepted: [
       "Yes, but I should mention one limitation. All the tests were done at half load, so we don't have any data at full load yet.",
@@ -521,7 +521,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "건조기 성능 발표 중. 린 씨가 발표와 관계없는 다른 프로젝트(바이오가스 플랜트)의 일정을 묻습니다.",
     dialogue: [{ speaker: "Linh", en: "By the way, do you know when the biogas project will start?", ko: "그런데 바이오가스 프로젝트는 언제 시작하는지 아세요?" }],
     promptKo: "좋은 질문이지만, 오늘 발표 범위에서는 좀 벗어나는 것 같습니다. 회의 끝나고 이야기해도 될까요?",
-    segments: ["좋은 질문이지만,", "죄송하지만", "그건 좀 벗어나요", "오늘 발표의 범위에서", "~해도 될까요?", "그것에 대해 이야기하다", "회의 후에"],
+    segments: ["좋은 질문이지만", "오늘 발표 범위에서는 좀 벗어나는 것 같아요", "회의 끝나고 이야기해도 될까요?"],
     reference: "That's a good question, but I'm afraid it's a bit outside the scope of today's presentation. Could we talk about it after the meeting?",
     accepted: [
       "That's a good question, but I'm afraid it's a little outside the scope of today's presentation. Could we talk about it after the meeting?",
@@ -567,7 +567,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "파일럿 결과 발표의 마지막. 건조기 납기가 약 8개월이라, 지금 주문하지 않으면 시운전 일정을 놓칠 수 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So, what do you suggest as the next step?", ko: "그래서 다음 단계로 무엇을 제안하시나요?" }],
     promptKo: "이 결과를 바탕으로, 이번 달에 건조기를 주문하는 것을 추천드립니다. 납기가 약 8개월이라, 늦게 주문하면 시운전 날짜를 놓칠 수도 있습니다.",
-    segments: ["이 결과를 바탕으로,", "저는 추천합니다", "건조기를 주문하는 것을", "이번 달에", "납기가", "약 8개월이다", "그래서", "만약 우리가 늦게 주문하면", "우리는 놓칠 수도 있다", "시운전 날짜를"],
+    segments: ["이 결과를 바탕으로", "이번 달에 건조기를 주문하는 걸 추천해요", "납기가 약 8개월이에요", "그래서 늦게 주문하면 시운전 날짜를 놓칠 수도 있어요"],
     reference: "Based on these results, I'd recommend ordering the dryer this month. The delivery time is about eight months, so if we order later, we might miss the start-up date.",
     accepted: [
       "Based on these results, I'd recommend ordering the dryer this month. The delivery time is about eight months, so if we order it later, we might miss the start-up date.",
@@ -610,7 +610,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "질의응답. 다니엘 씨가 왜 직접 건조기 대신 간접 건조기를 골랐는지 묻습니다. 직접 건조기는 훨씬 큰 집진 설비가 필요했습니다.",
     dialogue: [{ speaker: "Daniel", en: "Why did you choose an indirect dryer? A direct dryer is cheaper, isn't it?", ko: "왜 간접 건조기를 골랐나요? 직접 건조기가 더 싸지 않나요?" }],
     promptKo: "직접 건조기도 검토했지만, 훨씬 더 큰 집진 설비가 필요했습니다. 그래서 조금 더 비싸긴 해도 간접 건조기를 선택했습니다.",
-    segments: ["우리는 검토했다", "직접 건조기도", "하지만", "그것은 필요했다", "훨씬 더 큰 집진 설비가", "그래서", "우리는 선택했다", "간접 건조기를", "비록 ~이지만", "그것이 조금 더 비싸다"],
+    segments: ["직접 건조기도 검토했어요", "하지만 훨씬 더 큰 집진 설비가 필요했어요", "그래서 간접 건조기를 선택했어요", "조금 더 비싸긴 하지만"],
     reference: "We did consider a direct dryer, but it needed a much bigger dust collection system. That's why we chose the indirect dryer, even though it costs a little more.",
     accepted: [
       "We did look at a direct dryer, but it needed a much bigger dust collection system. That's why we chose the indirect dryer, even though it costs a little more.",
@@ -656,7 +656,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "질의응답. 고객이 3주 차에 수율이 왜 떨어졌는지 묻습니다. 폭우 때문에 원료가 평소보다 젖어 있었을 거라고 보지만, 다음 주에 원료 샘플을 확인해야 확실해집니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Why did the yield drop in week three?", ko: "3주 차에 수율이 왜 떨어졌나요?" }],
     promptKo: "아직 확실하지는 않지만, 폭우 때문에 원료가 평소보다 더 젖어 있었던 것 같습니다. 그러면 수율이 낮아진 것이 설명됩니다. 확인하려고 다음 주에 원료 샘플을 점검할 예정입니다.",
-    segments: ["우리는 아직 완전히 확실하지 않다", "하지만 우리는 생각한다", "원료가 더 젖어 있었다", "평소보다", "폭우 때문에", "그것이 설명할 것이다", "낮아진 수율을", "우리는 점검할 예정이다", "원료 샘플을", "다음 주에", "확인하기 위해"],
+    segments: ["아직 완전히 확실하지는 않지만", "폭우 때문에 원료가 평소보다 더 젖어 있었던 것 같아요", "그러면 수율이 낮아진 게 설명돼요", "확인하려고 다음 주에 원료 샘플을 점검할 거예요"],
     reference: "We're not completely sure yet, but we think the feed was wetter than usual because of the heavy rain. That would explain the lower yield. We're going to check the feed samples next week to confirm it.",
     accepted: [
       "We're not completely sure yet, but we think the feed was wetter than usual because of the heavy rain. That would explain the lower yield. We're going to check the feed samples next week to confirm this.",
@@ -702,7 +702,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "라이선서 앞 실시간 공정 시뮬레이션 시연 중 프로그램이 멈췄습니다. 다시 시작하는 동안 어제 돌린 결과를 보여 주고, 그래도 안 되면 회의 후 짧은 영상을 보내려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Hmm, the screen hasn't changed for a while.", ko: "음, 화면이 한동안 그대로네요." }],
     promptKo: "시뮬레이션이 멈춘 것 같습니다. 다시 시작하는 동안 어제 돌린 결과를 대신 보여 드릴게요. 그래도 안 되면 회의 후에 짧은 영상을 보내 드리겠습니다.",
-    segments: ["~인 것 같다", "시뮬레이션이 멈췄다", "~하는 동안", "제가 그것을 다시 시작하다", "제가 보여 드릴게요", "어제 돌린 결과를", "대신", "만약 그래도 안 되면", "제가 보내 드리겠습니다", "짧은 영상을", "회의 후에"],
+    segments: ["시뮬레이션이 멈춘 것 같아요", "다시 시작하는 동안", "대신 어제 돌린 결과를 보여 드릴게요", "그래도 안 되면", "회의 후에 짧은 영상을 보내 드릴게요"],
     reference: "It looks like the simulation has crashed. While I restart it, let me show you the results from yesterday's run instead. If it still doesn't work, I'll send you a short video after the meeting.",
     accepted: [
       "It looks like the simulation has crashed. While I'm restarting it, let me show you the results from yesterday's run instead. If it still doesn't work, I'll send you a short video after the meeting.",
@@ -749,7 +749,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "1단계 플랜트 설계 발표 중. Mr. Tan이 오늘 주제가 아닌 2단계 예산을 계속 묻습니다. 최신 숫자가 없어 틀린 정보를 주고 싶지 않고, 다음 주 원가팀과 별도 통화를 제안하려 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "I know it's not on the agenda, but can you give us a rough number for the Phase 2 budget?", ko: "안건에 없는 건 알지만, 2단계 예산을 대략이라도 알려 줄 수 있나요?" }],
     promptKo: "그게 왜 중요한지는 알지만, 지금 최신 숫자를 갖고 있지 않아서 틀린 수치를 드리고 싶지 않습니다. 다음 주에 저희 원가팀과 따로 통화를 잡아도 괜찮을까요? 그러면 정확한 숫자를 드릴 수 있습니다.",
-    segments: ["저는 이해합니다", "그게 왜 중요한지", "하지만", "저는 최신 숫자가 없어요", "지금", "그리고 저는 드리고 싶지 않아요", "틀린 수치를", "괜찮을까요?", "우리가 따로 통화를 잡다", "저희 원가팀과", "다음 주에", "그러면", "우리는 드릴 수 있다", "정확한 숫자를"],
+    segments: ["그게 왜 중요한지는 알지만", "지금 최신 숫자를 갖고 있지 않아요", "그래서 틀린 수치를 드리고 싶지 않아요", "다음 주에 저희 원가팀과 따로 통화를 잡아도 될까요?", "그러면 정확한 숫자를 드릴 수 있어요"],
     reference: "I understand why that's important, but I don't have the latest numbers with me, and I'd rather not give you the wrong figures. Would it be all right if we set up a separate call with our cost team next week? That way, we can give you accurate numbers.",
     accepted: [
       "I understand why that's important, but I don't have the latest numbers with me, and I'd rather not give you the wrong figures. Would it be okay if we set up a separate call with our cost team next week? That way, we can give you accurate numbers.",
@@ -796,7 +796,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "추천안 발표 후 질의응답. Mr. Tan이 더 싼 현지 업체 건조기를 쓰자고 합니다. 현지 건조기는 EFB로 시험된 적이 없어서, 목표 수분에 못 미치면 나중에 건조기를 하나 더 달아야 할 수도 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Why not use the dryer from the local vendor? It's much cheaper.", ko: "현지 업체 건조기를 쓰면 어때요? 훨씬 싸잖아요." }],
     promptKo: "좋은 질문이고, 현지 건조기가 사기에는 확실히 더 쌉니다. 하지만 아직 EFB로 시험된 적이 없어서, 목표 수분에 도달하지 못하면 나중에 건조기를 하나 더 추가해야 할 수도 있습니다. 결정하기 전에 현지 업체에 짧은 시험을 요청해 보면 어떨까요?",
-    segments: ["좋은 질문입니다,", "그리고 현지 건조기가", "확실히 더 싸다", "사기에는", "하지만", "그것은 아직 시험되지 않았다", "EFB로", "그래서 만약 그것이 도달하지 못하면", "목표 수분에", "우리는 추가해야 할 수도 있다", "두 번째 건조기를", "나중에", "~하면 어떨까요?", "현지 업체에 요청하다", "짧은 시험을", "우리가 결정하기 전에"],
+    segments: ["좋은 질문이고, 현지 건조기가 사기에는 확실히 더 싸요", "하지만 아직 EFB로 시험된 적이 없어요", "그래서 목표 수분에 도달하지 못하면", "나중에 건조기를 하나 더 추가해야 할 수도 있어요", "결정하기 전에 현지 업체에 짧은 시험을 요청하면 어떨까요?"],
     reference: "That's a fair question, and the local dryer is definitely cheaper to buy. However, it hasn't been tested with EFB yet, so if it doesn't reach the target moisture, we might have to add a second dryer later. Why don't we ask the local vendor for a short trial before we decide?",
     accepted: [
       "That's a fair question, and the local dryer is definitely cheaper to buy. However, it hasn't been tested with EFB yet, so if it doesn't reach the target moisture, we might have to add a second dryer later. Could we ask the local vendor for a short trial before we decide?",

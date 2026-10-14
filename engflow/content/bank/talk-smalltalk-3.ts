@@ -670,7 +670,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "런던에 사는 친구 엠마와 영상 통화를 합니다. 엠마가 이번 주에도 자전거를 탔는지 묻는데, 이번 주는 내내 비가 와서 한 번도 못 탔습니다.",
     dialogue: [{ speaker: "Emma", en: "So, have you been out on your bike this week?", ko: "그래서, 이번 주에 자전거 타러 나갔어?" }],
     promptKo: "아쉽게도 못 탔어. 이번 주 내내 비가 와서 자전거를 못 탔거든.",
-    segments: ["아쉽게도 아니야.", "비가 계속 오고 있어", "이번 주 내내,", "그래서", "나는 ~할 수 없었어", "자전거 타러 가는 걸"],
+    segments: ["아쉽게도 못 탔어.", "이번 주 내내 비가 왔어", "그래서 자전거를 못 탔어"],
     reference: "Unfortunately not. It's been raining all week, so I haven't been able to go cycling.",
     accepted: [
       "Unfortunately not. It's been raining all week, so I haven't had a chance to go cycling.",
@@ -897,7 +897,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "자카르타 출장에서 돌아온 다음 날, 화상회의에서 프리야 씨가 돌아오는 길은 어땠는지 묻습니다. 비행기가 세 시간 지연되어 새벽 2시에야 집에 도착했습니다.",
     dialogue: [{ speaker: "Priya", en: "Welcome back, Minsu! How was your trip back from Jakarta?", ko: "돌아온 걸 환영해요, 민수 씨! 자카르타에서 돌아오는 길은 어땠어요?" }],
     promptKo: "길었어요! 비행기가 세 시간 지연돼서 새벽 2시가 되어서야 집에 도착했어요.",
-    segments: ["길었어요!", "제 비행기가 지연됐어요", "세 시간만큼,", "그래서", "저는 집에 도착하지 못했어요", "새벽 2시까지는"],
+    segments: ["길었어요!", "비행기가 세 시간 지연됐어요", "그래서 새벽 2시에야 집에 도착했어요"],
     reference: "Long! My flight was delayed by three hours, so I didn't get home until two in the morning.",
     accepted: [
       "Long! My flight was delayed by three hours, so I didn't get home until 2 a.m.",
@@ -942,7 +942,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "서울 사무실을 찾은 부디 씨가 발리 여행에서 생긴 재미있는 일을 이야기하려고 합니다. 듣고 싶지만 5분 뒤에 프리야 씨와 통화가 잡혀 있습니다.",
     dialogue: [{ speaker: "Budi", en: "Wait, I haven't told you what happened in Bali yet! It's a long story…", ko: "잠깐, 발리에서 있었던 일 아직 얘기 안 했죠! 얘기가 좀 길어요…" }],
     promptKo: "정말 듣고 싶은데, 5분 뒤에 프리야 씨랑 통화가 있어요. 점심 먹으면서 얘기해 줄래요?",
-    segments: ["저는 정말 듣고 싶어요", "그 이야기를,", "하지만 저는 통화가 있어요", "프리야 씨와", "5분 후에.", "~하는 게 어때요", "저에게 이야기해 주다", "점심 먹으면서"],
+    segments: ["정말 듣고 싶은데", "5분 뒤에 프리야 씨랑 통화가 있어요.", "점심 먹으면서 얘기해 줄래요?"],
     reference: "I'd love to hear it, but I have a call with Priya in five minutes. Why don't you tell me over lunch?",
     accepted: [
       "I'd love to hear it, but I have a call with Priya in five minutes. Can you tell me over lunch?",
@@ -987,7 +987,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "서울 사무실 워크숍 쉬는 시간에 린 씨가 탕비실 커피를 마셔 보더니 원래 이렇게 맛이 없냐고 묻습니다. 건물 1층에 괜찮은 카페가 있습니다.",
     dialogue: [{ speaker: "Linh", en: "Is the coffee here always this bad, or is it just me?", ko: "여기 커피는 원래 이렇게 맛없어요, 아니면 저만 그런 거예요?" }],
     promptKo: "하하, 원래 그래요! 아래층에 괜찮은 카페가 있으니까 대신 거기 가는 게 어때요?",
-    segments: ["하하, 그건 항상 그래요!", "괜찮은 카페가 있어요", "아래층에,", "그러니", "~하는 게 어때요", "우리가 거기 가다", "대신"],
+    segments: ["하하, 원래 그래요!", "아래층에 괜찮은 카페가 있어요", "그러니 대신 거기 가는 게 어때요?"],
     reference: "Ha, it's always like that! There's a nice cafe downstairs, so why don't we go there instead?",
     accepted: [
       "Ha, it's always like that! There's a nice café downstairs, so why don't we go there instead?",
@@ -1079,7 +1079,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "인도 협력사의 프리야 씨가 화상회의 전에 아들이 올해 학교에 들어가지 않았냐며 안부를 묻습니다. 아들은 3월에 초등학교에 입학해 처음 2주 동안은 아침마다 울었지만, 지금은 학교를 정말 좋아합니다.",
     dialogue: [{ speaker: "Priya", en: "How's your son doing, Minsu? Didn't he start school this year?", ko: "민수 씨, 아들은 잘 지내요? 올해 학교 들어가지 않았어요?" }],
     promptKo: "네, 3월에 초등학교에 들어갔어요. 처음 2주 동안은 아침마다 울었는데, 지금은 학교를 정말 좋아해요. 선생님 말씀으로는 벌써 친구가 많대요.",
-    segments: ["네,", "그는 초등학교를 시작했어요", "3월에.", "그는 매일 아침 울었어요", "처음 2주 동안,", "하지만 지금은 정말 좋아해요.", "선생님이 저희에게 말했어요", "그가 벌써 가지고 있다고", "많은 친구를"],
+    segments: ["네, 3월에 초등학교에 들어갔어요.", "처음 2주 동안은 아침마다 울었는데", "지금은 정말 좋아해요.", "선생님 말씀으로는 벌써 친구가 많대요"],
     reference: "Yes, he started elementary school in March. He cried every morning for the first two weeks, but now he really loves it. His teacher told us he already has a lot of friends.",
     accepted: [
       "Yes, he started elementary school in March. He cried every morning for the first two weeks, but now he really loves it. His teacher told us that he already has lots of friends.",
@@ -1128,7 +1128,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "일주일 휴가를 다녀온 자카르타 팀의 사리 씨와 오랜만에 화상회의를 합니다. 부디 씨에게서 사리 씨가 홋카이도에 다녀왔다고 들었고, 당신도 늘 겨울에 홋카이도에 가 보고 싶었습니다.",
     dialogue: [{ speaker: "Sari", en: "Morning, Minsu! Sorry I've been so quiet. I only got back from my holiday yesterday.", ko: "좋은 아침이에요, 민수 씨! 그동안 연락이 뜸해서 미안해요. 어제 휴가에서 막 돌아왔어요." }],
     promptKo: "어서 와요! 부디 씨가 홋카이도에 갔다고 하던데요. 어땠어요? 저도 늘 겨울에 한번 가 보고 싶었거든요.",
-    segments: ["다시 온 걸 환영해요!", "부디 씨가 저에게 말했어요", "당신이 홋카이도에 갔다고.", "그것은 어땠어요?", "저는 늘 원해 왔어요", "그곳에 가는 것을", "겨울에"],
+    segments: ["어서 와요!", "부디 씨가 홋카이도에 갔다고 하던데요.", "어땠어요?", "저도 늘 겨울에 가 보고 싶었어요"],
     reference: "Welcome back! Budi told me you'd gone to Hokkaido. How was it? I've always wanted to go there in winter.",
     accepted: [
       "Welcome back! Budi told me you went to Hokkaido. How was it? I've always wanted to go there in winter.",
@@ -1174,7 +1174,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "서울 출장 마지막 날 저녁, 탄 씨가 귀국 전에 꼭 먹어 보고 싶다며 가장 좋아하는 한국 음식이 뭐냐고 묻습니다. 당신은 어릴 때 어머니가 자주 끓여 주신 김치찌개를 가장 좋아합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So, Minsu, what's your favorite Korean food? I want to try it before I fly home.", ko: "그래서 민수 씨, 가장 좋아하는 한국 음식이 뭐예요? 귀국하기 전에 먹어 보고 싶어요." }],
     promptKo: "어려운 질문이네요! 하나만 고르라면 김치찌개라고 할게요. 특별한 음식은 아니지만, 어렸을 때 어머니가 늘 끓여 주셨거든요. 그래서 먹을 때마다 집 생각이 나요.",
-    segments: ["어려운 질문이네요!", "만약 제가 하나만 골라야 한다면,", "저는 말할 거예요", "김치찌개라고.", "그건 특별한 게 아니지만,", "제 어머니가 만들어 주셨어요", "늘", "제가 어렸을 때.", "그걸 먹을 때마다,", "그것은 생각나게 해요", "집을"],
+    segments: ["어려운 질문이네요!", "하나만 고르라면 김치찌개라고 할게요.", "특별한 음식은 아니지만", "어렸을 때 엄마가 늘 끓여 주셨어요.", "먹을 때마다 집 생각이 나요"],
     reference: "That's a hard one! If I had to choose just one, I'd say kimchi stew. It's nothing fancy, but my mom made it for us all the time when I was a kid. Whenever I eat it, it reminds me of home.",
     accepted: [
       "That's a tough one! If I had to pick just one, I'd say kimchi stew. It's nothing fancy, but my mom used to make it for us all the time when I was a kid. Whenever I eat it, it reminds me of home.",
@@ -1224,7 +1224,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "다음 주 화요일 한국과 인도네시아의 축구 경기를 앞두고 부디 씨가 이번에는 인도네시아가 꼭 이긴다고 큰소리칩니다. 인도네시아가 요즘 잘하는 건 인정하지만, 한국이 최근 인도네시아와의 세 경기를 모두 이겼습니다. 웃으며 내기를 제안합니다.",
     dialogue: [{ speaker: "Budi", en: "Korea against Indonesia next Tuesday! I'm telling you, Indonesia is going to win this time.", ko: "다음 주 화요일에 한국 대 인도네시아 경기예요! 진짜로, 이번에는 인도네시아가 이길 거예요." }],
     promptKo: "글쎄요, 그건 장담 못 하죠! 인도네시아가 요즘 정말 잘하고 있긴 한데, 한국이 지난 세 경기를 다 이겼잖아요. 우리 가볍게 내기할까요? 지는 쪽이 팀 전체에 커피 사기로요.",
-    segments: ["글쎄요, 저라면 그렇게 확신하지 않겠어요!", "당신 팀이 정말 잘해 오고 있어요", "요즘,", "하지만 한국이 이겼어요", "지난 세 경기를", "인도네시아와의.", "~는 어때요", "가벼운 내기?", "지는 사람은 누구든", "커피를 사요", "팀 전체에게"],
+    segments: ["글쎄요, 그건 장담 못 하죠!", "인도네시아가 요즘 정말 잘하지만", "한국이 인도네시아에 지난 세 경기를 다 이겼어요.", "가볍게 내기할까요?", "지는 쪽이 팀 전체에 커피 사기로요"],
     reference: "Well, I wouldn't be so sure about that! Your team has been playing really well lately, but Korea has won the last three games against Indonesia. How about a friendly bet? Whoever loses buys coffee for the whole team.",
     accepted: [
       "Well, I wouldn't be so sure! Your team has been playing really well lately, but Korea has won the last three games against Indonesia. How about a friendly bet? The loser buys coffee for the whole team.",
@@ -1275,7 +1275,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "서울 출장 중인 다니엘 씨가 토요일에 차를 빌려 혼자 DMZ에 가 보겠다고 합니다. 대부분의 DMZ 견학지는 공식 투어로만 들어갈 수 있고 여권도 필요합니다. 서울에서 출발하는 투어 예약을 도와주겠다고 제안하고 싶습니다.",
     dialogue: [{ speaker: "Daniel", en: "I'm thinking of renting a car on Saturday and driving up to the DMZ by myself.", ko: "토요일에 차를 빌려서 혼자 DMZ까지 운전해서 가 볼까 해요." }],
     promptKo: "좋은 계획이긴 한데, 그냥 차를 몰고 들어가실 수는 없을 거예요. 대부분의 DMZ 견학지는 공식 투어에 참여해야 하고, 여권도 가져가셔야 해요. 괜찮으시면 서울에서 출발하는 투어 예약을 도와드릴게요.",
-    segments: ["좋은 계획 같아요,", "하지만 확실하지 않아요", "당신이 그냥 차로 들어갈 수 있는지.", "대부분의 DMZ 견학지는", "공식 투어에 참여해야 해요,", "그리고 여권을 가져가야 해요.", "원하시면,", "제가 도와드릴 수 있어요", "투어를 예약하는 것을", "서울에서 출발하는"],
+    segments: ["좋은 계획이지만", "그냥 차로 들어가실 수 있을지 모르겠어요.", "DMZ 견학지 대부분은 공식 투어로만 갈 수 있고", "여권도 가져가셔야 해요.", "괜찮으시면 투어 예약을 도와드릴게요", "서울에서 출발하는"],
     reference: "That sounds like a great plan, but I'm not sure you can just drive in. For most of the DMZ sites, you have to join an official tour, and you need to bring your passport. If you'd like, I can help you book a tour that leaves from Seoul.",
     accepted: [
       "That sounds like a great plan, but I don't think you can just drive in. For most of the DMZ sites, you have to join an official tour, and you need to bring your passport. If you'd like, I can help you book a tour that leaves from Seoul.",
@@ -1320,7 +1320,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "서울에 놀러 온 친구 제이크가 토요일에 북한산에 가자며 러닝화만 신고 가겠다고 합니다. 북한산은 바위가 많고 가파른 구간이 있어 매년 미끄러지는 사람이 있습니다. 금요일에 등산화를 사러 가거나, 원하면 더 쉬운 코스로 가자고 제안하고 싶습니다.",
     dialogue: [{ speaker: "Jake", en: "Let's climb Bukhansan on Saturday! I'll just wear my running shoes. It can't be that hard, right?", ko: "토요일에 북한산 가자! 그냥 러닝화 신고 갈게. 그렇게 힘들진 않겠지?" }],
     promptKo: "나도 정말 같이 가고 싶은데, 러닝화는 좀 아닌 것 같아. 몇몇 구간은 정말 가파르고 바위가 많아서 매년 미끄러지는 사람들이 있거든. 금요일에 제대로 된 등산화 사러 가는 거 어때? 아니면 네가 원하면 더 쉬운 코스로 가도 되고.",
-    segments: ["나도 정말 같이 가고 싶어,", "하지만 잘 모르겠어", "러닝화가 좋은 생각인지.", "몇몇 구간이", "정말 가파르고 바위가 많아,", "그리고 사람들이 미끄러져", "매년.", "~하는 게 어때", "쇼핑하러 가다", "제대로 된 등산화를 사러", "금요일에?", "아니면 우리는 갈 수도 있어", "더 쉬운 코스로", "네가 원하면"],
+    segments: ["나도 정말 같이 가고 싶은데", "러닝화는 좀 아닌 것 같아.", "몇몇 구간은 정말 가파르고 바위가 많아서", "매년 미끄러지는 사람이 있어.", "금요일에 제대로 된 등산화 사러 갈까?", "아니면 원하면 더 쉬운 코스로 가도 되고"],
     reference: "I'd love to go with you, but I'm not sure running shoes are a good idea. Some parts of the trail are really steep and rocky, and people slip there every year. Why don't we go shopping for proper hiking boots on Friday? Or we could take an easier trail if you'd prefer.",
     accepted: [
       "I'd love to go with you, but I don't think running shoes are a good idea. Some parts of the trail are really steep and rocky, and people slip there every year. Why don't we go shopping for proper hiking boots on Friday? Or we could take an easier trail if you'd prefer.",

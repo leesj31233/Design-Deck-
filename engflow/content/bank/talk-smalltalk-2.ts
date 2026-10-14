@@ -346,7 +346,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "설 연휴 직전 화상회의에서 부디 씨가 한국도 설날이 큰 명절인지 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "Happy Lunar New Year, Minsu! Is it a big holiday in Korea too?", ko: "새해 복 많이 받으세요, 민수 씨! 한국에서도 설날이 큰 명절이에요?" }],
     promptKo: "네, 가장 큰 명절 중 하나예요. 대부분 고향에 가서 길이 엄청 막혀요.",
-    segments: ["네,", "그것은 ~중 하나예요", "우리의 가장 큰 명절들", "대부분의 사람들은", "방문해요", "고향을", "그래서", "교통이 끔찍해요"],
+    segments: ["네, 가장 큰 명절 중 하나예요.", "대부분 고향에 가요", "그래서 길이 엄청 막혀요"],
     reference: "Yes, it's one of our biggest holidays. Most people visit their hometowns, so the traffic is terrible.",
     accepted: [
       "Yes, it's one of the biggest holidays in Korea. Most people visit their hometowns, so the traffic is terrible.",
@@ -425,7 +425,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "서울 출장을 온 다니엘 씨가 설계 검토가 끝난 뒤 주말에 어디를 가면 좋을지 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "I have a free weekend after the design review. Where should I go?", ko: "설계 검토 끝나고 주말이 비는데, 어디 가면 좋을까요?" }],
     promptKo: "바다를 좋아하시면 부산에 가 보세요. KTX로 두 시간 반밖에 안 걸려요.",
-    segments: ["만약 당신이 좋아한다면", "바다를", "당신은 가 봐야 해요", "부산에", "그것은 겨우 걸려요", "두 시간 반", "KTX로"],
+    segments: ["바다를 좋아하시면", "부산에 가 보세요.", "KTX로 두 시간 반밖에 안 걸려요"],
     reference: "If you like the sea, you should go to Busan. It only takes two and a half hours by KTX.",
     accepted: [
       "If you like the beach, you should go to Busan. It only takes two and a half hours by KTX.",
@@ -594,7 +594,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "화상회의를 마치며 인도네시아어로 '감사합니다'라고 인사하자 부디 씨가 놀라서 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "Wait, did you just say 'terima kasih'? Are you learning Indonesian?", ko: "잠깐만요, 방금 '뜨리마 까시'라고 했어요? 인도네시아어 배워요?" }],
     promptKo: "네, 석 달 정도 배우고 있어요. 다음에 자카르타에 가면 다들이랑 이야기를 좀 나눠 보고 싶어서요.",
-    segments: ["네,", "저는 배워 오고 있어요", "그것을", "약 석 달 동안", "저는 ~할 수 있으면 좋겠어요", "모두와 이야기하다", "제가 자카르타를 방문할 때"],
+    segments: ["네, 석 달 정도 배우고 있어요.", "다들이랑 얘기 좀 나눠 보고 싶어요", "자카르타에 가면"],
     reference: "Yes, I've been learning it for about three months. I'd like to be able to chat with everyone when I visit Jakarta.",
     accepted: [
       "Yes, I've been learning it for about three months. I want to be able to chat with everyone when I visit Jakarta.",
@@ -636,7 +636,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "인도 협력사의 프리야 씨가 이번 주 금요일을 끝으로 회사를 떠난다고 직접 알려 줍니다. 당신은 부디 씨에게서 미리 소식을 들었습니다.",
     dialogue: [{ speaker: "Priya", en: "Minsu, I wanted to tell you myself. Friday is my last day here.", ko: "민수 씨, 직접 말씀드리고 싶었어요. 금요일이 제 마지막 출근이에요." }],
     promptKo: "부디 씨가 떠나신다고 말해 줬는데, 믿고 싶지 않았어요! 정말 보고 싶을 거예요. 함께 일해서 정말 즐거웠어요.",
-    segments: ["부디 씨가 제게 말했어요", "당신이 떠난다고", "하지만 저는 믿고 싶지 않았어요!", "우리는 정말 그리워할 거예요", "당신을", "정말 즐거웠어요", "당신과 함께 일한 것이"],
+    segments: ["부디 씨가 떠나신다고 말해 줬는데", "믿고 싶지 않았어요!", "정말 보고 싶을 거예요.", "함께 일해서 정말 즐거웠어요"],
     reference: "Budi told me you were leaving, but I didn't want to believe it! We're really going to miss you. It's been a real pleasure working with you.",
     accepted: [
       "Budi told me that you were leaving, but I didn't want to believe it! We'll really miss you. It's been a real pleasure working with you.",
@@ -677,7 +677,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "출퇴근에 하루 두 시간이 걸린다고 하자 말레이시아 고객사의 탄 씨가 놀랍니다. 회사 근처 집값이 비싸서 이사하지 못하고 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Two hours a day on the subway? That's a lot!", ko: "하루에 지하철로 두 시간이요? 많이 걸리네요!" }],
     promptKo: "그러게요. (실제로는 아니지만) 회사 가까이 산다면 아이들과 시간을 훨씬 더 많이 보낼 텐데요. 그런데 회사 근처 집은 너무 비싸서 당분간은 지금 사는 곳에 있을 거예요.",
-    segments: ["그러게요.", "만약 제가 더 가까이 산다면", "회사에", "저는 가질 텐데요", "훨씬 더 많은 시간을", "아이들과", "하지만 집들은", "회사 근처의", "너무 비싸요", "그래서 우리는 머물 거예요", "지금 사는 곳에", "당분간은"],
+    segments: ["그러게요.", "회사 가까이 산다면", "아이들과 시간을 훨씬 더 보낼 텐데요.", "그런데 회사 근처 집은 너무 비싸요", "그래서 당분간은 지금 사는 곳에 있을 거예요"],
     reference: "I know. If I lived closer to the office, I'd have much more time with my kids. But houses near the office are too expensive, so we're staying where we are for now.",
     accepted: [
       "I know. If I lived closer to the office, I would have much more time with my kids. But houses near the office are too expensive, so we're staying where we are for now.",
@@ -720,7 +720,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "다니엘 씨가 한국 사람들은 야근을 많이 하고 휴가를 거의 안 간다고 들었다며 사실인지 묻습니다. 당신은 요즘은 많이 달라졌다고 생각합니다.",
     dialogue: [{ speaker: "Daniel", en: "I've heard that people in Korea work really long hours and hardly ever take holidays. Is that true?", ko: "한국 사람들은 일을 엄청 오래 하고 휴가는 거의 안 간다고 들었어요. 사실이에요?" }],
     promptKo: "글쎄요, 예전에는 그랬는데 지금은 많이 바뀌었어요. 요즘은 대부분의 회사가 야근에 훨씬 엄격하고, 젊은 사람들은 휴가도 더 길게 가요. 그래서 회사마다 다르다고 말하고 싶어요.",
-    segments: ["글쎄요,", "예전에는 그랬어요", "하지만 상황이 많이 바뀌었어요", "요즘은", "대부분의 회사가", "훨씬 더 엄격해요", "야근에 대해", "그리고 젊은 사람들은", "더 긴 휴가를 가요", "그래서 저는 말하고 싶어요", "그건 정말 회사에 달려 있다고"],
+    segments: ["글쎄요, 예전엔 그랬지만", "지금은 많이 바뀌었어요.", "요즘 대부분 회사는 야근에 훨씬 엄격하고", "젊은 사람들은 휴가도 더 길게 가요.", "그래서 회사마다 다르다고 말하고 싶어요"],
     reference: "Well, it used to be like that, but things have changed a lot. These days, most companies are much stricter about overtime, and younger people take longer holidays. So I'd say it really depends on the company.",
     accepted: [
       "Well, it used to be like that, but things have changed a lot. Nowadays, most companies are much stricter about overtime, and younger people take longer vacations. So I'd say it really depends on the company.",
@@ -760,7 +760,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "부디 씨가 1월 방학에 가족과 서울에 오고 싶다고 합니다. 1월의 서울은 영하 15도까지 내려가, 더운 나라에서 오는 가족에게는 힘들 수 있습니다.",
     dialogue: [{ speaker: "Budi", en: "My family wants to visit Seoul during the school holidays in January. Is that a good time?", ko: "가족들이 1월 방학에 서울에 가고 싶어 해요. 그때 가면 괜찮을까요?" }],
     promptKo: "글쎄요, 솔직히 1월은 가장 좋은 때가 아닐 수도 있어요. 자카르타보다 훨씬 춥고, 영하 15도까지 내려갈 수 있거든요. 대신 날씨가 훨씬 좋은 4월이나 10월에 오시는 걸 추천해요.",
-    segments: ["글쎄요, 솔직히 말하면", "1월은 ~아닐 수도 있어요", "가장 좋은 때가", "그것은 훨씬 더 추워요", "자카르타보다", "그리고 내려갈 수 있어요", "영하 15도까지", "저는 오시는 걸 추천해요", "4월이나 10월에", "대신", "날씨가 훨씬 좋을 때"],
+    segments: ["글쎄요, 솔직히 1월은 가장 좋은 때가 아닐 수도 있어요.", "자카르타보다 훨씬 춥고", "영하 15도까지 내려갈 수 있어요.", "대신 4월이나 10월에 오시는 걸 추천해요", "날씨가 훨씬 좋을 때요"],
     reference: "Well, to be honest, January might not be the best time. It's much colder than Jakarta, and it can go down to minus fifteen. I'd suggest coming in April or October instead, when the weather is much nicer.",
     accepted: [
       "Well, to be honest, January might not be the best time. It's much colder than Jakarta, and it can drop to minus fifteen. I'd suggest coming in April or October instead, when the weather is much nicer.",

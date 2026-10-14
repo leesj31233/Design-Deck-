@@ -309,7 +309,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "유럽 라이선서의 다니엘 씨가 당신 팀이 지난달 새 사무실로 이사했다는 이야기를 들었습니다.",
     dialogue: [{ speaker: "Daniel", en: "I heard your team moved last month. How do you like the new office?", ko: "팀이 지난달에 이사했다고 들었어요. 새 사무실은 어때요?" }],
     promptKo: "좋아요. 예전 사무실보다 훨씬 넓고, 집에서도 더 가까워요.",
-    segments: ["좋아요.", "그것은 훨씬 더 넓다", "예전 사무실보다", "그리고", "더 가깝다", "우리 집에"],
+    segments: ["좋아요.", "예전 사무실보다 훨씬 넓고", "집에서도 더 가까워요"],
     reference: "I like it. It's much bigger than the old one, and it's closer to my home.",
     accepted: [
       "I like it. It's much bigger than the old office, and it's closer to my home.",
@@ -392,7 +392,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "인도 협력사의 프리야 씨와 쉬는 시간에 이야기합니다. 그녀가 서울 출신인지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "So, are you from Seoul originally?", ko: "그럼 원래 서울 출신이세요?" }],
     promptKo: "아니요, 부산에서 태어났는데 서울에서 자랐어요.",
-    segments: ["아니요,", "저는 태어났다", "부산에서", "하지만", "저는 자랐다", "서울에서"],
+    segments: ["아니요, 부산에서 태어났지만", "서울에서 자랐어요"],
     reference: "No, I was born in Busan, but I grew up in Seoul.",
     accepted: [
       "Actually, I was born in Busan, but I grew up in Seoul.",
@@ -430,7 +430,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "당신에게 첫아이가 태어나자 하노이 팀이 아기 옷을 선물로 보냈습니다. 화상회의에서 린 씨를 만났습니다.",
     dialogue: [{ speaker: "Linh", en: "Hi Minsu! Did the package from our team arrive?", ko: "안녕하세요, 민수 씨! 저희 팀이 보낸 소포 도착했어요?" }],
     promptKo: "네, 어제 도착했어요. 보내 주신 아기 옷 정말 고마워요. 아내가 정말 좋아했어요.",
-    segments: ["네, 어제 도착했어요.", "정말 고마워요", "아기 옷에 대해", "(그것은) 당신이 보낸", "제 아내가", "정말 좋아했어요", "그것들을"],
+    segments: ["네, 어제 도착했어요.", "보내 주신 아기 옷 정말 고마워요.", "아내가 정말 좋아했어요"],
     reference: "Yes, it arrived yesterday. Thank you so much for the baby clothes that you sent. My wife really loved them.",
     accepted: [
       "Yes, it came yesterday. Thank you so much for the baby clothes you sent. My wife really loved them.",
@@ -517,7 +517,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "금요일 회의가 끝나갈 무렵, 다니엘 씨가 여름휴가 계획을 묻습니다. 당신은 프로젝트 때문에 길게 쉴 수 없습니다.",
     dialogue: [{ speaker: "Daniel", en: "Any plans for your summer holiday?", ko: "여름휴가 계획 있어요?" }],
     promptKo: "아직 없어요. (실제로는 시간이 없지만) 시간이 더 있다면 가족과 유럽 여행을 갈 텐데요. 올해는 아마 그냥 집에서 쉴 것 같아요.",
-    segments: ["아직 없어요.", "만약 제게 시간이 더 있다면", "저는 여행할 텐데요", "가족과 유럽으로", "하지만 올해는", "저는 아마 그냥 쉴 거예요", "집에서"],
+    segments: ["아직 없어요.", "시간이 더 있다면", "가족과 유럽 여행을 갈 텐데요.", "그런데 올해는 아마 그냥 집에서 쉴 것 같아요"],
     reference: "Not yet. If I had more time, I would travel to Europe with my family. But this year, I'll probably just stay home and rest.",
     accepted: [
       "Not yet. If I had more time, I'd go to Europe with my family. But this year, I'll probably just stay home and rest.",
@@ -561,7 +561,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "자카르타 출장 중, 사리 씨가 퇴근 후 팀 노래방 모임에 초대합니다. 당신은 오늘 밤 서울 본사와 화상회의가 있습니다.",
     dialogue: [{ speaker: "Sari", en: "Minsu, some of us are going to karaoke after work tonight. You should come!", ko: "민수 씨, 오늘 퇴근 후에 몇 명이 노래방에 가요. 같이 가요!" }],
     promptKo: "초대해 줘서 고마워요. 정말 가고 싶은데, 아쉽게도 오늘 밤은 서울 본사와 화상회의가 있어서 못 가요. 혹시 다음 주 금요일에 하는 건 어때요?",
-    segments: ["고마워요", "저를 초대해 준 것", "정말 가고 싶지만", "아쉽게도 저는 못 가요", "오늘 밤은", "왜냐하면 화상회의가 있어서", "서울 본사와", "혹시 가능할까요", "다음 주 금요일에 하는 것이"],
+    segments: ["초대해 줘서 고마워요.", "정말 가고 싶지만", "아쉽게도 오늘 밤은 못 가요", "서울 본사와 화상회의가 있어서요.", "대신 다음 주 금요일에 하는 건 어때요?"],
     reference: "Thanks for inviting me. I'd love to come, but I'm afraid I can't tonight because I have a video call with the Seoul office. Would it be possible to do it next Friday instead?",
     accepted: [
       "Thank you for inviting me. I'd really love to come, but I'm afraid I can't make it tonight because I have a video call with the head office in Seoul. Would it be possible to go next Friday instead?",

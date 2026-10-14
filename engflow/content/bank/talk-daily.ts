@@ -719,7 +719,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장지 동네 식당에서 팟타이를 주문했습니다. 땅콩 알레르기가 있어서 땅콩을 빼 달라고 부탁해야 합니다.",
     dialogue: [{ speaker: "Server", en: "One pad thai. Anything else I should know?", ko: "팟타이 하나요. 더 알아 둬야 할 게 있을까요?" }],
     promptKo: "제가 땅콩 알레르기가 있어서요. 땅콩 빼고 만들어 주실 수 있어요?",
-    segments: ["저는 알레르기가 있어요", "땅콩에,", "그래서", "~해 주실 수 있어요", "그것을 만들다", "땅콩 없이"],
+    segments: ["저는 땅콩 알레르기가 있어요", "그래서 땅콩 없이 만들어 주실 수 있어요?"],
     reference: "I'm allergic to peanuts, so could you make it without peanuts?",
     accepted: [
       "I'm allergic to peanuts, so could you make it without them?",
@@ -764,7 +764,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장 마지막 날 아침, 호텔 프런트에 들렀습니다. 비행기가 밤 10시라 체크아웃을 조금 늦게 할 수 있는지 부탁하려 합니다.",
     dialogue: [{ speaker: "Hotel clerk", en: "Good morning! Is there anything I can help you with?", ko: "좋은 아침입니다! 도와드릴 일이 있을까요?" }],
     promptKo: "네. 제 비행기가 밤 10시라서요, 체크아웃을 좀 늦게 해도 될까요?",
-    segments: ["네.", "제 비행기가", "밤 10시예요,", "그래서", "제가 ~해도 될까요", "체크아웃하다", "조금 더 늦게"],
+    segments: ["네. 제 비행기가 밤 10시예요", "그래서 조금 늦게 체크아웃해도 될까요?"],
     reference: "Yes. My flight is at ten tonight, so could I check out a bit later?",
     accepted: [
       "Yes. My flight is at 10 p.m., so could I check out a bit later?",
@@ -808,7 +808,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "주말에 혼자 과학 박물관에 가려고 걷는데, 지도 앱이 이상해서 길을 잃었습니다. 지나가던 사람이 먼저 말을 겁니다.",
     dialogue: [{ speaker: "Passer-by", en: "Are you okay? You look a little lost.", ko: "괜찮으세요? 길을 잃으신 것 같은데요." }],
     promptKo: "네, 과학 박물관을 찾고 있는데 길을 잃은 것 같아요.",
-    segments: ["네,", "저는 찾고 있어요", "과학 박물관을,", "하지만", "제 생각에", "저는 길을 잃었어요"],
+    segments: ["네, 과학 박물관을 찾고 있어요", "그런데 길을 잃은 것 같아요"],
     reference: "Yes, I'm looking for the Science Museum, but I think I'm lost.",
     accepted: [
       "Yes, I'm trying to find the Science Museum, but I think I'm lost.",
@@ -853,7 +853,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "석 달짜리 프로젝트 때문에 현지 아파트에서 살게 되었습니다. 엘리베이터에서 옆집 이웃이 말을 겁니다.",
     dialogue: [{ speaker: "Neighbour", en: "Hi! I don't think we've met. Are you new here?", ko: "안녕하세요! 처음 뵙는 것 같은데, 새로 오셨어요?" }],
     promptKo: "네, 지난주에 막 이사 왔어요. 그래서 아직 이 동네를 잘 몰라요.",
-    segments: ["네,", "저는 막 이사 왔어요", "지난주에,", "그래서", "저는 아직 잘 몰라요", "이 동네를"],
+    segments: ["네, 지난주에 막 이사 왔어요", "그래서 아직 이 동네를 잘 몰라요"],
     reference: "Yes, I just moved here last week, so I don't know the area very well yet.",
     accepted: [
       "Yes, I moved here last week, so I don't know the area very well yet.",
@@ -948,7 +948,7 @@ export const TALK_DAILY: Question[] = [
       { speaker: "Server", en: "Is everything okay here?", ko: "별일 없으시죠?" },
     ],
     promptKo: "사실 40분 전에 주문했는데 음식이 아직 안 나왔어요.",
-    segments: ["사실,", "우리는 주문했어요", "40분 전에,", "하지만", "우리 음식이", "아직 안 나왔어요"],
+    segments: ["사실 40분 전에 주문했어요", "그런데 음식이 아직 안 나왔어요"],
     reference: "Actually, we ordered forty minutes ago, but our food hasn't come yet.",
     accepted: [
       "Actually, we ordered forty minutes ago, but our food still isn't here.",
@@ -995,7 +995,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "현지에 사는 친구 제이크와 저녁을 먹기로 했습니다. 차량 호출 앱으로 차를 불렀는데 기사님이 아직 오지 않아, 제이크의 메시지에 답장합니다.",
     dialogue: [{ speaker: "Jake", en: "Hey, I'm at the restaurant. Are you on your way?", ko: "나 식당에 도착했어. 오고 있어?" }],
     promptKo: "아직. 차를 불렀는데 기사님이 아직 안 왔어. 10분 정도 늦을 수도 있어.",
-    segments: ["아직.", "나는 차를 불렀어,", "하지만", "기사님이", "아직 도착하지 않았어.", "나는 ~일 수도 있어", "약 10분", "늦은"],
+    segments: ["아직.", "차를 불렀는데", "기사님이 아직 안 왔어.", "10분 정도 늦을 수도 있어"],
     reference: "Not yet. I've booked a car, but the driver hasn't arrived yet. I might be about ten minutes late.",
     accepted: [
       "Not yet. I booked a car, but the driver hasn't arrived yet. I might be about ten minutes late.",
@@ -1274,7 +1274,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "어제 산 운동화를 신어 보니 작습니다. 영수증을 가지고 가게에 다시 와서 큰 사이즈로 바꿔 달라고 합니다.",
     dialogue: [{ speaker: "Shop assistant", en: "Hi! How can I help you?", ko: "안녕하세요! 무엇을 도와드릴까요?" }],
     promptKo: "어제 여기서 이 신발을 샀는데 조금 작아요. 한 사이즈 큰 걸로 교환할 수 있을까요?",
-    segments: ["저는 이 신발을 샀어요", "여기서 어제,", "하지만", "그것들은 조금 너무 작아요.", "~할 수 있을까요", "제가 그것들을 교환하다", "더 큰 사이즈로"],
+    segments: ["어제 여기서 이 신발을 샀어요", "그런데 조금 작아요.", "한 사이즈 큰 걸로 교환할 수 있을까요?"],
     reference: "I bought these shoes here yesterday, but they're a bit too small. Could I exchange them for a bigger size?",
     accepted: [
       "I bought these shoes here yesterday, but they're a little too small. Could I exchange them for a bigger size?",
@@ -1323,7 +1323,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장 중 묵는 호텔에서 자정이 넘었는데 옆방이 계속 시끄러워 잠을 잘 수 없습니다. 프런트에 전화했습니다.",
     dialogue: [{ speaker: "Front desk", en: "Front desk, this is Anna. How can I help you?", ko: "프런트, 안나입니다. 무엇을 도와드릴까요?" }],
     promptKo: "옆방 사람들이 자정부터 계속 너무 시끄러워서 잠을 못 자겠어요. 조용히 좀 해 달라고 말씀해 주시겠어요?",
-    segments: ["옆방 사람들이", "계속 정말 시끄러웠어요", "자정부터,", "그리고", "저는 잠을 잘 수 없어요.", "~해 주시겠어요", "그들에게 부탁하다", "소리를 줄이라고"],
+    segments: ["옆방 사람들이 자정부터 계속 정말 시끄러워요", "그래서 잠을 못 자겠어요.", "조용히 해 달라고 말해 주시겠어요?"],
     reference: "The people next door have been really loud since midnight, and I can't sleep. Could you ask them to keep it down?",
     accepted: [
       "The people next door have been really noisy since midnight, and I can't sleep. Could you ask them to keep it down?",
@@ -1371,7 +1371,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "싱가포르를 거쳐 자카르타로 가는 길입니다. 첫 비행기가 두 시간 늦게 도착해서 자카르타행 환승편을 놓치게 생겼습니다. 환승 데스크 직원에게 말합니다.",
     dialogue: [{ speaker: "Transfer desk agent", en: "Good evening. How can I help you?", ko: "안녕하세요. 무엇을 도와드릴까요?" }],
     promptKo: "제 비행기가 두 시간 늦게 도착해서, 자카르타행 환승편을 놓칠 것 같아요. 다음 비행기로 다시 예약해 주실 수 있나요?",
-    segments: ["제 비행기가", "두 시간 늦게 도착했어요,", "그래서", "저는 놓칠 거예요", "환승편을", "자카르타행.", "~해 주실 수 있나요", "저를 다시 예약하다", "다음 비행기로"],
+    segments: ["제 비행기가 두 시간 늦게 도착했어요", "그래서 자카르타행 환승편을 놓칠 거예요.", "다음 비행기로 다시 예약해 주실 수 있나요?"],
     reference: "My flight arrived two hours late, so I'm going to miss my connection to Jakarta. Could you rebook me on the next flight?",
     accepted: [
       "My flight arrived two hours late, so I'm going to miss my connecting flight to Jakarta. Could you rebook me on the next flight?",
@@ -1419,7 +1419,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장 중 묵고 있는 호텔 앞에서, 관광객이 기차역까지 걸어갈 수 있는지 묻습니다. 당신은 이 동네를 어느 정도 압니다.",
     dialogue: [{ speaker: "Tourist", en: "Excuse me, can I walk to the train station from here?", ko: "실례지만, 여기서 기차역까지 걸어갈 수 있나요?" }],
     promptKo: "갈 수는 있는데 걸어서 30분 정도 걸려요. 저라면 12번 버스를 타겠어요. 길 바로 건너편에 서요.",
-    segments: ["갈 수는 있어요,", "하지만", "약 30분 걷는 거리예요.", "저라면", "타겠어요", "12번 버스를.", "그것은 서요", "길 바로 건너편에"],
+    segments: ["갈 수는 있는데", "걸어서 30분 정도 걸려요.", "저라면 12번 버스를 타겠어요.", "길 바로 건너편에 서요"],
     reference: "You can, but it's about a thirty-minute walk. I'd take the number 12 bus. It stops right across the street.",
     accepted: [
       "You can, but it's about a 30-minute walk. I'd take the number 12 bus. It stops right across the street.",
@@ -1467,7 +1467,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장 사흘째, 감기가 심해져 같은 약국에 다시 왔습니다. 약사에게 증상과 이미 먹은 약을 설명하고 더 센 약이 있는지 묻습니다.",
     dialogue: [{ speaker: "Pharmacist", en: "Hi again. How are you feeling?", ko: "또 오셨네요. 몸은 좀 어떠세요?" }],
     promptKo: "솔직히 더 안 좋아졌어요. 일요일부터 목이 아팠는데, 오늘 아침에는 기침도 나기 시작했어요. 어젯밤에 감기약을 먹었는데 별로 효과가 없었어요. 더 센 약이 있을까요?",
-    segments: ["솔직히,", "더 나빠졌어요.", "저는 목이 아팠어요", "일요일부터,", "그리고 오늘 아침에", "기침하기 시작했어요.", "저는 감기약을 먹었어요", "어젯밤에,", "하지만 별로 도움이 되지 않았어요.", "있나요", "더 센 무언가가", "제가 먹을 수 있는?"],
+    segments: ["솔직히 더 나빠졌어요.", "일요일부터 목이 아팠고", "오늘 아침엔 기침도 시작됐어요.", "어젯밤에 감기약을 먹었는데", "별로 효과가 없었어요.", "제가 먹을 수 있는 더 센 약이 있을까요?"],
     reference: "Honestly, it's gotten worse. I've had a sore throat since Sunday, and this morning I started coughing. I took some cold medicine last night, but it didn't help much. Is there anything stronger I can take?",
     accepted: [
       "Honestly, it's gotten worse. I've had a sore throat since Sunday, and this morning I started coughing. I took some cold medicine last night, but it didn't really help. Is there anything stronger I can take?",
@@ -1517,7 +1517,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "택시를 타고 호텔에 도착해 체크인하려는데 지갑이 없습니다. 택시에 두고 내린 것 같습니다. 다행히 요금은 카드로 내서 영수증이 있습니다.",
     dialogue: [{ speaker: "Hotel clerk", en: "Is something wrong, sir?", ko: "무슨 문제 있으세요?" }],
     promptKo: "저를 여기까지 태워 준 택시에 지갑을 두고 내린 것 같아요. 카드로 결제해서 영수증에 차량 번호가 있을 거예요. 택시 회사에 연락하는 것 좀 도와주실 수 있나요?",
-    segments: ["제 생각에", "저는 지갑을 두고 내렸어요", "택시에", "(그것은) 저를 여기 데려다준.", "저는 카드로 결제했어요,", "그래서", "영수증에", "차량 번호가 있을 거예요.", "~해 주실 수 있나요", "제가 연락하는 것을 돕다", "택시 회사에"],
+    segments: ["지갑을 두고 내린 것 같아요", "저를 여기 태워 준 택시에.", "카드로 결제했으니", "영수증에 차량 번호가 있을 거예요.", "택시 회사에 연락하는 것 좀 도와주실 수 있나요?"],
     reference: "I think I left my wallet in the taxi that brought me here. I paid by card, so the receipt should have the car number on it. Could you help me contact the taxi company?",
     accepted: [
       "I think I left my wallet in the taxi that brought me here. I paid by card, so the receipt should have the taxi number on it. Could you help me contact the taxi company?",
@@ -1569,7 +1569,7 @@ export const TALK_DAILY: Question[] = [
       { speaker: "Daniel", en: "Hmm, four beers? I'm pretty sure we only had two.", ko: "음, 맥주가 네 병이요? 분명 두 병만 마셨는데요." },
     ],
     promptKo: "죄송한데, 계산서가 잘못된 것 같아요. 맥주는 두 병만 마셨는데 네 병 값이 청구됐어요. 그리고 디저트는 주문하지 않았어요. 다시 확인해 주실 수 있나요?",
-    segments: ["죄송한데,", "제 생각에", "실수가 있을 수도 있어요", "계산서에.", "우리는 맥주를 두 병만 마셨어요,", "하지만", "네 병 값이 청구됐어요.", "그리고", "우리는 디저트를 주문하지 않았어요.", "~해 주실 수 있나요", "다시 확인하다"],
+    segments: ["죄송한데, 계산서가 잘못된 것 같아요.", "맥주는 두 병만 마셨는데", "네 병 값이 청구됐어요.", "그리고 디저트는 주문 안 했어요.", "다시 확인해 주실 수 있나요?"],
     reference: "Sorry, I think there might be a mistake on the bill. We only had two beers, but we've been charged for four. And we didn't order any dessert. Could you check it again?",
     accepted: [
       "Sorry, I think there's a mistake on the bill. We only had two beers, but we've been charged for four. And we didn't order any dessert. Could you check it again?",
@@ -1615,7 +1615,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장 마지막 주말, 현지에서 일하는 친구 에마와 내일(월요일) 국립박물관에 가기로 했습니다. 그런데 호텔 프런트 직원이 박물관은 월요일에 문을 닫는다고 알려 주었습니다. 두 사람은 화요일 오후에 기차로 다른 도시에 갑니다.",
     dialogue: [{ speaker: "Emma", en: "So, are we still going to the National Museum tomorrow?", ko: "그럼 내일 국립박물관 가는 거 맞지?" }],
     promptKo: "프런트 직원이 그러는데 박물관이 월요일에는 문을 닫는대. 대신 화요일 아침에 가면 오후 기차 타기 전에 볼 수 있을 거야.",
-    segments: ["프런트 직원이", "말했어", "박물관이", "월요일에는 문을 닫는다고.", "만약", "우리가 화요일 아침에 가면", "대신,", "우리는 볼 수 있어", "~하기 전에", "우리 기차", "오후에"],
+    segments: ["프런트 직원이 그러는데", "박물관이 월요일엔 문을 닫는대.", "대신 화요일 아침에 가면", "오후 기차 타기 전에 볼 수 있어"],
     reference: "The receptionist said the museum is closed on Mondays. If we go on Tuesday morning instead, we can see it before our train in the afternoon.",
     accepted: [
       "The receptionist said that the museum is closed on Mondays. If we go on Tuesday morning instead, we can see it before our train in the afternoon.",
@@ -1665,7 +1665,7 @@ export const TALK_DAILY: Question[] = [
       { speaker: "Airline agent", en: "I can move you to the Thursday evening flight. There's no change fee for that one.", ko: "목요일 저녁 비행기로 옮겨 드릴 수 있어요. 그 편은 변경 수수료가 없습니다." },
     ],
     promptKo: "죄송하지만 그건 안 될 것 같아요. 고객과의 회의가 금요일 오후로 옮겨져서 그 뒤에 떠나야 하거든요. 대신 토요일 비행기로 바꿔 주실 수 있을까요? 요금 차액은 제가 내도 괜찮아요.",
-    segments: ["죄송하지만", "그건 저에게 안 될 것 같아요.", "고객과의 회의가", "옮겨졌어요", "금요일 오후로,", "그래서", "저는 떠나야 해요", "그 뒤에.", "~하는 것이 가능할까요", "저를 토요일 비행기에 넣다", "대신?", "저는 괜찮아요", "요금 차액을 내는 것은"],
+    segments: ["죄송하지만 그건 저한테 안 될 것 같아요.", "고객 회의가 금요일 오후로 옮겨져서", "그 뒤에 떠나야 해요.", "대신 토요일 비행기로 바꿔 주실 수 있을까요?", "요금 차액은 제가 내도 괜찮아요"],
     reference: "I'm afraid that won't work for me. Our meeting with the client has been moved to Friday afternoon, so I need to leave after that. Would it be possible to put me on a Saturday flight instead? I don't mind paying the fare difference.",
     accepted: [
       "I'm afraid that won't work for me. Our meeting with the client has been moved to Friday afternoon, so I need to leave after that. Would it be possible to put me on a Saturday flight instead? I'm happy to pay the fare difference.",
@@ -1714,7 +1714,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "늦은 밤 호텔에 체크인하는데, 금연실을 예약했는데도 흡연실밖에 없다고 합니다. 예약 확인 메일이 있고, 당신은 담배 냄새에 민감합니다.",
     dialogue: [{ speaker: "Hotel clerk", en: "I'm sorry, but we only have a smoking room left tonight.", ko: "죄송하지만 오늘 밤은 흡연실밖에 남지 않았어요." }],
     promptKo: "사정은 이해하지만, 저는 금연실로 예약했고 확인 메일도 있어요. 담배 냄새에 꽤 민감해서 흡연실은 정말 곤란해요. 근처 다른 호텔에 금연실이 있는지 확인해 주실 수 있을까요?",
-    segments: ["이해해요,", "하지만", "저는 금연실을 예약했어요,", "그리고 확인 메일이 있어요.", "저는 꽤 민감해요", "담배 연기에,", "그래서", "흡연실은 정말 안 될 것 같아요.", "~해 주실 수 있을까요", "확인하다", "~인지", "근처 다른 호텔에", "금연실이 있는지"],
+    segments: ["이해하지만 저는 금연실을 예약했고", "확인 메일도 있어요.", "담배 연기에 꽤 민감해서", "흡연실은 정말 안 될 것 같아요.", "확인해 주실 수 있을까요?", "근처 다른 호텔에 금연실이 있는지"],
     reference: "I understand, but I booked a non-smoking room, and I have the confirmation email. I'm quite sensitive to smoke, so I'm afraid a smoking room really won't work for me. Could you check if another hotel nearby has a non-smoking room?",
     accepted: [
       "I understand, but I booked a non-smoking room, and I have the confirmation email. I'm quite sensitive to smoke, so I'm afraid a smoking room really won't work for me. Could you check if there's a non-smoking room at another hotel nearby?",
@@ -1763,7 +1763,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장 마지막 날, 어제 산 가방에 흠이 있어 환불하러 왔는데 점원이 현금 환불은 안 되고 매장 적립금만 줄 수 있다고 합니다. 당신은 내일 출국합니다.",
     dialogue: [{ speaker: "Shop assistant", en: "Sorry, we don't give refunds. We can only give you store credit.", ko: "죄송하지만 환불은 안 돼요. 매장 적립금으로만 드릴 수 있어요." }],
     promptKo: "그게 규정인 건 이해하지만, 제가 내일 출국해서 적립금은 쓸 수가 없어요. 대신 제 카드로 환불해 주실 수는 없을까요? 그게 안 되면 오늘 다른 물건으로라도 교환할 수 있을까요?",
-    segments: ["이해해요", "그게 규정이라는 걸,", "하지만", "저는 출국해요", "내일,", "그래서", "저는 적립금을 쓸 수 없을 거예요.", "~하는 것이 가능할까요", "그것을 환불하다", "제 카드로", "대신?", "그게 안 되면,", "제가 교환할 수 있을까요", "그것을 다른 것으로", "오늘?"],
+    segments: ["규정인 건 이해하지만", "제가 내일 출국해서", "적립금은 쓸 수가 없어요.", "대신 제 카드로 환불해 주실 수 있을까요?", "안 되면 오늘 다른 물건으로 교환할 수 있을까요?"],
     reference: "I understand that's your policy, but I'm leaving the country tomorrow, so I won't be able to use store credit. Would it be possible to refund it to my card instead? If not, could I exchange it for something else today?",
     accepted: [
       "I understand that's your policy, but I'm leaving the country tomorrow, so I won't be able to use store credit. Would it be possible to put the refund on my card instead? If not, could I exchange it for something else today?",
@@ -1809,7 +1809,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장 중 고열이 사흘째 계속되어 현지 병원에 전화했더니, 가장 빠른 예약이 다음 주 목요일이라고 합니다. 당신은 토요일에 귀국합니다.",
     dialogue: [{ speaker: "Clinic receptionist", en: "I'm sorry, but our earliest appointment is next Thursday.", ko: "죄송하지만 가장 빠른 예약이 다음 주 목요일이에요." }],
     promptKo: "예약이 다 찬 건 이해하지만, 사흘째 고열이 나고 점점 심해지고 있어요. 토요일에 귀국해서 목요일까지 기다릴 수가 없어요. 혹시 오늘 진료받을 방법이 있을까요? 안 되면 예약 없이 갈 수 있는 병원을 추천해 주시겠어요?",
-    segments: ["이해해요", "예약이 다 찼다는 걸,", "하지만", "저는 고열이 있어 왔어요", "사흘 동안,", "그리고 점점 심해지고 있어요.", "저는 귀국해요", "토요일에,", "그래서", "저는 기다릴 수 없어요", "목요일까지.", "혹시 가능성이 있을까요", "의사가 저를 보다", "오늘?", "아니면,", "추천해 주실 수 있나요", "병원을", "(그곳은) 예약 없이 받는"],
+    segments: ["예약이 다 찬 건 이해하지만", "사흘째 고열이 나고 점점 심해지고 있어요.", "토요일에 귀국해서 목요일까지 못 기다려요.", "혹시 오늘 진료받을 방법이 있을까요?", "안 되면 예약 없이 가는 병원을 추천해 주시겠어요?"],
     reference: "I understand you're fully booked, but I've had a high fever for three days, and it's getting worse. I'm flying home on Saturday, so I can't wait until Thursday. Is there any chance a doctor could see me today? Otherwise, could you recommend a clinic that takes walk-ins?",
     accepted: [
       "I understand you're fully booked, but I've had a high fever for three days, and it's getting worse. I'm flying home on Saturday, so I can't wait until Thursday. Is there any chance the doctor could see me today? Otherwise, could you recommend a clinic that takes walk-ins?",

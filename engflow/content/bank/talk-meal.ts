@@ -284,7 +284,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "베트남 협력사의 린 씨가 매운 음식을 잘 못 먹는다며 메뉴 추천을 부탁합니다.",
     dialogue: [{ speaker: "Linh", en: "Everything looks good, but I'm not good with spicy food. Any suggestions?", ko: "다 맛있어 보이는데, 제가 매운 걸 잘 못 먹어요. 추천해 줄 만한 거 있어요?" }],
     promptKo: "그럼 불고기를 추천해요. 전혀 맵지 않거든요.",
-    segments: ["그럼", "저는 추천해요", "불고기를", "왜냐하면", "그것은 전혀 맵지 않다"],
+    segments: ["그럼 불고기를 추천해요", "전혀 맵지 않거든요"],
     reference: "Then I'd recommend the bulgogi because it isn't spicy at all.",
     accepted: [
       "Then I recommend the bulgogi because it's not spicy at all.",
@@ -326,7 +326,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "서울에서 다니엘 씨와 저녁 식사 중, 그가 맥주를 한 잔 더 따라 주려고 합니다. 당신은 오늘 차를 가져왔습니다.",
     dialogue: [{ speaker: "Daniel", en: "This beer is great. Let me pour you another glass!", ko: "이 맥주 정말 맛있네요. 한 잔 더 따라 드릴게요!" }],
     promptKo: "고맙지만 괜찮아요. 오늘 밤 제가 운전해야 해서 더는 못 마셔요.",
-    segments: ["고맙지만 괜찮아요.", "저는 더는 못 마셔요", "왜냐하면", "제가 운전하거든요", "오늘 밤"],
+    segments: ["고맙지만 괜찮아요.", "더는 못 마셔요", "오늘 밤 제가 운전해야 해서요"],
     reference: "Thanks, but I'm okay. I can't drink any more because I'm driving tonight.",
     accepted: [
       "Thank you, but I'm fine. I can't drink any more because I'm driving tonight.",
@@ -368,7 +368,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "회식 전에 다니엘 씨가 한국 술자리에서 알아 두면 좋은 예절을 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "Is there anything I should know before the team dinner tonight?", ko: "오늘 밤 회식 전에 알아 둬야 할 게 있을까요?" }],
     promptKo: "네. 나이가 많은 분이 술을 따라 줄 때는 두 손으로 잔을 들어야 해요.",
-    segments: ["네.", "~할 때", "나이가 많은 분이", "따라 주다", "당신에게 술을", "당신은 ~해야 한다", "잔을 들다", "두 손으로"],
+    segments: ["네. 윗사람이 술을 따라 줄 때는", "잔을 두 손으로 들어야 해요"],
     reference: "Yes. When an older person pours you a drink, you should hold your glass with both hands.",
     accepted: [
       "Yes. When an older person pours you a drink, you should hold the glass with both hands.",
@@ -496,7 +496,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "인도네시아 팀이 서울을 방문한 첫날 환영 만찬입니다. 부디 씨가 당신에게 건배사를 부탁합니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu, you're the host tonight. Can you say a few words?", ko: "민수 씨, 오늘 호스트잖아요. 한마디 해 줄래요?" }],
     promptKo: "멀리 한국까지 와 주셔서 감사합니다. 우리 프로젝트의 성공을 위해 건배합시다!",
-    segments: ["감사합니다", "와 준 것에 대해", "먼 길을", "한국까지", "건배합시다", "성공을 위해", "우리 프로젝트의"],
+    segments: ["멀리 한국까지 와 주셔서 모두 감사합니다.", "건배합시다", "우리 프로젝트의 성공을 위해!"],
     reference: "Thank you all for coming all the way to Korea. Let's have a toast to the success of our project!",
     accepted: [
       "Thank you for coming all the way to Korea. Let's make a toast to the success of our project!",
@@ -538,7 +538,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "무더운 여름날 점심, 다니엘 씨가 비빔밥과 냉면 사이에서 고르지 못하고 있습니다.",
     dialogue: [{ speaker: "Daniel", en: "I can't decide between the bibimbap and the cold noodles.", ko: "비빔밥이랑 냉면 중에 못 고르겠어요." }],
     promptKo: "둘 다 맛있어요. 그런데 제가 다니엘 씨라면 냉면을 먹어 볼 거예요. 오늘 정말 덥잖아요. 냉면은 이런 날씨에 딱이에요.",
-    segments: ["둘 다 맛있어요,", "하지만", "제가 당신이라면", "저는 먹어 볼 거예요", "냉면을", "오늘 정말 덥다", "그리고 그것은 딱이다", "이런 날씨에"],
+    segments: ["둘 다 맛있지만", "제가 다니엘 씨라면", "냉면을 먹어 볼 거예요.", "오늘 정말 덥잖아요", "냉면은 이런 날씨에 딱이에요"],
     reference: "Both are good, but if I were you, I'd try the cold noodles. It's really hot today, and they're perfect for this kind of weather.",
     accepted: [
       "Both are good, but if I were you, I would try the cold noodles. It's really hot today, and they're perfect for this weather.",
@@ -581,7 +581,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "쿠알라룸푸르 출장 마지막 날 저녁, 식사가 끝나자 탄 씨가 계산하려고 합니다. 어제 점심도 탄 씨가 냈습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Please, put your wallet away. Dinner is on us tonight.", ko: "지갑 넣으세요. 오늘 저녁은 저희가 살게요." }],
     promptKo: "정말 감사하지만, 어제 점심도 사 주셨잖아요. 오늘 저녁은 제가 낼게요. 다음에 서울에 오시면 그때 사 주세요.",
-    segments: ["정말 친절하시지만,", "당신은 이미 냈어요", "점심값을", "어제", "오늘 저녁은 제가 낼게요", "그리고 당신이 사 주세요", "다음에", "당신이 서울에 올 때"],
+    segments: ["정말 감사하지만", "어제 점심도 사 주셨잖아요.", "오늘 저녁은 제가 낼게요", "다음에 서울에 오시면 그때 사 주세요"],
     reference: "That's very kind of you, but you already paid for lunch yesterday. Please let me get dinner tonight, and you can treat me next time you come to Seoul.",
     accepted: [
       "That's very kind of you, but you paid for lunch yesterday. Please let me pay for dinner tonight, and you can treat me next time you come to Seoul.",

@@ -529,7 +529,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "해외 파견 중 주문한 택배가 어제 왔는데, 집에 없어서 받지 못했습니다. 배송 회사 고객센터에 전화해 사정을 설명합니다.",
     dialogue: [{ speaker: "Customer service", en: "Thank you for calling. How can I help you today?", ko: "전화 주셔서 감사합니다. 오늘 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 어제 집에 없어서 택배를 못 받았어요.",
-    segments: ["안녕하세요,", "저는 택배를 놓쳤어요", "어제", "왜냐하면", "제가 집에 없었어요"],
+    segments: ["안녕하세요, 어제 택배를 못 받았어요", "집에 없어서요"],
     reference: "Hi, I missed a delivery yesterday because I wasn't home.",
     accepted: [
       "Hi, I missed a delivery yesterday because I wasn't at home.",
@@ -573,7 +573,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "회의 중에 사리 씨의 메시지에 'ok.'라고만 답장했습니다. 사리 씨가 화난 거냐고 다시 메시지를 보내서, 회의 중이라 급하게 답한 거라고 설명합니다.",
     dialogue: [{ speaker: "Sari", en: "You just wrote \"ok.\" Are you upset with me?", ko: "방금 'ok.'라고만 보냈던데요. 저한테 화났어요?" }],
     promptKo: "전혀요! 회의 중이어서 그냥 급하게 답한 거예요.",
-    segments: ["전혀요!", "저는 그냥 급하게 답했어요", "왜냐하면", "제가 회의 중이었어요"],
+    segments: ["전혀요!", "그냥 급하게 답한 거예요", "회의 중이어서요"],
     reference: "Not at all! I just replied quickly because I was in a meeting.",
     accepted: [
       "Not at all! I just answered quickly because I was in a meeting.",
@@ -615,7 +615,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "친구 제이크가 메신저로 긴 음성 메시지를 자주 보냅니다. 회사에서는 음성 메시지를 들을 수 없어서, 앞으로는 문자로 보내 달라고 부탁합니다.",
     dialogue: [{ speaker: "Jake", en: "Did you get my voice messages? I sent you three this morning.", ko: "내 음성 메시지 받았어? 오늘 아침에 세 개 보냈는데." }],
     promptKo: "대신 문자로 보내 줄 수 있어? 회사에 있을 때는 음성 메시지를 못 듣거든.",
-    segments: ["~해 줄 수 있어", "나에게 문자를 보내다", "대신?", "나는 들을 수 없어", "음성 메시지를", "~할 때", "내가 회사에 있다"],
+    segments: ["대신 문자로 보내 줄 수 있어?", "음성 메시지를 못 듣거든", "회사에 있을 때는"],
     reference: "Could you text me instead? I can't listen to voice messages when I'm at work.",
     accepted: [
       "Can you text me instead? I can't listen to voice messages when I'm at work.",
@@ -799,7 +799,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "온라인 쇼핑몰 고객센터에 전화했습니다. 지난달에 주소를 바꿨는데도 주문한 물건이 예전 주소로 배송된 것 같습니다.",
     dialogue: [{ speaker: "Customer service", en: "I can see your order here. What seems to be the problem?", ko: "주문 내역 확인했습니다. 어떤 문제가 있으신가요?" }],
     promptKo: "지난달에 주소를 바꿨는데도, 제 주문이 예전 주소로 보내진 것 같아요.",
-    segments: ["제 생각에", "제 주문이", "보내진 것 같아요", "예전 주소로,", "~에도 불구하고", "제가 그것을 바꿨는데", "지난달에"],
+    segments: ["제 주문이 예전 주소로 간 것 같아요", "지난달에 주소를 바꿨는데도요"],
     reference: "I think my order was sent to my old address, even though I updated it last month.",
     accepted: [
       "I think my order was sent to my old address, even though I changed it last month.",
@@ -843,7 +843,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "지난주에 병원에서 혈액 검사를 받았고, 오늘 결과가 나온다고 들었습니다. 병원에 전화해 접수 직원에게 사정을 말합니다.",
     dialogue: [{ speaker: "Receptionist", en: "Riverside Clinic, good afternoon. How can I help you?", ko: "리버사이드 병원입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 지난주에 혈액 검사를 받았는데, 오늘 결과가 나올 거라고 들었어요.",
-    segments: ["안녕하세요,", "저는 혈액 검사를 받았어요", "지난주에,", "그리고", "저는 들었어요(안내받았어요)", "결과가", "준비될 거라고", "오늘"],
+    segments: ["안녕하세요, 지난주에 혈액 검사를 받았어요", "그리고 결과가 오늘 나온다고 들었어요"],
     reference: "Hi, I had a blood test last week, and I was told the results would be ready today.",
     accepted: [
       "Hi, I had a blood test last week, and I was told that the results would be ready today.",
@@ -937,7 +937,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "출장 중 호텔 방에서 캐나다에 사는 사촌 제니와 노트북으로 영상 통화를 하는데, 화면이 계속 멈춥니다. 호텔 와이파이가 느리니 휴대폰으로 다시 걸겠다고 합니다.",
     dialogue: [{ speaker: "Jenny", en: "Minsu? You keep freezing. I can only hear every second word.", ko: "민수야? 화면이 계속 멈춰. 말이 반은 안 들려." }],
     promptKo: "미안, 오늘 밤 호텔 와이파이가 너무 느리네. 대신 휴대폰으로 다시 걸게.",
-    segments: ["미안,", "호텔 와이파이가", "정말 느려", "오늘 밤.", "내가 다시 걸게", "너에게", "내 휴대폰으로", "대신"],
+    segments: ["미안, 오늘 밤 호텔 와이파이가 너무 느려.", "대신 휴대폰으로 다시 걸게"],
     reference: "Sorry, the hotel Wi-Fi is really slow tonight. Let me call you back on my phone instead.",
     accepted: [
       "Sorry, the hotel Wi-Fi is really slow tonight. I'll call you back on my phone instead.",
@@ -980,7 +980,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "같은 태양광 판매 회사에서 이번 주에만 세 번째 전화가 왔습니다. 이미 관심 없다고 말했으니, 명단에서 번호를 지워 달라고 단호하지만 정중하게 말합니다.",
     dialogue: [{ speaker: "Sales caller", en: "Hi, I'm calling again about our solar panel offer. Have you had time to think about it?", ko: "안녕하세요, 태양광 패널 상품 건으로 다시 전화드렸어요. 생각해 보셨어요?" }],
     promptKo: "관심 없다고 이미 말씀드렸어요. 명단에서 제 번호를 지워 주시겠어요?",
-    segments: ["저는 이미 말씀드렸어요", "당신에게", "제가 관심이 없다고.", "~해 주시겠어요", "지우다", "제 번호를", "당신의 명단에서?"],
+    segments: ["관심 없다고 이미 말씀드렸어요.", "제 번호를 명단에서 지워 주시겠어요?"],
     reference: "I've already told you that I'm not interested. Could you please remove my number from your list?",
     accepted: [
       "I've already told you I'm not interested. Could you please remove my number from your list?",
@@ -1023,7 +1023,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "현지 인터넷이 계속 끊겨 통신사에 전화했습니다. 상담원이 공유기를 껐다 켜 보라고 하는데, 이미 두 번 해 봤지만 소용없었습니다. 기술자에게 연결해 달라고 합니다.",
     dialogue: [{ speaker: "Support agent", en: "Okay. Have you tried turning your router off and on again?", ko: "네. 공유기를 껐다가 다시 켜 보셨어요?" }],
     promptKo: "네, 이미 두 번 해 봤는데 소용없었어요. 기술자분께 연결해 주시겠어요?",
-    segments: ["네,", "저는 이미 해 봤어요", "그것을", "두 번,", "그리고 그것은 도움이 안 됐어요.", "~해 주시겠어요", "저를 연결하다", "기술자에게?"],
+    segments: ["네, 이미 두 번 해 봤는데", "소용없었어요.", "기술자분께 연결해 주시겠어요?"],
     reference: "Yes, I've already tried that twice, and it didn't help. Could you transfer me to a technician, please?",
     accepted: [
       "Yes, I've already tried that twice, but it didn't help. Could you transfer me to a technician, please?",
@@ -1068,7 +1068,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "자카르타 회의가 목요일로 미뤄져서 항공사에 전화했습니다. 지금은 수요일 오전 9시 비행기로 예약되어 있는데, 가능하면 목요일 같은 편으로 바꾸고 변경 수수료가 있는지 묻습니다.",
     dialogue: [{ speaker: "Airline agent", en: "Thank you for holding. How can I help you with your booking today?", ko: "기다려 주셔서 감사합니다. 예약 관련해서 무엇을 도와드릴까요?" }],
     promptKo: "자카르타 회의가 목요일로 옮겨져서 비행기를 바꿔야 해요. 지금은 수요일 오전 9시 비행기로 예약되어 있어요. 가능하면 목요일 같은 편으로 바꾸고 싶어요. 변경 수수료가 있나요?",
-    segments: ["제 회의가", "자카르타에서의", "옮겨졌어요", "목요일로,", "그래서", "저는 바꿔야 해요", "제 비행기를.", "저는 현재 예약되어 있어요", "오전 9시 비행기에", "수요일.", "가능하다면,", "저는 옮기고 싶어요", "같은 비행기로", "목요일.", "있나요", "변경 수수료가?"],
+    segments: ["자카르타 회의가 목요일로 옮겨져서", "비행기를 바꿔야 해요.", "지금은 수요일 오전 9시 비행기로 예약돼 있어요.", "가능하면 목요일 같은 편으로 바꾸고 싶어요.", "변경 수수료가 있나요?"],
     reference: "My meeting in Jakarta has been moved to Thursday, so I need to change my flight. I'm currently booked on the 9 a.m. flight on Wednesday. If possible, I'd like to move to the same flight on Thursday. Is there a change fee?",
     accepted: [
       "My meeting in Jakarta has been moved to Thursday, so I need to change my flight. I'm currently booked on the 9 a.m. flight on Wednesday. If possible, I'd like to change to the same flight on Thursday. Is there a change fee?",
@@ -1115,7 +1115,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "한국 시간 오전 11시에 런던에 사는 친구 에마에게 전화했는데, 에마가 잠에서 깬 목소리로 받습니다. 런던은 새벽 3시였습니다. 시차를 잊었다고 사과합니다.",
     dialogue: [{ speaker: "Emma", en: "Minsu? It's three in the morning here. Is everything okay?", ko: "민수야? 여기 새벽 세 시야. 무슨 일 있어?" }],
     promptKo: "정말 미안해, 시차를 완전히 잊어버렸어. 먼저 확인했더라면 그냥 메시지를 보냈을 거야. 다시 자, 내일 전화할게.",
-    segments: ["정말 미안해,", "나는 완전히 잊었어", "시차를.", "만약 내가 확인했더라면", "먼저,", "나는 보냈을 거야", "메시지를", "대신.", "다시 자,", "그리고", "내가 전화할게", "내일"],
+    segments: ["정말 미안해, 시차를 완전히 잊었어.", "먼저 확인했더라면", "대신 메시지를 보냈을 거야.", "다시 자, 내일 전화할게"],
     reference: "I'm so sorry, I completely forgot about the time difference. If I had checked first, I would have sent a message instead. Go back to sleep, and I'll call you tomorrow.",
     accepted: [
       "I'm so sorry, I completely forgot about the time difference. If I'd checked first, I would have sent a message instead. Go back to sleep, and I'll call you tomorrow.",
@@ -1159,7 +1159,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "라이선서 다니엘 씨와의 통화에 지수 씨가 참석하지 못했습니다. 지수 씨가 팀 채팅방(해외 동료도 있어 영어로 씁니다)에서 중요한 내용이 있었냐고 묻습니다.",
     dialogue: [{ speaker: "Jisoo", en: "Sorry, I missed the call with Daniel. Did anything important come up?", ko: "죄송해요, 다니엘 씨와의 통화를 놓쳤어요. 중요한 얘기 있었어요?" }],
     promptKo: "네, 두 가지요. 다니엘 씨가 수정된 설계 데이터는 금요일까지 보내질 거라고 했어요. 또 검토 회의를 다음 주로 옮길 수 있는지 물었어요. 전체 메모는 오늘 오후에 채팅방에 올릴게요.",
-    segments: ["네, 두 가지요.", "다니엘 씨가 말했어요", "수정된 설계 데이터가", "보내질 거라고", "금요일까지.", "그는 또 물었어요", "우리가 옮길 수 있는지", "검토 회의를", "다음 주로.", "제가 올릴게요", "전체 메모를", "채팅방에", "오늘 오후에"],
+    segments: ["네, 두 가지요.", "다니엘 씨 말로는", "수정된 설계 데이터가 금요일까지 온대요.", "또 검토 회의를 다음 주로 옮길 수 있는지 물었어요.", "전체 메모는 오늘 오후에 채팅방에 올릴게요"],
     reference: "Yes, two things. Daniel said that the updated design data will be sent by Friday. He also asked whether we could move the review meeting to next week. I'll post the full notes in the chat this afternoon.",
     accepted: [
       "Yes, two things. Daniel said the updated design data will be sent by Friday. He also asked whether we could move the review meeting to next week. I'll post the full notes in the chat this afternoon.",
@@ -1208,7 +1208,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "부디 씨가 프로젝트 내부 단체 채팅방에 고객사 Mr. Tan을 추가하자고 합니다. 그 방에서는 아직 고객과 공유할 준비가 안 된 문제를 자주 논의하기 때문에, 정중하게 반대하고 따로 방을 만들자고 제안합니다.",
     dialogue: [{ speaker: "Budi", en: "Why don't we just add Mr. Tan to our project chat? It would be much faster than email.", ko: "그냥 Mr. Tan을 우리 프로젝트 채팅방에 추가하면 어때요? 메일보다 훨씬 빠를 텐데요." }],
     promptKo: "왜 그게 편할지는 알겠는데, Mr. Tan을 우리 내부 채팅방에 넣는 건 좀 걱정돼요. 거기서 아직 고객과 공유할 준비가 안 된 문제들을 자주 논의하잖아요. 대신 Mr. Tan과 따로 채팅방을 만드는 건 어때요?",
-    segments: ["저는 알겠어요", "왜 그게 편할지,", "하지만", "저는 조금 걱정돼요", "Mr. Tan을 추가하는 것이", "우리 내부 채팅방에.", "우리는 자주 논의해요", "문제들을", "거기서", "(그 문제들은) 아직 준비가 안 된", "공유할", "고객과.", "~하는 게 어때요", "우리가 만들다", "따로 채팅방을", "그와 함께", "대신?"],
+    segments: ["왜 편할지는 알겠는데", "Mr. Tan을 내부 채팅방에 넣는 건 좀 걱정돼요.", "거기서 자주 문제를 논의하잖아요", "아직 고객과 공유할 준비가 안 된.", "대신 따로 채팅방을 만드는 건 어때요?"],
     reference: "I see why that would be convenient, but I'm a bit worried about adding Mr. Tan to our internal chat. We often discuss problems there that aren't ready to share with the client. Why don't we create a separate chat with him instead?",
     accepted: [
       "I see why that would be convenient, but I'm a little worried about adding Mr. Tan to our internal chat. We often discuss problems there that aren't ready to share with the client. Why don't we create a separate chat with him instead?",
@@ -1262,7 +1262,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "베트남 현장의 린 씨가 야간 조의 사소한 질문 때문에 또 밤늦게 전화했습니다. 도와주는 건 괜찮지만, 밤 9시 이후 급하지 않은 질문은 메시지로 보내 달라고 정중히 부탁하고, 진짜 비상시에는 언제든 전화하라고 덧붙입니다.",
     dialogue: [{ speaker: "Linh", en: "Sorry for calling so late again. The night shift had a small question about the dryer temperature.", ko: "또 늦게 전화해서 미안해요. 야간 조에서 건조기 온도에 대해 작은 질문이 있었어요." }],
     promptKo: "언제든 기꺼이 도와드리지만, 밤 9시 이후에는 급하지 않은 질문은 메시지로 보내 주실 수 있을까요? 아침에 가장 먼저 답할게요. 물론 현장에 진짜 비상 상황이 생기면 언제든 전화 주세요.",
-    segments: ["저는 언제나 기꺼이 도와요,", "하지만", "~하는 게 가능할까요", "급하지 않은 질문을 보내는 것", "메시지로", "밤 9시 이후에?", "제가 그것들에 답할게요", "아침에 가장 먼저.", "물론,", "만약 진짜 비상 상황이 있으면", "현장에,", "전화 주세요", "언제든"],
+    segments: ["언제든 기꺼이 도울게요, 그런데", "급하지 않은 질문은 메시지로 보내 주시겠어요?", "밤 9시 이후에는요.", "아침에 가장 먼저 답할게요.", "물론 현장에 진짜 비상 상황이면", "언제든 전화 주세요"],
     reference: "I'm always happy to help, but would it be possible to send non-urgent questions by message after 9 p.m.? I'll answer them first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
     accepted: [
       "I'm always happy to help, but would it be possible to send non-urgent questions by message after 9 p.m.? I'll reply to them first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
@@ -1310,7 +1310,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "벤더의 프리야 씨가 앞으로도 진행 상황을 음성 메시지로 보내겠다고 합니다. 숫자가 많아서 음성으로는 놓치기 쉬우니, 핵심 수치만이라도 글로 보내 달라고 정중하게 부탁합니다.",
     dialogue: [{ speaker: "Priya", en: "I'll keep sending you voice messages with the updates. It's much quicker for me than typing.", ko: "진행 상황은 계속 음성 메시지로 보낼게요. 저는 타이핑보다 그게 훨씬 빨라서요." }],
     promptKo: "빠르게 알려 주셔서 고맙지만, 음성 메시지로는 숫자를 다 알아듣기가 가끔 어려워요. 핵심 수치는 글로 보내 주실 수 있을까요? 짧은 문자라도 정말 도움이 될 거예요.",
-    segments: ["저는 감사해요", "빠른 업데이트를,", "하지만", "가끔 어려워요", "제가", "모든 숫자를 알아듣는 것이", "음성 메시지에서.", "~해 주실 수 있을까요", "핵심 수치를 보내는 것", "글로?", "짧은 문자라도", "정말 도움이 될 거예요"],
+    segments: ["빠른 업데이트는 고맙지만", "가끔 숫자를 다 알아듣기 어려워요", "음성 메시지로는.", "핵심 수치는 글로 보내 주실 수 있을까요?", "짧은 문자라도 정말 도움이 될 거예요"],
     reference: "I appreciate the quick updates, but it's sometimes hard for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would be really helpful.",
     accepted: [
       "I appreciate the quick updates, but it's sometimes difficult for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would be really helpful.",

@@ -481,7 +481,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "디캔터 공급 펌프를 고르는 회의가 한 시간째 결론이 나지 않습니다. Sari가 답답해하자, 펌프만 볼 게 아니라 전체 공정을 다시 보자고 제안합니다.",
     dialogue: [{ speaker: "Sari", en: "We've been talking about this pump for an hour, and we still can't agree.", ko: "이 펌프 얘기를 한 시간째 하고 있는데 아직도 합의가 안 되네요." }],
     promptKo: "한발 물러서서 전체 공정을 다시 보는 게 좋겠어요.",
-    segments: ["아마 우리는 ~하는 게 좋겠어요", "한발 물러서다", "그리고 보다", "전체 공정을"],
+    segments: ["한발 물러서는 게 좋겠어요", "그리고 전체 공정을 봐요"],
     reference: "Maybe we should take a step back and look at the whole process.",
     accepted: ["Maybe we should step back and look at the whole process.", "I think we should take a step back and look at the whole process.", "Why don't we take a step back and look at the whole process?", "Maybe we should take a step back and look at the process as a whole.", "Maybe we should take a step back and look at the big picture."],
     meaning: [
@@ -853,7 +853,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "금요일 화상회의가 끝난 뒤 Sari가 오늘 기분이 좋아 보인다며 무슨 일 있냐고 묻습니다. 다음 주에 남동생 결혼식이 있어서 일주일 동안 사무실에 없을 예정입니다.",
     dialogue: [{ speaker: "Sari", en: "You look happy today, Minsu! Anything special?", ko: "민수 씨, 오늘 기분 좋아 보이네요! 무슨 일 있어요?" }],
     promptKo: "다음 주에 사무실에 없을 거예요. 남동생이 결혼하거든요!",
-    segments: ["저는 사무실에 없을 거예요 (out of the office)", "다음 주에,", "왜냐하면 남동생이", "결혼할 예정이에요"],
+    segments: ["다음 주에 사무실에 없을 거예요", "남동생이 결혼하거든요!"],
     reference: "I'll be out of the office next week, because my brother is getting married!",
     accepted: ["I won't be in the office next week, because my brother is getting married!", "I'm out of the office next week, because my brother is getting married!", "I'll be out of the office next week. My brother is getting married!", "I'll be away from the office next week, because my brother is getting married!", "I'll be on leave next week, because my brother is getting married!"],
     meaning: [
@@ -892,7 +892,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "말레이시아 고객사와의 주간 화상회의에서 Mr. Tan이 공사 진행 상황을 묻습니다. 토목 공사는 계획대로 가고 있지만, 배관 서포트가 늦게 납품돼서 배관 공사가 2주쯤 늦어졌습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Can you give us a quick update on the construction?", ko: "공사 진행 상황을 간단히 알려 주시겠어요?" }],
     promptKo: "토목 공사는 계획대로 가고 있는데, 배관은 서포트가 늦게 납품돼서 2주 정도 늦어지고 있어요.",
-    segments: ["토목 공사는 순조롭게 가고 있어요 (on track),", "하지만 배관은", "약 2주 늦어져 있어요 (behind schedule)", "왜냐하면 배관 서포트가", "늦게 납품됐어요"],
+    segments: ["토목 공사는 계획대로 가고 있어요", "하지만 배관은 2주 정도 늦어지고 있어요", "배관 서포트가 늦게 납품돼서요"],
     reference: "The civil work is on track, but the piping is about two weeks behind schedule because the pipe supports were delivered late.",
     accepted: ["The civil work is on track, but the piping is around two weeks behind schedule because the pipe supports were delivered late.", "The civil work is on schedule, but the piping is about two weeks behind schedule because the pipe supports were delivered late.", "The civil work is on track, but the piping is about two weeks behind because the pipe supports arrived late.", "The civil work is on track, but the piping work is about two weeks behind schedule because the pipe supports were delivered late.", "The civil work is on track, but the piping is about two weeks behind schedule, since the pipe supports were delivered late."],
     meaning: [

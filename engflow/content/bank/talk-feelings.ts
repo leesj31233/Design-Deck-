@@ -616,7 +616,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "김 팀장님이 고객사가 다른 회사의 제안서를 선택했다고 알려 줍니다. 팀이 몇 주 동안 준비한 제안서였습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "I'm afraid the client chose the other company's proposal.", ko: "아쉽게도 고객사가 다른 회사의 제안서를 선택했어요." }],
     promptKo: "정말 실망스럽네요. 다들 그렇게 열심히 준비했는데요.",
-    segments: ["그건 정말 실망스러워요", "왜냐하면", "우리 모두", "정말 열심히 일했어요", "그것에"],
+    segments: ["정말 실망스럽네요", "다들 그렇게 열심히 준비했으니까요"],
     reference: "That's really disappointing, because we all worked so hard on it.",
     accepted: [
       "That's so disappointing, because we all worked really hard on it.",
@@ -657,7 +657,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "사리 씨가 내일 고객 앞에서 할 발표 준비가 다 됐는지 묻습니다. 고객 앞에서 발표하는 건 이번이 처음입니다.",
     dialogue: [{ speaker: "Sari", en: "Are you ready for your presentation to the client tomorrow?", ko: "내일 고객 앞에서 할 발표 준비는 다 됐어요?" }],
     promptKo: "아직이요. 고객 앞에서 발표하는 게 처음이라 좀 긴장돼요.",
-    segments: ["아직이요", "저는 좀 긴장돼요", "왜냐하면", "처음이에요", "고객 앞에서 발표하는 것이"],
+    segments: ["아직이요.", "좀 긴장돼요", "고객 앞에서 발표하는 게 처음이라서요"],
     reference: "Not really. I'm a bit nervous, because it's my first time presenting to a client.",
     accepted: [
       "Not really. I'm a little nervous, because it's my first time presenting to a client.",
@@ -742,7 +742,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "자카르타 파일럿 플랜트의 첫 시험 운전이 실패했습니다. 운전을 맡았던 부디 씨가 많이 속상해합니다.",
     dialogue: [{ speaker: "Budi", en: "The first test run failed. The pellets were too soft, and I feel terrible about it.", ko: "첫 시험 운전이 실패했어요. 펠릿이 너무 물렀어요. 정말 속상해요." }],
     promptKo: "걱정 마세요, 첫 운전이었을 뿐이잖아요. 원료 수분을 조정하면 다음 운전은 분명 더 잘될 거예요.",
-    segments: ["걱정 마세요", "그건 첫 운전일 뿐이었어요", "만약 우리가 조정하면", "원료 수분을", "저는 확신해요", "다음 운전은", "더 잘될 거라고"],
+    segments: ["걱정 마세요,", "첫 운전이었을 뿐이에요.", "원료 수분을 조정하면", "다음 운전은 분명 더 잘될 거예요"],
     reference: "Don't worry, it was only the first run. If we adjust the feed moisture, I'm sure the next run will go better.",
     accepted: [
       "Don't worry, it was just the first run. If we adjust the feed moisture, I'm sure the next run will go better.",
@@ -959,7 +959,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "자카르타 팀의 사리 씨가 베트남 현장의 린 씨가 공장장으로 승진했다는 소식을 전합니다. 린 씨는 시운전 문제를 거의 혼자 해결했습니다.",
     dialogue: [{ speaker: "Sari", en: "Did you hear? Linh has been promoted to plant manager!", ko: "소식 들었어요? 린 씨가 공장장으로 승진했대요!" }],
     promptKo: "정말요? 잘됐네요! 시운전 문제를 거의 다 해결한 사람이 린 씨니까, 승진할 만하죠.",
-    segments: ["정말요? 잘됐네요!", "그녀가 바로 그 사람이에요", "(그 사람이) 해결했다", "시운전 문제 대부분을", "그래서", "그녀는 정말 자격이 있어요"],
+    segments: ["정말요? 잘됐네요!", "린 씨가 바로 그 사람이에요", "시운전 문제를 거의 다 해결한.", "그러니 정말 승진할 만해요"],
     reference: "Really? That's great news! She's the one who solved most of the start-up problems, so she really deserves it.",
     accepted: [
       "Really? That's great! She's the one who solved most of the start-up problems, so she really deserves it.",
@@ -1001,7 +1001,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "자카르타 팀의 부디 씨가 요즘 메일 답장을 자주 놓치고 회의에서도 말이 없습니다. 통화가 끝날 무렵 부디 씨가 사과합니다.",
     dialogue: [{ speaker: "Budi", en: "Sorry, I missed your email again. I've been a bit distracted lately.", ko: "미안해요, 메일을 또 놓쳤네요. 요즘 좀 정신이 없어요." }],
     promptKo: "이런 거 물어봐도 될지 모르겠지만, 별일 없는 거죠? 요즘 좀 기운이 없어 보여서요.",
-    segments: ["괜찮으면 좋겠어요", "제가 묻는 것이", "하지만", "모든 게 괜찮아요?", "당신은 보였어요", "좀 기운이 없어", "요즘"],
+    segments: ["이런 거 물어봐도 괜찮을지 모르겠지만", "별일 없는 거죠?", "요즘 좀 기운이 없어 보여서요"],
     reference: "I hope you don't mind me asking, but is everything okay? You've seemed a bit down lately.",
     accepted: [
       "I hope you don't mind my asking, but is everything okay? You've seemed a bit down lately.",
@@ -1087,7 +1087,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "지난 토요일 친구 제이크의 생일 파티에 가기로 했는데, 급한 출장 때문에 못 갔습니다. 제이크가 메시지를 보냅니다.",
     dialogue: [{ speaker: "Jake", en: "You missed a great party on Saturday! Everyone was asking about you.", ko: "토요일 파티 진짜 재밌었는데 못 왔네! 다들 너 어디 있냐고 물어봤어." }],
     promptKo: "못 가서 정말 미안해. 일 때문에 자카르타에 가야 했거든. 미안한 마음으로 이번 주에 내가 저녁 살게.",
-    segments: ["정말 미안해", "내가 갈 수 없었어", "하지만", "자카르타에 (비행기로) 가야 했어", "일 때문에", "내가 저녁 살게", "이번 주에", "그걸 만회하려고"],
+    segments: ["못 가서 정말 미안해", "일 때문에 자카르타에 가야 했어.", "이번 주에 내가 저녁 살게", "미안한 마음을 갚으려고"],
     reference: "I'm so sorry I couldn't make it, but I had to fly to Jakarta for work. Let me buy you dinner this week to make up for it.",
     accepted: [
       "I'm really sorry I couldn't make it, but I had to fly to Jakarta for work. Let me buy you dinner this week to make up for it.",
@@ -1129,7 +1129,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "유럽 라이선서의 다니엘 씨가 통화 중 민수 씨 목소리가 지쳐 보인다며 무슨 일 있는지 묻습니다. FEED 마감은 다음 주인데 벤더 데이터가 아직 오지 않았습니다.",
     dialogue: [{ speaker: "Daniel", en: "You sound a bit stressed today, Minsu. Is everything okay?", ko: "민수 씨, 오늘 목소리가 좀 지쳐 보이네요. 별일 없어요?" }],
     promptKo: "솔직히 FEED 마감 때문에 스트레스가 커요. 벤더 데이터를 아직 못 받았거든요. 어떻게 대처하면 좋을지 조언해 주실 수 있을까요?",
-    segments: ["솔직히", "저는 정말 스트레스를 받고 있어요", "FEED 마감 때문에", "왜냐하면", "우리는 아직 받지 못했어요", "벤더 데이터를", "조언이 있으세요?", "어떻게 대처할지에 대해"],
+    segments: ["솔직히 FEED 마감 때문에 스트레스가 커요", "벤더 데이터를 아직 못 받았거든요.", "어떻게 대처하면 좋을지 조언이 있을까요?"],
     reference: "To be honest, I'm really stressed about the FEED deadline, because we still haven't received the vendor data. Do you have any advice on how to deal with it?",
     accepted: [
       "Honestly, I'm really stressed about the FEED deadline, because we still haven't received the vendor data. Do you have any advice on how to deal with it?",
@@ -1258,7 +1258,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "자카르타 팀의 부디 씨가 아버지가 어젯밤 병원에 실려 가셨다며, 이번 주 P&ID 검토를 어떻게 해야 할지 걱정합니다.",
     dialogue: [{ speaker: "Budi", en: "My father was taken to the hospital last night. I don't know how I can finish the P&ID review this week.", ko: "어젯밤에 아버지가 병원에 실려 가셨어요. 이번 주에 P&ID 검토를 어떻게 끝내야 할지 모르겠어요." }],
     promptKo: "정말 안타까워요, 부디 씨. 제가 부디 씨라면 며칠 쉬면서 아버지 곁에 있겠어요. 일은 걱정 마세요. 돌아올 때까지 P&ID 검토는 제가 맡을게요.",
-    segments: ["정말 안타까워요, 부디 씨", "만약 제가 당신이라면", "저는 며칠 쉬겠어요", "그분 곁에 있으려고", "일은 걱정 마세요", "제가 맡을게요", "P&ID 검토를", "당신이 돌아올 때까지"],
+    segments: ["정말 안타까워요, 부디 씨.", "제가 부디 씨라면", "며칠 쉬고 아버지 곁에 있겠어요.", "일은 걱정 마세요.", "돌아올 때까지 P&ID 검토는 제가 맡을게요"],
     reference: "I'm so sorry to hear that, Budi. If I were you, I'd take a few days off to be with him. Don't worry about work. I'll cover the P&ID review until you're back.",
     accepted: [
       "I'm so sorry to hear that, Budi. If I were you, I would take a few days off to be with him. Don't worry about work. I'll cover the P&ID review until you're back.",
@@ -1348,7 +1348,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "자카르타 팀의 사리 씨가 다른 회사로 이직하게 됐다고 알려 줍니다. 민수 씨는 프로젝트에 합류한 뒤로 사리 씨에게 많이 배웠습니다.",
     dialogue: [{ speaker: "Sari", en: "I have some news. I've accepted an offer from another company, so Friday will be my last day.", ko: "전할 소식이 있어요. 다른 회사 제안을 받아들여서, 금요일이 마지막 날이에요." }],
     promptKo: "와, 축하해요! 정말 잘됐지만, 솔직히 좀 섭섭하네요. 프로젝트에 합류한 뒤로 사리 씨한테 정말 많이 배워서, 같이 일하던 게 많이 그리울 거예요.",
-    segments: ["와, 축하해요!", "정말 잘됐어요", "하지만 솔직히", "저도 좀 섭섭해요", "저는 정말 많이 배워 왔어요", "당신에게서", "제가 프로젝트에 합류한 이후로", "그래서", "같이 일하던 게 정말 그리울 거예요"],
+    segments: ["와, 축하해요!", "정말 잘됐지만, 솔직히 좀 섭섭해요.", "프로젝트에 합류한 뒤로 정말 많이 배웠어요", "그래서 같이 일하던 게 많이 그리울 거예요"],
     reference: "Wow, congratulations! I'm really happy for you, but to be honest, I'm a little sad too. I've learned so much from you since I joined the project, so I'll really miss working with you.",
     accepted: [
       "Wow, congratulations! I'm really happy for you, but to be honest, I'm a bit sad too. I've learned so much from you since I joined the project, so I'll really miss working with you.",
@@ -1391,7 +1391,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "친구 제이크가 공통 친구 엠마의 소식을 묻습니다. 어젯밤 엠마가 전화로 지원했던 시드니 회사에 합격했다고 알려 주었습니다.",
     dialogue: [{ speaker: "Jake", en: "Have you heard from Emma lately? She hasn't posted anything for ages.", ko: "요즘 엠마 소식 들었어? 한참 동안 아무것도 안 올리던데." }],
     promptKo: "응, 어젯밤에 전화 왔었어. 지원했던 시드니 회사에 합격했대! 다음 달부터 일을 시작한대. 정말 잘됐지만, 많이 보고 싶을 거야.",
-    segments: ["응, 어젯밤에 전화 왔었어", "그녀가 나에게 말했어", "합격했다고", "지원했던 일자리에", "시드니에서", "그리고 다음 달에 시작한대", "정말 잘됐어", "하지만 많이 보고 싶을 거야"],
+    segments: ["응, 어젯밤에 전화 왔었어.", "지원했던 시드니 회사에 합격했대", "그리고 다음 달부터 일을 시작한대.", "정말 잘됐지만 많이 보고 싶을 거야"],
     reference: "Yes, she called me last night. She told me she'd got the job she applied for in Sydney, and she's starting next month. I'm so happy for her, but I'll really miss her.",
     accepted: [
       "Yes, she called me last night. She said she'd got the job she applied for in Sydney, and she's starting next month. I'm so happy for her, but I'll really miss her.",
@@ -1437,7 +1437,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "김 팀장님이 다음 달부터 베트남 프로젝트도 맡아 줄 수 있는지 묻습니다. 민수 씨는 이미 자카르타 프로젝트 마감에 쫓기고 있습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Minsu, could you also take on the Vietnam project from next month?", ko: "민수 씨, 다음 달부터 베트남 프로젝트도 맡아 줄 수 있어요?" }],
     promptKo: "저를 생각해 주셔서 감사하고, 정말 돕고 싶어요. 그런데 솔직히 자카르타 프로젝트만으로도 벌써 좀 벅차요. 지금 프로젝트를 하나 더 맡는다면 일의 질이 떨어질까 봐 걱정돼요. 3월 자카르타 시운전이 끝난 뒤에 시작해도 될까요?",
-    segments: ["감사합니다", "저를 생각해 주셔서", "정말 돕고 싶어요", "하지만 솔직히", "저는 벌써 좀 벅차요", "자카르타 프로젝트로", "만약 제가 하나 더 맡는다면", "지금", "저는 걱정돼요", "일의 질이 떨어질까", "가능할까요", "시작하는 것이", "3월 자카르타 시운전 후에"],
+    segments: ["생각해 주셔서 감사하고, 정말 돕고 싶어요.", "그런데 솔직히 벌써 좀 벅차요", "자카르타 프로젝트만으로도.", "지금 프로젝트를 하나 더 맡으면 일의 질이 떨어질까 걱정돼요.", "3월 자카르타 시운전 뒤에 시작해도 될까요?"],
     reference: "Thank you for thinking of me, and I'd really like to help. But to be honest, I'm already feeling a bit overwhelmed with the Jakarta project. If I took on another project now, I'm worried the quality of my work would suffer. Would it be possible to start after the Jakarta start-up in March?",
     accepted: [
       "Thank you for thinking of me, and I'd really like to help. But to be honest, I'm already a bit overwhelmed with the Jakarta project. If I took on another project now, I'm worried the quality of my work would suffer. Would it be possible to start after the Jakarta start-up in March?",
@@ -1480,7 +1480,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "우기에 원료가 너무 젖어서 베트남 현장의 시운전이 중단됐습니다. 린 씨는 자기가 원료 수분을 미리 확인하지 않아서라며 자책합니다.",
     dialogue: [{ speaker: "Linh", en: "The start-up failed because of me. I should have checked the feed moisture before we started.", ko: "시운전이 실패한 건 저 때문이에요. 시작하기 전에 원료 수분을 확인했어야 했어요." }],
     promptKo: "그렇게 자책하는 건 맞지 않다고 생각해요. 비 때문에 원료가 그렇게 젖을 줄은 아무도 예상할 수 없었을 거예요. 그리고 지금 문제를 발견하지 못했더라면 나중에 훨씬 큰 문제가 됐을 거예요. 내일 같이 데이터를 검토해 보는 게 어때요?",
-    segments: ["저는 생각하지 않아요", "공정하다고", "자신을 탓하는 것이", "아무도 예상할 수 없었을 거예요", "비가 원료를 그렇게 젖게 만들 거라고", "그리고 만약 우리가 지금 문제를 발견하지 못했더라면", "그것은 훨씬 더 큰 문제를 일으켰을 거예요", "나중에", "~하는 게 어때요", "데이터를 같이 검토하다", "내일"],
+    segments: ["자책하는 건 맞지 않다고 생각해요.", "비로 원료가 그렇게 젖을 줄 아무도 몰랐을 거예요.", "그리고 지금 문제를 못 찾았더라면", "나중에 훨씬 큰 문제가 됐을 거예요.", "내일 같이 데이터를 검토해 보는 게 어때요?"],
     reference: "I don't think it's fair to blame yourself. Nobody could have predicted that the rain would make the feed so wet. And if we hadn't found the problem now, it would have caused much bigger problems later. Why don't we go through the data together tomorrow?",
     accepted: [
       "I don't think it's fair to blame yourself. Nobody could have predicted that the rain would make the feed so wet. And if we hadn't found the problem now, it would have caused much bigger problems later. Why don't we look at the data together tomorrow?",
@@ -1523,7 +1523,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "오늘 저녁 민수 씨 생일 저녁을 함께하기로 한 친구 엠마가 회사 일 때문에 못 오게 됐다고 연락합니다. 이번이 두 번째 취소입니다.",
     dialogue: [{ speaker: "Emma", en: "I'm so sorry, but I can't make it to your birthday dinner tonight. My boss just asked me to finish a report.", ko: "정말 미안한데, 오늘 저녁 네 생일 저녁에 못 갈 것 같아. 상사가 방금 보고서를 끝내라고 해서." }],
     promptKo: "괜찮아, 이해해. 솔직히 좀 서운하긴 해. 너랑 밀린 얘기 하는 거 정말 기대했거든. 그래도 너무 미안해하지 마. 대신 토요일에 점심 어때? 네가 좋아하는 그 이탈리안 식당 예약할게.",
-    segments: ["괜찮아, 이해해", "솔직히 인정할게", "나는 좀 서운해", "왜냐하면 정말 기대하고 있었거든", "너랑 밀린 얘기 하는 것을", "하지만 너무 미안해하지 마", "토요일 점심은 어때", "대신", "내가 예약할게", "네가 좋아하는 그 이탈리안 식당을"],
+    segments: ["괜찮아, 이해해.", "솔직히 좀 서운해", "너랑 밀린 얘기 하는 거 정말 기대했거든.", "그래도 너무 미안해하지 마.", "대신 토요일에 점심 어때?", "네가 좋아하는 그 이탈리안 식당 예약할게"],
     reference: "That's okay, I understand. I have to admit I'm a little disappointed, because I was really looking forward to catching up with you. But don't feel bad about it. How about lunch on Saturday instead? I'll book that Italian place you like.",
     accepted: [
       "That's okay, I understand. To be honest, I'm a little disappointed, because I was really looking forward to catching up with you. But don't feel bad about it. How about lunch on Saturday instead? I'll book that Italian place you like.",
@@ -1566,7 +1566,7 @@ export const TALK_FEELINGS: Question[] = [
     contextKo: "자카르타 팀의 부디 씨가 몇 주째 자정까지 일하고 있습니다. 걱정돼서 쉬라고 했더니 괜찮다고만 합니다.",
     dialogue: [{ speaker: "Budi", en: "I'm fine, really. I just need to finish these reports tonight.", ko: "정말 괜찮아요. 오늘 밤에 이 보고서들만 끝내면 돼요." }],
     promptKo: "참견하고 싶지는 않지만, 좀 걱정돼서요. 몇 주째 매일 자정까지 일하고 있잖아요. 이렇게 계속하다가는 아플 수도 있어요. 감사 끝나면 며칠 쉬는 게 어때요?",
-    segments: ["참견하고 싶지는 않지만", "저는 좀 걱정돼요", "당신이", "당신은 일해 왔어요", "매일 자정까지", "몇 주 동안", "만약 이렇게 계속한다면", "당신은 아플 수도 있어요", "며칠 쉬는 게 어때요", "감사가 끝난 후에"],
+    segments: ["참견하고 싶진 않지만, 좀 걱정돼서요.", "몇 주째 매일 자정까지 일하고 있잖아요.", "이렇게 계속하다간 아플 수도 있어요.", "감사 끝나면 며칠 쉬는 게 어때요?"],
     reference: "I don't want to interfere, but I'm a little worried about you. You've been working until midnight every day for weeks. If you keep going like this, you might get sick. Why don't you take a few days off after the audit?",
     accepted: [
       "I don't want to interfere, but I'm a bit worried about you. You've been working until midnight every day for weeks. If you keep going like this, you might get sick. Why don't you take a few days off after the audit?",

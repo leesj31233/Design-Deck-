@@ -369,7 +369,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Budi가 A안이 더 싸고 일정도 똑같이 맞출 수 있다고 합니다. 비용은 맞지만 일정은 동의하기 어렵다고 말합니다.",
     dialogue: [{ speaker: "Budi", en: "Option A is cheaper, and we can still finish it on the same schedule.", ko: "A안이 더 싸고, 일정도 똑같이 맞출 수 있어요." }],
     promptKo: "비용은 동의하지만, 일정은 동의하지 않아요.",
-    segments: ["저는 동의해요", "당신에게", "비용에 대해서는,", "하지만", "일정에 대해서는 아니에요"],
+    segments: ["비용은 동의해요", "하지만 일정은 아니에요"],
     reference: "I agree with you on the cost, but not on the schedule.",
     accepted: ["I agree with you about the cost, but not about the schedule.", "I agree on the cost, but not on the schedule.", "I agree with you on the cost, but I don't agree on the schedule.", "You're right about the cost, but not about the schedule.", "I agree with you about the cost, but not the schedule."],
     meaning: [
@@ -482,7 +482,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Priya가 새 제어 로직에서는 펌프가 일정한 속도로 돈다고 설명합니다. 좋은 생각이지만 탱크 레벨이 떨어지면 어떻게 되는지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "With the new control logic, the pump will always run at a fixed speed.", ko: "새 제어 로직에서는 펌프가 항상 일정한 속도로 돌아요." }],
     promptKo: "좋네요. 그런데 탱크 레벨이 떨어지면 어떻게 돼요?",
-    segments: ["좋네요,", "그런데", "무슨 일이 생겨요", "만약", "탱크 레벨이", "떨어지면"],
+    segments: ["좋네요", "그런데 탱크 레벨이 떨어지면 어떻게 돼요?"],
     reference: "That sounds good, but what happens if the tank level drops?",
     accepted: ["That sounds good, but what happens when the tank level drops?", "Sounds good, but what happens if the tank level drops?", "That sounds good, but what if the tank level drops?", "That sounds good, but what will happen if the tank level drops?", "That sounds good, but what happens if the level in the tank drops?", "That sounds good, but what happens if the tank level goes down?"],
     meaning: [
@@ -520,7 +520,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Ms. Kim이 두 안의 가장 큰 차이가 뭐냐고 묻습니다. A안은 구매 비용이 싸고, B안은 스팀을 덜 쓴다고 비교합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "So what's the main difference between the two options?", ko: "그래서 두 안의 가장 큰 차이가 뭐예요?" }],
     promptKo: "A안이 구매 비용은 더 싸지만, B안이 스팀을 덜 써요.",
-    segments: ["A안이", "더 싸요", "사기에는,", "하지만", "B안이", "쓴다", "더 적은 스팀을"],
+    segments: ["A안이 구매 비용은 더 싸요", "하지만 B안이 스팀을 덜 써요"],
     reference: "Option A is cheaper to buy, but Option B uses less steam.",
     accepted: ["Option A costs less to buy, but Option B uses less steam.", "Option A is cheaper to buy, while Option B uses less steam.", "Option A is cheaper to buy, but Option B consumes less steam.", "Option A is cheaper to buy, but Option B needs less steam.", "Option A has a lower purchase price, but Option B uses less steam."],
     meaning: [
@@ -560,7 +560,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Daniel이 새 세척 시험 결과에 대해 의견을 묻습니다. 아직 데이터를 보지 못해서 섣불리 말하기 어렵다고 솔직하게 말합니다.",
     dialogue: [{ speaker: "Daniel", en: "Minsu, what do you think of the new washing results?", ko: "민수 씨, 새 세척 결과는 어떻게 보세요?" }],
     promptKo: "아직 시험 데이터를 못 봐서, 그건 제가 뭐라고 말하기 어려워요.",
-    segments: ["저는 보지 못했어요", "시험 데이터를", "아직,", "그래서", "저는 말하기 어려워요", "그것에 대해"],
+    segments: ["아직 시험 데이터를 못 봤어요", "그래서 그건 뭐라고 말하기 어려워요"],
     reference: "I haven't seen the test data yet, so I can't really comment on that.",
     accepted: ["I haven't seen the test data yet, so I can't really comment.", "I haven't had a chance to look at the test data yet, so I can't really comment on that.", "I can't really comment on that, because I haven't seen the test data yet.", "I haven't looked at the test data yet, so I can't really comment on that.", "I haven't seen the test data yet, so I can't really say."],
     meaning: [
@@ -677,7 +677,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "팀장인 Ms. Kim이 수분 문제를 해결하려고 건조기 온도를 올리자고 합니다. 스팀 사용량이 늘 것 같아서 조심스럽게 질문 형태로 의문을 제기합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Let's just raise the dryer temperature. That should fix the moisture problem.", ko: "그냥 건조기 온도를 올립시다. 그러면 수분 문제는 해결될 거예요." }],
     promptKo: "제가 틀렸다면 말씀해 주세요. 그런데 그러면 스팀 사용량이 늘지 않을까요?",
-    segments: ["저를 바로잡아 주세요", "제가 틀렸다면,", "하지만", "~하지 않을까요", "그것이", "늘리다", "스팀 사용량을"],
+    segments: ["제가 틀렸다면 말씀해 주세요", "그런데 그러면 스팀 사용량이 늘지 않을까요?"],
     reference: "Correct me if I'm wrong, but wouldn't that increase the steam consumption?",
     accepted: ["Correct me if I'm wrong, but wouldn't that increase steam consumption?", "Correct me if I'm wrong, but wouldn't that also increase the steam consumption?", "Correct me if I'm wrong, but wouldn't that raise the steam consumption?", "Correct me if I'm wrong, but wouldn't that mean higher steam consumption?", "Correct me if I'm wrong, but wouldn't we use more steam that way?", "I might be wrong, but wouldn't that increase the steam consumption?"],
     meaning: [
@@ -751,7 +751,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "고객사 Mr. Tan이 새 건조기 소음이 인근 주민에게 문제가 될까 걱정합니다. 걱정은 이해하지만 벤더가 이미 소음을 확인했다고 답합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "I'm worried that the new dryer will be too noisy for the people living nearby.", ko: "새 건조기가 근처 주민들한테 너무 시끄러울까 봐 걱정이에요." }],
     promptKo: "걱정하시는 건 이해합니다. 그런데 소음 수준은 벤더가 이미 확인했어요.",
-    segments: ["저는 이해합니다", "걱정하시는 것을,", "하지만", "소음 수준은", "이미 확인되었어요", "벤더에 의해"],
+    segments: ["걱정하시는 건 이해해요", "하지만 소음 수준은 벤더가 이미 확인했어요"],
     reference: "I understand your concern, but the noise level has already been checked by the vendor.",
     accepted: ["I understand your concern, but the vendor has already checked the noise level.", "I understand the concern, but the noise level has already been checked by the vendor.", "I understand your concern, but the noise level was already checked by the vendor.", "I can see why you're worried, but the noise level has already been checked by the vendor.", "I understand your concern, but the vendor has already checked the noise levels."],
     meaning: [
@@ -792,7 +792,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Budi가 2030년 용량까지 생각하면 처음부터 건조기 두 대가 필요하다고 합니다. 예산이 빠듯하니 한 대로 시작하고 나중에 추가하자고 제안합니다.",
     dialogue: [{ speaker: "Budi", en: "If we want enough capacity for 2030, we need two dryers from the start.", ko: "2030년까지 용량을 생각하면 처음부터 건조기 두 대가 필요해요." }],
     promptKo: "예산이 이미 아주 빠듯해요. 건조기 한 대로 시작하고 두 번째는 나중에 추가하면 어떨까요?",
-    segments: ["예산이", "이미 아주 빠듯해요.", "~하면 어떨까요", "우리가 시작하다", "건조기 한 대로", "그리고 추가하다", "두 번째 것을", "나중에"],
+    segments: ["예산이 이미 아주 빠듯해요", "건조기 한 대로 시작하고", "두 번째는 나중에 추가하면 어떨까요?"],
     reference: "The budget is already very tight. What if we start with one dryer and add a second one later?",
     accepted: ["The budget is already very tight. Why don't we start with one dryer and add a second one later?", "The budget is already very tight. Could we start with one dryer and add another one later?", "Our budget is already very tight. What if we start with one dryer and add a second one later?", "The budget is already very tight, so what if we start with one dryer and add a second one later?", "The budget is already very tight. How about starting with one dryer and adding a second one later?", "The budget is already very tight. Why not start with one dryer and add a second one later?"],
     meaning: [
@@ -871,7 +871,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Linh이 새 스크루로 처리량이 25% 늘었다며 그 수치를 설계에 쓰자고 합니다. 시험 한 번의 결과라서 설계에 쓰기 전에 반복해 보자고 합니다.",
     dialogue: [{ speaker: "Linh", en: "The new screw gave us 25% more throughput. Let's use that number for the design.", ko: "새 스크루로 처리량이 25% 늘었어요. 그 수치를 설계에 쓰죠." }],
     promptKo: "흥미로운 결과네요. 그런데 시험 한 번에 근거한 거잖아요. 설계에 쓰기 전에 한 번 더 해 볼 수 있을까요?",
-    segments: ["그건 흥미로운 결과예요,", "하지만", "그건 근거해요", "단 한 번의 시험에.", "~할 수 있을까요", "우리가 반복하다", "그것을", "~하기 전에", "우리가 쓰다", "그것을", "설계에"],
+    segments: ["흥미로운 결과네요", "하지만 시험 한 번에 근거한 거예요", "설계에 쓰기 전에 한 번 더 해 볼 수 있을까요?"],
     reference: "That's an interesting result, but it's based on only one test. Could we repeat it before we use it for the design?",
     accepted: ["That's an interesting result, but it's only based on one test. Could we repeat it before we use it for the design?", "That's an interesting result, but it's based on just one test. Could we repeat it before we use it for the design?", "That's an interesting result, but it's based on only one test. Could we repeat the test before we use it for the design?", "That's an interesting result, but it's based on only one test. Could we repeat it before using it for the design?", "That's an interesting result, but it's based on only one test. Can we repeat it before we use it in the design?"],
     meaning: [
@@ -912,7 +912,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Daniel이 새 공장에도 기존 공장과 같은 스크루 피더를 쓰자고 합니다. 어제 운전원들에게 들은 이야기를 전하며 다른 옵션을 먼저 보자고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "We suggest using the same screw feeder as in the current plant.", ko: "새 공장에도 기존 공장과 같은 스크루 피더를 쓰는 걸 제안해요." }],
     promptKo: "어제 운전원들과 얘기했는데, 지금 피더가 자주 막힌다고 했어요. 새 공장에 같은 피더를 쓰면 아마 같은 문제가 생길 거예요. 그래서 먼저 다른 옵션들을 검토해 보고 싶어요.",
-    segments: ["저는 얘기했어요", "운전원들과", "어제,", "그리고 그들이 말했어요", "지금 피더가", "자주 막힌다고.", "만약 우리가 쓰면", "같은 피더를", "새 공장에,", "우리는 아마 겪을 거예요", "같은 문제를.", "그래서", "저는 검토하고 싶어요", "다른 옵션들을", "먼저"],
+    segments: ["어제 운전원들과 얘기했는데", "지금 피더가 자주 막힌대요", "새 공장에 같은 피더를 쓰면", "아마 같은 문제가 생길 거예요", "그래서 먼저 다른 옵션들을 검토하고 싶어요"],
     reference: "I talked to the operators yesterday, and they said the current feeder often gets blocked. If we use the same feeder in the new plant, we'll probably have the same problem. So I'd like to look at other options first.",
     accepted: [
       "I spoke to the operators yesterday, and they said the current feeder often gets blocked. If we use the same feeder in the new plant, we'll probably have the same problem. So I'd like to look at other options first.",
@@ -959,7 +959,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "긴 논의 끝에 Ms. Kim이 지금 어디까지 왔는지 묻습니다. 합의된 부분과 남은 쟁점을 정리하고, 임시 값으로 진행하자고 제안합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "We've talked about this a lot. So where are we now?", ko: "이 얘기를 많이 했는데요. 그래서 지금 어디까지 왔죠?" }],
     promptKo: "다들 패들 건조기에는 동의하시는 것 같아요. 남은 문제는 용량뿐이에요. 일단 5 t/h로 하고, 파일럿 시험 후에 다시 검토하면 어떨까요?",
-    segments: ["~인 것 같아요", "우리 모두 동의한다", "패들 건조기에.", "유일하게 남은 문제는", "용량이에요.", "~할 수 있을까요", "우리가 5 t/h로 가다", "일단은", "그리고 다시 검토하다", "그것을", "파일럿 시험 후에"],
+    segments: ["다들 패들 건조기에는 동의하시는 것 같아요", "남은 문제는 용량뿐이에요", "일단 5 t/h로 하고", "파일럿 시험 후에 다시 검토하면 어떨까요?"],
     reference: "It sounds like we all agree on the paddle dryer. The only question left is the capacity. Could we go with 5 t/h for now and review it after the pilot test?",
     accepted: [
       "It seems like we all agree on the paddle dryer. The only question left is the capacity. Could we go with 5 t/h for now and review it after the pilot test?",
@@ -1007,7 +1007,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Budi가 시간을 아끼려고 정지 직후에 바로 건조기를 청소하자고 합니다. 화상 위험을 설명하고 절차에 냉각 단계를 넣자고 제안합니다.",
     dialogue: [{ speaker: "Budi", en: "To save time, the maintenance team can clean the dryer right after shutdown.", ko: "시간을 아끼려면 정비팀이 정지 직후에 바로 건조기를 청소하면 돼요." }],
     promptKo: "그건 좀 걱정돼요. 정지 직후에는 건조기가 아직 아주 뜨거워서, 누가 문을 열면 크게 화상을 입을 수 있어요. 절차에 냉각 단계를 추가할 수 있을까요?",
-    segments: ["저는 좀 걱정돼요", "그것이.", "건조기가", "아직 아주 뜨거워요", "정지 직후에는,", "그래서", "만약 누가 연다면", "문을,", "그들은 크게 화상을 입을 수 있어요.", "~할 수 있을까요", "우리가 추가하다", "냉각 단계를", "절차에"],
+    segments: ["그건 좀 걱정돼요", "정지 직후에는 건조기가 아직 아주 뜨거워요", "그래서 누가 문을 연다면", "크게 화상을 입을 수 있어요", "절차에 냉각 단계를 추가할 수 있을까요?"],
     reference: "I'm a bit worried about that. The dryer is still very hot right after shutdown, so if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?",
     accepted: [
       "I'm a little worried about that. The dryer is still very hot right after shutdown, so if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?",
@@ -1055,7 +1055,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "팀장 Ms. Kim이 이달 말까지 기본설계를 전부 끝내자고 합니다. 벤더 데이터가 아직 확정되지 않아 배치를 다시 해야 할 위험이 있어서, 공정 부분만 먼저 확정하자고 정중히 제안합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "I want the whole basic design finished by the end of this month.", ko: "이달 말까지 기본설계를 전부 끝냈으면 해요." }],
     promptKo: "이번 달에 끝내고 싶으신 이유는 이해합니다. 그런데 너무 서두르는 것 같아 걱정돼요. 벤더 데이터가 아직 확정되지 않았고, 그게 바뀌면 배치를 다시 해야 해요. 공정 부분을 먼저 확정하고 배치는 다음 달로 미루면 어떨까요?",
-    segments: ["저는 이해합니다", "왜 당신이 원하는지", "그것을 끝내기를", "이번 달에,", "하지만 저는 걱정돼요", "우리가 너무 빨리 가고 있다고.", "벤더 데이터가", "아직 확정되지 않았어요,", "그리고 그게 바뀌면,", "우리는 다시 해야 할 거예요", "배치를.", "~할 수 있을까요", "우리가 확정하다", "공정 부분을", "먼저", "그리고 미루다", "배치를", "다음 달까지"],
+    segments: ["이번 달에 끝내고 싶으신 이유는 이해하지만", "너무 서두르는 것 같아 걱정돼요", "벤더 데이터가 아직 확정되지 않았어요", "그게 바뀌면 배치를 다시 해야 해요", "공정 부분을 먼저 확정하고 배치는 다음 달로 미루면 어떨까요?"],
     reference: "I understand why you want to finish it this month, but I'm worried that we're moving too fast. The vendor data hasn't been confirmed yet, and if it changes, we'll have to redo the layout. Could we finalize the process part first and leave the layout until next month?",
     accepted: [
       "I understand why you'd like to finish it this month, but I'm worried that we're moving too fast. The vendor data hasn't been confirmed yet, and if it changes, we'll have to redo the layout. Could we finalize the process part first and leave the layout until next month?",
@@ -1106,7 +1106,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Budi가 A안이 건설비가 20% 싸니까 당연히 A안이라고 합니다. 건설비는 맞지만, 스팀을 더 많이 써서 10년 운전비까지 보면 다를 수 있으니 총비용을 비교하자고 제안합니다.",
     dialogue: [{ speaker: "Budi", en: "Option A is the obvious choice. It's 20% cheaper to build.", ko: "A안이 당연한 선택이에요. 건설비가 20% 싸잖아요." }],
     promptKo: "A안이 건설비가 더 싸다는 건 동의해요. 그런데 전체적으로도 더 싼지는 잘 모르겠어요. 스팀을 30% 정도 더 쓰니까, 10년 동안 운전비가 훨씬 더 높을 거예요. 결정하기 전에 두 안의 총비용을 비교해 볼 수 있을까요?",
-    segments: ["저는 동의해요", "A안이 더 싸다는 것에", "건설하기에,", "하지만 저는 잘 모르겠어요", "그게 더 싼지", "전체적으로.", "그것은 쓴다", "약 30% 더 많은 스팀을,", "그래서", "운전비가", "훨씬 더 높을 거예요", "10년 동안.", "~하기 전에", "우리가 결정하다,", "~할 수 있을까요", "우리가 비교하다", "총비용을", "두 안의"],
+    segments: ["A안이 건설비가 더 싸다는 건 동의하지만", "전체적으로도 더 싼지는 잘 모르겠어요", "스팀을 30% 정도 더 써요", "그래서 10년 동안 운전비가 훨씬 더 높을 거예요", "결정하기 전에 두 안의 총비용을 비교해 볼 수 있을까요?"],
     reference: "I agree that Option A is cheaper to build, but I'm not sure it's cheaper overall. It uses about 30% more steam, so the operating cost would be much higher over ten years. Before we decide, could we compare the total cost of both options?",
     accepted: [
       "I agree that Option A is cheaper to build, but I'm not sure it's cheaper overall. It uses about 30% more steam, so the operating cost will be much higher over ten years. Before we decide, could we compare the total cost of both options?",
@@ -1157,7 +1157,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Sari가 다른 의견이 없으면 오늘 부지 배치를 확정하자고 합니다. 새 부지가 주거 지역과 가까워 악취 민원 위험이 있다는 점을 짚고, 계획을 뒤집자는 것이 아니라 벤더에게 먼저 확인하자고 제안합니다.",
     dialogue: [{ speaker: "Sari", en: "So if there are no other comments, we can finalize the site layout today.", ko: "다른 의견이 없으면 오늘 부지 배치를 확정할게요." }],
     promptKo: "확정하기 전에, 아직 논의하지 않은 것 같은 위험이 하나 있어요. 새 부지가 주거 지역과 가까워서, 건조기 배기에서 냄새가 나면 주민들의 민원을 받을 수 있어요. 계획을 바꾸자는 건 아니지만, 먼저 벤더에게 악취 관리에 대해 물어볼 수 있을까요?",
-    segments: ["~하기 전에", "우리가 확정하다,", "위험이 하나 있어요", "제 생각에 우리가 논의하지 않은.", "새 부지가", "가까워요", "주거 지역과,", "그래서", "만약 건조기 배기가", "냄새가 나면,", "우리는 받을 수 있어요", "민원을", "주민들로부터.", "저는 말하는 게 아니에요", "계획을 바꾸자고,", "하지만", "~할 수 있을까요", "우리가 묻다", "벤더에게", "악취 관리에 대해", "먼저"],
+    segments: ["확정하기 전에", "아직 논의하지 않은 위험이 하나 있어요", "새 부지가 주거 지역과 가까워요", "그래서 건조기 배기에서 냄새가 나면 주민 민원을 받을 수 있어요", "계획을 바꾸자는 건 아니지만", "먼저 벤더에게 악취 관리에 대해 물어볼 수 있을까요?"],
     reference: "Before we finalize it, there's one risk that I don't think we've discussed. The new site is close to a residential area, so if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",
     accepted: [
       "Before we finalize it, there's one risk that I don't think we've talked about. The new site is close to a residential area, so if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",

@@ -13,7 +13,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["cond-1", "modal-possibility", "cause-effect"],
     contextKo: "Pre-FEED 회의에서 인도네시아 측이 장비 사양을 이번 주에 확정하자고 제안합니다. 당신은 서두르면 나중에 바뀔 수 있다고 설명합니다.",
     promptKo: "만약 우리가 지금 장비 사양을 결정한다면, 실제 운전 데이터가 다를 수도 있기 때문에 나중에 그 사양을 변경해야 할 수도 있다.",
-    segments: ["만약", "우리가 지금 결정한다면", "장비 사양을", "우리는 변경해야 할 수도 있다", "그 사양을", "나중에", "왜냐하면", "실제 운전 데이터가", "달라질 수도 있기 때문이다"],
+    segments: ["지금 장비 사양을 결정한다면", "나중에 그 사양을 바꿔야 할 수도 있다", "왜냐하면 실제 운전 데이터가 다를 수도 있다"],
     reference: "If we decide on the equipment specifications now, we might have to change them later because the actual operating data could be different.",
     accepted: [
       "If we decide the equipment specifications now, we might have to change them later because the actual operating data could be different.",
@@ -234,7 +234,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["present-perfect", "cause-effect"],
     contextKo: "파일럿 결과 회의에서 인도네시아 팀이 건조기 용량을 이번에 확정해 달라고 합니다. 시료의 수분 분석이 아직 끝나지 않았습니다.",
     promptKo: "우리는 아직 수분 분석을 끝내지 못해서 건조기 용량을 확정할 수 없습니다.",
-    segments: ["우리는", "아직 끝내지 못했다", "수분 분석을", "그래서", "우리는 확정할 수 없다", "건조기 용량을"],
+    segments: ["아직 수분 분석을 끝내지 못했다", "그래서 건조기 용량을 확정할 수 없다"],
     reference: "We haven't finished the moisture analysis yet, so we can't confirm the dryer capacity.",
     accepted: [
       "We can't confirm the dryer capacity because we haven't finished the moisture analysis yet.",
@@ -279,7 +279,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["time-clause", "future-plan", "agreement"],
     contextKo: "Pre-FEED 일정 회의에서 고객이 장비 사이징을 언제 시작하는지 묻습니다. 설계 기준(design basis)이 확정되면 바로 시작할 계획입니다.",
     promptKo: "고객이 설계 기준을 확정하는 대로 장비 사이징을 시작하겠습니다.",
-    segments: ["우리는", "시작하겠다", "장비 사이징을", "~하는 대로", "고객이", "확정하다", "설계 기준을"],
+    segments: ["장비 사이징을 시작하겠다", "고객이 설계 기준을 확정하는 대로"],
     reference: "We will start the equipment sizing as soon as the client confirms the design basis.",
     accepted: [
       "As soon as the client confirms the design basis, we will start the equipment sizing.",
@@ -367,7 +367,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["modal-possibility", "cause-effect", "comparative"],
     contextKo: "말레이시아 현장의 Pre-FEED 회의에서 고객이 건조기 크기를 묻습니다. 우기에는 EFB 원료가 더 젖은 상태로 들어올 수 있습니다.",
     promptKo: "우기에는 원료 수분이 더 높을 수도 있기 때문에, 더 큰 건조기가 필요할 수도 있습니다.",
-    segments: ["우리는", "필요할 수도 있다", "더 큰 건조기가", "왜냐하면", "원료 수분이", "더 높을 수도 있다", "우기에는"],
+    segments: ["더 큰 건조기가 필요할 수도 있다", "왜냐하면 원료 수분이 더 높을 수도 있다", "우기에는"],
     reference: "We might need a larger dryer because the feed moisture could be higher in the rainy season.",
     accepted: [
       "We may need a bigger dryer because the feed moisture might be higher in the rainy season.",
@@ -414,7 +414,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["purpose-to"],
     contextKo: "파일럿 결과 보고 회의에서 지난주에 세척 조건을 바꾼 이유를 설명합니다.",
     promptKo: "우리는 EFB의 회분 함량을 줄이기 위해 지난주에 세척 시간을 늘렸습니다.",
-    segments: ["우리는", "늘렸다", "세척 시간을", "지난주에", "줄이기 위해", "회분 함량을", "EFB의"],
+    segments: ["지난주에 세척 시간을 늘렸다", "EFB의 회분 함량을 줄이기 위해"],
     reference: "We increased the washing time last week to reduce the ash content of the EFB.",
     accepted: [
       "Last week, we increased the washing time to reduce the ash content of the EFB.",
@@ -500,7 +500,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["collocation", "cause-effect", "present-perfect"],
     contextKo: "설계 회의에서 인도네시아 팀이 원료 성분 분석 결과가 바뀌었다고 알려 줍니다. 당신은 시뮬레이션을 다시 돌려야 한다고 말합니다.",
     promptKo: "원료 성분이 바뀌었기 때문에 공정 시뮬레이션을 다시 돌려야 합니다.",
-    segments: ["우리는", "돌려야 한다", "공정 시뮬레이션을", "다시", "왜냐하면", "원료 성분이", "바뀌었기 때문이다"],
+    segments: ["공정 시뮬레이션을 다시 돌려야 한다", "왜냐하면 원료 성분이 바뀌었다"],
     reference: "We need to run the process simulation again because the feed composition has changed.",
     accepted: [
       "Because the feed composition has changed, we need to run the process simulation again.",
@@ -548,7 +548,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["passive", "time-clause"],
     contextKo: "EPC 일정 회의에서 펌프 벤더가 데이터시트를 언제 받을 수 있는지 묻습니다. 먼저 고객이 P&ID를 승인해야 합니다.",
     promptKo: "펌프 데이터시트는 고객이 P&ID를 승인한 후에 벤더에게 발송될 예정입니다.",
-    segments: ["펌프 데이터시트는", "발송될 것이다", "벤더에게", "~한 후에", "P&ID가", "승인되다", "고객에 의해"],
+    segments: ["펌프 데이터시트는 벤더에게 발송될 것이다", "P&ID가 고객에게 승인된 후에"],
     reference: "The pump datasheets will be sent to the vendor after the P&IDs are approved by the client.",
     accepted: [
       "The pump datasheets will be sent to the vendor after the client approves the P&IDs.",
@@ -597,7 +597,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["relative-clause", "cause-effect", "comparative"],
     contextKo: "벤더와의 성능 검토 회의에서, 지난달 파일럿에서 시험한 건조기가 목표 수분에 도달하지 못한 이유를 설명합니다.",
     promptKo: "우리가 지난달에 테스트한 건조기는 원료가 예상보다 더 젖어 있었기 때문에 목표 수분 10 wt%에 도달하지 못했습니다.",
-    segments: ["그 건조기는", "우리가 테스트한", "지난달에", "도달하지 못했다", "목표 수분에", "10 wt%라는", "왜냐하면", "원료가", "더 젖어 있었다", "예상보다"],
+    segments: ["우리가 지난달에 테스트한 건조기는", "목표 수분 10 wt%에 도달하지 못했다", "왜냐하면 원료가 예상보다 더 젖어 있었다"],
     reference: "The dryer that we tested last month could not reach the target moisture of 10 wt% because the feed was wetter than expected.",
     accepted: [
       "The dryer which we tested last month couldn't reach the target moisture of 10 wt% because the feed was wetter than expected.",
@@ -645,7 +645,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["cond-2", "comparative"],
     contextKo: "Pre-FEED 회의에서 고객이 건조기 설계 여유율이 왜 20%나 되는지 묻습니다. 실제 운전 데이터가 부족한 상황입니다.",
     promptKo: "(실제로는 부족하지만) 운전 데이터가 더 많다면, 건조기에 더 작은 설계 여유율을 적용할 텐데요.",
-    segments: ["만약 ~라면 (가정)", "우리에게 있다", "더 많은 운전 데이터가", "우리는 ~할 텐데", "적용하다", "더 작은 설계 여유율을", "건조기에"],
+    segments: ["(가정) 운전 데이터가 더 많다면", "건조기에 더 작은 설계 여유율을 적용할 텐데"],
     reference: "If we had more operating data, we would use a smaller design margin for the dryer.",
     accepted: [
       "If we had more operating data, we would apply a smaller design margin to the dryer.",
@@ -691,7 +691,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["degree", "comparative"],
     contextKo: "벤더 회의에서 파일럿 건조기 결과를 보고합니다. 처리 용량은 보증값에 조금 못 미쳤지만, 스팀 사용량은 예상을 크게 넘었습니다.",
     promptKo: "건조기 처리 용량은 벤더 보증값보다 약간 낮았지만, 스팀 사용량은 예상보다 훨씬 많았습니다.",
-    segments: ["건조기 처리 용량은", "~였다", "약간 더 낮은", "벤더 보증값보다", "하지만", "스팀 사용량은", "훨씬 더 많았다", "우리가 예상한 것보다"],
+    segments: ["건조기 처리 용량은 벤더 보증값보다 약간 낮았다", "하지만 스팀 사용량은 예상보다 훨씬 많았다"],
     reference: "The dryer capacity was slightly lower than the vendor's guaranteed value, but the steam consumption was much higher than we expected.",
     accepted: [
       "The dryer capacity was a little lower than the vendor's guaranteed value, but the steam consumption was much higher than we expected.",
@@ -738,7 +738,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["cond-1", "modal-necessity", "purpose-to"],
     contextKo: "파일럿 운전 회의에서 다음 주 테스트 계획을 정합니다. 건조기 출구 수분이 목표를 넘을 가능성이 있습니다.",
     promptKo: "(다음 주 테스트에서) 건조기 출구 수분이 15 wt%를 넘으면, 체류 시간을 늘리기 위해 투입량을 줄여야 할 것입니다.",
-    segments: ["만약", "출구 수분이", "넘으면", "15 wt%를", "우리는 줄여야 할 것이다", "투입량을", "늘리기 위해", "체류 시간을"],
+    segments: ["출구 수분이 15 wt%를 넘으면", "투입량을 줄여야 할 것이다", "체류 시간을 늘리기 위해"],
     reference: "If the outlet moisture goes above 15 wt%, we will have to reduce the feed rate to increase the residence time.",
     accepted: [
       "If the outlet moisture is above 15 wt%, we will need to reduce the feed rate to increase the residence time.",
@@ -785,10 +785,11 @@ export const SENTENCES_A: Question[] = [
     difficulty: 6,
     skills: ["cause-effect", "too-adj", "modal-necessity"],
     contextKo: "배관 설계 검토 회의에서 스팀 유량이 늘어난 뒤의 계산 결과를 설명하고 배관 크기 변경을 제안합니다.",
-    promptKo: "증가한 스팀 유량 때문에 스팀 배관의 압력 강하가 너무 커서, 배관 크기를 키워야 합니다.",
-    segments: ["~때문에", "증가한 스팀 유량", "압력 강하가", "스팀 배관의", "너무 크다", "그래서", "우리는 키워야 한다", "배관 크기를"],
-    reference: "Because of the higher steam flow, the pressure drop in the steam line is too high, so we need to increase the pipe size.",
+    promptKo: "배관 크기를 키워야 합니다. 증가한 스팀 유량 때문에 스팀 배관의 압력 강하가 너무 큽니다.",
+    segments: ["배관 크기를 키워야 한다", "스팀 배관의 압력 강하가 너무 크다", "증가한 스팀 유량 때문에"],
+    reference: "We need to increase the pipe size. The pressure drop in the steam line is too high because of the higher steam flow.",
     accepted: [
+      "Because of the higher steam flow, the pressure drop in the steam line is too high, so we need to increase the pipe size.",
       "Due to the higher steam flow, the pressure drop in the steam line is too high, so we need to increase the pipe size.",
       "Because the steam flow has increased, the pressure drop in the steam line is too high, so we need to increase the pipe size.",
       "The pressure drop in the steam line is too high because of the increased steam flow, so we need to use a larger pipe size.",
@@ -801,7 +802,7 @@ export const SENTENCES_A: Question[] = [
       { id: "increased", en: "higher / increased", ko: "증가한", any: ["higher|increase|increased|more|larger"] },
       { id: "pressure-drop", en: "pressure drop", ko: "압력 강하", any: ["pressure drop|loss", "dp"], term: true, critical: true },
       { id: "too-high", en: "too high", ko: "너무 크다", any: ["too high|large|big|much", "exceed|above"], critical: true },
-      { id: "so", en: "so", ko: "그래서", any: ["so|therefore|thus", "as a result"] },
+      { id: "so", en: "so", ko: "그래서", any: ["so|therefore|thus|because|due", "as a result"] },
       { id: "pipe-size", en: "increase the pipe size", ko: "배관 크기를 키우다", any: ["pipe|line size|diameter", "larger|bigger ... pipe|line", "upsize|enlarge ... pipe|line"], term: true, critical: true },
     ],
     pitfalls: [
@@ -810,9 +811,9 @@ export const SENTENCES_A: Question[] = [
       { id: "because-noun", pattern: "re:\\bbecause(?= (the |a )?(higher|increased|increasing|larger|bigger|high) steam (flow|flowrate|rate) (the|so|pressure|we|it)\\b)", category: "sentence-structure", severity: "major", fix: "because of", messageKo: "because 뒤에 명사(구)만 올 때는 'because of'를 씁니다: 'because of the higher steam flow'. 문장을 쓰려면 'because the steam flow has increased'처럼 동사가 필요합니다.", skill: "cause-effect" },
     ],
     hints: {
-      pattern: "Because of / Due to + 명사, 주어 + 동사 …, so + 주어 + 동사",
-      skeleton: "____ ____ the higher steam flow, the pressure drop in the steam line is ____ high, so we need to increase the pipe size.",
-      partial: "Because of the higher steam flow, the pressure drop in the steam line is too high, so …",
+      pattern: "주어 + need to + 동사. 주어 + is too + 형용사 + because of / due to + 명사",
+      skeleton: "We need to ____ the pipe size. The pressure drop in the steam line is ____ high ____ ____ the higher steam flow.",
+      partial: "We need to increase the pipe size. The pressure drop in the steam line …",
     },
     explanationKo: "원인이 명사(구)이면 'because of / due to + 명사'(because of the higher steam flow), 문장이면 'because + 주어 + 동사'(because the steam flow increased)로 씁니다. 'because of the steam flow increased'처럼 두 형태를 섞으면 틀린 문장이 됩니다.",
     probes: [
@@ -832,7 +833,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["reporting", "verb-object"],
     contextKo: "벤더와의 성능 검토 회의 후 내부 보고에서, 벤더가 말한 처리 용량과 파일럿에서 실제로 나온 값을 비교해 전달합니다.",
     promptKo: "벤더는 그 건조기가 시간당 2톤을 처리할 수 있다고 했지만, 우리 파일럿 데이터에서는 시간당 1.6톤밖에 나오지 않았습니다.",
-    segments: ["벤더는", "말했다", "그 건조기가", "처리할 수 있다고", "시간당 2톤을", "하지만", "우리 파일럿 데이터는", "보여 주었다", "시간당 1.6톤만"],
+    segments: ["벤더는 그 건조기가 시간당 2톤을 처리할 수 있다고 했다", "하지만 우리 파일럿 데이터는 시간당 1.6톤만 나왔다"],
     reference: "The vendor said that the dryer could handle 2 t/h, but our pilot data showed only 1.6 t/h.",
     accepted: [
       "The vendor told us that the dryer could handle 2 t/h, but our pilot data showed only 1.6 t/h.",
@@ -882,7 +883,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["cond-3", "time-clause"],
     contextKo: "파일럿 결과 회의에서 지난주 테스트 중 건조기 처리량이 떨어진 원인을 돌아봅니다. 당시 원료 수분은 하루에 한 번만 측정했습니다.",
     promptKo: "(지난주 테스트에서) 원료 수분을 더 자주 측정했더라면, 건조기 처리량이 떨어지기 전에 문제를 발견했을 것입니다.",
-    segments: ["만약", "우리가 측정했더라면", "원료 수분을", "더 자주", "지난주에", "우리는 발견했을 것이다", "그 문제를", "~하기 전에", "건조기 처리량이 떨어지다"],
+    segments: ["(지난주에) 원료 수분을 더 자주 측정했더라면", "그 문제를 발견했을 것이다", "건조기 처리량이 떨어지기 전에"],
     reference: "If we had measured the feed moisture more often last week, we would have found the problem before the dryer capacity dropped.",
     accepted: [
       "If we had measured the feed moisture more often last week, we would have noticed the problem before the dryer capacity dropped.",
@@ -927,10 +928,11 @@ export const SENTENCES_A: Question[] = [
     difficulty: 9,
     skills: ["relative-clause", "passive", "prep-gerund"],
     contextKo: "공정 최적화 회의에서 시뮬레이션 결과로 스팀을 줄일 수 있다는 의견이 나옵니다. 당신은 근거 데이터가 부족하다는 점을 짚습니다.",
-    promptKo: "파일럿 운전 세 번의 결과만을 바탕으로 한 이 시뮬레이션은 스팀 사용량을 10% 줄일 수 있다고 보여 주지만, 설계를 바꾸기 전에 더 많은 데이터로 이를 확인해야 합니다.",
-    segments: ["그 시뮬레이션은", "~을 바탕으로 한", "파일럿 운전 세 번만", "보여 준다", "우리가 줄일 수 있다고", "스팀 사용량을", "10%만큼", "하지만", "우리는 확인해야 한다", "이것을", "더 많은 데이터로", "~하기 전에", "설계를 바꾸다"],
-    reference: "The simulation, which is based on only three pilot runs, shows that we could reduce the steam consumption by 10%, but we should confirm this with more data before changing the design.",
+    promptKo: "파일럿 운전 세 번의 결과만을 바탕으로 한 이 시뮬레이션은 스팀 사용량을 10% 줄일 수 있다고 보여 줍니다. 하지만 설계를 바꾸기 전에 더 많은 데이터로 이를 확인해야 합니다.",
+    segments: ["파일럿 운전 세 번만을 바탕으로 한 이 시뮬레이션은", "스팀 사용량을 10% 줄일 수 있다고 보여 준다", "하지만 더 많은 데이터로 확인해야 한다", "설계를 바꾸기 전에"],
+    reference: "The simulation, which is based on only three pilot runs, shows that we could reduce the steam consumption by 10%. But we should confirm this with more data before changing the design.",
     accepted: [
+      "The simulation, which is based on only three pilot runs, shows that we could reduce the steam consumption by 10%, but we should confirm this with more data before changing the design.",
       "The simulation, which is based on only three pilot runs, shows that we could reduce the steam consumption by 10%, but we should confirm this with more data before we change the design.",
       "The simulation, which is only based on three pilot runs, shows that we can reduce the steam consumption by 10%, but we need to confirm this with more data before changing the design.",
       "The simulation, which uses data from only three pilot runs, shows that we could reduce the steam consumption by 10%, but we should confirm this with more data before changing the design.",
@@ -940,7 +942,7 @@ export const SENTENCES_A: Question[] = [
     meaning: [
       { id: "simulation", en: "the simulation", ko: "시뮬레이션", any: ["simulation|model"], term: true, critical: true },
       { id: "three-runs", en: "based on only three pilot runs", ko: "파일럿 운전 세 번만을 바탕으로 한", any: ["three|3 ... run|test|trial|batch"], critical: true },
-      { id: "reduce", en: "could reduce", ko: "줄일 수 있다", any: ["reduce|cut|lower|decrease|save"], critical: true },
+      { id: "reduce", en: "could reduce", ko: "줄일 수 있다", any: ["reduce|cut|lower|decrease|save|reduction|saving|savings"], critical: true },
       { id: "steam", en: "steam consumption", ko: "스팀 사용량", any: ["steam consumption|use|usage|demand", "steam"], term: true },
       { id: "ten", en: "by 10%", ko: "10%만큼", any: ["10", "ten"] },
       { id: "confirm", en: "should confirm", ko: "확인해야 한다", any: ["confirm|verify|check|validate|prove"], critical: true },
@@ -953,7 +955,7 @@ export const SENTENCES_A: Question[] = [
     ],
     hints: {
       pattern: "명사, which is based on …, + 동사 …, but + 주어 + should + 동사 + before + V-ing",
-      skeleton: "The simulation, ____ is based on only three pilot runs, shows that we ____ reduce the steam consumption by 10%, but …",
+      skeleton: "The simulation, ____ is based on only three pilot runs, shows that we ____ reduce the steam consumption by 10%. But …",
       partial: "The simulation, which is based on only three pilot runs, shows that …",
     },
     explanationKo: "명사에 정보를 덧붙일 때는 ', which + 동사'로 쓰고, '~을 바탕으로 한'은 수동 형태 'which is based on'이므로 is를 빼면 안 됩니다. 'before' 뒤에는 동사ing(before changing)나 '주어 + 동사'(before we change)가 옵니다.",
@@ -973,10 +975,11 @@ export const SENTENCES_A: Question[] = [
     difficulty: 8,
     skills: ["polite-disagree", "modal-necessity", "cause-effect"],
     contextKo: "FEED 회의에서 고객이 CAPEX를 줄이기 위해 건조기 크기를 20% 줄이자고 제안합니다. 당신은 파일럿 데이터를 근거로 정중하게 반대합니다.",
-    promptKo: "말씀하신 점은 이해하지만, 파일럿 데이터에서 원료 수분이 설계값보다 높을 수 있다는 결과가 나왔기 때문에 건조기 크기를 20% 줄여야 할지는 잘 모르겠습니다.",
-    segments: ["말씀하신 점은 이해합니다", "하지만", "저는 잘 모르겠습니다", "~해야 할지", "건조기 크기를 줄이다", "20%만큼", "왜냐하면", "파일럿 데이터가 보여 주었다", "원료 수분이", "더 높을 수 있다고", "설계값보다"],
-    reference: "I see your point, but I'm not sure that we should reduce the dryer size by 20%, because the pilot data showed that the feed moisture could be higher than the design value.",
+    promptKo: "말씀하신 점은 이해하지만, 건조기 크기를 20% 줄여야 할지는 잘 모르겠습니다. 파일럿 데이터에서 원료 수분이 설계값보다 높을 수 있다는 결과가 나왔습니다.",
+    segments: ["말씀하신 점은 이해하지만", "건조기 크기를 20% 줄여야 할지는 잘 모르겠다", "파일럿 데이터를 보면", "원료 수분이 설계값보다 높을 수 있다"],
+    reference: "I see your point, but I'm not sure we should reduce the dryer size by 20%. The pilot data showed that the feed moisture could be higher than the design value.",
     accepted: [
+      "I see your point, but I'm not sure that we should reduce the dryer size by 20%, because the pilot data showed that the feed moisture could be higher than the design value.",
       "I understand your point, but I'm not sure that we should reduce the dryer size by 20%, because the pilot data showed that the feed moisture could be higher than the design value.",
       "I see your point, but I'm not sure that we should reduce the dryer size by 20%, since the pilot data showed that the feed moisture could be higher than the design value.",
       "I see your point, but I'm not sure if we should reduce the dryer size by 20%, because the pilot data showed that the feed moisture might be higher than the design value.",
@@ -1000,9 +1003,9 @@ export const SENTENCES_A: Question[] = [
       { id: "about-base", pattern: "re:(?<=\\bsure about )(reduce|cut|decrease|lower|downsize|make)\\b", category: "verb-form", severity: "major", fix: "reducing", messageKo: "전치사 about 뒤에 동사가 올 때는 동사ing 형태입니다: 'I'm not sure about reducing …'.", skill: "prep-gerund" },
     ],
     hints: {
-      pattern: "I see your point, but I'm not sure (that) + 주어 + should + 동사, because …",
-      skeleton: "I see your ____, but I'm not ____ that we should reduce the dryer size by 20%, because the pilot data ____ …",
-      partial: "I see your point, but I'm not sure that we should reduce the dryer size by 20%, because …",
+      pattern: "I see your point, but I'm not sure (that) + 주어 + should + 동사. + 이유 문장",
+      skeleton: "I see your ____, but I'm not ____ we should reduce the dryer size by 20%. The pilot data ____ that …",
+      partial: "I see your point, but I'm not sure we should reduce the dryer size by 20%. The pilot data …",
     },
     explanationKo: "정중하게 반대할 때는 상대 의견을 먼저 인정한 뒤('I see your point, but') 'I'm not sure that …'으로 완곡하게 의견을 말하고 근거를 because로 덧붙입니다. 'sure'는 형용사라서 'I don't sure'가 아니라 'I'm not sure'입니다.",
     probes: [

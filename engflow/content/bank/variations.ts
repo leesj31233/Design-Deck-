@@ -408,7 +408,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-too-early", level: 2 },
     contextKo: "공정 설계 회의에서 PM이 이번 주에 열수지를 확정하자고 합니다. 파일럿 데이터는 아직 없습니다.",
     promptKo: "파일럿 데이터가 아직 준비되지 않았기 때문에 열수지를 확정하기에는 너무 이르다고 생각합니다.",
-    segments: ["저는 생각합니다", "너무 이르다", "확정하기에는", "열수지를", "왜냐하면", "파일럿 데이터가", "아직 준비되지 않았다"],
+    segments: ["열수지를 확정하기에는 너무 이르다고 생각한다", "왜냐하면 파일럿 데이터가 아직 준비되지 않았다"],
     reference: "I think it's too early to finalize the heat balance because the pilot data is not ready yet.",
     accepted: [
       "I think it's too early to finalize the heat balance since the pilot data is not ready yet.",
@@ -451,7 +451,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-too-early", level: 3 },
     contextKo: "프로젝트 회의에서 인도네시아 팀이 일정 때문에 이번 주에 건조기를 발주하자고 제안합니다. 파일럿 시험 결과는 다음 달에 나옵니다.",
     promptKo: "일정이 빠듯한 것은 이해하지만, 건조기를 발주하기에는 너무 이르다고 생각합니다. 먼저 파일럿 시험 결과를 기다려야 합니다.",
-    segments: ["저는 이해합니다", "일정이 빠듯하다는 것을", "하지만", "저는 생각합니다", "너무 이르다", "발주하기에는", "건조기를", "우리는 기다려야 합니다", "파일럿 시험 결과를", "먼저"],
+    segments: ["일정이 빠듯한 것은 이해한다", "하지만 건조기를 발주하기에는 너무 이르다고 생각한다", "먼저 파일럿 시험 결과를 기다려야 한다"],
     reference: "I understand the schedule is tight, but I think it's too early to order the dryer. We should wait for the pilot test results first.",
     accepted: [
       "I understand the schedule is tight, but I think it's too early to order the dryer. We need to wait for the pilot test results first.",
@@ -493,7 +493,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-too-early", level: 3 },
     contextKo: "고객과의 타당성 검토 회의에서 고객이 오늘 최종 CAPEX 금액을 달라고 합니다. 벤더 견적은 다음 주에 받습니다.",
     promptKo: "지금 최종 CAPEX 금액을 드리기에는 너무 이릅니다. 다음 주에 벤더 견적을 받은 후에 더 정확한 추정치를 공유드릴 수 있습니다.",
-    segments: ["너무 이르다", "드리기에는", "최종 CAPEX 금액을", "지금", "우리가 받은 후에", "벤더 견적을", "다음 주에", "우리는 공유할 수 있다", "더 정확한 추정치를"],
+    segments: ["지금 최종 CAPEX 금액을 드리기에는 너무 이르다", "다음 주에 벤더 견적을 받은 후에", "더 정확한 추정치를 공유할 수 있다"],
     reference: "It's too early to give you a final CAPEX number now. After we receive the vendor quotations next week, we can share a more accurate estimate.",
     accepted: [
       "It's too soon to give you a final CAPEX number now. When we receive the vendor quotations next week, we can share a more accurate estimate.",
@@ -659,7 +659,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-still-waiting", level: 2 },
     contextKo: "공정 설계 회의에서 PM이 물질수지를 언제 확정할 수 있는지 묻습니다.",
     promptKo: "아직 실험실 분석 결과를 기다리고 있어서, 물질수지를 아직 확정할 수 없습니다.",
-    segments: ["우리는", "아직 기다리고 있다", "실험실 분석 결과를", "그래서", "우리는 확정할 수 없다", "물질수지를", "아직"],
+    segments: ["아직 실험실 분석 결과를 기다리고 있다", "그래서 물질수지를 아직 확정할 수 없다"],
     reference: "We are still waiting for the lab results, so we can't finalize the mass balance yet.",
     accepted: [
       "We are still waiting for the lab results, so we are not able to finalize the mass balance yet.",
@@ -698,7 +698,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-still-waiting", level: 2 },
     contextKo: "시운전 일일 회의에서 건조기 시운전을 왜 시작하지 못했는지 설명합니다.",
     promptKo: "보일러가 아직 준비되지 않아서 시운전 팀은 스팀 공급을 기다리고 있습니다.",
-    segments: ["시운전 팀은", "기다리고 있다", "스팀 공급을", "왜냐하면", "보일러가", "아직 준비되지 않았다"],
+    segments: ["시운전 팀은 스팀 공급을 기다리고 있다", "왜냐하면 보일러가 아직 준비되지 않았다"],
     reference: "The commissioning team is waiting for the steam supply because the boiler is not ready yet.",
     accepted: [
       "The commissioning team is waiting for the steam supply since the boiler is not ready yet.",
@@ -737,7 +737,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-still-waiting", level: 3 },
     contextKo: "주간 진행 회의에서 PM이 물질수지 상황을 묻습니다. 인도네시아 현장이 원료 분석 결과를 아직 보내지 않았습니다.",
     promptKo: "아직 물질수지를 끝내지 못했습니다. 현장에서 오는 원료 분석 결과를 아직 기다리고 있고, 월요일에 받을 것으로 예상합니다.",
-    segments: ["우리는 끝내지 못했다", "물질수지를", "아직", "우리는 아직 기다리고 있다", "원료 분석 결과를", "현장에서 오는", "그리고", "우리는 예상한다", "그것을 받을 것으로", "월요일에"],
+    segments: ["아직 물질수지를 끝내지 못했다", "현장에서 오는 원료 분석 결과를 아직 기다리고 있다", "그리고 월요일에 받을 것으로 예상한다"],
     reference: "We haven't finished the mass balance yet. We are still waiting for the feed analysis from the site, and we expect to receive it on Monday.",
     accepted: [
       "We have not completed the mass balance yet. We are still waiting for the feed analysis from the site, and we expect to get it on Monday.",
@@ -943,7 +943,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-check-object", level: 2 },
     contextKo: "건조기 성능 문제 회의에서 원인 조사를 제안합니다.",
     promptKo: "출구 수분이 아직 너무 높기 때문에 건조기 입구의 스팀 압력을 확인해야 합니다.",
-    segments: ["우리는 확인해야 한다", "스팀 압력을", "건조기 입구의", "왜냐하면", "출구 수분이", "아직 너무 높다"],
+    segments: ["건조기 입구의 스팀 압력을 확인해야 한다", "왜냐하면 출구 수분이 아직 너무 높다"],
     reference: "We should check the steam pressure at the dryer inlet because the outlet moisture is still too high.",
     accepted: [
       "We need to check the steam pressure at the dryer inlet because the outlet moisture is still too high.",
@@ -981,7 +981,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-check-object", level: 2 },
     contextKo: "기동 전 점검 회의에서 현장 운전원에게 작업을 지시합니다.",
     promptKo: "기동 전에 스팀 압력을 확인하고, 모든 플랜지에 누설이 있는지 점검해 주세요.",
-    segments: ["기동 전에", "확인해 주세요", "스팀 압력을", "그리고", "점검해 주세요", "모든 플랜지를", "누설이 있는지"],
+    segments: ["기동 전에", "스팀 압력을 확인해 주세요", "그리고 모든 플랜지에 누설이 있는지 점검해 주세요"],
     reference: "Before startup, please check the steam pressure and check all flanges for leaks.",
     accepted: [
       "Before startup, please check the steam pressure and check all the flanges for leaks.",
@@ -1028,7 +1028,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-check-object", level: 3 },
     contextKo: "인도네시아 현장 운전원이 화상 회의에서 건조기 출구 수분이 목표보다 높다고 보고합니다.",
     promptKo: "업데이트 감사합니다. 실제 원료 투입량과 스팀 압력을 확인해 주시겠어요? 그러면 원인을 찾을 수 있습니다.",
-    segments: ["감사합니다", "업데이트에 대해", "확인해 주시겠어요?", "실제 원료 투입량과", "스팀 압력을", "그러면", "우리는 찾을 수 있다", "원인을"],
+    segments: ["업데이트 감사합니다", "실제 원료 투입량과 스팀 압력을 확인해 주시겠어요?", "그러면 원인을 찾을 수 있다"],
     reference: "Thank you for the update. Could you check the actual feed rate and the steam pressure? Then we can find the cause.",
     accepted: [
       "Thanks for the update. Can you check the actual feed rate and the steam pressure? Then we can find the cause.",
@@ -1067,7 +1067,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-check-object", level: 3 },
     contextKo: "고객과의 파일럿 결과 회의에서 고객이 펠릿 수율이 왜 낮은지 묻습니다.",
     promptKo: "아직 확실하지 않습니다. 이번 주에 원료 조성과 수분 함량을 확인한 다음, 결과를 공유드리겠습니다.",
-    segments: ["우리는 아직 확실하지 않다", "이번 주에", "우리는 확인하겠다", "원료 조성과", "수분 함량을", "그다음에", "우리는 공유하겠다", "결과를"],
+    segments: ["아직 확실하지 않다", "이번 주에 원료 조성과 수분 함량을 확인하겠다", "그다음에 결과를 공유드리겠다"],
     reference: "We are not sure yet. This week, we will check the feed composition and the moisture content, and then we will share the results with you.",
     accepted: [
       "We are not sure yet. We will check the feed composition and the moisture content this week, and then we will share the results with you.",
@@ -1231,7 +1231,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-receive-when", level: 2 },
     contextKo: "분석 기관이 다음 주 화요일에 결과를 보내기로 확정했습니다. 고객에게 다음 단계를 설명합니다.",
     promptKo: "(확정된 일정대로) 다음 주에 분석 결과를 받으면, 물질수지를 업데이트해서 보내 드리겠습니다.",
-    segments: ["~하면 (확실한 일)", "우리가 받다", "분석 결과를", "다음 주에", "우리는 업데이트하겠다", "물질수지를", "그리고 보내 드리겠다", "그것을"],
+    segments: ["(확정된 일정) 다음 주에 분석 결과를 받으면", "물질수지를 업데이트하겠다", "그리고 보내 드리겠다"],
     reference: "When we receive the lab results next week, we will update the mass balance and send it to you.",
     accepted: [
       "When we get the lab results next week, we will update the mass balance and send it to you.",
@@ -1308,7 +1308,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-receive-when", level: 3 },
     contextKo: "벤더 킥오프 회의에서 벤더가 다음 주 화요일에 성능 데이터를 보내겠다고 약속했습니다.",
     promptKo: "감사합니다. 다음 주에 성능 데이터를 받으면, 검토해서 금요일까지 코멘트를 보내 드리겠습니다.",
-    segments: ["감사합니다", "~하면 (확실한 일)", "우리가 받다", "귀사의 성능 데이터를", "다음 주에", "우리는 검토하겠다", "그리고 보내겠다", "우리의 코멘트를", "금요일까지"],
+    segments: ["감사합니다", "(확정된 일정) 다음 주에 성능 데이터를 받으면", "검토하겠다", "그리고 금요일까지 코멘트를 보내 드리겠다"],
     reference: "Thank you. When we receive your performance data next week, we will review it and send our comments by Friday.",
     accepted: [
       "Thank you. When we get your performance data next week, we will review it and send our comments by Friday.",
@@ -1354,7 +1354,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-receive-when", level: 3 },
     contextKo: "고객과의 진행 회의에서 고객이 열수지 업데이트 시기를 묻습니다. 인도네시아 팀이 월요일에 원료 분석 결과를 보내기로 확정했습니다.",
     promptKo: "인도네시아 팀이 월요일에 원료 분석 결과를 보낼 예정입니다. 그것을 받으면 이틀 안에 열수지를 업데이트하겠습니다.",
-    segments: ["인도네시아 팀이", "보낼 예정이다", "원료 분석 결과를", "월요일에", "~하면 (확실한 일)", "우리가 그것을 받다", "우리는 업데이트하겠다", "열수지를", "이틀 안에"],
+    segments: ["인도네시아 팀이 월요일에 원료 분석 결과를 보낼 예정이다", "(확실한 일) 그것을 받으면", "이틀 안에 열수지를 업데이트하겠다"],
     reference: "The Indonesian team will send the feed analysis on Monday. When we receive it, we will update the heat balance within two days.",
     accepted: [
       "The Indonesian team will send the feed analysis on Monday. When we get it, we will update the heat balance within two days.",
@@ -1566,7 +1566,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-before-ing", level: 2 },
     contextKo: "벤더와 데이터시트를 주고받는 일정을 팀에 설명합니다.",
     promptKo: "벤더의 코멘트를 받은 후에, 데이터시트를 수정해서 다시 보내겠습니다.",
-    segments: ["~한 후에", "받기", "벤더의 코멘트를", "우리는 수정하겠다", "데이터시트를", "그리고 다시 보내겠다", "그것을"],
+    segments: ["벤더의 코멘트를 받은 후에", "데이터시트를 수정하겠다", "그리고 다시 보내 드리겠다"],
     reference: "After receiving the vendor's comments, we will revise the datasheet and send it back.",
     accepted: [
       "After we receive the vendor's comments, we will revise the datasheet and send it back.",
@@ -1610,7 +1610,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-before-ing", level: 3 },
     contextKo: "고객이 회의에서 디캔터를 지금 바로 발주하자고 합니다. 벤더의 성능 시험 결과는 아직 받지 못했습니다.",
     promptKo: "발주하기 전에 벤더의 시험 결과를 보고 싶습니다. 이번 주에 데이터를 보내 달라고 벤더에게 요청해 주시겠어요?",
-    segments: ["~하기 전에", "발주하기", "우리는 보고 싶다", "시험 결과를", "벤더의", "요청해 주시겠어요?", "그들에게", "데이터를 보내 달라고", "이번 주에"],
+    segments: ["발주하기 전에", "벤더의 시험 결과를 보고 싶다", "이번 주에 데이터를 보내 달라고 벤더에게 요청해 주시겠어요?"],
     reference: "Before placing the order, we would like to see the test results from the vendor. Could you ask them to send the data this week?",
     accepted: [
       "Before we place the order, we would like to see the test results from the vendor. Could you ask them to send the data this week?",
@@ -1650,7 +1650,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-before-ing", level: 3 },
     contextKo: "시운전 준비 회의에서 운전원이 내일 아침에 건조기를 기동하자고 제안합니다.",
     promptKo: "건조기를 기동하기 전에 스팀 압력과 응축수 라인을 확인해야 합니다. 모두 문제가 없으면 내일 오후에 기동할 수 있습니다.",
-    segments: ["~하기 전에", "기동하기", "건조기를", "우리는 확인해야 한다", "스팀 압력과", "응축수 라인을", "만약 모두 문제없다면", "우리는 기동할 수 있다", "그것을", "내일 오후에"],
+    segments: ["건조기를 기동하기 전에", "스팀 압력과 응축수 라인을 확인해야 한다", "모두 문제가 없으면", "내일 오후에 기동할 수 있다"],
     reference: "Before starting the dryer, we need to check the steam pressure and the condensate line. If everything is OK, we can start it tomorrow afternoon.",
     accepted: [
       "Before we start the dryer, we need to check the steam pressure and the condensate line. If everything is OK, we can start it tomorrow afternoon.",
@@ -1820,7 +1820,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-schedule-delayed", level: 2 },
     contextKo: "시운전 진행 회의에서 일정이 늦어진 이유를 설명합니다.",
     promptKo: "지난주에 보일러에 문제가 있어서 시운전이 (현재) 조금 지연된 상태입니다.",
-    segments: ["시운전이", "~이다 (상태)", "조금 지연된", "왜냐하면", "보일러에 문제가 있었다", "지난주에"],
+    segments: ["시운전이 (현재) 조금 지연된 상태다", "왜냐하면 지난주에 보일러에 문제가 있었다"],
     reference: "The commissioning is a little delayed because the boiler had a problem last week.",
     accepted: [
       "The commissioning is slightly delayed because the boiler had a problem last week.",
@@ -1862,7 +1862,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-schedule-delayed", level: 2 },
     contextKo: "고객과의 설계 회의에서 PFD 제출 일정을 조정합니다.",
     promptKo: "기본 설계가 (현재) 약간 지연된 상태라서, PFD는 다음 주 월요일에 보내 드리겠습니다.",
-    segments: ["기본 설계가", "~이다 (상태)", "약간 지연된", "그래서", "우리는 보내겠다", "PFD를", "다음 주 월요일에"],
+    segments: ["기본 설계가 (현재) 약간 지연된 상태다", "그래서 PFD는 다음 주 월요일에 보내겠다"],
     reference: "The basic design is slightly delayed, so we will send the PFD next Monday.",
     accepted: [
       "The basic design is a little delayed, so we will send the PFD next Monday.",
@@ -1903,7 +1903,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-schedule-delayed", level: 3 },
     contextKo: "고객과의 주간 진행 회의에서 고객이 FEED 문서가 일정대로 진행되는지 묻습니다.",
     promptKo: "벤더 데이터를 아직 기다리고 있어서 FEED 문서가 조금 지연된 상태입니다. 다음 주 말까지 끝낼 것으로 예상합니다.",
-    segments: ["FEED 문서가", "~이다 (상태)", "조금 지연된", "왜냐하면", "우리는 아직 기다리고 있다", "벤더 데이터를", "우리는 예상한다", "그것들을 끝낼 것으로", "다음 주 말까지"],
+    segments: ["FEED 문서가 조금 지연된 상태다", "왜냐하면 벤더 데이터를 아직 기다리고 있다", "다음 주 말까지 끝낼 것으로 예상한다"],
     reference: "The FEED documents are a little delayed because we are still waiting for the vendor data. We expect to finish them by the end of next week.",
     accepted: [
       "The FEED documents are slightly delayed because we are still waiting for the vendor data. We expect to finish them by the end of next week.",
@@ -1947,7 +1947,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-schedule-delayed", level: 3 },
     contextKo: "말레이시아 현장 팀과의 시운전 회의입니다. 건조기 설치가 늦어져 고객이 기동 날짜를 걱정합니다.",
     promptKo: "건조기 설치가 조금 지연된 상태이지만, 배관 작업이 이미 끝났기 때문에 기동 날짜에는 영향을 주지 않을 것입니다.",
-    segments: ["건조기 설치가", "~이다 (상태)", "조금 지연된", "하지만", "그것은 영향을 주지 않을 것이다", "기동 날짜에", "왜냐하면", "배관 작업이", "이미 끝났다"],
+    segments: ["건조기 설치가 조금 지연된 상태다", "하지만 기동 날짜에는 영향을 주지 않을 것이다", "왜냐하면 배관 작업이 이미 끝났다"],
     reference: "The dryer installation is a little delayed, but it will not affect the start-up date because the piping work is already finished.",
     accepted: [
       "The dryer installation is slightly delayed, but it won't affect the start-up date because the piping work is already finished.",
@@ -2120,7 +2120,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-object-order", level: 2 },
     contextKo: "파일럿 건조 시험 회의에서 운전 조건을 바꾸는 순서를 정합니다.",
     promptKo: "먼저 수분 함량을 측정해야 하고, 그다음에 스팀 유량을 조정할 수 있습니다.",
-    segments: ["우리는 측정해야 한다", "수분 함량을", "먼저", "그리고 그다음에", "우리는 조정할 수 있다", "스팀 유량을"],
+    segments: ["먼저 수분 함량을 측정해야 한다", "그다음에 스팀 유량을 조정할 수 있다"],
     reference: "We need to measure the moisture content first, and then we can adjust the steam flow.",
     accepted: [
       "First, we need to measure the moisture content, and then we can adjust the steam flow.",
@@ -2206,7 +2206,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-object-order", level: 3 },
     contextKo: "건조기 출구 수분이 높아 열린 문제 해결 회의에서 인도네시아 팀이 스팀 압력을 올리자고 제안합니다.",
     promptKo: "먼저 실제 원료 투입량을 확인해야 한다고 생각합니다. 투입량이 설계값보다 높다면 줄여야 할 수도 있습니다.",
-    segments: ["저는 생각합니다", "우리는 확인해야 한다", "실제 원료 투입량을", "먼저", "만약 투입량이 높다면", "설계값보다", "우리는 줄여야 할 수도 있다", "그것을"],
+    segments: ["먼저 실제 원료 투입량을 확인해야 한다고 생각한다", "투입량이 설계값보다 높다면", "줄여야 할 수도 있다"],
     reference: "I think we should check the actual feed rate first. If the feed rate is higher than the design value, we may need to reduce it.",
     accepted: [
       "I think we need to check the actual feed rate first. If the feed rate is higher than the design value, we might need to reduce it.",
@@ -2251,7 +2251,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-object-order", level: 3 },
     contextKo: "벤더와의 출하 일정 회의에서 고객이 출하 날짜를 바로 확정하자고 합니다.",
     promptKo: "먼저 FAT 보고서를 보고 싶습니다. 보고서를 검토한 후에 출하 날짜를 확정할 수 있습니다.",
-    segments: ["우리는 보고 싶다", "FAT 보고서를", "먼저", "우리가 검토한 후에", "보고서를", "우리는 확정할 수 있다", "출하 날짜를"],
+    segments: ["먼저 FAT 보고서를 보고 싶다", "보고서를 검토한 후에", "출하 날짜를 확정할 수 있다"],
     reference: "We would like to see the FAT report first. After we review the report, we can confirm the shipping date.",
     accepted: [
       "We would like to see the FAT report first. After reviewing the report, we can confirm the shipping date.",

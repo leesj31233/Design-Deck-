@@ -478,7 +478,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "자카르타 호텔 로비에서 Sari와 내일 현장 방문 일정을 이야기합니다. 현장까지 두 시간쯤 걸리니 7시에 출발하자고 제안합니다.",
     dialogue: [{ speaker: "Sari", en: "The meeting at the site starts at ten tomorrow.", ko: "내일 현장 회의는 10시에 시작해요." }],
     promptKo: "현장까지 두 시간쯤 걸려요. 내일 아침 7시에 호텔에서 출발하는 게 어때요?",
-    segments: ["(그것은) 걸려요", "두 시간쯤", "현장까지 가는 데.", "~하는 게 어때요", "우리가 출발하다", "호텔에서", "7시에", "내일 아침"],
+    segments: ["현장까지 두 시간쯤 걸려요.", "내일 아침 7시에 호텔에서 출발하는 게 어때요?"],
     reference: "It takes about two hours to get to the site. Why don't we leave the hotel at seven tomorrow morning?",
     accepted: [
       "It takes about two hours to get to the site, so why don't we leave the hotel at seven tomorrow morning?",
@@ -521,7 +521,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "자카르타 출장 마지막 날, Budi가 공항까지 배웅하며 구시가지 구경은 했는지 묻습니다. 시간이 없어 아쉽다고 말하고, 다음에는 한국에 오라고 초대합니다.",
     dialogue: [{ speaker: "Budi", en: "Did you get a chance to see the old town?", ko: "구시가지는 구경하셨어요?" }],
     promptKo: "아쉽게도 못 봤어요. (내일 떠나야 하지만) 시간이 더 있으면 꼭 보고 싶은데요. 다음에는 한국에 꼭 오세요. 제가 구경시켜 드릴게요.",
-    segments: ["아쉽게도, 못 봤어요.", "만약", "시간이 더 있다면", "저는 정말 보고 싶을 텐데요", "그것을.", "다음에는", "한국에 오세요,", "그러면 제가 구경시켜 드릴게요"],
+    segments: ["아쉽게도 못 봤어요.", "시간이 더 있으면", "꼭 보고 싶은데요.", "다음엔 한국에 꼭 오세요", "제가 구경시켜 드릴게요"],
     reference: "Unfortunately, no. If I had more time, I would love to see it. Next time, you should come to Korea, and I'll show you around.",
     accepted: [
       "Unfortunately not. If I had more time, I'd love to see it. Next time, you should come to Korea, and I'll show you around.",
@@ -565,7 +565,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "말레이시아 출장 마지막 날, Mr. Tan이 멀리 있는 식당에서 저녁을 대접하겠다고 합니다. 내일 새벽 비행기라 정중히 거절하고 점심을 대안으로 제안합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "We'd like to take you to dinner tonight. The restaurant is about an hour away, but it's worth it.", ko: "오늘 저녁 식사를 대접하고 싶어요. 식당이 한 시간쯤 걸리지만 가 볼 만해요." }],
     promptKo: "정말 감사한 말씀인데, 죄송하지만 오늘 저녁은 어려울 것 같아요. 내일 아침 6시 비행기라서 일찍 자야 하거든요. 대신 오늘 점심을 같이 하는 건 어떨까요?",
-    segments: ["정말 친절하시네요,", "하지만 죄송하게도", "저는 오늘 밤 갈 수 없어요.", "제 비행기는", "내일 아침 6시예요,", "그래서 저는 ~해야 해요", "일찍 자다.", "~이 가능할까요", "점심을 같이 하는 것", "오늘", "대신"],
+    segments: ["정말 감사하지만", "오늘 저녁은 어려울 것 같아요.", "내일 아침 6시 비행기라서", "일찍 자야 해요.", "대신 오늘 점심을 같이 할 수 있을까요?"],
     reference: "That's very kind of you, but I'm afraid I can't make it tonight. My flight is at six tomorrow morning, so I need to go to bed early. Would it be possible to have lunch together today instead?",
     accepted: [
       "That's very kind of you, but I'm afraid I can't join you tonight. My flight is at six tomorrow morning, so I need to go to bed early. Could we have lunch together today instead?",

@@ -265,7 +265,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "건조기 출력이 또 낮다는 보고에 Budi가 어떻게 할지 묻습니다. 출구 온도가 낮으니 스팀 압력부터 확인하자고 말합니다.",
     dialogue: [{ speaker: "Budi", en: "The dryer output is low again. What should we do?", ko: "건조기 출력이 또 낮아요. 어떻게 해야 할까요?" }],
     promptKo: "출구 온도가 낮으니까, 스팀 압력부터 먼저 확인해야 할 것 같아요.",
-    segments: ["제 생각엔", "우리는 확인해야 한다", "스팀 압력을", "먼저", "왜냐하면", "출구 온도가", "낮다"],
+    segments: ["스팀 압력부터 먼저 확인해야 할 것 같아요", "왜냐하면 출구 온도가 낮아요"],
     reference: "I think we should check the steam pressure first, because the outlet temperature is low.",
     accepted: [
       "I think we should check the steam pressure first, since the outlet temperature is low.",
@@ -306,7 +306,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "Sari가 건조기 크기를 정했는지 묻습니다. 실험실 결과가 아직 오지 않아서 결정할 수 없다고 말합니다.",
     dialogue: [{ speaker: "Sari", en: "Have you decided the dryer size yet?", ko: "건조기 크기는 정하셨어요?" }],
     promptKo: "실험실 결과를 아직 기다리는 중이라서, 아직 정할 수가 없어요.",
-    segments: ["우리는", "아직 기다리고 있다", "실험실 결과를", "그래서", "우리는 결정할 수 없다", "아직"],
+    segments: ["실험실 결과를 아직 기다리고 있어요", "그래서 아직 정할 수가 없어요"],
     reference: "We're still waiting for the lab results, so we can't decide yet.",
     accepted: [
       "We're still waiting for the lab results, so we can't decide the size yet.",
@@ -391,7 +391,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "라이선서 Daniel이 안전하게 더 큰 건조기를 쓰자고 합니다. 이해는 하지만 그렇게 큰 건조기가 필요한지는 확신이 없습니다.",
     dialogue: [{ speaker: "Daniel", en: "To be safe, I'd go with the bigger dryer, the 12 t/h model.", ko: "안전하게 더 큰 건조기, 12 t/h 모델로 가는 게 좋겠어요." }],
     promptKo: "무슨 말씀인지는 알겠는데, 그렇게 큰 건조기가 필요한지는 잘 모르겠어요.",
-    segments: ["무슨 말씀인지 알겠어요", "하지만", "저는 잘 모르겠어요", "우리가 필요한지", "그렇게 큰 건조기가"],
+    segments: ["무슨 말씀인지는 알겠는데", "그렇게 큰 건조기가 필요한지는 잘 모르겠어요"],
     reference: "I see what you mean, but I'm not sure we need such a big dryer.",
     accepted: [
       "I see your point, but I'm not sure we need such a big dryer.",
@@ -473,7 +473,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "Sari가 다음 회의 날짜를 정하자고 합니다. 실험실 결과가 목요일에 나오니, 결과를 확인한 뒤 다음 주 월요일에 다시 만나자고 제안합니다.",
     dialogue: [{ speaker: "Sari", en: "When should we have the next meeting?", ko: "다음 회의는 언제 할까요?" }],
     promptKo: "실험실 결과가 목요일에 나와요. 결과를 확인한 다음에 다음 주 월요일에 다시 만나는 게 어때요?",
-    segments: ["실험실 결과가", "준비될 거예요", "목요일에.", "~하는 게 어때요", "우리가 다시 만나다", "다음 주 월요일에", "확인한 다음에", "그 결과를"],
+    segments: ["실험실 결과가 목요일에 나와요", "다음 주 월요일에 다시 만나는 게 어때요?", "결과를 확인한 다음에"],
     reference: "The lab results will be ready on Thursday. Why don't we meet again next Monday after checking them?",
     accepted: [
       "The lab results will be ready on Thursday. Why don't we meet again next Monday, after we check them?",
@@ -517,7 +517,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "회의를 마치며 Mr. Tan이 오늘 결정한 내용을 정리해 달라고 합니다. 합의 내용과 다음 단계를 요약합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Minsu, can you summarize what we decided today?", ko: "민수 씨, 오늘 결정한 내용 정리해 주실래요?" }],
     promptKo: "네, 정리해 볼게요. Priya 씨가 금요일까지 수정된 데이터시트를 보내 주시고, 저희가 월요일에 검토하기로 합의했습니다. 큰 변경이 없으면 다음 주에 발주하겠습니다.",
-    segments: ["네,", "제가 정리할게요.", "우리는 합의했다", "Priya가 보낼 것이라고", "수정된 데이터시트를", "금요일까지,", "그리고 우리가 검토할 것이라고", "그것을", "월요일에.", "만약", "큰 변경이 없다면", "우리는 발주할 것이다", "다음 주에"],
+    segments: ["네, 정리해 볼게요", "Priya 씨가 금요일까지 수정된 데이터시트를 보내고", "저희가 월요일에 검토하기로 합의했어요", "큰 변경이 없으면", "다음 주에 발주할게요"],
     reference: "Sure, let me summarize. We agreed that Priya will send the revised datasheet by Friday, and we'll review it on Monday. If there are no big changes, we'll place the order next week.",
     accepted: [
       "Sure, let me summarize. We agreed that Priya would send the revised datasheet by Friday, and we would review it on Monday. If there are no big changes, we will place the order next week.",
@@ -563,7 +563,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "라이선서 Daniel이 일정을 줄이려고 파일럿 시험을 건너뛰자고 합니다. 정중하게 우려를 말하고, 더 짧은 시험을 대안으로 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "Honestly, I think we can skip the pilot test. It would save us about three months.", ko: "솔직히 파일럿 시험은 건너뛰어도 될 것 같아요. 그러면 3개월 정도 아낄 수 있어요." }],
     promptKo: "시간이 중요하다는 건 이해하지만, 파일럿 시험을 건너뛰는 건 좀 걱정돼요. 실제 규모에서 원료가 다르게 반응하면 나중에 설계를 바꿔야 할 수도 있어요. 대신 4주짜리 짧은 시험을 하는 건 어떨까요?",
-    segments: ["저는 이해해요", "시간이 중요하다는 것을", "하지만", "저는 조금 걱정돼요", "건너뛰는 것이", "파일럿 시험을.", "만약", "원료가 다르게 반응하면", "실제 규모에서", "우리는 바꿔야 할 수도 있어요", "설계를", "나중에.", "~하면 어떨까요", "우리가 하다", "더 짧은 4주 시험을", "대신"],
+    segments: ["시간이 중요하다는 건 이해하지만", "파일럿 시험을 건너뛰는 건 좀 걱정돼요", "실제 규모에서 원료가 다르게 반응하면", "나중에 설계를 바꿔야 할 수도 있어요", "대신 4주짜리 짧은 시험을 하면 어떨까요?"],
     reference: "I understand that time is important, but I'm a little worried about skipping the pilot test. If the feed behaves differently at full scale, we might have to change the design later. What if we run a shorter four-week test instead?",
     accepted: [
       "I understand that time is important, but I'm a bit worried about skipping the pilot test. If the feed behaves differently at full scale, we might need to change the design later. Why don't we run a shorter four-week test instead?",

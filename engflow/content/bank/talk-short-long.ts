@@ -142,7 +142,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "다음 주에 공장을 방문하는 Mr. Tan에게 전화했지만 받지 않아 음성 메시지를 남깁니다. 건조기 시험을 목요일로 옮겨야 해서, 그날도 괜찮은지 알려 달라고 하고 휴대전화 번호를 남깁니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "(voicemail) Hi, you've reached Tan. Please leave a message after the tone.", ko: "(음성 사서함) 안녕하세요, 탄입니다. 삐 소리 후에 메시지를 남겨 주세요." }],
     promptKo: "안녕하세요, Mr. Tan. 민수입니다. 다음 주 방문 건으로 전화드렸어요. 건조기 시험을 목요일로 옮겨야 했는데, 그날도 괜찮으신지 알려 주시겠어요? 제 번호는 010-4417-2290입니다.",
-    segments: ["안녕하세요, Mr. Tan,", "민수입니다.", "저는 전화하고 있어요", "당신의 방문에 관해", "다음 주.", "우리는 옮겨야 했어요", "건조기 시험을", "목요일로,", "그러니 알려 주시겠어요", "그날이 여전히 괜찮은지", "당신에게?", "제 번호는", "010-4417-2290입니다"],
+    segments: ["안녕하세요 Mr. Tan, 민수입니다", "다음 주 방문 건으로 전화드렸어요", "건조기 시험을 목요일로 옮겨야 했어요", "그날도 괜찮으신지 알려 주시겠어요?", "제 번호는 010-4417-2290입니다"],
     reference: "Hi Mr. Tan, it's Minsu. I'm calling about your visit next week. We've had to move the dryer test to Thursday, so could you let me know if that still works for you? My number is 010-4417-2290.",
     accepted: [
       "Hi Mr. Tan, this is Minsu. I'm calling about your visit next week. We've had to move the dryer test to Thursday, so could you let me know if that still works for you? My number is 010-4417-2290.",
@@ -189,7 +189,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "벤더의 프리야 씨가 이 과장님을 찾는 전화를 했습니다. 이 과장님은 지난달에 퇴사했고, 그분 프로젝트는 민수 씨가 맡게 되었습니다.",
     dialogue: [{ speaker: "Priya", en: "Hello, this is Priya from the pump vendor. Could I speak to Mr. Lee, please?", ko: "안녕하세요, 펌프 벤더의 프리야입니다. 이 과장님과 통화할 수 있을까요?" }],
     promptKo: "죄송하지만 이 과장님은 지난달에 퇴사하셨어요. 그분 프로젝트를 제가 맡게 돼서, 도와드릴 수 있을지도 몰라요. 펌프 주문 건이면 지금 바로 진행 상황을 확인해 드릴 수 있어요.",
-    segments: ["죄송하지만", "이 과장님은 회사를 떠났어요", "지난달에.", "제가 맡았어요", "그의 프로젝트들을,", "그래서", "제가 도와드릴 수 있을지도 몰라요.", "만약 그게", "펌프 주문에 관한 거라면,", "제가 확인할 수 있어요", "진행 상황을", "지금 바로"],
+    segments: ["죄송하지만 이 과장님은 지난달에 퇴사하셨어요", "그분 프로젝트를 제가 맡았어요", "그래서 도와드릴 수 있을지도 몰라요", "펌프 주문 건이면", "지금 바로 진행 상황을 확인해 드릴 수 있어요"],
     reference: "I'm afraid Mr. Lee left the company last month. I've taken over his projects, so I might be able to help. If it's about the pump order, I can check the status for you right now.",
     accepted: [
       "I'm afraid Mr. Lee left the company last month. I've taken over his projects, so I may be able to help. If it's about the pump order, I can check the status for you right now.",
@@ -235,7 +235,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "펌프 입찰 결과를 벤더의 프리야 씨에게 전화로 알립니다. 프리야 씨 회사의 제안도 좋았지만, 다른 업체의 납기가 4주 더 짧아서 그 업체를 선택했습니다. 관계는 좋게 유지하고 싶습니다.",
     dialogue: [{ speaker: "Priya", en: "Hi Minsu! Is there any news about our pump offer?", ko: "민수 씨! 저희 펌프 제안 건은 소식이 있나요?" }],
     promptKo: "네, 그래서 전화드렸어요. 아쉽지만 이번에는 다른 업체와 진행하기로 했어요. 제안은 아주 좋았는데, 그쪽 납기가 4주 더 짧았어요. 다음 프로젝트에서는 꼭 함께 일할 수 있으면 좋겠어요.",
-    segments: ["네, 그래서", "제가 전화하고 있어요.", "아쉽지만,", "우리는 결정했어요", "다른 업체와 진행하기로", "이번에는.", "당신의 제안은 아주 좋았어요,", "하지만", "그들의 납기가", "4주 더 짧았어요.", "저는 정말 바라요", "우리가 함께 일할 수 있기를", "다음 프로젝트에서"],
+    segments: ["네, 그래서 전화드렸어요", "아쉽지만 이번에는 다른 업체와 진행하기로 했어요", "제안은 아주 좋았는데", "그쪽 납기가 4주 더 짧았어요", "다음 프로젝트에서는 꼭 함께 일하고 싶어요"],
     reference: "Yes, that's why I'm calling. Unfortunately, we've decided to go with another vendor this time. Your offer was very good, but their delivery time was four weeks shorter. I really hope we can work together on the next project.",
     accepted: [
       "Yes, that's why I'm calling. Unfortunately, we decided to go with another vendor this time. Your offer was very good, but their delivery time was four weeks shorter. I really hope we can work together on the next project.",
@@ -397,7 +397,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "벤더의 프리야 씨가 디캔터 여섯 대를 한 번에 주문해 달라고 합니다. 민수 씨 팀은 먼저 한 대를 파일럿 플랜트에서 시험해 보고, 결과가 좋으면 나머지를 주문하려 합니다. 첫 대는 더 싸게 받고 싶습니다.",
     dialogue: [{ speaker: "Priya", en: "So, can we go ahead with the order for all six decanters?", ko: "그럼 디캔터 여섯 대 전부 주문 진행해도 될까요?" }],
     promptKo: "전체 주문을 확정하기 전에, 먼저 파일럿 플랜트에서 한 대를 시험해 보고 싶어요. 예상대로 작동하면 나머지 다섯 대는 연말까지 주문할게요. 첫 번째 한 대는 더 낮은 가격에 주실 수 있을까요?",
-    segments: ["~하기 전에", "우리가 확정하다", "전체 주문을,", "우리는 시험해 보고 싶어요", "한 대를", "우리 파일럿 플랜트에서.", "만약 그것이 작동하면", "예상대로,", "우리는 주문할게요", "나머지 다섯 대를", "연말까지.", "~해 주실 의향이 있나요", "첫 번째 한 대를 제공하다", "더 낮은 가격에"],
+    segments: ["전체 주문을 확정하기 전에", "먼저 파일럿 플랜트에서 한 대를 시험해 보고 싶어요", "예상대로 작동하면", "나머지 다섯 대는 연말까지 주문할게요", "첫 번째 한 대는 더 낮은 가격에 주실 수 있을까요?"],
     reference: "Before we commit to the full order, we'd like to test one unit at our pilot plant. If it works as expected, we'll order the other five by the end of the year. Would you be willing to offer the first unit at a lower price?",
     accepted: [
       "Before we commit to the full order, we'd like to test one unit at our pilot plant. If it works as expected, we'll order the other five by the end of the year. Would you be willing to give us the first unit at a lower price?",
@@ -446,7 +446,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "협상 시작부터 프리야 씨가 할인율 이야기를 꺼냅니다. 민수 씨는 견적에 무엇이 포함되는지 아직 분명하지 않아서, 가격은 미뤄 두고 기술 범위부터 정리하자고 제안합니다.",
     dialogue: [{ speaker: "Priya", en: "Let's start with the price. We can offer a 3% discount on the whole package.", ko: "가격부터 시작하죠. 패키지 전체에 3% 할인을 드릴 수 있어요." }],
     promptKo: "가격은 잠시 미뤄 두고 기술 범위부터 먼저 보면 어떨까요? 정확히 무엇이 포함되는지 합의하고 나면, 가격 이야기가 훨씬 쉬워질 거예요. 그렇게 해도 괜찮으세요?",
-    segments: ["저는 제안해요", "우리가 가격을 미뤄 두자고", "지금은", "그리고 기술 범위를 보자고", "먼저.", "일단 우리가 합의하면", "정확히 무엇이 포함되는지,", "훨씬 쉬워질 거예요", "가격에 대해 이야기하는 것이.", "그게 괜찮으세요", "당신에게?"],
+    segments: ["가격은 잠시 미뤄 두고", "기술 범위부터 먼저 보면 좋겠어요", "정확히 무엇이 포함되는지 합의하고 나면", "가격 이야기가 훨씬 쉬워질 거예요", "그렇게 해도 괜찮으세요?"],
     reference: "I suggest we leave the price aside for now and look at the technical scope first. Once we agree on exactly what's included, it'll be much easier to talk about the price. Does that work for you?",
     accepted: [
       "I suggest we put the price aside for now and look at the technical scope first. Once we agree on exactly what's included, it'll be much easier to talk about the price. Does that work for you?",
@@ -493,7 +493,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "프리야 씨가 수정 제안서를 보냈습니다. 가격과 지불 조건은 괜찮지만 납기가 20주입니다. 공장 시운전 날짜가 정해져 있어서 16주 안에 건조기가 현장에 와야 합니다.",
     dialogue: [{ speaker: "Priya", en: "So, what do you think of our revised offer?", ko: "그래서, 저희 수정 제안은 어떻게 보세요?" }],
     promptKo: "가격과 지불 조건은 받아들일 수 있지만, 20주는 저희에게 너무 길어요. 시운전 날짜가 정해져 있어서 16주 안에 건조기가 현장에 와야 해요. 그걸 서면으로 확인해 주시면 이번 달에 계약할 준비가 돼 있어요. 공장과 확인하시고 수요일까지 알려 주시겠어요?",
-    segments: ["우리는 받아들일 수 있어요", "가격과 지불 조건은,", "하지만", "20주는 너무 길어요", "우리에게.", "우리 시운전 날짜가 정해져 있어요,", "그래서", "건조기가 현장에 있어야 해요", "16주 안에.", "만약 당신이 그걸 확인해 줄 수 있으면", "서면으로,", "우리는 계약할 준비가 돼 있어요", "이번 달에.", "확인해 주시겠어요", "공장과", "그리고 알려 주시겠어요", "수요일까지"],
+    segments: ["가격과 지불 조건은 받아들일 수 있지만", "20주는 저희에게 너무 길어요", "시운전 날짜가 정해져 있어서 16주 안에 건조기가 현장에 와야 해요", "서면으로 확인해 주시면", "이번 달에 계약할 준비가 돼 있어요", "공장과 확인하고 수요일까지 알려 주시겠어요?"],
     reference: "We can accept the price and the payment terms, but twenty weeks is too long for us. Our start-up date is fixed, so we'd need the dryer on site within sixteen weeks. If you can confirm that in writing, we're ready to sign this month. Could you check with your factory and let us know by Wednesday?",
     accepted: [
       "We're happy with the price and the payment terms, but twenty weeks is too long for us. Our start-up date is fixed, so we'd need the dryer on site within sixteen weeks. If you can confirm that in writing, we're ready to sign this month. Could you check with your factory and let us know by Wednesday?",
@@ -666,7 +666,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "현장의 사리 씨가 예비 필터 천이 아직 안 왔다고 묻습니다. 사실 민수 씨가 지난주에 구매 요청서를 보내는 것을 깜빡해서 주문이 어제야 나갔습니다. 벤더에게는 이미 항공 배송을 부탁했습니다.",
     dialogue: [{ speaker: "Sari", en: "Minsu, the spare filter cloths still haven't arrived. Do you know what happened?", ko: "민수 씨, 예비 필터 천이 아직 안 왔어요. 무슨 일인지 아세요?" }],
     promptKo: "죄송해요, 제 실수예요. 지난주에 구매 요청서 보내는 걸 깜빡해서 주문이 어제야 나갔어요. 벤더에게 항공으로 보내 달라고 이미 부탁했고, 다음 주 금요일까지 납품하겠다고 약속받았어요.",
-    segments: ["죄송해요,", "그건 제 실수였어요.", "저는 보내는 것을 잊었어요", "구매 요청서를", "지난주에,", "그래서", "주문이 겨우 나갔어요", "어제.", "저는 이미 부탁했어요", "벤더에게", "그것들을 항공으로 보내 달라고,", "그리고 그들은 약속했어요", "납품하겠다고", "다음 주 금요일까지"],
+    segments: ["죄송해요, 제 실수예요", "지난주에 구매 요청서 보내는 걸 깜빡했어요", "그래서 주문이 어제야 나갔어요", "벤더에게 항공으로 보내 달라고 이미 부탁했고", "다음 주 금요일까지 납품하겠다고 약속받았어요"],
     reference: "I'm sorry, that was my mistake. I forgot to send the purchase request last week, so the order only went out yesterday. I've already asked the vendor to send them by air, and they've promised to deliver by next Friday.",
     accepted: [
       "I'm sorry, that was my mistake. I forgot to send the purchase request last week, so the order only went out yesterday. I've already asked the vendor to ship them by air, and they've promised to deliver by next Friday.",
@@ -712,7 +712,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "라이선서 다니엘 씨가 어젯밤 시험 운전 데이터를 보내 달라고 합니다. 그런데 짧은 정전으로 데이터 기록 장치가 멈춰 약 6시간 분량이 날아갔고, 오늘 아침에야 알았습니다. 중요한 시험 포인트는 이미 다시 했고, 알람도 달았습니다.",
     dialogue: [{ speaker: "Daniel", en: "Could you send me the data from last night's test run?", ko: "어젯밤 시험 운전 데이터 좀 보내 주시겠어요?" }],
     promptKo: "죄송하지만 어젯밤 데이터가 약 6시간 분량 날아갔어요. 짧은 정전 후에 데이터 기록 장치가 멈췄는데, 오늘 아침까지 아무도 몰랐어요. 가장 중요한 시험 포인트는 이미 다시 했고, 알람을 달아서 다음에는 바로 알 수 있을 거예요.",
-    segments: ["죄송하지만", "우리는 잃었어요", "약 6시간 분량의 데이터를", "어젯밤에.", "데이터 기록 장치가 멈췄어요", "짧은 정전 후에,", "그리고 아무도 몰랐어요", "오늘 아침까지.", "우리는 이미 다시 했어요", "가장 중요한 시험 포인트를,", "그리고 알람을 추가했어요,", "그래서 다음에는", "우리가 바로 알 거예요"],
+    segments: ["죄송하지만 어젯밤 데이터가 약 6시간 분량 날아갔어요", "짧은 정전 후에 데이터 기록 장치가 멈췄는데", "오늘 아침까지 아무도 몰랐어요", "가장 중요한 시험 포인트는 이미 다시 했고", "알람을 달아서 다음에는 바로 알 수 있을 거예요"],
     reference: "I'm afraid we lost about six hours of data last night. The data logger stopped after a short power cut, and nobody noticed until this morning. We've already repeated the most important test points, and we've added an alarm, so next time we'll know right away.",
     accepted: [
       "I'm afraid we lost about six hours of data last night. The data logger stopped after a short power cut, and nobody noticed until this morning. We've already repeated the most important test points, and we've added an alarm, so next time we'll know immediately.",
@@ -761,7 +761,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "새 펌프의 메커니컬 실이 3주 만에 고장 났습니다. 벤더의 프리야 씨는 실은 소모품이라 보증 대상이 아니라고 합니다. 민수 씨는 데이터시트 수명보다 훨씬 짧으니 보증으로 교체해 달라고 정중하지만 분명하게 요구하고, 원인 확인을 위한 자료도 제공하겠다고 합니다.",
     dialogue: [{ speaker: "Priya", en: "I'm sorry, but the mechanical seal is a wear part, so it isn't covered by the warranty.", ko: "죄송하지만 메커니컬 실은 소모품이라서 보증 대상이 아니에요." }],
     promptKo: "실이 소모품인 건 알지만, 이건 겨우 3주 만에 고장 났고 데이터시트에 나온 수명보다 훨씬 짧아요. 그래서 보증으로 교체해 주셨으면 해요. 원인을 먼저 확인하고 싶으시면 기존 실과 운전 기록을 기꺼이 보내 드릴게요.",
-    segments: ["저는 이해해요", "실이 소모품이라는 것을,", "하지만", "이것은 고장 났어요", "겨우 3주 만에,", "그것은 훨씬 짧아요", "데이터시트에 나온 것보다.", "그래서 우리는 당신이 ~해 주길 원해요", "그것을 교체하다", "보증으로.", "만약 당신이 확인하고 싶으면", "원인을 먼저,", "우리는 기꺼이 보내 드릴게요", "기존 실과", "우리 운전 기록을"],
+    segments: ["실이 소모품인 건 알지만", "이건 겨우 3주 만에 고장 났어요", "데이터시트에 나온 수명보다 훨씬 짧아요", "그래서 보증으로 교체해 주셨으면 해요", "원인을 먼저 확인하고 싶으시면", "기존 실과 운전 기록을 기꺼이 보내 드릴게요"],
     reference: "I understand that seals are wear parts, but this one failed after only three weeks, which is much shorter than your datasheet says. So we'd like you to replace it under warranty. If you'd like to check the cause first, we're happy to send you the old seal and our operating records.",
     accepted: [
       "I understand that seals are wear parts, but this one failed after just three weeks, which is much shorter than your datasheet says. So we'd like you to replace it under warranty. If you'd like to check the cause first, we're happy to send you the old seal and our operating records.",
@@ -922,7 +922,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "자카르타에서 공장 가동 한 달을 축하하는 팀 회식 자리입니다. 부디 씨가 시작하기 전에 한마디 해 달라고 합니다. 2년 전 시작할 때는 건조기가 잘 돌아갈지 아무도 확신하지 못했지만, 지금은 한 달째 큰 문제 없이 돌아가고 있습니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu, would you like to say a few words before we start?", ko: "민수 씨, 시작하기 전에 한마디 해 주실래요?" }],
     promptKo: "물론이죠. 2년 전 이 프로젝트를 시작했을 때, 건조기가 정말 잘 돌아갈지 아무도 몰랐어요. 모두가 열심히 해 준 덕분에 지금 한 달째 큰 문제 없이 돌아가고 있습니다. 그러니 다 같이 잔을 들어 주세요. 우리 팀을 위하여!",
-    segments: ["물론이죠.", "우리가 시작했을 때", "이 프로젝트를", "2년 전에,", "우리 중 아무도 몰랐어요", "건조기가 정말 작동할지.", "모두의 노력 덕분에,", "그것은 계속 돌아가고 있어요", "한 달 동안", "지금까지", "큰 문제 없이.", "그러니 잔을 들어 주세요.", "우리 팀을 위하여!"],
+    segments: ["물론이죠", "2년 전 이 프로젝트를 시작했을 때", "건조기가 정말 잘 돌아갈지 아무도 몰랐어요", "모두가 열심히 해 준 덕분에", "지금 한 달째 큰 문제 없이 돌아가고 있어요", "그러니 잔을 들어 주세요. 우리 팀을 위하여!"],
     reference: "Of course. When we started this project two years ago, none of us knew whether the dryer would really work. Thanks to everyone's hard work, it's been running for a month now without any major problems. So please raise your glasses. To the team!",
     accepted: [
       "Of course. When we started this project two years ago, none of us knew if the dryer would really work. Thanks to everyone's hard work, it's been running for a month now without any major problems. So please raise your glasses. To the team!",
@@ -969,7 +969,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "서울에서 다니엘 씨 팀에게 저녁을 대접했습니다. 시간이 늦었고 손님들은 내일 아침 일찍 일정이 있습니다. 택시는 이미 식당 밖에 와 있어서, 자리를 정중하게 마무리하려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "This has been a wonderful evening, Minsu. Thank you.", ko: "민수 씨, 정말 멋진 저녁이었어요. 고마워요." }],
     promptKo: "즐거우셨다니 정말 기뻐요. 드디어 모두 직접 만나서 정말 좋았어요. 그런데 시간이 늦어지고 있고, 내일 아침 일찍 시작하셔야 하니까 오늘은 여기서 마무리하는 게 좋겠어요. 택시가 밖에서 기다리고 있으니 제가 배웅해 드릴게요.",
-    segments: ["저는 정말 기뻐요", "당신이 즐거웠다니.", "정말 좋았어요", "드디어 모두를 만나서", "직접.", "그런데 시간이 늦어지고 있어요,", "그리고 저는 알아요", "당신들이 내일 일찍 시작한다는 것을,", "그러니 아마 우리는 마무리하는 게 좋겠어요", "여기서.", "택시가 기다리고 있어요", "밖에서,", "그러니 제가 배웅할게요"],
+    segments: ["즐거우셨다니 정말 기뻐요", "드디어 모두 직접 만나서 정말 좋았어요", "그런데 시간이 늦었고 내일 일찍 시작하시잖아요", "그러니 오늘은 여기서 마무리하는 게 좋겠어요", "택시가 밖에서 기다리고 있으니 배웅해 드릴게요"],
     reference: "I'm so glad you enjoyed it. It was great to finally meet everyone in person. It's getting late, though, and I know you have an early start tomorrow, so maybe we should wrap up here. The taxis are waiting outside, so let me walk you out.",
     accepted: [
       "I'm really glad you enjoyed it. It was great to finally meet everyone in person. It's getting late, though, and I know you have an early start tomorrow, so maybe we should wrap up here. The taxis are waiting outside, so let me walk you out.",
@@ -1013,7 +1013,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "고객사 Mr. Tan이 축하 자리에서 한 잔 더 하자고 계속 권합니다. 내일 아침 일찍 비행기를 타야 해서 더는 마시고 싶지 않지만, 분위기는 깨고 싶지 않습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Come on, Minsu, one more glass! It's a celebration!", ko: "에이, 민수 씨, 한 잔만 더 해요! 축하하는 자리잖아요!" }],
     promptKo: "정말 그러고 싶은데, 오늘은 제 주량을 다 채운 것 같아요. 내일 아침 일찍 비행기라서 절대 놓치면 안 되거든요! 대신 저는 주스로 바꾸고 다음 건배사를 제가 하면 어떨까요?",
-    segments: ["저는 정말 그러고 싶어요,", "하지만", "제 생각에 저는 한계에 도달했어요", "오늘 밤은.", "저는 이른 비행기가 있어요", "내일,", "그리고 정말 놓치고 싶지 않아요!", "~하면 어떨까요", "제가 주스로 바꾸다", "그리고 다음 건배사를 하다", "대신?"],
+    segments: ["정말 그러고 싶은데", "오늘은 제 주량을 다 채운 것 같아요", "내일 아침 일찍 비행기라서", "절대 놓치면 안 되거든요!", "대신 저는 주스로 바꾸고 다음 건배사를 하면 어떨까요?"],
     reference: "I'd love to, but I think I've reached my limit for tonight. I have an early flight tomorrow, and I really don't want to miss it! Why don't I switch to juice and make the next toast instead?",
     accepted: [
       "I'd love to, but I think I've had enough for tonight. I have an early flight tomorrow, and I really don't want to miss it! Why don't I switch to juice and make the next toast instead?",
@@ -1187,7 +1187,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "월요일 아침 화상회의 전에 베트남 팀의 린 씨가 주말에 등산을 갔는지 묻습니다. 아이들과 토요일에 등산을 가려 했지만 하루 종일 비가 와서 집에서 영화를 봤고, 아이들은 그래도 좋아했습니다.",
     dialogue: [{ speaker: "Linh", en: "How was your weekend? Did you go hiking like you planned?", ko: "주말 어땠어요? 계획대로 등산 갔어요?" }],
     promptKo: "사실 계획대로 안 됐어요. 토요일에 아이들이랑 등산을 가려고 했는데 하루 종일 비가 와서, 결국 집에서 영화만 봤어요. 그래도 아이들은 정말 좋아했어요. 린 씨는요? 뭐 재미있는 거 했어요?",
-    segments: ["사실,", "계획대로 되지 않았어요.", "우리는 등산을 가려고 했어요", "아이들과", "토요일에,", "하지만 하루 종일 비가 왔어요,", "그래서 결국", "영화를 보게 됐어요", "집에서.", "그래도 아이들은 정말 좋아했어요.", "당신은요?", "뭐 재미있는 거 했어요?"],
+    segments: ["사실 계획대로 안 됐어요", "토요일에 아이들이랑 등산을 가려고 했는데", "하루 종일 비가 와서", "결국 집에서 영화만 봤어요", "그래도 아이들은 정말 좋아했어요", "린 씨는요? 뭐 재미있는 거 했어요?"],
     reference: "Actually, it didn't go as planned. We were going to go hiking with the kids on Saturday, but it rained all day, so we ended up watching movies at home. The kids loved it, though. How about you? Did you do anything fun?",
     accepted: [
       "Actually, it didn't go as planned. We were going to go hiking with the kids on Saturday, but it rained all day, so we ended up watching movies at home. The kids loved it, though. What about you? Did you do anything fun?",
@@ -1234,7 +1234,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "시드니에 사는 친구 제이크와 1년 만에 영상 통화를 합니다. 3월에 새 팀으로 옮겨 말레이시아 바이오매스 프로젝트를 맡고 있고, 6월에 아들이 태어났습니다.",
     dialogue: [{ speaker: "Jake", en: "Minsu! It's been ages! So, what's new with you?", ko: "민수! 진짜 오랜만이다! 요즘 어떻게 지내?" }],
     promptKo: "그동안 일이 많았어! 3월에 새 팀으로 옮겨서 지금은 말레이시아 바이오매스 프로젝트를 하고 있어. 그리고 6월에 아들이 태어났어. 너는? 아직 시드니에 살아?",
-    segments: ["많은 일이 있었어", "우리가 마지막으로 이야기한 이후로!", "나는 새 팀으로 옮겼어", "3월에,", "그리고 지금 일하고 있어", "바이오매스 프로젝트를", "말레이시아의.", "또, 내 아들이 태어났어", "6월에.", "너는?", "아직 시드니에 있어?"],
+    segments: ["지난번 이야기한 뒤로 일이 많았어!", "3월에 새 팀으로 옮겼고", "지금은 말레이시아 바이오매스 프로젝트를 하고 있어", "그리고 6월에 아들이 태어났어", "너는? 아직 시드니에 있어?"],
     reference: "A lot has happened since we last talked! I moved to a new team in March, and I'm working on a biomass project in Malaysia now. Also, my son was born in June. What about you? Are you still in Sydney?",
     accepted: [
       "A lot has happened since we last talked! I moved to a new team in March, and now I'm working on a biomass project in Malaysia. Also, my son was born in June. How about you? Are you still in Sydney?",
@@ -1278,7 +1278,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "쿠알라룸푸르의 저녁 자리에서 고객사 Mr. Tan이 한국 엔지니어 연봉이 얼마나 되는지 묻습니다. 숫자를 말하고 싶지는 않아서, 웃으며 부드럽게 넘기고 화제를 상대 쪽으로 돌리려 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So, Minsu, if you don't mind me asking, how much does an engineer earn in Korea?", ko: "그런데 민수 씨, 실례가 안 된다면, 한국 엔지니어는 얼마나 벌어요?" }],
     promptKo: "하하, 어려운 질문이네요! 솔직히 회사마다 많이 달라서 숫자 하나로 말씀드리기는 어려워요. 다만 서울은 집값이 아주 비싸서 다들 생각만큼 저축하지는 못한다는 건 말씀드릴 수 있어요. 쿠알라룸푸르는 어때요? 거기는 생활비가 비싼가요?",
-    segments: ["하하, 어려운 질문이네요!", "솔직히,", "그건 정말 회사에 따라 달라요,", "그래서", "숫자 하나를 드리기는 어려워요.", "제가 말씀드릴 수 있는 건", "서울의 집값이 아주 비싸다는 거예요,", "그래서 대부분의 사람들은", "저축하지 못해요", "생각하시는 만큼.", "쿠알라룸푸르는 어때요?", "거기 사는 건 비싼가요?"],
+    segments: ["하하, 어려운 질문이네요!", "솔직히 회사마다 많이 달라서", "숫자 하나로 말씀드리기는 어려워요", "다만 서울은 집값이 아주 비싸요", "그래서 다들 생각만큼 저축하지는 못해요", "쿠알라룸푸르는 어때요? 거기는 생활비가 비싼가요?"],
     reference: "Ha, that's a tough question! To be honest, it really depends on the company, so it's hard to give you one number. What I can tell you is that housing in Seoul is very expensive, so most people don't save as much as you'd think. How about in Kuala Lumpur? Is it expensive to live there?",
     accepted: [
       "Ha, that's a difficult question! To be honest, it really depends on the company, so it's hard to give you one number. What I can tell you is that housing in Seoul is very expensive, so most people don't save as much as you'd think. What about Kuala Lumpur? Is it expensive to live there?",
@@ -1434,7 +1434,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "다니엘 씨 일행에게 파일럿 플랜트를 안내하기 직전입니다. 공정 구역에 들어가기 전에 안전 수칙 네 가지(보호구, 노란 선, 경보 시 대피, 밸브·스위치 금지)를 짧게 설명합니다.",
     dialogue: [{ speaker: "Daniel", en: "We're ready. Is there anything we should know before we go in?", ko: "준비됐어요. 들어가기 전에 알아야 할 게 있나요?" }],
     promptKo: "네, 안전 수칙 몇 가지만 말씀드릴게요. 안전모와 보안경은 항상 쓰고 계시고, 노란 선 안쪽으로만 다니세요. 경보가 울리면 저를 따라 정문 옆 집결 장소로 가시면 됩니다. 그리고 밸브나 스위치는 만지지 마세요.",
-    segments: ["네, 안전 수칙 몇 가지만.", "안전모와 보안경을", "계속 쓰고 계세요", "항상,", "그리고 머무르세요", "노란 선 안쪽에.", "만약 경보를 들으면,", "저를 따라오세요", "집결 장소로", "정문 옆의.", "그리고 만지지 마세요", "어떤 밸브나 스위치도"],
+    segments: ["네, 안전 수칙 몇 가지만 말씀드릴게요", "안전모와 보안경은 항상 쓰고 계세요", "그리고 노란 선 안쪽으로만 다니세요", "경보가 울리면", "저를 따라 정문 옆 집결 장소로 가세요", "그리고 밸브나 스위치는 만지지 마세요"],
     reference: "Yes, just a few safety points. Please keep your helmet and safety glasses on at all times, and stay inside the yellow lines. If you hear the alarm, follow me to the assembly point next to the main gate. And please don't touch any valves or switches.",
     accepted: [
       "Yes, just a few safety points. Please keep your helmet and safety glasses on at all times, and stay inside the yellow lines. If you hear the alarm, follow me to the assembly point by the main gate. And please don't touch any valves or switches.",
@@ -1479,7 +1479,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "Mr. Tan에게 파일럿 플랜트의 세척 라인을 보여 주고 있습니다. EFB가 먼저 파쇄되고, 칼륨을 빼기 위해 세척된 뒤, 디캔터에서 물기를 대부분 빼고 건조로 넘어갑니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So what happens to the EFB in this part of the plant?", ko: "그럼 공장의 이 구역에서는 EFB가 어떻게 되나요?" }],
     promptKo: "여기가 세척 라인이에요. EFB는 먼저 여기서 잘게 파쇄된 다음, 칼륨 대부분을 제거하기 위해 세척돼요. 그다음 디캔터를 거치는데, 디캔터가 건조 전에 물을 대부분 빼 줍니다.",
-    segments: ["이것은 세척 라인이에요.", "EFB는 파쇄돼요", "여기서 먼저,", "그다음 세척돼요", "제거하기 위해", "칼륨 대부분을.", "그 후에,", "그것은 디캔터를 거쳐요,", "그것(디캔터)은 빼내요", "물 대부분을", "건조 전에"],
+    segments: ["여기가 세척 라인이에요", "EFB는 먼저 여기서 파쇄돼요", "그다음 칼륨 대부분을 제거하기 위해 세척돼요", "그 후에 디캔터를 거쳐요", "디캔터가 건조 전에 물을 대부분 빼 줘요"],
     reference: "This is the washing line. The EFB is shredded here first, and then it's washed to remove most of the potassium. After that, it goes through the decanter, which takes out most of the water before drying.",
     accepted: [
       "This is the washing line. The EFB is shredded here first, and then it's washed to remove most of the potassium. After that, it goes through the decanter, which removes most of the water before drying.",
@@ -1525,7 +1525,7 @@ export const TALK_SHORT_LONG: Question[] = [
     contextKo: "투어 중 다니엘 씨가 건조기 플랫폼에 올라가 보고 싶다고 합니다. 건조기가 최고 온도로 운전 중이라 운전 중에는 운전원만 올라갈 수 있습니다. 플랫폼 카메라 화면을 제어실에서 보여 줄 수 있고, 내일 청소로 정지하면 함께 올라갈 수 있습니다.",
     dialogue: [{ speaker: "Daniel", en: "Can we go up to the dryer platform for a closer look?", ko: "건조기 플랫폼에 올라가서 가까이 볼 수 있을까요?" }],
     promptKo: "죄송하지만 오늘은 올라갈 수 없어요. 건조기가 최고 온도로 운전 중인데, 운전 중에는 운전원만 플랫폼에 올라갈 수 있거든요. 대신 플랫폼에 카메라가 있으니 제어실에서 실시간 화면을 보여 드릴 수 있어요. 내일 청소 때문에 정지할 때 올라가시죠.",
-    segments: ["죄송하지만", "우리는 올라갈 수 없어요", "오늘은.", "건조기가 운전 중이에요", "최고 온도로,", "그리고 운전원만", "플랫폼에 허용돼요", "그것이 운전하는 동안.", "하지만 카메라가 있어요", "거기 위에,", "그래서 실시간 화면을 보여 드릴 수 있어요", "제어실에서.", "우리는 내일 올라갈 수 있어요,", "그것이 정지될 때", "청소를 위해"],
+    segments: ["죄송하지만 오늘은 올라갈 수 없어요", "건조기가 최고 온도로 운전 중이에요", "운전 중에는 운전원만 플랫폼에 올라갈 수 있어요", "대신 위에 카메라가 있어서", "제어실에서 실시간 화면을 보여 드릴 수 있어요", "내일 청소 때문에 정지할 때 올라가요"],
     reference: "I'm afraid we can't go up there today. The dryer is running at full temperature, and only operators are allowed on the platform while it's running. But there's a camera up there, so I can show you the live view in the control room. We can go up tomorrow, when it's shut down for cleaning.",
     accepted: [
       "I'm afraid we can't go up there today. The dryer is running at full temperature, and only the operators are allowed on the platform while it's running. But there's a camera on the platform, so I can show you the live view in the control room. We can go up tomorrow when it's shut down for cleaning.",

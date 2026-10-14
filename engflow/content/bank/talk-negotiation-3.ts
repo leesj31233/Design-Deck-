@@ -455,7 +455,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "김 팀장님이 데이터시트를 수요일까지 끝낼 수 있는지 묻습니다. 이번 주는 FEED 보고서 작업 중이라 금요일에 보내도 되는지 조율합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Can you finish the datasheets by Wednesday?", ko: "데이터시트 수요일까지 끝낼 수 있어요?" }],
     promptKo: "이번 주에 FEED 보고서 작업을 하고 있어서요, 금요일에 보내 드려도 될까요?",
-    segments: ["저는 작업하고 있어요", "FEED 보고서를", "이번 주에,", "그래서", "제가 보내도 될까요", "그것들을", "금요일에"],
+    segments: ["이번 주에 FEED 보고서 작업을 하고 있어요", "그래서 금요일에 보내 드려도 될까요?"],
     reference: "I'm working on the FEED report this week, so could I send them on Friday?",
     accepted: [
       "I'm working on the FEED report this week, so could I send them by Friday?",
@@ -498,7 +498,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Priya가 철강 부족 때문에 납기가 20주로 늘었다고 합니다. 18주까지는 받아들일 수 있지만 20주는 너무 길다고 선을 긋습니다.",
     dialogue: [{ speaker: "Priya", en: "Because of a steel shortage, our lead time is now 20 weeks.", ko: "철강 부족 때문에 지금 납기가 20주예요." }],
     promptKo: "18주까지는 받아들일 수 있는데, 20주는 저희한테 너무 길어요.",
-    segments: ["저희는 받아들일 수 있어요", "18주는,", "하지만", "20주는", "너무 길어요", "저희에게"],
+    segments: ["18주까지는 받아들일 수 있어요", "하지만 20주는 저희한테 너무 길어요"],
     reference: "We can accept 18 weeks, but 20 is too long for us.",
     accepted: [
       "We can accept 18 weeks, but 20 weeks is too long for us.",
@@ -542,7 +542,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "베트남 법인의 Linh이 유틸리티 구역 P&ID도 민수 팀이 해 줄 수 있는지 묻습니다. 지금 인원이 부족해서 메인 공정 구역만 할 수 있다고 범위를 정합니다.",
     dialogue: [{ speaker: "Linh", en: "Can your team also prepare the P&IDs for the utility area?", ko: "유틸리티 구역 P&ID도 민수 씨 팀에서 해 주실 수 있어요?" }],
     promptKo: "지금은 인원이 부족해서, 메인 공정 구역만 할 수 있어요.",
-    segments: ["저희는 충분한 인원이 없어요", "지금은,", "그래서", "저희는 ~만 할 수 있어요", "메인 공정 구역"],
+    segments: ["지금은 인원이 부족해요", "그래서 메인 공정 구역만 할 수 있어요"],
     reference: "We don't have enough people right now, so we can only do the main process area.",
     accepted: [
       "We don't have enough people at the moment, so we can only do the main process area.",
@@ -631,7 +631,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Budi가 이번 토요일 파일럿 플랜트 근무를 해 줄 수 있는지 묻습니다. 이번 달에 이미 주말 근무를 두 번 했으니 이번엔 다른 사람이 맡아 줄 수 있는지 조율합니다.",
     dialogue: [{ speaker: "Budi", en: "Can you work this Saturday? We need someone at the pilot plant.", ko: "이번 토요일에 근무해 줄 수 있어요? 파일럿 플랜트에 사람이 필요해서요." }],
     promptKo: "이번 달에 벌써 주말에 두 번 일했어요. 그러니 이번에는 다른 사람이 맡아 줄 수 있을까요?",
-    segments: ["저는 벌써 일했어요", "주말 두 번", "이번 달에,", "그래서", "다른 사람이 맡아 줄 수 있을까요", "이번 건은"],
+    segments: ["이번 달에 벌써 주말에 두 번 일했어요", "그래서 이번에는 다른 사람이 맡아 줄 수 있을까요?"],
     reference: "I've already worked two weekends this month, so could someone else take this one?",
     accepted: [
       "I've already worked two weekends this month, so could someone else do this one?",
@@ -719,7 +719,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "연말 면담에서 김 팀장님이 올해를 어떻게 봤는지 묻습니다. 올해 역할이 꽤 많이 바뀌었으니 연봉을 재검토할 수 있을지 조심스럽게 꺼냅니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "So, how do you feel about this year overall?", ko: "그래서, 올해 전반적으로 어땠어요?" }],
     promptKo: "올해 제 역할이 꽤 많이 바뀌어서, 연봉을 다시 검토해 주실 수 있을지 여쭤보고 싶었어요.",
-    segments: ["저는 궁금했어요", "우리가 ~할 수 있을지", "제 연봉을 재검토하다,", "~때문에", "제 역할이 바뀌었다", "꽤 많이", "올해"],
+    segments: ["연봉을 다시 검토해 주실 수 있을지 여쭤보고 싶었어요", "올해 제 역할이 꽤 많이 바뀌어서요"],
     reference: "I was wondering if we could review my salary, since my role has changed quite a lot this year.",
     accepted: [
       "I was wondering if we could look at my salary, since my role has changed quite a lot this year.",
@@ -763,7 +763,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Mr. Tan이 오래 걸리지 않을 거라며 폐수 처리 설비 원가 견적도 추가해 달라고 합니다. 현재 계약 범위에 없는 일이라 별도 견적을 보내야 한다고 정중히 말합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Could you also add a cost estimate for the wastewater unit? It shouldn't take long.", ko: "폐수 처리 설비 원가 견적도 넣어 주실 수 있어요? 오래 걸리진 않을 거예요." }],
     promptKo: "죄송하지만 그건 현재 업무 범위에 포함되어 있지 않아서, 별도 견적을 보내 드려야 할 것 같아요.",
-    segments: ["죄송하지만", "그건 포함되어 있지 않아요", "저희 현재 범위에,", "그래서", "저희는 보내 드려야 할 거예요", "별도 견적을"],
+    segments: ["죄송하지만 그건 현재 업무 범위에 포함되어 있지 않아요", "그래서 별도 견적을 보내 드려야 할 것 같아요"],
     reference: "I'm afraid that isn't included in our current scope, so we'd need to send you a separate quote.",
     accepted: [
       "I'm afraid that's not included in our current scope, so we'd need to send you a separate quote.",
@@ -806,7 +806,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Priya가 다음 달부터 가격이 6% 오른다고 합니다. 이번 달에 넣을 주문에는 현재 가격을 유지해 달라고 하면서, 예산이 이미 승인되었다고 이유를 댑니다.",
     dialogue: [{ speaker: "Priya", en: "Just so you know, our prices will go up by 6% from next month.", ko: "참고로, 다음 달부터 저희 가격이 6% 올라요." }],
     promptKo: "이번 달에 넣을 주문에는 현재 가격을 유지해 주실 수 있을까요? 저희 예산이 이미 승인되어서요.",
-    segments: ["~해 주실 수 있을까요", "현재 가격을 유지하다", "주문에", "저희가 넣을", "이번 달에?", "저희 예산이", "이미 승인되었어요"],
+    segments: ["이번 달에 넣을 주문에는", "현재 가격을 유지해 주실 수 있을까요?", "저희 예산이 이미 승인됐어요"],
     reference: "Could you keep the current price for the order we're placing this month? Our budget has already been approved.",
     accepted: [
       "Could you keep the current price for the order that we're placing this month? Our budget has already been approved.",
@@ -851,7 +851,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "김 팀장님이 Daniel도 목요일까지 수정한 열수지를 원한다고 전합니다. 이번 주에 이미 마감이 세 개라서, 열수지는 다음 주 화요일로 미룰 수 있는지 제안합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Daniel also wants the updated heat balance by Thursday.", ko: "Daniel도 목요일까지 수정된 열수지를 원해요." }],
     promptKo: "이번 주에 이미 마감이 세 개나 있어요. 열수지는 다음 주 화요일로 미룰 수 있을까요?",
-    segments: ["저는 이미 있어요", "마감이 세 개", "이번 주에.", "우리가 ~할 수 있을까요", "옮기다", "열수지를", "다음 주 화요일로"],
+    segments: ["이번 주에 이미 마감이 세 개나 있어요", "열수지는 다음 주 화요일로 미룰 수 있을까요?"],
     reference: "I already have three deadlines this week. Could we move the heat balance to next Tuesday?",
     accepted: [
       "I already have three deadlines this week. Could we push the heat balance to next Tuesday?",
@@ -896,7 +896,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "독일의 Daniel, 자카르타의 Sari와 셋이 통화할 시간을 정해야 합니다. 한국 시간 오후 4시면 자카르타 오후 2시, 독일 오전 9시라서 모두 근무 시간이라고 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "We need to find a time that works for all three of us.", ko: "우리 셋 모두에게 맞는 시간을 찾아야 해요." }],
     promptKo: "한국 시간 오후 4시 어때요? 자카르타는 오후 2시, 독일은 오전 9시라서 모두에게 근무 시간이에요.",
-    segments: ["어때요", "오후 4시", "한국 시간?", "그건 오후 2시예요", "자카르타에서", "그리고 오전 9시", "독일에서,", "그래서", "근무 시간이에요", "모두에게"],
+    segments: ["한국 시간 오후 4시 어때요?", "자카르타는 오후 2시, 독일은 오전 9시예요", "그래서 모두에게 근무 시간이에요"],
     reference: "How about 4 p.m. Korean time? That's 2 p.m. in Jakarta and 9 a.m. in Germany, so it's during working hours for everyone.",
     accepted: [
       "How about 4 p.m. Seoul time? That's 2 p.m. in Jakarta and 9 a.m. in Germany, so it's during working hours for everyone.",
@@ -940,7 +940,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "출장 마지막 날 전, 호텔 직원이 체크아웃은 오전 11시라고 알려 줍니다. 비행기가 밤 9시이고 오후 1시까지 화상 회의가 있으니 2시에 체크아웃할 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Hotel clerk", en: "Just a reminder that checkout is at 11 a.m. tomorrow.", ko: "내일 체크아웃은 오전 11시라는 점 알려 드려요." }],
     promptKo: "제 비행기가 밤 9시고, 1시까지 화상 회의가 있어서요. 2시에 체크아웃해도 될까요?",
-    segments: ["제 비행기는", "밤 9시예요,", "그리고 저는 있어요", "화상 회의가", "1시까지.", "~이 가능할까요", "체크아웃하다", "2시에"],
+    segments: ["제 비행기가 밤 9시예요", "그리고 1시까지 화상 회의가 있어요", "2시에 체크아웃해도 될까요?"],
     reference: "My flight is at 9 p.m., and I have an online meeting until 1. Would it be possible to check out at 2?",
     accepted: [
       "My flight is at 9 p.m., and I have an online meeting until 1 p.m. Would it be possible to check out at 2 p.m.?",
@@ -985,7 +985,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "자카르타 팀과 시료 채취와 건조 시험 분담을 한참 조율했습니다. Sari가 누가 뭘 할지 다 정리됐는지 묻자, 합의 내용을 요약하고 오늘 이메일로 서면 정리를 보내겠다고 합니다.",
     dialogue: [{ speaker: "Sari", en: "So, are we all clear on who does what?", ko: "그럼 누가 뭘 하는지 다 정리된 거죠?" }],
     promptKo: "그런 것 같아요. 정리하자면, 자카르타 팀이 20일까지 원료 시료를 채취하고, 저희가 그다음 주에 건조 시험을 할 거예요. 서면으로 남겨 두게 오늘 모두에게 이메일 보낼게요.",
-    segments: ["그런 것 같아요.", "정리하자면,", "그쪽 팀이 채취할 거예요", "원료 시료를", "20일까지,", "그리고 저희가 할 거예요", "건조 시험을", "그다음 주에.", "제가 모두에게 이메일을 보낼게요", "오늘", "서면으로 남겨 두도록"],
+    segments: ["그런 것 같아요. 정리하자면", "그쪽 팀이 20일까지 원료 시료를 채취하고", "저희가 그다음 주에 건조 시험을 할 거예요", "오늘 모두에게 이메일 보낼게요", "서면으로 남겨 두도록"],
     reference: "I think so. Just to summarize, your team will collect the feed samples by the 20th, and we'll run the drying tests the following week. I'll send everyone an email today so that we have it in writing.",
     accepted: [
       "Yes, I think so. Just to summarize, your team will collect the feed samples by the 20th, and we'll run the drying tests the following week. I'll send everyone an email today so that we have it in writing.",
@@ -1030,7 +1030,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "모터 납품 지연으로 생긴 추가 비용을 두고, Priya가 저희 도면이 일주일 늦게 와서 그런 거라고 합니다. 도면이 늦은 건 인정하지만, 제때 왔더라도 모터는 3주 늦었을 테니 추가 비용을 전부 부담하는 건 공정하지 않다고 말합니다.",
     dialogue: [{ speaker: "Priya", en: "The delay wasn't our fault. Your drawings came a week late.", ko: "지연은 저희 잘못이 아니에요. 그쪽 도면이 일주일 늦게 왔잖아요." }],
     promptKo: "저희 도면이 일주일 늦은 건 맞아요. 하지만 도면이 제때 도착했더라면, 그래도 모터는 3주 늦었을 거예요. 그래서 저희가 추가 비용을 전부 내는 건 공정하지 않다고 생각해요.",
-    segments: ["맞아요", "저희 도면이", "일주일 늦었던 건.", "하지만 설령 ~했더라면", "그게 제때 도착했다", "모터는 그래도 ~였을 거예요", "3주 늦은.", "그래서 저는 생각하지 않아요", "공정하다고", "저희가 내는 것이", "추가 비용 전부를"],
+    segments: ["저희 도면이 일주일 늦은 건 맞아요", "하지만 도면이 제때 도착했더라도", "모터는 그래도 3주 늦었을 거예요", "그래서 저희가 추가 비용을 전부 내는 건 공정하지 않다고 생각해요"],
     reference: "You're right that our drawings were a week late. But even if they had arrived on time, the motors would still have been three weeks late. So I don't think it's fair for us to pay all the extra costs.",
     accepted: [
       "You're right that our drawings were a week late. But even if they had come on time, the motors would still have been three weeks late. So I don't think it's fair for us to pay all the extra costs.",
@@ -1074,7 +1074,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Daniel이 라이선스 비용은 더 이상 낮출 수 없다고 합니다. 비용을 전액 선지급할 테니 운전원 교육을 포함해 달라고 제안하고, 그러면 라이선서는 돈을 일찍 받고 저희는 교육 예산을 따로 잡지 않아도 된다고 설명합니다.",
     dialogue: [{ speaker: "Daniel", en: "I'm sorry, but we can't lower the license fee any further.", ko: "죄송하지만 라이선스 비용은 더 이상 낮출 수 없어요." }],
     promptKo: "이해합니다. 그럼 저희가 비용을 전액 선지급하고, 그쪽에서 운전원 교육을 포함해 주시는 건 어때요? 그러면 그쪽은 돈을 더 일찍 받고, 저희는 교육 예산을 따로 잡을 필요가 없잖아요.",
-    segments: ["이해합니다.", "~하면 어때요", "저희가 전액을 선지급하다,", "그리고 그쪽이 포함하다", "운전원 교육을?", "그렇게 하면,", "그쪽은 받아요", "돈을 더 일찍,", "그리고 저희는 필요 없어요", "별도 예산이", "교육을 위한"],
+    segments: ["이해합니다", "저희가 비용을 전액 선지급하고", "그쪽에서 운전원 교육을 포함해 주시면 어때요?", "그러면 그쪽은 돈을 더 일찍 받고", "저희는 교육 예산을 따로 잡을 필요가 없어요"],
     reference: "I understand. What if we pay the full fee upfront, and you include the operator training? That way, you get the money earlier, and we don't need a separate budget for training.",
     accepted: [
       "I understand. What if we pay the full fee in advance, and you include the operator training? That way, you get the money earlier, and we don't need a separate budget for training.",
@@ -1120,7 +1120,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "김 팀장님이 내년 4월까지는 연봉 인상 예산이 없다고 합니다. 사정은 이해한다고 하면서, 1월 이후 새 프로젝트를 두 개 맡았고 지금은 자카르타 팀을 이끌고 있다고 근거를 대고, 지금이 어렵다면 최소한 4월에 다시 검토하기로 약속해 달라고 합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "I'm afraid there's no budget for raises until next April.", ko: "미안하지만 내년 4월까지는 연봉 인상 예산이 없어요." }],
     promptKo: "올해 예산이 빠듯한 건 이해해요. 하지만 저는 1월부터 새 프로젝트를 두 개 맡았고, 지금은 자카르타 팀을 이끌고 있어요. 지금 당장 인상이 어렵다면, 최소한 4월에 제 연봉을 다시 검토하기로 정해 둘 수 있을까요?",
-    segments: ["이해해요", "예산이 빠듯하다는 것을", "올해.", "하지만 저는 맡아 왔어요", "새 프로젝트 두 개를", "1월부터,", "그리고 저는 지금 이끌고 있어요", "자카르타 팀을.", "만약 인상이 가능하지 않다면", "지금 당장,", "우리가 최소한 합의할 수 있을까요", "제 연봉을 검토하기로", "4월에"],
+    segments: ["올해 예산이 빠듯한 건 이해해요", "하지만 1월부터 새 프로젝트를 두 개 맡았고", "지금은 자카르타 팀을 이끌고 있어요", "지금 당장 인상이 어렵다면", "최소한 4월에 연봉을 다시 검토하기로 할 수 있을까요?"],
     reference: "I understand that the budget is tight this year. But I've taken on two new projects since January, and I'm now leading the Jakarta team. If a raise isn't possible right now, could we at least agree to review my salary in April?",
     accepted: [
       "I understand that the budget is tight this year. But I've taken on two new projects since January, and I'm now leading the Jakarta team. If a raise isn't possible right now, could we at least agree to look at my salary again in April?",
@@ -1166,7 +1166,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "집주인이 계속 살려면 다음 달부터 월세를 10% 올리겠다고 합니다. 계속 살고 싶지만 10%는 부담스럽다고 하고, 늘 제때 냈고 집을 잘 관리했다는 점을 들어 2년 더 사는 조건으로 5%를 제안합니다.",
     dialogue: [{ speaker: "Landlord", en: "If you want to stay, the rent will go up by 10% from next month.", ko: "계속 사시려면 다음 달부터 월세가 10% 올라요." }],
     promptKo: "정말 계속 살고 싶은데, 10% 인상은 저한테 꽤 부담이에요. 저는 월세를 항상 제때 냈고 집도 잘 관리해 왔어요. 제가 2년 더 산다면 5%로 생각해 주실 수 있을까요?",
-    segments: ["저는 정말 계속 살고 싶어요,", "하지만 10% 인상은", "꽤 많아요", "저에게.", "저는 항상 제때 냈어요", "그리고 잘 관리해 왔어요", "아파트를.", "고려해 주실 수 있을까요", "5%를", "만약 제가 더 산다면", "2년"],
+    segments: ["정말 계속 살고 싶은데", "10% 인상은 저한테 꽤 부담이에요", "월세를 항상 제때 냈고 집도 잘 관리해 왔어요", "5%로 생각해 주실 수 있을까요", "제가 2년 더 산다면"],
     reference: "I'd really like to stay, but a 10% increase is quite a lot for me. I've always paid on time and taken good care of the apartment. Would you consider 5% if I stay for another two years?",
     accepted: [
       "I'd really like to stay, but a 10% increase is quite a lot for me. I've always paid the rent on time and taken good care of the apartment. Would you consider 5% if I stay for another two years?",
@@ -1211,7 +1211,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Daniel이 설계 확정 전에 저희 비용으로 3개월 파일럿 시험을 한 번 더 하라고 요구합니다. 데이터가 더 있으면 좋다는 건 인정하지만, 원래 계약에 없는 시험이고 올해 예산이 이미 확정됐다고 설명한 뒤, 현재 파일럿 데이터를 공유하고 그래도 필요하면 다음 분기에 비용을 논의하자고 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "Before we finalize the design, we'd like your team to run another three-month pilot test at your own cost.", ko: "설계를 확정하기 전에, 그쪽 비용으로 3개월 파일럿 시험을 한 번 더 해 주셨으면 해요." }],
     promptKo: "데이터가 더 있으면 도움이 된다는 건 이해해요. 하지만 그 시험은 원래 계약에 없었고, 올해 예산도 이미 확정됐어요. 대신 지금 하고 있는 파일럿 운전 데이터를 공유해 드릴 수 있고, 그래도 더 필요하시면 다음 분기에 비용을 논의할 수 있어요.",
-    segments: ["이해해요", "더 많은 데이터가 도움이 될 거라는 걸.", "하지만,", "그 시험들은 포함되지 않았어요", "원래 계약에,", "그리고 올해 예산은", "이미 확정됐어요.", "대신,", "저희가 공유할 수 있어요", "현재 파일럿 운전 데이터를,", "그리고 만약 그래도 더 필요하시면,", "저희는 비용을 논의할 수 있어요", "다음 분기에"],
+    segments: ["데이터가 더 있으면 도움이 된다는 건 이해해요", "하지만 그 시험은 원래 계약에 없었어요", "그리고 올해 예산도 이미 확정됐어요", "대신 지금 파일럿 운전 데이터를 공유해 드릴 수 있어요", "그래도 더 필요하시면 다음 분기에 비용을 논의할 수 있어요"],
     reference: "I understand that more data would be useful. However, those tests weren't part of our original agreement, and our budget for this year has already been fixed. Instead, we could share the data from our current pilot runs, and if you still need more, we can discuss the cost next quarter.",
     accepted: [
       "I understand that more data would be helpful. However, those tests weren't part of our original agreement, and our budget for this year has already been fixed. Instead, we could share the data from our current pilot runs, and if you still need more, we can discuss the cost next quarter.",

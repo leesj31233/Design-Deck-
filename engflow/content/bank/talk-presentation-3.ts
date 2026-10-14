@@ -469,7 +469,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "라이선서 대상 발표. 세척 공정 설명을 마쳤고, 다음은 성격이 꽤 다른 비용 파트라 넘어가기 전에 질문을 받으려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Okay, the washing step is clear. What's next?", ko: "네, 세척 단계는 이해됐어요. 다음은 뭔가요?" }],
     promptKo: "다음 파트는 꽤 다른 내용이라, 여기서 잠깐 멈추고 질문을 받을게요.",
-    segments: ["다음 파트는", "꽤 다르다", "그래서", "제가 멈출게요", "여기서", "질문을 위해"],
+    segments: ["다음 파트는 꽤 다른 내용이에요", "그래서 여기서 잠깐 멈추고 질문을 받을게요"],
     reference: "The next part is quite different, so I'll stop here for questions.",
     accepted: ["The next part is quite different, so let me pause here for any questions.", "The next part is quite different, so let's stop here for questions.", "Since the next part is quite different, I'll pause here for questions.", "The next part is quite different, so let me stop here and take any questions.", "The next section is quite different, so I'll pause here for any questions."],
     meaning: [
@@ -504,7 +504,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "온라인 발표 중. 노트북이 계속 멈춰서 슬라이드가 보이지 않습니다. 파일을 가진 Sari에게 대신 공유해 달라고 하려 합니다.",
     dialogue: [{ speaker: "Budi", en: "We still can't see your slides, Minsu.", ko: "민수 씨, 아직 슬라이드가 안 보여요." }],
     promptKo: "제 노트북이 계속 멈춰서, Sari 씨에게 대신 슬라이드를 공유해 달라고 할게요.",
-    segments: ["제 노트북이", "계속 멈춰요", "그래서", "제가 부탁할게요", "Sari 씨에게", "공유해 달라고", "슬라이드를", "대신"],
+    segments: ["제 노트북이 계속 멈춰요", "그래서 대신 Sari 씨에게 슬라이드를 공유해 달라고 할게요"],
     reference: "My laptop keeps freezing, so I'll ask Sari to share the slides instead.",
     accepted: ["My laptop keeps freezing, so I'm going to ask Sari to share the slides instead.", "My laptop keeps freezing, so I'll ask Sari to share them instead.", "Since my laptop keeps freezing, I'll ask Sari to share the slides instead.", "My laptop keeps freezing, so let me ask Sari to share the slides instead.", "My laptop keeps crashing, so I'll ask Sari to share the slides instead.", "My laptop keeps freezing, so I'll have Sari share the slides instead."],
     meaning: [
@@ -542,7 +542,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "고객 대상 발표. Mr. Tan이 디캔터 청소 주기를 묻는데, 현장에서 디캔터를 직접 운전해 온 Budi가 더 잘 압니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "How often do the operators need to clean the decanter?", ko: "운전원들이 디캔터를 얼마나 자주 청소해야 하나요?" }],
     promptKo: "Budi 씨가 현장에서 디캔터를 운전해 왔으니까, 아마 저보다 더 잘 답해 주실 수 있을 거예요.",
-    segments: ["Budi 씨가", "운전해 왔어요", "디캔터를", "현장에서", "그래서", "그는 아마 답할 수 있어요", "그것에", "더 잘", "저보다"],
+    segments: ["Budi 씨가 현장에서 디캔터를 운전해 왔어요", "그래서 아마 저보다 더 잘 답해 주실 거예요"],
     reference: "Budi has been running the decanter on site, so he can probably answer that better than I can.",
     accepted: ["Budi has been running the decanter on site, so he can probably answer that better than me.", "Budi has been running the decanter on site, so he might be able to answer that better than I can.", "Budi's been running the decanter on site, so he can probably answer that better than I can.", "Since Budi has been running the decanter on site, he can probably answer that better than I can.", "Budi has been operating the decanter on site, so he can probably answer that better than I can."],
     meaning: [
@@ -581,7 +581,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "온라인 발표 중. 베트남의 Linh이 화면이 흐리게 보인다고 합니다. 확대는 했지만 그래도 안 보이면 파일을 보내 주려 합니다.",
     dialogue: [{ speaker: "Linh", en: "It's a bit blurry on my side, even after you zoomed in.", ko: "확대해 주셨는데도 제 쪽에서는 좀 흐리게 보여요." }],
     promptKo: "그래도 잘 안 보이시면, 발표 끝나고 파일을 보내 드릴게요.",
-    segments: ["만약", "여전히 잘 안 보이면", "제가 보내 드릴게요", "당신에게", "파일을", "발표 후에"],
+    segments: ["그래도 잘 안 보이시면", "발표 끝나고 파일을 보내 드릴게요"],
     reference: "If you still can't see it clearly, I can send you the file after the presentation.",
     accepted: ["If you still can't see it clearly, I'll send you the file after the presentation.", "If it's still not clear, I can send you the file after the presentation.", "If you still can't see it well, I'll send you the slides after the presentation.", "If you still can't read it, I can email you the file after the presentation.", "If it's still blurry, I can send you the file after the presentation."],
     meaning: [
@@ -659,7 +659,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "라이선서 대상 발표. 에너지 소비 슬라이드를 보던 Daniel이 이 수치가 자체 시험 결과인지 묻습니다. 사실은 벤더 자료입니다.",
     dialogue: [{ speaker: "Daniel", en: "Are these energy figures from your own tests?", ko: "이 에너지 수치는 자체 시험에서 나온 건가요?" }],
     promptKo: "사실 이 수치들은 벤더가 제공한 거라서, 저희가 아직 직접 확인하지는 못했어요.",
-    segments: ["사실", "이 수치들은", "제공되었어요", "벤더에 의해", "그래서", "우리는 아직 확인하지 못했어요", "그것들을", "직접"],
+    segments: ["사실 이 수치들은 벤더가 제공한 거예요", "그래서 저희가 아직 직접 확인하지는 못했어요"],
     reference: "Actually, these figures were provided by the vendor, so we haven't checked them ourselves yet.",
     accepted: ["Actually, these figures were provided by the vendor, so we haven't verified them ourselves yet.", "Actually, these numbers were provided by the vendor, so we haven't checked them ourselves yet.", "Actually, these figures came from the vendor, so we haven't checked them ourselves yet.", "Actually, the vendor provided these figures, so we haven't checked them ourselves yet.", "Not exactly. These figures were provided by the vendor, so we haven't checked them ourselves yet."],
     meaning: [
@@ -733,7 +733,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "라이선서 대상 발표. Daniel이 간접 건조기는 섬유질 원료에 잘 안 맞는다고 반론합니다. 파일럿 결과는 달랐습니다.",
     dialogue: [{ speaker: "Daniel", en: "In our experience, indirect dryers don't work well with fibrous feed.", ko: "저희 경험상, 간접 건조기는 섬유질 원료에는 잘 안 맞아요." }],
     promptKo: "작은 장치에서는 그럴 수도 있지만, 저희 파일럿 데이터를 보면 꽤 잘 작동하는 것 같아요.",
-    segments: ["그건 맞을 수도 있어요", "더 작은 장치에서는", "하지만", "저희 파일럿 데이터는", "보여 줘요", "그것이 꽤 잘 작동한다는 것을"],
+    segments: ["작은 장치에서는 그럴 수도 있어요", "하지만 저희 파일럿 데이터를 보면 꽤 잘 작동해요"],
     reference: "That might be true for smaller units, but our pilot data suggests that it works quite well.",
     accepted: ["That may be true for smaller units, but our pilot data suggests that it works quite well.", "That might be true for smaller units, but our pilot data shows that it works quite well.", "That might be true for smaller units, but according to our pilot data, it works quite well.", "That could be true for smaller units, but our pilot data suggests it works quite well.", "That might be the case for smaller units, but our pilot data suggests that it works quite well."],
     meaning: [
@@ -772,7 +772,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "본사 설계 검토 발표 마무리. Ms. Kim이 팀에게 필요한 게 있는지 묻습니다. 이달 말에 설계를 확정해야 해서 의견을 받고 싶습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "We're almost out of time, Minsu. Is there anything you need from the team?", ko: "민수 씨, 시간이 거의 다 됐어요. 팀에게 필요한 게 있나요?" }],
     promptKo: "네. 이달 말에 설계를 확정할 계획이라서요. 다음 주 금요일까지 의견을 보내 주시겠어요?",
-    segments: ["네.", "우리는 확정할 계획이에요", "설계를", "이달 말에", "보내 주시겠어요?", "저에게", "의견을", "다음 주 금요일까지"],
+    segments: ["네", "이달 말에 설계를 확정할 계획이에요", "다음 주 금요일까지 의견을 보내 주시겠어요?"],
     reference: "Yes. We're planning to finalize the design at the end of the month. Could you send me your comments by next Friday?",
     accepted: ["Yes. We're going to finalize the design at the end of the month, so could you send me your comments by next Friday?", "Yes. We plan to finalize the design at the end of the month. Could you send me your comments by next Friday?", "Yes. We're planning to finalise the design at the end of the month. Could you send me your feedback by next Friday?", "Yes. We're planning to finalize the design at the end of the month. Could you please send me your comments by next Friday?", "Yes. We're planning to finalize the design at the end of the month. Would you mind sending me your comments by next Friday?"],
     meaning: [
@@ -809,7 +809,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "온라인 발표 중. 슬라이드 대신 메일함 창이 공유되고 있었다고 Linh이 알려 줍니다.",
     dialogue: [{ speaker: "Linh", en: "Minsu, I think we're seeing your email, not the slides.", ko: "민수 씨, 슬라이드가 아니라 메일이 보이는 것 같아요." }],
     promptKo: "죄송해요, 다른 창을 공유하고 있었네요. 슬라이드로 바꿀 테니, 보이면 말씀해 주세요.",
-    segments: ["죄송해요,", "제가 공유하고 있어요", "잘못된 창을.", "제가 바꿀게요", "슬라이드로,", "그리고 알려 주세요", "언제", "그것들이 보이는지"],
+    segments: ["죄송해요, 다른 창을 공유하고 있네요", "슬라이드로 바꿀게요", "보이면 말씀해 주세요"],
     reference: "Sorry, I'm sharing the wrong window. Let me switch to the slides, and please let me know when you can see them.",
     accepted: ["Sorry, I'm sharing the wrong window. I'll switch to the slides, so please let me know when you can see them.", "Sorry, I was sharing the wrong window. Let me switch to the slides, and please let me know when you can see them.", "Sorry, I'm sharing the wrong window. Let me switch to the slides. Please let me know when you can see them.", "Sorry, I'm sharing the wrong window. Let me change to the slides, and please tell me when you can see them.", "Sorry, that's the wrong window. Let me switch to the slides, and please let me know when you can see them."],
     meaning: [
@@ -846,7 +846,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "고객사 대상 에너지 절감 발표. 결과를 보여 주기 전에 청중이 먼저 생각해 보도록 질문을 던지려 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Please go ahead with the energy part.", ko: "에너지 파트 진행하시죠." }],
     promptKo: "답을 보여 드리기 전에 질문 하나 드릴게요. 이 플랜트에서 에너지를 가장 많이 쓰는 게 뭐라고 생각하세요?",
-    segments: ["~하기 전에", "제가 보여 드리다", "답을,", "질문 하나 드릴게요.", "뭐라고 생각하세요", "가장 많은 에너지를 쓰는 것", "이 플랜트에서"],
+    segments: ["답을 보여 드리기 전에", "질문 하나 드릴게요", "이 플랜트에서 에너지를 가장 많이 쓰는 게 뭐라고 생각하세요?"],
     reference: "Before I show you the answer, let me ask you a question. What do you think uses the most energy in this plant?",
     accepted: ["Before I show you the answer, I'd like to ask you a question. What do you think uses the most energy in this plant?", "Before I show you the answer, let me ask you something. What do you think uses the most energy in this plant?", "Before I show you the answer, let me ask you a question. Which part of this plant do you think uses the most energy?", "Before I show you the answer, here's a question for you. What do you think uses the most energy in this plant?", "Before I show you the answer, let me ask you a quick question. What do you think uses the most energy in the plant?"],
     meaning: [
@@ -883,7 +883,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "본사·자카르타 합동 온라인 발표. 처음 보는 사람도 있어서 자기소개, 발표 순서, 소요 시간, 질문 시간을 한 번에 안내하려 합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Great, everyone's here. Minsu, whenever you're ready.", ko: "좋아요, 다 모였네요. 민수 씨, 준비되면 시작하세요." }],
     promptKo: "감사합니다. 저를 모르시는 분들을 위해 말씀드리면, 저는 EFB 프로젝트의 공정 엔지니어 민수입니다. 오늘은 먼저 파일럿 결과를 살펴보고, 그다음 비용 견적을 말씀드리겠습니다. 20분 정도 걸릴 예정이고, 마지막에 질문 시간이 있습니다.",
-    segments: ["감사합니다.", "저를 모르시는 분들을 위해,", "저는 민수입니다,", "EFB 프로젝트의 공정 엔지니어.", "오늘은", "먼저 살펴보고", "파일럿 결과를,", "그다음", "비용 견적을 말씀드릴게요.", "약 20분 걸릴 거고,", "질문 시간이 있어요", "마지막에"],
+    segments: ["감사합니다", "저를 모르시는 분들을 위해", "저는 EFB 프로젝트 공정 엔지니어 민수입니다", "오늘은 먼저 파일럿 결과를 살펴보고", "그다음 비용 견적을 말씀드릴게요", "20분 정도 걸리고 마지막에 질문 시간이 있어요"],
     reference: "Thank you. For those who don't know me, I'm Minsu, a process engineer on the EFB project. Today, I'll go over the pilot results first, and then I'll talk about the cost estimate. It should take about twenty minutes, and there'll be time for questions at the end.",
     accepted: ["Thank you. For those of you who don't know me, I'm Minsu, a process engineer on the EFB project. Today, I'll go over the pilot results first, and then I'll talk about the cost estimate. It should take about twenty minutes, and there'll be time for questions at the end.", "Thanks. For those who don't know me, I'm Minsu, and I'm a process engineer on the EFB project. Today, I'll start with the pilot results, and then I'll move on to the cost estimate. It'll take about twenty minutes, and there will be time for questions at the end.", "Thank you. For those who don't know me, my name is Minsu, and I'm a process engineer on the EFB project. Today, I'll first go over the pilot results, and then I'll talk about the cost estimate. It should take about 20 minutes, and we'll have time for questions at the end.", "Thank you. For those who don't know me, I'm Minsu, a process engineer on the EFB project. Today, I'm going to go through the pilot results first and then the cost estimate. It should take about twenty minutes, and there'll be time for questions at the end."],
     meaning: [
@@ -924,7 +924,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "백필터 차압 그래프를 설명하는 중. 3주차에 차압이 크게 뛰어서 Daniel이 이유를 묻습니다. 아직 확인 전이라 가설로 설명하려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "What happened in week three? That's quite a big jump.", ko: "3주차에 무슨 일이 있었나요? 꽤 크게 뛰었네요." }],
     promptKo: "3주차에 차압이 급격히 올랐어요. 필터 백이 막히고 있었던 것 같아요. 그게 맞다면, 다음 백 교체 후에도 같은 패턴이 보일 거예요.",
-    segments: ["차압이", "급격히 올랐어요", "3주차에.", "우리는 생각해요", "필터 백이", "막히고 있었다고.", "그게 맞다면,", "우리는 보게 될 거예요", "같은 패턴을", "다음 백 교체 후에"],
+    segments: ["3주차에 차압이 급격히 올랐어요", "필터 백이 막히고 있었던 것 같아요", "그게 맞다면", "다음 백 교체 후에도 같은 패턴이 보일 거예요"],
     reference: "The pressure drop rose sharply in week three. We think the filter bags were getting blocked. If that's right, we should see the same pattern after the next bag change.",
     accepted: ["The pressure drop went up sharply in week three. We think the filter bags were getting blocked. If that's right, we should see the same pattern after the next bag change.", "The pressure drop rose sharply in week three. We think the filter bags were getting clogged. If that's correct, we should see the same pattern after the next bag change.", "The pressure drop increased sharply in week three, and we think the filter bags were getting blocked. If that's right, we should see the same pattern after the next bag change.", "The pressure drop rose sharply in week three. We believe the filter bags were becoming blocked. If that's the case, we should see the same pattern after the next bag change.", "The pressure drop rose sharply in week three. We think it was because the filter bags were getting blocked. If that's right, we'll probably see the same pattern after the next bag change."],
     meaning: [
@@ -965,7 +965,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "펠릿 시험 결과 발표 마무리. Mr. Tan이 끝내기 전에 핵심만 다시 정리해 달라고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Before you finish, could you give us the main points again?", ko: "마치기 전에 핵심만 다시 말씀해 주시겠어요?" }],
     promptKo: "네. 기억해 주셨으면 하는 게 세 가지 있어요. 첫째, 펠릿이 내구성 기준을 만족합니다. 둘째, 다이를 예상보다 자주 교체해야 합니다. 셋째, 다음 분기에 더 단단한 다이 소재를 시험할 계획입니다.",
-    segments: ["네.", "세 가지가 있어요", "기억해 주셨으면 하는.", "첫째,", "펠릿이 만족해요", "내구성 기준을.", "둘째,", "다이가 교체되어야 해요", "더 자주", "우리가 예상한 것보다.", "셋째,", "우리는 시험할 계획이에요", "더 단단한 다이 소재를", "다음 분기에"],
+    segments: ["네. 기억해 주셨으면 하는 게 세 가지 있어요", "첫째, 펠릿이 내구성 기준을 만족해요", "둘째, 다이를 예상보다 자주 교체해야 해요", "셋째, 다음 분기에 더 단단한 다이 소재를 시험할 계획이에요"],
     reference: "Sure. There are three things I'd like you to remember. First, the pellets meet the durability spec. Second, the die needs to be replaced more often than we expected. And third, we're planning to test a harder die material next quarter.",
     accepted: ["Sure. There are three things I'd like you to remember. First, the pellets meet the durability spec. Second, we need to replace the die more often than we expected. And third, we're planning to test a harder die material next quarter.", "Sure. There are three key points I'd like you to remember. First, the pellets meet the durability spec. Second, the die needs to be replaced more often than we expected. And third, we're planning to test a harder die material next quarter.", "Of course. There are three things I'd like you to take away. First, the pellets meet the durability spec. Second, the die needs to be replaced more often than we expected. Third, we're going to test a harder die material next quarter.", "Sure. There are three things I'd like you to remember. First, the pellets meet the durability specification. Second, the die has to be replaced more often than we expected. And third, we plan to test a harder die material next quarter.", "Sure. There are three things I'd like you to remember. First, the pellets meet the durability spec. Second, the die needs replacing more often than we expected. And third, we're planning to test a harder die material next quarter."],
     meaning: [
@@ -1004,7 +1004,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "라이선서 대상 결과 발표. Daniel이 결과가 너무 좋다며 측정이 맞는지 의심합니다. 근거를 대며 정중하게 방어하고, 데이터 비교를 제안하려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Honestly, these results look too good. Are you sure your measurements are correct?", ko: "솔직히 결과가 너무 좋아 보이네요. 측정이 정확한 게 확실한가요?" }],
     promptKo: "충분히 물어보실 만해요. 유량계를 모두 교정했고 주요 운전은 두 번씩 반복했기 때문에, 데이터는 꽤 확신합니다. 다만 저희 원료가 귀사 레퍼런스 플랜트와 꽤 달라서, 그게 차이를 설명할 수도 있어요. 직접 비교할 수 있게 그쪽 플랜트 데이터를 조금 공유해 주실 수 있을까요?",
-    segments: ["좋은 질문이에요.", "우리는 교정했어요", "모든 유량계를", "그리고 반복했어요", "주요 운전을 두 번,", "그래서 꽤 확신해요", "데이터를.", "다만,", "저희 원료는 꽤 달라요", "귀사 레퍼런스 플랜트와,", "그게 설명할 수도 있어요", "차이를.", "공유해 주실 수 있나요", "플랜트 데이터를 조금", "우리가 직접 비교할 수 있게"],
+    segments: ["충분히 물어보실 만해요", "유량계를 모두 교정했고 주요 운전은 두 번씩 반복했어요", "그래서 데이터는 꽤 확신해요", "다만 저희 원료가 귀사 레퍼런스 플랜트와 꽤 달라서", "그게 차이를 설명할 수도 있어요", "직접 비교할 수 있게 플랜트 데이터를 좀 공유해 주실 수 있을까요?"],
     reference: "That's a fair question. We calibrated all the flow meters and repeated the key runs twice, so we're fairly confident in the data. That said, our feed is quite different from your reference plant, which might explain the gap. Could you share some of your plant data so we can compare the two directly?",
     accepted: ["That's a fair question. We calibrated all the flow meters and repeated the key runs twice, so we're quite confident in the data. However, our feed is quite different from your reference plant, which might explain the gap. Could you share some of your plant data so we can compare the two directly?", "That's a fair question. We calibrated all the flow meters and repeated the main runs twice, so we're fairly confident in the data. That said, our feed is very different from your reference plant, and that might explain the difference. Could you share some of your plant data so we can compare them directly?", "That's a fair question. We calibrated all the flow meters and ran the key tests twice, so we're fairly confident in the data. Having said that, our feed is quite different from your reference plant, which could explain the gap. Would you be able to share some of your plant data so we can compare the two directly?", "I understand your concern. We calibrated all the flow meters and repeated the key runs twice, so we're fairly confident in the data. That said, our feed is quite different from your reference plant, which might explain the gap. Could you share some of your plant data so that we can compare the two directly?"],
     meaning: [
@@ -1045,7 +1045,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "고객사 발표 질의응답. Mr. Tan이 실제 규모에서도 수분 10%를 보증할 수 있냐고 묻습니다. 보증은 아직 받지 못한 벤더 최종 설계에 달려 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Can you guarantee that the dryer will reach 10% moisture at full scale?", ko: "실제 규모에서도 건조기가 수분 10%에 도달한다고 보증할 수 있나요?" }],
     promptKo: "솔직히 오늘 확답을 드리기는 어려워요. 보증은 벤더의 최종 설계에 달려 있는데, 그걸 아직 받지 못했거든요. 지키지 못할 약속은 드리고 싶지 않으니, Priya 팀과 확인해서 금요일까지 답을 드릴게요.",
-    segments: ["솔직히,", "저는 드릴 수 없어요", "확실한 답을", "오늘.", "보증은", "달려 있어요", "벤더의 최종 설계에,", "그것을 우리는 아직 받지 못했어요.", "약속하고 싶지 않아요", "우리가 지킬 수 없는 것을,", "그래서 확인할게요", "Priya 팀과", "그리고 답을 드릴게요", "금요일까지"],
+    segments: ["솔직히 오늘 확답을 드리기는 어려워요", "보증은 벤더의 최종 설계에 달려 있어요", "그런데 그걸 아직 받지 못했어요", "지키지 못할 약속은 드리고 싶지 않아요", "그래서 Priya 팀과 확인해서 금요일까지 답을 드릴게요"],
     reference: "To be honest, I can't give you a firm answer today. The guarantee depends on the final vendor design, which we haven't received yet. I don't want to promise something we can't deliver, so let me check with Priya's team and get back to you by Friday.",
     accepted: ["Honestly, I can't give you a firm answer today. The guarantee depends on the final vendor design, which we haven't received yet. I don't want to promise something we can't deliver, so let me check with Priya's team and get back to you by Friday.", "To be honest, I can't give you a clear answer today. The guarantee depends on the vendor's final design, which we haven't received yet. I don't want to promise something we can't deliver, so I'll check with Priya's team and get back to you by Friday.", "To be honest, I can't give you a firm answer today. The guarantee depends on the final vendor design, and we haven't received it yet. I don't want to make a promise we can't keep, so let me check with Priya's team and get back to you by Friday.", "To be honest, I can't give you a firm answer today, because the guarantee depends on the final vendor design, which we haven't received yet. I don't want to promise something we can't deliver, so let me check with Priya's team and come back to you by Friday."],
     meaning: [
@@ -1087,7 +1087,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "고객 발표 전날 리허설. Ms. Kim이 위험 요소 파트는 고객에게 보여 줄 필요 없으니 빼자고 합니다. 민수는 신뢰 문제로 일부는 남기고 싶습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Let's skip the risks section tomorrow. The client doesn't need to see that.", ko: "내일은 위험 요소 파트를 빼죠. 고객이 그걸 볼 필요는 없어요." }],
     promptKo: "말씀하신 뜻은 알겠지만, 위험 요소 슬라이드는 적어도 한 장은 남기고 싶어요. 고객이 나중에 알게 되면 저희를 덜 신뢰할 수도 있으니까요. 주요 위험 세 가지만 보여 주고 자세한 내용은 부록으로 옮기면 어떨까요?",
-    segments: ["뜻은 알겠지만,", "저는 차라리 남기고 싶어요", "적어도 슬라이드 한 장을", "위험 요소에 관한.", "만약 고객이 알게 되면", "그것들에 대해", "나중에,", "그들은 우리를 덜 신뢰할 수도 있어요.", "~하는 게 어때요", "보여 주는 것", "주요 위험 세 가지만", "그리고 옮기는 것", "자세한 내용을", "부록으로"],
+    segments: ["말씀하신 뜻은 알겠지만", "위험 요소 슬라이드는 적어도 한 장 남기고 싶어요", "고객이 나중에 알게 되면", "저희를 덜 신뢰할 수도 있어요", "주요 위험 세 가지만 보여 주고 자세한 내용은 부록으로 옮기면 어떨까요?"],
     reference: "I see your point, but I'd rather keep at least one slide on the risks. If the client finds out about them later, they might trust us less. How about showing just the top three risks and moving the details to the appendix?",
     accepted: ["I see your point, but I'd prefer to keep at least one slide on the risks. If the client finds out about them later, they might trust us less. How about showing just the top three risks and moving the details to the appendix?", "I understand, but I'd rather keep at least one slide on the risks. If the client finds out about them later, they might not trust us as much. How about showing just the top three risks and moving the details to the appendix?", "I see your point, but I'd rather keep at least one slide on the risks. If the client finds out about them later, they might trust us less. Why don't we show just the top three risks and move the details to the appendix?", "I see your point, but I'd rather keep at least one risk slide. If the client finds out about the risks later, they might trust us less. Maybe we could show just the top three risks and move the details to the appendix."],
     meaning: [

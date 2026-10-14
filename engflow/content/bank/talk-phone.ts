@@ -430,7 +430,7 @@ export const TALK_PHONE: Question[] = [
       { speaker: "Budi", en: "Hello, Budi speaking.", ko: "여보세요, 부디입니다." },
     ],
     promptKo: "부디 씨, 전화 못 받아서 죄송해요. 운전 중이라 받을 수가 없었어요.",
-    segments: ["부디 씨,", "죄송해요", "제가 당신의 전화를 놓쳤어요.", "저는 운전하고 있었어요,", "그래서", "받을 수 없었어요"],
+    segments: ["부디 씨, 전화 못 받아서 죄송해요.", "운전 중이었어요", "그래서 받을 수가 없었어요"],
     reference: "Hi Budi, sorry I missed your call. I was driving, so I couldn't pick up.",
     accepted: [
       "Hi Budi, sorry I missed your call. I was driving, so I couldn't answer.",
@@ -523,7 +523,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "라이선서 다니엘 씨와 통화가 길어졌는데, 곧 다른 회의가 있어서 통화를 정중하게 끝내려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "So, that's the update on the heat balance. Do you have any other questions?", ko: "그래서 열 수지 관련 업데이트는 여기까지예요. 다른 질문 있으세요?" }],
     promptKo: "아니요, 그게 다예요. 죄송하지만 다른 회의가 있어서 이제 끊어야 할 것 같아요. 전화 주셔서 감사해요, 다니엘 씨.",
-    segments: ["아니요, 그게 다예요.", "죄송하지만", "저는 가야 해요", "이제", "왜냐하면", "다른 회의가 있다.", "감사해요", "전화 주셔서,", "다니엘 씨"],
+    segments: ["아니요, 그게 다예요.", "죄송하지만 이제 끊어야 해요", "다른 회의가 있어서요.", "전화 주셔서 감사해요, 다니엘 씨"],
     reference: "No, that's all. I'm afraid I have to go now because I have another meeting. Thanks for calling, Daniel.",
     accepted: [
       "No, that's all. I'm afraid I need to go now because I have another meeting. Thanks for calling, Daniel.",
@@ -617,7 +617,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "베트남 팀 린 씨가 시험 결과를 같이 검토할 통화 시간을 묻습니다. 목요일 오후를 제안하고, 안 되면 금요일 오전도 괜찮다고 말합니다.",
     dialogue: [{ speaker: "Linh", en: "When can we have a call to go over the test results?", ko: "시험 결과 검토하는 통화는 언제 할까요?" }],
     promptKo: "목요일 오후 어때요? 그때가 안 되면 금요일 오전도 괜찮아요.",
-    segments: ["~어때요", "목요일 오후?", "만약", "그때가 당신에게 안 맞으면,", "금요일 오전도", "괜찮아요"],
+    segments: ["목요일 오후 어때요?", "그때가 안 되시면", "금요일 오전도 괜찮아요"],
     reference: "How about Thursday afternoon? If that doesn't work for you, Friday morning is also fine.",
     accepted: [
       "How about Thursday afternoon? If that doesn't work for you, Friday morning is fine too.",
@@ -663,7 +663,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "벤더 프리야 씨에게 전화했지만 받지 않아 음성 사서함으로 넘어갔습니다. 펌프가 출고되었는지 확인하려고 메시지를 남깁니다.",
     dialogue: [{ speaker: "Priya", en: "(voicemail) Hi, you've reached Priya. Please leave a message after the beep.", ko: "(음성 사서함) 안녕하세요, 프리야입니다. 삐 소리 후에 메시지를 남겨 주세요." }],
     promptKo: "안녕하세요 프리야 씨, 민수입니다. 펌프가 출고됐는지 확인하려고 전화드렸어요. 이 메시지 들으시면 전화 부탁드려요.",
-    segments: ["안녕하세요 프리야 씨,", "민수입니다.", "저는 전화하고 있어요", "확인하려고", "~인지", "펌프가 출고되었다.", "다시 전화해 주세요", "~할 때", "당신이 이 메시지를 받다"],
+    segments: ["안녕하세요 프리야 씨, 민수입니다.", "확인하려고 전화드렸어요", "펌프가 출고됐는지.", "다시 전화 부탁드려요", "이 메시지 들으시면"],
     reference: "Hi Priya, it's Minsu. I'm calling to check if the pumps have been shipped. Please call me back when you get this message.",
     accepted: [
       "Hi Priya, this is Minsu. I'm calling to check if the pumps have been shipped. Please call me back when you get this message.",
@@ -800,7 +800,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "Mr. Tan과 휴대전화로 납품 일정을 이야기하는데, 소리가 계속 끊겨 날짜와 숫자를 제대로 들을 수 없습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Sorry, Minsu, can you hear me now? I said the… is… on the…", ko: "미안해요, 민수 씨, 이제 들려요? 제가… 그러니까… 날짜가…" }],
     promptKo: "죄송해요, 소리가 계속 끊겨서 잘 안 들려요. 대신 화상 통화로 바꾸는 게 어때요?",
-    segments: ["죄송해요,", "소리가 계속 끊겨요,", "그래서", "저는 잘 들을 수 없어요.", "~하는 게 어때요", "우리가 바꾸다", "화상 통화로", "대신"],
+    segments: ["죄송해요, 소리가 계속 끊겨요", "그래서 잘 안 들려요.", "대신 화상 통화로 바꾸는 게 어때요?"],
     reference: "Sorry, the line keeps cutting out, so I can't hear you clearly. Why don't we switch to a video call instead?",
     accepted: [
       "Sorry, the line keeps cutting out, so I can't hear you well. Why don't we switch to a video call instead?",
@@ -845,7 +845,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "오후 3시에 프리야 씨와 통화하기로 했는데, 현장에 급한 일이 생겼습니다. 프리야 씨가 메신저로 통화를 확인합니다.",
     dialogue: [{ speaker: "Priya", en: "Hi Minsu, are we still on for our call at three?", ko: "민수 씨, 3시 통화 그대로 하는 거죠?" }],
     promptKo: "죄송해요, 현장에 급한 일이 생겼어요. 통화를 내일 오전으로 옮길 수 있을까요?",
-    segments: ["죄송해요,", "급한 일이", "생겼어요", "현장에.", "~할 수 있을까요", "우리가 옮기다", "우리 통화를", "내일 오전으로"],
+    segments: ["죄송해요, 급한 일이 생겼어요", "현장에.", "통화를 옮길 수 있을까요", "내일 오전으로?"],
     reference: "Sorry, something urgent has come up at the site. Could we move our call to tomorrow morning?",
     accepted: [
       "Sorry, something urgent has come up at the site. Could we move the call to tomorrow morning?",
@@ -894,7 +894,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "방금 벤더 프리야 씨와 통화를 마쳤습니다. 사무실의 부디 씨가 펌프 소식을 묻습니다. 펌프는 어제 출고됐지만 다음 주 금요일에야 도착합니다.",
     dialogue: [{ speaker: "Budi", en: "Did Priya call back about the pumps?", ko: "프리야 씨가 펌프 건으로 다시 전화했어요?" }],
     promptKo: "네, 방금 통화했어요. 펌프는 어제 출고됐는데, 다음 주 금요일에야 도착한다고 하더라고요. 그래서 설치 일정을 옮겨야 할 수도 있어요.",
-    segments: ["네,", "방금 통화했어요", "그녀와.", "그녀가 말했어요", "펌프가 출고되었다고", "어제,", "하지만", "도착하지 않을 거라고", "다음 주 금요일까지는.", "그래서", "우리는 옮겨야 할 수도 있어요", "설치 일정을"],
+    segments: ["네, 방금 통화했어요.", "펌프는 어제 출고됐는데", "다음 주 금요일에야 도착한대요.", "그래서 설치 일정을 옮겨야 할 수도 있어요"],
     reference: "Yes, I just talked to her. She said the pumps were shipped yesterday, but they won't arrive until next Friday. So we might have to move the installation.",
     accepted: [
       "Yes, I just spoke to her. She said the pumps were shipped yesterday, but they won't arrive until next Friday. So we might have to move the installation.",
@@ -942,7 +942,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "라이선서 다니엘 씨에게 전화했지만 받지 않아 음성 메시지를 남깁니다. 열 수지에 대한 다니엘 씨의 코멘트를 대부분 검토했는데, 설계를 수정하기 전에 두 가지를 논의하고 싶습니다.",
     dialogue: [{ speaker: "Daniel", en: "(voicemail) Hello, this is Daniel. I can't take your call right now. Please leave a message.", ko: "(음성 사서함) 안녕하세요, 다니엘입니다. 지금은 전화를 받을 수 없어요. 메시지를 남겨 주세요." }],
     promptKo: "다니엘 씨, 민수입니다. 열 수지에 대한 코멘트 건으로 전화드렸어요. 대부분 검토했는데, 설계를 수정하기 전에 두 가지를 논의하고 싶어요. 시간 되실 때 전화 부탁드려요.",
-    segments: ["다니엘 씨, 민수입니다.", "저는 전화하고 있어요", "당신의 코멘트에 관해", "열 수지에 대한.", "우리는 검토했어요", "그중 대부분을,", "하지만", "우리는 논의하고 싶어요", "두 가지를", "~하기 전에", "우리가 설계를 수정하다.", "다시 전화해 주시겠어요", "시간이 있을 때"],
+    segments: ["다니엘 씨, 민수입니다.", "열 수지 코멘트 건으로 전화드렸어요.", "대부분 검토했는데", "두 가지를 논의하고 싶어요", "설계를 수정하기 전에.", "시간 되실 때 전화 주시겠어요?"],
     reference: "Hi Daniel, it's Minsu. I'm calling about your comments on the heat balance. We've checked most of them, but we'd like to discuss two points before we revise the design. Could you call me back when you have a moment?",
     accepted: [
       "Hi Daniel, this is Minsu. I'm calling about your comments on the heat balance. We've checked most of them, but we'd like to discuss two points before we revise the design. Could you call me back when you have a moment?",
@@ -988,10 +988,11 @@ export const TALK_PHONE: Question[] = [
     expression: "I'm a bit worried that … Would you mind if I sent you …?",
     contextKo: "Mr. Tan이 전화로 건조기 설계 조건을 지금 바로 확정하자고 합니다. 통화로 이야기해도 되지만, 숫자가 많아서 통화가 끝나면 메일로 정리해 서로 확인하고 싶습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Let's just agree on the design conditions now on the phone. There's no need for more paperwork.", ko: "그냥 지금 전화로 설계 조건을 합의합시다. 서류 작업을 더 할 필요는 없어요." }],
-    promptKo: "지금 이야기하는 건 좋은데, 숫자가 많아서 통화로는 세부 사항을 놓칠까 봐 조금 걱정돼요. 통화가 끝나면 짧게 요약해서 보내 드려도 될까요? 그러면 둘 다 같은 숫자를 갖고 있게 될 거예요.",
-    segments: ["저는 기꺼이 이야기할게요", "지금,", "하지만", "저는 조금 걱정돼요", "우리가 놓칠 수도 있다고", "세부 사항을", "전화로는,", "숫자가 많아서.", "~해도 될까요", "제가 짧은 요약을 보내다", "통화 후에?", "그러면", "우리 둘 다", "같은 숫자를 갖게 될 거예요"],
-    reference: "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone, because there are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
+    promptKo: "지금 이야기하는 건 좋은데, 통화로는 세부 사항을 놓칠까 봐 조금 걱정돼요. 숫자가 많거든요. 통화가 끝나면 짧게 요약해서 보내 드려도 될까요? 그러면 둘 다 같은 숫자를 갖고 있게 될 거예요.",
+    segments: ["지금 이야기하는 건 좋은데", "통화로는 세부 사항을 놓칠까 봐 걱정돼요.", "숫자가 많거든요.", "통화 끝나고 짧은 요약을 보내 드려도 될까요?", "그러면 둘 다 같은 숫자를 갖게 돼요"],
+    reference: "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone. There are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
     accepted: [
+      "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone, because there are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
       "I'm happy to discuss it now, but I'm a little worried that we might miss some details over the phone, because there are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
       "I'm happy to discuss it now, but I'm a bit worried that we might miss some details on the phone, because there are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
       "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone, because there are many numbers. Would it be okay if I sent you a short summary after the call? That way, we'll both have the same numbers.",
@@ -1033,7 +1034,7 @@ export const TALK_PHONE: Question[] = [
     contextKo: "유럽의 다니엘 씨가 내일 자기 시간으로 오후 4시에 통화하자고 합니다. 그 시간은 서울 기준 밤 11시라서, 정중하게 그쪽 오전 시간을 제안하려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Can we have the call tomorrow at 4 pm my time? That's the only free slot I have.", ko: "내일 제 시간으로 오후 4시에 통화할 수 있을까요? 그때밖에 시간이 없어요." }],
     promptKo: "꼭 참여하고 싶은데, 그쪽 오후 4시는 서울에서 밤 11시예요. 대신 그쪽 오전에 통화하는 건 가능할까요? 그게 어려우시면 4시에라도 참여할 수 있어요.",
-    segments: ["저는 정말 참여하고 싶어요,", "하지만", "당신 시간 오후 4시는", "밤 11시예요", "여기 서울에서는.", "~하는 것이 가능할까요", "통화를 하다", "당신의 오전에", "대신?", "만약", "그게 당신에게 어려우면,", "저는 그래도 참여할 수 있어요", "4시에"],
+    segments: ["정말 참여하고 싶은데", "그쪽 오후 4시는 서울에선 밤 11시예요.", "대신 그쪽 오전에 통화할 수 있을까요?", "그게 어려우시면", "4시에라도 참여할 수 있어요"],
     reference: "I'd really like to join, but 4 pm your time is 11 pm here in Seoul. Would it be possible to have the call in your morning instead? If that's difficult for you, I can still join at 4.",
     accepted: [
       "I'd really like to join, but 4 pm your time is 11 pm here in Seoul. Would it be possible to have the call in your morning instead? If that's difficult for you, I can still join at 4 pm.",

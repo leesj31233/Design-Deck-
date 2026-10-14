@@ -103,7 +103,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["present-perfect", "cause-effect", "be-adj"],
     contextKo: "주간 공정 회의에서 펌프 사이징이 왜 늦어지는지 설명합니다. 벤더 데이터시트가 아직 오지 않았습니다.",
     promptKo: "우리는 아직 벤더로부터 펌프 데이터시트를 받지 못해서, 사이징 작업이 지연된 상태입니다.",
-    segments: ["우리는", "아직 받지 못했다", "펌프 데이터시트를", "벤더로부터", "그래서", "사이징 작업이", "지연된 상태이다"],
+    segments: ["아직 벤더로부터 펌프 데이터시트를 받지 못했다", "그래서 사이징 작업이 지연된 상태다"],
     reference: "We haven't received the pump datasheet from the vendor yet, so the sizing work is delayed.",
     accepted: [
       "We have not received the pump datasheet from the vendor yet, so the sizing work has been delayed.",
@@ -189,7 +189,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["modal-necessity", "prep-gerund", "present-perfect"],
     contextKo: "Pre-FEED 회의에서 업무를 나눕니다. 일부 모터 용량이 바뀌어서 인도네시아 Pak Budi 팀이 장비 리스트를 수정해야 합니다.",
     promptKo: "일부 모터 사이즈가 바뀌었기 때문에, 우리가 고객에게 보내기 전에 Pak Budi 팀이 장비 리스트를 업데이트해야 합니다.",
-    segments: ["Pak Budi 팀이", "업데이트해야 한다", "장비 리스트를", "~하기 전에", "우리가 그것을 보내다", "고객에게", "왜냐하면", "일부 모터 사이즈가", "바뀌었다"],
+    segments: ["Pak Budi 팀이 장비 리스트를 업데이트해야 한다", "우리가 고객에게 보내기 전에", "왜냐하면 일부 모터 사이즈가 바뀌었다"],
     reference: "Pak Budi's team needs to update the equipment list before we send it to the client, because some motor sizes have changed.",
     accepted: [
       "Pak Budi's team has to update the equipment list before we send it to the client because some motor sizes have changed.",
@@ -235,7 +235,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["cond-1", "passive", "modal-possibility"],
     contextKo: "프로젝트 회의에서 말레이시아 벤더가 아직 납기일을 확정하지 않았습니다. 당신은 일정 리스크를 팀에 알립니다.",
     promptKo: "만약 벤더가 이번 주에 납기일을 확정해 주지 않으면, 시운전이 2주 지연될 수도 있습니다.",
-    segments: ["만약", "벤더가 확정해 주지 않으면", "납기일을", "이번 주에", "시운전이", "지연될 수도 있다", "2주만큼"],
+    segments: ["벤더가 이번 주에 납기일을 확정해 주지 않으면", "시운전이 2주 지연될 수도 있다"],
     reference: "If the vendor doesn't confirm the delivery date this week, the commissioning might be delayed by two weeks.",
     accepted: [
       "If the vendor does not confirm the delivery date this week, commissioning could be delayed by two weeks.",
@@ -281,9 +281,10 @@ export const SENTENCES_B: Question[] = [
     skills: ["reporting", "relative-clause", "modal-possibility"],
     contextKo: "주간 프로젝트 회의에서 벤더와 통화한 내용을 팀에 전달합니다. 원래 5월 도착 예정이던 건조기가 늦어질 수 있습니다.",
     promptKo: "벤더 말로는 원래 5월에 도착할 예정이었던 건조기가 7월이 되어서야 도착할 수도 있다고 합니다. 그래서 우리는 시운전 일정을 변경해야 할 수도 있습니다.",
-    segments: ["벤더가 말했다", "~라고", "건조기가", "도착할 예정이었던", "5월에", "도착하지 않을 수도 있다", "7월까지는", "그래서", "우리는 변경해야 할 수도 있다", "시운전 일정을"],
-    reference: "The vendor said that the dryer, which was scheduled to arrive in May, might not arrive until July, so we might have to change the commissioning schedule.",
+    segments: ["벤더 말로는", "원래 5월에 도착할 예정이었던 건조기가", "7월이 되어서야 도착할 수도 있다", "그래서 시운전 일정을 바꿔야 할 수도 있다"],
+    reference: "The vendor said that the dryer, which was scheduled to arrive in May, might not arrive until July. So we might have to change the commissioning schedule.",
     accepted: [
+      "The vendor said that the dryer, which was scheduled to arrive in May, might not arrive until July, so we might have to change the commissioning schedule.",
       "The vendor told us that the dryer, which was scheduled to arrive in May, may not arrive until July, so we may need to change the commissioning schedule.",
       "The vendor said the dryer, which was supposed to arrive in May, might not arrive until July, so we might have to revise the commissioning schedule.",
       "According to the vendor, the dryer, which was planned to arrive in May, might not be delivered until July, so we might have to change the commissioning schedule.",
@@ -308,8 +309,8 @@ export const SENTENCES_B: Question[] = [
       { id: "to-past", pattern: "re:(?<=\\b(have|has|need|needs) to )(changed|revised|adjusted|modified|moved|updated)\\b", category: "verb-form", severity: "major", fix: "change", messageKo: "'have to / need to' 뒤에는 동사원형이 옵니다: 'might have to change' ('to changed' ✗).", skill: "modal-necessity" },
     ],
     hints: {
-      pattern: "The vendor said that + 주어, which was …, might not + 동사 + until …, so + 주어 + might have to + 동사",
-      skeleton: "The vendor said that the dryer, ____ was scheduled to arrive in May, might ____ arrive ____ July, so …",
+      pattern: "The vendor said that + 주어, which was …, might not + 동사 + until …. So + 주어 + might have to + 동사",
+      skeleton: "The vendor said that the dryer, ____ was scheduled to arrive in May, might ____ arrive ____ July. So …",
       partial: "The vendor said that the dryer, which was scheduled to arrive in May, …",
     },
     explanationKo: "남의 말을 전할 때는 'said that + 문장' 또는 'told us that + 문장'을 씁니다('said us'는 틀림). 'which was scheduled to arrive in May'는 건조기를 보충 설명하는 관계절이고, '7월이 되어서야'는 'not … until July'로 표현합니다.",
@@ -458,7 +459,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["cause-effect", "be-adj"],
     contextKo: "말레이시아 고객이 건조기 용량을 늘려 달라고 요청합니다. 현장 스팀 공급량이 제한되어 있어 어렵다고 설명합니다.",
     promptKo: "현장의 스팀 공급량이 시간당 3톤으로 제한되어 있기 때문에 우리는 건조기 용량을 늘릴 수 없습니다.",
-    segments: ["우리는 늘릴 수 없다", "건조기 용량을", "왜냐하면", "스팀 공급량이", "현장의", "제한되어 있다", "시간당 3톤으로"],
+    segments: ["건조기 용량을 늘릴 수 없다", "왜냐하면 현장의 스팀 공급량이 시간당 3톤으로 제한되어 있다"],
     reference: "We can't increase the dryer capacity because the steam supply at the site is limited to 3 t/h.",
     accepted: [
       "Because the steam supply at the site is limited to 3 t/h, we can't increase the dryer capacity.",
@@ -504,7 +505,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["polite-disagree", "cause-effect"],
     contextKo: "인도네시아 고객이 성능 시험을 1주일만 하자고 합니다. 원료 품질이 매일 바뀌어서 부족할 수 있다고 정중하게 반대합니다.",
     promptKo: "말씀하신 점은 이해하지만, 원료 품질이 매일 바뀌기 때문에 성능 시험에 1주일이 충분한지는 잘 모르겠습니다.",
-    segments: ["말씀하신 점은 이해합니다", "하지만", "저는 잘 모르겠습니다", "1주일이", "충분한지", "성능 시험에", "왜냐하면", "원료 품질이", "매일 바뀐다"],
+    segments: ["말씀하신 점은 이해하지만", "성능 시험에 1주일이 충분한지는 잘 모르겠다", "왜냐하면 원료 품질이 매일 바뀐다"],
     reference: "I see your point, but I'm not sure that one week is enough for the performance test, because the feed quality changes every day.",
     accepted: [
       "I understand your point, but I'm not sure one week is enough for the performance test because the feed quality changes every day.",
@@ -551,7 +552,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["reporting", "future-plan"],
     contextKo: "말레이시아 벤더와의 회의를 마치며 결정 사항을 요약합니다. 벤더가 견적서를 수정해서 목요일까지 보내기로 했습니다.",
     promptKo: "정리하면, 말레이시아 벤더가 견적서를 수정해서 목요일까지 저희에게 보내 주기로 합의했습니다.",
-    segments: ["정리하면", "우리는 합의했다", "~라고", "말레이시아 벤더가", "수정할 것이다", "견적서를", "그리고 그것을 보낼 것이다", "저희에게", "목요일까지"],
+    segments: ["정리하면, 우리는 합의했다", "말레이시아 벤더가 견적서를 수정해서", "목요일까지 저희에게 보내기로"],
     reference: "To summarize, we agreed that the Malaysian vendor will revise the quotation and send it to us by Thursday.",
     accepted: [
       "To summarize, we agreed that the Malaysian vendor would revise the quotation and send it to us by Thursday.",
@@ -596,10 +597,11 @@ export const SENTENCES_B: Question[] = [
     difficulty: 9,
     skills: ["cond-3", "modal-possibility"],
     contextKo: "FEED 검토 회의에서 고객이 냉각수 염화물 한계치를 뒤늦게 알려 줬습니다. 튜브 재질 선정이 달라졌을 것이라고 설명합니다.",
-    promptKo: "고객이 염화물 한계치를 (설계 초기에) 더 일찍 알려 줬더라면, 우리는 다른 튜브 재질을 선택했을 것입니다. 현재의 스테인리스강이 적합하지 않을 수도 있기 때문입니다.",
-    segments: ["만약", "고객이 알려 줬더라면", "염화물 한계치에 대해", "더 일찍", "우리는 선택했을 것이다", "다른 튜브 재질을", "왜냐하면", "현재의 스테인리스강이", "적합하지 않을 수도 있다"],
-    reference: "If the client had told us about the chloride limit earlier, we would have chosen a different tube material, because the current stainless steel might not be suitable.",
+    promptKo: "고객이 염화물 한계치를 (설계 초기에) 더 일찍 알려 줬더라면, 우리는 다른 튜브 재질을 선택했을 것입니다. 현재의 스테인리스강은 적합하지 않을 수도 있습니다.",
+    segments: ["고객이 염화물 한계치를 더 일찍 알려 줬더라면", "다른 튜브 재질을 선택했을 것이다", "현재의 스테인리스강은 적합하지 않을 수도 있다"],
+    reference: "If the client had told us about the chloride limit earlier, we would have chosen a different tube material. The current stainless steel might not be suitable.",
     accepted: [
+      "If the client had told us about the chloride limit earlier, we would have chosen a different tube material, because the current stainless steel might not be suitable.",
       "If the client had told us about the chloride limit earlier, we would have selected a different tube material, because the current stainless steel might not be suitable.",
       "If the client had informed us about the chloride limit earlier, we would have chosen a different material for the tubes, because the current stainless steel may not be suitable.",
       "We would have chosen a different tube material if the client had told us about the chloride limit earlier, because the current stainless steel might not be suitable.",
@@ -624,8 +626,8 @@ export const SENTENCES_B: Question[] = [
       { id: "if-would-have", pattern: "if the? client|customer would have", category: "tense", severity: "major", fix: "if the client had", messageKo: "if절에는 would를 쓰지 않습니다. 과거 가정의 if절은 'If the client had told us …'이고, would have는 결과절에만 씁니다.", skill: "cond-3" },
     ],
     hints: {
-      pattern: "If + 주어 + had + p.p., 주어 + would have + p.p., because + 주어 + might not be + 형용사",
-      skeleton: "If the client ____ told us about the chloride limit earlier, we would ____ chosen a different tube material, because …",
+      pattern: "If + 주어 + had + p.p., 주어 + would have + p.p. + 이유 문장 (might not be + 형용사)",
+      skeleton: "If the client ____ told us about the chloride limit earlier, we would ____ chosen a different tube material. The current …",
       partial: "If the client had told us about the chloride limit earlier, we would have …",
     },
     explanationKo: "과거 사실과 반대되는 가정('~했더라면 ~했을 것이다')은 'If + had + p.p., would have + p.p.'입니다. 'If the client told us …, we would choose …'는 현재 가정처럼 들립니다. 이유 부분은 지금의 가능성이라 'might not be'로 씁니다.",
@@ -739,7 +741,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["modal-possibility", "cause-effect", "time-clause"],
     contextKo: "DCS에서 유량 제어가 안 되는 문제를 현장 팀과 논의합니다. 제어 밸브가 고착됐을 가능성을 말합니다.",
     promptKo: "컨트롤러 출력을 조정해도 유량이 변하지 않기 때문에, 제어 밸브가 고착되어 있을 수도 있습니다.",
-    segments: ["제어 밸브가", "고착되어 있을 수도 있다", "왜냐하면", "유량이", "변하지 않는다", "우리가 조정할 때", "컨트롤러 출력을"],
+    segments: ["제어 밸브가 고착되어 있을 수도 있다", "왜냐하면 유량이 변하지 않는다", "컨트롤러 출력을 조정할 때"],
     reference: "The control valve might be stuck, because the flow doesn't change when we adjust the controller output.",
     accepted: [
       "The control valve may be stuck because the flow does not change when we adjust the controller output.",
@@ -785,7 +787,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["degree", "comparative", "modal-necessity"],
     contextKo: "펠릿 공장 시운전 중 건조기 출구 수분이 목표보다 조금 높습니다. 운전원에게 공급량을 약간 줄이자고 합니다.",
     promptKo: "건조기 출구 수분이 목표보다 약간 높아서, 공급 속도를 조금 줄여야 합니다.",
-    segments: ["출구 수분이", "건조기의", "약간 더 높다", "목표보다", "그래서", "우리는 줄여야 한다", "공급 속도를", "조금"],
+    segments: ["건조기 출구 수분이 목표보다 약간 높다", "그래서 공급 속도를 조금 줄여야 한다"],
     reference: "The outlet moisture of the dryer is slightly higher than the target, so we need to reduce the feed rate a little.",
     accepted: [
       "The dryer outlet moisture is slightly higher than the target, so we need to reduce the feed rate a little.",
@@ -832,7 +834,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["passive", "present-perfect"],
     contextKo: "정비 회의에서 공급 펌프 상태를 보고합니다. 메커니컬 실은 지난주에 교체했지만 누설 문제는 아직 해결되지 않았습니다.",
     promptKo: "공급 펌프의 메커니컬 실은 지난주에 교체되었지만, 누설은 아직 해결되지 않았습니다.",
-    segments: ["메커니컬 실은", "공급 펌프의", "교체되었다", "지난주에", "하지만", "누설은", "아직 해결되지 않았다"],
+    segments: ["공급 펌프의 메커니컬 실은 지난주에 교체되었다", "하지만 누설은 아직 해결되지 않았다"],
     reference: "The mechanical seal of the feed pump was replaced last week, but the leak has not been fixed yet.",
     accepted: [
       "The feed pump's mechanical seal was replaced last week, but the leak hasn't been fixed yet.",
@@ -878,7 +880,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["relative-clause", "progressive", "modal-necessity"],
     contextKo: "시운전 일일 회의에서 지난달 설치한 온도 트랜스미터 값이 불안정하다고 보고하고 배선 점검을 제안합니다.",
     promptKo: "지난달 건조기 출구에 설치한 온도 트랜스미터가 불안정한 값을 보이고 있어서, 배선을 점검해야 합니다.",
-    segments: ["온도 트랜스미터가", "(그것을) 우리가 설치한", "건조기 출구에", "지난달", "보이고 있다", "불안정한 값을", "그래서", "우리는 점검해야 한다", "배선을"],
+    segments: ["지난달 건조기 출구에 설치한 온도 트랜스미터가", "불안정한 값을 보이고 있다", "그래서 배선을 점검해야 한다"],
     reference: "The temperature transmitter that we installed at the dryer outlet last month is showing unstable readings, so we need to check the wiring.",
     accepted: [
       "The temperature transmitter which we installed at the dryer outlet last month is showing unstable readings, so we need to check the wiring.",
@@ -921,10 +923,11 @@ export const SENTENCES_B: Question[] = [
     difficulty: 9,
     skills: ["cond-3", "cond-2", "progressive"],
     contextKo: "오늘 아침 공급 펌프가 트립되어 생산이 멈췄습니다. 원인 검토 회의에서 지난 정기 정지 때 스트레이너를 청소하지 않은 점을 지적합니다.",
-    promptKo: "지난 정기 정지 기간에 흡입 스트레이너를 청소했더라면, 오늘 아침 펌프가 트립되지 않았을 것이고, 지금 우리는 생산 손실을 보고 있지 않을 것입니다.",
-    segments: ["만약", "우리가 청소했더라면", "흡입 스트레이너를", "지난 정기 정지 때", "펌프가", "트립되지 않았을 것이다", "오늘 아침", "그리고", "우리는 잃고 있지 않을 것이다", "생산량을", "지금"],
-    reference: "If we had cleaned the suction strainer during the last shutdown, the pump would not have tripped this morning, and we would not be losing production now.",
+    promptKo: "지난 정기 정지 기간에 흡입 스트레이너를 청소했더라면, 오늘 아침 펌프가 트립되지 않았을 것입니다. 그리고 지금 우리는 생산 손실을 보고 있지 않을 것입니다.",
+    segments: ["지난 정기 정지 때 흡입 스트레이너를 청소했더라면", "오늘 아침 펌프가 트립되지 않았을 것이다", "그리고 지금 생산 손실도 보고 있지 않을 것이다"],
+    reference: "If we had cleaned the suction strainer during the last shutdown, the pump would not have tripped this morning. And we would not be losing production now.",
     accepted: [
+      "If we had cleaned the suction strainer during the last shutdown, the pump would not have tripped this morning, and we would not be losing production now.",
       "If we had cleaned the suction strainer during the last shutdown, the pump would not have tripped this morning and we would not be losing any production now.",
       "If the suction strainer had been cleaned during the last shutdown, the pump would not have tripped this morning, and we would not be losing production now.",
       "The pump would not have tripped this morning if we had cleaned the suction strainer during the last shutdown, and we would not be losing production now.",
@@ -951,7 +954,7 @@ export const SENTENCES_B: Question[] = [
     ],
     hints: {
       pattern: "If + had + p.p., 주어 + would not have + p.p. (과거 결과), and 주어 + would not be + V-ing + now (현재 결과)",
-      skeleton: "If we ____ cleaned the suction strainer during the last shutdown, the pump would not ____ tripped this morning, and …",
+      skeleton: "If we ____ cleaned the suction strainer during the last shutdown, the pump would not ____ tripped this morning. And …",
       partial: "If we had cleaned the suction strainer during the last shutdown, the pump …",
     },
     explanationKo: "과거 사실과 반대되는 가정은 'If + had + p.p.'이고, 결과가 과거(오늘 아침 트립)이면 'would not have + p.p.', 지금 상황이면 'would not be + V-ing'(혼합 가정)입니다. 'If we cleaned …, would not trip'은 현재·미래 가정처럼 들려 사고 분석에 맞지 않습니다.",
@@ -973,7 +976,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["comparative", "degree", "articles"],
     contextKo: "타당성 검토 회의에서 두 가지 건조기 옵션을 비교합니다. 옵션 2는 투자비가 낮지만 운영비가 훨씬 높습니다.",
     promptKo: "옵션 2는 옵션 1보다 CAPEX가 더 낮지만, OPEX는 훨씬 더 높습니다.",
-    segments: ["옵션 2는", "가지고 있다", "더 낮은 CAPEX를", "옵션 1보다", "하지만", "그것의 OPEX는", "훨씬 더 높다"],
+    segments: ["옵션 2는 옵션 1보다 CAPEX가 더 낮다", "하지만 OPEX는 훨씬 더 높다"],
     reference: "Option 2 has a lower CAPEX than Option 1, but its OPEX is much higher.",
     accepted: [
       "Option 2 has lower CAPEX than Option 1, but its OPEX is much higher.",
@@ -1017,7 +1020,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["future-plan", "time-clause"],
     contextKo: "베트남 고객과의 화상 회의에서 기술 제안서 제출 계획을 설명합니다. CAPEX 견적을 먼저 마무리해야 합니다.",
     promptKo: "우리는 CAPEX 견적을 마친 후, 다음 주 금요일에 기술 제안서를 제출할 계획입니다.",
-    segments: ["우리는 ~할 계획이다", "제출하다", "기술 제안서를", "다음 주 금요일에", "~한 후에", "우리가 마치다", "CAPEX 견적을"],
+    segments: ["다음 주 금요일에 기술 제안서를 제출할 계획이다", "CAPEX 견적을 마친 후에"],
     reference: "We are planning to submit the technical proposal next Friday, after we finish the CAPEX estimate.",
     accepted: [
       "We are going to submit the technical proposal next Friday, after we finish the CAPEX estimate.",
@@ -1060,7 +1063,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["cond-2", "degree", "comparative"],
     contextKo: "타당성 검토 회의입니다. 현재 보일러는 디젤을 쓰고 있고, EFB를 연료로 쓴다고 가정했을 때의 OPEX 효과를 설명합니다.",
     promptKo: "(실제로는 디젤을 쓰고 있지만) 디젤 대신 EFB를 보일러 연료로 쓴다고 가정하면, OPEX가 약 20% 더 낮을 것입니다.",
-    segments: ["만약 우리가 쓴다고 가정하면", "EFB를", "보일러 연료로", "디젤 대신", "우리의 OPEX는", "~일 것이다", "약 20% 더 낮은"],
+    segments: ["(가정) 디젤 대신 EFB를 보일러 연료로 쓴다면", "OPEX가 약 20% 더 낮을 것이다"],
     reference: "If we used EFB as boiler fuel instead of diesel, our OPEX would be about 20% lower.",
     accepted: [
       "If we used EFB instead of diesel as boiler fuel, our OPEX would be about 20% lower.",
@@ -1106,7 +1109,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["passive", "cond-1"],
     contextKo: "EPC 일정 회의에서 베트남 고객에게 상세 설계 완료 시점을 설명합니다. 배치도 승인이 전제 조건입니다.",
     promptKo: "고객이 이번 달에 배치도를 승인하면, 상세 설계는 3월 말까지 완료될 것입니다.",
-    segments: ["상세 설계는", "완료될 것이다", "3월 말까지", "만약", "고객이 승인하면", "배치도를", "이번 달에"],
+    segments: ["상세 설계는 3월 말까지 완료될 것이다", "고객이 이번 달에 배치도를 승인하면"],
     reference: "The detailed design will be completed by the end of March if the client approves the layout this month.",
     accepted: [
       "If the client approves the layout this month, the detailed design will be completed by the end of March.",
@@ -1152,10 +1155,11 @@ export const SENTENCES_B: Question[] = [
     difficulty: 8,
     skills: ["modal-possibility", "cond-1", "modal-necessity"],
     contextKo: "베트남 고객과 상업 조건을 협의합니다. CAPEX 견적의 전제(유틸리티는 고객이 공급)를 설명하고, 전제가 바뀌면 비용이 오를 수 있다고 알립니다.",
-    promptKo: "저희 CAPEX 견적은 고객이 스팀과 냉각수를 공급한다고 가정하고 있어서, 만약 저희가 직접 공급해야 한다면 약 15% 증가할 수도 있습니다.",
-    segments: ["저희 CAPEX 견적은", "가정하고 있다", "고객이 공급할 것이라고", "스팀과 냉각수를", "그래서", "그것은 증가할 수도 있다", "약 15%만큼", "만약 저희가 공급해야 한다면", "그것들을", "직접"],
-    reference: "Our CAPEX estimate assumes that the client will supply the steam and cooling water, so it could increase by about 15% if we have to provide them ourselves.",
+    promptKo: "저희 CAPEX 견적은 고객이 스팀과 냉각수를 공급한다고 가정하고 있습니다. 그래서 저희가 직접 공급해야 한다면 약 15% 증가할 수도 있습니다.",
+    segments: ["저희 CAPEX 견적의 가정은", "고객이 스팀과 냉각수를 공급한다는 것이다", "그래서 약 15% 늘어날 수도 있다", "저희가 직접 공급해야 한다면"],
+    reference: "Our CAPEX estimate assumes that the client will supply the steam and cooling water. So it could increase by about 15% if we have to provide them ourselves.",
     accepted: [
+      "Our CAPEX estimate assumes that the client will supply the steam and cooling water, so it could increase by about 15% if we have to provide them ourselves.",
       "Our CAPEX estimate is based on the assumption that the client will supply the steam and cooling water, so it could increase by about 15% if we have to supply them ourselves.",
       "Our CAPEX estimate assumes that the client will provide the steam and cooling water, so it might go up by about 15% if we need to provide them ourselves.",
       "Our CAPEX estimate assumes the client will supply steam and cooling water, so the estimate may increase by around 15% if we have to provide these utilities ourselves.",
@@ -1177,9 +1181,9 @@ export const SENTENCES_B: Question[] = [
       { id: "increase-about", pattern: "increase|rise about|around", category: "preposition", severity: "minor", fix: "increase by about", messageKo: "증가 폭은 'increase by + 수치'로 나타냅니다: 'increase by about 15%'." },
     ],
     hints: {
-      pattern: "주어 + assumes that + 주어 + will + 동사, so + it + could + 동사 + by + 수치 + if + 주어 + have to + 동사",
-      skeleton: "Our CAPEX estimate ____ that the client will supply …, so it ____ increase by about 15% if we ____ to provide them ourselves.",
-      partial: "Our CAPEX estimate assumes that the client will supply the steam and cooling water, so …",
+      pattern: "주어 + assumes that + 주어 + will + 동사. So + it + could + 동사 + by + 수치 + if + 주어 + have to + 동사",
+      skeleton: "Our CAPEX estimate ____ that the client will supply the steam and cooling water. So it ____ increase by about 15% if …",
+      partial: "Our CAPEX estimate assumes that the client will supply the steam and cooling water. So …",
     },
     explanationKo: "견적의 전제는 'assumes that + 주어 + will + 동사'로 말하고, 전제가 바뀔 때의 영향은 'could + 동사'로 가능성을 표현합니다. if절은 미래 일이라도 현재시제(if we have to)를 쓰며, 'will increase'라고 하면 확정된 것처럼 들려 협상에서 오해를 줄 수 있습니다.",
     probes: [

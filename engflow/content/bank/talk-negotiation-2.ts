@@ -477,7 +477,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 기어박스를 항공으로 보내면 8,000달러가 더 든다고 합니다. 너무 비싸서 해상 운송으로 하겠다고 말합니다.",
     dialogue: [{ speaker: "Priya", en: "Air freight for the gearbox would cost an extra 8,000 dollars.", ko: "기어박스를 항공으로 보내면 8,000달러가 추가로 들어요." }],
     promptKo: "그건 저희한테 너무 비싸서, 해상 운송으로 할게요.",
-    segments: ["그건 너무 비싸요", "저희에게,", "그래서", "저희는 ~로 할게요", "해상 운송"],
+    segments: ["그건 저희한테 너무 비싸요", "그래서 해상 운송으로 할게요"],
     reference: "That's too expensive for us, so we'll go with sea freight.",
     accepted: [
       "That's too expensive, so we'll go with sea freight.",
@@ -519,7 +519,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Linh이 7만 2천 달러가 정말 최저가라고 합니다. 그 가격은 받아들일 수 없지만 계속 함께 일하고 싶다고 정중하게 말합니다.",
     dialogue: [{ speaker: "Linh", en: "Sorry, 72,000 dollars is really our lowest price.", ko: "죄송해요, 7만 2천 달러가 정말 최저가예요." }],
     promptKo: "죄송하지만 그 가격은 받아들일 수 없어요. 그래도 계속 함께 일하고 싶어요.",
-    segments: ["죄송하지만", "저희는 받아들일 수 없어요", "그 가격을,", "하지만", "저희는 그래도 ~하고 싶어요", "함께 일하다", "당신과"],
+    segments: ["죄송하지만 그 가격은 받아들일 수 없어요", "하지만 그래도 계속 함께 일하고 싶어요"],
     reference: "I'm afraid we can't accept that price, but we'd still like to work with you.",
     accepted: [
       "I'm afraid we can't accept that price, but we'd still like to keep working with you.",
@@ -561,7 +561,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 추가 성능 시험에 3,000달러가 든다고 합니다. 그 시험은 원래 견적에 들어 있었으니 추가 비용을 낼 이유가 없다고 말합니다.",
     dialogue: [{ speaker: "Priya", en: "The extra performance test will cost 3,000 dollars.", ko: "추가 성능 시험은 3,000달러가 들어요." }],
     promptKo: "그 시험은 원래 견적에 들어 있었으니까, 저희가 추가로 돈을 낼 필요는 없을 것 같아요.",
-    segments: ["그 시험은", "들어 있었어요", "원래 견적에,", "그래서", "저희가 낼 필요는 없어요", "추가로", "그것에 대해"],
+    segments: ["그 시험은 원래 견적에 들어 있었어요", "그래서 저희가 추가로 낼 필요는 없을 것 같아요"],
     reference: "That test was in your original quote, so we shouldn't have to pay extra for it.",
     accepted: [
       "That test was included in your original quote, so we shouldn't have to pay extra for it.",
@@ -779,7 +779,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 계약서 초안을 보냈다며 괜찮은지 묻습니다. 대부분 괜찮지만 지급 조건이 지난주에 합의한 것과 다르다고 지적합니다.",
     dialogue: [{ speaker: "Priya", en: "I've sent you the draft contract. Does everything look okay?", ko: "계약서 초안을 보내 드렸어요. 다 괜찮아 보이세요?" }],
     promptKo: "대부분은요. 그런데 지급 조건이 지난주에 저희가 합의한 것과 달라요.",
-    segments: ["대부분은요,", "그런데", "지급 조건이", "달라요", "~와", "저희가 합의한 것들", "지난주에"],
+    segments: ["대부분은요", "그런데 지급 조건이 달라요", "지난주에 저희가 합의한 것과"],
     reference: "Mostly, but the payment terms are different from the ones we agreed on last week.",
     accepted: [
       "Mostly, but the payment terms are different from what we agreed on last week.",
@@ -868,7 +868,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Linh이 7월 시운전 전까지 컨베이어 두 대를 다 끝낼 수 없다고 합니다. 시운전 날짜는 못 바꾸니 첫 번째는 7월까지, 두 번째는 9월에 납품해 달라고 제안합니다.",
     dialogue: [{ speaker: "Linh", en: "We can't finish both conveyors before your start-up in July.", ko: "7월 시운전 전까지 컨베이어 두 대를 다 끝낼 수는 없어요." }],
     promptKo: "저희 시운전 날짜는 바꿀 수 없어요. 첫 번째 컨베이어는 7월까지, 두 번째는 9월에 납품해 주실 수 있을까요?",
-    segments: ["저희 시운전 날짜는", "바뀔 수 없어요.", "~해 주실 수 있을까요", "납품하다", "첫 번째 컨베이어를", "7월까지", "그리고 두 번째는", "9월에"],
+    segments: ["저희 시운전 날짜는 바꿀 수 없어요", "첫 번째 컨베이어는 7월까지 납품해 주실 수 있을까요", "그리고 두 번째는 9월에요"],
     reference: "Our start-up date can't change. Could you deliver the first conveyor by July and the second one in September?",
     accepted: [
       "We can't change our start-up date. Could you deliver the first conveyor by July and the second one in September?",
@@ -911,7 +911,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Linh이 저희 도면이 늦었으니 항공 운송비 6,000달러를 저희가 내야 한다고 합니다. 도면이 늦은 건 맞지만 Linh 쪽 생산도 늦었으니 비용을 반반 나누자고 제안합니다.",
     dialogue: [{ speaker: "Linh", en: "The air freight will cost 6,000 dollars. Since your drawings were late, we think you should pay for it.", ko: "항공 운송비가 6,000달러 들 거예요. 그쪽 도면이 늦었으니 그쪽에서 내셔야 할 것 같아요." }],
     promptKo: "저희 도면이 늦은 건 맞지만, 그쪽 생산도 일정보다 늦었잖아요. 비용을 반반 나누는 게 어때요?",
-    segments: ["저희 도면이 늦었어요,", "하지만", "그쪽 생산도", "일정보다 늦었어요.", "~하는 게 어때요", "나누다", "비용을", "똑같이"],
+    segments: ["저희 도면이 늦은 건 맞아요", "하지만 그쪽 생산도 일정보다 늦었어요", "비용을 반반 나누는 게 어때요?"],
     reference: "Our drawings were late, but your production was also behind schedule. Why don't we split the cost equally?",
     accepted: [
       "Our drawings were late, but your production was behind schedule too. Why don't we split the cost equally?",
@@ -956,7 +956,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 이 가격을 원하면 오늘 결정해 달라고 합니다. 큰 주문이고 이사님이 목요일까지 자리를 비우셔서 금요일까지 시간을 달라고 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "If you want this price, we need your decision today.", ko: "이 가격을 원하시면 오늘 결정해 주셔야 해요." }],
     promptKo: "저희한테는 큰 주문이고, 이사님이 목요일까지 안 계세요. 금요일까지 결정할 시간을 주실 수 있을까요?",
-    segments: ["이건 큰 주문이에요", "저희에게,", "그리고 저희 이사님이", "자리에 없어요", "목요일까지.", "주실 수 있을까요", "저희에게", "금요일까지", "결정할"],
+    segments: ["저희한테는 큰 주문이에요", "그리고 이사님이 목요일까지 안 계세요", "금요일까지 결정할 시간을 주실 수 있을까요?"],
     reference: "This is a big order for us, and our director is away until Thursday. Could you give us until Friday to decide?",
     accepted: [
       "This is a big order for us, and our director is out of the office until Thursday. Could you give us until Friday to decide?",
@@ -1001,7 +1001,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 펌프 20대 주문에 3% 할인을 제안합니다. 이 규모에 비해 낮다고 말하고, 다른 공급사들은 보통 8%를 준다는 근거를 들어 6%면 이번 주에 발주하겠다고 역제안합니다.",
     dialogue: [{ speaker: "Priya", en: "For an order of 20 pumps, we can offer a 3% discount.", ko: "펌프 20대 주문이면 3% 할인해 드릴 수 있어요." }],
     promptKo: "감사합니다만, 이 정도 규모의 주문에 3%는 좀 낮아요. 다른 공급사들은 보통 저희에게 8% 정도를 줘요. 6%를 해 주시면, 이번 주에 발주할 수 있어요.",
-    segments: ["감사합니다만,", "3%는 좀 낮아요", "이 규모의 주문에는.", "다른 공급사들은", "보통 저희에게 줘요", "약 8%를.", "만약 해 주실 수 있으면", "6%를,", "저희는 발주할 수 있어요", "이번 주에"],
+    segments: ["감사합니다만", "이 정도 규모의 주문에 3%는 좀 낮아요", "다른 공급사들은 보통 8% 정도를 줘요", "6%를 해 주시면", "이번 주에 발주할 수 있어요"],
     reference: "Thanks, but 3% is a bit low for an order of this size. Other suppliers usually give us around 8%. If you can offer 6%, we can place the order this week.",
     accepted: [
       "Thank you, but 3% is a bit low for an order of this size. Other suppliers usually give us around 8%. If you can offer 6%, we can place the order this week.",
@@ -1049,7 +1049,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "협상이 끝나 갈 때 Priya가 다 다룬 것 같다고 합니다. 가격·지급·납기를 숫자로 다시 확인하고, 수요일까지 발주서를 보내겠다며 주문 확인서를 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "So, I think we've covered everything.", ko: "그럼 다 다룬 것 같네요." }],
     promptKo: "좋아요. 확인차 말씀드리면, 가격은 9만 5천 달러, 지급은 45일 안에, 납기는 14주예요. 수요일까지 발주서를 보내 드릴게요. 받으시면 주문 확인서를 보내 주시겠어요?",
-    segments: ["좋아요.", "확인차 말하면,", "가격은 9만 5천 달러,", "지급은 45일 안에,", "그리고 납기는 14주예요.", "제가 보내 드릴게요", "발주서를", "수요일까지.", "보내 주시겠어요", "주문 확인서를", "받으시면"],
+    segments: ["좋아요. 확인차 말씀드리면", "가격은 9만 5천 달러, 지급은 45일 안에, 납기는 14주예요", "수요일까지 발주서를 보내 드릴게요", "받으시면 주문 확인서를 보내 주시겠어요?"],
     reference: "Great. Just to confirm, the price is 95,000 dollars, payment is in 45 days, and delivery is in 14 weeks. I'll send you the purchase order by Wednesday. Could you send us the order confirmation once you receive it?",
     accepted: [
       "Great. Just to confirm, the price is 95,000 dollars, payment is within 45 days, and delivery is in 14 weeks. I'll send you the purchase order by Wednesday. Could you send us the order confirmation once you receive it?",
@@ -1096,7 +1096,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 12월에 공지한 대로 1월 주문부터 새 가격이 적용된다고 합니다. 그 공지를 받지 못했고, 알았다면 12월에 주문했을 거라며 이번 주문은 예전 가격으로 해 달라고 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "As we announced in December, our new prices apply to all orders from January.", ko: "12월에 공지했듯이, 1월 주문부터는 모두 새 가격이 적용돼요." }],
     promptKo: "이해합니다만, 저희는 그 공지를 받지 못했어요. 인상 소식을 알았다면 12월에 주문했을 거예요. 이번 주문은 예전 가격으로 해 주실 수 있을까요?",
-    segments: ["이해합니다만,", "저희는 받지 못했어요", "그 공지를.", "만약 저희가 알았더라면", "인상에 대해,", "저희는 주문했을 거예요", "12월에.", "~해 주실 수 있을까요", "유지하다", "예전 가격을", "이번 주문에"],
+    segments: ["이해합니다만, 저희는 그 공지를 받지 못했어요", "인상 소식을 알았더라면", "12월에 주문했을 거예요", "이번 주문은 예전 가격으로 해 주실 수 있을까요?"],
     reference: "I understand, but we never received that announcement. If we had known about the increase, we would have placed the order in December. Could you keep the old price for this order?",
     accepted: [
       "I understand, but we didn't receive that announcement. If we had known about the increase, we would have placed the order in December. Could you keep the old price for this order?",
@@ -1144,7 +1144,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Linh이 8만 달러 밑으로는 정말 안 된다고 합니다. 그동안의 노력에 감사하면서, 가격 차이가 너무 커서 이번에는 진행하기 어렵겠다고 하고, 다음 프로젝트에서는 함께하고 싶다고 관계를 남겨 둡니다.",
     dialogue: [{ speaker: "Linh", en: "I'm sorry, but we really can't go below 80,000 dollars.", ko: "죄송하지만 8만 달러 밑으로는 정말 안 돼요." }],
     promptKo: "이해합니다. 그리고 그동안 애써 주셔서 감사해요. 아쉽지만 가격 차이가 아직 너무 커서, 이번에는 진행하기 어려울 것 같아요. 그래도 앞으로 다른 프로젝트에서는 함께 일하면 좋겠어요.",
-    segments: ["이해합니다,", "그리고 감사해요", "이 건에 대한 모든 노력에.", "아쉽지만,", "저희는 아직 너무 차이가 나요", "가격에서,", "그래서 ~할 수 없을 것 같아요", "진행하다", "이번에는.", "하지만 저희는 기꺼이 함께 일하고 싶어요", "앞으로의 프로젝트에서"],
+    segments: ["이해합니다. 그동안 애써 주셔서 감사해요", "아쉽지만 가격 차이가 아직 너무 커요", "그래서 이번에는 진행하기 어려울 것 같아요", "그래도 앞으로 다른 프로젝트에서 함께 일하면 좋겠어요"],
     reference: "I understand, and thank you for all your work on this. Unfortunately, we're still too far apart on the price, so I don't think we can go ahead this time. But we'd be happy to work with you on future projects.",
     accepted: [
       "I understand, and thank you for all your work on this. Unfortunately, we're still too far apart on the price, so I don't think we can move forward this time. But we'd be happy to work with you on future projects.",
@@ -1189,7 +1189,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Linh이 납기 지연 위약 조항은 보통 받아들이지 않는다고 합니다. 걱정은 이해하지만 그 조항 없이는 경영진이 계약을 승인하지 않는다고 하고, 주당 1%·최대 5%로 낮춘 안을 제안합니다.",
     dialogue: [{ speaker: "Linh", en: "We don't usually accept penalty clauses for late delivery.", ko: "저희는 보통 납기 지연 위약 조항은 받지 않아요." }],
     promptKo: "걱정하시는 건 이해하지만, 위약 조항이 없으면 저희 경영진이 계약을 승인하지 않을 거예요. 예를 들어 주당 1%, 최대 5%처럼 더 낮은 위약금은 어떠세요? 그러면 그쪽 위험은 제한되고, 저희도 보호를 받을 수 있어요.",
-    segments: ["저는 이해해요", "걱정하시는 것을,", "하지만", "저희 경영진은 승인하지 않을 거예요", "계약을", "위약 조항 없이는.", "어떠세요", "더 낮은 위약금은,", "예를 들어 주당 1%,", "최대 5%로?", "그러면,", "그쪽 위험은 제한되고,", "저희도 여전히 보호받아요"],
+    segments: ["걱정하시는 건 이해하지만", "위약 조항이 없으면 저희 경영진이 계약을 승인하지 않을 거예요", "더 낮은 위약금은 어떠세요?", "예를 들어 주당 1%, 최대 5%로요", "그러면 그쪽 위험은 제한되고 저희도 보호받아요"],
     reference: "I understand your concern, but our management won't approve the contract without a penalty clause. How about a lower penalty, for example 1% per week, with a maximum of 5%? That way, your risk is limited, and we're still protected.",
     accepted: [
       "I understand your concern, but our management won't approve the contract without a penalty clause. How about a lower penalty, say 1% per week, with a maximum of 5%? That way, your risk is limited, and we're still protected.",
@@ -1239,7 +1239,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 할인 대신 보증을 3년으로 늘려 주겠다고 합니다. 고맙지만 그쪽 장비는 늘 믿을 만했고 가격이 문제라고 하면서, 표준 1년 보증에 가격 4% 인하를 대안으로 제시합니다.",
     dialogue: [{ speaker: "Priya", en: "Instead of a discount, we could extend the warranty to three years.", ko: "할인 대신 보증을 3년으로 늘려 드릴 수 있어요." }],
     promptKo: "감사하지만, 보증이 길어진다고 저희 문제가 해결되진 않아요. 그쪽 장비는 늘 믿을 만했고, 저희가 가장 걱정하는 건 가격이에요. 대신 표준 1년 보증은 그대로 두고 가격을 4% 낮추는 건 고려해 주실 수 있을까요?",
-    segments: ["감사하지만,", "더 긴 보증은", "정말로 해결하지는 않아요", "저희 문제를.", "그쪽 장비는", "늘 믿을 만했어요,", "그래서 가격이", "저희의 주된 걱정이에요.", "고려해 주시겠어요", "유지하는 것을", "표준 1년 보증을", "그리고 가격을 낮추는 것을", "4%만큼", "대신"],
+    segments: ["감사하지만 보증이 길어진다고 저희 문제가 해결되진 않아요", "그쪽 장비는 늘 믿을 만했어요", "그래서 저희가 가장 걱정하는 건 가격이에요", "대신 표준 1년 보증은 그대로 두고", "가격을 4% 낮추는 건 고려해 주실 수 있을까요?"],
     reference: "Thank you, but a longer warranty doesn't really solve our problem. Your equipment has always been very reliable, so the price is our main concern. Would you consider keeping the standard one-year warranty and lowering the price by 4% instead?",
     accepted: [
       "Thanks, but a longer warranty doesn't really solve our problem. Your equipment has always been very reliable, so the price is our main concern. Would you consider keeping the standard one-year warranty and lowering the price by 4% instead?",

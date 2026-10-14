@@ -473,7 +473,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "견학 중 Mr. Tan이 열교환기를 얼마나 자주 청소하는지 묻습니다. 정확히 몰라서 운전원들에게 확인하고 알려 드리겠다고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "How often do you clean this heat exchanger?", ko: "이 열교환기는 얼마나 자주 청소해요?" }],
     promptKo: "잘 모르겠는데, 운전원들한테 확인해 보고 알려 드릴게요.",
-    segments: ["잘 모르겠어요,", "하지만", "확인해 볼게요", "운전원들에게", "그리고", "알려 드릴게요"],
+    segments: ["잘 모르겠어요", "운전원들한테 확인하고 알려 드릴게요"],
     reference: "I'm not sure, but I'll check with the operators and let you know.",
     accepted: [
       "I'm not sure, but I'll ask the operators and let you know.",
@@ -558,7 +558,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "견학이 예정보다 길어져 벌써 11시 반입니다. Daniel이 일정대로 가고 있는지 묻자, 조금 늦어지고 있어서 창고는 건너뛸 수도 있다고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "It's already eleven thirty. Are we still on schedule?", ko: "벌써 11시 반이네요. 아직 일정대로 가고 있나요?" }],
     promptKo: "조금 늦어지고 있어서, 창고는 건너뛰어야 할 수도 있어요.",
-    segments: ["우리는 조금 늦어지고 있어요,", "그래서", "우리는 ~해야 할 수도 있어요", "건너뛰다", "창고를"],
+    segments: ["조금 늦어지고 있어요", "그래서 창고는 건너뛰어야 할 수도 있어요"],
     reference: "We're running a little behind, so we might have to skip the warehouse.",
     accepted: [
       "We're running a bit behind, so we might have to skip the warehouse.",
@@ -645,7 +645,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "Mr. Tan이 오늘 건조기가 돌아가는 모습을 볼 수 있는지 묻습니다. 운전원들이 방금 가동을 시작해서 돌아가는 걸 보실 수 있다고 답합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Will we be able to see the dryer running today?", ko: "오늘 건조기가 돌아가는 걸 볼 수 있을까요?" }],
     promptKo: "네, 운전원들이 방금 가동을 시작해서 돌아가는 걸 보실 수 있을 거예요.",
-    segments: ["네,", "운전원들이", "방금 가동을 시작했어요,", "그래서", "당신은 보실 거예요", "그것이 돌아가는 것을"],
+    segments: ["네, 운전원들이 방금 가동을 시작했어요", "그래서 돌아가는 걸 보실 수 있을 거예요"],
     reference: "Yes, the operators have just started it up, so you'll see it running.",
     accepted: [
       "Yes, the operators have just started it, so you'll see it running.",
@@ -730,7 +730,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "견학 중 Daniel이 일정에 없던 보일러실도 보고 싶다고 합니다. 오늘은 어려울 수도 있지만 공장장에게 확인해 보겠다고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "While we're here, could we also have a look at the boiler house?", ko: "온 김에 보일러실도 좀 볼 수 있을까요?" }],
     promptKo: "오늘은 좀 어려울 수도 있는데, 공장장님께 확인해 볼게요.",
-    segments: ["그건 어려울 수도 있어요", "오늘은,", "하지만", "제가 확인해 볼게요", "공장장님께"],
+    segments: ["오늘은 좀 어려울 수도 있어요", "그래도 공장장님께 확인해 볼게요"],
     reference: "That might be difficult today, but let me check with the plant manager.",
     accepted: [
       "That might be a bit difficult today, but let me check with the plant manager.",
@@ -816,7 +816,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "Mr. Tan이 공장으로 오는 길에 전화해서 차가 막혀 40분 정도 늦겠다고 합니다. 걱정하지 말라고 하고, 도착하면 바로 공장을 보고 발표는 점심 후에 하자고 제안합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "I'm so sorry, the traffic is terrible. I'll be about forty minutes late.", ko: "정말 죄송해요, 길이 너무 막혀요. 40분 정도 늦을 것 같아요." }],
     promptKo: "걱정 마세요, 이 시간엔 항상 길이 막혀요. 도착하시면 바로 공장으로 가고, 발표는 점심 후에 해요.",
-    segments: ["걱정 마세요,", "교통이 항상 안 좋아요", "이 시간엔.", "당신이 도착하면,", "바로 가요", "공장으로", "그리고 발표를 해요", "점심 후에"],
+    segments: ["걱정 마세요, 이 시간엔 항상 길이 막혀요.", "도착하시면", "바로 공장으로 가고", "발표는 점심 후에 해요"],
     reference: "Don't worry, the traffic is always bad at this time. When you get here, let's go straight to the plant and do the presentation after lunch.",
     accepted: [
       "No worries, the traffic is always bad at this time. When you get here, let's go straight to the plant and do the presentation after lunch.",
@@ -859,7 +859,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "인도 벤더 공장에서 펌프 성능 시험을 참관했습니다. Priya가 시험이 어땠는지 묻자, 진동이 있었다고 말하고 출하 전에 정렬 상태를 확인해 달라고 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "So, what did you think of the test?", ko: "그래서, 시험은 어떠셨어요?" }],
     promptKo: "시험 중에 펌프에서 진동이 좀 있었어요. 출하하기 전에 정렬 상태를 확인해 주실 수 있을까요?",
-    segments: ["우리는 알아챘어요", "약간의 진동을", "펌프에서", "시험 중에.", "확인해 주실 수 있을까요", "정렬 상태를", "~하기 전에", "출하하다"],
+    segments: ["시험 중에 펌프에서 진동이 좀 있었어요.", "정렬 상태를 확인해 주실 수 있을까요?", "출하하기 전에"],
     reference: "We noticed some vibration on the pump during the test. Could you check the alignment before you ship it?",
     accepted: [
       "We noticed some vibration in the pump during the test. Could you check the alignment before you ship it?",
@@ -901,7 +901,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "견학 중 하늘이 어두워지자 Sari가 비가 올 것 같은지 묻습니다. 곧 비가 올 것 같으니 야외 저장 구역을 먼저 보고 제어실은 나중에 가자고 제안합니다.",
     dialogue: [{ speaker: "Sari", en: "Look at those clouds. Do you think it'll rain?", ko: "저 구름 좀 봐요. 비가 올 것 같아요?" }],
     promptKo: "곧 비가 올 것 같네요. 야외 저장 구역을 먼저 보고 제어실은 나중에 가는 게 어때요?",
-    segments: ["~할 것 같아요", "비가 오다", "곧.", "~하는 게 어때요", "보다", "야외 저장 구역을", "먼저", "그리고 가다", "제어실에", "나중에"],
+    segments: ["곧 비가 올 것 같네요.", "야외 저장 구역을 먼저 보고", "제어실은 나중에 가는 게 어때요?"],
     reference: "It looks like it's going to rain soon. Why don't we see the outdoor storage area first and visit the control room later?",
     accepted: [
       "It looks like it's going to rain soon. Let's see the outdoor storage area first and visit the control room later.",
@@ -945,7 +945,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "하루 일정을 마친 Daniel을 정문에서 배웅합니다. 와 줘서 고맙다고 하고, 논의한 대로 수정 배치도를 다음 주 금요일까지 보내고 검토가 끝나면 범위를 확정하는 통화를 잡자고 정리합니다.",
     dialogue: [{ speaker: "Daniel", en: "Thanks for everything today, Minsu. It was a very productive visit.", ko: "오늘 여러모로 고마웠어요, 민수 씨. 아주 생산적인 방문이었어요." }],
     promptKo: "먼 길 와 주셔서 감사합니다. 논의한 대로 수정된 배치도를 다음 주 금요일까지 보내 드릴게요. 검토하시고 나면 범위를 확정하기 위해 통화 일정을 잡아요.",
-    segments: ["감사합니다", "먼 길 와 주셔서.", "논의한 대로,", "저희가 보내 드릴게요", "수정된 배치도를", "다음 주 금요일까지.", "당신이 검토하고 나면,", "통화 일정을 잡아요", "확정하기 위해", "범위를"],
+    segments: ["먼 길 와 주셔서 감사합니다.", "논의한 대로", "수정된 배치도를 다음 주 금요일까지 보낼게요.", "검토하시고 나면", "범위를 확정하게 통화 일정을 잡아요"],
     reference: "Thank you for coming all this way. As we discussed, we'll send you the updated layout by next Friday. Once you've reviewed it, let's set up a call to finalize the scope.",
     accepted: [
       "Thank you for coming all this way. As we discussed, we'll send you the updated layout by next Friday. Once you've checked it, let's set up a call to finalize the scope.",
@@ -990,7 +990,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "자카르타 공장 방문을 마치는 날, Budi가 방문이 도움이 되었는지 묻습니다. 정말 유익했다고 감사하며, 데이터만 봤다면 디캔터 실 문제를 놓쳤을 거라고 하고 한국에 돌아가면 팀에 메모를 공유하겠다고 합니다.",
     dialogue: [{ speaker: "Budi", en: "I hope the visit was useful for you.", ko: "이번 방문이 도움이 됐으면 좋겠어요." }],
     promptKo: "정말 유익했어요. 구경시켜 주셔서 정말 감사합니다. 데이터만 봤더라면 디캔터 실 문제를 놓쳤을 거예요. 한국에 돌아가면 제 메모를 팀에 공유할게요.",
-    segments: ["정말 유익했어요.", "정말 감사합니다", "구경시켜 주셔서.", "만약 제가 데이터만 봤더라면,", "저는 놓쳤을 거예요", "디캔터 실 문제를.", "제 메모를 공유할게요", "팀에", "~하면", "제가 한국에 돌아가다"],
+    segments: ["정말 유익했어요.", "구경시켜 주셔서 정말 감사해요.", "데이터만 봤더라면", "디캔터 실 문제를 놓쳤을 거예요.", "한국에 돌아가면 메모를 팀에 공유할게요"],
     reference: "It was really useful. Thank you so much for showing me around. If I had only looked at the data, I would have missed the problem with the decanter seal. I'll share my notes with the team when I get back to Korea.",
     accepted: [
       "It was really helpful. Thank you so much for showing me around. If I had only looked at the data, I would have missed the problem with the decanter seal. I'll share my notes with my team when I get back to Korea.",
@@ -1034,7 +1034,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "견학 중 Mr. Tan이 물었던 열교환기 청소 주기를 운전원들에게 확인했습니다. 보통 2주마다 청소하지만 우기에는 원료가 훨씬 더러워서 가끔 매주 청소해야 한다고 전합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Did you find out how often they clean the heat exchanger?", ko: "열교환기를 얼마나 자주 청소하는지 알아보셨어요?" }],
     promptKo: "네, 운전원들에게 물어봤어요. 보통 2주마다 청소한다고 하더라고요. 그런데 우기에는 원료가 훨씬 더러워서 가끔 매주 청소해야 한대요.",
-    segments: ["네,", "운전원들에게 물어봤어요.", "그들이 말했어요", "보통 청소한다고", "2주마다.", "우기에는,", "그런데,", "가끔 청소해야 한대요", "매주", "왜냐하면", "원료가 훨씬 더러워서"],
+    segments: ["네, 운전원들에게 물어봤어요.", "보통 2주마다 청소한대요.", "그런데 우기에는 가끔 매주 청소해야 한대요", "원료가 훨씬 더러워서요"],
     reference: "Yes, I asked the operators. They said they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.",
     accepted: [
       "Yes, I checked with the operators. They said they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.",
@@ -1079,7 +1079,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "견학 중 Daniel이 건조기 실을 가까이서 보려고 잠깐만 보행로 밖으로 나가도 되냐고 묻습니다. 정중하게 안 된다고 이유를 말하고, 대신 운전원에게 최근 점검 사진을 회의실로 가져다 달라고 할 수 있다고 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "Can I step over the line for a minute? I'd like a closer look at the dryer seals.", ko: "잠깐만 선 밖으로 나가도 될까요? 건조기 실을 좀 더 가까이서 보고 싶어서요." }],
     promptKo: "가까이서 보고 싶으신 건 알지만, 죄송하게도 방문객은 잠깐이라도 표시된 보행로 안에 계셔야 해요. 건조기 주변은 아주 뜨거워지고 움직이는 장비도 많거든요. 괜찮으시면 운전원에게 최근 점검 사진을 회의실로 가져다 달라고 부탁할 수 있어요.",
-    segments: ["저도 알아요", "가까이서 보고 싶으신 걸,", "하지만 죄송하게도", "방문객은 ~에 있어야 해요", "표시된 보행로", "잠깐이라도.", "건조기 주변은", "아주 뜨거워져요,", "그리고 많은 움직이는 장비가 있어요.", "괜찮으시면,", "제가 부탁할 수 있어요", "운전원에게", "가져다 달라고", "최근 점검 사진을", "회의실로"],
+    segments: ["가까이서 보고 싶으신 건 알지만", "방문객은 표시된 보행로에 계셔야 해요", "잠깐이라도요.", "건조기 주변은 아주 뜨겁고 움직이는 장비도 많아요.", "괜찮으시면 운전원에게 부탁할 수 있어요", "최근 점검 사진을 회의실로 가져오라고"],
     reference: "I know you'd like a closer look, but I'm afraid visitors have to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you'd like, I can ask an operator to bring the latest inspection photos to the meeting room.",
     accepted: [
       "I know you'd like a closer look, but I'm afraid visitors need to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you like, I can ask an operator to bring the latest inspection photos to the meeting room.",
@@ -1125,7 +1125,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "인도 벤더 공장을 방문했는데, Priya가 이번 주는 시험대가 꽉 차 있으니 펌프 시험은 다음 방문 때 보여 주겠다고 합니다. 이번 방문의 주된 목적이 시험 참관이고 경영진이 주문 승인 전에 결과를 필요로 한다고 설명한 뒤, 내일 오전에 한 시간이라도 짧게 시험할 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "I'm sorry, the test bench is fully booked this week. Could we show you the pump test on your next visit?", ko: "죄송해요, 이번 주는 시험대 일정이 꽉 차 있어요. 펌프 시험은 다음 방문 때 보여 드려도 될까요?" }],
     promptKo: "시험대가 바쁜 건 이해하지만, 펌프가 돌아가는 걸 보는 게 저희 방문의 주된 이유예요. 경영진이 다음 주문을 승인하기 전에 시험 결과가 필요하거든요. 대신 내일 오전에 한 시간이라도 짧게 시험해 주실 수 있을까요?",
-    segments: ["이해해요", "시험대가 바쁘다는 것을,", "하지만", "펌프가 돌아가는 걸 보는 것이", "주된 이유예요", "저희 방문의.", "저희 경영진은 필요해요", "시험 결과가", "~하기 전에", "그들이 다음 주문을 승인하다.", "~하는 게 가능할까요", "더 짧은 시험을 하다", "내일 오전에", "대신,", "한 시간만이라도"],
+    segments: ["시험대가 바쁜 건 이해하지만", "펌프가 돌아가는 걸 보는 게 방문의 주된 이유예요.", "경영진이 시험 결과가 필요해요", "다음 주문을 승인하기 전에.", "대신 내일 오전에 짧게 시험할 수 있을까요?", "한 시간이라도요"],
     reference: "I understand the test bench is busy, but seeing the pump run is the main reason for our visit. Our management needs the test results before they approve the next order. Would it be possible to run a shorter test tomorrow morning instead, even for just an hour?",
     accepted: [
       "I understand the test bench is busy, but seeing the pump running is the main reason for our visit. Our management needs the test results before they approve the next order. Would it be possible to run a shorter test tomorrow morning instead, even for just an hour?",
@@ -1169,10 +1169,11 @@ export const TALK_VISIT_3: Question[] = [
     expression: "Of course you can …, but …. Why don't you …? That way, …",
     contextKo: "방문을 마친 Mr. Tan이 신경 쓰지 말라며 공항까지 택시를 타겠다고 합니다. 이곳은 택시 잡기가 어렵고 이 시간에는 공항까지 한 시간 넘게 걸릴 수 있다고 설명하고, 어차피 그쪽으로 가는 회사 기사님 차를 타라고 권합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Don't worry about me. I'll just take a taxi to the airport.", ko: "제 걱정은 마세요. 공항까지 그냥 택시 탈게요." }],
-    promptKo: "물론 택시를 타셔도 되지만, 여기는 택시 잡기가 어려울 때가 많고 이 시간에는 공항까지 한 시간 넘게 걸릴 수도 있어요. 어차피 저희 기사님이 그쪽으로 가니까 같이 타고 가시는 게 어때요? 그러면 비행기 걱정은 안 하셔도 돼요.",
-    segments: ["물론 택시를 타셔도 돼요,", "하지만", "자주 어려워요", "택시를 찾기가", "여기서는,", "그리고 이 시간에는", "한 시간 넘게 걸릴 수도 있어요", "공항까지 가는 데.", "저희 기사님이 그쪽으로 가요", "어차피,", "그러니", "같이 타고 가시는 게 어때요?", "그러면,", "걱정하지 않으셔도 돼요", "비행기에 대해"],
-    reference: "Of course you can take a taxi, but it's often hard to find one out here, and at this time of day it can take over an hour to get to the airport. Our driver is going that way anyway, so why don't you ride with him? That way, you won't have to worry about your flight.",
+    promptKo: "물론 택시를 타셔도 되지만, 여기는 택시 잡기가 어려울 때가 많아요. 이 시간에는 공항까지 한 시간 넘게 걸릴 수도 있고요. 어차피 저희 기사님이 그쪽으로 가니까 같이 타고 가시는 게 어때요? 그러면 비행기 걱정은 안 하셔도 돼요.",
+    segments: ["물론 택시를 타셔도 되지만", "여기선 택시 잡기가 어려울 때가 많아요.", "이 시간엔 공항까지 한 시간 넘게 걸릴 수도 있어요.", "어차피 기사님이 그쪽으로 가니까", "같이 타고 가시는 게 어때요?", "그러면 비행기 걱정은 안 하셔도 돼요"],
+    reference: "Of course you can take a taxi, but it's often hard to find one out here. At this time of day, it can take over an hour to get to the airport. Our driver is going that way anyway, so why don't you ride with him? That way, you won't have to worry about your flight.",
     accepted: [
+      "Of course you can take a taxi, but it's often hard to find one out here, and at this time of day it can take over an hour to get to the airport. Our driver is going that way anyway, so why don't you ride with him? That way, you won't have to worry about your flight.",
       "Of course you can take a taxi, but it's often hard to find one out here, and at this time of day it can take more than an hour to get to the airport. Our driver is going that way anyway, so why don't you ride with him? That way, you won't have to worry about your flight.",
       "Of course you can take a taxi, but it's often difficult to get one out here, and at this time of day it might take over an hour to get to the airport. Our driver is going that way anyway, so why don't you go with him? That way, you won't need to worry about your flight.",
       "You can take a taxi, of course, but it's often hard to find one out here, and at this time of day it can take over an hour to get to the airport. Since our driver is going that way anyway, why don't you ride with him? Then you won't have to worry about your flight.",
@@ -1193,7 +1194,7 @@ export const TALK_VISIT_3: Question[] = [
       { id: "why-you-dont", pattern: "why you do not", category: "word-order", severity: "major", fix: "why don't you", messageKo: "제안하는 'Why don't you …?'는 의문문 어순이라 don't가 you 앞에 옵니다." },
       { id: "it-needs-hour", pattern: "re:\\bit (can |could |might |may |will )?(need|needs) (more than|over|about|around)? ?(an|one|1) hour", category: "word-choice", severity: "major", fix: "it can take over an hour", messageKo: "시간이 '걸리다'는 'It takes + 시간'입니다: 'it can take over an hour'. need는 이렇게 쓰지 않습니다." },
     ],
-    hints: { pattern: "Of course you can …, but it's often hard to …. … so why don't you + 동사원형? That way, you won't have to …", skeleton: "Of course you can take a taxi, but it's often ____ to find one out here, … so ___ _____ you ride with him? …", partial: "Of course you can take a taxi, but it's often hard to find one out here,…" },
+    hints: { pattern: "Of course you can …, but it's often hard to …. … so why don't you + 동사원형? That way, you won't have to …", skeleton: "Of course you can take a taxi, but it's often ____ to find one out here. … so ___ _____ you ride with him? …", partial: "Of course you can take a taxi, but it's often hard to find one out here…" },
     explanationKo: "상대의 제안을 먼저 인정하고(Of course you can …, but), 구체적인 이유를 든 뒤 'Why don't you …?'로 대안을 권합니다. 시간이 걸리는 것은 'it can take + 시간 + to get to + 장소'이고, 'That way, …'로 상대에게 좋은 점을 덧붙이면 부드럽습니다.",
     probes: [
       { answer: "Of course you can take a taxi, but it's often hard to find one out here, and at this time of day it could take over an hour to get to the airport. Our driver is going that way anyway, so why don't you ride with him? That way, you won't have to worry about your flight.", expect: "pass" },

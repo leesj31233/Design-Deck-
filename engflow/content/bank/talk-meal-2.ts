@@ -342,7 +342,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "회식 자리에서 다니엘 씨가 자기 잔에 직접 맥주를 따르려고 합니다. 한국에서는 서로 따라 주는 것이 예절입니다.",
     dialogue: [{ speaker: "Daniel", en: "My glass is empty. I'll just pour myself some more beer.", ko: "잔이 비었네요. 제가 맥주 좀 더 따를게요." }],
     promptKo: "아, 잠깐만요! 한국에서는 자기 술을 직접 따르지 않아요. 그러니까 제가 따라 드릴게요.",
-    segments: ["아, 잠깐만요!", "한국에서는", "우리는 따르지 않아요", "우리 자신의 술을", "그러니까", "제가 따르게 해 주세요", "당신의 것을"],
+    segments: ["아, 잠깐만요!", "한국에서는 자기 술을 직접 안 따라요", "그러니까 제가 따라 드릴게요"],
     reference: "Oh, wait! In Korea, we don't pour our own drinks, so let me pour yours.",
     accepted: [
       "Oh, wait! In Korea, we don't pour our own drinks, so let me pour it for you.",
@@ -384,7 +384,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "고깃집에서 다니엘 씨가 상추와 고기를 어떻게 먹는지 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "What do I do with these lettuce leaves?", ko: "이 상추는 어떻게 먹는 거예요?" }],
     promptKo: "상추에 고기 한 점을 올리고, 싸서 한입에 드세요. 마늘을 좋아하시면 마늘도 넣으셔도 돼요.",
-    segments: ["올려요", "고기 한 점을", "상추 한 장 위에", "그것을 싸요", "그리고 그것을 드세요", "한입에", "만약 마늘을 좋아하면", "조금 넣어도 돼요", "그것도"],
+    segments: ["상추에 고기 한 점을 올리고", "싸서 한입에 드세요.", "마늘을 좋아하시면", "마늘도 넣으셔도 돼요"],
     reference: "Put a piece of meat on a lettuce leaf, wrap it up, and eat it in one bite. If you like garlic, you can add some too.",
     accepted: [
       "Put a piece of meat on a lettuce leaf, wrap it up, and then eat it in one bite. If you like garlic, you can add some too.",
@@ -507,7 +507,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "한여름 점심, 삼계탕집에 온 다니엘 씨가 더운 날 뜨거운 국물을 먹는 게 이상하다고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Hot chicken soup on the hottest day of the year? Isn't that a bit strange?", ko: "1년 중 제일 더운 날에 뜨거운 닭고기 수프요? 좀 이상하지 않아요?" }],
     promptKo: "한국의 전통이에요. 삼계탕은 보통 여름에 가장 더운 날 먹는데, 기운을 북돋아 준다고 여겨지거든요.",
-    segments: ["그것은 한국의 전통이에요.", "삼계탕은", "보통 먹어져요", "여름의 가장 더운 날에", "왜냐하면", "그것은 ~한다고 여겨져요", "기운을 주다"],
+    segments: ["한국의 전통이에요.", "삼계탕은 보통 여름 가장 더운 날 먹어요", "기운을 북돋아 준다고 여겨지거든요"],
     reference: "It's a Korean tradition. Samgyetang is usually eaten on the hottest days of summer because it's believed to give you energy.",
     accepted: [
       "It's a Korean tradition. Samgyetang is usually eaten on the hottest days of the year because it's believed to give you energy.",
@@ -550,7 +550,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "말레이시아 고객사의 탄 씨가 집게를 들고 고기를 굽겠다고 합니다. 이 자리에서 가장 어린 사람은 당신입니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Give me the tongs. I'll grill the meat for everyone!", ko: "집게 주세요. 제가 다 같이 먹을 고기를 구울게요!" }],
     promptKo: "아니에요, 제가 할게요. 한국에서는 보통 자리에서 가장 어린 사람이 고기를 굽거든요. 그러니까 편하게 드세요.",
-    segments: ["아니에요,", "제가 하게 해 주세요", "한국에서는", "가장 어린 사람이", "자리에서", "보통 고기를 구워요", "그러니까", "그냥 편하게 즐기세요"],
+    segments: ["아니에요, 제가 할게요.", "한국에서는 보통 가장 어린 사람이 고기를 구워요", "그러니까 편하게 드세요"],
     reference: "No, please let me do it. In Korea, the youngest person at the table usually grills the meat, so just relax and enjoy.",
     accepted: [
       "No, please let me do it. In Korea, the youngest person at the table usually grills the meat, so please just relax and enjoy.",
@@ -590,7 +590,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "서울 회식을 앞두고, 무슬림인 부디 씨가 자신은 술을 마시지 않는다며 분위기를 망칠까 걱정합니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu, I don't drink alcohol. Is that going to be a problem at the team dinner?", ko: "민수 씨, 저는 술을 안 마셔요. 회식 때 문제가 될까요?" }],
     promptKo: "걱정 마세요, 마시지 않아도 돼요. 여기도 술을 안 마시는 사람이 많으니까, 테이블에 음료수를 좀 시킬게요.",
-    segments: ["걱정 마세요,", "당신은 마시지 않아도 돼요", "많은 사람들이", "여기에서도", "마시지 않아요 (~도)", "그래서 제가 주문할게요", "음료수를 좀", "테이블에"],
+    segments: ["걱정 마세요, 안 마셔도 돼요.", "여기도 술 안 마시는 사람이 많아요", "그래서 테이블에 음료수를 좀 시킬게요"],
     reference: "Don't worry, you don't have to drink. A lot of people here don't drink either, so I'll order some soft drinks for the table.",
     accepted: [
       "Don't worry, you don't have to drink. Lots of people here don't drink either, so I'll order some soft drinks for the table.",
@@ -632,7 +632,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "쿠알라룸푸르 출장 중 탄 씨가 팀 전체에게 저녁을 대접했습니다. 다음 날 아침 회의에서 탄 씨를 다시 만났습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Good morning, Minsu! Did everyone get back to the hotel safely last night?", ko: "좋은 아침이에요, 민수 씨! 어젯밤에 다들 호텔에 잘 들어갔어요?" }],
     promptKo: "어젯밤 저녁 다시 한번 감사드려요. 다들 음식에 정말 감탄했고, 사리 씨는 이번 출장에서 최고의 식사였다고 했어요. 다음에 서울에 오시면 저녁은 제가 살게요.",
-    segments: ["다시 한번 감사드려요", "어젯밤 저녁에 대해", "모두가 정말 감탄했어요", "음식에", "그리고 사리 씨가 말했어요", "그것이 최고의 식사였다고", "이번 출장 전체에서", "다음에 당신이 서울에 오면", "저녁은 제가 낼게요"],
+    segments: ["어젯밤 저녁 다시 한번 감사드려요.", "다들 음식에 정말 감탄했어요", "사리 씨는 이번 출장 최고의 식사였대요.", "다음에 서울에 오시면", "저녁은 제가 살게요"],
     reference: "Thank you again for dinner last night. Everyone was really impressed with the food, and Sari said it was the best meal of the whole trip. Next time you come to Seoul, dinner is on me.",
     accepted: [
       "Thank you again for dinner last night. Everyone was really impressed with the food, and Sari said it was the best meal of the trip. Next time you come to Seoul, dinner is on me.",
@@ -674,7 +674,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "해산물 식당에 린 씨를 데려갔는데, 린 씨가 조개류 알레르기가 있어 거의 먹지 못합니다. 미리 알았다면 다른 식당을 골랐을 겁니다.",
     dialogue: [{ speaker: "Linh", en: "Don't worry about me. I'm allergic to shellfish, so I'll just have some rice.", ko: "제 걱정은 마세요. 조개류 알레르기가 있어서 그냥 밥만 먹을게요." }],
     promptKo: "정말 미안해요. 알레르기가 있는 줄 알았더라면 다른 식당을 골랐을 거예요. 다른 메뉴를 좀 주문해 드릴게요.",
-    segments: ["정말 미안해요.", "만약 제가 알았더라면", "당신이 알레르기가 있다는 것을", "저는 골랐을 거예요", "다른 식당을", "제가 주문할게요", "다른 것을", "당신을 위해"],
+    segments: ["정말 미안해요.", "알레르기가 있는 줄 알았더라면", "다른 식당을 골랐을 거예요.", "다른 메뉴를 주문해 드릴게요"],
     reference: "I'm so sorry. If I'd known you were allergic, I would have chosen a different restaurant. Let me order something else for you.",
     accepted: [
       "I'm so sorry. If I had known you were allergic, I would have chosen a different restaurant. Let me order something else for you.",
@@ -717,7 +717,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "서울 사무실에서 자카르타 팀, 다니엘 씨와 늦게까지 보고서를 준비합니다. 다니엘 씨가 저녁으로 피자를 시키자고 하지만, 부디 씨는 돼지고기를 먹지 않습니다.",
     dialogue: [{ speaker: "Daniel", en: "It's getting late. Shall we just order pizza for everyone?", ko: "늦었네요. 그냥 다 같이 피자 시킬까요?" }],
     promptKo: "피자 좋죠. 그런데 오늘은 그게 최선인지 잘 모르겠어요. 여기 피자는 대부분 돼지고기가 들어가는데, 부디 씨는 돼지고기를 안 먹거든요. 대신 치킨을 시키는 게 어때요? 그러면 다 같이 먹을 수 있잖아요.",
-    segments: ["피자 좋죠,", "하지만 잘 모르겠어요", "그게 최선인지", "오늘 밤", "대부분의 피자에는", "돼지고기가 올라가요", "그리고 부디 씨는", "돼지고기를 안 먹어요", "대신 치킨을 시키는 게 어때요?", "그러면", "모두가 먹을 수 있어요"],
+    segments: ["피자 좋죠, 그런데", "오늘은 그게 최선인지 모르겠어요.", "여기 피자는 대부분 돼지고기가 들어가요", "그리고 부디 씨는 돼지고기를 안 먹어요.", "대신 치킨을 시키는 게 어때요?", "그러면 다 같이 먹을 수 있어요"],
     reference: "Pizza sounds good, but I'm not sure it's the best choice tonight. Most of the pizzas here have pork on them, and Budi doesn't eat pork. Why don't we order fried chicken instead? That way, everyone can eat.",
     accepted: [
       "Pizza sounds good, but I'm not sure it's the best choice tonight. Most of the pizzas here have pork on them, and Budi doesn't eat pork. How about ordering fried chicken instead? That way, everyone can eat.",
@@ -758,7 +758,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "회식이 끝나고 다니엘 씨가 계산서를 인원수대로 똑같이 나누자고 합니다. 그런데 프리야 씨는 술을 마시지 않았고 샐러드만 먹었습니다.",
     dialogue: [{ speaker: "Daniel", en: "The total is 400,000 won. Let's just divide it by five, so 80,000 each.", ko: "합계가 40만 원이에요. 그냥 다섯 명이 나눠서 8만 원씩 내요." }],
     promptKo: "음, 똑같이 나누는 게 공평한지 잘 모르겠어요. 프리야 씨는 술을 안 마셨고 샐러드만 먹었거든요. 음식값은 나누고, 술값은 따로 내는 게 어때요?",
-    segments: ["음,", "저는 잘 모르겠어요", "똑같이 나누는 것이", "공평한지", "프리야 씨는 마시지 않았어요", "그리고 그녀는 샐러드만 먹었어요", "~하는 게 어때요", "음식값은 나누다", "그리고 술값을 내다", "따로"],
+    segments: ["음, 똑같이 나누는 게 공평한지 모르겠어요.", "프리야 씨는 술을 안 마셨고", "샐러드만 먹었거든요.", "음식값은 나누고", "술값은 따로 내는 게 어때요?"],
     reference: "Hmm, I'm not sure splitting it equally is fair. Priya didn't drink, and she only had a salad. Why don't we split the food and pay for the drinks separately?",
     accepted: [
       "Hmm, I'm not sure splitting it equally is fair. Priya didn't drink, and she only had a salad. How about splitting the food and paying for the drinks separately?",

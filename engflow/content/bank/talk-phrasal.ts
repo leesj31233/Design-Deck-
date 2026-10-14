@@ -698,7 +698,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "베트남 현장으로 보낸 예비 부품이 하노이 세관에 묶여 있습니다. Linh이 언제 받을 수 있는지 걱정합니다. 운송 회사와 해결하는 중이라 금요일까지는 도착할 것으로 봅니다.",
     dialogue: [{ speaker: "Linh", en: "The spare parts are still stuck at customs in Hanoi. When can we get them?", ko: "예비 부품이 아직 하노이 세관에 묶여 있어요. 언제 받을 수 있을까요?" }],
     promptKo: "지금 운송 회사와 해결하고 있어서, 금요일까지는 도착할 거예요.",
-    segments: ["우리는 해결하고 있어요", "그것을", "운송 회사와", "지금,", "그래서 부품은", "도착할 거예요", "금요일까지는"],
+    segments: ["지금 운송 회사와 해결하고 있어요", "그래서 부품은 금요일까지 도착할 거예요"],
     reference: "We're sorting it out with the shipping company now, so the parts should arrive by Friday.",
     accepted: [
       "We're sorting it out with the shipping company now, so the parts should be there by Friday.",
@@ -740,7 +740,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "다른 회의에 들어가 있는데 Mr. Tan에게서 전화가 왔습니다. 시험 일정을 이야기하고 싶다고 합니다. 지금은 통화가 어려우니 회의가 끝나는 대로 연락하겠다고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Hi Minsu, do you have a few minutes to talk about the test schedule?", ko: "안녕하세요, 민수 씨. 시험 일정에 대해 잠깐 얘기할 시간 있어요?" }],
     promptKo: "죄송해요, 지금 회의 중이에요. 회의 끝나는 대로 바로 다시 연락드릴게요.",
-    segments: ["죄송해요,", "저는 회의 중이에요", "지금,", "하지만 제가 다시 연락드릴게요", "당신에게", "~하자마자", "그것(회의)이 끝나다"],
+    segments: ["죄송해요, 지금 회의 중이에요", "하지만 끝나는 대로 바로 다시 연락드릴게요"],
     reference: "Sorry, I'm in a meeting right now, but I'll get back to you as soon as it finishes.",
     accepted: [
       "Sorry, I'm in a meeting right now, but I'll get back to you as soon as it's over.",
@@ -783,7 +783,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "유럽 라이선서 Daniel과 일정 회의 중입니다. 설계 검토가 이번 주 금요일로 잡혀 있지만, 벤더 데이터가 아직 오지 않아 다음 주로 미루고 싶습니다.",
     dialogue: [{ speaker: "Daniel", en: "Are we still on for the design review this Friday?", ko: "이번 주 금요일 설계 검토는 그대로 진행하는 거죠?" }],
     promptKo: "사실 다음 주로 미룰 수 있을까요? 아직 벤더 데이터를 못 받았거든요.",
-    segments: ["사실,", "~할 수 있을까요", "미루다", "그것을", "다음 주로 (until)", "우리는 받지 못했어요", "벤더 데이터를", "아직"],
+    segments: ["사실 다음 주로 미룰 수 있을까요?", "아직 벤더 데이터를 못 받았어요"],
     reference: "Actually, could we put it off until next week? We haven't received the vendor data yet.",
     accepted: [
       "Actually, could we put it off until next week? We haven't got the vendor data yet.",
@@ -825,7 +825,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "말레이시아 고객사와 건조기 패키지 가격을 협상 중입니다. Mr. Tan이 견적이 아직 예산보다 15% 정도 높다고 합니다. 팀과 상의해서 더 싼 방안을 찾아보겠다고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "To be honest, your price for the dryer package is still about 15% over our budget.", ko: "솔직히 건조기 패키지 가격이 아직 저희 예산보다 15% 정도 높아요." }],
     promptKo: "저희 팀과 이야기해서 더 저렴한 방안을 마련할 수 있는지 볼게요.",
-    segments: ["제가 ~할게요 (let me)", "저희 팀과 이야기하다", "그리고 알아보다", "~할 수 있는지", "우리가 (생각해) 내다", "더 저렴한 방안을"],
+    segments: ["팀과 이야기해 볼게요", "더 저렴한 방안을 마련할 수 있는지"],
     reference: "Let me talk to our team and see if we can come up with a cheaper option.",
     accepted: [
       "Let me talk to our team and see if we can come up with a cheaper solution.",
@@ -944,7 +944,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "당신이 진행하는 화상회의가 길어졌습니다. 공항으로 출발해야 할 시간인데, Sari가 아직 안건이 두 개 남았다고 합니다. Sari에게 나머지 진행을 부탁하려 합니다.",
     dialogue: [{ speaker: "Sari", en: "We still have two more items on the agenda.", ko: "아직 안건이 두 개 더 남았어요." }],
     promptKo: "죄송하지만 지금 공항으로 출발해야 해서요. 여기서부터 진행을 맡아 주실 수 있을까요?",
-    segments: ["죄송하지만", "저는 출발해야 해요", "공항으로", "지금.", "~해 주실 수 있을까요", "이어받다", "여기서부터"],
+    segments: ["죄송하지만 지금 공항으로 출발해야 해요.", "여기서부터 맡아 주실 수 있을까요?"],
     reference: "I'm sorry, but I have to leave for the airport now. Could you take over from here?",
     accepted: [
       "I'm sorry, but I need to leave for the airport now. Could you take over from here?",
@@ -1028,7 +1028,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "유럽 라이선서 Daniel이 한국 연구소를 방문했습니다. 오전 회의가 끝나자 Daniel이 오후 일정을 묻습니다. 관심이 있다면 점심 후에 새 파일럿 플랜트를 직접 안내하겠다고 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "That's all my questions for this morning. What's the plan for the afternoon?", ko: "오전 질문은 이게 다예요. 오후 일정은 어떻게 되나요?" }],
     promptKo: "관심 있으시면 점심 후에 파일럿 플랜트를 안내해 드릴 수 있어요.",
-    segments: ["만약 ~하시면", "당신이 관심 있다,", "제가 ~할 수 있어요", "안내하며 보여 드리다", "당신에게", "파일럿 플랜트를", "점심 후에"],
+    segments: ["관심 있으시면", "파일럿 플랜트를 안내해 드릴 수 있어요", "점심 후에"],
     reference: "If you're interested, I can show you around the pilot plant after lunch.",
     accepted: [
       "If you're interested, I'll show you around the pilot plant after lunch.",
@@ -1071,7 +1071,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "말레이시아 고객사에 두 번째 진행 상황 발표를 시작합니다. 본론에 들어가기 전에, 지난 회의에서 합의한 내용을 간단히 다시 짚고 싶습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Okay, Minsu, whenever you're ready.", ko: "좋아요, 민수 씨, 준비되면 시작하세요." }],
     promptKo: "감사합니다. 시작하기 전에 지난번에 합의한 내용을 간단히 다시 짚어 볼게요.",
-    segments: ["감사합니다.", "~하기 전에", "우리가 시작하다,", "제가 ~할게요 (let me)", "간단히", "다시 짚어 보다", "우리가 합의한 것을", "지난번에"],
+    segments: ["감사합니다.", "시작하기 전에", "지난번에 합의한 내용을 간단히 짚어 볼게요"],
     reference: "Thank you. Before we start, let me quickly go over what we agreed last time.",
     accepted: [
       "Thank you. Before we start, let me quickly go over what we agreed on last time.",
@@ -1285,7 +1285,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "말레이시아 고객사 현장의 시운전을 준비하고 있습니다. Mr. Tan이 다음 주 월요일 시운전이 계획대로 진행되는지 묻습니다. 어제 디캔터에 문제가 생겨 며칠 늦어질 수 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Is everything on track for the start-up next Monday?", ko: "다음 주 월요일 시운전은 계획대로 되고 있나요?" }],
     promptKo: "죄송하지만 디캔터에 문제가 생겨서, 시운전이 며칠 늦어질 수도 있어요.",
-    segments: ["죄송하지만", "우리는 맞닥뜨렸어요", "문제를", "디캔터에,", "그래서 시운전이", "늦어질 수도 있어요", "며칠"],
+    segments: ["죄송하지만 디캔터에 문제가 생겼어요", "그래서 시운전이 며칠 늦어질 수도 있어요"],
     reference: "I'm afraid we've run into a problem with the decanter, so the start-up might be delayed by a few days.",
     accepted: [
       "I'm afraid we've run into a problem with the decanter, so the start-up might be delayed a few days.",

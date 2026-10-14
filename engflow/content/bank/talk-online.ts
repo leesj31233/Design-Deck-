@@ -357,7 +357,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "고객과의 화상회의. 고객이 최신 도면을 어디서 볼 수 있는지 묻습니다. 공유 폴더 링크는 채팅창에 올렸지만, 새 도면은 아직 폴더에 올리지 못했습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Where can we find the latest drawings?", ko: "최신 도면은 어디서 볼 수 있나요?" }],
     promptKo: "채팅창에 링크를 올렸는데, 새 도면은 아직 업로드하지 않았어요.",
-    segments: ["제가 올렸어요", "링크를", "채팅창에", "하지만", "저는 아직 업로드하지 않았어요", "새 도면을"],
+    segments: ["채팅창에 링크를 올렸어요", "그런데 새 도면은 아직 안 올렸어요"],
     reference: "I've put the link in the chat, but I haven't uploaded the new drawings yet.",
     accepted: [
       "I have put the link in the chat, but I have not uploaded the new drawings yet.",
@@ -400,7 +400,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "고객과의 화상회의. 베트남 팀의 린 씨가 일찍 나가야 해서, 나머지 내용을 나중에 볼 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Linh", en: "Sorry, I have to leave early today. Is there a way to see the rest later?", ko: "죄송해요, 오늘 일찍 나가야 해요. 나머지 내용을 나중에 볼 방법이 있을까요?" }],
     promptKo: "걱정 마세요. 이 회의는 녹화되고 있고, 녹화 파일은 회의가 끝난 후 모두에게 공유될 거예요.",
-    segments: ["걱정 마세요.", "이 회의는", "녹화되고 있다", "그리고", "녹화 파일은", "공유될 것이다", "모두에게", "회의 후에"],
+    segments: ["걱정 마세요.", "이 회의는 녹화되고 있어요", "녹화 파일은 회의 후에 모두에게 공유될 거예요"],
     reference: "Don't worry. This meeting is being recorded, and the recording will be shared with everyone after the call.",
     accepted: [
       "Don't worry. The meeting is being recorded, and the recording will be shared with everyone after the meeting.",
@@ -444,7 +444,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "말레이시아 고객과의 월간 화상회의가 끝나 갑니다. 고객 측 실험실이 다음 주에 원료 분석 결과를 보내 주기로 했습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "I think that's everything for today. Anything else from your side?", ko: "오늘은 이게 다인 것 같네요. 그쪽에서 더 하실 말씀 있나요?" }],
     promptKo: "아니요, 저희 쪽은 그게 다입니다. 오늘 참석해 주셔서 모두 감사합니다. 다음 주에 실험실 결과를 보게 되기를 기대하겠습니다.",
-    segments: ["아니요,", "그게 다입니다", "저희 쪽에서는", "감사합니다", "모두", "참석해 주셔서", "오늘", "저희는 기대하고 있습니다", "보는 것을", "실험실 결과를", "다음 주에"],
+    segments: ["아니요, 저희 쪽은 그게 다입니다.", "오늘 참석해 주셔서 모두 감사합니다.", "다음 주에 실험실 결과를 보길 기대할게요"],
     reference: "No, that's all from our side. Thank you all for joining today. We're looking forward to seeing the lab results next week.",
     accepted: [
       "No, that's all from our side. Thanks, everyone, for joining today. We're looking forward to seeing the lab results next week.",
@@ -488,7 +488,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "당신이 진행하는 화상회의. 남은 시간은 5분인데, 마지막 안건인 일정 검토는 30분은 걸릴 것 같습니다.",
     dialogue: [{ speaker: "Budi", en: "Okay, the next item is the schedule review.", ko: "자, 다음 안건은 일정 검토입니다." }],
     promptKo: "5분밖에 안 남아서, 지금 일정 검토를 시작하기에는 너무 늦은 것 같아요. 다음 주 회의로 넘길까요?",
-    segments: ["우리는 5분밖에 없다", "남은", "그래서", "제 생각에", "너무 늦다", "일정 검토를 시작하기에", "지금", "~할까요?", "그것을 옮기다", "다음 주 회의로"],
+    segments: ["5분밖에 안 남았어요", "그래서 일정 검토를 시작하기엔", "지금은 너무 늦은 것 같아요.", "다음 주 회의로 넘길까요?"],
     reference: "We only have five minutes left, so I think it's too late to start the schedule review now. Shall we move it to next week's meeting?",
     accepted: [
       "We only have five minutes left, so I think it's too late to start the schedule review now. Can we move it to next week's meeting?",
@@ -532,7 +532,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "인도네시아 팀과의 화상회의 마무리. 당신이 결정 사항을 요약하고, 회의록을 메일로 보내겠다고 합니다.",
     dialogue: [{ speaker: "Budi", en: "Great. So, what are the next steps?", ko: "좋아요. 그럼 다음 단계는 뭔가요?" }],
     promptKo: "정리하면, 부디 씨는 건조기 데이터를 확인하고 사리 씨는 일정을 업데이트할 겁니다. 회의가 끝나면 제가 회의록을 메일로 보낼게요. 혹시 틀린 부분이 있으면 금요일까지 알려 주세요.",
-    segments: ["정리하면,", "부디 씨는 확인할 것이다", "건조기 데이터를", "그리고", "사리 씨는 업데이트할 것이다", "일정을", "제가 보낼게요", "회의록을", "메일로", "회의 후에", "만약 틀린 부분이 있으면", "알려 주세요", "금요일까지"],
+    segments: ["정리하면, 부디 씨는 건조기 데이터를 확인하고", "사리 씨는 일정을 업데이트할 거예요.", "회의 끝나고 회의록을 메일로 보낼게요.", "틀린 부분이 있으면", "금요일까지 알려 주세요"],
     reference: "To sum up, Budi will check the dryer data, and Sari will update the schedule. I'll send the minutes by email after the call. If there are any mistakes, please let me know by Friday.",
     accepted: [
       "To summarize, Budi will check the dryer data, and Sari will update the schedule. I'll send the minutes by email after the call. If there are any mistakes, please let me know by Friday.",
@@ -577,7 +577,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "고객과의 화상회의 마지막. Mr. Tan이 다음 회의를 건너뛰고 배치를 메일로 확정하자고 하지만, 배관 경로가 아직 받지 못한 벤더 도면에 달려 있어서 짧게라도 회의가 필요하다고 생각합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Everyone is very busy next week. Let's skip the next call and finalize the layout by email.", ko: "다음 주에는 모두 너무 바빠요. 다음 회의는 건너뛰고 배치는 메일로 확정합시다." }],
     promptKo: "무슨 말씀인지 알겠지만, 메일로 배치를 확정할 수 있을지는 잘 모르겠습니다. 배관 경로가 벤더 도면에 따라 달라지는데, 저희는 아직 그 도면을 기다리고 있습니다. 대신 화요일에 짧게 통화할 수 있을까요?",
-    segments: ["말씀은 알겠지만,", "잘 모르겠습니다", "우리가 배치를 확정할 수 있을지", "메일로", "배관 경로는", "~에 달려 있다", "벤더 도면", "그리고 우리는 아직 기다리고 있다", "그 도면을", "~할 수 있을까요?", "짧게 통화하다", "화요일에", "대신"],
+    segments: ["무슨 말씀인지 알지만", "메일로 배치를 확정할 수 있을지 모르겠어요.", "배관 경로가 벤더 도면에 따라 달라지는데", "아직 그 도면을 기다리고 있어요.", "대신 화요일에 짧게 통화할 수 있을까요?"],
     reference: "I see your point, but I'm not sure we can finalize the layout by email. The pipe routing depends on the vendor drawings, and we're still waiting for them. Could we have a short call on Tuesday instead?",
     accepted: [
       "I understand your point, but I'm not sure we can finalize the layout by email. The pipe routing depends on the vendor drawings, and we're still waiting for them. Could we have a short call on Tuesday instead?",

@@ -410,7 +410,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Linh이 할인 후 최종 가격으로 9만 2천 달러를 제시합니다. 이 패키지 예산이 9만 달러라서 그 이상은 어렵다고 설명합니다.",
     dialogue: [{ speaker: "Linh", en: "With the discount, the final price is 92,000 dollars.", ko: "할인을 적용하면 최종 가격은 9만 2천 달러예요." }],
     promptKo: "죄송하지만 9만 달러를 넘길 수는 없어요. 그게 이 패키지의 전체 예산이라서요.",
-    segments: ["죄송하지만", "우리는 넘길 수 없어요", "9만 달러를,", "왜냐하면", "그게 ~이기 때문에", "우리의 전체 예산", "이 패키지의"],
+    segments: ["죄송하지만 9만 달러를 넘길 수는 없어요", "왜냐하면 그게 이 패키지의 전체 예산이에요"],
     reference: "I'm afraid we can't go over 90,000 dollars, because that's our total budget for this package.",
     accepted: [
       "I'm afraid we can't go above 90,000 dollars, because that's our total budget for this package.",
@@ -452,7 +452,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya의 견적에 벤더 팀의 설치 작업이 포함돼 있습니다. 설치는 저희가 직접 하니 견적에서 빼 달라고 합니다.",
     dialogue: [{ speaker: "Priya", en: "The quote also includes installation by our team.", ko: "견적에는 저희 팀의 설치 작업도 포함돼 있어요." }],
     promptKo: "설치는 저희가 직접 할 거라서, 그건 견적에서 빼 주실 수 있을까요?",
-    segments: ["저희가 할 거예요", "설치를", "직접,", "그래서", "~해 주실 수 있을까요", "빼다", "그것을", "견적에서"],
+    segments: ["설치는 저희가 직접 할 거예요", "그래서 그건 견적에서 빼 주실 수 있을까요?"],
     reference: "We'll do the installation ourselves, so could you take it out of the quote?",
     accepted: [
       "We'll do the installation ourselves, so could you remove it from the quote?",
@@ -534,7 +534,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya가 이게 최종 가격이고 납기는 16주라고 합니다. 5월까지 납품해 준다면 그 가격을 받아들이겠다고 조건을 겁니다.",
     dialogue: [{ speaker: "Priya", en: "This is our final price, and the delivery time is sixteen weeks.", ko: "이게 저희 최종 가격이고, 납기는 16주예요." }],
     promptKo: "5월까지 납품해 주실 수 있다면, 그 가격은 받아들일 수 있어요.",
-    segments: ["만약", "당신이 납품할 수 있다면", "5월까지,", "우리는 받아들일 수 있어요", "그 가격을"],
+    segments: ["5월까지 납품해 주실 수 있다면", "그 가격은 받아들일 수 있어요"],
     reference: "If you can deliver by May, we can accept the price.",
     accepted: [
       "If you can deliver by May, we can accept that price.",
@@ -576,7 +576,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "고객사 Mr. Tan이 설계 용역비를 5% 더 깎아 달라고 합니다. 이미 두 번 가격을 낮췄기 때문에 더는 어렵다고 말합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Could you take another 5% off your engineering fee?", ko: "설계 용역비에서 5% 더 빼 주실 수 있을까요?" }],
     promptKo: "저희가 이미 가격을 두 번이나 낮춰 드려서, 죄송하지만 더 이상은 어려워요.",
-    segments: ["저희는", "이미 낮췄어요", "가격을", "두 번,", "그래서", "죄송하지만", "저희는 더 낮출 수 없어요"],
+    segments: ["저희가 이미 가격을 두 번이나 낮췄어요", "그래서 죄송하지만 더 이상은 어려워요"],
     reference: "We've already lowered our price twice, so I'm afraid we can't go any lower.",
     accepted: [
       "We've already reduced our price twice, so I'm afraid we can't go any lower.",
@@ -620,7 +620,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya가 계약할 때 선금 50%를 요구합니다. 선금은 30%만 내고 나머지는 시운전 후에 지급하자고 정중하게 제안합니다.",
     dialogue: [{ speaker: "Priya", en: "We usually ask for 50% in advance when the contract is signed.", ko: "보통 계약할 때 50%를 선금으로 받아요." }],
     promptKo: "혹시 선금은 30%만 드리고, 나머지는 시운전이 끝난 뒤에 드려도 될까요?",
-    segments: ["~해도 될까요(가능할까요)", "지급하는 것이", "30%를", "선금으로", "그리고 나머지를", "시운전 후에"],
+    segments: ["혹시 선금은 30%만 드려도 될까요", "나머지는 시운전 후에 드리고요"],
     reference: "Would it be possible to pay 30% in advance and the rest after commissioning?",
     accepted: [
       "Would it be possible for us to pay 30% in advance and the rest after commissioning?",
@@ -705,7 +705,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Daniel이 라이선스 비용의 새 지급 일정을 오늘 확정하자고 합니다. 지급 조건 변경은 재무팀 승인이 필요해서 금요일까지 답하겠다고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Can you confirm the new payment schedule today?", ko: "새 지급 일정을 오늘 확정해 주실 수 있어요?" }],
     promptKo: "지급 조건 변경은 재무팀 승인을 받아야 해서요, 금요일까지 다시 연락드릴게요.",
-    segments: ["지급 조건 변경은", "승인되어야 해요", "재무팀에 의해,", "그래서", "제가 다시 연락드릴게요", "당신에게", "금요일까지"],
+    segments: ["지급 조건 변경은 재무팀 승인을 받아야 해요", "그래서 금요일까지 다시 연락드릴게요"],
     reference: "Any change to the payment terms has to be approved by our finance team, so I'll get back to you by Friday.",
     accepted: [
       "Any change to the payment terms needs to be approved by our finance team, so I'll get back to you by Friday.",
@@ -753,7 +753,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "할인율을 두고 Priya와 줄다리기 중입니다. Priya가 4%까지 올려 준 것은 고맙지만 저희 목표는 10%였으니, 7%에서 타협하자고 제안합니다.",
     dialogue: [{ speaker: "Priya", en: "We've moved from 2% to 4%. That's a big step for us.", ko: "저희는 2%에서 4%까지 올렸어요. 저희로선 큰 양보예요." }],
     promptKo: "4%까지 올려 주셔서 감사하지만, 저희는 10%를 기대하고 있었어요. 7%로 중간에서 타협하면 어떨까요?",
-    segments: ["감사해요", "올려 주신 것", "4%까지,", "하지만", "저희는 기대하고 있었어요", "10%를.", "~하면 어떨까요", "우리가 중간에서 타협하다", "7%로"],
+    segments: ["4%까지 올려 주셔서 감사하지만", "저희는 10%를 기대하고 있었어요", "7%로 중간에서 타협하면 어떨까요?"],
     reference: "Thanks for going up to 4%, but we were hoping for 10%. Why don't we meet halfway at 7%?",
     accepted: [
       "Thank you for going up to 4%, but we were hoping for 10%. Why don't we meet halfway at 7%?",
@@ -798,7 +798,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya와 할인과 납기 조건에 합의했습니다. 계약 전에 이사님 승인이 필요하니 최종 제안을 서면으로 보내 달라고 합니다.",
     dialogue: [{ speaker: "Priya", en: "Great, so we're agreed on 5% and twelve weeks.", ko: "좋아요, 그럼 5%와 12주로 합의한 거예요." }],
     promptKo: "좋아요. 최종 제안을 서면으로 보내 주실 수 있을까요? 계약서에 서명하기 전에 이사님이 승인하셔야 해서요.",
-    segments: ["좋아요.", "~해 주실 수 있을까요", "우리에게 보내다", "최종 제안을", "서면으로?", "이사님이", "승인해야 해요", "그것을", "우리가 서명하기 전에", "계약서에"],
+    segments: ["좋아요", "최종 제안을 서면으로 보내 주실 수 있을까요?", "이사님이 승인하셔야 해요", "계약서에 서명하기 전에"],
     reference: "Great. Could you send us the final offer in writing? Our director needs to approve it before we sign the contract.",
     accepted: [
       "Great. Could you send us the final offer in writing? Our director has to approve it before we sign the contract.",
@@ -844,7 +844,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya가 슬러리 펌프 6대 견적을 보냈습니다. 아직 정한 건 아니지만, 2단계 공장 몫까지 12대를 한꺼번에 주문한다고 가정하고 할인이 가능한지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "Here's our quote for the six slurry pumps.", ko: "슬러리 펌프 6대 견적이에요." }],
     promptKo: "아직 정한 건 아니지만, 저희가 1·2단계 몫으로 펌프 12대를 한꺼번에 주문한다고 가정하면, 10% 할인해 주실 수 있을까요? 그러면 내부 승인을 받기가 훨씬 쉬울 거예요.",
-    segments: ["만약", "우리가 주문한다고 가정하면", "펌프 12대를", "한꺼번에", "두 단계 모두를 위해,", "당신은 ~해 주시겠어요", "10% 할인을", "그건 ~하게 만들 거예요", "훨씬 쉽게", "내부 승인을 받는 것을"],
+    segments: ["(가정) 1·2단계 몫으로 펌프 12대를 한꺼번에 주문한다면", "10% 할인해 주실 수 있을까요?", "그러면 내부 승인을 받기가 훨씬 쉬울 거예요"],
     reference: "If we ordered twelve pumps at once for both phases, would you give us a 10% discount? That would make it much easier to get internal approval.",
     accepted: [
       "If we ordered twelve pumps at once for both phases, could you give us a 10% discount? That would make it much easier to get internal approval.",
@@ -892,7 +892,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Daniel의 수정 제안을 내부에서 검토했습니다. 이사님이 가격은 괜찮다고 했지만 현장 기술 지원을 늘릴 수 있는지 물었다고 전하고, 그렇게 해 주면 이번 주에 서명하겠다고 말합니다.",
     dialogue: [{ speaker: "Daniel", en: "Did you have a chance to discuss our revised offer internally?", ko: "수정 제안을 내부에서 논의해 보셨어요?" }],
     promptKo: "네. 이사님이 가격은 괜찮다고 하셨어요. 다만 현장 기술 지원을 4주에서 6주로 늘려 주실 수 있는지 물어보셨어요. 그렇게 해 주시면 이번 주에 계약서에 서명할 수 있어요.",
-    segments: ["네.", "이사님이 말했어요", "가격은 괜찮다고,", "하지만 그는 물었어요", "당신이 늘려 줄 수 있는지", "현장 지원을", "4주에서 6주로.", "만약 그렇게 해 주시면,", "우리는 서명할 수 있어요", "계약서에", "이번 주에"],
+    segments: ["네. 이사님이 가격은 괜찮다고 하셨어요", "다만 현장 지원을 4주에서 6주로 늘려 주실 수 있는지 물어보셨어요", "그렇게 해 주시면", "이번 주에 계약서에 서명할 수 있어요"],
     reference: "Yes. Our director said that the price was fine, but he asked whether you could extend the on-site support from four to six weeks. If you can do that, we can sign the contract this week.",
     accepted: [
       "Yes. Our director said the price was fine, but he asked if you could extend the on-site support from four to six weeks. If you can do that, we can sign the contract this week.",
@@ -937,7 +937,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "라이선서 Daniel이 내년부터 기술 지원비를 15% 올리겠다고 합니다. 사정은 이해하지만 받아들이기 어렵다고 하고, 5% 인상과 2년 계약을 대안으로 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "Our costs have gone up a lot, so we need to raise the support fee by 15% from next year.", ko: "비용이 많이 올라서 내년부터 지원비를 15% 올려야 해요." }],
     promptKo: "비용이 오른 건 이해하지만, 15% 인상은 저희가 받아들이기 어려워요. 저희는 5년 동안 함께 일해 왔고 앞으로도 계속 같이 하고 싶어요. 대신 5% 인상에 2년 계약으로 하는 건 고려해 주실 수 있을까요?",
-    segments: ["저는 이해해요", "비용이 올랐다는 것을,", "하지만", "15% 인상은", "받아들이기 어려워요", "저희에게.", "우리는 함께 일해 왔어요", "5년 동안,", "그리고 계속하고 싶어요.", "고려해 주시겠어요", "5% 인상을", "2년 계약과 함께", "대신"],
+    segments: ["비용이 오른 건 이해하지만", "15% 인상은 받아들이기 어려워요", "저희는 5년 동안 함께 일해 왔고 계속 같이 하고 싶어요", "대신 2년 계약에 5% 인상은 고려해 주실 수 있을까요?"],
     reference: "I understand that your costs have gone up, but a 15% increase is difficult for us to accept. We've worked together for five years, and we'd like to continue. Would you consider a 5% increase with a two-year contract instead?",
     accepted: [
       "I understand that your costs have gone up, but a 15% increase is hard for us to accept. We've been working together for five years, and we'd like to continue. Would you consider a 5% increase with a two-year contract instead?",
@@ -983,7 +983,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "고객사 Mr. Tan이 예산은 그대로 두고 건조 라인 하나를 검토 범위에 추가하자고 합니다. 이해는 하지만 큰 범위 변경이라 4주가 더 걸린다고 하고, 10% 증액을 받아 주면 바로 시작하겠다고 제안합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "We'd like to add a second drying line to the study, but we can't increase the budget.", ko: "검토 범위에 건조 라인을 하나 더 추가하고 싶은데, 예산은 늘릴 수 없어요." }],
     promptKo: "예산을 그대로 유지하고 싶으신 건 이해하지만, 두 번째 라인을 추가하는 건 범위가 크게 바뀌는 거예요. 저희 팀에 4주 정도가 더 걸릴 거고요. 10% 증액을 받아들여 주시면, 다음 주 월요일에 바로 시작할 수 있어요.",
-    segments: ["저는 이해해요", "같은 예산을 유지하고 싶으신 것을,", "하지만", "두 번째 라인을 추가하는 것은", "큰 변경이에요", "범위에 대한.", "그건 걸릴 거예요", "저희 팀에", "약 4주 더.", "만약 받아들여 주시면", "10% 증액을,", "우리는 시작할 수 있어요", "다음 주 월요일에"],
+    segments: ["예산을 그대로 유지하고 싶으신 건 이해하지만", "두 번째 라인 추가는 범위가 크게 바뀌는 거예요", "저희 팀에 4주 정도가 더 걸릴 거예요", "10% 증액을 받아들여 주시면", "다음 주 월요일에 시작할 수 있어요"],
     reference: "I understand that you want to keep the same budget, but adding a second line is a big change to the scope. It would take our team about four more weeks. If you can accept a 10% increase, we can start next Monday.",
     accepted: [
       "I understand that you'd like to keep the same budget, but adding a second line is a big change to the scope. It would take our team about four more weeks. If you can accept a 10% increase, we can start next Monday.",

@@ -199,7 +199,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "공정 흐름도(PFD) 슬라이드를 띄웠습니다. 원료가 들어와서 나가는 순서대로 설명하려 합니다.",
     dialogue: [{ speaker: "Linh", en: "This diagram looks quite complex.", ko: "이 도면 꽤 복잡해 보이네요." }],
     promptKo: "네, 공정 흐름을 단계별로 설명해 드릴게요. 원료 투입구부터 시작하겠습니다.",
-    segments: ["네,", "제가 ~할게요", "차례로 설명하다", "공정 흐름을", "단계별로", "저는 시작하겠습니다", "원료 투입구부터"],
+    segments: ["네, 공정 흐름을 단계별로 설명해 드릴게요", "원료 투입구부터 시작할게요"],
     reference: "Yes, let me walk you through the process flow step by step. I'll start with the feed inlet.",
     accepted: [
       "Yes, let me walk you through the process step by step. I'll start with the feed inlet.",
@@ -363,7 +363,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "월간 프로젝트 리뷰 발표. 지난달 회의 이후 진행된 일부터 보고합니다.",
     dialogue: [{ speaker: "Daniel", en: "Let's start with an update. Where are we now?", ko: "업데이트부터 시작하죠. 지금 어디까지 왔나요?" }],
     promptKo: "지난 회의 이후로 파일럿 운전을 두 번 더 마쳤고, 결과는 꽤 안정적입니다.",
-    segments: ["지난 회의 이후로", "우리는 마쳤다", "두 번 더", "파일럿 운전을", "그리고", "결과는", "꽤 안정적이다"],
+    segments: ["지난 회의 이후로", "파일럿 운전을 두 번 더 마쳤어요", "그리고 결과는 꽤 안정적이에요"],
     reference: "Since our last meeting, we've finished two more pilot runs, and the results are quite stable.",
     accepted: [
       "Since our last meeting, we have finished two more pilot runs, and the results are quite stable.",
@@ -404,7 +404,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "결과 슬라이드 발표 중. 라이선서가 데이터를 믿을 수 있는지 묻자, 샘플을 외부 실험실에서 분석했다고 설명합니다.",
     dialogue: [{ speaker: "Daniel", en: "These numbers look very good. Where did the data come from?", ko: "숫자가 아주 좋아 보이네요. 데이터는 어디서 나온 건가요?" }],
     promptKo: "모든 샘플은 외부 실험실에서 분석되었기 때문에, 데이터는 신뢰할 수 있습니다.",
-    segments: ["모든 샘플은", "분석되었다", "외부 실험실에 의해", "그래서", "데이터는", "신뢰할 수 있다"],
+    segments: ["모든 샘플은 외부 실험실에서 분석됐어요", "그래서 데이터는 신뢰할 수 있어요"],
     reference: "All the samples were analyzed by an external lab, so the data is reliable.",
     accepted: [
       "All the samples were analyzed by an external lab, so the data are reliable.",
@@ -446,7 +446,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "질의응답 시간. 라이선서 측 Daniel이 지금 결과로 실규모 설계를 해도 되는지 묻습니다. 데이터는 2주치밖에 없습니다.",
     dialogue: [{ speaker: "Daniel", en: "Can we use these results for the full-scale design?", ko: "이 결과를 실규모 설계에 써도 될까요?" }],
     promptKo: "그렇게 말하기에는 아직 좀 이른 것 같습니다. 데이터가 2주치밖에 없기 때문입니다.",
-    segments: ["제 생각에", "좀 너무 이르다", "말하기에는", "왜냐하면", "우리는 ~밖에 없다", "2주치 데이터"],
+    segments: ["그렇게 말하기에는 좀 이른 것 같아요", "왜냐하면 데이터가 2주치밖에 없어요"],
     reference: "I think it's a bit too early to say, because we only have two weeks of data.",
     accepted: [
       "I think it's a little too early to say, because we only have two weeks of data.",
@@ -489,7 +489,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "건조기 대안 비교 슬라이드. A안은 싸지만 증기를 많이 쓰고, B안은 조금 비싸지만 증기를 훨씬 적게 씁니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So, which option do you recommend?", ko: "그래서 어느 안을 추천하시나요?" }],
     promptKo: "B안이 조금 더 비싸지만 증기를 훨씬 적게 씁니다. 그래서 저는 B안으로 가는 것을 제안합니다.",
-    segments: ["B안이", "조금 더 비싸다", "하지만", "그것은 훨씬 적은 증기를 쓴다", "그래서", "저는 제안합니다", "B안으로 가는 것을"],
+    segments: ["B안이 조금 더 비싸요", "하지만 증기를 훨씬 적게 써요", "그래서 B안으로 가는 걸 제안해요"],
     reference: "Option B is a little more expensive, but it uses much less steam. So I'd suggest going with Option B.",
     accepted: [
       "Option B is slightly more expensive, but it uses much less steam. So I'd suggest going with Option B.",
@@ -531,7 +531,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "발표 마지막 요약. 새 건조기는 잘 작동하지만 출구 수분이 아직 목표보다 약간 높아서, 설계를 확정하기 전에 최대 부하로 시험을 한 번 더 해야 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Can you summarize the main points for us?", ko: "핵심 내용을 요약해 주시겠어요?" }],
     promptKo: "요약하자면, 새 건조기는 잘 작동하지만 출구 수분이 아직 목표보다 약간 높습니다. 그래서 설계를 확정하기 전에 최대 부하에서 시험을 한 번 더 해야 합니다.",
-    segments: ["요약하자면,", "새 건조기는", "잘 작동한다", "하지만", "출구 수분이", "아직 약간 더 높다", "목표보다", "그래서", "우리는 해야 한다", "시험을 한 번 더", "최대 부하에서", "확정하기 전에", "설계를"],
+    segments: ["요약하자면, 새 건조기는 잘 작동해요", "하지만 출구 수분이 아직 목표보다 약간 높아요", "그래서 최대 부하에서 시험을 한 번 더 해야 해요", "설계를 확정하기 전에"],
     reference: "To sum up, the new dryer works well, but the outlet moisture is still slightly higher than the target. So we need to run one more test at full load before finalizing the design.",
     accepted: [
       "To summarize, the new dryer works well, but the outlet moisture is still slightly higher than the target. So we need to run one more test at full load before finalizing the design.",
@@ -575,7 +575,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "발표 후 질의응답. 라이선서 측 Daniel이 추가 시험 없이 바로 실규모 설계로 가자고 합니다. 당신은 우기에 원료 수분이 바뀌면 건조기가 목표에 못 미칠 수 있다고 봅니다.",
     dialogue: [{ speaker: "Daniel", en: "The results look good enough to me. Why not go straight to the full-scale design?", ko: "제가 보기엔 결과가 충분히 좋아요. 바로 실규모 설계로 가면 안 되나요?" }],
     promptKo: "이해는 하지만, 바로 스케일업하는 것은 좀 걱정됩니다. 우기에 원료 수분이 바뀌면 건조기가 목표에 도달하지 못할 수도 있습니다. 대신 먼저 젖은 원료로 짧은 시험을 해 보면 어떨까요? 2주 정도밖에 안 걸릴 겁니다.",
-    segments: ["이해합니다, 하지만", "저는 좀 걱정됩니다", "바로 스케일업하는 것이", "만약 원료 수분이 바뀌면", "우기에", "건조기가", "목표에 도달하지 못할 수도 있다", "대신", "~하면 어떨까요?", "짧은 시험을 하다", "젖은 원료로", "먼저", "2주 정도밖에 안 걸릴 것이다"],
+    segments: ["이해는 하지만 바로 스케일업하는 건 좀 걱정돼요", "우기에 원료 수분이 바뀌면", "건조기가 목표에 도달하지 못할 수도 있어요", "대신 먼저 젖은 원료로 짧은 시험을 해 보면 어떨까요?", "2주 정도밖에 안 걸릴 거예요"],
     reference: "I understand, but I'm a bit worried about scaling up directly. If the feed moisture changes in the rainy season, the dryer might not reach the target. Instead, why don't we run a short test with wet feed first? It would only take about two weeks.",
     accepted: [
       "I understand, but I'm a little worried about scaling up directly. If the feed moisture changes in the rainy season, the dryer might not reach the target. Instead, why don't we run a short test with wet feed first? It would only take about two weeks.",
