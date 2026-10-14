@@ -189,7 +189,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "자카르타 출장 전에 사리 씨가 호텔 예약을 대신 도와주었습니다. 다음 날 회의에서 그녀가 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "Did you get the hotel confirmation email?", ko: "호텔 예약 확인 메일 받으셨어요?" }],
     promptKo: "네, 받았어요. 호텔 예약 도와줘서 고마워요.",
-    segments: ["네, 받았어요.", "고마워요", "도와준 것에 대해", "저를", "호텔 예약에 관해"],
+    segments: ["네, 받았어요", "고마워요", "호텔 예약을 도와줘서요"],
     reference: "Yes, I got it. Thank you for helping me with the hotel booking.",
     accepted: [
       "Yes, I did. Thank you for helping me with the hotel booking.",
@@ -229,7 +229,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "부디 씨가 지난주 회의에 빠진 이유를 말합니다. 아기가 태어났다고 합니다.",
     dialogue: [{ speaker: "Budi", en: "Sorry I missed last week's meeting. My wife had a baby girl on Tuesday!", ko: "지난주 회의에 못 와서 미안해요. 화요일에 아내가 딸을 낳았어요!" }],
     promptKo: "축하해요! 부인과 아기는 잘 지내요?",
-    segments: ["축하해요!", "어떻게", "~하고 있어요 (복수)", "부인과 아기는", "지내다"],
+    segments: ["축하해요!", "부인과 아기는 잘 지내요?"],
     reference: "Congratulations! How are your wife and the baby doing?",
     accepted: [
       "Congratulations! How are your wife and baby doing?",
@@ -270,7 +270,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "회의 시작 시간이 되었지만 유럽 라이선서의 다니엘 씨가 아직 접속하지 않았습니다. 사리 씨가 시작할지 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "It's ten o'clock. Should we start now?", ko: "10시예요. 지금 시작할까요?" }],
     promptKo: "다니엘 씨가 들어올 때까지 몇 분만 기다려요.",
-    segments: ["~합시다", "몇 분 기다리다", "~할 때까지", "다니엘 씨가 들어오다"],
+    segments: ["몇 분만 기다려요", "다니엘 씨가 들어올 때까지"],
     reference: "Let's wait a few minutes until Daniel joins.",
     accepted: [
       "Let's wait a couple of minutes until Daniel joins.",
@@ -351,7 +351,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "회의를 마치며 말레이시아 고객사의 탄 씨가 언젠가 쿠알라룸푸르에 꼭 오라고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "You should come to Kuala Lumpur sometime. The food is amazing!", ko: "언젠가 쿠알라룸푸르에 꼭 오세요. 음식이 정말 끝내줘요!" }],
     promptKo: "꼭 가 보고 싶어요. 말레이시아에는 한 번도 가 본 적이 없거든요.",
-    segments: ["저는 정말 ~하고 싶어요", "저는 한 번도 가 본 적이 없다", "말레이시아에", "(지금까지)"],
+    segments: ["꼭 가 보고 싶어요", "말레이시아에는 한 번도 가 본 적이 없어요"],
     reference: "I'd love to. I've never been to Malaysia before.",
     accepted: [
       "I'd love to! I have never been to Malaysia.",
@@ -473,7 +473,7 @@ export const TALK_SMALLTALK: Question[] = [
     contextKo: "2년 동안 화상으로만 만난 다니엘 씨가 다음 달 서울에 출장을 온다고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Good news. I'll be in Seoul next month for the design review.", ko: "좋은 소식이 있어요. 다음 달에 설계 검토 때문에 서울에 가요." }],
     promptKo: "잘됐네요! 직접 만난 지 정말 오래됐잖아요. 서울에 계시는 동안 커피 한잔해요.",
-    segments: ["잘됐네요!", "정말 오래됐어요", "우리가 마지막으로 직접 만난 이후로", "커피 한잔해요", "당신이 서울에 있는 동안"],
+    segments: ["잘됐네요!", "직접 만난 지 정말 오래됐어요", "커피 한잔해요", "서울에 계시는 동안"],
     reference: "That's great! It's been a long time since we last met in person. Let's have coffee while you're in Seoul.",
     accepted: [
       "Great! It's been a long time since we met in person. Let's get coffee while you're in Seoul.",

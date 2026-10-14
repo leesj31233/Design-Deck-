@@ -405,7 +405,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "고객 회의에 들어가려는데, 벤더가 보낸 샘플 택배가 1층 안내 데스크에 도착했다는 문자가 왔습니다. 지수 씨는 자리에 있습니다.",
     dialogue: [{ speaker: "Jisoo", en: "Are you heading to the client meeting now?", ko: "지금 고객 회의 가는 거예요?" }],
     promptKo: "네. 안내 데스크에서 제 택배 좀 대신 받아 줄 수 있어요?",
-    segments: ["네.", "~해 줄 수 있어요", "택배를 찾아오다", "저를 위해", "안내 데스크에서?"],
+    segments: ["네.", "택배 좀 찾아 줄 수 있어요", "안내 데스크에서, 저 대신?"],
     reference: "Yes. Could you pick up a package for me at the front desk?",
     accepted: [
       "Yes. Can you pick up a package for me at the front desk?",
@@ -450,7 +450,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "오늘은 김 팀장님 생일이라 팀이 오후에 케이크를 준비했습니다. 신입 톰 씨가 소문을 듣고 물어봅니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "Someone said there's cake today. Where and when?", ko: "오늘 케이크 있다고 들었는데, 어디서 언제예요?" }],
     promptKo: "3시에 휴게실에서 케이크 먹을 거예요.",
-    segments: ["우리는 먹을 거예요", "케이크를", "휴게실에서", "3시에."],
+    segments: ["휴게실에서 케이크 먹어요", "3시에"],
     reference: "We're having cake in the break room at three.",
     accepted: [
       "We're having cake in the break room at 3.",
@@ -495,7 +495,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "자리를 옮긴 뒤 모니터가 아직 안 와서 노트북 작은 화면으로 도면을 보고 있습니다. 지수 씨가 지나가다 묻습니다.",
     dialogue: [{ speaker: "Jisoo", en: "Why are you working on that tiny laptop screen?", ko: "왜 그 작은 노트북 화면으로 일하고 있어요?" }],
     promptKo: "IT팀에서 새 모니터 오는 걸 아직 기다리고 있어요.",
-    segments: ["저는 아직 기다리고 있어요", "제 새 모니터를", "IT팀으로부터."],
+    segments: ["아직 새 모니터를 기다리고 있어요", "IT팀에서 오는"],
     reference: "I'm still waiting for my new monitor from IT.",
     accepted: [
       "I'm still waiting for IT to send me a new monitor.",
@@ -585,7 +585,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "4월인데 난방이 아직 켜져 있어서 사무실이 덥습니다. 창가 자리의 지수 씨에게 말합니다.",
     dialogue: [{ speaker: "Jisoo", en: "Phew, I think they forgot to turn off the heating again.", ko: "휴, 또 난방 끄는 걸 잊었나 봐요." }],
     promptKo: "여기 너무 덥네요. 창문 좀 열어도 될까요?",
-    segments: ["너무 덥네요", "여기 안은.", "괜찮을까요", "제가 열어도", "창문을?"],
+    segments: ["여기 정말 덥네요.", "괜찮을까요", "창문 좀 열어도?"],
     reference: "It's really hot in here. Do you mind if I open the window?",
     accepted: [
       "It's so hot in here. Do you mind if I open the window?",
@@ -723,7 +723,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "회사가 지난주에 새 회의실 예약 시스템을 도입했는데, 아직 한 번도 써 보지 않았습니다. 지수 씨가 다니엘 씨와의 통화용 회의실을 잡아 달라고 합니다.",
     dialogue: [{ speaker: "Jisoo", en: "Could you book a room for the call with Daniel? Just use the new booking system.", ko: "다니엘 씨랑 통화할 회의실 좀 잡아 줄래요? 새 예약 시스템 쓰면 돼요." }],
     promptKo: "새 예약 시스템은 한 번도 안 써 봤어요. 어떻게 쓰는지 보여 줄 수 있어요?",
-    segments: ["저는 한 번도 써 본 적이 없어요", "새 예약 시스템을.", "보여 줄 수 있어요", "저에게", "그게 어떻게 작동하는지?"],
+    segments: ["새 예약 시스템은 한 번도 안 써 봤어요.", "보여 줄 수 있어요", "어떻게 쓰는지?"],
     reference: "I've never used the new booking system. Could you show me how it works?",
     accepted: [
       "I haven't used the new booking system yet. Could you show me how it works?",
@@ -814,7 +814,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "벤더 일정 문제로 고민하다가 김 팀장님 자리로 갔습니다. 팀장님이 무슨 일인지 묻습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Hi, Minsu. You look a bit worried. Is everything okay?", ko: "민수 씨, 좀 걱정 있어 보이네요. 괜찮아요?" }],
     promptKo: "실은 뭐 좀 조언을 구할 수 있을까 해서요. 몇 분 시간 있으세요?",
-    segments: ["실은,", "저는 ~할 수 있을까 해서요", "당신의 조언을 얻다", "어떤 일에 대해.", "있으세요", "몇 분이?"],
+    segments: ["실은, 조언 좀 구할 수 있을까 해서요", "어떤 일에 대해.", "몇 분 시간 있으세요?"],
     reference: "Actually, I was wondering if I could get your advice on something. Do you have a few minutes?",
     accepted: [
       "Actually, I was wondering if I could ask your advice about something. Do you have a few minutes?",
@@ -908,7 +908,7 @@ export const TALK_OFFICE_3: Question[] = [
     contextKo: "아침 회의 때 회의실에 검은 수첩을 두고 나왔는데, 다시 가 보니 없습니다. 지수 씨가 뭘 찾냐고 묻습니다.",
     dialogue: [{ speaker: "Jisoo", en: "You look like you're looking for something.", ko: "뭐 찾는 것 같네요." }],
     promptKo: "네. 오늘 아침에 회의실에 두고 온 검은 수첩 봤어요?",
-    segments: ["네.", "봤어요", "검은 수첩을", "제가 두고 온", "회의실에", "오늘 아침에?"],
+    segments: ["네.", "검은 수첩 봤어요", "회의실에 두고 온", "오늘 아침에?"],
     reference: "Yes. Have you seen the black notebook that I left in the meeting room this morning?",
     accepted: [
       "Yes. Have you seen the black notebook I left in the meeting room this morning?",

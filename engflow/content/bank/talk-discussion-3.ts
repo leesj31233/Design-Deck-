@@ -332,7 +332,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "미결 사항이 너무 많아 논의가 흩어지고 있습니다. 가장 기본이 되는 설계 용량부터 먼저 합의하자고 제안합니다.",
     dialogue: [{ speaker: "Linh", en: "There are so many open points: the capacity, the layout, the materials and the control system.", ko: "미결 사항이 너무 많아요. 용량, 배치, 재질, 제어 시스템까지요." }],
     promptKo: "설계 용량에 대해서 먼저 합의할 수 있을까요?",
-    segments: ["~할 수 있을까요", "우리가 합의하다", "설계 용량에 대해", "먼저"],
+    segments: ["설계 용량에 합의할 수 있을까요", "먼저?"],
     reference: "Can we agree on the design capacity first?",
     accepted: ["Could we agree on the design capacity first?", "Can we first agree on the design capacity?", "Can we decide on the design capacity first?", "Why don't we agree on the design capacity first?", "Let's agree on the design capacity first.", "Could we start by agreeing on the design capacity?"],
     meaning: [
@@ -405,7 +405,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Linh이 B사 건조기가 더 싸다고 합니다. 구매 가격만 보지 말고 예비 부품 비용도 생각해야 한다고 말합니다.",
     dialogue: [{ speaker: "Linh", en: "Vendor B's dryer is about 10% cheaper than Vendor A's.", ko: "B사 건조기가 A사보다 10% 정도 싸요." }],
     promptKo: "예비 부품 비용도 생각해야 해요.",
-    segments: ["우리는 ~해야 해요", "또한", "생각하다", "비용에 대해", "예비 부품의"],
+    segments: ["우리는 또 생각해야 해요", "예비 부품 비용도"],
     reference: "We should also think about the cost of spare parts.",
     accepted: ["We also need to think about the cost of spare parts.", "We should also consider the cost of spare parts.", "We should think about the cost of spare parts too.", "We should also think about the spare parts cost.", "We should also look at the cost of spare parts.", "We should also think about the cost of the spare parts."],
     meaning: [
@@ -444,7 +444,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Sari가 이번 주 내내 건조기 출구 수분이 높다며 이유를 묻습니다. 확실하지는 않지만 원료가 평소보다 젖어 있는 것 같다고 조심스럽게 말합니다.",
     dialogue: [{ speaker: "Sari", en: "The outlet moisture has been too high all week. Any ideas why?", ko: "출구 수분이 이번 주 내내 너무 높아요. 이유가 뭘까요?" }],
     promptKo: "제가 틀릴 수도 있지만, 원료가 평소보다 젖어 있는 것 같아요.",
-    segments: ["제가 틀릴 수도 있지만,", "저는 생각해요", "원료가", "더 젖어 있다고", "평소보다"],
+    segments: ["제가 틀릴 수도 있지만,", "원료가 더 젖어 있는 것 같아요", "평소보다"],
     reference: "I might be wrong, but I think the feed is wetter than usual.",
     accepted: ["I could be wrong, but I think the feed is wetter than usual.", "I may be wrong, but I think the feed is wetter than usual.", "I might be wrong, but I think the feed is wetter than normal.", "I might be wrong, but maybe the feed is wetter than usual.", "I might be wrong, but I think the feed has more moisture than usual.", "I could be wrong, but I think the feed is a bit wetter than usual."],
     meaning: [
@@ -598,7 +598,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Ms. Kim이 시험 한 번을 위해 새 파일럿 건조기를 사기에는 너무 비싸다고 합니다. 사는 대신 빌리는 방법을 제안합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "A new pilot dryer would cost about 200,000 dollars. That's too much for one trial.", ko: "새 파일럿 건조기는 20만 달러 정도 들어요. 시험 한 번에 쓰기엔 너무 많아요." }],
     promptKo: "새 건조기를 사는 대신, 시험 기간 동안 하나 빌릴 수도 있어요.",
-    segments: ["~하는 대신", "사는 것", "새 건조기를,", "우리는 빌릴 수도 있어요", "하나를", "시험 동안"],
+    segments: ["새 건조기를 사는 대신,", "하나 빌릴 수도 있어요", "시험 기간 동안"],
     reference: "Instead of buying a new dryer, we could rent one for the trial.",
     accepted: ["Instead of buying a new one, we could rent a dryer for the trial.", "Rather than buying a new dryer, we could rent one for the trial.", "Instead of buying a new dryer, we could hire one for the trial.", "We could rent a dryer for the trial instead of buying a new one.", "Instead of buying a new dryer, maybe we could rent one for the trial."],
     meaning: [
@@ -636,7 +636,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Linh이 디캔터를 하나 더 두면 성수기 물량을 감당할 수 있다고 합니다. 맞는 말이지만 CAPEX가 약 15% 늘어난다고 짚습니다.",
     dialogue: [{ speaker: "Linh", en: "If we add a second decanter, we can handle the peak season easily.", ko: "디캔터를 하나 더 두면 성수기도 쉽게 감당할 수 있어요." }],
     promptKo: "맞아요. 그런데 디캔터를 하나 더 추가하면, CAPEX가 15% 정도 올라갈 거예요.",
-    segments: ["맞아요,", "그런데", "만약 우리가 추가하면", "두 번째 디캔터를,", "CAPEX가 올라갈 거예요", "약 15%만큼"],
+    segments: ["맞아요.", "그런데 디캔터를 하나 더 추가하면,", "CAPEX가 올라갈 거예요", "15% 정도"],
     reference: "That's true, but if we add a second decanter, the CAPEX will go up by about 15%.",
     accepted: ["That's true, but if we add a second decanter, the CAPEX will increase by about 15%.", "That's true, but if we add another decanter, the CAPEX will go up by about 15%.", "True, but if we add a second decanter, the CAPEX will go up by about 15%.", "That's true, but the CAPEX will go up by about 15% if we add a second decanter.", "That's true, but if we add a second decanter, CAPEX will go up by around 15%."],
     meaning: [
@@ -714,7 +714,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "Daniel이 자사 피더 설계가 유럽 공장에서 잘 돌아갔다고 합니다. 유럽에서는 우드칩을 쓰기 때문에 EFB로도 시험했는지 확인합니다.",
     dialogue: [{ speaker: "Daniel", en: "This feeder design has worked very well in our plants in Europe.", ko: "이 피더 설계는 유럽 공장들에서 아주 잘 돌아갔어요." }],
     promptKo: "EFB로도 시험해 봤나요, 아니면 우드칩으로만 해 봤나요?",
-    segments: ["그것이 시험된 적 있나요", "EFB로,", "아니면", "우드칩으로만"],
+    segments: ["EFB로 시험해 봤나요,", "아니면 우드칩으로만 해 봤나요?"],
     reference: "Has it been tested on EFB, or only on wood chips?",
     accepted: ["Has it been tested with EFB, or only with wood chips?", "Has it been tested on EFB, or just on wood chips?", "Has it ever been tested on EFB, or only on wood chips?", "Have you tested it on EFB, or only on wood chips?", "Was it tested on EFB, or only on wood chips?", "Did you test it on EFB, or only on wood chips?"],
     meaning: [
@@ -833,7 +833,7 @@ export const TALK_DISCUSSION_3: Question[] = [
     contextKo: "건조기 배치 문제로 거의 한 시간째 논의 중인데, Sari가 또 다른 논점을 꺼내려고 합니다. 이제는 결정할 때라고 회의를 정리합니다.",
     dialogue: [{ speaker: "Sari", en: "There's one more thing about the dryer layout that I'd like to discuss.", ko: "건조기 배치에 대해 얘기하고 싶은 게 하나 더 있어요." }],
     promptKo: "이 얘기를 거의 한 시간째 하고 있어요. 이제 결정을 내릴 때인 것 같아요.",
-    segments: ["우리는 논의해 오고 있어요", "이것을", "거의 한 시간 동안.", "저는 생각해요", "때라고", "결정을 내릴"],
+    segments: ["이걸 논의하고 있어요", "거의 한 시간째요.", "이제 결정을 내릴 때인 것 같아요"],
     reference: "We've been discussing this for almost an hour. I think it's time to make a decision.",
     accepted: ["We've been talking about this for almost an hour. I think it's time to make a decision.", "We've been discussing this for almost an hour. I think it's time to decide.", "We've been discussing this for nearly an hour. I think it's time to make a decision.", "We've discussed this for almost an hour. I think it's time to make a decision.", "We've been discussing this for almost an hour, so I think it's time to make a decision."],
     meaning: [

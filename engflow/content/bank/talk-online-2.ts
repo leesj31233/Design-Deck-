@@ -233,7 +233,7 @@ export const TALK_ONLINE_2: Question[] = [
     contextKo: "말레이시아 고객과의 화상회의 중 인터넷이 끊겼다가 1분 만에 다시 들어왔습니다. 어디까지 이야기했는지 모릅니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Oh, welcome back, Minsu. We lost you for a minute.", ko: "아, 다시 오셨네요, 민수 씨. 잠깐 연결이 끊겼어요." }],
     promptKo: "죄송해요, 연결이 끊겼어요. 어디까지 얘기했죠?",
-    segments: ["죄송해요,", "저는 연결이 끊겼어요", "어디까지", "우리가 (얘기)했죠?"],
+    segments: ["죄송해요, 연결이 끊겼어요", "어디까지 얘기했죠?"],
     reference: "Sorry, I got disconnected. Where were we?",
     accepted: [
       "Sorry, I was disconnected. Where were we?",
@@ -274,7 +274,7 @@ export const TALK_ONLINE_2: Question[] = [
     contextKo: "인도네시아 팀과의 화상회의. 사리 씨가 말할 때마다 소리가 두 번씩 울립니다. 사리 씨 쪽 스피커 때문인 것 같습니다.",
     dialogue: [{ speaker: "Sari", en: "Can everyone hear me? My audio sounds strange.", ko: "다들 제 목소리 들리세요? 소리가 좀 이상하네요." }],
     promptKo: "사리 씨, 사리 씨 쪽에서 에코가 들려요.",
-    segments: ["사리 씨,", "우리는 듣고 있어요", "에코를", "당신 쪽에서"],
+    segments: ["사리 씨, 지금 에코가 들려요", "사리 씨 쪽에서요"],
     reference: "Sari, we're getting an echo from your side.",
     accepted: [
       "Sari, we're getting an echo from your end.",
@@ -315,7 +315,7 @@ export const TALK_ONLINE_2: Question[] = [
     contextKo: "인도네시아 팀과의 화상회의. 부디 씨 쪽에서 공사 소음이 계속 들리는데, 지금은 부디 씨가 말하는 순서가 아닙니다.",
     dialogue: [{ speaker: "Linh", en: "Sorry, it's a bit hard to hear. There's a lot of noise.", ko: "죄송한데 잘 안 들려요. 소음이 많네요." }],
     promptKo: "부디 씨, 말씀 안 하실 때는 음소거 좀 해 주시겠어요? 뒤에서 소음이 좀 들려서요.",
-    segments: ["부디 씨,", "~해 주시겠어요?", "음소거하다", "말하지 않을 때는", "~이 있어요", "배경 소음이 좀"],
+    segments: ["부디 씨, 음소거 좀 해 주시겠어요?", "말씀 안 하실 때는", "뒤에서 소음이 좀 들려요"],
     reference: "Budi, could you mute yourself when you're not speaking? There's some background noise.",
     accepted: [
       "Budi, could you mute your mic when you're not speaking? There's some background noise.",
@@ -359,7 +359,7 @@ export const TALK_ONLINE_2: Question[] = [
     contextKo: "주간 화상회의. 당신이 화면을 공유하고 있는데, 부디 씨가 새 P&ID를 자기 노트북에서 직접 보여 주고 싶다고 합니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu, can I show the new P&ID from my laptop?", ko: "민수 씨, 제 노트북에서 새 P&ID를 보여 줘도 될까요?" }],
     promptKo: "네. 부디 씨가 화면을 공유할 수 있게 제가 공유를 멈출게요.",
-    segments: ["네.", "제가 멈출게요", "공유하는 것을", "~할 수 있도록", "당신이 공유하다", "당신의 화면을"],
+    segments: ["네, 제가 공유를 멈출게요", "부디 씨가", "화면을 공유할 수 있게요"],
     reference: "Sure. I'll stop sharing so you can share your screen.",
     accepted: [
       "Sure. Let me stop sharing so you can share your screen.",
@@ -401,7 +401,7 @@ export const TALK_ONLINE_2: Question[] = [
     contextKo: "부디 씨가 진행하는 화상회의. 당신의 발표가 끝나고 질문을 받는데, 마이크가 안 되는 린 씨가 방금 채팅창에 질문을 올렸습니다.",
     dialogue: [{ speaker: "Budi", en: "Okay, does anyone have any questions for Minsu?", ko: "자, 민수 씨에게 질문 있는 분 계신가요?" }],
     promptKo: "린 씨가 방금 채팅창에 질문을 올렸네요. 제가 읽어 드릴게요.",
-    segments: ["린 씨가", "방금 올렸어요", "질문을", "채팅창에", "제가 ~할게요", "그것을 소리 내어 읽다"],
+    segments: ["린 씨가 방금 질문을 올렸어요", "채팅창에", "제가 읽어 드릴게요"],
     reference: "Linh has just posted a question in the chat. Let me read it out.",
     accepted: [
       "Linh has just posted a question in the chat. Let me read it out for everyone.",
@@ -529,7 +529,7 @@ export const TALK_ONLINE_2: Question[] = [
     contextKo: "말레이시아 고객과의 화상회의. 종료 5분 전에 Mr. Tan이 예비 부품 목록도 보자고 합니다. 오늘 다루기엔 시간이 부족합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "There's one more thing. Can we also go through the spare parts list?", ko: "하나 더 있어요. 예비 부품 목록도 같이 볼 수 있을까요?" }],
     promptKo: "죄송하지만 시간이 거의 다 됐습니다. 예비 부품 목록은 목요일 회의에서 다뤄도 괜찮을까요?",
-    segments: ["죄송하지만", "우리는 시간이 다 되어 가요", "괜찮을까요?", "다루다", "예비 부품 목록을", "목요일 회의에서"],
+    segments: ["죄송하지만 시간이 거의 다 됐어요", "예비 부품 목록은", "목요일 회의에서", "다뤄도 괜찮을까요?"],
     reference: "I'm afraid we're running out of time. Would it be okay to discuss the spare parts list at our meeting on Thursday?",
     accepted: [
       "I'm afraid we're running out of time. Would it be okay to discuss the spare parts list on Thursday?",

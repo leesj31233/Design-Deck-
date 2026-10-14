@@ -201,7 +201,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "부디 씨는 무슬림이라 돼지고기를 먹지 않습니다. 메뉴에 사진만 있어서 당신이 종업원에게 확인합니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu, I don't eat pork. Could you ask about this one?", ko: "민수 씨, 저는 돼지고기를 안 먹어요. 이것 좀 물어봐 줄래요?" }],
     promptKo: "(종업원에게) 저기요, 이 음식에 돼지고기가 들어가나요?",
-    segments: ["저기요,", "~하나요", "이 음식이", "가지고 있다", "돼지고기를", "그 안에"],
+    segments: ["저기요,", "이 음식에 돼지고기가 들어가나요?"],
     reference: "Excuse me, does this dish have any pork in it?",
     accepted: [
       "Excuse me, is there any pork in this dish?",
@@ -242,7 +242,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "서울 사무실을 방문한 인도 협력사의 프리야 씨와 오전 회의가 끝났습니다. 팀 점심에 초대합니다.",
     dialogue: [{ speaker: "Priya", en: "Thanks for the meeting, Minsu. I think that's everything for this morning.", ko: "회의 감사해요, 민수 씨. 오늘 오전은 이걸로 다 된 것 같아요." }],
     promptKo: "좋아요. 저희랑 같이 점심 드실래요?",
-    segments: ["좋아요.", "~하시겠어요", "함께하다", "저희와", "점심 식사에"],
+    segments: ["좋아요", "저희랑 같이 점심 드실래요?"],
     reference: "Great. Would you like to join us for lunch?",
     accepted: [
       "Great. Would you like to have lunch with us?",
@@ -411,7 +411,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "다니엘 씨가 상 위의 처음 보는 음식을 가리키며 무엇인지 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "What's this noodle dish? It looks interesting.", ko: "이 국수 요리는 뭐예요? 특이해 보이네요." }],
     promptKo: "잡채라고 해요. 고구마 당면이랑 채소, 소고기로 만들어요.",
-    segments: ["그것은 불린다", "잡채라고", "그것은 만들어진다", "고구마 당면으로", "채소와 소고기(로)"],
+    segments: ["잡채라고 해요", "고구마 당면으로 만들어요", "채소와 소고기도 넣고요"],
     reference: "It's called japchae. It's made with sweet potato noodles, vegetables and beef.",
     accepted: [
       "It is called japchae. It is made with sweet potato noodles, vegetables, and beef.",
@@ -452,7 +452,7 @@ export const TALK_MEAL: Question[] = [
     contextKo: "인도 협력사의 프리야 씨가 다음 주 서울에 옵니다. 그녀는 채식주의자라서 저녁 식사 장소를 미리 정해 두었습니다.",
     dialogue: [{ speaker: "Priya", en: "Just to let you know, I'm vegetarian. I hope that's not a problem for dinner.", ko: "참고로 저는 채식주의자예요. 저녁 식사에 문제가 안 되면 좋겠어요." }],
     promptKo: "전혀 문제없어요. 채식 메뉴가 많은 식당으로 예약해 뒀어요.",
-    segments: ["전혀 문제없어요.", "저는 예약해 뒀어요", "식당을", "(그 식당은) 가지고 있다", "채식 메뉴를 많이"],
+    segments: ["전혀 문제없어요", "식당을 예약해 뒀어요", "채식 메뉴가 많은 곳으로요"],
     reference: "No problem at all. I've booked a restaurant that has a lot of vegetarian dishes.",
     accepted: [
       "Not a problem at all. I've booked a restaurant that has lots of vegetarian dishes.",

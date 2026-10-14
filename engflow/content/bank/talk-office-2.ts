@@ -401,7 +401,7 @@ export const TALK_OFFICE_2: Question[] = [
     contextKo: "말레이시아 고객사 탄 사장님께 보낼 제안서 초안을 거의 다 썼습니다. 보내기 전에 지수 씨에게 한번 봐 달라고 부탁합니다.",
     dialogue: [{ speaker: "Jisoo", en: "How's the proposal for Mr. Tan going?", ko: "탄 사장님께 보낼 제안서는 어떻게 돼 가요?" }],
     promptKo: "거의 다 했어요. 제 초안 좀 한번 봐 줄 수 있어요?",
-    segments: ["거의 다 했어요.", "~해 줄 수 있어요?", "한번 (빠르게) 보다", "제 초안을"],
+    segments: ["거의 다 했어요.", "한번 봐 줄 수 있어요", "제 초안?"],
     reference: "Almost done. Could you take a quick look at my draft?",
     accepted: [
       "Almost done. Could you take a look at my draft?",
@@ -447,7 +447,7 @@ export const TALK_OFFICE_2: Question[] = [
     contextKo: "김 팀장님이 회의 전에 최신 벤더 목록을 보고 싶어 하신다고 지수 씨가 알려 줍니다. 그런데 파일이 어디 있는지 모릅니다.",
     dialogue: [{ speaker: "Jisoo", en: "Ms. Kim wants the updated vendor list before the meeting.", ko: "김 팀장님이 회의 전에 최신 벤더 목록을 보고 싶어 하세요." }],
     promptKo: "알겠어요. 그게 공유 드라이브 어디에 있는지 알아요?",
-    segments: ["알겠어요.", "당신은 알아요?", "어디에", "그것이 있는지", "공유 드라이브에서"],
+    segments: ["알겠어요.", "그게 어디 있는지 알아요", "공유 드라이브에서?"],
     reference: "Okay. Do you know where it is on the shared drive?",
     accepted: [
       "Okay. Do you know where it's saved on the shared drive?",
@@ -488,7 +488,7 @@ export const TALK_OFFICE_2: Question[] = [
     contextKo: "부디 씨가 오늘 오후 인도 벤더 프리야 씨에게 납기일 변경 건으로 메일을 보낸다고 합니다. 내용을 같이 알고 싶습니다.",
     dialogue: [{ speaker: "Budi", en: "I'll email Priya about the new delivery date this afternoon.", ko: "오늘 오후에 프리야 씨한테 새 납기일 건으로 메일 보낼게요." }],
     promptKo: "좋아요. 그 메일에 저도 참조로 넣어 줄 수 있어요?",
-    segments: ["좋아요.", "~해 줄 수 있어요?", "저를 참조로 넣다", "그 이메일에"],
+    segments: ["좋아요. 저도 참조로 넣어 줄 수 있어요", "그 메일에?"],
     reference: "Great. Could you cc me on that email?",
     accepted: [
       "Great. Can you cc me on that email?",
@@ -721,7 +721,7 @@ export const TALK_OFFICE_2: Question[] = [
     contextKo: "전사 안전 교육에서 안전팀 준 씨가 옆자리에 앉았습니다. 엘리베이터에서 자주 마주쳤지만 인사를 나눈 적은 없습니다.",
     dialogue: [{ speaker: "Jun (safety team)", en: "Hi! I think I see you in the elevator almost every morning.", ko: "안녕하세요! 거의 매일 아침 엘리베이터에서 뵙는 것 같아요." }],
     promptKo: "맞아요! 우리 인사는 처음 하는 것 같네요. 저는 공정팀 민수예요. 만나서 반가워요.",
-    segments: ["맞아요!", "제 생각에 ~ 않은 것 같아요", "우리가 인사한 적 있다.", "저는 민수예요", "공정팀의.", "만나서 반가워요."],
+    segments: ["맞아요!", "우리 처음 인사하는 것 같네요.", "저는 공정팀 민수예요.", "만나서 반가워요."],
     reference: "Yes! I don't think we've met. I'm Minsu from the process team. Nice to meet you.",
     accepted: [
       "Yes! I don't think we've met before. I'm Minsu from the process team. Nice to meet you.",

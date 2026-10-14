@@ -222,7 +222,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "출장 중 저녁 식사 자리에서 부디 씨가 요즘 하는 운동이 있는지 묻습니다. 당신은 최근 등산에 재미를 붙였습니다.",
     dialogue: [{ speaker: "Budi", en: "You look really healthy these days, Minsu. Do you play any sports?", ko: "민수 씨 요즘 정말 건강해 보여요. 하는 운동 있어요?" }],
     promptKo: "딱히 없는데, 요즘 등산에 재미를 붙였어요.",
-    segments: ["딱히 없지만,", "저는 ~에 빠져 왔어요", "등산에", "최근에"],
+    segments: ["딱히 없는데,", "요즘 등산에 재미를 붙였어요"],
     reference: "Not really, but I've been getting into hiking lately.",
     accepted: [
       "Not really, but I've been getting into hiking recently.",
@@ -263,7 +263,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "쉬는 시간에 인도 협력사의 프리야 씨가 아이 사진을 보여 주며 아이가 있는지 묻습니다. 당신에게는 일곱 살 딸과 네 살 아들이 있습니다.",
     dialogue: [{ speaker: "Priya", en: "This is a photo of my twins. Do you have any kids, Minsu?", ko: "우리 쌍둥이 사진이에요. 민수 씨는 아이가 있어요?" }],
     promptKo: "네, 일곱 살 딸이랑 네 살 아들이 있어요.",
-    segments: ["네,", "저는 있어요", "일곱 살짜리 딸과", "네 살짜리 아들이"],
+    segments: ["네, 아이가 있어요", "일곱 살짜리 딸과", "네 살짜리 아들이요"],
     reference: "Yes, I have a seven-year-old daughter and a four-year-old son.",
     accepted: [
       "Yes, I have a 7-year-old daughter and a 4-year-old son.",
@@ -305,7 +305,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "인도네시아와 한국의 축구 경기가 열린 다음 날 아침, 부디 씨가 경기를 봤는지 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "Did you watch the football match last night? Indonesia against Korea!", ko: "어젯밤 축구 경기 봤어요? 인도네시아 대 한국이요!" }],
     promptKo: "네, 봤어요! 경기가 너무 흥미진진해서 끝나고 잠이 안 오더라고요.",
-    segments: ["네, 봤어요!", "경기가 너무 흥미진진해서", "저는 잠을 잘 수 없었어요", "끝난 후에"],
+    segments: ["네, 봤어요!", "경기가 너무 흥미진진해서", "끝나고 잠이 안 왔어요"],
     reference: "Yes, I did! The match was so exciting that I couldn't sleep afterwards.",
     accepted: [
       "Yes! I was so excited that I couldn't sleep afterwards.",
@@ -386,7 +386,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "1년 만에 유럽 라이선서의 다니엘 씨와 화상회의를 합니다. 그가 그동안 어떻게 지냈는지 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "Minsu! It's been ages. What have you been up to?", ko: "민수 씨! 정말 오랜만이에요. 그동안 어떻게 지냈어요?" }],
     promptKo: "별일 없었어요, 그냥 일 때문에 바빴어요. 3월부터 새 프로젝트를 하고 있거든요.",
-    segments: ["별일 없었어요,", "그냥 일로 바빴어요.", "저는 ~해 오고 있어요", "새 프로젝트를", "3월부터"],
+    segments: ["별일 없었어요, 그냥 일로 바빴어요", "새 프로젝트를 하고 있어요", "3월부터요"],
     reference: "Not much, just busy with work. I've been working on a new project since March.",
     accepted: [
       "Not much, I've just been busy with work. I've been working on a new project since March.",
@@ -467,7 +467,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "재택근무 중인 당신의 화면 뒤로 고양이가 지나가자, 린 씨가 재택근무가 마음에 드는지 묻습니다.",
     dialogue: [{ speaker: "Linh", en: "Oh, is that your cat? Do you like working from home?", ko: "어머, 고양이예요? 재택근무는 마음에 들어요?" }],
     promptKo: "편하긴 한데, 솔직히 집에서는 가끔 집중하기가 어려워요.",
-    segments: ["그것은 편해요,", "하지만 솔직히 말하면", "저는 가끔 ~라고 느껴요", "집중하는 것이 어렵다", "집에서"],
+    segments: ["편하긴 한데,", "솔직히 가끔 집중하기가 어려워요", "집에서는요"],
     reference: "It's convenient, but to be honest, I sometimes find it hard to focus at home.",
     accepted: [
       "It's convenient, but to be honest, I sometimes find it difficult to focus at home.",
@@ -510,7 +510,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "점심 식사 중 인도 협력사의 프리야 씨가 한국 남자들은 모두 군대에 가야 하는지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "Is it true that all Korean men have to do military service?", ko: "한국 남자들은 모두 군 복무를 해야 한다는 게 사실이에요?" }],
     promptKo: "네, 대부분의 남자들에게 의무예요. 저는 대학 졸업 후에 2년 정도 복무했어요.",
-    segments: ["네,", "그것은 요구돼요 (의무예요)", "대부분의 남자들에게", "저는 복무했어요", "약 2년 동안", "대학 졸업 후에"],
+    segments: ["네, 대부분의 남자들에게 의무예요", "저는 2년 정도 복무했어요", "대학 졸업 후에요"],
     reference: "Yes, it's required for most men. I served for about two years after university.",
     accepted: [
       "Yes, it's mandatory for most men. I served for about two years after university.",
@@ -553,7 +553,7 @@ export const TALK_SMALLTALK_2: Question[] = [
     contextKo: "다니엘 씨가 오늘 새벽 서울에 도착해 바로 사무실에 왔습니다. 많이 피곤해 보입니다.",
     dialogue: [{ speaker: "Daniel", en: "Sorry, I'm a bit slow today. I only landed at five this morning.", ko: "미안해요, 오늘 좀 정신이 없네요. 오늘 새벽 5시에야 도착했거든요." }],
     promptKo: "그렇게 긴 비행 뒤라 정말 피곤하시겠어요. 호텔로 돌아가서 좀 쉬시는 게 어때요?",
-    segments: ["당신은 분명 지쳤겠어요", "그렇게 긴 비행 후에", "~하는 게 어때요", "호텔로 돌아가다", "그리고 좀 쉬다"],
+    segments: ["정말 피곤하시겠어요", "그렇게 긴 비행 뒤라", "호텔로 돌아가서", "좀 쉬시는 게 어때요?"],
     reference: "You must be exhausted after such a long flight. Why don't you go back to the hotel and get some rest?",
     accepted: [
       "You must be really tired after such a long flight. Why don't you go back to the hotel and get some rest?",

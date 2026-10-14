@@ -68,7 +68,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Daniel", en: "Thank you! And sorry for the wait. My flight was an hour late.", ko: "고마워요! 그리고 기다리게 해서 미안해요. 비행기가 한 시간 늦었어요." },
     ],
     promptKo: "괜찮아요. 긴 비행 끝이라 피곤하시겠어요.",
-    segments: ["괜찮아요.", "당신은 분명 피곤하겠어요", "~ 뒤라서", "긴 비행"],
+    segments: ["괜찮아요.", "긴 비행 끝이라 피곤하시겠어요"],
     reference: "No problem. You must be tired after the long flight.",
     accepted: [
       "No problem. You must be tired after such a long flight.",
@@ -160,7 +160,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Daniel", en: "Yes, just this suitcase. Should we get a taxi?", ko: "네, 이 가방 하나예요. 택시 타야 하나요?" },
     ],
     promptKo: "아니요, 그럴 필요 없어요. 제 차를 가져왔어요. 바로 앞에 주차되어 있어요.",
-    segments: ["필요 없어요.", "저는 가져왔어요", "제 차를.", "그것은 주차되어 있어요", "바로 밖에"],
+    segments: ["괜찮아요, 필요 없어요.", "제 차를 가져왔어요.", "바로 밖에 주차돼 있어요"],
     reference: "No need. I brought my car. It's parked right outside.",
     accepted: [
       "No need. I brought my car, and it's parked right outside.",
@@ -250,7 +250,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
     contextKo: "자카르타 출장 첫날 밤, 호텔 프런트에 도착했습니다. 예약은 '김민수' 이름으로 되어 있습니다.",
     dialogue: [{ speaker: "Receptionist", en: "Good evening, sir. Welcome to our hotel. How can I help you?", ko: "안녕하세요, 손님. 저희 호텔에 오신 걸 환영합니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 체크인하려고요. 김민수 이름으로 예약했어요.",
-    segments: ["안녕하세요,", "저는 ~하고 싶어요", "체크인하다.", "저는 예약이 있어요", "김민수 이름으로"],
+    segments: ["안녕하세요,", "체크인하고 싶어요.", "김민수 이름으로 예약했어요"],
     reference: "Hi, I'd like to check in, please. I have a reservation under Minsu Kim.",
     accepted: [
       "Hi, I'd like to check in. I have a reservation under the name Minsu Kim.",
@@ -438,7 +438,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
     contextKo: "자카르타 팀의 사리 씨가 2주 동안 서울 본사에 와 있습니다. 월요일 오전 커피 브레이크에 주말을 어떻게 보냈는지 묻습니다. 당신은 가족과 강릉에 다녀왔습니다.",
     dialogue: [{ speaker: "Sari", en: "Morning, Minsu! How was your weekend?", ko: "좋은 아침이에요, 민수 씨! 주말 어땠어요?" }],
     promptKo: "꽤 좋았어요. 가족 데리고 강릉에 다녀왔어요. 사리 씨는요?",
-    segments: ["꽤 좋았어요, 고마워요.", "저는 데려갔어요", "제 가족을", "강릉에.", "당신은요?"],
+    segments: ["꽤 좋았어요, 고마워요.", "가족이랑 강릉에 다녀왔어요.", "당신은요?"],
     reference: "Pretty good, thanks. I took my family to Gangneung. How about you?",
     accepted: [
       "Pretty good, thanks. I took my family to Gangneung. What about you?",
@@ -526,7 +526,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Sari", en: "It was. But to be honest, I'm a little homesick. I really miss my kids.", ko: "좋았어요. 그런데 솔직히 집이 좀 그리워요. 아이들이 너무 보고 싶어요." },
     ],
     promptKo: "그 마음 알 것 같아요. 아이들과 떨어져 있는 게 힘드시겠어요.",
-    segments: ["그 마음 알 것 같아요.", "(그것은) 분명 힘들겠어요", "떨어져 있는 것은", "당신 아이들과"],
+    segments: ["그 마음 알 것 같아요.", "분명 힘드시겠어요", "아이들과 떨어져 있는 게"],
     reference: "I can imagine. It must be hard to be away from your kids.",
     accepted: [
       "I can imagine. It must be hard being away from your kids.",
@@ -671,7 +671,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Linh", en: "Maybe some shopping. And I'd really like to try Korean street food.", ko: "쇼핑을 좀 하고 싶어요. 그리고 한국 길거리 음식을 꼭 먹어 보고 싶어요." },
     ],
     promptKo: "그럼 명동에 가요. 쇼핑이랑 길거리 음식으로 유명한 곳이에요.",
-    segments: ["그럼", "가요", "명동에.", "그곳은 유명해요", "쇼핑과 길거리 음식으로"],
+    segments: ["그럼 명동에 가요.", "거긴 유명해요", "쇼핑이랑 길거리 음식으로"],
     reference: "Then let's go to Myeongdong. It's famous for shopping and street food.",
     accepted: [
       "Then let's go to Myeongdong. It's known for shopping and street food.",
@@ -804,7 +804,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
     contextKo: "서울에 온 말레이시아 고객사의 탄 씨와 팀 회식 자리입니다. 탄 씨가 메뉴 고르기를 맡기자, 주문하기 전에 못 먹는 음식이 있는지 확인하려고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "The pictures all look good, but I can't read the menu. Could you order for us, Minsu?", ko: "사진은 다 맛있어 보이는데 메뉴를 못 읽겠어요. 민수 씨가 주문해 줄래요?" }],
     promptKo: "물론이죠. 주문하기 전에요, 혹시 안 드시는 음식 있으세요?",
-    segments: ["물론이죠.", "제가 주문하기 전에,", "~이 있나요", "무언가", "당신이 먹지 않는?"],
+    segments: ["물론이죠.", "주문하기 전에요,", "혹시 안 드시는 음식 있으세요?"],
     reference: "Of course. Before I order, is there anything you don't eat?",
     accepted: [
       "Sure. Before I order, is there anything you don't eat?",
@@ -849,7 +849,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Mr. Tan", en: "I eat almost everything. But I'm not very good with spicy food.", ko: "거의 다 먹어요. 그런데 매운 음식은 잘 못 먹어요." },
     ],
     promptKo: "알겠어요. 그럼 안 매운 요리로 주문할게요.",
-    segments: ["알겠어요.", "그럼", "제가 주문할게요", "요리들을", "(그 요리들은) 맵지 않은"],
+    segments: ["알겠어요.", "그럼 주문할게요", "안 매운 요리로"],
     reference: "Got it. Then I'll order some dishes that aren't spicy.",
     accepted: [
       "Okay. Then I'll order some dishes that aren't spicy.",
@@ -1071,7 +1071,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Budi", en: "Okay, everyone, quiet, please! Minsu is going to say a few words.", ko: "자, 여러분, 조용히 해 주세요! 민수 씨가 한마디 하겠습니다." },
     ],
     promptKo: "우선, 올 한 해 고생해 주신 여러분 모두께 감사드립니다.",
-    segments: ["우선,", "감사합니다", "여러분 모두", "여러분의 수고에 대해", "올 한 해"],
+    segments: ["우선, 모두 감사드려요", "올 한 해 수고해 주셔서"],
     reference: "First of all, thank you all for your hard work this year.",
     accepted: [
       "First of all, thank you all for all your hard work this year.",
@@ -1162,7 +1162,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Budi", en: "So, are we going to work together again on the next project?", ko: "그럼 다음 프로젝트에서도 같이 일하는 거죠?" },
     ],
     promptKo: "그러길 바라요! 다음 프로젝트에서도 여러분과 다시 함께 일하길 정말 기대하고 있어요. 건배!",
-    segments: ["그러길 바라요!", "저는 정말 기대하고 있어요", "여러분 모두와 다시 일하는 것을", "다음 프로젝트에서.", "건배!"],
+    segments: ["그러길 바라요!", "정말 기대하고 있어요", "여러분과 다음 프로젝트에서 다시 일하길.", "건배!"],
     reference: "I hope so! I'm really looking forward to working with you all again on the next project. Cheers!",
     accepted: [
       "I hope so! I'm really looking forward to working with all of you again on the next project. Cheers!",
@@ -1333,7 +1333,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Priya", en: "That sounds wonderful! I don't know the exact dates yet, though.", ko: "정말 좋아요! 그런데 아직 정확한 날짜는 몰라요." },
     ],
     promptKo: "괜찮아요. 날짜가 확정되면 알려 주세요. 그럼 제가 좋은 식당을 예약해 둘게요.",
-    segments: ["괜찮아요.", "그냥 저에게 알려 주세요", "당신 날짜를", "그것이 확정되면,", "그러면 제가 예약할게요", "좋은 식당을"],
+    segments: ["괜찮아요.", "날짜가 확정되면 알려 주세요,", "그럼 좋은 식당을 예약해 둘게요"],
     reference: "No problem. Just let me know your dates once they're confirmed, and I'll book a nice restaurant.",
     accepted: [
       "No problem. Just let me know your dates when they're confirmed, and I'll book a nice restaurant.",
@@ -1378,7 +1378,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
     contextKo: "쿠알라룸푸르 출장 중, 탄 씨 팀을 금요일 저녁에 대접하려고 호텔 근처 식당에 전화를 겁니다. 모두 6명입니다.",
     dialogue: [{ speaker: "Restaurant staff", en: "Good afternoon, Riverside Grill. How can I help you?", ko: "안녕하세요, 리버사이드 그릴입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 금요일 저녁에 6명 자리 예약하고 싶어요.",
-    segments: ["안녕하세요,", "저는 예약하고 싶어요", "테이블을", "6명을 위한", "금요일 저녁에"],
+    segments: ["안녕하세요, 자리 예약하고 싶어요", "6명이요", "금요일 저녁에요"],
     reference: "Hi, I'd like to book a table for six on Friday evening.",
     accepted: [
       "Hi, I'd like to book a table for six people on Friday evening.",
@@ -1513,7 +1513,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Restaurant staff", en: "Yes, seven is fine. So that's a table for six at seven on Friday evening.", ko: "네, 7시 괜찮습니다. 그럼 금요일 저녁 7시에 6명으로 해 드릴게요." },
     ],
     promptKo: "아, 그런데 7시 반으로 바꿀 수 있을까요? 동료 몇 명이 좀 늦을지도 몰라서요.",
-    segments: ["아, 그런데(사실은),", "우리가 ~할 수 있을까요", "7시 반으로 하다", "대신에?", "제 동료들 중 몇 명이", "조금 늦을지도 몰라요"],
+    segments: ["그런데 혹시 대신 7시 반으로 할 수 있을까요?", "동료 몇 명이 좀 늦을지도 몰라서요"],
     reference: "Actually, could we make it seven thirty instead? Some of my colleagues might be a little late.",
     accepted: [
       "Actually, could we make it 7:30 instead? Some of my colleagues might be a little late.",
@@ -1599,7 +1599,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Budi", en: "Thanks! And that's not all. My wife and I are expecting our first baby in March!", ko: "고마워요! 그게 다가 아니에요. 3월에 저희 첫아이가 태어나요!" },
     ],
     promptKo: "정말요? 정말 좋은 소식이네요! 아들인지 딸인지 알아요?",
-    segments: ["정말요?", "정말 좋은 소식이네요!", "당신은 알아요", "~인지", "그것이 아들인지 딸인지?"],
+    segments: ["정말요?", "정말 좋은 소식이네요!", "아들인지 딸인지 알아요?"],
     reference: "Really? That's wonderful news! Do you know if it's a boy or a girl?",
     accepted: [
       "Really? That's wonderful news! Do you know whether it's a boy or a girl?",
@@ -1644,7 +1644,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Budi", en: "It's a girl! But to be honest, I'm a little nervous. A new job and a new baby at the same time!", ko: "딸이에요! 그런데 솔직히 좀 긴장돼요. 새 직책에 첫아이까지 한꺼번에요!" },
     ],
     promptKo: "당연한 거예요. 저도 아들이 태어났을 때 똑같은 기분이었어요.",
-    segments: ["그건 정말 당연해요.", "저도 느꼈어요", "똑같은 기분을", "~했을 때", "제 아들이 태어났다"],
+    segments: ["그건 정말 당연해요.", "저도 똑같은 기분이었어요", "아들이 태어났을 때"],
     reference: "That's totally normal. I felt the same way when my son was born.",
     accepted: [
       "That's completely normal. I felt the same way when my son was born.",
@@ -1690,7 +1690,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Budi", en: "Really? That makes me feel a lot better.", ko: "정말요? 그 말을 들으니 훨씬 마음이 놓여요." },
     ],
     promptKo: "다음 달에 제가 자카르타에 가면 같이 축하해요. 저녁은 제가 살게요!",
-    segments: ["축하해요 (같이)", "제가 자카르타에 있을 때", "다음 달에.", "저녁은 제가 살게요!"],
+    segments: ["같이 축하해요", "다음 달 제가 자카르타에 가면.", "저녁은 제가 살게요!"],
     reference: "Let's celebrate when I'm in Jakarta next month. Dinner is on me!",
     accepted: [
       "Let's celebrate together when I'm in Jakarta next month. Dinner is on me!",
@@ -1776,7 +1776,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Linh", en: "Thank you. I learned a lot. I'll probably have more questions when I'm back in Hanoi, though.", ko: "고마워요. 많이 배웠어요. 그래도 하노이에 돌아가면 질문이 더 생길 것 같아요." },
     ],
     promptKo: "그럼요. 질문이 생기면 그냥 메일 주세요. 최대한 빨리 답장 드릴게요.",
-    segments: ["그럼요.", "그냥 저에게 이메일을 보내세요", "만약 질문이 있으면,", "그러면 제가 답을 드릴게요", "당신에게", "가능한 한 빨리"],
+    segments: ["그럼요.", "질문 있으면 그냥 메일 주세요,", "최대한 빨리 답장 드릴게요"],
     reference: "Of course. Just send me an email if you have any questions, and I'll get back to you as soon as I can.",
     accepted: [
       "Of course. Just email me if you have any questions, and I'll get back to you as soon as I can.",

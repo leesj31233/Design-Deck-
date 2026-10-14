@@ -322,7 +322,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "베트남 협력사와의 화상회의. 린 씨가 오늘 제어실에서 접속했는데, 목소리가 멀리서 들리는 것처럼 작습니다.",
     dialogue: [{ speaker: "Linh", en: "Can you hear me? I'm joining from the control room today.", ko: "제 목소리 들리세요? 오늘은 제어실에서 접속했어요." }],
     promptKo: "네, 그런데 마이크 쪽으로 조금 더 가까이 와 주시겠어요?",
-    segments: ["네, 그런데", "~해 주시겠어요?", "움직이다", "조금 더 가까이", "마이크 쪽으로"],
+    segments: ["네, 그런데 조금 더 가까이 와 주시겠어요?", "마이크 쪽으로요"],
     reference: "Yes, but could you move a bit closer to your microphone?",
     accepted: [
       "Yes, but could you move a little closer to your microphone?",
@@ -364,7 +364,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "자카르타 팀과 P&ID를 검토하는 화상회의. 화면을 공유했는데, 부디 씨가 라인 번호가 너무 작아서 안 보인다고 합니다.",
     dialogue: [{ speaker: "Budi", en: "Sorry, the line numbers are too small to read on my screen.", ko: "죄송한데, 제 화면에서는 라인 번호가 너무 작아서 안 보여요." }],
     promptKo: "아, 죄송해요. 도면을 확대해 볼게요.",
-    segments: ["아, 죄송해요.", "제가 ~할게요", "확대하다", "도면을"],
+    segments: ["아, 죄송해요", "도면을 확대해 볼게요"],
     reference: "Sorry about that. Let me zoom in on the drawing.",
     accepted: [
       "Sorry about that. I'll zoom in on the drawing.",
@@ -406,7 +406,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "당신이 호스트인 화상회의. 사리 씨가 다니엘 씨가 5분째 대기실에 있다고 알려 줍니다. 입장 요청 알림을 못 봤습니다.",
     dialogue: [{ speaker: "Sari", en: "Minsu, Daniel just messaged me. He's been in the waiting room for five minutes.", ko: "민수 씨, 다니엘 씨한테 방금 메시지가 왔는데, 5분째 대기실에 있대요." }],
     promptKo: "아, 죄송해요. 대기실에 계신 걸 못 봤어요.",
-    segments: ["아, 죄송해요.", "저는 못 봤어요", "그를", "대기실에서"],
+    segments: ["아, 죄송해요", "대기실에 계신 걸 못 봤어요"],
     reference: "Oh, sorry. I didn't see him in the waiting room.",
     accepted: [
       "Sorry, I didn't see him in the waiting room.",
@@ -447,7 +447,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "자카르타 팀과의 긴 설계 검토 화상회의. 거의 두 시간째 쉬지 않고 회의 중이라 다들 지쳐 보입니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "We've been going for almost two hours. How is everyone doing?", ko: "거의 두 시간째 하고 있네요. 다들 괜찮으세요?" }],
     promptKo: "다들 좀 지친 것 같으니까 10분 쉬었다 하죠.",
-    segments: ["제 생각에", "모두가 좀 지쳤어요", "그러니까", "~하죠", "갖다", "10분 휴식을"],
+    segments: ["다들 좀 지친 것 같으니까", "10분 쉬었다 하죠"],
     reference: "I think everyone's a bit tired, so let's take a ten-minute break.",
     accepted: [
       "I think everyone is a bit tired, so let's take a ten-minute break.",
@@ -492,7 +492,7 @@ export const TALK_ONLINE_3: Question[] = [
       { speaker: "Budi", en: "No, you go first, Sari.", ko: "아니에요, 사리 씨 먼저 하세요." },
     ],
     promptKo: "약간 지연이 있으니까, 한 사람씩 말하도록 해 보죠.",
-    segments: ["약간의 지연이 있어요", "그러니까", "~해 보죠", "말하다", "한 사람씩"],
+    segments: ["약간 지연이 있으니까", "한 사람씩 말해 보죠"],
     reference: "There's a bit of a delay, so let's try to speak one at a time.",
     accepted: [
       "There's a slight delay, so let's try to speak one at a time.",
@@ -533,7 +533,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "거의 30명이 참석한 프로젝트 전체 화상회의. 김 부장님이 질문이 동시에 나오면 정신없을 거라고 걱정합니다. 진행자인 당신이 안내합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "There are almost thirty people on this call. Questions could get a bit messy.", ko: "이 회의에 거의 30명이 있어요. 질문이 좀 정신없을 수도 있겠네요." }],
     promptKo: "질문이 있으시면 '손 들기' 버튼을 이용해 주세요.",
-    segments: ["~하면", "여러분이 질문이 있다", "~해 주세요", "이용하다", "손 들기 버튼을"],
+    segments: ["질문이 있으시면", "손 들기 버튼을 이용해 주세요"],
     reference: "If you have a question, please use the raise hand button.",
     accepted: [
       "If you have a question, please raise your hand.",
@@ -574,7 +574,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "말레이시아 고객과의 화상회의. 출장지 호텔 와이파이가 약해서 당신 영상이 계속 멈추고 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Minsu, your video keeps freezing. I can only see half of your face.", ko: "민수 씨, 영상이 계속 멈춰요. 얼굴이 반만 보이네요." }],
     promptKo: "죄송해요. 계속 멈추면 음성으로만 할게요.",
-    segments: ["죄송해요.", "~하면", "그게 계속 멈추다", "제가 바꿀게요", "음성으로만"],
+    segments: ["죄송해요", "계속 멈추면", "음성으로만 할게요"],
     reference: "Sorry about that. If it keeps freezing, I'll switch to audio only.",
     accepted: [
       "Sorry. If it keeps freezing, I'll switch to audio only.",
@@ -616,7 +616,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "인도 벤더 프리야 씨가 회의에 들어오지 못하고 전화를 했습니다. 지난주 회의 링크를 누른 것 같아서, 방금 새 초대장을 다시 보냈습니다.",
     dialogue: [{ speaker: "Priya", en: "The link in my calendar isn't working. It says the meeting has ended.", ko: "캘린더에 있는 링크가 안 돼요. 회의가 끝났다고 나와요." }],
     promptKo: "죄송해요, 그건 예전 링크예요. 방금 새 초대장을 보내 드렸어요.",
-    segments: ["죄송해요,", "그건 예전 링크예요.", "제가 방금 보냈어요", "당신에게", "새 초대장을"],
+    segments: ["죄송해요, 그건 예전 링크예요", "방금 새 초대장을", "보내 드렸어요"],
     reference: "Sorry, that's the old link. I've just sent you a new invitation.",
     accepted: [
       "Sorry, that's the old link. I've just sent you a new invite.",
@@ -700,7 +700,7 @@ export const TALK_ONLINE_3: Question[] = [
     contextKo: "베트남 협력사와의 워크숍 화상회의. 소회의실(breakout room)로 나누기 직전에 린 씨가 시간이 끝나면 직접 돌아와야 하는지 묻습니다.",
     dialogue: [{ speaker: "Linh", en: "What happens when the time is up? Do we have to come back by ourselves?", ko: "시간이 다 되면 어떻게 돼요? 저희가 직접 돌아와야 하나요?" }],
     promptKo: "20분이 지나면 자동으로 메인 회의실로 다시 옮겨질 거예요.",
-    segments: ["여러분은 옮겨질 거예요", "다시", "메인 회의실로", "자동으로", "20분 후에"],
+    segments: ["다시 메인 회의실로 옮겨질 거예요", "자동으로", "20분이 지나면"],
     reference: "You'll be moved back to the main room automatically after twenty minutes.",
     accepted: [
       "You'll be automatically moved back to the main room after twenty minutes.",

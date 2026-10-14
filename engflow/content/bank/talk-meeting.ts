@@ -684,7 +684,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "고객과의 화상회의가 예정보다 길어졌습니다. 당신은 곧 다른 회의가 있어서 먼저 나가야 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Let's spend a few more minutes on the layout.", ko: "배치 얘기를 몇 분만 더 하죠." }],
     promptKo: "죄송한데, 다른 회의가 있어서 먼저 나가 봐야 해요.",
-    segments: ["죄송한데,", "저는 ~해야 해요", "(회의에서) 나가다", "다른 회의 때문에"],
+    segments: ["죄송한데, 먼저 나가 봐야 해요", "다른 회의가 있어서요"],
     reference: "Sorry, I have to drop off for another meeting.",
     accepted: [
       "Sorry, I need to drop off for another meeting.",
@@ -728,7 +728,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "화상회의를 마무리하는 중입니다. 이번 회의록은 당신이 정리해서 오늘 퇴근 전까지 보내기로 합니다.",
     dialogue: [{ speaker: "Linh", en: "Who's writing up the minutes this time?", ko: "이번 회의록은 누가 정리하나요?" }],
     promptKo: "제가 할게요. 오늘 업무 끝나기 전까지 회의록을 보내 드릴게요.",
-    segments: ["제가 할게요.", "제가 보낼게요", "회의록을", "오늘 업무가 끝나기 전까지"],
+    segments: ["제가 할게요.", "회의록을 보내 드릴게요", "오늘 업무 끝나기 전까지요"],
     reference: "I'll do it. I'll send out the minutes by the end of the day.",
     accepted: [
       "I'll do it. I'll send the minutes by the end of the day.",
@@ -773,7 +773,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "당신이 건조기를 공장 북쪽에 두자고 제안했는데, Sari 씨가 그쪽은 우기에 물에 잠긴다고 지적합니다. 미처 생각하지 못한 점입니다.",
     dialogue: [{ speaker: "Sari", en: "But the north side floods in the rainy season. The dryer would be standing in water.", ko: "그런데 북쪽은 우기에 물에 잠겨요. 건조기가 물속에 서 있게 될 거예요." }],
     promptKo: "좋은 지적이네요. 그건 생각하지 못했어요.",
-    segments: ["그건 ~이네요", "좋은 지적", "저는 생각하지 못했어요", "그것을"],
+    segments: ["좋은 지적이네요.", "그건 생각하지 못했어요"],
     reference: "That's a fair point. I hadn't thought of that.",
     accepted: [
       "That's a fair point. I didn't think of that.",
@@ -815,7 +815,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "인도네시아 현장과의 화상회의. 부디 씨의 목소리가 계속 끊겨서 잘 들리지 않습니다. 카메라를 끄면 나아질 것 같습니다.",
     dialogue: [{ speaker: "Budi", en: "So the… pressure… we… on Monday… and then…", ko: "그래서 그… 압력이… 우리가… 월요일에… 그리고…" }],
     promptKo: "부디 씨, 소리가 끊겨요. 카메라를 꺼 주실 수 있어요?",
-    segments: ["부디 씨,", "소리가 끊기고 있어요.", "~해 주실 수 있어요?", "끄다", "카메라를"],
+    segments: ["부디 씨, 소리가 끊겨요.", "카메라를 꺼 주실 수 있어요?"],
     reference: "Budi, you're breaking up. Could you turn off your camera?",
     accepted: [
       "Budi, you're breaking up. Could you turn your camera off?",
@@ -861,7 +861,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "고객사 엔지니어들 앞에서 파일럿 결과 발표를 시작합니다. 발표 중 언제든지 질문해도 된다고 말하고 싶습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Okay, Minsu, the floor is yours.", ko: "자, 민수 씨, 시작하세요." }],
     promptKo: "감사합니다. 발표 중에 언제든지 편하게 질문해 주세요.",
-    segments: ["감사합니다.", "편하게 ~하세요", "질문하다", "언제든지", "발표 중에"],
+    segments: ["감사합니다.", "언제든지 편하게 질문해 주세요", "발표 중에요"],
     reference: "Thank you. Feel free to ask questions at any time during the presentation.",
     accepted: [
       "Thank you. Please feel free to ask questions at any time during the presentation.",
@@ -905,7 +905,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "당신이 진행하는 회의. 첫 번째 안건(펌프 선정) 논의가 끝나 갑니다. 다음 안건으로 넘어가기 전에 더 할 말이 있는지 확인합니다.",
     dialogue: [{ speaker: "Priya", en: "So that's our proposal for the pumps.", ko: "그래서 이게 펌프에 대한 저희 제안이에요." }],
     promptKo: "감사합니다, Priya 씨. 다음으로 넘어가기 전에 덧붙일 말씀 있으신 분 계세요?",
-    segments: ["감사합니다, Priya 씨.", "누구든 있나요", "덧붙일 것이", "~하기 전에", "우리가 넘어가다"],
+    segments: ["감사합니다, Priya 씨.", "덧붙일 말씀 있으신 분 계세요?", "다음으로 넘어가기 전에요"],
     reference: "Thanks, Priya. Does anyone have anything to add before we move on?",
     accepted: [
       "Thanks, Priya. Does anyone have anything else to add before we move on?",
@@ -950,7 +950,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "라이선서 Daniel 씨가 우기에는 원료 수분이 훨씬 높아진다고 설명합니다. 결국 건조기가 더 커야 한다는 뜻인지 확인하고 싶습니다.",
     dialogue: [{ speaker: "Daniel", en: "In the rainy season, the feed moisture can go up to sixty percent. Your current dryer was sized for forty-five.", ko: "우기에는 원료 수분이 60%까지 올라갈 수 있어요. 지금 건조기는 45% 기준으로 설계됐고요." }],
     promptKo: "그러니까 말씀하시는 건, 저희에게 더 큰 건조기가 필요하다는 거죠?",
-    segments: ["그러니까", "당신이 말하는 것은", "~라는 거죠", "우리는 필요하다", "더 큰 건조기가"],
+    segments: ["그러니까 말씀하시는 건,", "저희에게 더 큰 건조기가 필요하다는 거죠?"],
     reference: "So what you're saying is that we need a bigger dryer?",
     accepted: [
       "So what you're saying is we need a bigger dryer?",
@@ -992,7 +992,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "화상회의 종료 시간이 됐는데 배관 경로 논의가 아직 끝나지 않았습니다. Daniel 씨가 목요일에 복귀하니 그때 이어서 하자고 합니다.",
     dialogue: [{ speaker: "Sari", en: "We still haven't agreed on the pipe routing, and it's already twelve.", ko: "아직 배관 경로에 대해 합의를 못 했는데, 벌써 12시네요." }],
     promptKo: "그럼 Daniel 씨가 돌아오는 목요일에 이 얘기를 이어서 하죠.",
-    segments: ["~하죠", "이 얘기를 이어서 하다", "목요일에", "~할 때", "Daniel 씨가 돌아오다"],
+    segments: ["이 얘기는 목요일에 이어서 하죠", "Daniel 씨가 돌아오면요"],
     reference: "Let's pick this up on Thursday, when Daniel is back.",
     accepted: [
       "Let's pick this up again on Thursday, when Daniel is back.",
@@ -1125,7 +1125,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "고객사 앞에서 발표와 질의응답을 마쳤습니다. 더 질문이 없으면 회의 진행자인 김 부장님께 진행을 다시 넘기려 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Thank you, Minsu. That answers my question.", ko: "고마워요, 민수 씨. 궁금한 게 해결됐어요." }],
     promptKo: "감사합니다. 더 질문이 없으시면, 김 부장님께 다시 넘기겠습니다.",
-    segments: ["감사합니다.", "만약 ~이 없으면", "더 이상의 질문이", "제가 넘기겠습니다", "다시", "김 부장님께"],
+    segments: ["감사합니다.", "더 질문이 없으시면,", "김 부장님께 다시 넘기겠습니다"],
     reference: "Thank you. If there are no more questions, I'll hand it back to Ms. Kim.",
     accepted: [
       "Thank you. If there are no further questions, I'll hand it back to Ms. Kim.",
@@ -1168,7 +1168,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "화상회의에서 펌프 씰 재질 변경을 30분째 논의 중인데, 벤더 쪽 Priya 씨는 아직 한마디도 하지 않았습니다. 의견을 듣고 싶습니다.",
     dialogue: [{ speaker: "Budi", en: "So we're all fine with the new seal material?", ko: "그럼 새 씰 재질로 다들 괜찮은 거죠?" }],
     promptKo: "Priya 씨, 아직 의견을 못 들었네요. 덧붙이고 싶은 거 있으세요?",
-    segments: ["Priya 씨,", "우리는 아직 듣지 못했어요", "당신에게서", "있나요", "뭔가", "당신이 덧붙이고 싶은"],
+    segments: ["Priya 씨, 아직 의견을 못 들었네요.", "덧붙이고 싶은 거 있으세요?"],
     reference: "Priya, we haven't heard from you yet. Is there anything you'd like to add?",
     accepted: [
       "Priya, we haven't heard from you yet. Is there anything you would like to add?",
@@ -1213,7 +1213,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "두 공급업체 안을 비교한 결과, 대부분 B안을 선호하는 분위기입니다. 반대가 없으면 B안으로 결정하려 합니다.",
     dialogue: [{ speaker: "Linh", en: "Option B is a bit more expensive, but the delivery time is much shorter.", ko: "B안이 조금 더 비싸지만 납기가 훨씬 짧아요." }],
     promptKo: "반대하시는 분이 없으면, B안으로 가죠.",
-    segments: ["만약 ~이 없으면", "아무도", "반대 의견을 가지다", "~하죠", "B안으로 가다"],
+    segments: ["반대하시는 분이 없으면,", "B안으로 가죠"],
     reference: "If nobody has any objections, let's go with Option B.",
     accepted: [
       "If no one has any objections, let's go with Option B.",
@@ -1302,7 +1302,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "Budi 씨가 지난 회의에서 이미 결정한 탱크 재질 문제를 다시 꺼냅니다. 이미 다룬 내용이니 다음 안건인 예산으로 넘어가고 싶습니다.",
     dialogue: [{ speaker: "Budi", en: "Sorry, can we talk about the tank material again? I'm still not sure about stainless steel.", ko: "죄송한데, 탱크 재질 얘기를 다시 할 수 있을까요? 스테인리스강이 아직 확신이 안 서요." }],
     promptKo: "그건 이미 다룬 것 같아요. 괜찮으시면 예산 안건으로 넘어가죠.",
-    segments: ["제 생각에", "우리는 이미 다뤘어요", "그것을.", "괜찮으시면,", "넘어가죠", "예산 (안건)으로"],
+    segments: ["그건 이미 다룬 것 같아요.", "괜찮으시면", "예산 안건으로 넘어가죠"],
     reference: "I think we've already covered that. If it's okay, let's move on to the budget.",
     accepted: [
       "I think we've already discussed that. If it's okay, let's move on to the budget.",
@@ -1402,7 +1402,7 @@ export const TALK_MEETING: Question[] = [
     contextKo: "고객사 앞에서 공동 발표 중입니다. 당신이 기술 부분을 마쳤고, 이제 원가 견적을 설명할 Budi 씨에게 넘깁니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Thanks, Minsu. The technical part is clear now.", ko: "고마워요, 민수 씨. 기술 부분은 이제 이해됐어요." }],
     promptKo: "감사합니다. 이제 원가 견적을 설명해 드릴 Budi 씨에게 넘기겠습니다.",
-    segments: ["감사합니다.", "이제", "제가 넘기겠습니다", "Budi 씨에게,", "그는 설명해 드릴 거예요", "원가 견적을"],
+    segments: ["감사합니다.", "이제 Budi 씨에게 넘기겠습니다", "원가 견적을 설명해 드릴 거예요"],
     reference: "Thank you. Now I'll hand over to Budi, who's going to walk you through the cost estimate.",
     accepted: [
       "Thank you. Now I'll hand over to Budi, who will walk you through the cost estimate.",

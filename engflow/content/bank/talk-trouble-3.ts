@@ -391,7 +391,7 @@ export const TALK_TROUBLE_3: Question[] = [
     contextKo: "아침에 고객사 공장 정문에서 경비원이 출입증을 보여 달라고 합니다. 그런데 출입증을 집에 두고 나왔습니다.",
     dialogue: [{ speaker: "Security guard", en: "Good morning. Can I see your ID badge, please?", ko: "안녕하세요. 출입증 좀 보여 주시겠어요?" }],
     promptKo: "죄송해요, 오늘 출입증을 집에 두고 왔어요.",
-    segments: ["죄송해요,", "저는 두고 왔어요", "제 출입증을", "집에", "오늘"],
+    segments: ["죄송해요,", "오늘 출입증을 집에 두고 왔어요"],
     reference: "Sorry, I left my badge at home today.",
     accepted: [
       "I'm sorry, I left my badge at home today.",
@@ -433,7 +433,7 @@ export const TALK_TROUBLE_3: Question[] = [
     contextKo: "회의실에서 사리 씨 노트북 위에 실수로 커피를 쏟았습니다. 사리 씨가 노트북이 안 켜진다고 합니다.",
     dialogue: [{ speaker: "Sari", en: "Oh, my laptop won't turn on now.", ko: "어떡해, 이제 노트북이 안 켜져요." }],
     promptKo: "정말 죄송해요. 수리비는 당연히 제가 낼게요.",
-    segments: ["정말 죄송해요.", "당연히,", "제가 낼게요", "수리 비용을"],
+    segments: ["정말 죄송해요.", "당연히 수리비는 제가 낼게요"],
     reference: "I'm so sorry. Of course, I'll pay for the repair.",
     accepted: [
       "I'm really sorry. I'll pay for the repair, of course.",
@@ -474,7 +474,7 @@ export const TALK_TROUBLE_3: Question[] = [
     contextKo: "베트남 현장의 린 씨에게 보낸 메일에서 이름을 'Lin'으로 잘못 썼습니다. 린 씨가 통화 중에 웃으며 알려 줍니다.",
     dialogue: [{ speaker: "Linh", en: "By the way, my name is spelled L-I-N-H.", ko: "그런데 제 이름 철자는 L-I-N-H예요." }],
     promptKo: "죄송해요, 메일에서 성함 철자를 틀렸네요.",
-    segments: ["죄송해요,", "제가 철자를 틀렸어요", "당신의 이름의", "제 메일에서"],
+    segments: ["죄송해요, 성함 철자를 틀렸어요", "제 메일에서"],
     reference: "Sorry, I misspelled your name in my email.",
     accepted: [
       "I'm sorry, I misspelled your name in my email.",
@@ -646,7 +646,7 @@ export const TALK_TROUBLE_3: Question[] = [
     contextKo: "자카르타 공항에 도착했는데 짐이 오지 않았습니다. 수하물 카운터 직원이 짐이 도착하면 호텔로 보내 주겠다고 합니다. 모레 고객 회의가 있어서 옷이 필요합니다.",
     dialogue: [{ speaker: "Airline agent", en: "We'll deliver your bag to your hotel as soon as it arrives.", ko: "짐이 도착하는 대로 호텔로 보내 드릴게요." }],
     promptKo: "내일까지 가방이 안 오면, 옷을 좀 사고 비용을 돌려받을 수 있나요?",
-    segments: ["만약 제 가방이", "도착하지 않으면", "내일까지,", "제가 살 수 있나요", "옷을 좀", "그리고 비용을 돌려받다?"],
+    segments: ["내일까지 가방이 안 오면,", "옷을 좀 사도 될까요", "그리고 비용을 돌려받을 수 있나요?"],
     reference: "If my bag doesn't arrive by tomorrow, can I buy some clothes and get reimbursed?",
     accepted: [
       "If my bag doesn't arrive by tomorrow, can I buy some clothes and get the money back?",
@@ -689,7 +689,7 @@ export const TALK_TROUBLE_3: Question[] = [
     contextKo: "온라인 쇼핑몰에서 산 헤드폰을 2주 전에 반품했는데, 아직 환불이 들어오지 않았습니다. 고객센터에 전화했습니다.",
     dialogue: [{ speaker: "Customer service", en: "Thank you for calling. How can I help you today?", ko: "전화 주셔서 감사합니다. 무엇을 도와드릴까요?" }],
     promptKo: "2주 전에 헤드폰을 반품했는데, 아직도 환불을 못 받았어요.",
-    segments: ["저는 반품했어요", "헤드폰 하나를", "2주 전에,", "그런데", "저는 아직도 못 받았어요", "제 환불을"],
+    segments: ["헤드폰을 반품했어요", "2주 전에,", "그런데 아직 환불을 못 받았어요"],
     reference: "I returned a pair of headphones two weeks ago, but I still haven't received my refund.",
     accepted: [
       "I returned a pair of headphones two weeks ago, but I still haven't gotten my refund.",
@@ -776,7 +776,7 @@ export const TALK_TROUBLE_3: Question[] = [
     contextKo: "출장을 마치고 호텔에서 체크아웃하는데, 계산서를 보니 화요일 밤 숙박비가 두 번 청구되어 있습니다.",
     dialogue: [{ speaker: "Hotel clerk", en: "Here's your final bill. Is everything okay?", ko: "최종 계산서입니다. 이상 없으신가요?" }],
     promptKo: "죄송한데, 화요일 밤 요금이 두 번 청구된 것 같아요.",
-    segments: ["죄송한데,", "제 생각에", "저는 청구된 것 같아요", "두 번", "화요일 밤에 대해"],
+    segments: ["죄송한데,", "두 번 청구된 것 같아요", "화요일 밤 요금이"],
     reference: "Sorry, I think I've been charged twice for Tuesday night.",
     accepted: [
       "Sorry, I think I was charged twice for Tuesday night.",
@@ -863,7 +863,7 @@ export const TALK_TROUBLE_3: Question[] = [
     contextKo: "지난 메일에 성능 시험을 '미룬다'고 쓰려 했는데, 표현이 애매해서 다니엘 씨가 시험이 취소된 줄 알았습니다.",
     dialogue: [{ speaker: "Daniel", en: "So the performance test has been cancelled? That's a big problem for us.", ko: "그럼 성능 시험이 취소된 건가요? 저희한테는 큰 문제인데요." }],
     promptKo: "죄송해요, 오해가 있었던 것 같아요. 시험은 취소된 게 아니라 연기된 거예요.",
-    segments: ["죄송해요,", "제 생각에", "오해가 있었어요.", "시험은", "연기되었어요,", "취소된 게 아니라"],
+    segments: ["죄송해요, 오해가 있었던 것 같아요.", "시험은 연기된 거예요,", "취소된 게 아니라"],
     reference: "Sorry, I think there's been a misunderstanding. The test has been postponed, not cancelled.",
     accepted: [
       "Sorry, I think there's been a misunderstanding. The test has been postponed, not canceled.",

@@ -247,7 +247,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "인도 벤더 Priya가 지난주에 수정 견적서를 보내 주기로 했는데 아직 소식이 없습니다. 진행 상황을 확인하려고 전화를 겁니다.",
     dialogue: [{ speaker: "Priya", en: "Hello, this is Priya speaking.", ko: "여보세요, 프리야입니다." }],
     promptKo: "안녕하세요, 프리야 씨. 수정 견적서 건으로 확인차 전화드렸어요.",
-    segments: ["안녕하세요, 프리야 씨,", "저는 전화하고 있어요", "확인하려고 (후속 조치)", "수정 견적서에 대해"],
+    segments: ["안녕하세요, 프리야 씨", "확인차 전화드렸어요 (follow up on)", "수정 견적서 건으로요"],
     reference: "Hi Priya, I'm calling to follow up on the revised quotation.",
     accepted: [
       "Hi Priya, I'm just calling to follow up on the revised quotation.",
@@ -288,7 +288,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "베트남 협력사에 공정 결과를 발표하는 중입니다. Linh이 차트의 단위가 잘못됐다고 알려 줍니다. 확인해 보니 맞는 말입니다.",
     dialogue: [{ speaker: "Linh", en: "Sorry, I think the unit on this chart should be kg/h, not t/h.", ko: "죄송한데, 이 차트의 단위는 t/h가 아니라 kg/h여야 할 것 같아요." }],
     promptKo: "맞아요, 지적해 주셔서 감사해요. 슬라이드를 고칠게요.",
-    segments: ["맞아요,", "감사해요", "지적해 주셔서", "그것을.", "제가 고칠게요", "슬라이드를"],
+    segments: ["맞아요, 지적해 주셔서 감사해요 (point out)", "슬라이드를 고칠게요"],
     reference: "You're right, thanks for pointing that out. I'll fix the slide.",
     accepted: [
       "You're right. Thank you for pointing that out. I'll fix the slide.",
@@ -330,7 +330,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "유럽 라이선서 Daniel에게 파일럿 시험 결과를 발표하는 중입니다. Daniel이 중간에 질문을 했고, 답변을 듣고 나서 끼어들어 미안하다고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Thanks, that answers my question. Sorry for interrupting.", ko: "고마워요, 궁금한 게 풀렸어요. 끼어들어서 죄송해요." }],
     promptKo: "괜찮습니다. 그럼 시험 결과 설명을 계속할게요.",
-    segments: ["괜찮습니다.", "그럼,", "제가 계속할게요 (let me)", "시험 결과를"],
+    segments: ["괜찮습니다.", "그럼 시험 결과 설명을 계속할게요 (carry on with)"],
     reference: "No problem. So, let me carry on with the test results.",
     accepted: [
       "No problem. So, I'll carry on with the test results.",
@@ -411,7 +411,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "Daniel의 한국 공장 방문 마지막 날입니다. 저녁 6시 비행기라 공항까지 어떻게 가면 좋을지 묻습니다. 점심 후 회사 기사님이 데려다줄 예정입니다.",
     dialogue: [{ speaker: "Daniel", en: "My flight is at six. What's the best way to get to the airport?", ko: "제 비행기가 6시예요. 공항까지 어떻게 가는 게 제일 좋을까요?" }],
     promptKo: "점심 먹고 나서 저희 기사님이 공항에 내려 드릴 거예요.",
-    segments: ["저희 기사님이", "~할 거예요", "내려 드리다", "당신을", "공항에", "점심 후에"],
+    segments: ["저희 기사님이 공항에 내려 드릴 거예요 (drop off)", "점심 먹고 나서요"],
     reference: "Our driver will drop you off at the airport after lunch.",
     accepted: [
       "After lunch, our driver will drop you off at the airport.",
@@ -451,7 +451,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "말레이시아 고객사와 계약 조건을 협상하고 있습니다. Mr. Tan이 30% 선금 조건이 부담스럽다고 합니다. 이해한다고 말하고, 서로 맞는 방법을 찾을 수 있다고 안심시킵니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Honestly, paying 30% in advance is difficult for us.", ko: "솔직히 30%를 선금으로 내는 건 저희한테 어려워요." }],
     promptKo: "이해합니다. 분명히 좋은 방법을 찾을 수 있을 거예요.",
-    segments: ["이해합니다.", "저는 확신해요", "우리가 ~할 수 있다고", "(방법을) 찾아내다", "무언가를"],
+    segments: ["이해합니다.", "분명히 좋은 방법을 찾을 수 있을 거예요 (work out)"],
     reference: "I understand. I'm sure we can work something out.",
     accepted: [
       "I understand. I'm sure we can work this out.",
@@ -492,7 +492,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "다음 주 하노이 출장을 앞두고 Linh과 통화를 마무리합니다. 지금까지 이메일과 화상으로만 함께 일해서 직접 만나는 건 처음입니다.",
     dialogue: [{ speaker: "Linh", en: "Okay, so I'll see you at Noi Bai Airport next Monday!", ko: "좋아요, 그럼 다음 주 월요일에 노이바이 공항에서 봬요!" }],
     promptKo: "좋아요. 직접 만나 뵙는 게 정말 기대돼요.",
-    segments: ["좋아요.", "저는 정말 기대하고 있어요", "만나는 것을", "당신을", "직접"],
+    segments: ["좋아요.", "직접 만나 뵙는 게 정말 기대돼요 (look forward to)"],
     reference: "Great. I'm really looking forward to meeting you in person.",
     accepted: [
       "Great. I really look forward to meeting you in person.",
@@ -534,7 +534,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "서울에서 Daniel과 저녁 식사 중입니다. Daniel이 와인을 한 잔 더 하겠냐고 묻습니다. 요즘 술을 줄이고 있어서 정중히 사양하려 합니다.",
     dialogue: [{ speaker: "Daniel", en: "How about another glass of wine?", ko: "와인 한 잔 더 하실래요?" }],
     promptKo: "저는 그만 마실게요, 고마워요. 요즘 술을 좀 줄이려고 하고 있어요.",
-    segments: ["저는 더는 괜찮아요, 고마워요.", "저는 ~하려고 하고 있어요", "줄이다", "술을", "요즘"],
+    segments: ["저는 그만 마실게요, 고마워요.", "요즘 술을 좀 줄이려고 하고 있어요 (cut back on)"],
     reference: "No more for me, thanks. I'm trying to cut back on alcohol these days.",
     accepted: [
       "No more for me, thanks. I'm trying to cut down on alcohol these days.",
@@ -578,7 +578,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "자카르타 팀과의 주간 화상회의가 끝나 갑니다. Budi가 안건이 다 끝났다고 하는데, 디캔터 납기 문제를 꼭 이야기하고 싶습니다.",
     dialogue: [{ speaker: "Budi", en: "Okay, I think that's everything on the agenda for today.", ko: "좋아요, 오늘 안건은 이게 다인 것 같아요." }],
     promptKo: "끝내기 전에 한 가지만 더 얘기하고 싶어요.",
-    segments: ["~하기 전에", "우리가 끝내다,", "저는 ~하고 싶어요", "(이야기를) 꺼내다", "한 가지 더"],
+    segments: ["끝내기 전에", "한 가지만 더 얘기하고 싶어요 (bring up)"],
     reference: "Before we finish, I'd like to bring up one more thing.",
     accepted: [
       "Before we finish, I'd like to bring up one more issue.",
@@ -618,7 +618,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "인도네시아 팀과의 주간 화상회의. 원래 김 부장님이 들어오는 회의인데, 오늘은 현장에 가 계셔서 당신이 대신 참석했습니다. Sari가 김 부장님은 안 오시는지 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "Hi Minsu! Is Mr. Kim joining us today?", ko: "안녕하세요, 민수 씨! 오늘 김 부장님도 들어오시나요?" }],
     promptKo: "오늘 현장에 계셔서 제가 대신 들어왔어요.",
-    segments: ["그는 있어요", "현장에", "오늘,", "그래서 제가 대신하고 있어요", "그를"],
+    segments: ["그분은 오늘 현장에 계셔서", "제가 대신 들어왔어요 (fill in for)"],
     reference: "He's at the site today, so I'm filling in for him.",
     accepted: [
       "He's at the site today, so I'm standing in for him.",
@@ -658,7 +658,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "서울 출장 중인 Daniel과 오늘 저녁 팀 회식이 있습니다. Daniel이 식당까지 어떻게 가면 되는지 묻습니다. 마침 당신이 식당에 가는 길에 Daniel의 호텔이 있습니다.",
     dialogue: [{ speaker: "Daniel", en: "How do I get to the restaurant tonight? Should I take a taxi?", ko: "오늘 저녁 식당에는 어떻게 가면 되죠? 택시를 타야 할까요?" }],
     promptKo: "제가 가는 길이라서 호텔로 모시러 갈 수 있어요.",
-    segments: ["그것은 있어요", "제가 가는 길에,", "그래서 저는 ~할 수 있어요", "태우러 가다", "당신을", "당신 호텔에서"],
+    segments: ["제가 가는 길이라서", "호텔로 모시러 갈 수 있어요 (pick up)"],
     reference: "It's on my way, so I can pick you up at your hotel.",
     accepted: [
       "It's on my way, so I'll pick you up at your hotel.",
@@ -864,7 +864,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "월요일 아침 화상회의 전, Sari가 주말에 계획했던 등산은 다녀왔는지 묻습니다. 가려고 했지만 하루 종일 비가 와서 결국 집에 있었습니다.",
     dialogue: [{ speaker: "Sari", en: "So, did you go hiking on Saturday like you planned?", ko: "그래서 계획한 대로 토요일에 등산 갔어요?" }],
     promptKo: "가려고 했는데, 하루 종일 비가 와서 결국 집에 있었어요.",
-    segments: ["저는 그럴 계획이었어요,", "그런데 비가 왔어요", "하루 종일,", "그래서 저는 결국 ~하게 됐어요", "집에 있다"],
+    segments: ["가려고 했는데,", "하루 종일 비가 와서", "결국 집에 있었어요 (end up)"],
     reference: "I was planning to, but it rained all day, so I ended up staying at home.",
     accepted: [
       "I was going to, but it rained all day, so I ended up staying at home.",
@@ -904,7 +904,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "자카르타 파일럿 플랜트. Budi가 피드 펌프 개스킷이 또 샌다며 오늘 교체할 수 있는지 묻습니다. 그런데 예비 개스킷이 하나도 남아 있지 않습니다.",
     dialogue: [{ speaker: "Budi", en: "The gasket on the feed pump is leaking again. Can we replace it today?", ko: "피드 펌프 개스킷이 또 새요. 오늘 교체할 수 있을까요?" }],
     promptKo: "예비 개스킷이 다 떨어져서 오늘 좀 주문할게요.",
-    segments: ["우리는 다 써 버렸어요", "예비 개스킷을,", "그래서 제가 주문할게요", "좀 (몇 개)", "오늘"],
+    segments: ["예비 개스킷이 다 떨어져서 (run out of)", "오늘 좀 주문할게요"],
     reference: "We've run out of spare gaskets, so I'll order some today.",
     accepted: [
       "We've run out of spare gaskets, so I'll order more today.",
@@ -984,7 +984,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "금요일 팀 회식에 현장 문제 때문에 가지 못했습니다. 월요일에 Sari가 회식 때 당신이 없어서 아쉬웠다고 합니다. 사과하고, 미안한 마음에 이번 주에 점심을 사겠다고 합니다.",
     dialogue: [{ speaker: "Sari", en: "We missed you at the team dinner on Friday!", ko: "금요일 팀 회식 때 민수 씨가 없어서 아쉬웠어요!" }],
     promptKo: "못 가서 정말 미안해요. 만회하는 뜻으로 이번 주에 제가 점심 살게요.",
-    segments: ["정말 미안해요", "제가 갈 수 없었던 것.", "제가 ~할게요 (let me)", "점심을 사 드리다", "이번 주에", "만회하기 위해"],
+    segments: ["못 가서 정말 미안해요.", "이번 주에 제가 점심 살게요", "만회하는 뜻으로요 (make up for)"],
     reference: "I'm so sorry I couldn't make it. Let me buy you lunch this week to make up for it.",
     accepted: [
       "I'm really sorry I couldn't make it. Let me buy you lunch this week to make up for it.",
@@ -1114,7 +1114,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "인도 벤더 Priya와 펌프 구매 조건을 협상 중입니다. Priya가 납기 14주 조건을 제안하는데, 프로젝트 일정상 받아들일 수 없습니다.",
     dialogue: [{ speaker: "Priya", en: "So, can you accept our offer with a 14-week delivery time?", ko: "그럼 납기 14주 조건으로 저희 제안을 받아들이실 수 있나요?" }],
     promptKo: "죄송하지만 거절해야 할 것 같아요. 저희 일정에는 너무 길어요.",
-    segments: ["죄송하지만", "우리는 ~해야 할 것 같아요", "거절하다", "그것을.", "그것은 너무 길어요", "우리 일정에는"],
+    segments: ["죄송하지만 거절해야 할 것 같아요 (turn down)", "저희 일정에는 너무 길어요"],
     reference: "I'm afraid we'll have to turn it down. That's too long for our schedule.",
     accepted: [
       "I'm afraid we have to turn it down. That's too long for our schedule.",
@@ -1158,7 +1158,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "자카르타 출장 중, 내일 팜유 공장 견학이 잡혀 있었는데 폭우 때문에 공장 측이 방문을 취소했다는 연락을 방금 받았습니다. Budi는 아직 모르고 있습니다.",
     dialogue: [{ speaker: "Budi", en: "Is our visit to the palm oil mill still on for tomorrow?", ko: "내일 팜유 공장 방문은 그대로 진행되나요?" }],
     promptKo: "아쉽지만 폭우 때문에 취소됐어요.",
-    segments: ["아쉽지만", "그것은 취소됐어요", "~ 때문에", "폭우"],
+    segments: ["아쉽지만 취소됐어요 (call off)", "폭우 때문에요"],
     reference: "I'm afraid it's been called off because of the heavy rain.",
     accepted: [
       "I'm afraid it's been cancelled because of the heavy rain.",
@@ -1200,7 +1200,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "유럽 라이선서와의 기술 검토 회의. Daniel이 발표한 수율 92%를 얼마나 믿을 수 있는지 묻습니다. 3개월간의 파일럿 운전 데이터가 있습니다.",
     dialogue: [{ speaker: "Daniel", en: "How confident are you about the 92% yield figure?", ko: "수율 92%라는 수치에 대해 얼마나 확신하세요?" }],
     promptKo: "꽤 확신해요. 3개월간의 파일럿 데이터가 뒷받침하고 있거든요.",
-    segments: ["꽤 확신해요.", "그것은 뒷받침되고 있어요", "~에 의해", "3개월간의 파일럿 데이터"],
+    segments: ["꽤 확신해요.", "3개월간의 파일럿 데이터가 뒷받침하고 있거든요 (back up)"],
     reference: "Quite confident. It's backed up by three months of pilot data.",
     accepted: [
       "Quite confident. It's backed by three months of pilot data.",
@@ -1243,7 +1243,7 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "말레이시아 고객사에 인도네시아 팀과 공동 발표를 하고 있습니다. 당신은 공정 부분을 맡았고, 다음 순서인 플랜트 배치 설명은 Budi가 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Thank you, Minsu. The process part was very clear.", ko: "고마워요, 민수 씨. 공정 부분은 아주 명확했어요." }],
     promptKo: "감사합니다. 이제 부디 씨에게 넘길게요. 부디 씨가 플랜트 배치를 설명해 드릴 거예요.",
-    segments: ["감사합니다.", "이제 제가 넘길게요", "부디 씨에게,", "그리고 그는 (who)", "설명할 거예요", "플랜트 배치를"],
+    segments: ["감사합니다. 이제 부디 씨에게 넘길게요 (hand over to)", "부디 씨가 플랜트 배치를 설명해 드릴 거예요"],
     reference: "Thank you. Now I'll hand over to Budi, who will explain the plant layout.",
     accepted: [
       "Thank you. Now I'll hand it over to Budi, who will explain the plant layout.",

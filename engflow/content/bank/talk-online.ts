@@ -190,7 +190,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "말레이시아 고객과의 화상회의. 접속 문제로 10분 늦게 들어왔습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Oh, hi Minsu. We just started talking about the schedule.", ko: "아, 민수 씨 안녕하세요. 방금 일정 이야기를 시작했어요." }],
     promptKo: "늦게 들어와서 죄송합니다. 인터넷 연결에 문제가 있었어요.",
-    segments: ["죄송합니다", "늦게 들어온 것에 대해", "저는 ~이 있었어요", "문제가", "인터넷 연결에"],
+    segments: ["늦게 들어와서 죄송합니다", "인터넷 연결에", "문제가 있었어요"],
     reference: "Sorry for joining late. I had a problem with my internet connection.",
     accepted: [
       "Sorry for joining late. I had a problem with my connection.",
@@ -230,7 +230,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "인도네시아 팀의 결과 보고 중, 부디 씨의 화면과 소리가 몇 초간 멈춰서 마지막 내용을 놓쳤습니다.",
     dialogue: [{ speaker: "Budi", en: "So the outlet moisture was about twelve percent, and then we changed the… Okay, does that make sense?", ko: "그래서 출구 수분이 약 12%였고, 그다음에 우리가 …를 바꿨어요. 자, 이해되시나요?" }],
     promptKo: "죄송한데, 잠깐 화면이 멈췄어요. 마지막 부분을 다시 말씀해 주시겠어요?",
-    segments: ["죄송한데,", "당신이 멈췄어요", "잠깐", "~해 주시겠어요?", "다시 말하다", "마지막 부분을"],
+    segments: ["죄송한데, 잠깐 화면이 멈췄어요", "마지막 부분을", "다시 말씀해 주시겠어요?"],
     reference: "Sorry, you froze for a moment. Could you repeat the last part?",
     accepted: [
       "Sorry, you froze for a second. Could you repeat the last part?",
@@ -273,7 +273,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "당신이 진행하는 화상회의. 정각이 됐지만 고객 측 Mr. Tan이 아직 들어오지 않았습니다.",
     dialogue: [{ speaker: "Budi", en: "It's ten o'clock. Shall we start?", ko: "10시네요. 시작할까요?" }],
     promptKo: "Mr. Tan이 들어올 때까지 몇 분만 더 기다리죠.",
-    segments: ["~하죠", "기다리다", "몇 분 더", "~할 때까지", "Mr. Tan이 들어오다"],
+    segments: ["몇 분만 더 기다리죠", "Mr. Tan이 들어올 때까지"],
     reference: "Let's wait a few more minutes until Mr. Tan joins.",
     accepted: [
       "Let's wait a couple more minutes until Mr. Tan joins.",
@@ -314,7 +314,7 @@ export const TALK_ONLINE: Question[] = [
     contextKo: "주간 화상회의. 당신의 설계 진행 보고가 끝났고, 다음 순서인 부디 씨에게 넘기려 합니다.",
     dialogue: [{ speaker: "Sari", en: "Thanks, Minsu. That was clear. No questions from me.", ko: "고마워요, 민수 씨. 명확했어요. 저는 질문 없어요." }],
     promptKo: "제 쪽은 여기까지입니다. 부디 씨, 다음에 하시겠어요?",
-    segments: ["그게 전부예요", "제 쪽에서는", "부디 씨,", "~하시겠어요?", "다음에 하다"],
+    segments: ["제 쪽은 여기까지입니다", "부디 씨,", "다음에 하시겠어요?"],
     reference: "That's all from my side. Budi, would you like to go next?",
     accepted: [
       "That's all from me. Budi, would you like to go next?",

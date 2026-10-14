@@ -403,7 +403,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "추석 연휴를 앞두고 다니엘 씨가 다음 주가 한국의 큰 명절이라던데 계획이 있는지 묻습니다. 당신은 대구에 계신 부모님 댁에 가기로 했습니다.",
     dialogue: [{ speaker: "Daniel", en: "I heard next week is a big holiday in Korea. Do you have any plans?", ko: "다음 주가 한국의 큰 명절이라고 들었어요. 무슨 계획 있어요?" }],
     promptKo: "네, 추석에 대구에 계신 부모님 댁에 가요.",
-    segments: ["네,", "저는 방문해요", "제 부모님을", "대구에 계신", "추석에"],
+    segments: ["네, 부모님 댁에 가요", "대구에, 추석에요"],
     reference: "Yes, I'm visiting my parents in Daegu for Chuseok.",
     accepted: [
       "Yes, I'm going to visit my parents in Daegu for Chuseok.",
@@ -446,7 +446,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "서울 사무실 워크숍에 온 베트남 협력사의 린 씨가 일주일째 한식만 먹었다며 베트남 음식이 그립다고 합니다. 마침 지난주 길 건너편에 베트남 식당이 새로 생겼습니다.",
     dialogue: [{ speaker: "Linh", en: "I love Korean food, but I really miss Vietnamese food. Is there any pho around here?", ko: "한식 정말 좋아하는데, 베트남 음식이 너무 그리워요. 이 근처에 쌀국수 집 있어요?" }],
     promptKo: "마침 길 건너편에 베트남 식당이 새로 생겼어요.",
-    segments: ["마침,", "새 베트남 식당이", "막 문을 열었어요", "길 건너편에"],
+    segments: ["마침 베트남 식당이 새로 생겼어요", "길 건너편에요"],
     reference: "Actually, a new Vietnamese restaurant just opened across the street.",
     accepted: [
       "Actually, a new Vietnamese restaurant has just opened across the street.",
@@ -489,7 +489,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "화상회의 시작 전에 인도 협력사의 프리야 씨가 주말에 보통 뭘 하는지 묻습니다. 당신은 일요일마다 한강을 따라 자전거를 탑니다.",
     dialogue: [{ speaker: "Priya", en: "So, Minsu, what do you usually do on weekends?", ko: "그런데 민수 씨는 주말에 보통 뭐 해요?" }],
     promptKo: "일요일마다 보통 한강을 따라 자전거를 타요.",
-    segments: ["저는 보통", "자전거 타러 가요", "한강을 따라", "일요일마다"],
+    segments: ["보통 자전거 타러 가요", "한강을 따라", "일요일마다요"],
     reference: "I usually go cycling along the Han River on Sundays.",
     accepted: [
       "On Sundays, I usually go cycling along the Han River.",
@@ -535,7 +535,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "다음 달 서울 출장이 정해진 다니엘 씨가 제대로 된 한국 음식은 마트에서 산 김치밖에 먹어 본 적이 없다고 합니다. 오면 맛있는 고깃집에 데려가고 싶습니다.",
     dialogue: [{ speaker: "Daniel", en: "I've never had real Korean food. Only kimchi from the supermarket!", ko: "제대로 된 한국 음식은 먹어 본 적이 없어요. 마트에서 산 김치뿐이에요!" }],
     promptKo: "다음 달에 서울 오시면 정말 맛있는 한국식 바비큐 집에 모시고 갈게요.",
-    segments: ["~할 때", "당신이 서울에 오다", "다음 달에,", "제가 데려갈게요", "당신을", "정말 맛있는 한국식 바비큐 집에"],
+    segments: ["다음 달에 서울 오시면", "제가 모시고 갈게요", "정말 맛있는 한국식 바비큐 집에"],
     reference: "When you come to Seoul next month, I'll take you to a really good Korean barbecue place.",
     accepted: [
       "When you come to Seoul next month, I'll take you to a great Korean barbecue restaurant.",
@@ -580,7 +580,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "아침 화상회의에서 부디 씨가 어젯밤 배드민턴 결승을 봤는지 신이 나서 묻습니다. 당신은 야근하느라 경기를 못 봤습니다.",
     dialogue: [{ speaker: "Budi", en: "Did you watch the badminton final last night? Indonesia won!", ko: "어젯밤 배드민턴 결승 봤어요? 인도네시아가 이겼어요!" }],
     promptKo: "아쉽게도 야근하느라 못 봤어요. 경기 재미있었어요?",
-    segments: ["아쉽게도,", "저는 그것을 놓쳤어요", "왜냐하면 저는 늦게까지 일해야 했어요.", "그것은 흥미진진했나요?"],
+    segments: ["아쉽게도 못 봤어요", "늦게까지 일해야 해서요", "경기 재미있었어요?"],
     reference: "Unfortunately, I missed it because I had to work late. Was it exciting?",
     accepted: [
       "Unfortunately, I missed it because I had to work late. Was it a good match?",
@@ -624,7 +624,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "탄 씨와 화상회의를 하는데 뒤에서 아이가 보는 만화 소리가 들립니다. 아들이 열이 나서 오늘은 집에서 일하고 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Is that a cartoon I can hear in the background?", ko: "뒤에서 들리는 게 만화 소리인가요?" }],
     promptKo: "시끄러워서 죄송해요! 아들이 열이 나서 오늘은 집에서 일하고 있어요.",
-    segments: ["죄송해요", "소음에 대해!", "저는 집에서 일하고 있어요", "오늘은", "왜냐하면 제 아들이", "열이 있어요"],
+    segments: ["시끄러워서 죄송해요!", "오늘은 집에서 일하고 있어요", "아들이 열이 나서요"],
     reference: "Sorry about the noise! I'm working from home today because my son has a fever.",
     accepted: [
       "Sorry for the noise! I'm working from home today because my son has a fever.",
@@ -715,7 +715,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "쿠알라룸푸르의 바이오매스 박람회장에서 인도 협력사의 프리야 씨와 우연히 마주쳤습니다. 2년 전 뭄바이 킥오프 미팅 이후 처음 만나는 것입니다.",
     dialogue: [{ speaker: "Priya", en: "Minsu? Is that you? What a surprise!", ko: "민수 씨? 민수 씨 맞죠? 이게 웬일이에요!" }],
     promptKo: "프리야 씨! 정말 반가워요. 뭄바이 킥오프 미팅 이후로 처음 뵙네요!",
-    segments: ["프리야 씨!", "정말 반가워요.", "저는 당신을 보지 못했어요", "킥오프 미팅 이후로", "뭄바이에서의"],
+    segments: ["프리야 씨! 정말 반가워요", "처음 뵙네요", "뭄바이 킥오프 미팅 이후로!"],
     reference: "Priya! It's so good to see you. I haven't seen you since the kickoff meeting in Mumbai!",
     accepted: [
       "Priya! Great to see you! I haven't seen you since the kickoff meeting in Mumbai!",
@@ -761,7 +761,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "서울 워크숍에 온 자카르타 팀의 사리 씨가 워크숍이 끝난 주말에 서울에 혼자 남는다고 합니다. 토요일에 시간이 되면 북촌 한옥마을을 구경시켜 주고 싶습니다.",
     dialogue: [{ speaker: "Sari", en: "My flight home isn't until Sunday, but I don't know anyone in Seoul.", ko: "귀국 비행기가 일요일이라 주말에 남는데, 서울에 아는 사람이 없어요." }],
     promptKo: "토요일에 시간 괜찮으시면 제가 북촌 한옥마을을 구경시켜 드릴 수 있어요.",
-    segments: ["만약 당신이 시간이 되면", "토요일에,", "제가 구경시켜 드릴 수 있어요", "당신에게", "북촌 한옥마을을"],
+    segments: ["토요일에 시간 괜찮으시면", "제가 구경시켜 드릴 수 있어요", "북촌 한옥마을을요"],
     reference: "If you're free on Saturday, I can show you around Bukchon Hanok Village.",
     accepted: [
       "If you're free on Saturday, I could show you around Bukchon Hanok Village.",
@@ -806,7 +806,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "8월에 서울 사무실을 찾은 부디 씨와 카페에 갔습니다. 옆 테이블 사람들이 모두 커다란 그릇에 담긴 디저트를 먹고 있자 부디 씨가 그게 뭐냐고 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "What's that? Everyone in this café is eating it!", ko: "저게 뭐예요? 카페에 있는 사람들이 다 먹고 있네요!" }],
     promptKo: "빙수라고 해요. 곱게 간 얼음과 달콤한 팥으로 만든 한국 디저트예요.",
-    segments: ["그것은 불려요", "빙수라고.", "그것은 한국 디저트예요", "만들어진", "간 얼음과 달콤한 팥으로"],
+    segments: ["빙수라고 해요", "한국 디저트예요", "곱게 간 얼음과 달콤한 팥으로 만든"],
     reference: "It's called bingsu. It's a Korean dessert that's made with shaved ice and sweet red beans.",
     accepted: [
       "It's called bingsu. It's a Korean dessert made with shaved ice and sweet red beans.",
@@ -851,7 +851,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "방콕 바이오매스 박람회의 네트워킹 시간에 스웨덴 펠릿 생산 업체의 안나 씨가 먼저 자기소개를 했습니다. 당신도 이름과 하는 일을 소개합니다.",
     dialogue: [{ speaker: "Anna (attendee)", en: "Hi, I'm Anna. I work for a pellet producer in Sweden.", ko: "안녕하세요, 안나예요. 스웨덴의 펠릿 생산 업체에서 일해요." }],
     promptKo: "만나서 반가워요, 안나 씨. 저는 민수예요. 바이오매스 건조기를 설계하는 한국 회사의 공정 엔지니어예요.",
-    segments: ["만나서 반가워요, 안나 씨.", "저는 민수예요,", "공정 엔지니어", "한국 회사의", "그 회사는 설계해요", "바이오매스 건조기를"],
+    segments: ["만나서 반가워요, 안나 씨", "저는 민수예요, 공정 엔지니어예요", "한국 회사의", "바이오매스 건조기를 설계하는"],
     reference: "Nice to meet you, Anna. I'm Minsu, a process engineer at a Korean company that designs biomass dryers.",
     accepted: [
       "Nice to meet you, Anna. I'm Minsu. I'm a process engineer at a Korean company that designs biomass dryers.",
@@ -1031,7 +1031,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     contextKo: "10월에 서울 사무실을 방문한 다니엘 씨가 하늘이 정말 파랗다며 가을 날씨에 감탄합니다. 날씨가 좋으니 구내식당 대신 근처 공원에서 점심을 먹자고 제안하고 싶습니다.",
     dialogue: [{ speaker: "Daniel", en: "Look at that blue sky! Is autumn in Seoul always like this?", ko: "저 파란 하늘 좀 봐요! 서울의 가을은 늘 이래요?" }],
     promptKo: "오늘 날씨 정말 좋네요. 구내식당 말고 공원에서 점심 먹는 게 어때요?",
-    segments: ["날씨가 정말 좋아요", "오늘.", "~하는 게 어때요", "점심을 먹다", "공원에서", "구내식당 대신에"],
+    segments: ["오늘 날씨 정말 좋네요", "공원에서 점심 먹는 게 어때요?", "구내식당 말고요"],
     reference: "The weather's so nice today. How about having lunch in the park instead of the cafeteria?",
     accepted: [
       "The weather's so nice today. Why don't we have lunch in the park instead of the cafeteria?",

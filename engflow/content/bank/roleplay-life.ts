@@ -65,7 +65,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rental agent", en: "Thank you, Mr. Lee. You booked a compact car for three days. Would you like to add full insurance?", ko: "감사합니다, 이 선생님. 소형차로 사흘 예약하셨네요. 완전 보험을 추가하시겠어요?" },
     ],
     promptKo: "네, 완전 보험으로 할게요. 하루에 얼마예요?",
-    segments: ["네,", "저는 원해요", "완전 보험을.", "얼마예요", "그것은", "하루에?"],
+    segments: ["네,", "완전 보험으로 할게요.", "하루에 얼마예요?"],
     reference: "Yes, I'd like full insurance. How much is it per day?",
     accepted: [
       "Yes, I'd like full insurance. How much is it a day?",
@@ -295,7 +295,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Shop assistant", en: "Sure. Do you want prepaid or a monthly plan? How long are you staying?", ko: "네. 선불로 하실래요, 월정액으로 하실래요? 얼마나 머무세요?" },
     ],
     promptKo: "선불로 할게요. 여기 2주만 있을 거예요.",
-    segments: ["선불로,", "부탁해요.", "저는 단지 여기 있어요", "2주 동안"],
+    segments: ["선불로 할게요.", "여기 2주만 있어요"],
     reference: "Prepaid, please. I'm only here for two weeks.",
     accepted: [
       "Prepaid, please. I'm only staying for two weeks.",
@@ -433,7 +433,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Shop assistant", en: "It should work in a few minutes. If it doesn't, just restart your phone.", ko: "몇 분 안에 될 거예요. 안 되면 휴대폰을 다시 켜 보세요." },
     ],
     promptKo: "고마워요. 문제가 생기면 전화할 번호를 좀 적어 주실 수 있어요?",
-    segments: ["고마워요.", "적어 주실 수 있어요", "번호를", "제가 전화해야 할", "만약 문제가 있으면?"],
+    segments: ["고마워요.", "전화할 번호를 좀 적어 주실 수 있어요", "문제가 생기면?"],
     reference: "Thanks. Could you write down the number I should call if there's a problem?",
     accepted: [
       "Thanks. Could you write down the number that I should call if there's a problem?",
@@ -523,7 +523,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Jake", en: "Awesome! So what should we do? I've never been to Seoul before.", ko: "좋아! 그럼 뭐 할까? 나 서울은 처음이야." },
     ],
     promptKo: "오전에 경복궁에 가 보는 거 어때?",
-    segments: ["어때", "경복궁을 방문하는 거", "오전에?"],
+    segments: ["경복궁 가 보는 거 어때", "오전에?"],
     reference: "How about visiting Gyeongbokgung Palace in the morning?",
     accepted: [
       "How about going to Gyeongbokgung Palace in the morning?",
@@ -754,7 +754,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Neighbour", en: "Oh, hi! Nice to finally meet you. What can I do for you?", ko: "아, 안녕하세요! 드디어 인사하네요. 무슨 일이세요?" },
     ],
     promptKo: "내일 저 대신 택배 좀 받아 주실 수 있을까요?",
-    segments: ["받아 주실 수 있을까요", "택배를", "저를 위해", "내일?"],
+    segments: ["택배 좀 받아 주실 수 있을까요", "저 대신, 내일?"],
     reference: "Could you take in a parcel for me tomorrow?",
     accepted: [
       "Could you receive a parcel for me tomorrow?",
@@ -847,7 +847,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Neighbour", en: "No worries, I'm home all afternoon. Is it heavy?", ko: "괜찮아요, 오후 내내 집에 있어요. 무거워요?" },
     ],
     promptKo: "좀 무거울 수도 있어요. 그러니 그냥 문 옆에 두셔도 돼요.",
-    segments: ["그것은 무거울 수도 있어요", "조금,", "그러니", "그냥 두셔도 돼요", "그것을", "문 옆에"],
+    segments: ["좀 무거울 수도 있어요,", "그러니 그냥 두셔도 돼요", "문 옆에"],
     reference: "It might be a bit heavy, so you can just leave it by your door.",
     accepted: [
       "It might be a little heavy, so you can just leave it by your door.",
@@ -894,7 +894,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Neighbour", en: "Okay. I'll text you when it arrives.", ko: "알겠어요. 오면 문자 드릴게요." },
     ],
     promptKo: "정말 감사해요. 집에 오자마자 가지러 갈게요. 아마 7시쯤일 거예요.",
-    segments: ["정말 감사해요.", "저는 가지러 갈게요", "그것을", "제가 집에 오자마자,", "그건 아마 될 거예요", "7시쯤"],
+    segments: ["정말 감사해요.", "가지러 갈게요", "집에 오자마자,", "아마 7시쯤일 거예요"],
     reference: "Thank you so much. I'll come and get it as soon as I get home, which should be around 7.",
     accepted: [
       "Thank you so much. I'll come and pick it up as soon as I get home, which should be around 7.",
@@ -940,7 +940,7 @@ export const ROLEPLAY_LIFE: Question[] = [
     contextKo: "인도 벤더의 프리야 씨와 화상회의를 시작합니다. 프리야 씨가 건조기 튜브 재질 이야기를 하자고 합니다. 어제 관련 이메일을 받았습니다.",
     dialogue: [{ speaker: "Priya", en: "Hi Minsu, thanks for joining. I wanted to talk about the material for the dryer tubes.", ko: "안녕하세요, 민수 씨. 참석해 주셔서 감사해요. 건조기 튜브 재질에 대해 얘기하고 싶었어요." }],
     promptKo: "네. 어제 새 재질에 관한 이메일 받았어요.",
-    segments: ["네.", "저는 받았어요", "당신의 이메일을", "새 재질에 관한", "어제"],
+    segments: ["네.", "새 재질에 관한 메일 받았어요", "어제"],
     reference: "Sure. I got your email about the new material yesterday.",
     accepted: [
       "Sure. I received your email about the new material yesterday.",
@@ -1033,7 +1033,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Priya", en: "I understand. We've used SS304 in similar plants without any problems.", ko: "이해해요. 저희는 비슷한 공장들에서 SS304를 문제없이 써 왔어요." },
     ],
     promptKo: "그 공장들도 염화물 농도가 비슷했나요? 그렇다면 운전 데이터를 좀 공유해 주실 수 있을까요?",
-    segments: ["그 공장들도 가졌나요", "비슷한 염화물 농도를?", "그렇다면,", "공유해 주실 수 있을까요", "운전 데이터를 좀?"],
+    segments: ["그 공장들도 염화물 농도가 비슷했나요?", "그렇다면 운전 데이터를 좀 공유해 주실 수 있을까요?"],
     reference: "Did those plants have a similar chloride level? If so, could you share some operating data?",
     accepted: [
       "Did those plants have similar chloride levels? If so, could you share some operating data?",
@@ -1081,7 +1081,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Priya", en: "To be honest, most of them had lower chloride levels. But I can check with our materials team.", ko: "솔직히 대부분은 염화물 농도가 더 낮았어요. 그래도 저희 재료팀에 확인해 볼게요." },
     ],
     promptKo: "감사합니다. SS304를 쓰면 튜브는 얼마나 자주 점검을 받아야 할까요?",
-    segments: ["감사합니다.", "만약 우리가 쓰면", "SS304를,", "얼마나 자주", "튜브가 필요할까요", "점검받는 것이?"],
+    segments: ["감사합니다.", "SS304를 쓰면,", "튜브는 얼마나 자주 점검해야 할까요?"],
     reference: "Thank you. If we use SS304, how often will the tubes need to be inspected?",
     accepted: [
       "Thank you. If we use SS304, how often would the tubes need to be inspected?",
@@ -1221,7 +1221,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Rizal", en: "Thanks, Minsu! Ms. Kim said you would show me around.", ko: "고마워요, 민수 씨! 김 팀장님이 민수 씨가 이것저것 알려 줄 거라고 하셨어요." },
     ],
     promptKo: "그럼요. 먼저 우리 문서 시스템 쓰는 법을 알려 드릴게요.",
-    segments: ["그럼요.", "먼저,", "제가 알려 드릴게요", "당신에게", "쓰는 법을", "우리 문서 시스템을"],
+    segments: ["그럼요.", "먼저 알려 드릴게요", "우리 문서 시스템 쓰는 법을"],
     reference: "Sure. First, I'll show you how to use our document system.",
     accepted: [
       "Sure. First, I'll show you how our document system works.",
@@ -1500,7 +1500,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Ms. Kim", en: "That's great to hear. You've also been working well with the Jakarta team.", ko: "좋은 소식이네요. 자카르타 팀과도 잘 협업하고 있고요." },
     ],
     promptKo: "감사합니다. 제가 더 개선해야 할 점이 뭔지 말씀해 주시겠어요?",
-    segments: ["감사합니다.", "말씀해 주시겠어요", "저에게", "무엇을", "제가 개선해야 하는지"],
+    segments: ["감사합니다.", "말씀해 주시겠어요", "제가 뭘 개선해야 하는지"],
     reference: "Thank you. Could you tell me what I should improve?",
     accepted: [
       "Thank you. Could you tell me what I should work on?",
@@ -1545,7 +1545,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Ms. Kim", en: "Sure. Sometimes your reports go to the client without a summary, and clients often read only the first page.", ko: "그럼요. 가끔 보고서가 요약 없이 고객에게 가는데, 고객들은 첫 페이지만 읽는 경우가 많아요." },
     ],
     promptKo: "알겠습니다. 앞으로는 고객에게 가는 모든 보고서에 한 페이지 요약을 넣겠습니다.",
-    segments: ["알겠습니다.", "앞으로는,", "저는 넣겠습니다", "한 페이지 요약을", "모든 보고서에", "고객에게 가는"],
+    segments: ["알겠습니다.", "앞으로는 한 페이지 요약을 넣겠습니다", "모든 보고서에", "고객에게 가는"],
     reference: "I see. From now on, I'll add a one-page summary to every report that goes to the client.",
     accepted: [
       "I see. From now on, I'll include a one-page summary in every report that goes to the client.",
@@ -1777,7 +1777,7 @@ export const ROLEPLAY_LIFE: Question[] = [
       { speaker: "Sari", en: "Would you like some more rendang? There's plenty left.", ko: "렌당 좀 더 드실래요? 많이 남았어요." },
     ],
     promptKo: "고맙지만 괜찮아요. 벌써 두 접시나 먹었어요. 정말 맛있었어요.",
-    segments: ["고맙지만 괜찮아요.", "저는 벌써 먹었어요", "두 접시를.", "그것은 정말 맛있었어요"],
+    segments: ["고맙지만 괜찮아요.", "벌써 두 접시 먹었어요.", "정말 맛있었어요"],
     reference: "No, thank you. I've already had two plates. It was really delicious.",
     accepted: [
       "I'm okay, thank you. I've already had two plates. It was really delicious.",

@@ -228,7 +228,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "자카르타 팀과 화상회의 중입니다. Sari가 하노이의 Linh 팀도 이 건조기 데이터가 필요하다고 합니다. 지금 오가는 이메일에 Linh도 넣어 달라고 부탁하려 합니다.",
     dialogue: [{ speaker: "Sari", en: "Linh's team in Hanoi will need this dryer data too.", ko: "하노이의 린 씨 팀도 이 건조기 데이터가 필요할 거예요." }],
     promptKo: "그럼 이메일 스레드에 린 씨도 넣어 주실 수 있을까요?",
-    segments: ["그럼", "~해 주실 수 있을까요", "(대화에) 끼워 주다 (loop … in)", "린 씨를", "이메일 스레드에"],
+    segments: ["그럼 린 씨도 넣어 주실 수 있을까요 (loop in)", "이메일 스레드에요"],
     reference: "Then could you loop Linh in on the email thread?",
     accepted: ["Then could you loop Linh into the email thread?", "Then could you add Linh to the email thread?", "Then could you copy Linh on the email thread?", "Then can you loop Linh in on the email thread?", "In that case, could you loop Linh in on the email thread?"],
     meaning: [
@@ -263,7 +263,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "말레이시아 고객사 Mr. Tan에게 전화를 걸었습니다. 특별한 문제는 없지만, 건조기 선적 일정에 대해 서로 상황을 한번 확인하고 싶습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Hi Minsu, good to hear from you. What's up?", ko: "민수 씨, 반가워요. 무슨 일이에요?" }],
     promptKo: "안녕하세요, 탄 씨. 선적 일정 관련해서 상황 한번 확인하려고 연락드렸어요.",
-    segments: ["안녕하세요, 탄 씨,", "저는 그냥 ~하고 싶었어요", "상황을 확인하다 (touch base)", "선적 일정에 대해"],
+    segments: ["안녕하세요, 탄 씨", "그냥 한번 확인하려고 연락드렸어요 (touch base)", "선적 일정에 대해서요"],
     reference: "Hi Mr. Tan, I just wanted to touch base about the shipping schedule.",
     accepted: ["Hi Mr. Tan, I just wanted to touch base with you about the shipping schedule.", "Hi Mr. Tan, I just wanted to touch base on the shipping schedule.", "Hi Mr. Tan, I just want to touch base about the shipping schedule.", "Hi Mr. Tan, I just wanted to check in about the shipping schedule.", "Hi Mr. Tan, I'm just calling to touch base about the shipping schedule."],
     meaning: [
@@ -299,7 +299,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "인도 벤더 Priya와 디캔터 구매를 협의 중입니다. 정식 견적까지 2주가 걸린다고 하는데, 예산을 잡으려면 대략적인 금액이 먼저 필요합니다.",
     dialogue: [{ speaker: "Priya", en: "We'll need about two weeks to prepare a formal quotation.", ko: "정식 견적을 준비하는 데 2주 정도 걸릴 거예요." }],
     promptKo: "알겠습니다. 그 전에 대략적인 금액이라도 알려 주실 수 있을까요?",
-    segments: ["알겠습니다.", "~해 주실 수 있을까요", "저희에게", "대략적인 금액을 (a ballpark figure)", "그 전에"],
+    segments: ["알겠습니다.", "대략적인 금액이라도 알려 주실 수 있을까요 (ballpark)", "그 전에요"],
     reference: "I see. Could you give us a ballpark figure before that?",
     accepted: ["I see. Could you give us a ballpark figure in the meantime?", "I see. Could you give us a rough figure before that?", "I see. Could you give us a ballpark estimate before that?", "I see. Can you give us a ballpark figure before that?", "I see. Could you give us a rough idea of the price before that?"],
     meaning: [
@@ -334,7 +334,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "말레이시아 고객사에 건조기 두 가지 안을 자세히 비교 발표했습니다. Mr. Tan이 정보가 너무 많다며 핵심이 뭔지 묻습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "That's a lot of information. What's the main point?", ko: "정보가 많네요. 핵심이 뭐예요?" }],
     promptKo: "한마디로 말하면, B안이 에너지를 20% 덜 써요.",
-    segments: ["한마디로 말하면,", "B안이", "사용해요", "20% 더 적은 에너지를"],
+    segments: ["한마디로 말하면 (in a nutshell)", "B안이 에너지를 20% 덜 써요"],
     reference: "In a nutshell, Option B uses 20% less energy.",
     accepted: ["In a nutshell, Option B uses about 20% less energy.", "In a nutshell, Option B consumes 20% less energy.", "In short, Option B uses 20% less energy.", "Basically, Option B uses 20% less energy.", "To put it simply, Option B uses 20% less energy."],
     meaning: [
@@ -372,7 +372,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "건조기 형식을 두고 자카르타 팀과 한참 논의했습니다. 마지막에 Budi가 간접식 건조기가 낫겠다고 정리하자, 모두 같은 생각인지 확인하려 합니다.",
     dialogue: [{ speaker: "Budi", en: "So I think the indirect dryer is the better choice for us.", ko: "그래서 저는 간접식 건조기가 저희한테 더 나은 선택인 것 같아요." }],
     promptKo: "좋아요. 그럼 우리 모두 같은 생각인 거죠?",
-    segments: ["좋아요.", "그럼 우리 모두 ~인 거죠", "같은 페이지 위에 (같은 생각)", "그렇죠?"],
+    segments: ["좋아요.", "그럼 우리 모두 같은 생각인 거죠? (on the same page)"],
     reference: "Great. So we're all on the same page, right?",
     accepted: ["Great. So are we all on the same page?", "Great. So we're all on the same page?", "Great. So everyone is on the same page, right?", "Great. So we all agree, right?"],
     meaning: [
@@ -445,7 +445,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "여러 나라 사람이 참석한 주간 화상회의를 진행하고 있습니다. Budi와 Linh이 개스킷 재질을 두고 한참 논쟁 중인데, 다른 참석자와는 관계없는 이야기라 회의 뒤에 따로 이야기하게 하려 합니다.",
     dialogue: [{ speaker: "Budi", en: "Linh, I still don't agree. EPDM won't last at that temperature.", ko: "린 씨, 저는 여전히 동의 못 해요. EPDM은 그 온도에서 오래 못 버텨요." }],
     promptKo: "이건 두 분 사이의 문제니까, 회의 끝나고 따로 얘기하시죠.",
-    segments: ["이건 ~이에요", "두 분 사이의 문제,", "그러니까 ~하시죠 (let's)", "가져가다 (take)", "이 얘기를", "회의 밖으로 (따로 얘기하다)"],
+    segments: ["이건 두 분 사이의 문제니까", "이 얘기는 회의 끝나고 따로 하시죠 (take offline)"],
     reference: "This is between the two of you, so let's take this offline.",
     accepted: ["This is between the two of you, so let's take it offline.", "This is between you two, so let's take this offline.", "This is between the two of you, so why don't we take this offline?", "Since this is between the two of you, let's take this offline.", "This is between the two of you, so let's discuss it separately after the meeting."],
     meaning: [
@@ -517,7 +517,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "다른 고객과의 통화를 거의 끝내 가는데 인도 벤더 Priya에게서 전화가 왔습니다. 펌프 데이터시트 얘기를 하고 싶다고 합니다.",
     dialogue: [{ speaker: "Priya", en: "Hi Minsu, is now a good time to talk about the pump datasheet?", ko: "민수 씨, 지금 펌프 데이터시트 얘기 좀 할 수 있을까요?" }],
     promptKo: "지금 다른 통화를 마무리하는 중이라서요. 10분 뒤에 다시 전화드려도 될까요?",
-    segments: ["저는 지금 마무리하는 중이에요", "다른 통화를,", "그래서 ~해도 될까요", "다시 전화하다", "당신에게", "10분 뒤에"],
+    segments: ["지금 다른 통화를 마무리하는 중이라서요 (wrap up)", "10분 뒤에 다시 전화드려도 될까요?"],
     reference: "I'm just wrapping up another call, so can I call you back in ten minutes?",
     accepted: ["I'm just wrapping up another call, so could I call you back in ten minutes?", "I'm just finishing another call, so can I call you back in ten minutes?", "I'm just wrapping up another call. Can I call you back in ten minutes?", "I'm just wrapping up another call, so is it okay if I call you back in ten minutes?", "Sorry, I can't talk right now. I'm just wrapping up another call. Can I call you back in ten minutes?"],
     meaning: [
@@ -552,7 +552,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "인도 벤더 Priya와 펌프 패키지 가격을 협상 중입니다. Priya가 예비 부품과 교육을 약간의 추가 비용으로 넣어 주겠다고 하지만, 총액이 이미 예산을 넘습니다.",
     dialogue: [{ speaker: "Priya", en: "We can also include spare parts and training for a small extra cost.", ko: "약간의 추가 비용으로 예비 부품과 교육도 넣어 드릴 수 있어요." }],
     promptKo: "감사하지만, 핵심은 저희가 예산을 넘길 수 없다는 거예요.",
-    segments: ["감사하지만,", "핵심은 ~라는 거예요 (the bottom line)", "저희가 넘길 수 없다", "저희 예산을"],
+    segments: ["감사하지만,", "핵심은 (the bottom line)", "저희가 예산을 넘길 수 없다는 거예요"],
     reference: "Thanks, but the bottom line is that we can't go over our budget.",
     accepted: ["Thanks, but the bottom line is we can't go over our budget.", "Thanks, but the bottom line is that we can't exceed our budget.", "Thanks, but the bottom line is that we can't go over budget.", "Thanks, but the main point is that we can't go over our budget.", "Thanks, but the bottom line is that we have to stay within our budget."],
     meaning: [
@@ -587,7 +587,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "베트남 협력사 Linh이 수정된 열·물질 수지(HMB)가 왜 이렇게 늦어지는지 묻습니다. 시뮬레이션 파일이 손상되는 바람에 처음부터 다시 해야 했습니다.",
     dialogue: [{ speaker: "Linh", en: "Why is the updated heat and mass balance taking so long?", ko: "수정된 열·물질 수지가 왜 이렇게 오래 걸려요?" }],
     promptKo: "시뮬레이션 파일이 손상돼서 처음부터 다시 해야 했어요.",
-    segments: ["시뮬레이션 파일이", "손상됐어요,", "그래서 우리는 ~해야 했어요", "시작하다", "처음부터 (from scratch)"],
+    segments: ["시뮬레이션 파일이 손상돼서", "처음부터 다시 해야 했어요 (from scratch)"],
     reference: "The simulation file got corrupted, so we had to start from scratch.",
     accepted: ["The simulation file was corrupted, so we had to start from scratch.", "The simulation file got corrupted, so we had to start over from scratch.", "The simulation file got corrupted, so we had to redo it from scratch.", "Our simulation file got corrupted, so we had to start again from the beginning."],
     meaning: [
@@ -664,7 +664,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "주간 화상회의 시간이 거의 끝났는데 예산 안건이 남았습니다. 예산 수치는 유럽 라이선서 Daniel이 확인해 줘야 하는데 아직 확인이 안 됐습니다.",
     dialogue: [{ speaker: "Sari", en: "We still haven't talked about the budget, and we only have five minutes left.", ko: "아직 예산 얘기를 못 했는데, 5분밖에 안 남았어요." }],
     promptKo: "다니엘 씨가 아직 수치를 확인하지 않았으니까, 예산은 다음 주에 다시 얘기하죠.",
-    segments: ["다니엘 씨가 확인하지 않았어요", "수치를", "아직,", "그러니까 다시 돌아와 얘기하죠 (circle back to)", "예산으로", "다음 주에"],
+    segments: ["다니엘 씨가 아직 수치를 확인하지 않았으니까", "예산 얘기는 다시 하죠 (circle back)", "다음 주에요"],
     reference: "Daniel hasn't confirmed the numbers yet, so let's circle back to the budget next week.",
     accepted: ["Daniel hasn't confirmed the figures yet, so let's circle back to the budget next week.", "Since Daniel hasn't confirmed the numbers yet, let's circle back to the budget next week.", "Daniel hasn't confirmed the numbers yet, so let's come back to the budget next week.", "Daniel hasn't confirmed the numbers yet, so let's circle back on the budget next week.", "Daniel still hasn't confirmed the numbers, so let's circle back to the budget next week."],
     meaning: [
@@ -702,7 +702,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "건조기 출구 수분이 높게 나오는 원인을 논의하고 있습니다. Budi는 원료가 젖어서 그렇다고 확신하지만, 수분 센서는 아직 점검하지 않았습니다.",
     dialogue: [{ speaker: "Budi", en: "I'm sure the high moisture is caused by the wet feed.", ko: "수분이 높은 건 분명히 원료가 젖어서 그런 거예요." }],
     promptKo: "그럴 수도 있지만, 아직 센서를 점검하지 않았으니까 센서 문제일 가능성도 배제할 수 없어요.",
-    segments: ["그럴 수도 있지만,", "우리는 배제할 수 없어요 (rule out)", "센서 문제를,", "왜냐하면 우리는 점검하지 않았어요", "센서를", "아직"],
+    segments: ["그럴 수도 있지만,", "센서 문제를 배제할 수는 없어요 (rule out)", "아직 센서를 점검하지 않았으니까요"],
     reference: "Maybe, but we can't rule out a sensor problem, because we haven't checked the sensor yet.",
     accepted: ["Maybe, but we can't rule out a sensor problem, since we haven't checked the sensor yet.", "Maybe, but we haven't checked the sensor yet, so we can't rule out a sensor problem.", "Maybe, but we can't exclude a sensor problem, because we haven't checked the sensor yet.", "That's possible, but we can't rule out a sensor problem, because we haven't checked the sensor yet.", "Maybe, but we can't rule out a sensor problem, because we haven't checked it yet."],
     meaning: [
@@ -740,7 +740,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "자카르타 팀과 건조기 용량을 높이는 방법을 논의 중입니다. Budi가 출구 온도를 120°C로 올리자고 하는데, 공정 조건 변경은 라이선스에 영향을 줄 수 있어 유럽 라이선서 Daniel의 의견이 필요합니다.",
     dialogue: [{ speaker: "Budi", en: "What if we raise the dryer outlet temperature to 120°C?", ko: "건조기 출구 온도를 120°C로 올리면 어떨까요?" }],
     promptKo: "좋은 생각이에요. 그런데 라이선스에 영향을 줄 수도 있으니까, 먼저 다니엘 씨한테 의견을 물어볼게요.",
-    segments: ["좋은 생각이에요.", "그런데 그것은 영향을 줄 수도 있어요", "라이선스에,", "그러니까 제가 (의견을) 물어볼게요 (run it by)", "다니엘 씨에게", "먼저"],
+    segments: ["좋은 생각이에요.", "그런데 라이선스에 영향을 줄 수도 있으니까", "먼저 다니엘 씨한테 물어볼게요 (run it by)"],
     reference: "Good idea. But it might affect the license, so I'll run it by Daniel first.",
     accepted: ["Good idea. But it might affect the license, so let me run it by Daniel first.", "Good idea. But it could affect the license, so I'll run it by Daniel first.", "Good idea. But it might affect the license, so I'll check with Daniel first.", "Good idea. But since it might affect the license, I'll run it by Daniel first.", "Good idea. But it might affect the licence, so I'll run it by Daniel first."],
     meaning: [
@@ -778,7 +778,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "말레이시아 고객사 Mr. Tan과 건조기 계약 조건을 협상 중입니다. Mr. Tan은 보증 기간을 2년으로 늘려 달라고 하고, 저희는 선금 비율을 높이고 싶습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "We'd really like a two-year warranty instead of one.", ko: "보증 기간을 1년이 아니라 2년으로 해 주셨으면 해요." }],
     promptKo: "선금으로 30%를 내 주시면 보증을 2년으로 늘려 드릴 수 있어요. 서로에게 좋은 거죠.",
-    segments: ["만약 ~해 주시면", "선금으로 30%를 내다,", "저희는 늘려 드릴 수 있어요", "보증을", "2년으로.", "서로에게 이득이에요 (a win-win)"],
+    segments: ["선금으로 30%를 내 주시면", "보증을 2년으로 늘려 드릴 수 있어요", "서로에게 좋은 거죠 (a win-win)"],
     reference: "If you can pay 30% upfront, we can extend the warranty to two years. It's a win-win.",
     accepted: ["If you can pay 30% in advance, we can extend the warranty to two years. It's a win-win.", "If you pay 30% upfront, we can extend the warranty to two years. It's a win-win.", "If you can pay 30% upfront, we can extend the warranty to two years. It's a win-win for both of us.", "If you can pay 30% upfront, we can extend the warranty to two years. That way, everyone wins.", "If you can pay 30% upfront, we can extend the warranty to two years. It's a win-win situation."],
     meaning: [
@@ -815,7 +815,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "유럽 라이선서 Daniel이 파일럿 플랜트 증설이 어떻게 되고 있는지 묻습니다. 고객사가 아직 환경 허가를 받지 못해서 프로젝트를 일단 멈춘 상태입니다.",
     dialogue: [{ speaker: "Daniel", en: "How's the pilot plant expansion going?", ko: "파일럿 플랜트 증설은 어떻게 돼 가요?" }],
     promptKo: "고객사가 아직 환경 허가를 못 받아서 일단 보류해 놨어요.",
-    segments: ["우리는 보류해 놨어요 (put … on hold)", "그것을,", "왜냐하면 고객사가 받지 못했어요", "환경 허가를", "아직"],
+    segments: ["일단 보류해 놨어요 (put on hold)", "고객사가 아직 환경 허가를 못 받아서요"],
     reference: "We've put it on hold, because the client hasn't received the environmental permit yet.",
     accepted: ["We've put it on hold because the client hasn't got the environmental permit yet.", "We put it on hold, because the client hasn't received the environmental permit yet.", "We've put the project on hold, because the client hasn't received the environmental permit yet.", "We've put it on hold, since the client still hasn't received the environmental permit.", "It's on hold, because the client hasn't received the environmental permit yet."],
     meaning: [
@@ -931,7 +931,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "디캔터 벤더를 두고 자카르타 팀과 논의 중입니다. Budi는 B사가 고객에게 더 좋은 선택이라고 계속 주장합니다. 하지만 비용을 내는 건 고객사이니 결정도 고객사가 해야 한다고 생각합니다.",
     dialogue: [{ speaker: "Budi", en: "But I really think Vendor B is the better choice for the client.", ko: "그래도 저는 B사가 고객에게 더 나은 선택이라고 생각해요." }],
     promptKo: "그럴 수도 있지만, 결국 돈을 내는 건 고객사니까 결정은 고객사가 하는 거죠.",
-    segments: ["그럴 수도 있지만,", "결국 (at the end of the day),", "고객사가 바로 그 쪽이에요 (the one)", "돈을 내는 (who)", "그러니까 그건 그들의 결정이에요"],
+    segments: ["그럴 수도 있지만,", "결국 돈을 내는 건 고객사니까 (at the end of the day)", "결정은 고객사가 하는 거죠"],
     reference: "Maybe, but at the end of the day, the client is the one who pays, so it's their decision.",
     accepted: ["Maybe, but at the end of the day, the client is the one who pays, so it's up to them.", "Maybe, but at the end of the day, it's the client who pays, so it's their decision.", "Maybe, but at the end of the day, the client is the one that pays, so it's their decision.", "Maybe, but in the end, the client is the one who pays, so it's their decision.", "Maybe, but at the end of the day, the client is the one who's paying, so it's their decision."],
     meaning: [
@@ -1005,7 +1005,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "인도 벤더 Priya와 펌프 납기를 협상하고 있습니다. 표준 납기는 16주인데, 프로젝트 일정상 3월 말까지는 펌프가 꼭 들어와야 합니다.",
     dialogue: [{ speaker: "Priya", en: "Our standard delivery time for these pumps is 16 weeks.", ko: "이 펌프들의 표준 납기는 16주예요." }],
     promptKo: "빠듯한 일정인 건 알지만, 3월 말까지 펌프를 납품해 주시는 게 가능할까요?",
-    segments: ["저도 알아요", "빠듯한 마감이라는 걸,", "하지만 ~하는 게 가능할까요", "펌프를 납품하다", "3월 말까지"],
+    segments: ["빠듯한 일정인 건 알지만,", "펌프를 납품해 주시는 게 가능할까요", "3월 말까지요"],
     reference: "I know it's a tight deadline, but would it be possible to deliver the pumps by the end of March?",
     accepted: ["I know it's a tight deadline, but could you deliver the pumps by the end of March?", "I know the deadline is tight, but would it be possible to deliver the pumps by the end of March?", "I know it's a tight schedule, but would it be possible to deliver the pumps by the end of March?", "I know it's a tight deadline, but is it possible to deliver the pumps by the end of March?", "I know it's a tight deadline, but would it be possible to deliver the pumps by late March?"],
     meaning: [
@@ -1044,7 +1044,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "말레이시아 고객사 Mr. Tan이 당신이 보낸 데이터시트의 유량 단위가 t/h가 아니라 kg/h로 적혀 있다고 지적합니다. 보내기 전에 다시 확인하지 않은 당신의 실수입니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "The flow rate in your datasheet is in kg/h, not t/h. Is that a mistake?", ko: "보내 주신 데이터시트의 유량이 t/h가 아니라 kg/h로 돼 있어요. 실수인가요?" }],
     promptKo: "네, 제 실수예요. 죄송합니다, 보내기 전에 단위를 다시 확인했어야 했는데요.",
-    segments: ["네, 제 실수예요.", "죄송합니다,", "저는 다시 확인했어야 했어요 (should have p.p.)", "단위를", "보내기 전에"],
+    segments: ["네, 제 실수예요. 죄송합니다.", "단위를 다시 확인했어야 했는데요", "보내기 전에요"],
     reference: "Yes, that's my mistake. Sorry, I should have double-checked the units before sending it.",
     accepted: ["Yes, that's my mistake. Sorry, I should have double-checked the units before I sent it.", "Yes, that's my mistake. Sorry, I should have checked the units again before sending it.", "Yes, my mistake. Sorry, I should have double-checked the units before sending it.", "Yes, that's my mistake. I'm sorry, I should have double-checked the units before sending it.", "Yes, that's my mistake. Sorry, I didn't double-check the units before sending it."],
     meaning: [
@@ -1081,7 +1081,7 @@ export const TALK_IDIOMS: Question[] = [
     contextKo: "시운전 일정이 밀리자 Budi가 새 배관의 압력 시험을 일부 생략하면 이틀을 아낄 수 있다고 제안합니다. 일정이 늦어지더라도 안전 시험은 제대로 해야 한다고 생각합니다.",
     dialogue: [{ speaker: "Budi", en: "We could skip part of the pressure test and save two days.", ko: "압력 시험을 일부 건너뛰면 이틀을 아낄 수 있어요." }],
     promptKo: "무슨 말인지는 알지만, 시운전이 늦어지더라도 압력 시험을 대충 하면 안 될 것 같아요.",
-    segments: ["이해는 하지만,", "저는 ~라고 생각하지 않아요", "우리가 대충 해야 한다고 (cut corners)", "압력 시험에서,", "~하더라도", "그것이 시운전을 늦추다"],
+    segments: ["무슨 말인지는 알지만,", "압력 시험은 대충 하면 안 될 것 같아요 (cut corners)", "시운전이 늦어지더라도요"],
     reference: "I understand, but I don't think we should cut corners on the pressure test, even if it delays the start-up.",
     accepted: ["I see your point, but I don't think we should cut corners on the pressure test, even if it delays the start-up.", "I understand, but I don't think we should cut corners with the pressure test, even if it delays the start-up.", "I understand, but I don't think we should skip any part of the pressure test, even if it delays the start-up.", "I understand, but we shouldn't cut corners on the pressure test, even if it delays the start-up.", "I understand, but I don't think we should cut corners on the pressure test, even if the start-up is delayed."],
     meaning: [

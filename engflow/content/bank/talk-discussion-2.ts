@@ -236,7 +236,7 @@ export const TALK_DISCUSSION_2: Question[] = [
     contextKo: "회의를 시작하며 Budi가 도울 일이 있는지 묻습니다. 오늘 회의록을 맡아 달라고 부탁합니다.",
     dialogue: [{ speaker: "Budi", en: "Is there anything I can help with today?", ko: "오늘 제가 도울 일이 있을까요?" }],
     promptKo: "네, Budi 씨, 오늘 회의록 좀 맡아 주실 수 있어요?",
-    segments: ["네,", "Budi 씨,", "~해 주실 수 있어요", "맡다", "회의록을", "오늘"],
+    segments: ["네, Budi 씨,", "회의록 좀 맡아 주실 수 있어요", "오늘?"],
     reference: "Yes, Budi, could you take care of the minutes today?",
     accepted: [
       "Yes, Budi, could you take care of the meeting minutes today?",
@@ -279,7 +279,7 @@ export const TALK_DISCUSSION_2: Question[] = [
     contextKo: "Linh이 배관 도면 작업이 계획보다 조금 오래 걸리고 있다고 합니다. 3월 15일 마감을 아직 지킬 수 있는지 확인합니다.",
     dialogue: [{ speaker: "Linh", en: "The piping drawings are taking a bit longer than we planned.", ko: "배관 도면이 계획보다 조금 오래 걸리고 있어요." }],
     promptKo: "그럼 3월 15일 마감은 아직 지킬 수 있는 거죠?",
-    segments: ["그럼", "~인가요", "우리는", "아직 순조롭게 가고 있는", "3월 15일 마감을 향해"],
+    segments: ["그럼 아직 순조롭게 가고 있는 거죠", "3월 15일 마감에 맞춰서?"],
     reference: "So are we still on track for the March 15 deadline?",
     accepted: [
       "So can we still meet the March 15 deadline?",
@@ -419,7 +419,7 @@ export const TALK_DISCUSSION_2: Question[] = [
     contextKo: "디캔터 벤더 두 곳을 비교하고 있습니다. B사와 일해 본 적이 있을 것 같은 Linh에게 경험이 어땠는지 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "Vendor B is cheaper, but we've never used them before.", ko: "B사가 더 싸긴 한데, 우리는 한 번도 써 본 적이 없어요." }],
     promptKo: "Linh 씨, 전에 B사와 일해 본 적 있어요? 어땠어요?",
-    segments: ["Linh 씨,", "일해 본 적 있어요", "B사와", "전에?", "어땠어요"],
+    segments: ["Linh 씨,", "전에 B사와 일해 본 적 있어요?", "어땠어요?"],
     reference: "Linh, have you worked with Vendor B before? How did it go?",
     accepted: [
       "Linh, have you worked with Vendor B before? How was it?",

@@ -543,7 +543,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "호텔 앞에서 택시를 타고 공항으로 가 달라고 했습니다. 비행기 시간이 빠듯해서 얼마나 걸리는지 묻습니다.",
     dialogue: [{ speaker: "Taxi driver", en: "The airport? Sure, no problem.", ko: "공항이요? 네, 알겠습니다." }],
     promptKo: "공항까지 가는 데 얼마나 걸려요?",
-    segments: ["얼마나 오래", "(시간이) 걸려요", "가는 데", "공항까지"],
+    segments: ["얼마나 걸려요?", "공항까지 가는 데"],
     reference: "How long does it take to get to the airport?",
     accepted: [
       "How long will it take to get to the airport?",
@@ -588,7 +588,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장지에서 처음으로 시내버스를 타려고 합니다. 버스가 정류장에 서고 문이 열리자, 중앙역에 가는지 기사에게 확인합니다.",
     dialogue: [{ speaker: "Bus driver", en: "Morning! Hop on.", ko: "안녕하세요! 타세요." }],
     promptKo: "실례지만, 이 버스 중앙역에 가요?",
-    segments: ["실례지만,", "~하나요", "이 버스가", "가다", "중앙역에"],
+    segments: ["실례지만,", "이 버스 중앙역에 가요?"],
     reference: "Excuse me, does this bus go to Central Station?",
     accepted: [
       "Excuse me, does this bus stop at Central Station?",
@@ -629,7 +629,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "자카르타 출장 중 호텔 방에 들어왔는데 에어컨이 작동하지 않습니다. 프런트에 전화를 걸었습니다.",
     dialogue: [{ speaker: "Front desk", en: "Good evening, front desk. How can I help you?", ko: "안녕하세요, 프런트입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 1204호인데요. 방 에어컨이 작동을 안 해요.",
-    segments: ["안녕하세요,", "1204호입니다.", "에어컨이", "제 방의", "작동하지 않고 있어요"],
+    segments: ["안녕하세요, 1204호입니다", "제 방 에어컨이", "작동을 안 해요"],
     reference: "Hi, this is room 1204. The air conditioner in my room isn't working.",
     accepted: [
       "Hi, this is room 1204. The air conditioning in my room isn't working.",
@@ -673,7 +673,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "어제 산 재킷이 마음에 들지 않아 영수증을 챙겨 가게에 다시 왔습니다. 점원이 무엇을 도와드릴지 묻습니다.",
     dialogue: [{ speaker: "Shop assistant", en: "Hi, how can I help you today?", ko: "안녕하세요, 무엇을 도와드릴까요?" }],
     promptKo: "이 재킷 환불받고 싶어요.",
-    segments: ["저는 받고 싶어요", "환불을", "이 재킷에 대해"],
+    segments: ["환불받고 싶어요", "이 재킷이요"],
     reference: "I'd like to get a refund for this jacket.",
     accepted: [
       "I'd like a refund for this jacket, please.",
@@ -899,7 +899,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "자카르타 공항에 도착했는데, 수하물 찾는 곳에서 한 시간 가까이 기다려도 여행 가방이 나오지 않습니다. 항공사 직원이 말을 겁니다.",
     dialogue: [{ speaker: "Airline staff", en: "Hi, is everything okay?", ko: "안녕하세요, 무슨 문제 있으세요?" }],
     promptKo: "아니요, 제 가방이 아직 안 나왔어요. 거의 한 시간째 기다리고 있어요.",
-    segments: ["아니요.", "제 가방이", "아직 나오지 않았어요.", "저는 기다려 왔어요", "거의 한 시간 동안"],
+    segments: ["아니요, 제 가방이 아직 안 나왔어요", "기다린 지", "거의 한 시간 됐어요"],
     reference: "Not really. My suitcase hasn't come out yet. I've been waiting for almost an hour.",
     accepted: [
       "Not really. My suitcase hasn't come out yet, and I've been waiting for almost an hour.",
@@ -1041,7 +1041,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "공항 환전소에서 300달러를 현지 돈으로 바꾸고 있습니다. 택시나 길거리 음식에 쓸 돈이 필요해서, 일부는 작은 단위 지폐로 받고 싶습니다.",
     dialogue: [{ speaker: "Exchange clerk", en: "So that's three hundred dollars. How would you like your money?", ko: "300달러 맞으시죠. 돈은 어떻게 드릴까요?" }],
     promptKo: "일부는 작은 단위 지폐로 주실 수 있어요? 택시랑 길거리 음식에 현금이 필요할 것 같아서요.",
-    segments: ["제가 받을 수 있을까요", "그중 일부를", "작은 단위 지폐로?", "저는 현금이 필요할 거예요", "택시와 길거리 음식에"],
+    segments: ["일부는 받을 수 있을까요", "작은 단위 지폐로?", "현금이 필요할 거예요", "택시랑 길거리 음식에"],
     reference: "Could I get some of it in small bills? I'll need cash for taxis and street food.",
     accepted: [
       "Could I get some of it in smaller bills? I'll need cash for taxis and street food.",
@@ -1087,7 +1087,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "자카르타에서 택시를 탔는데 에어컨이 너무 세서 춥습니다. 기사님께 조금 약하게 해 달라고 정중하게 부탁합니다.",
     dialogue: [{ speaker: "Taxi driver", en: "It's a long way to your hotel. Are you comfortable back there?", ko: "호텔까지 꽤 멀어요. 뒤에 편하세요?" }],
     promptKo: "죄송한데 좀 추워서요. 에어컨을 조금만 약하게 해 주실 수 있을까요?",
-    segments: ["죄송한데,", "좀 추워요.", "~해 주실 수 있을까요", "약하게 하다", "에어컨을", "조금"],
+    segments: ["죄송한데, 좀 추워요", "에어컨을 약하게 해 주실 수 있을까요", "조금만요"],
     reference: "Sorry, it's a bit cold. Would you mind turning down the air conditioning a little?",
     accepted: [
       "Sorry, it's a bit cold. Would you mind turning the air conditioning down a little?",
@@ -1133,7 +1133,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "약국에서 약사가 감기약을 권해 주었는데, 졸릴 수 있다고 합니다. 오후에 운전해야 해서 졸리지 않는 약이 필요합니다.",
     dialogue: [{ speaker: "Pharmacist", en: "This one works really well, but it might make you a little drowsy.", ko: "이 약이 효과가 정말 좋은데, 조금 졸릴 수 있어요." }],
     promptKo: "졸리지 않는 약은 없나요? 오늘 오후에 운전해야 해서요.",
-    segments: ["있나요", "무언가", "(그것은) 저를 졸리게 하지 않는?", "저는 운전해야 해요", "오늘 오후에"],
+    segments: ["졸리지 않는 약 있나요?", "오늘 오후에 운전해야 해서요"],
     reference: "Do you have anything that won't make me sleepy? I have to drive this afternoon.",
     accepted: [
       "Do you have anything that won't make me drowsy? I have to drive this afternoon.",
@@ -1179,7 +1179,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "공항에서 여행 가방을 찾았는데 바퀴 하나가 부서져 있습니다. 항공사 수하물 서비스 창구에 왔습니다.",
     dialogue: [{ speaker: "Airline staff", en: "Hello. What seems to be the problem?", ko: "안녕하세요. 무슨 문제가 있으신가요?" }],
     promptKo: "제 여행 가방이 비행 중에 파손됐어요. 바퀴 하나가 부서졌어요.",
-    segments: ["제 여행 가방이", "파손되었어요", "비행 중에.", "바퀴 중 하나가", "부서져 있어요"],
+    segments: ["제 여행 가방이 파손됐어요", "비행 중에요", "바퀴 하나가 부서졌어요"],
     reference: "My suitcase was damaged during the flight. One of the wheels is broken.",
     accepted: [
       "My suitcase was damaged on the flight. One of the wheels is broken.",
@@ -1229,7 +1229,7 @@ export const TALK_DAILY: Question[] = [
     contextKo: "출장을 마치고 시내 역에서 공항 열차를 타려는데, 어느 승강장에서 타는지 모르겠습니다. 역무원이 말을 겁니다.",
     dialogue: [{ speaker: "Station staff", en: "Hi there. Do you need any help?", ko: "안녕하세요. 도와드릴까요?" }],
     promptKo: "네, 공항 가는 열차가 어디서 출발하는지 알려 주실 수 있어요?",
-    segments: ["네,", "~알려 주실 수 있어요", "어디서", "공항 열차가", "출발하는지"],
+    segments: ["네, 알려 주실 수 있어요?", "공항 열차가 어디서 출발하는지"],
     reference: "Yes, could you tell me where the airport train leaves from?",
     accepted: [
       "Yes, could you tell me which platform the airport train leaves from?",

@@ -295,7 +295,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "공급업체 프리야 씨가 견적이 30일 동안 유효하다고 합니다. 민수 씨는 30일을 언제부터 세는지 바로 확인하고 싶습니다.",
     dialogue: [{ speaker: "Priya", en: "Our quote is valid for 30 days.", ko: "저희 견적은 30일 동안 유효합니다." }],
     promptKo: "그건 오늘부터인가요, 아니면 견적서 날짜부터인가요?",
-    segments: ["그건", "오늘부터인가요", "아니면", "견적서 날짜부터인가요?"],
+    segments: ["그건 오늘부터인가요,", "아니면 견적서 날짜부터인가요?"],
     reference: "Is that from today or from the quote date?",
     accepted: ["Is that from today or from the date of the quote?", "Is that from today or from the date on the quote?", "Do you mean from today or from the quote date?", "Okay. Is that from today or from the quote date?", "Sorry, is that from today or from the quote date?"],
     meaning: [
@@ -328,7 +328,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "사리 씨가 새 P&ID가 이전 버전과 사실상 같으냐고 묻습니다. 실제로 펌프 배치만 바뀌었습니다.",
     dialogue: [{ speaker: "Sari", en: "So the new P&ID is basically the same as the old one?", ko: "그러니까 새 P&ID는 사실상 예전 거랑 같은 거죠?" }],
     promptKo: "거의 그래요. 펌프 배치만 빼고요.",
-    segments: ["거의 그래요", "빼고는", "펌프 배치를"],
+    segments: ["거의 그래요.", "펌프 배치만 빼고요"],
     reference: "Pretty much, except for the pump layout.",
     accepted: ["Pretty much, apart from the pump layout.", "Pretty much. Only the pump layout is different.", "Pretty much, except the pump layout.", "Yes, pretty much, except for the pump layout.", "Mostly, except for the pump layout.", "Almost, except for the pump layout."],
     meaning: [
@@ -361,7 +361,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "부디 씨가 전화로 공급업체 담당자의 번호를 불러 주려고 합니다. 민수 씨는 받아 적을 펜이 필요합니다.",
     dialogue: [{ speaker: "Budi", en: "Okay, I'll give you the vendor's mobile number. Ready?", ko: "자, 공급업체 휴대폰 번호 알려 줄게요. 준비됐어요?" }],
     promptKo: "잠깐만요, 펜 좀 가져올게요.",
-    segments: ["잠깐만요", "제가 가져올게요", "펜을"],
+    segments: ["잠깐만요,", "펜 좀 가져올게요"],
     reference: "Hang on, let me grab a pen.",
     accepted: ["Hold on, let me grab a pen.", "Just a second, let me get a pen.", "Hang on a second. Let me grab a pen.", "One second, let me get a pen.", "Hang on, I need to grab a pen.", "Wait a moment, let me find a pen."],
     meaning: [
@@ -396,7 +396,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "부디 씨가 고객이 회의를 일주일 미루고 싶어 한다며 실망합니다. 민수 씨는 취소가 아닌 게 다행이라고 생각합니다.",
     dialogue: [{ speaker: "Budi", en: "Bad news. The client wants to push the meeting back by a week.", ko: "안 좋은 소식이에요. 고객이 회의를 일주일 미루고 싶대요." }],
     promptKo: "뭐, 더 나쁠 수도 있었죠. 적어도 취소하지는 않았잖아요.",
-    segments: ["뭐", "그건 더 나쁠 수도 있어요", "적어도", "그들은 취소하지 않았어요", "그걸"],
+    segments: ["뭐, 더 나쁠 수도 있었죠.", "적어도 취소하지는 않았잖아요"],
     reference: "Well, it could be worse. At least they didn't cancel it.",
     accepted: ["It could be worse. At least they didn't cancel it.", "Could be worse. At least they didn't cancel it.", "Well, it could be worse. At least they didn't cancel the meeting.", "It could have been worse. At least they didn't cancel it.", "Well, it could be worse. At least it wasn't cancelled.", "Oh well, it could be worse. At least they haven't cancelled it.", "It could be worse. At least it's not cancelled."],
     meaning: [
@@ -430,7 +430,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "보고서 마감 전날 밤, 사리 씨가 늦게까지 있을 것 같으니 음식을 시키자고 합니다. 민수 씨도 막 같은 말을 하려던 참이었습니다.",
     dialogue: [{ speaker: "Sari", en: "Should we order some food? It looks like we'll be here until late.", ko: "음식 좀 시킬까요? 늦게까지 있어야 할 것 같아요." }],
     promptKo: "제 마음을 읽으셨네요! 막 그 얘기를 하려던 참이었어요.",
-    segments: ["당신이 읽었어요", "제 마음을!", "저는 막 ~하려던 참이었어요", "그걸 제안하려고"],
+    segments: ["제 마음을 읽으셨네요!", "막 그 얘기를 하려던 참이었어요"],
     reference: "You read my mind! I was just about to suggest that.",
     accepted: ["You read my mind. I was just going to suggest that.", "You read my mind! I was just going to say that.", "You read my mind! I was about to suggest the same thing.", "You read my mind! I was just thinking the same thing.", "You read my mind! I was just about to ask you the same thing."],
     meaning: [
@@ -498,7 +498,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "서울 사무실을 방문한 다니엘 씨가 어젯밤 프랑크푸르트에서 도착해 거의 못 잤다고 합니다. 민수 씨는 공감하고 회의 전에 커피를 권하고 싶습니다.",
     dialogue: [{ speaker: "Daniel", en: "Sorry, I'm a bit slow today. I flew in from Frankfurt last night and hardly slept.", ko: "죄송해요, 오늘 좀 정신이 없네요. 어젯밤 프랑크푸르트에서 와서 거의 못 잤어요." }],
     promptKo: "피곤하실 만하네요. 시차 때문에 힘드시겠어요. 시작하기 전에 커피 한 잔 드릴까요?",
-    segments: ["당연하네요", "당신이 피곤한 게", "당신은 분명 시차를 겪고 있겠어요", "커피를 원하세요?", "우리가 시작하기 전에"],
+    segments: ["피곤하실 만하네요.", "시차 때문에 힘드시겠어요.", "시작하기 전에 커피 한 잔 드릴까요?"],
     reference: "No wonder you're tired. You must be jet-lagged. Would you like a coffee before we start?",
     accepted: ["No wonder you're tired. You must be jet-lagged. Do you want a coffee before we start?", "No wonder you're tired! You must be really jet-lagged. Would you like some coffee before we start?", "No wonder you're tired. You must have jet lag. Would you like a coffee before we begin?", "That explains it. You must be jet-lagged. Can I get you a coffee before we start?", "No wonder you're so tired. You must be jet-lagged. Shall I get you a coffee before we start?"],
     meaning: [
@@ -601,7 +601,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "화상회의 중 다니엘 씨가 열수지 최신본을 공유 폴더에서 못 찾겠다고 합니다. 민수 씨는 잠깐 기억을 더듬습니다. 누가 보냈는지는 확실하지 않습니다.",
     dialogue: [{ speaker: "Daniel", en: "Where's the latest version of the heat balance? I can't find it in the shared folder.", ko: "열수지 최신본은 어디 있어요? 공유 폴더에서 못 찾겠네요." }],
     promptKo: "음, 잠깐만요. 지난 금요일에 프리야 씨한테 보내진 것 같아요.",
-    segments: ["음, 잠깐만요", "제 생각에", "그건 보내졌어요", "프리야 씨에게", "지난 금요일에"],
+    segments: ["음, 잠깐만요.", "프리야 씨한테 보내진 것 같아요", "지난 금요일에요"],
     reference: "Hmm, let me see. I think it was sent to Priya last Friday.",
     accepted: ["Let me see. I think it was sent to Priya last Friday.", "Hmm, let me think. I think it was sent to Priya last Friday.", "Hmm, let me see. I believe it was sent to Priya last Friday.", "Hmm, let me see. I think it was emailed to Priya last Friday.", "Let me see. I think we sent it to Priya last Friday.", "Hmm, let me check. I think it was sent to Priya last Friday."],
     meaning: [
@@ -815,7 +815,7 @@ export const TALK_REACTION_3: Question[] = [
     contextKo: "미국 친구 제이크가 영상 통화에서 한국어를 배우기 시작했다고 신이 나서 말합니다. 민수 씨는 기뻐하며 얼마나 됐는지 묻고, 말하기 연습을 도와주겠다고 하고 싶습니다.",
     dialogue: [{ speaker: "Jake", en: "Guess what? I've started learning Korean!", ko: "있잖아, 나 한국어 배우기 시작했어!" }],
     promptKo: "대단하다! 배운 지 얼마나 됐어? 혹시 말하기 연습하고 싶으면 기꺼이 도와줄게.",
-    segments: ["그거 대단하다!", "얼마나 오래", "너는 배워 오고 있어?", "만약 네가 혹시 원하면", "말하기를 연습하기를", "나는 기꺼이 도울게"],
+    segments: ["대단하다!", "배운 지 얼마나 됐어?", "혹시 말하기 연습하고 싶으면", "기꺼이 도와줄게"],
     reference: "That's amazing! How long have you been learning it? If you ever want to practice speaking, I'd be happy to help.",
     accepted: ["That's awesome! How long have you been learning it? If you ever want to practice speaking, I'd be glad to help.", "That's amazing! How long have you been studying it? If you ever want to practice speaking, I'd be happy to help.", "Wow, that's amazing! How long have you been learning? If you ever want to practice speaking, I'm happy to help.", "That's amazing! How long have you been learning it? If you ever want to practice speaking, just let me know. I'd be happy to help.", "No way, that's amazing! How long have you been learning it? I'd be happy to help if you ever want to practice speaking."],
     meaning: [

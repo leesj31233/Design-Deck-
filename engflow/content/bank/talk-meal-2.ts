@@ -222,7 +222,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "팀 회식에서 다니엘 씨가 테이블에 맥주를 주문하려고 합니다. 당신은 건강 때문에 술을 끊었습니다.",
     dialogue: [{ speaker: "Daniel", en: "I'm ordering beers for the table. Do you want one too?", ko: "테이블에 맥주를 시키려고 하는데, 민수 씨도 한 잔 할래요?" }],
     promptKo: "저는 술을 안 마셔요. 대신 탄산음료 마실게요.",
-    segments: ["저는 술을 안 마셔요,", "하지만 저는 마실게요", "탄산음료를"],
+    segments: ["저는 술을 안 마시지만", "탄산음료 마실게요"],
     reference: "I don't drink, but I'll have a soda.",
     accepted: [
       "Thanks, but I don't drink. I'll have a soda.",
@@ -262,7 +262,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "쿠알라룸푸르에서 탄 씨가 주문한 칠리크랩이 먹음직스럽게 나왔습니다. 먹기 전에 가족에게 보여 줄 사진을 찍고 싶습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Here's the chili crab. It's our most famous dish!", ko: "칠리크랩 나왔어요. 저희 대표 요리예요!" }],
     promptKo: "와! 먹기 전에 사진 한 장 찍어도 될까요?",
-    segments: ["와!", "괜찮으세요", "제가 찍어도", "사진 한 장을", "우리가 먹기 전에"],
+    segments: ["와!", "사진 한 장 찍어도 될까요?", "먹기 전에요"],
     reference: "Wow! Do you mind if I take a quick photo before we eat?",
     accepted: [
       "Wow! Do you mind if I take a photo before we eat?",
@@ -303,7 +303,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "고깃집에서 식사를 마쳤는데 음식이 꽤 남았습니다. 사리 씨가 배부르다며 아까워합니다.",
     dialogue: [{ speaker: "Sari", en: "I'm so full, but it's a shame to waste all this food.", ko: "너무 배부른데, 이 음식을 다 버리기는 아깝네요." }],
     promptKo: "아직 음식이 많이 남았으니까 포장 용기를 달라고 해요.",
-    segments: ["아직 음식이 많이 있어요", "남은", "그러니까", "~해요", "요청하다", "포장 용기를"],
+    segments: ["아직 음식이 많이 남았으니까", "포장 용기를 달라고 해요"],
     reference: "There's still a lot of food left, so let's ask for a box.",
     accepted: [
       "There's still a lot of food left, so let's ask for a to-go box.",
@@ -425,7 +425,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "회식 1차가 끝나고 식당을 나왔습니다. 아직 9시라 다들 아쉬워하는 분위기입니다.",
     dialogue: [{ speaker: "Budi", en: "That was a great dinner! It's only nine o'clock, though.", ko: "저녁 정말 좋았어요! 그런데 아직 9시밖에 안 됐네요." }],
     promptKo: "너무 피곤하지 않으면, 2차로 어디 갈까요?",
-    segments: ["만약 당신이 너무 피곤하지 않다면", "우리 ~할까요", "어딘가로 가다", "2차로"],
+    segments: ["너무 피곤하지 않으면", "2차로 어디 갈까요?"],
     reference: "If you're not too tired, shall we go somewhere for a second round?",
     accepted: [
       "If you're not too tired, why don't we go somewhere for a second round?",
@@ -467,7 +467,7 @@ export const TALK_MEAL_2: Question[] = [
     contextKo: "쿠알라룸푸르 출장 중, 탄 씨가 자신이 좋아하는 식당에 데려가 나시르막을 추천했습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So, what do you think of the nasi lemak?", ko: "그래서, 나시르막 어때요?" }],
     promptKo: "정말 맛있어요! 지금까지 먹어 본 나시르막 중에 최고예요.",
-    segments: ["정말 맛있어요!", "그것은 최고예요", "나시르막 중에", "(그것은) 제가 지금까지 먹어 본"],
+    segments: ["정말 맛있어요!", "최고의 나시르막이에요", "지금까지 먹어 본 것 중에"],
     reference: "It's delicious! It's the best nasi lemak I've ever had.",
     accepted: [
       "It's amazing! It's the best nasi lemak I've ever had.",

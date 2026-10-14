@@ -759,7 +759,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "부디 씨가 금요일에 있는 사리 씨 송별 회식에 올 건지 묻습니다. 민수 씨는 꼭 갈 생각입니다.",
     dialogue: [{ speaker: "Budi", en: "Are you coming to Sari's farewell dinner on Friday?", ko: "금요일에 사리 씨 송별 회식 올 거예요?" }],
     promptKo: "당연하죠! 절대 안 빠지죠.",
-    segments: ["당연하죠!", "저는 놓치지 않을 거예요", "그것을"],
+    segments: ["당연하죠!", "절대 안 빠지죠"],
     reference: "You bet! I wouldn't miss it.",
     accepted: ["You bet! I wouldn't miss it for the world.", "Of course! I wouldn't miss it.", "Absolutely! I wouldn't miss it.", "Definitely! I won't miss it.", "Of course! I'll be there.", "You bet! I'll definitely be there.", "Of course I'm coming! I wouldn't miss it."],
     meaning: [
@@ -793,7 +793,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "지수 씨가 몇 달 동안 준비한 기술사 시험에 합격했다며 기뻐합니다.",
     dialogue: [{ speaker: "Jisoo", en: "Guess what? I passed the professional engineer exam!", ko: "있잖아요, 저 기술사 시험 붙었어요!" }],
     promptKo: "잘했어요! 해낼 줄 알았어요.",
-    segments: ["잘했어요!", "저는 알았어요", "당신이 해낼 수 있다는 걸"],
+    segments: ["잘했어요!", "해낼 줄 알았어요"],
     reference: "Way to go! I knew you could do it.",
     accepted: ["Way to go, Jisoo! I knew you could do it.", "Congratulations! I knew you could do it.", "Good for you! I knew you could do it.", "Well done! I knew you'd pass.", "That's amazing! I knew you could do it!", "Way to go! I knew you would pass."],
     meaning: [
@@ -826,7 +826,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "사리 씨가 전화로, 감사(audit) 건으로 꼭 할 이야기가 있다며 잠깐 시간이 되는지 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "Do you have a minute? There's something I need to tell you about the audit.", ko: "잠깐 시간 돼요? 감사 건으로 꼭 드릴 말씀이 있어요." }],
     promptKo: "네, 말씀하세요. 듣고 있어요.",
-    segments: ["네", "말씀하세요", "저는 듣고 있어요"],
+    segments: ["네, 말씀하세요.", "듣고 있어요"],
     reference: "Sure. Go ahead, I'm listening.",
     accepted: ["Go ahead, I'm listening.", "Of course. Go ahead, I'm listening.", "Sure, I'm listening.", "Yes, of course. I'm listening.", "Sure. What is it? I'm listening.", "Of course. I'm all ears."],
     meaning: [
@@ -860,7 +860,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "고객사 건물에서 탄 부장님과 동시에 엘리베이터 앞에 섰습니다. 탄 부장님이 먼저 타라고 하지만, 민수 씨는 양보하려고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Oh, please, go ahead.", ko: "아, 먼저 타세요." }],
     promptKo: "먼저 타세요. 저는 급하지 않아요.",
-    segments: ["당신 다음에 (탈게요)", "저는", "급하지 않아요"],
+    segments: ["먼저 타세요.", "저는 급하지 않아요"],
     reference: "After you. I'm not in a hurry.",
     accepted: ["Please, after you. I'm not in a hurry.", "After you, Mr. Tan. I'm not in a hurry.", "After you, please. I'm in no hurry.", "Please go ahead. I'm not in a hurry.", "Please, you go first. I'm not in a rush.", "After you. I'm not in a rush."],
     meaning: [
@@ -893,7 +893,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "자카르타 장기 출장 중 묵는 아파트에서, 이웃이 길모퉁이 슈퍼마켓이 24시간 문을 연다고 알려 줍니다.",
     dialogue: [{ speaker: "Neighbour", en: "By the way, the supermarket on the corner is open 24 hours.", ko: "참, 길모퉁이 슈퍼마켓은 24시간 열어요." }],
     promptKo: "아, 좋은 정보네요. 알려 줘서 고마워요!",
-    segments: ["아, 알게 돼서 좋네요", "고마워요", "저에게 알려 줘서"],
+    segments: ["아, 좋은 정보네요.", "알려 줘서 고마워요!"],
     reference: "Oh, good to know. Thanks for telling me!",
     accepted: ["Good to know. Thanks for telling me!", "Oh, that's good to know. Thanks for letting me know!", "Oh, really? Good to know. Thanks!", "Oh, good to know! Thank you for telling me.", "That's good to know. Thanks for the tip!", "Oh, that's useful to know. Thanks!"],
     meaning: [
@@ -927,7 +927,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "민수 씨가 부디 씨의 새 전화번호를 물었는데, 지수 씨도 모른다며 사리 씨가 알 수도 있다고 합니다.",
     dialogue: [{ speaker: "Jisoo", en: "Sorry, I don't have Budi's new number. Maybe Sari has it?", ko: "미안해요, 부디 씨 새 번호는 저도 없어요. 사리 씨가 알지도 몰라요." }],
     promptKo: "알겠어요, 어쨌든 고마워요. 사리 씨한테 물어볼게요.",
-    segments: ["알겠어요", "어쨌든 고마워요", "제가 물어볼게요", "사리 씨에게"],
+    segments: ["알겠어요, 어쨌든 고마워요.", "사리 씨한테 물어볼게요"],
     reference: "Okay, thanks anyway. I'll ask Sari.",
     accepted: ["That's okay. Thanks anyway. I'll ask Sari.", "No worries, thanks anyway. I'll ask Sari.", "Okay, thank you anyway. I'll check with Sari.", "Thanks anyway. I'll ask Sari, then.", "Okay, thanks anyway. I'll ask her.", "All right, thanks anyway. I'll try Sari.", "Okay, thanks anyway! I'll ask Sari about it."],
     meaning: [
@@ -960,7 +960,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "민수 씨가 아까 최신 P&ID 파일이 어디 있는지 물었는데, 통화 중이던 지수 씨가 이제야 무슨 일이었냐고 묻습니다. 그사이 민수 씨가 직접 찾았습니다.",
     dialogue: [{ speaker: "Jisoo", en: "Sorry, Minsu, I was on the phone. What did you need?", ko: "미안해요, 민수 씨, 통화 중이었어요. 뭐 필요했어요?" }],
     promptKo: "아, 괜찮아요. 찾았어요. 고마워요!",
-    segments: ["신경 쓰지 마세요", "제가 찾았어요", "그것을", "고마워요!"],
+    segments: ["아, 괜찮아요. 찾았어요.", "고마워요!"],
     reference: "Never mind, I found it. Thanks!",
     accepted: ["Oh, never mind. I found it. Thanks!", "Never mind, I just found it. Thanks anyway!", "That's okay, I found it. Thanks!", "Don't worry, I already found it. Thanks!", "It's okay, I found it already. Thanks!", "Never mind, I've found it. Thanks!"],
     meaning: [
@@ -994,7 +994,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "토요일 오후, 친구 에마가 메시지로 왜 주말에 사무실에 있냐고 묻습니다. 사정을 다 설명하자면 깁니다.",
     dialogue: [{ speaker: "Emma", en: "Wait, why are you at the office on a Saturday?", ko: "잠깐, 토요일인데 왜 사무실에 있어?" }],
     promptKo: "얘기하자면 길어. 커피 마시면서 얘기해 줄게.",
-    segments: ["그건 긴 이야기야", "내가 말해 줄게", "너에게", "커피 마시면서"],
+    segments: ["얘기하자면 길어.", "커피 마시면서 얘기해 줄게"],
     reference: "It's a long story. I'll tell you over coffee.",
     accepted: ["It's a long story. I'll tell you about it over coffee.", "Long story. I'll tell you over coffee.", "Oh, it's a long story. I'll tell you later over coffee.", "It's a long story! Let's grab a coffee and I'll tell you.", "It's a long story. I'll tell you when we get coffee."],
     meaning: [
@@ -1029,7 +1029,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "사리 씨가 도면의 옛날 버전을 보냈다며 미안해합니다. 민수 씨는 괜찮다고 하고, 시간 될 때 맞는 파일을 보내 달라고 하려 합니다.",
     dialogue: [{ speaker: "Sari", en: "I'm so sorry, Minsu. I sent you the old version of the drawing.", ko: "정말 미안해요, 민수 씨. 도면 옛날 버전을 보냈어요." }],
     promptKo: "괜찮아요, 그럴 수도 있죠. 시간 될 때 맞는 걸로 보내 주세요.",
-    segments: ["걱정 마세요", "그런 일은 있어요", "그냥 보내 주세요", "맞는 걸", "당신이 시간 될 때"],
+    segments: ["괜찮아요, 그럴 수도 있죠.", "시간 될 때 맞는 걸로 보내 주세요"],
     reference: "Don't worry, it happens. Just send me the right one when you can.",
     accepted: ["No worries, it happens. Just send me the right one when you can.", "Don't worry about it. It happens. Just send me the correct version when you can.", "Don't worry, it happens to everyone. Just send me the new one when you have time.", "That's okay, it happens. Just send me the right one when you get a chance.", "Don't worry, these things happen. Please send me the right version when you can."],
     meaning: [
@@ -1063,7 +1063,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "말레이시아 고객사의 탄 부장님이 전화로, 지난주에 트립됐던 건조기가 월요일부터 문제없이 돌아가고 있다고 알려 줍니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Good news. The dryer has been running smoothly since Monday.", ko: "좋은 소식이에요. 건조기가 월요일부터 문제없이 잘 돌아가고 있어요." }],
     promptKo: "그렇다니 다행이에요! 지난주에 트립됐을 때 걱정했거든요.",
-    segments: ["기뻐요", "그 말을 들으니!", "저는 걱정했어요", "그게 트립됐을 때", "지난주에"],
+    segments: ["그렇다니 다행이에요!", "지난주에 트립됐을 때 걱정했거든요"],
     reference: "Glad to hear that! I was worried when it tripped last week.",
     accepted: ["I'm glad to hear that! I was worried when it tripped last week.", "Good to hear! I was worried when the dryer tripped last week.", "That's great to hear! I was really worried when it tripped last week.", "Glad to hear it! I was a bit worried when it tripped last week.", "Great news! I was worried when the dryer tripped last week.", "I'm happy to hear that. I was worried after it tripped last week."],
     meaning: [
@@ -1095,7 +1095,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "파일럿 플랜트에서 압력 시험을 앞두고, 지수 씨가 어제 이미 확인한 플랜지 볼트를 또 점검해야 하냐고 묻습니다.",
     dialogue: [{ speaker: "Jisoo", en: "We already checked the flange bolts yesterday. Do we really need to check them again?", ko: "플랜지 볼트는 어제 이미 확인했잖아요. 정말 또 확인해야 해요?" }],
     promptKo: "조심해서 나쁠 건 없죠. 그러니까 한 번 더 확인해요.",
-    segments: ["안전한 게 낫죠", "후회하는 것보다", "그러니까", "확인해요", "그것들을", "한 번 더"],
+    segments: ["조심해서 나쁠 건 없죠.", "그러니까 한 번 더 확인해요"],
     reference: "Better safe than sorry, so let's check them one more time.",
     accepted: ["Better safe than sorry. Let's check them one more time.", "It's better to be safe than sorry, so let's check them again.", "Better safe than sorry, right? Let's check them again.", "Well, better safe than sorry, so let's check them once more.", "Better to be safe than sorry. Let's just check them again."],
     meaning: [
@@ -1128,7 +1128,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "부디 씨가 다음 달 발리에서 열리는 바이오매스 학회에서 발표해 볼 생각이 있는지 묻습니다. 민수 씨는 바로 결정하기 어렵습니다.",
     dialogue: [{ speaker: "Budi", en: "We need someone to give a talk at the biomass conference in Bali next month. Would you be interested?", ko: "다음 달 발리 바이오매스 학회에서 발표할 사람이 필요해요. 해 볼 생각 있어요?" }],
     promptKo: "생각해 볼게요. 금요일까지 알려 드릴게요.",
-    segments: ["제가 생각해 볼게요", "그것에 대해", "제가 알려 드릴게요", "금요일까지"],
+    segments: ["생각해 볼게요.", "금요일까지 알려 드릴게요"],
     reference: "Let me think about it. I'll let you know by Friday.",
     accepted: ["Let me think about it, and I'll let you know by Friday.", "Can I think about it? I'll let you know by Friday.", "I'll think about it and let you know by Friday.", "I'll think about it. I'll let you know by Friday.", "Let me think it over. I'll get back to you by Friday.", "Let me think about it. I'll tell you by Friday.", "Let me think about it first. I'll give you an answer by Friday.", "Let me think about it. I'll give you my answer by Friday."],
     meaning: [
@@ -1161,7 +1161,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "지수 씨가 자카르타 프로젝트의 공정 엔지니어 자리에 지원할까 고민 중이라며 의견을 묻습니다. 민수 씨는 지수 씨가 그 공정을 누구보다 잘 안다고 생각합니다.",
     dialogue: [{ speaker: "Jisoo", en: "I'm thinking about applying for the process engineer position in Jakarta. What do you think?", ko: "자카르타 프로젝트 공정 엔지니어 자리에 지원해 볼까 생각 중이에요. 어떻게 생각해요?" }],
     promptKo: "한번 해 봐요! 지수 씨가 그 공정은 누구보다 잘 알잖아요.",
-    segments: ["한번 해 봐요!", "당신은 알아요", "그 공정을", "누구보다 더 잘"],
+    segments: ["한번 해 봐요!", "지수 씨가 그 공정은 누구보다 잘 알잖아요"],
     reference: "Go for it! You know the process better than anyone.",
     accepted: ["Go for it, Jisoo! You know the process better than anyone.", "You should go for it! You know the process better than anyone.", "Go for it! You know the process better than anyone else.", "Definitely go for it! Nobody knows the process better than you.", "Go for it! No one knows the process better than you do.", "You should apply! You know the process better than anyone."],
     meaning: [
@@ -1194,7 +1194,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "부디 씨가 전화로 고객이 시운전 시작을 2주 미뤘다고 알려 줍니다. 민수 씨는 모든 준비가 끝난 줄 알았습니다.",
     dialogue: [{ speaker: "Budi", en: "The client just postponed the start-up by two weeks.", ko: "고객이 방금 시운전을 2주 미뤘어요." }],
     promptKo: "정말요? 왜요? 다 준비된 줄 알았는데요.",
-    segments: ["정말요?", "어째서요?", "저는 생각했어요", "모든 게 준비됐다고"],
+    segments: ["정말요? 왜요?", "다 준비된 줄 알았는데요"],
     reference: "Really? How come? I thought everything was ready.",
     accepted: ["Really? Why? I thought everything was ready.", "Really? How come? I thought we were ready.", "Seriously? How come? I thought everything was ready.", "Really? Why is that? I thought everything was ready.", "Oh, really? How come? I thought everything was on schedule.", "Really? How come they postponed it? I thought everything was ready."],
     meaning: [
@@ -1228,7 +1228,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "유럽 라이선서의 다니엘 씨와 화상으로 설계 검토 회의를 하기 직전입니다. 다니엘 씨가 바로 시작해도 되는지 묻고, 민수 씨 쪽 참석자는 모두 들어와 있습니다.",
     dialogue: [{ speaker: "Daniel", en: "Shall we start, or do you need a few more minutes?", ko: "시작할까요, 아니면 몇 분 더 필요하세요?" }],
     promptKo: "저는 언제든 준비됐어요. 저희 쪽은 모두 들어와 있어요.",
-    segments: ["저는 준비됐어요", "당신이 준비될 때", "저희 쪽 모두가", "여기 있어요"],
+    segments: ["저는 언제든 준비됐어요.", "저희 쪽은 모두 들어와 있어요"],
     reference: "I'm ready when you are. Everyone from our side is here.",
     accepted: ["Ready when you are. Everyone from our side is here.", "We're ready when you are. Everyone from our side is here.", "I'm ready when you are. Everyone on our side has joined.", "I'm ready when you are. Everyone from our side has joined.", "I'm ready whenever you are. Our whole team is here.", "We're ready when you are. Everyone from our team is here.", "We're ready when you are. Everyone on our side is here.", "I'm ready when you are. Everybody from our side is here."],
     meaning: [
@@ -1261,7 +1261,7 @@ export const TALK_REACTION_2: Question[] = [
     contextKo: "팀 화상회의에서 사리 씨가 경쟁사가 훨씬 커서 이번 입찰은 어려울 것 같다고 합니다. 하지만 우리 견적 가격이 더 낮습니다.",
     dialogue: [{ speaker: "Sari", en: "Honestly, I don't think we'll win the bid. The other company is much bigger than us.", ko: "솔직히 이번 입찰은 못 딸 것 같아요. 경쟁사가 우리보다 훨씬 크잖아요." }],
     promptKo: "그건 모르는 일이죠. 우리 가격이 더 낮으니까 아직 가능성이 있어요.",
-    segments: ["그건 모르는 일이죠", "우리 가격이", "더 낮아요", "그래서 우리는 아직", "가능성이 있어요"],
+    segments: ["그건 모르는 일이죠.", "우리 가격이 더 낮으니까", "아직 가능성이 있어요"],
     reference: "You never know. Our price is lower, so we still have a chance.",
     accepted: ["You never know. Our price is lower, so we still have a good chance.", "Who knows? Our price is lower, so we still have a chance.", "You never know! Our price is lower, so there's still a chance.", "You never know. Our price is lower, so we could still win.", "You never know. We still have a chance, because our price is lower.", "Well, you never know. Our price is lower, so we still have a chance."],
     meaning: [

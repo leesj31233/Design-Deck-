@@ -97,7 +97,7 @@ export const ROLEPLAY_WORK: Question[] = [
       { speaker: "Budi", en: "Okay, I can see it. So, is the design review still on Friday?", ko: "네, 보여요. 그럼 설계 검토는 아직 금요일인가요?" },
     ],
     promptKo: "사실은 검토가 다음 주 월요일로 옮겨졌어요.",
-    segments: ["사실은", "검토가", "옮겨졌어요", "다음 주 월요일로"],
+    segments: ["사실 검토가 옮겨졌어요", "다음 주 월요일로"],
     reference: "Actually, the review has been moved to next Monday.",
     accepted: [
       "Actually, the review has been moved to Monday next week.",
@@ -189,7 +189,7 @@ export const ROLEPLAY_WORK: Question[] = [
       { speaker: "Priya", en: "So, what would you like to cover today?", ko: "그럼 오늘은 어떤 내용을 다루고 싶으세요?" },
     ],
     promptKo: "오늘 통화의 목적은 납기 일정을 확정하는 거예요.",
-    segments: ["목적은", "오늘 통화의", "~하는 거예요", "확정하다", "납기 일정을"],
+    segments: ["오늘 통화의 목적은", "납기 일정을 확정하는 거예요"],
     reference: "The purpose of today's call is to confirm the delivery schedule.",
     accepted: [
       "The main purpose of today's call is to confirm the delivery schedule.",
@@ -941,7 +941,7 @@ export const ROLEPLAY_WORK: Question[] = [
       { speaker: "Mr. Tan", en: "Please do. The other supplier offered us a lower price.", ko: "부탁해요. 다른 공급사는 더 낮은 가격을 제시했거든요." },
     ],
     promptKo: "죄송하지만 이번 주문에 10% 할인은 어려워요.",
-    segments: ["죄송하지만", "저희는 드릴 수 없어요", "10%를", "이번 주문에"],
+    segments: ["죄송하지만 10%는 어려워요", "이번 주문에는"],
     reference: "I'm afraid we can't offer 10% on this order.",
     accepted: [
       "I'm afraid we can't give you 10% on this order.",
@@ -1565,7 +1565,7 @@ export const ROLEPLAY_WORK: Question[] = [
       { speaker: "Priya", en: "Not at all. How can I help?", ko: "아니에요. 무엇을 도와드릴까요?" },
     ],
     promptKo: "디캔터 예비 부품을 아직 못 받았어요.",
-    segments: ["저희는", "아직 받지 못했어요", "예비 부품을", "디캔터용"],
+    segments: ["아직 못 받았어요", "디캔터 예비 부품을"],
     reference: "We still haven't received the spare parts for the decanter.",
     accepted: [
       "We haven't received the spare parts for the decanter yet.",
@@ -1611,7 +1611,7 @@ export const ROLEPLAY_WORK: Question[] = [
       { speaker: "Priya", en: "Ah, yes. The shipment has been stuck at customs since Monday. It's been a really stressful week.", ko: "아, 네. 화물이 월요일부터 세관에 묶여 있어요. 이번 주는 정말 스트레스가 많았어요." },
     ],
     promptKo: "아이고, 정말 답답하시겠어요. 언제 통관될지 혹시 아세요?",
-    segments: ["아이고,", "그거 정말 답답하게 들리네요.", "혹시 아세요", "언제", "그것이 통관될지", "세관을"],
+    segments: ["아이고, 정말 답답하시겠어요.", "혹시 아세요", "언제 통관될지?"],
     reference: "Oh no, that sounds frustrating. Do you know when it'll clear customs?",
     accepted: [
       "Oh no, that sounds really frustrating. Do you know when it'll clear customs?",
@@ -1704,7 +1704,7 @@ export const ROLEPLAY_WORK: Question[] = [
     contextKo: "유럽 라이선서 Daniel이 지난주 파일럿 건조기의 출구 수분이 왜 그렇게 높았는지 묻습니다. 주로 폭풍우 뒤에 들어온 젖은 피드 때문이었다고 답합니다.",
     dialogue: [{ speaker: "Daniel", en: "I looked at last week's data. Why was the dryer outlet moisture so high?", ko: "지난주 데이터를 봤는데요. 건조기 출구 수분이 왜 그렇게 높았어요?" }],
     promptKo: "주로 폭풍우 뒤에 들어온 젖은 피드 때문이었어요.",
-    segments: ["그건 ~ 때문이었어요", "주로", "젖은 피드", "폭풍우 뒤의"],
+    segments: ["주로 젖은 피드 때문이었어요", "폭풍우 뒤에 들어온"],
     reference: "It was mainly because of the wet feed after the storm.",
     accepted: [
       "It was mostly because of the wet feed after the storm.",

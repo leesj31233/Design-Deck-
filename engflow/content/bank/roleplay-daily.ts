@@ -294,7 +294,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Taxi driver", en: "Sure thing. Let me put your bag in the trunk. … Okay, here we go.", ko: "그럼요. 가방은 트렁크에 실어 드릴게요. … 자, 출발합니다." },
     ],
     promptKo: "감사합니다. 거기까지 얼마나 걸려요?",
-    segments: ["감사합니다.", "얼마나 오래", "(시간이) 걸려요", "거기 도착하는 데?"],
+    segments: ["감사합니다.", "거기까지 얼마나 걸려요?"],
     reference: "Thanks. How long does it take to get there?",
     accepted: [
       "Thank you. How long does it take to get there?",
@@ -339,7 +339,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Taxi driver", en: "Usually about thirty minutes. But look at this traffic! It might take an hour tonight. Sorry about that.", ko: "보통 30분쯤이요. 그런데 이 차 막히는 것 좀 보세요! 오늘 밤은 한 시간 걸릴 수도 있어요. 죄송해요." },
     ],
     promptKo: "괜찮아요. 급하지 않으니까 천천히 가셔도 돼요.",
-    segments: ["괜찮아요.", "저는 급하지 않아요,", "그러니까", "천천히 하세요"],
+    segments: ["괜찮아요.", "저는 급하지 않아요,", "그러니까 천천히 가세요"],
     reference: "That's okay. I'm not in a hurry, so take your time.",
     accepted: [
       "No problem. I'm not in a hurry, so take your time.",
@@ -428,7 +428,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Taxi driver", en: "Oh, thank you, sir! Have a good stay.", ko: "어이쿠, 감사합니다! 좋은 시간 보내세요." },
     ],
     promptKo: "아, 영수증 좀 주시겠어요? 회사에 내야 해서요.",
-    segments: ["아,", "제가 받을 수 있을까요", "영수증을,", "부탁해요?", "저는 그것이 필요해요", "제 회사를 위해"],
+    segments: ["아, 영수증 좀 받을 수 있을까요?", "회사에 내야 해서요"],
     reference: "Oh, could I get a receipt, please? I need it for my company.",
     accepted: [
       "Oh, could I have a receipt, please? I need it for my company.",
@@ -561,7 +561,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Hotel clerk", en: "Front desk, this is Anna speaking. How can I help you?", ko: "프런트 데스크, 안나입니다. 무엇을 도와드릴까요?" },
     ],
     promptKo: "안녕하세요, 1504호인데요. 에어컨이 안 돼요.",
-    segments: ["안녕하세요,", "여기는 1504호예요.", "에어컨이", "작동하지 않고 있어요"],
+    segments: ["안녕하세요,", "1504호인데요.", "에어컨이 안 돼요"],
     reference: "Hi, this is room 1504. The air conditioner isn't working.",
     accepted: [
       "Hi, this is room 1504. The air conditioning isn't working.",
@@ -748,7 +748,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Pharmacist", en: "Sure. What are your symptoms?", ko: "네. 어떤 증상이 있으세요?" },
     ],
     promptKo: "어제부터 목이 아프고 열이 나요.",
-    segments: ["저는 (계속) 앓고 있어요", "목 통증과", "열을", "어제부터"],
+    segments: ["목이 아프고 열이 나요", "어제부터요"],
     reference: "I've had a sore throat and a fever since yesterday.",
     accepted: [
       "I've had a sore throat and a slight fever since yesterday.",
@@ -842,7 +842,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Pharmacist", en: "Great. Then these tablets should help with both your throat and the fever.", ko: "좋아요. 그럼 이 알약이 목이랑 열에 둘 다 도움이 될 거예요." },
     ],
     promptKo: "감사합니다. 얼마나 자주 먹어야 하는지 알려 주시겠어요?",
-    segments: ["감사합니다.", "알려 주시겠어요", "저에게", "얼마나 자주", "제가 먹어야 하는지", "그것들을"],
+    segments: ["감사합니다.", "알려 주시겠어요", "얼마나 자주 먹어야 하는지"],
     reference: "Thanks. Could you tell me how often I should take them?",
     accepted: [
       "Thank you. Could you tell me how often I should take them?",
@@ -1026,7 +1026,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Shop assistant", en: "Sure. … Okay, I found it. Would you like to exchange it or get a refund?", ko: "네. … 찾았어요. 교환하시겠어요, 환불하시겠어요?" },
     ],
     promptKo: "한 치수 큰 걸로 교환할 수 있을까요? 그 사이즈가 없으면 환불받고 싶어요.",
-    segments: ["제가 교환할 수 있을까요", "그것을", "더 큰 사이즈로?", "만약 당신이 갖고 있지 않다면", "그것을,", "저는 환불을 받고 싶어요"],
+    segments: ["교환할 수 있을까요", "더 큰 사이즈로?", "그 사이즈가 없으면", "환불받고 싶어요"],
     reference: "Can I exchange it for a bigger size? If you don't have one, I'd like to get a refund.",
     accepted: [
       "Could I exchange it for a bigger size? If you don't have one, I'd like to get a refund.",
@@ -1106,7 +1106,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Passer-by", en: "No worries. Where are you trying to go?", ko: "걱정 마세요. 어디로 가시려고요?" },
     ],
     promptKo: "센트럴역에 가려고 하는데요. 어느 노선을 타야 해요?",
-    segments: ["저는 가려고 하고 있어요", "센트럴역에.", "어느 노선을", "제가 타야 해요?"],
+    segments: ["센트럴역에 가려고 하는데요.", "어느 노선을 타야 해요?"],
     reference: "I'm trying to get to Central Station. Which line should I take?",
     accepted: [
       "I'm trying to get to Central Station. Which subway line should I take?",
@@ -1242,7 +1242,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Passer-by", en: "Exactly! And the station entrance is just across the street.", ko: "맞아요! 그리고 역 입구는 바로 길 건너편에 있어요." },
     ],
     promptKo: "도와주셔서 정말 고마워요. 진심으로 감사드려요.",
-    segments: ["정말 고마워요", "당신의 도움에 대해.", "저는 정말 감사해요", "그것을"],
+    segments: ["도와주셔서 정말 고마워요.", "진심으로 감사드려요"],
     reference: "Thank you so much for your help. I really appreciate it.",
     accepted: [
       "Thanks so much for your help. I really appreciate it.",
@@ -1331,7 +1331,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Linh", en: "Thanks! But the new job is in Ho Chi Minh City, so I have to move there next month.", ko: "고마워요! 그런데 새 자리가 호찌민시에 있어서 다음 달에 그리로 이사해야 해요." },
     ],
     promptKo: "와, 큰 변화네요. 기분은 어때요?",
-    segments: ["와,", "그건 큰 변화네요.", "어떻게 느껴요", "그것에 대해?"],
+    segments: ["와, 큰 변화네요.", "기분은 어때요?"],
     reference: "Wow, that's a big change. How do you feel about it?",
     accepted: [
       "Wow, that's a big change. How do you feel about that?",
@@ -1378,7 +1378,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Linh", en: "Honestly, I'm a little worried. My whole family is in Hanoi, and I don't know anyone in Ho Chi Minh City.", ko: "솔직히 좀 걱정돼요. 가족이 다 하노이에 있고, 호찌민시에는 아는 사람이 하나도 없거든요." },
     ],
     promptKo: "충분히 이해해요. 새로운 도시로 이사하는 건 정말 스트레스받는 일일 수 있죠.",
-    segments: ["저는 충분히 이해해요.", "이사하는 것은", "새 도시로", "~일 수 있어요", "정말 스트레스가 되는"],
+    segments: ["충분히 이해해요.", "새 도시로 이사하는 건", "정말 스트레스받을 수 있어요"],
     reference: "I totally understand. Moving to a new city can be really stressful.",
     accepted: [
       "I completely understand. Moving to a new city can be really stressful.",
@@ -1425,7 +1425,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Linh", en: "Yeah. I'm worried that I won't make any friends there.", ko: "맞아요. 거기서 친구를 하나도 못 사귈까 봐 걱정돼요." },
     ],
     promptKo: "분명히 금방 친구를 사귈 거예요. 린 씨는 제가 아는 사람 중에 제일 친절한 사람 중 하나잖아요.",
-    segments: ["저는 확신해요", "당신은 친구를 사귈 거예요", "금방.", "당신은 ~ 중 한 명이에요", "가장 친절한 사람들", "제가 아는"],
+    segments: ["분명 금방 친구를 사귈 거예요.", "당신은 제일 친절한 사람 중 하나예요", "제가 아는 사람 중에"],
     reference: "I'm sure you'll make friends quickly. You're one of the friendliest people I know.",
     accepted: [
       "I'm sure you'll make friends really quickly. You're one of the friendliest people I know.",
@@ -1471,7 +1471,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Linh", en: "Aw, thanks, Minsu. That really makes me feel better.", ko: "어머, 고마워요, 민수 씨. 그 말 들으니 정말 기분이 나아지네요." },
     ],
     promptKo: "떠나기 전에 팀이랑 송별 저녁 같이 해요. 식당은 제가 예약할게요.",
-    segments: ["당신이 떠나기 전에,", "~해요", "송별 저녁을 하다", "팀과 함께.", "제가 예약할게요", "식당을"],
+    segments: ["떠나기 전에", "팀이랑 송별 저녁 해요.", "식당은 제가 예약할게요"],
     reference: "Before you leave, let's have a farewell dinner with the team. I'll book a restaurant.",
     accepted: [
       "Before you leave, let's have a farewell dinner with the whole team. I'll book a restaurant.",
@@ -1558,7 +1558,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Budi", en: "Sure, what do you need?", ko: "그럼요, 뭐가 필요해요?" },
     ],
     promptKo: "금요일 오후에 반차를 쓰거든요. 2시 벤더 통화를 저 대신 들어가 줄 수 있어요?",
-    segments: ["저는 쉬어요", "금요일 오후를.", "맡아 줄 수 있어요", "벤더 통화를", "2시에", "저 대신?"],
+    segments: ["금요일 오후에 쉬어요.", "2시 벤더 통화 좀 맡아 줄 수 있어요", "저 대신?"],
     reference: "I'm taking Friday afternoon off. Could you cover the vendor call at two for me?",
     accepted: [
       "I'm taking Friday afternoon off. Could you join the vendor call at two for me?",
@@ -1608,7 +1608,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Budi", en: "Sure, no problem. Is there anything I should prepare?", ko: "그럼요, 문제없어요. 제가 미리 준비할 게 있을까요?" },
     ],
     promptKo: "제가 나가기 전에 회의 메모를 보내 드릴게요.",
-    segments: ["제가 보내 드릴게요", "당신에게", "제 회의 메모를", "제가 나가기 전에"],
+    segments: ["회의 메모를 보내 드릴게요", "제가 나가기 전에"],
     reference: "I'll send you my meeting notes before I leave.",
     accepted: [
       "I'll send you my notes before I leave.",
@@ -1654,7 +1654,7 @@ export const ROLEPLAY_DAILY: Question[] = [
       { speaker: "Budi", en: "Perfect. Don't worry about it, and enjoy your afternoon off!", ko: "좋아요. 걱정 말고 오후 잘 쉬어요!" },
     ],
     promptKo: "고마워요, 부디 씨. 신세 졌네요. 혹시 대신해 줄 사람이 필요하면 언제든 말해요.",
-    segments: ["고마워요, 부디 씨.", "제가 하나 빚졌어요.", "만약 당신이 언젠가 필요하면", "누군가가", "당신을 대신해 줄,", "그냥 저에게 알려 주세요"],
+    segments: ["고마워요, 부디 씨.", "신세 졌어요.", "대신해 줄 사람이 필요하면", "언제든 말해 줘요"],
     reference: "Thanks, Budi. I owe you one. If you ever need someone to cover for you, just let me know.",
     accepted: [
       "Thanks, Budi. I owe you one. If you ever need me to cover for you, just let me know.",

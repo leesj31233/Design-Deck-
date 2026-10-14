@@ -504,7 +504,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "엑셀 계산 파일이 계속 오류를 냅니다. 엑셀을 잘 다루는 사리 씨가 무슨 일이냐고 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "You've been staring at that screen for a while. What's wrong?", ko: "한참 화면만 보고 있네요. 무슨 일이에요?" }],
     promptKo: "이 엑셀 파일 좀 도와줄 수 있어요?",
-    segments: ["~해 줄 수 있어요?", "저를 도와주다", "~에 관해", "이 엑셀 파일"],
+    segments: ["좀 도와줄 수 있어요", "이 엑셀 파일?"],
     reference: "Could you help me with this Excel file?",
     accepted: [
       "Can you help me with this Excel file?",
@@ -548,7 +548,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "어제 오후 병원 진료로 자리를 비웠는데, 지수 씨가 대신 벤더(프리야 씨)와의 회의에 들어가 주었습니다.",
     dialogue: [{ speaker: "Jisoo", en: "Morning! The meeting with Priya went fine yesterday. I'll send you my notes.", ko: "좋은 아침이에요! 어제 프리야 씨랑 회의 잘 끝났어요. 메모 보내 드릴게요." }],
     promptKo: "어제 회의에 저 대신 들어가 줘서 정말 고마워요.",
-    segments: ["정말 고마워요", "저를 대신해 준 것", "회의에서", "어제"],
+    segments: ["정말 고마워요", "저 대신 회의에 들어가 줘서", "어제"],
     reference: "Thanks so much for covering for me at the meeting yesterday.",
     accepted: [
       "Thank you so much for covering for me at the meeting yesterday.",
@@ -592,7 +592,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "부디 씨가 이번 주 금요일까지 시운전 보고서를 쓰기로 했습니다. 커피 머신 앞에서 마주쳐 가볍게 진행 상황을 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "Hey Minsu, good morning!", ko: "민수 씨, 좋은 아침이에요!" }],
     promptKo: "좋은 아침이에요, 부디 씨. 시운전 보고서는 잘 돼 가요?",
-    segments: ["좋은 아침이에요, 부디 씨.", "어떻게", "시운전 보고서는", "진행되고 있어요?"],
+    segments: ["좋은 아침이에요, 부디 씨.", "시운전 보고서는 잘 돼 가요?"],
     reference: "Morning, Budi. How's the commissioning report coming along?",
     accepted: [
       "Morning, Budi. How's the commissioning report going?",
@@ -634,7 +634,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "신입 톰 씨에게 공유 폴더 쓰는 법을 알려 주려고 메신저로 연락했습니다. 톰 씨는 지금 회의 중이라고 합니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "Sorry, I'm in a meeting right now. Can we do it later?", ko: "죄송해요, 지금 회의 중이에요. 이따 해도 될까요?" }],
     promptKo: "그럼요. 점심 먹고 제 자리로 잠깐 와 줄래요?",
-    segments: ["그럼요.", "~해 줄래요?", "잠깐 들르다", "제 자리에", "점심 후에"],
+    segments: ["그럼요. 제 자리로 잠깐 와 줄래요", "점심 먹고?"],
     reference: "Sure. Could you swing by my desk after lunch?",
     accepted: [
       "Sure. Could you stop by my desk after lunch?",
@@ -814,7 +814,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "첫 출근한 톰 씨가 노트북을 받아 설정하고 있습니다. 준비가 끝나면 사무실을 구경시켜 주려고 합니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "IT just gave me my laptop. I'm still setting it up.", ko: "IT팀에서 방금 노트북을 받았어요. 아직 설정 중이에요." }],
     promptKo: "천천히 해요. 준비되면 사무실 구경시켜 줄게요.",
-    segments: ["천천히 해요.", "~하면", "당신이 준비되다,", "제가 구경시켜 줄게요", "당신에게", "사무실을"],
+    segments: ["천천히 해요.", "준비되면,", "사무실 구경시켜 줄게요"],
     reference: "Take your time. When you're ready, I'll show you around the office.",
     accepted: [
       "No rush. When you're ready, I'll show you around the office.",
@@ -949,7 +949,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "자카르타 팀의 사리 씨가 다음 달 싱가포르 지사로 옮긴다며, 오늘이 이 프로젝트 마지막 날이라고 합니다.",
     dialogue: [{ speaker: "Sari", en: "So today's my last day on the project. I'm moving to the Singapore office next month.", ko: "그래서 오늘이 이 프로젝트 마지막 날이에요. 다음 달에 싱가포르 지사로 옮겨요." }],
     promptKo: "정말 보고 싶을 거예요. 그동안 같이 일해서 정말 좋았어요.",
-    segments: ["우리는 정말 그리울 거예요", "당신이.", "정말 좋았어요", "같이 일한 것이", "당신과"],
+    segments: ["정말 보고 싶을 거예요.", "정말 좋았어요", "같이 일해서"],
     reference: "We're really going to miss you. It's been great working with you.",
     accepted: [
       "We'll really miss you. It's been great working with you.",
@@ -995,7 +995,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "밤 9시, 지수 씨가 이번 주 내내 야근을 하고 있습니다. 걱정이 돼서 말을 겁니다.",
     dialogue: [{ speaker: "Jisoo", en: "Oh, you're still here? I thought everyone had gone home.", ko: "어, 아직 계셨어요? 다들 퇴근한 줄 알았어요." }],
     promptKo: "이번 주 내내 늦게까지 남아 있네요. 괜찮아요? 도울 일 있으면 말해요.",
-    segments: ["당신은 계속 늦게까지 남아 있어요", "이번 주 내내.", "괜찮아요?", "말해 줘요", "~하면", "제가 도울 수 있다"],
+    segments: ["이번 주 내내 늦게까지 남아 있네요.", "괜찮아요?", "도울 일 있으면", "말해 줘요"],
     reference: "You've been staying late all week. Are you okay? Let me know if I can help.",
     accepted: [
       "You've been staying late all week. Are you all right? Let me know if I can help.",
@@ -1133,7 +1133,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "신입 톰 씨에게 사무실을 안내하다가 지수 씨 자리에 왔습니다. 마침 톰 씨가 벤더 문서 담당자가 누구인지 묻습니다.",
     dialogue: [{ speaker: "Tom (new hire)", en: "Who should I talk to about the vendor documents?", ko: "벤더 문서 관련해서는 누구한테 얘기하면 돼요?" }],
     promptKo: "이쪽은 지수 씨예요. 벤더 문서를 전부 담당하는 사람이에요.",
-    segments: ["이쪽은 지수 씨예요.", "그녀가 바로 그 사람이에요", "~하는", "담당하다", "모든 벤더 문서를"],
+    segments: ["이쪽은 지수 씨예요.", "이분이 담당해요", "벤더 문서 전부를"],
     reference: "This is Jisoo. She's the one who's in charge of all the vendor documents.",
     accepted: [
       "This is Jisoo. She's the one who handles all the vendor documents.",
@@ -1318,7 +1318,7 @@ export const TALK_OFFICE: Question[] = [
     contextKo: "금요일 오후 5시, 힘든 한 주를 함께 보낸 사리 씨와 부디 씨에게 퇴근 후 가볍게 한잔하자고 제안합니다.",
     dialogue: [{ speaker: "Sari", en: "I can't believe it's finally Friday. What a week!", ko: "드디어 금요일이라니 믿기지가 않네요. 정말 힘든 한 주였어요!" }],
     promptKo: "그러게요, 정말 긴 한 주였어요. 퇴근하고 다 같이 한잔하러 가는 거 어때요?",
-    segments: ["그러게요,", "정말 긴 한 주였어요.", "~하는 게 어때요", "우리 다 같이", "한잔하러 가다", "퇴근 후에?"],
+    segments: ["그러게요, 정말 긴 한 주였어요.", "다 같이 한잔하러 가는 거 어때요", "퇴근하고?"],
     reference: "I know, it's been a really long week. Why don't we all go for a drink after work?",
     accepted: [
       "I know, it's been a really long week. Why don't we all grab a drink after work?",

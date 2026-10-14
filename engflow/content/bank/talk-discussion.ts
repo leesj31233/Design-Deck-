@@ -189,7 +189,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "고객사 Mr. Tan이 디캔터 데이터시트 수정본을 요청합니다. 언제까지 필요한지 묻습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "We need the updated datasheet for the decanter.", ko: "디캔터 데이터시트 수정본이 필요해요." }],
     promptKo: "알겠습니다. 언제까지 필요하세요?",
-    segments: ["알겠습니다.", "언제", "필요하세요", "그것이", "~까지"],
+    segments: ["알겠습니다.", "언제까지 필요하세요?"],
     reference: "Sure. When do you need it by?",
     accepted: ["Sure. By when do you need it?", "Sure. When do you need the datasheet by?", "No problem. When do you need it by?", "Sure. When do you need the datasheet?"],
     meaning: [
@@ -223,7 +223,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "벤더 Priya가 펌프 성능 시험을 끝냈다고 합니다. 금요일까지 시험 보고서를 보내 달라고 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "We finished the pump performance test yesterday.", ko: "어제 펌프 성능 시험을 끝냈어요." }],
     promptKo: "좋네요. 금요일까지 시험 보고서를 보내 주실 수 있을까요?",
-    segments: ["좋네요.", "~해 주실 수 있을까요", "우리에게 보내다", "시험 보고서를", "금요일까지"],
+    segments: ["좋네요.", "시험 보고서를 보내 주실 수 있을까요", "금요일까지?"],
     reference: "Great. Could you send us the test report by Friday?",
     accepted: [
       "Great. Could you please send us the test report by Friday?",
@@ -348,7 +348,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "회의 끝에 Linh이 다른 안건이 있는지 묻습니다. 지난주에 보낸 도면을 검토했는지 확인하고 싶습니다.",
     dialogue: [{ speaker: "Linh", en: "Okay, is there anything else from your side?", ko: "좋아요, 그쪽에서 다른 안건 있으세요?" }],
     promptKo: "네, 혹시 지난주에 저희가 보낸 도면 보실 시간 있으셨어요?",
-    segments: ["네,", "보실 기회가 있으셨어요", "그 도면을", "우리가 보낸", "지난주에"],
+    segments: ["네, 혹시 보실 시간 있으셨어요", "도면을", "지난주에 저희가 보낸?"],
     reference: "Yes, have you had a chance to look at the drawings we sent last week?",
     accepted: [
       "Yes, have you had a chance to review the drawings we sent last week?",
@@ -432,7 +432,7 @@ export const TALK_DISCUSSION: Question[] = [
     contextKo: "인도네시아 팀 Budi가 다음 주에 상세 설계를 시작할 수 있는지 묻습니다. 배치도가 아직 고객사 승인을 받지 못했습니다.",
     dialogue: [{ speaker: "Budi", en: "Can we start the detailed design next week?", ko: "다음 주에 상세 설계 시작할 수 있을까요?" }],
     promptKo: "아직이요. 배치도가 아직 고객사 승인을 받지 못했어요.",
-    segments: ["아직이요.", "배치도가", "승인되지 않았어요", "고객사에 의해", "아직"],
+    segments: ["아직이요.", "배치도가 아직 승인 안 됐어요", "고객사에서"],
     reference: "Not yet. The layout hasn't been approved by the client yet.",
     accepted: [
       "Not yet. The client hasn't approved the layout yet.",

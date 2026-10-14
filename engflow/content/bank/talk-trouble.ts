@@ -339,7 +339,7 @@ export const TALK_TROUBLE: Question[] = [
     contextKo: "프리야 씨가 전화로 수정된 펌프 사양을 오늘 승인해 줄 수 있는지 묻습니다. 팀과 확인해야 해서 오늘 안에 답을 주겠다고 합니다.",
     dialogue: [{ speaker: "Priya", en: "Can you approve the revised pump specification today?", ko: "수정된 펌프 사양을 오늘 승인해 주실 수 있나요?" }],
     promptKo: "팀과 확인해 봐야 해서요. 오늘 중으로 다시 연락드릴게요.",
-    segments: ["저는 확인해야 해요", "팀과.", "제가 다시 연락드릴게요", "당신에게", "오늘이 끝날 때까지"],
+    segments: ["팀과 확인해 봐야 해요.", "다시 연락드릴게요", "오늘 중으로"],
     reference: "I need to check with my team. I'll get back to you by the end of the day.",
     accepted: [
       "I need to check with my team first. I'll get back to you by the end of the day.",
@@ -381,7 +381,7 @@ export const TALK_TROUBLE: Question[] = [
     contextKo: "시운전 중 문제가 생겨 출하가 늦어지고 있습니다. Mr. Tan이 언제 해결되냐고 재촉합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "When will the problem be fixed? We're running out of time.", ko: "문제는 언제 해결돼요? 시간이 없어요." }],
     promptKo: "최선을 다하고 있어요. 며칠만 더 기다려 주세요.",
-    segments: ["우리는 최선을 다하고 있어요.", "참고 기다려 주세요", "우리를", "며칠만 더"],
+    segments: ["최선을 다하고 있어요.", "조금만 기다려 주세요", "며칠만 더"],
     reference: "We're doing our best. Please bear with us for a few more days.",
     accepted: [
       "We're doing everything we can. Please bear with us for a few more days.",
@@ -468,7 +468,7 @@ export const TALK_TROUBLE: Question[] = [
     contextKo: "Mr. Tan이 샘플이 또 늦게 도착했다며 화를 냅니다. 먼저 공감하고 사과한 뒤, 무엇이 잘못됐는지 알아보겠다고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "This is the second time the samples arrived late. This is not acceptable.", ko: "샘플이 늦게 도착한 게 벌써 두 번째예요. 이건 받아들일 수 없어요." }],
     promptKo: "충분히 이해합니다. 정말 죄송해요. 무엇이 잘못됐는지 제가 알아볼게요.",
-    segments: ["충분히 이해합니다,", "그리고 정말 죄송해요.", "제가 알아볼게요", "무엇이 잘못됐는지"],
+    segments: ["충분히 이해해요,", "그리고 정말 죄송해요.", "뭐가 잘못됐는지 알아볼게요"],
     reference: "I completely understand, and I'm really sorry. Let me find out what went wrong.",
     accepted: [
       "I completely understand, and I'm really sorry about this. Let me find out what went wrong.",
@@ -510,7 +510,7 @@ export const TALK_TROUBLE: Question[] = [
     contextKo: "부디 씨가 교체용 베어링이 언제 오는지 묻습니다. 벤더의 답을 아직 못 받아서, 연락이 오면 바로 알려 주겠다고 합니다.",
     dialogue: [{ speaker: "Budi", en: "Any news about the replacement bearings?", ko: "교체용 베어링 소식 있어요?" }],
     promptKo: "아직이요. 벤더한테서 연락 오는 대로 바로 알려 드릴게요.",
-    segments: ["아직이요.", "제가 알려 드릴게요", "당신에게", "~하자마자", "제가 연락을 받다", "벤더로부터"],
+    segments: ["아직이요.", "바로 알려 드릴게요", "벤더한테서 연락 오는 대로"],
     reference: "Not yet. I'll let you know as soon as I hear from the vendor.",
     accepted: [
       "Not yet. I'll let you know as soon as I hear back from the vendor.",

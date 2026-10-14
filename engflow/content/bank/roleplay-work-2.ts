@@ -65,7 +65,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Sari", en: "Sounds good. Who wants to go first?", ko: "좋아요. 누가 먼저 할까요?" },
     ],
     promptKo: "부디 씨, 건조기 시험 진행 상황부터 말씀해 주시겠어요?",
-    segments: ["부디 씨,", "해 주시겠어요", "시작하는 것을", "진행 상황으로", "건조기 시험에 대한"],
+    segments: ["부디 씨,", "먼저 말씀해 주시겠어요", "건조기 시험 진행 상황을"],
     reference: "Budi, could you start with an update on the dryer test?",
     accepted: [
       "Budi, can you start with an update on the dryer test?",
@@ -300,7 +300,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Mr. Tan", en: "Two weeks? That's quite a lot. What happened?", ko: "2주요? 꽤 길네요. 무슨 일이에요?" },
     ],
     promptKo: "지난달에 벤더가 건조기 설계를 바꿔서, 열·물질 수지를 다시 해야 했습니다.",
-    segments: ["벤더가", "바꿨습니다", "건조기 설계를", "지난달에,", "그래서 우리는 다시 해야 했습니다", "열·물질 수지를"],
+    segments: ["벤더가 건조기 설계를 바꿨어요", "지난달에,", "그래서 다시 해야 했어요", "열·물질 수지를"],
     reference: "The vendor changed the dryer design last month, so we had to redo the heat and mass balance.",
     accepted: [
       "The vendor changed the dryer design last month, so we had to update the heat and mass balance.",
@@ -347,7 +347,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Mr. Tan", en: "I understand, but we need it before the board meeting in March. Is there any way to catch up?", ko: "이해는 하지만, 3월 이사회 전에는 받아야 해요. 따라잡을 방법이 있을까요?" },
     ],
     promptKo: "엔지니어를 두 명 더 투입하면 1주일은 만회할 수 있을 것 같습니다.",
-    segments: ["제 생각에", "우리는 만회할 수 있습니다", "1주일을", "만약 우리가 투입하면", "엔지니어 두 명을 더", "팀에"],
+    segments: ["1주일은 만회할 수 있을 것 같아요", "엔지니어를 두 명 더", "팀에 투입하면"],
     reference: "I think we can recover one week if we add two more engineers to the team.",
     accepted: [
       "I think we can make up one week if we add two more engineers to the team.",
@@ -535,7 +535,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Daniel", en: "Ten tons per hour? Where does that number come from?", ko: "시간당 10톤이요? 그 수치는 어디서 나온 거예요?" },
     ],
     promptKo: "고객사의 작년 생산 데이터를 바탕으로 한 거예요.",
-    segments: ["그것은", "바탕으로 한 거예요", "고객사의 생산 데이터를", "작년의"],
+    segments: ["고객사 생산 데이터를 바탕으로 했어요", "작년 데이터요"],
     reference: "It's based on the client's production data from last year.",
     accepted: [
       "It comes from the client's production data from last year.",
@@ -627,7 +627,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Daniel", en: "Exactly. Do you have any data from the new mill?", ko: "바로 그거예요. 새 공장 데이터는 있어요?" },
     ],
     promptKo: "아직이요. 사리 씨가 지난주에 보낸 샘플을 아직 실험실에서 분석하고 있어요.",
-    segments: ["아직이요.", "샘플들은", "사리 씨가 보낸", "지난주에", "아직 분석되고 있어요", "실험실에서"],
+    segments: ["아직이요.", "사리 씨가 지난주에 보낸 샘플은", "아직 실험실에서 분석 중이에요"],
     reference: "Not yet. The samples that Sari sent last week are still being tested in the lab.",
     accepted: [
       "Not yet. The samples Sari sent last week are still being tested in the lab.",
@@ -771,7 +771,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "Sure, have a seat. What's going on?", ko: "그럼요, 앉아요. 무슨 일이에요?" },
     ],
     promptKo: "스팀 보일러를 교체해야 해서 3천만 원 정도가 더 필요합니다.",
-    segments: ["우리는 필요합니다", "약 3천만 원이", "더,", "왜냐하면 우리는 교체해야 해서", "스팀 보일러를"],
+    segments: ["3천만 원 정도 더 필요해요", "스팀 보일러를 교체해야 해서요"],
     reference: "We need about 30 million won more because we have to replace the steam boiler.",
     accepted: [
       "We need about 30 million won more because the steam boiler has to be replaced.",
@@ -1010,7 +1010,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "Oh no. Was anyone hurt?", ko: "저런. 다친 사람 있어요?" },
     ],
     promptKo: "운전원 한 명이 스팀 배관에 손을 데었어요.",
-    segments: ["운전원 한 명이", "데었어요", "그의 손을", "스팀 배관에"],
+    segments: ["운전원 한 명이", "스팀 배관에 손을 데었어요"],
     reference: "One of the operators burned his hand on a steam pipe.",
     accepted: [
       "An operator burned his hand on a steam pipe.",
@@ -1056,7 +1056,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Ms. Kim", en: "Is he okay? Did he see a doctor?", ko: "괜찮대요? 병원에는 갔어요?" },
     ],
     promptKo: "네, 벌써 병원에 다녀왔고, 의사가 심하지 않다고 했어요.",
-    segments: ["네,", "그는 이미 다녀왔어요", "병원에,", "그리고 의사가 말했어요", "그것이 심하지 않다고"],
+    segments: ["네, 벌써 병원에 다녀왔어요,", "그리고 의사가 말했어요", "심하지 않다고"],
     reference: "Yes, he's already been to the hospital, and the doctor said it's not serious.",
     accepted: [
       "Yes, he's already been to the hospital, and the doctor said it isn't serious.",
@@ -1243,7 +1243,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Priya", en: "Oh, I'm sorry to hear that. What kind of problem?", ko: "아, 그거 유감이네요. 어떤 문제인가요?" },
     ],
     promptKo: "시험해 보니 약 20%가 새서, 설치를 할 수가 없어요.",
-    segments: ["약 20%가", "그것들 중", "새고 있었어요", "우리가 시험했을 때,", "그래서 우리는 설치할 수 없어요", "그것들을"],
+    segments: ["약 20%가 새고 있었어요", "시험해 봤을 때,", "그래서 설치할 수 없어요"],
     reference: "About 20 percent of them were leaking when we tested them, so we can't install them.",
     accepted: [
       "About 20% of them were leaking when we tested them, so we can't install them.",
@@ -1472,7 +1472,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Linh", en: "No problem. Where should I start?", ko: "별말씀을요. 뭐부터 하면 될까요?" },
     ],
     promptKo: "가장 급한 건 벤더에서 온 디캔터 데이터시트예요.",
-    segments: ["가장 급한 것은", "이에요", "디캔터 데이터시트", "벤더에서 온"],
+    segments: ["가장 급한 건", "디캔터 데이터시트예요", "벤더에서 온"],
     reference: "The most urgent thing is the decanter datasheet from the vendor.",
     accepted: [
       "The most urgent one is the decanter datasheet from the vendor.",
@@ -1518,7 +1518,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Linh", en: "Okay. What do I need to do with it?", ko: "알겠어요. 그걸로 뭘 하면 돼요?" },
     ],
     promptKo: "우리 공정 데이터와 대조해서 확인해 주세요. 벤더가 금요일까지 우리 의견을 받아야 하거든요.",
-    segments: ["확인해 주세요", "그것을", "우리 공정 데이터와 대조해서,", "왜냐하면 벤더가 필요로 해서", "우리 의견을", "금요일까지"],
+    segments: ["우리 공정 데이터와 대조해서 확인해 주세요,", "벤더가 우리 의견을 받아야 하거든요", "금요일까지"],
     reference: "Please check it against our process data, because the vendor needs our comments by Friday.",
     accepted: [
       "Please check it against our process data because the vendor needs our comments by Friday.",
@@ -1564,7 +1564,7 @@ export const ROLEPLAY_WORK_2: Question[] = [
       { speaker: "Linh", en: "Got it. And what should I do if I have questions about the data?", ko: "알겠어요. 데이터에 대해 궁금한 게 생기면 어떻게 하죠?" },
     ],
     promptKo: "잘 모르는 게 있으면 사리 씨한테 물어보세요. 공정 데이터를 준비한 사람이 사리 씨예요.",
-    segments: ["만약 뭔가 불분명하면,", "물어보시면 돼요", "사리 씨한테.", "그녀가 그 사람이에요", "준비한", "공정 데이터를"],
+    segments: ["잘 모르는 게 있으면,", "사리 씨한테 물어보면 돼요.", "공정 데이터를 준비한 사람이", "사리 씨예요"],
     reference: "If anything is unclear, you can ask Sari. She's the one who prepared the process data.",
     accepted: [
       "If anything isn't clear, you can ask Sari. She's the one who prepared the process data.",

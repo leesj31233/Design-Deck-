@@ -411,7 +411,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "자카르타 프로젝트의 건조기 납품에 문제가 생겼습니다. 혼자 결정하기 어려워 김 팀장님 자리로 찾아갑니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Hi Minsu. You look worried. What's up?", ko: "민수 씨, 걱정 있어 보이네요. 무슨 일이에요?" }],
     promptKo: "잠깐 시간 있으세요? 자카르타 프로젝트 문제로 말씀드릴 게 있어요.",
-    segments: ["시간 있으세요", "잠깐?", "저는 말씀드려야 해요", "팀장님께", "문제에 대해", "자카르타 프로젝트의"],
+    segments: ["잠깐 시간 있으세요?", "말씀드릴 게 있어요", "문제에 대해", "자카르타 프로젝트의"],
     reference: "Do you have a minute? I need to talk to you about a problem with the Jakarta project.",
     accepted: [
       "Do you have a moment? I need to talk to you about a problem with the Jakarta project.",
@@ -456,7 +456,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "우리 팀의 실수로 고객사의 시운전이 하루 늦어졌습니다. Mr. Tan과의 회의를 시작하면서 팀을 대표해 먼저 사과합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Okay, let's start. I think we all know why we're here.", ko: "자, 시작하죠. 다들 왜 모였는지 아실 거예요." }],
     promptKo: "네. 먼저 저희 팀을 대표해서 사과드리고 싶습니다.",
-    segments: ["네.", "먼저,", "저는 사과드리고 싶습니다", "대표해서", "저희 팀을"],
+    segments: ["네.", "먼저 사과드리고 싶습니다", "저희 팀을 대표해서"],
     reference: "Yes. First, I'd like to apologize on behalf of our team.",
     accepted: [
       "Yes. First of all, I'd like to apologize on behalf of our team.",
@@ -872,7 +872,7 @@ export const TALK_TROUBLE_2: Question[] = [
     contextKo: "벤더에 잘못된 노즐 목록이 나간 일로 김 팀장님이 지수 씨의 실수냐고 묻습니다. 사실 그 목록을 최종 승인한 사람은 당신입니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "I heard the wrong nozzle list went to the vendor. Was that Jisoo's mistake?", ko: "벤더에 잘못된 노즐 목록이 갔다면서요. 지수 씨 실수였어요?" }],
     promptKo: "사실 그 목록을 승인한 사람은 저예요. 그러니까 지수 씨가 아니라 제 책임이에요.",
-    segments: ["사실,", "제가 그 사람이에요", "그 목록을 승인한,", "그러니까", "제 책임이에요,", "지수 씨 책임이 아니라"],
+    segments: ["사실 목록을 승인한 사람은 저예요,", "그러니까 제 책임이에요,", "지수 씨 책임이 아니라요"],
     reference: "Actually, I was the one who approved the list, so it's my responsibility, not Jisoo's.",
     accepted: [
       "Actually, I'm the one who approved the list, so it's my responsibility, not Jisoo's.",

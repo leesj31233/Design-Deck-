@@ -317,7 +317,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "부디 씨가 서울 사무실에 처음 출장 왔습니다. 점심 메뉴를 고르기 전에 부디 씨가 할랄 음식만 먹는다고 알려 줍니다.",
     dialogue: [{ speaker: "Budi", en: "Just so you know, I only eat halal food.", ko: "참고로, 저는 할랄 음식만 먹어요." }],
     promptKo: "알겠어요. 사무실 근처에 괜찮은 할랄 식당을 하나 알아요.",
-    segments: ["알겠어요.", "저는 알아요", "괜찮은 할랄 식당을", "근처에", "우리 사무실"],
+    segments: ["알겠어요", "괜찮은 할랄 식당을 알아요", "사무실 근처에요"],
     reference: "Got it. I know a good halal restaurant near our office.",
     accepted: [
       "Okay. I know a good halal restaurant near our office.",
@@ -356,7 +356,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "다니엘 씨와 한식당에서 메뉴를 봅니다. 다니엘 씨가 각자 하나씩 시키면 되는지 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "So, should we each order our own dish?", ko: "그럼 각자 자기 요리를 하나씩 시킬까요?" }],
     promptKo: "한국에서는 보통 모두 같이 음식을 나눠 먹어요.",
-    segments: ["한국에서는", "우리는 보통 나눠 먹어요", "음식을", "모두와 함께"],
+    segments: ["한국에서는 보통 음식을 나눠 먹어요", "모두 같이요"],
     reference: "In Korea, we usually share the dishes with everyone.",
     accepted: [
       "In Korea, we usually share dishes with everyone.",
@@ -397,7 +397,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "호텔 조식을 먹으며 린 씨와 이야기합니다. 린 씨가 출장 다니면 베트남 음식이 그립다고 합니다.",
     dialogue: [{ speaker: "Linh", en: "I always miss Vietnamese food when I travel.", ko: "저는 출장 다니면 늘 베트남 음식이 그리워요." }],
     promptKo: "베트남에서는 보통 아침으로 뭘 먹어요?",
-    segments: ["무엇을", "사람들은 보통 먹나요", "아침으로", "베트남에서는?"],
+    segments: ["보통 아침으로 뭘 먹어요?", "베트남 사람들은요"],
     reference: "What do people usually eat for breakfast in Vietnam?",
     accepted: [
       "What do people in Vietnam usually eat for breakfast?",
@@ -521,7 +521,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "다니엘 씨와 부대찌개 집에 왔습니다. 냄비가 불 위에 있고, 다니엘 씨가 라면 사리를 들고 언제 넣는지 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "When do I put the noodles in?", ko: "라면은 언제 넣어요?" }],
     promptKo: "국물이 끓기 시작하면 라면을 넣으면 돼요.",
-    segments: ["~하면", "국물이 끓기 시작하다", "당신은 넣을 수 있어요", "라면을"],
+    segments: ["국물이 끓기 시작하면", "라면을 넣으면 돼요"],
     reference: "When the soup starts boiling, you can put the noodles in.",
     accepted: [
       "When the soup starts to boil, you can put the noodles in.",
@@ -563,7 +563,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "점심을 먹으며 사리 씨와 각 나라 음식 이야기를 합니다. 사리 씨가 자카르타에 오면 진짜 인도네시아 음식을 먹어 보라고 합니다.",
     dialogue: [{ speaker: "Sari", en: "You should come to Jakarta and try some real Indonesian food!", ko: "자카르타에 와서 진짜 인도네시아 음식을 꼭 드셔 보세요!" }],
     promptKo: "좋죠. 인도네시아 음식은 한 번도 안 먹어 봤는데, 렌당이 정말 맛있다고 들었어요.",
-    segments: ["좋죠.", "저는 한 번도 먹어 본 적이 없어요", "인도네시아 음식을,", "하지만 저는 들었어요", "렌당이", "정말 맛있다고"],
+    segments: ["좋죠", "인도네시아 음식은 한 번도 안 먹어 봤는데", "렌당이 정말 맛있다고 들었어요"],
     reference: "I'd love to. I've never tried Indonesian food, but I've heard rendang is really good.",
     accepted: [
       "I'd love to! I've never had Indonesian food, but I've heard rendang is really good.",
@@ -607,7 +607,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "인도 협력사 프리야 씨가 서울 사무실에 방문했습니다. 점심 먹으러 가자고 하니 프리야 씨가 시간이 너무 이르지 않냐고 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "Isn't it a bit early for lunch? It's only eleven forty.", ko: "점심 먹기엔 좀 이르지 않아요? 이제 11시 40분인데요." }],
     promptKo: "별로 안 일러요. 지금 나가면 점심시간에 붐비기 전에 자리를 잡을 수 있어요.",
-    segments: ["별로요.", "만약 우리가 지금 나가면", "우리는 잡을 수 있어요", "자리를", "점심시간 붐비기 전에"],
+    segments: ["별로 안 일러요", "지금 나가면", "점심시간 붐비기 전에 자리를 잡을 수 있어요"],
     reference: "Not really. If we leave now, we can get a table before the lunch rush.",
     accepted: [
       "Not really. If we go now, we can get a table before the lunch rush.",
@@ -647,7 +647,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "팀 저녁 자리에 다니엘 씨가 30분 늦게 도착했습니다. 다니엘 씨가 주문을 했는지 묻습니다.",
     dialogue: [{ speaker: "Daniel", en: "Sorry I'm late! Have you ordered yet?", ko: "늦어서 미안해요! 주문했어요?" }],
     promptKo: "몇 가지 이미 시켰는데, 드시고 싶은 거 더 시키셔도 돼요.",
-    segments: ["우리는 이미 시켰어요", "몇 가지 요리를,", "하지만 당신은 추가해도 돼요", "무엇이든", "원하는 것을"],
+    segments: ["몇 가지 이미 시켰는데,", "원하는 거 더 시켜도 돼요"],
     reference: "We've already ordered a few dishes, but you can add anything you want.",
     accepted: [
       "We've already ordered a few dishes, but you can order anything else you want.",
@@ -686,7 +686,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "서울에 놀러 온 친구 에마와 오래된 국밥집에 도착했습니다. 지난주에 통화하면서 이 식당 이야기를 했었습니다.",
     dialogue: [{ speaker: "Emma", en: "Wow, this place is packed! How did you find it?", ko: "와, 사람 엄청 많네! 여기 어떻게 찾았어?" }],
     promptKo: "여기가 지난주에 내가 말했던 그 식당이야. 30년 넘게 이 자리에 있었어.",
-    segments: ["여기가", "그 식당이야", "내가 너에게 말했던", "지난주에.", "여기 있었어", "30년 넘게"],
+    segments: ["여기가 그 식당이야", "지난주에 내가 말했던", "30년 넘게 여기 있었어"],
     reference: "This is the restaurant I told you about last week. It's been here for over thirty years.",
     accepted: [
       "This is the restaurant that I told you about last week. It's been here for over thirty years.",
@@ -728,7 +728,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "돌솥비빔밥이 나왔습니다. 다니엘 씨가 그릇이 예쁘다며 손으로 잡으려고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "What a nice bowl! Is it made of stone?", ko: "그릇 멋지네요! 돌로 만든 거예요?" }],
     promptKo: "네. 나오기 전에 뜨겁게 데워지니까 만지지 않게 조심하세요.",
-    segments: ["네.", "그것은 데워져요", "그것이 나오기 전에,", "그러니까 조심하세요", "만지지 않게", "그것을"],
+    segments: ["네, 나오기 전에 데워져요", "그러니까 만지지 않게", "조심하세요"],
     reference: "Yes. It's heated before it's served, so be careful not to touch it.",
     accepted: [
       "Yes, it's heated before it's served, so be careful not to touch it.",
@@ -771,7 +771,7 @@ export const TALK_MEAL_3: Question[] = [
     contextKo: "탄 씨와 식사 중에 종업원이 주문하지 않은 해물파전을 가져왔습니다. 옆 테이블 음식인 것 같습니다.",
     dialogue: [{ speaker: "Server", en: "Here you go, one seafood pancake.", ko: "여기 해물파전 나왔습니다." }],
     promptKo: "죄송한데, 저희 것이 아닌 것 같아요. 옆 테이블 것일 수도 있어요.",
-    segments: ["죄송한데,", "저는 생각하지 않아요", "그게 저희 것이라고.", "아마 그건 ~일 수도 있어요", "옆 테이블 것"],
+    segments: ["죄송한데, 저희 것이 아닌 것 같아요", "옆 테이블 것일 수도 있어요"],
     reference: "Sorry, I don't think that's ours. It might be for the next table.",
     accepted: [
       "Sorry, I don't think this is ours. It might be for the next table.",

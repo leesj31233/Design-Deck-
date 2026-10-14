@@ -401,7 +401,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "출장 마지막 날 아침, 호텔에서 체크아웃을 마쳤습니다. 오후 3시에 공항으로 떠나기 전까지 시내를 둘러보고 싶어서, 그때까지 짐을 맡아 줄 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Hotel clerk", en: "You're all checked out. Is there anything else I can do for you?", ko: "체크아웃 다 되셨습니다. 더 도와드릴 일이 있을까요?" }],
     promptKo: "네, 3시까지 제 짐 좀 맡아 주실 수 있어요?",
-    segments: ["네,", "~해 주실 수 있어요", "맡아 두다", "제 짐을", "3시까지"],
+    segments: ["네, 제 짐 좀 맡아 주실 수 있어요?", "3시까지요"],
     reference: "Yes, could you keep my luggage until three?",
     accepted: [
       "Yes, could you hold my luggage until three?",
@@ -445,7 +445,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "자카르타 공항에 도착해 통신사 매장에 들렀습니다. 2주 동안 쓸 현지 선불 유심을 사려고 하는데, 데이터는 무제한이면 좋겠습니다.",
     dialogue: [{ speaker: "Shop assistant", en: "Hi! What are you looking for today?", ko: "안녕하세요! 오늘 뭘 찾으세요?" }],
     promptKo: "2주 동안 쓸 데이터 무제한 선불 유심 하나 주세요.",
-    segments: ["저는 원해요", "선불 유심 하나를", "무제한 데이터가 있는", "2주 동안"],
+    segments: ["선불 유심 하나 주세요", "데이터 무제한으로", "2주 동안 쓸 거요"],
     reference: "I'd like a prepaid SIM card with unlimited data for two weeks.",
     accepted: [
       "I'd like a prepaid SIM with unlimited data for two weeks.",
@@ -490,7 +490,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "한국에서 부모님이 놀러 오셔서 주말에 셋이서 국립박물관에 갔습니다. 매표소에서 표를 사면서, 일흔이 넘으신 부모님을 위한 경로 할인이 있는지 묻습니다.",
     dialogue: [{ speaker: "Ticket clerk", en: "Hi! How many tickets would you like?", ko: "안녕하세요! 표 몇 장 드릴까요?" }],
     promptKo: "세 장이요. 혹시 어르신 할인 있나요?",
-    segments: ["세 장 주세요.", "~이 있나요", "어르신 할인"],
+    segments: ["세 장 주세요", "어르신 할인 있나요?"],
     reference: "Three, please. Do you have a senior discount?",
     accepted: [
       "Three, please. Is there a senior discount?",
@@ -582,7 +582,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "1월에 출장으로 자카르타에 도착했습니다. 체크인하는데 호텔 직원이 날씨 이야기로 말을 겁니다. 서울은 떠날 때 영하의 날씨였습니다.",
     dialogue: [{ speaker: "Receptionist", en: "Welcome to Jakarta! Hot enough for you?", ko: "자카르타에 오신 걸 환영해요! 꽤 덥죠?" }],
     promptKo: "네, 정말 덥네요! 제가 서울을 떠날 때는 엄청 추웠거든요.",
-    segments: ["네,", "정말 덥네요!", "엄청 추웠어요", "~할 때", "제가 서울을 떠났을"],
+    segments: ["네, 정말 덥네요!", "엄청 추웠어요", "서울을 떠날 때는"],
     reference: "Yes, it's really hot! It was freezing when I left Seoul.",
     accepted: [
       "Yes, it's so hot! It was freezing when I left Seoul.",
@@ -674,7 +674,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "출장 중 기차를 타고 시내 역에 내렸는데, 한 시간쯤 지나서야 휴대폰을 기차에 두고 내린 걸 알았습니다. 역의 분실물 센터를 찾아왔습니다.",
     dialogue: [{ speaker: "Station staff", en: "Lost and found. How can I help you?", ko: "분실물 센터입니다. 무엇을 도와드릴까요?" }],
     promptKo: "한 시간쯤 전에 기차에 휴대폰을 두고 내렸어요. 혹시 누가 맡긴 게 있나요?",
-    segments: ["저는 휴대폰을 두고 내렸어요", "기차에", "약 한 시간 전에.", "누가 ~했나요", "그것을 맡기다?"],
+    segments: ["기차에 휴대폰을 두고 내렸어요", "한 시간쯤 전에요", "누가 맡긴 게 있나요?"],
     reference: "I left my phone on the train about an hour ago. Has anyone handed it in?",
     accepted: [
       "I left my phone on the train about an hour ago. Has anyone turned it in?",
@@ -721,7 +721,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "현지 서비스 아파트에서 저녁 음식을 배달시켰습니다. 기사님이 전화해서 건물 앞인데 아무도 안 나온다고 합니다. 기사님은 A동에 간 것 같고, 당신은 그 바로 뒤 B동에 삽니다.",
     dialogue: [{ speaker: "Delivery driver", en: "Hi, I'm outside your building, but nobody's answering the door.", ko: "안녕하세요, 건물 앞인데 아무도 문을 안 열어 주시네요." }],
     promptKo: "다른 건물로 가신 것 같아요. 저는 B동에 있어요. A동 바로 뒤예요.",
-    segments: ["제 생각에", "기사님이 ~에 있을 수도 있어요", "잘못된 건물에.", "저는 B동에 있어요.", "그곳은 바로 뒤에 있어요", "A동의"],
+    segments: ["다른 건물에 계신 것 같아요", "저는 B동에 있어요", "A동 바로 뒤예요"],
     reference: "I think you might be at the wrong building. I'm in Building B. It's right behind Building A.",
     accepted: [
       "I think you might be at the wrong building. I live in Building B. It's right behind Building A.",
@@ -905,7 +905,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "출장지 호텔에서 밤 11시쯤 갑자기 열이 납니다. 해열제를 사러 가야 하는데, 근처에 아직 문을 연 약국이 있는지 프런트에 묻습니다.",
     dialogue: [{ speaker: "Night receptionist", en: "Good evening. Is everything all right?", ko: "안녕하세요. 별일 없으시죠?" }],
     promptKo: "열이 좀 나서요. 근처에 아직 문 연 약국이 있을까요?",
-    segments: ["저는 열이 좀 있어요.", "있나요", "약국이", "이 근처에", "(그곳은) 아직 문을 연"],
+    segments: ["열이 좀 나요", "근처에 약국 있나요?", "아직 문 연 곳이요"],
     reference: "I have a bit of a fever. Is there a pharmacy near here that's still open?",
     accepted: [
       "I have a bit of a fever. Is there a pharmacy nearby that's still open?",
@@ -952,7 +952,7 @@ export const TALK_DAILY_2: Question[] = [
     contextKo: "출장 중 동료 부디 씨와 식당에서 점심을 먹는데, 나온 수프가 미지근하게 식어 있습니다. 종업원이 음식이 괜찮은지 묻습니다.",
     dialogue: [{ speaker: "Server", en: "How is everything? Is the food okay?", ko: "음식은 괜찮으세요?" }],
     promptKo: "죄송한데, 수프가 좀 식었어요. 데워 주실 수 있을까요?",
-    segments: ["죄송한데,", "제 수프가", "좀 식었어요.", "~해 주실 수 있을까요", "그것을 데우다", "저를 위해"],
+    segments: ["죄송한데,", "수프가 좀 식었어요", "데워 주실 수 있을까요?"],
     reference: "Sorry, my soup is a bit cold. Could you heat it up for me?",
     accepted: [
       "Sorry, my soup is a little cold. Could you heat it up for me?",
