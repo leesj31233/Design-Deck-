@@ -8,10 +8,14 @@ import type { DialogueTurn, ErrorSpan, MeaningCheck, ScoreBucket } from "../../c
 
 /* ───────────── Meaning chunks (numbered like process streams) ───────────── */
 
-export function MeaningChunks({ segments, size = "lg" }: { segments: string[]; size?: "lg" | "md" }) {
+/** Shown under the chunks of a multi-chunk sentence: say the point first, short sentences are fine. */
+export const SPEAK_FIRST_HINT_KO = "핵심 먼저 → 이유 → 덧붙임 순서로 말해 보세요. 두세 문장으로 나눠도 정답입니다.";
+
+export function MeaningChunks({ segments, size = "lg", hint = false }: { segments: string[]; size?: "lg" | "md"; hint?: boolean }) {
   const reduced = useReduced();
   return (
-    <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label="한국어 의미 단위 (영어 어순)">
+    <div>
+    <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label="한국어 의미 단위 (말하는 순서)">
       {segments.map((s, i) => (
         <motion.li
           key={`${i}-${s}`}
@@ -35,6 +39,8 @@ export function MeaningChunks({ segments, size = "lg" }: { segments: string[]; s
         </motion.li>
       ))}
     </ol>
+    {hint && segments.length > 1 ? <p className="ef-ko mt-2 text-[12px] text-[var(--muted)]" data-testid="speak-first-hint">{SPEAK_FIRST_HINT_KO}</p> : null}
+    </div>
   );
 }
 

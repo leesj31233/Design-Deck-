@@ -27,6 +27,8 @@ describe("AI evaluation contract", () => {
     expect(p).toMatch(/Grammar first/);
     expect(p).toMatch(/Site-specific word choice is NOT an error/);
     expect(p).toMatch(/ONE category only/);
+    // Speak first: short sentences and point-first order are correct, a complex one-sentence form is never required.
+    expect(p).toMatch(/Speak first/);
     // The reply carries no recommended sentence (the question's curated reference is shown) and an empty
     // correction when nothing is wrong: fewer tokens, so the grade comes back sooner.
     expect(p).not.toMatch(/"recommended"/);

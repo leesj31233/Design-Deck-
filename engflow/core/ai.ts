@@ -22,6 +22,7 @@ const PRINCIPLES = `Grading principles:
 4. Spelling slips are "spelling", severity "minor" (almost no penalty). Never call a spelling slip a grammar error.
 5. Understandable does not mean grammatically correct: "We still waiting data" is understandable but has two grammar errors.
 6. Charge each underlying error ONE category only. Do not invent errors; a correct answer gets an empty list. Style preferences are not errors.
+7. Speak first. The learner practises saying their thinking in meetings, not writing one long sentence. An answer that splits the content into 2–3 short sentences, puts the main point first, or links ideas with "but/so/the reason is" instead of "although/because" is fully correct when it keeps the meaning — never an error, never "organization" points off. The reference is one good way to say it, not the only structure: a complex one-sentence form is never required.
 Severity: "critical" = meaning becomes wrong or opposite; "major" = clear grammar error a listener notices (wrong tense, missing be, wrong verb form, agreement); "minor" = small slip (article, plural -s, preposition nuance).`;
 
 function questionBrief(q: Question): string {
@@ -287,7 +288,8 @@ Requirements:
 - This learner keeps making this mistake (${r.weakness.labelKo}). Build the question so the SAME grammar context appears, in a new situation:
 ${r.weakness.examples.slice(0, 4).map((x) => `  wrong: "${x.wrong}" → right: "${x.right}"`).join("\n")}
   Add a pitfall that catches this exact mistake.` : ""}
-- promptKo: natural Korean. segments: Korean meaning chunks in ENGLISH word order (${r.mode === "sentence" ? "at least 3" : "1–4"}).
+- Speak first (priority: clarity > easy to say on the spot > natural > grammatically complex). Order the content main point → reason → extra detail. Prefer 2–3 short sentences over one sentence with stacked clauses ("I don't think we should scale up yet. The lab results look good, but the site feed could be different." rather than "Although …, I don't think … because …"); put a complex one-sentence form in "advanced" or "accepted" only.
+- promptKo: natural Korean in the same speaking order. segments: Korean meaning chunks in SPEAKING order, each one a unit said in one breath (${r.mode === "sentence" ? "2–5 chunks" : "1–4"}); a linking word (하지만, 왜냐하면, 비록) goes inside the chunk it introduces, never as a chunk of its own.
 - Tense must be unambiguous: real future condition = "~한다면" → If + present; hypothetical = "(실제로는 아니지만) ~한다고 가정하면" → If + past, would; past counterfactual = "~했더라면" → If + had p.p., would have p.p.; never "had decided … now".
 - accepted = ${r.mode === "sentence" ? "2–4" : "1–3"} other fully correct answers.
 - meaning units use this pattern syntax: "word" matches by stem (change ~ changed/changing), "=word" exact form, "a|b" alternatives, "tok?" optional, "..." gap. Make units lenient about grammar and generous with synonyms; every correct answer must match every unit. Mark technical terms with "term": true and essential units with "critical": true.

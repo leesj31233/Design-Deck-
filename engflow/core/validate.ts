@@ -38,7 +38,7 @@ export function validateQuestion(q: Question, ctx: { skillIds: Set<string>; seed
   q.segments.forEach((s, i) => {
     if (!HANGUL.test(s)) err(`segment ${i + 1} has no Korean text`);
   });
-  if (q.mode === "sentence" && q.segments.length < 3) err("sentence mode needs at least 3 meaning segments");
+  if (q.mode === "sentence" && q.segments.length < 2) err("sentence mode needs at least 2 meaning chunks");
   if (q.mode === "phrase" && q.segments.length > 5) warn("phrase mode has more than 5 segments");
   if (q.mode === "sentence" && q.accepted.length < 2) warn("sentence mode should list at least 2 accepted alternatives");
   if (new Set(q.meaning.map((m) => m.id)).size !== q.meaning.length) err("duplicate meaning unit ids");
@@ -114,4 +114,25 @@ export function validateBank(questions: Question[], ctx: { skillIds: Set<string>
     else refs.set(key, q.id);
   }
   return issues;
+}
+
+/**
+ * Speak-first style (communication before grammar): how a sentence question reads to someone who has to say it
+ * in a meeting. Not errors — a report that drives the content passes (`check-content --style`).
+ * - fine-chunks: more than 6 hint chips, or a chip that is only a linking word ("비록 ~이지만", "왜냐하면").
+ *   Chips should be meaning units a speaker says in one breath.
+ * - concession-first: the model answer opens with "Although/Even though …"; say the point first instead
+ *   ("I don't think we should … . The results look good, but …") and keep the long form as `advanced`.
+ * - long-single: one sentence of 25+ words with no full stop; split it into 2–3 short sentences.
+ */
+export type SpeakFirstIssue = "fine-chunks" | "concession-first" | "long-single";
+const LINK_CHIP = /^(비록|왜냐하면|만약|하지만|그래서|그리고|그러나|따라서)(\s*~?[가-힣]{0,4})?$/;
+export function speakFirstStyle(q: Question): SpeakFirstIssue[] {
+  if (q.mode !== "sentence") return [];
+  const out: SpeakFirstIssue[] = [];
+  if (q.segments.length > 6 || q.segments.some((s) => LINK_CHIP.test(s.trim()))) out.push("fine-chunks");
+  if (/^(Although|Even though|Though)\b/.test(q.reference)) out.push("concession-first");
+  const sentences = q.reference.split(/(?<=[.!?])\s+/).filter(Boolean);
+  if (sentences.length === 1 && q.reference.split(/\s+/).length >= 25) out.push("long-single");
+  return out;
 }

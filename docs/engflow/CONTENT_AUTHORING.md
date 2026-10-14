@@ -13,6 +13,28 @@ Avoid: *"Due to the insufficiency of operational datasets, the equipment sizing 
 
 Difficulty comes from **grammar complexity, reasoning, sentence length and communicative demand** — never from rare words. Avoid idioms and slangy phrasal verbs (*touch base, ballpark, circle back*). Prefer *check, confirm, send, finish, delay, change, decide, increase, reduce*.
 
+## Speak first: communication before grammar
+
+The app trains **saying what you think in a meeting**, not assembling long written sentences. When writing or reviewing a sentence question, judge it in this order:
+
+1. **Clarity** — does the listener get the point at once?
+2. **Speakability** — can a B1–B2 speaker say it on the spot?
+3. **Naturalness** — would an international engineering team say it this way?
+4. **Accuracy** — correct grammar and meaning (never sacrificed; among correct options, pick the shorter, easier one).
+
+Default speaking order: **Main point → Reason → Extra detail** (condition, exception, concession). Other natural orders are accepted; the model answer leads with the point.
+
+| Before (grammar-first) | After (speak-first) |
+| --- | --- |
+| *Although the lab results look promising, I don't think we should scale up yet because the feedstock composition at the site may be different.* | *I don't think we should scale up yet. The lab results look promising, but the feed composition at the site could be different.* |
+| chips: `비록 ~이지만 / 실험실 결과가 / 좋아 보인다 / 나는 생각하지 않는다 / … / 왜냐하면 / …` (10) | chips: `아직 스케일업하면 안 된다고 생각한다 / 실험실 결과는 좋아 보이지만 / 현장의 원료 조성이 다를 수도 있다` (3) |
+
+- Write `promptKo` in the same order (point first) so the Korean already models the thinking.
+- A two- or three-sentence answer is always correct if it carries the meaning: the grader treats a missing *because / although / so* as said when the answer links its ideas with sentence order or another linking word (`checkMeaning` in `engflow/core/evaluate.ts`). Keep such linking-word units non-critical.
+- Questions that teach a structure (third conditional, relative clause, *although* itself) keep that structure in the reference; their chips still follow meaning units.
+- Growth by level is about communication, not length: L1 one core sentence → L2 opinion + reason (*I think / I don't think / We need to / We should … because …*) → L3 point + reason + extra (*but, so, because, if*; split into 2–3 sentences when it helps) → L4 meeting moves (concern, alternative, uncertainty, conditional agreement or disagreement).
+- `npx tsx scripts/check-content.ts --style` lists questions that break this style (`fine-chunks`, `concession-first`, `long-single`).
+
 ## Realistic settings
 
 Korean and Southeast Asian teams; palm-oil residues (POME, EFB), biomass drying and pelletizing, washing, decanters, indirect dryers, steam and condensate, pumps, heat exchangers, scale-up from lab to pilot, Pre-FEED and FEED documents, datasheets, vendor quotations, EPC schedules, commissioning, start-up/shutdown, troubleshooting, CAPEX/OPEX, feasibility. Use roles ("the Indonesian team", "the vendor", "the client", "the site operator") or occasional names (Pak Budi, Ms. Nguyen). Units must be realistic (t/h, kg/h, wt%, °C, bar(g), kW).
@@ -24,11 +46,11 @@ See `engflow/core/types.ts` (`Question`). Fields that matter most:
 | Field | Rule |
 | --- | --- |
 | `promptKo` | Natural Korean of the whole prompt. |
-| `segments` | Korean meaning chunks **in English word order** (may sound slightly unnatural). Short chunks (≈2–10 Korean syllables). Sentence mode ≥ 3 chunks. Example: `만약 / 우리가 지금 결정한다면 / 장비 사양을 / 우리는 변경해야 할 수도 있다 / 그 사양을 / 나중에 / 왜냐하면 / 실제 운전 데이터가 / 달라질 수도 있기 때문이다` |
+| `segments` | Korean **meaning chunks in speaking order** — each one a unit a speaker says in one breath (≈4–16 Korean syllables), main point first. 2–5 chunks for a sentence question (never more than 6), no chip that is only a linking word (`비록 ~이지만`, `왜냐하면`, `하지만` go *inside* the chunk they introduce). Example: `아직 스케일업하면 안 된다고 생각한다 / 실험실 결과는 좋아 보이지만 / 현장의 원료 조성이 다를 수도 있다` |
 | `contextKo` | One line: who speaks, which meeting, why. |
-| `reference` | Simple, clear international English. This is the "recommended version". |
+| `reference` | The **recommended version** shown first in feedback: clear, easy to say on the spot, main point first. Two or three short sentences are better than one long sentence with stacked clauses. |
 | `accepted` | Other fully correct answers: different structures, synonyms, contractions. Sentence mode 2–5, phrase 1–4. |
-| `advanced` | (Sentence mode, B2+) more natural/precise but still clear to non-native listeners. |
+| `advanced` | (Sentence mode, B2+) more natural/precise but still clear to non-native listeners. The one-sentence complex form (*Although …, … because …*) belongs here or in `accepted`, never as the only correct answer. |
 | `meaning` | Meaning units (below). |
 | `pitfalls` | Known Korean-speaker mistakes for this item (below). |
 | `hints` | `pattern` (grammar formula), `skeleton` (reference with ____ blanks), `partial` (first half of the reference + "…"). |
@@ -133,7 +155,7 @@ Required fields, on top of the normal schema:
 - `situation` — the file's scene. `category`: `meeting` for online/presentation/discussion, `collab` for smalltalk/meal/visit/daily/office/feelings.
 - `dialogue` — 1–3 earlier lines, `{ speaker, en, ko }`. Speakers are recurring colleagues (Budi and Sari from Jakarta, Mr. Tan from a Malaysian client, Linh from Vietnam, Priya from a vendor in India, Daniel from a European licensor). In `daily` they are also the people met on a trip or living abroad (a barista, a taxi driver, a hotel clerk, a pharmacist, a shop assistant, a neighbour, a friend such as Emma or Jake); name them by role when there is no name (`"Barista"`, `"Hotel clerk"`). Their English is natural and simple. The learner (Minsu) always speaks next.
 - `expression` — the key spoken expression the turn practises, e.g. `"Let me share my screen."`.
-- `promptKo` — what the learner wants to say, in natural Korean. `segments` — Korean meaning chunks in English word order.
+- `promptKo` — what the learner wants to say, in natural Korean. `segments` — Korean meaning chunks in speaking order (see "Speak first" above).
 - `reference` — the most common native phrasing. `accepted` — other common, fully correct ways (≥2 for sentences).
 - `probes` — at least one `pass` paraphrase and one `fail` typical Korean-speaker mistake.
 

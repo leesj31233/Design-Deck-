@@ -194,7 +194,7 @@ export function FeedbackPanel({
                     <div className="space-y-2 pt-2">
                       {e.advanced ? (
                         <p className="ef-en text-[15px]">
-                          <span className="mr-2 rounded bg-[var(--ef-accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--ef-accent-ink)]">ADVANCED</span>
+                          <span className="mr-2 rounded bg-[var(--ef-accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--ef-accent-ink)]">고급 · 선택</span>
                           {e.advanced}
                         </p>
                       ) : null}

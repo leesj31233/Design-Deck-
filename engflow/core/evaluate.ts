@@ -141,10 +141,25 @@ export function closestTarget(q: Question, w: Token[]): { target: string; tw: To
   return rankTargets(q, w)[0];
 }
 
+/** Linking words for reason, contrast and result. A meaning unit made only of these is the link, not the content. */
+const LINK_WORDS = new Set(["although", "though", "even", "but", "however", "while", "whereas", "yet", "still", "because", "since", "as", "so", "therefore", "thus", "reason", "why", "that", "means", "cause", "due", "to", "of"]);
+const isLinkOnly = (any: string[]) =>
+  any.length > 0 && any.every((p) => !p.startsWith("re:") && p.split(/\s*\.\.\.\s*|\s+|\|/).filter(Boolean).every((x) => LINK_WORDS.has(x.replace(/^=/, "").toLowerCase()))) &&
+  any.some((p) => /\b(although|though|because|since|but|however|so|therefore|while)\b/.test(p));
+/**
+ * Speak-first answers: "I don't think we should scale up yet. The lab results look good, but the feed may differ."
+ * says the reason and the concession in their own sentences, so the "because"/"although" of the one-sentence model
+ * is not missing — the link is carried by the sentence order or by another linking word.
+ */
+const linksClauses = (w: Token[]) =>
+  w.some((t, i) => t.sentenceEnd && i < w.length - 1) || w.some((t) => /^(but|so|because|since|though|although|however|reason|therefore|means|while)$/.test(t.norm));
+
 export function checkMeaning(q: Question, w: Token[]): MeaningCheck[] {
+  const linked = linksClauses(w);
   return q.meaning.map((u) => {
     const m = matchAny(u.any, w, 2, true);
-    return { id: u.id, en: u.en, ko: u.ko, present: !!m, fuzzy: m?.fuzzy || undefined, term: !!u.term, critical: !!u.critical };
+    const present = !!m || (linked && !u.critical && isLinkOnly(u.any));
+    return { id: u.id, en: u.en, ko: u.ko, present, fuzzy: m?.fuzzy || undefined, term: !!u.term, critical: !!u.critical };
   });
 }
 

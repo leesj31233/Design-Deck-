@@ -256,3 +256,37 @@ describe("long answers", () => {
     expect(bucketPenalties([note("r", "rule"), note("m", "alignment", "major")], 48).grammar).toBe(40);
   });
 });
+
+describe("speak first: point first, short sentences", () => {
+  // A question written the old grammar-first way: one sentence with "although … because …" and link-word units.
+  const scaleUp = q({
+    mode: "sentence", level: "C1", difficulty: 8, skills: ["polite-disagree"],
+    reference: "Although the lab results look good, I don't think we should scale up yet, because the feed composition at the site might be different.",
+    meaning: [
+      { id: "although", en: "although", ko: "~이지만", any: ["although|though|but|however|while"] },
+      { id: "lab", en: "lab results", ko: "실험실 결과", any: ["lab ... result|results"] },
+      { id: "not-scale", en: "don't think we should scale up", ko: "스케일업하면 안 된다", any: ["not ... scale"], critical: true },
+      { id: "because", en: "because", ko: "왜냐하면", any: ["because|since|as"] },
+      { id: "different", en: "might be different", ko: "다를 수도", any: ["different|differ|vary"], critical: true },
+    ],
+  });
+
+  it("two or three short sentences with the main point first are fully correct", () => {
+    for (const a of [
+      "I don't think we should scale up yet. The lab results look promising, but the feedstock composition at the actual site could be different.",
+      "I don't think we should scale up yet. The main reason is that the feed composition at the site could be different. The lab results look good, though.",
+      "I don't think we should scale up yet. The lab results look good. The feed composition at the site might be different.",
+    ]) {
+      const r = evaluateLocal(scaleUp, a);
+      expect(r.meaning.every((m) => m.present), a).toBe(true);
+      expect(r.scores.overall, a).toBeGreaterThanOrEqual(95);
+    }
+  });
+
+  it("a missing link still counts when nothing links the clauses, and a flipped opinion still fails", () => {
+    const runOn = evaluateLocal(scaleUp, "The lab results look good, I don't think we should scale up yet, the feed composition at the site might be different.");
+    expect(runOn.meaning.find((m) => m.id === "because")!.present).toBe(false);
+    const flipped = evaluateLocal(scaleUp, "I think we should scale up now. The lab results look good.");
+    expect(flipped.scores.overall).toBeLessThan(85);
+  });
+});

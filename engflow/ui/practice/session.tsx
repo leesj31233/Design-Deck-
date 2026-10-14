@@ -537,7 +537,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
               <MyTurn>
                 {isSentence ? (
                   <>
-                    <MeaningChunks segments={q.segments} size="md" />
+                    <MeaningChunks segments={q.segments} size="md" hint={q.segments.length >= 3} />
                     <button onClick={() => setShowNatural((v) => !v)} className="dd-focus mt-2.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showNatural}>
                       <ChevronDown className={cn("size-3.5 transition", showNatural && "rotate-180")} /> 자연스러운 한국어 {showNatural ? "숨기기" : "보기"}
                     </button>
@@ -556,7 +556,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
               </MyTurn>
             ) : isSentence ? (
               <>
-                <MeaningChunks segments={q.segments} />
+                <MeaningChunks segments={q.segments} hint={q.segments.length >= 3} />
                 <button onClick={() => setShowNatural((v) => !v)} className="dd-focus mt-3 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showNatural}>
                   <ChevronDown className={cn("size-3.5 transition", showNatural && "rotate-180")} /> 자연스러운 한국어 {showNatural ? "숨기기" : "보기"}
                 </button>
