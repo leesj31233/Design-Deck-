@@ -4130,6 +4130,78 @@ const learnerSlips: Rule = (w) => {
       out.push({ rule: "preposition-collocation", from: i + 1, to: i + 2, replacement: "of", category: "preposition", severity: "major", skill: "verb-prep", messageKo: "'~을 담당하다'는 'in charge of'입니다." });
       continue;
     }
+    // "I went to shopping" → "went shopping": go + -ing for activities.
+    if (/^(go|goes|went|going|gone)$/.test(t) && n1 === "to" && /^(shopping|swimming|hiking|fishing|camping|skiing|jogging|running|bowling|cycling|sightseeing|dancing)$/.test(w[i + 2]?.norm ?? "")) {
+      out.push({ rule: "extra-preposition", from: i + 1, to: i + 2, replacement: "", category: "preposition", severity: "major", skill: "prep-gerund", messageKo: `'~하러 가다'는 'go + -ing'입니다: '${w[i].raw} ${w[i + 2].raw}'.` });
+      continue;
+    }
+    // "My hobby is watching movie" → "watching movies".
+    if (/^(watch|watching|watched|watches|like|love|enjoy)$/.test(t) && /^(movie|drama|video|film|cartoon)$/.test(n1) && ends(i + 1)) {
+      out.push({ rule: "plural-needed", from: i + 1, to: i + 2, replacement: `${n1}s`, category: "countability", severity: "major", skill: "countability", messageKo: `일반적인 '영화/드라마'는 복수형으로 말합니다: '${w[i].raw} ${n1}s' (특정한 것은 'the ${n1}').` });
+      continue;
+    }
+    // "I'm living in Seoul for five years" → "I've been living": an ongoing period up to now needs the perfect.
+    if (/^(am|is|are)$/.test(t) && i > 0 && /^(i|we|you|they|he|she|it)$/.test(w[i - 1].norm) && ((verbInfo(n1)?.form === "ing" && !ING_NOUNS.has(n1)) || /^(raining|snowing)$/.test(n1)) && !w.some((x) => /^(next|until|till|starting|tomorrow|from)$/.test(x.norm))) {
+      let k = i + 2;
+      let hit = -1;
+      for (; k < w.length && k <= i + 7; k++) {
+        if (k > i + 2 && brokenAfter(w, k - 1)) break;
+        if (w[k].norm === "since" && w[k + 1] && !/^(i|we|you|they|he|she|it|the)$/.test(w[k + 1].norm)) { hit = k; break; }
+        if (w[k].norm === "for" && /^(\d+|two|three|four|five|six|seven|eight|nine|ten|many|several|a)$/.test(w[k + 1]?.norm ?? "") && /^(years|year|months|month)$/.test(w[k + 2]?.norm ?? "") && /^(living|working|studying|teaching|learning|using|playing|running)$/.test(n1)) { hit = k; break; }
+        if (/^(next|until|till|another|more|from|starting|tomorrow)$/.test(w[k].norm)) break;
+      }
+      if (hit >= 0) {
+        const subj = w[i - 1].norm;
+        const have = /^(he|she|it)$/.test(subj) ? "has been" : "have been";
+        out.push({ rule: "perfect-progressive", from: i, to: i + 1, replacement: have, category: "tense", severity: "major", skill: "present-perfect", messageKo: `과거부터 지금까지 계속되는 일은 현재완료진행형입니다: '${w[i - 1].raw} ${have} ${w[i + 1].raw} … ${w[hit].raw} …'.` });
+        continue;
+      }
+    }
+    // "My wife and me went hiking" → "my wife and I".
+    if (t === "and" && n1 === "me" && i >= 2 && /^(my|our)$/.test(w[i - 2].norm) && (i === 2 || brokenAfter(w, i - 3)) && w[i + 2] && (verbInfo(w[i + 2].norm) || /^(are|were|have|will|can|both|usually|often|always|also)$/.test(w[i + 2].norm))) {
+      out.push({ rule: "subject-pronoun", from: i + 1, to: i + 2, replacement: "I", category: "word-choice", severity: "major", skill: "agreement", messageKo: "주어 자리에는 'me'가 아니라 'I'입니다: 'My wife and I …'." });
+      continue;
+    }
+    // "three times in a week" → "three times a week".
+    if (/^(times|once|twice)$/.test(t) && n1 === "in" && w[i + 2]?.norm === "a" && /^(day|week|month|year)$/.test(w[i + 3]?.norm ?? "")) {
+      out.push({ rule: "extra-preposition", from: i + 1, to: i + 2, replacement: "", category: "preposition", severity: "minor", skill: "collocation", messageKo: `빈도는 전치사 없이 '${w[i].raw} a ${w[i + 3].raw}'입니다.` });
+      continue;
+    }
+    // "She looks like happy" → "looks happy" (look like + noun, look + adjective).
+    if (/^(look|looks|looked|seem|seems|seemed|sound|sounds|sounded|feel|feels|felt)$/.test(t) && n1 === "like" && /^(happy|tired|sad|good|great|nice|busy|sick|angry|fine|upset|worried|nervous|excited|bored|interesting|delicious|expensive|cheap|difficult|easy|hard|ok|okay|serious|wonderful)$/.test(w[i + 2]?.norm ?? "") && (end(i + 2) || /^(today|now|to|and|but|because|so)$/.test(w[i + 3]?.norm ?? ""))) {
+      out.push({ rule: "extra-preposition", from: i + 1, to: i + 2, replacement: "", category: "word-choice", severity: "major", skill: "be-adj", messageKo: `형용사 앞에는 like 없이 '${w[i].raw} ${w[i + 2].raw}'입니다 ('${w[i].raw} like' 뒤에는 명사·절).` });
+      continue;
+    }
+    // "in the weekend" → "on/at the weekend".
+    if (t === "in" && n1 === "the" && /^(weekend|weekends)$/.test(w[i + 2]?.norm ?? "") && ends(i + 2)) {
+      out.push({ rule: "time-preposition", from: i, to: i + 1, replacement: "on", category: "preposition", severity: "minor", skill: "time-clause", messageKo: "'주말에'는 'on the weekend' (영국식 'at the weekend')입니다." });
+      continue;
+    }
+    // "The food was very delicious" → "really/so delicious": 'very' does not go with extreme adjectives.
+    if (t === "very" && /^(delicious|excellent|perfect|amazing|terrible|awful|fantastic|exhausted|starving|freezing|huge|tiny|wonderful|awesome|brilliant|furious|unique|impossible)$/.test(n1)) {
+      out.push({ rule: "very-extreme", from: i, to: i + 1, replacement: "really", category: "word-choice", severity: "minor", skill: "degree", messageKo: `'${n1}'처럼 이미 강한 형용사는 'very' 대신 'really/so/absolutely'와 씁니다.` });
+      continue;
+    }
+    // "We are going to a picnic" → "going on a picnic".
+    if (/^(go|goes|going|went)$/.test(t) && n1 === "to" && w[i + 2]?.norm === "a" && /^(picnic|trip|tour|vacation|holiday|cruise|hike|date|diet)$/.test(w[i + 3]?.norm ?? "")) {
+      out.push({ rule: "preposition-collocation", from: i + 1, to: i + 2, replacement: "on", category: "preposition", severity: "minor", skill: "collocation", messageKo: `'~을 가다'는 'go on a ${w[i + 3].raw}'입니다.` });
+      continue;
+    }
+    // "I'm stressful these days" → "stressed".
+    if (t === "stressful" && i > 0 && /^(am|is|are|was|were|feel|feels|felt|so|very|really|too|getting|get|got)$/.test(w[i - 1].norm) && w.slice(Math.max(0, i - 4), i).some((x) => PEOPLE.test(x.norm))) {
+      out.push({ rule: "feeling-adjective", from: i, to: i + 1, replacement: "stressed", category: "verb-form", severity: "major", skill: "be-adj", messageKo: "사람이 스트레스를 받으면 'stressed'입니다 ('stressful'은 '스트레스를 주는')." });
+      continue;
+    }
+    // "I can't eat spicy" → "spicy food".
+    if (/^(eat|eats|ate|eating|like|likes|love|hate)$/.test(t) && /^(spicy|sweet|salty|oily|greasy)$/.test(n1) && (end(i + 1) || /^(very|much|well|at|so|anymore|either|too)$/.test(w[i + 2]?.norm ?? "")) && verbInfo(t)) {
+      insert(i + 2, "food", "missing-content", "major", "collocation", `'${n1}'는 형용사라 명사가 필요합니다: '${w[i].raw} ${n1} food'.`, "missing-noun");
+      continue;
+    }
+    // "Can I have a bill, please?" → "the bill".
+    if (/^(have|get|bring)$/.test(t) && n1 === "a" && w[i + 2]?.norm === "bill" && ends(i + 2)) {
+      out.push({ rule: "article-the", from: i + 1, to: i + 2, replacement: "the", category: "article", severity: "minor", skill: "articles", messageKo: `식당에서 계산서는 정해진 하나라서 'the ${w[i + 2].raw}'입니다.` });
+      continue;
+    }
     // "Was a long day." → "It was a long day": a sentence needs a subject.
     if (/^(is|was)$/.test(t) && !w[i].expanded && (i === 0 || brokenAfter(w, i - 1)) && /^(a|an)$/.test(n1) && /^(long|great|good|nice|busy|tough|hard|fun|lovely|wonderful|crazy|productive|big)$/.test(w[i + 2]?.norm ?? "") && /^(day|week|trip|time|idea|meeting|flight|night|year|month|weekend|game|movie|one)$/.test(w[i + 3]?.norm ?? "") && end(i + 3)) {
       out.push({ rule: "missing-subject-it", from: i, to: i + 1, replacement: /^[A-Z]/.test(w[i].raw) ? `It ${t}` : `it ${t}`, category: "sentence-structure", severity: "major", skill: "be-adj", messageKo: `영어 문장에는 주어가 필요합니다: 'It ${t} ${w.slice(i + 1, i + 4).map((x) => x.raw).join(" ")}'.` });

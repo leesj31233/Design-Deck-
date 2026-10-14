@@ -170,6 +170,11 @@ export const UNCOUNTABLE_PLURALS: Record<string, string> = {
 
 /** Learner non-words with their likely intended form. */
 export const NON_WORDS: Record<string, { fix: string; noteKo: string; skill?: string }> = {
+  childrens: { fix: "children", noteKo: "child의 복수형은 'children'입니다 (-s를 붙이지 않습니다).", skill: "countability" },
+  mens: { fix: "men", noteKo: "man의 복수형은 'men'입니다.", skill: "countability" },
+  womens: { fix: "women", noteKo: "woman의 복수형은 'women'입니다.", skill: "countability" },
+  foots: { fix: "feet", noteKo: "foot의 복수형은 'feet'입니다.", skill: "countability" },
+  tooths: { fix: "teeth", noteKo: "tooth의 복수형은 'teeth'입니다.", skill: "countability" },
   stucked: { fix: "stuck", noteKo: "stick의 과거·과거분사는 'stuck'입니다: 'The valve is stuck.'" },
   sticked: { fix: "stuck", noteKo: "stick의 과거·과거분사는 'stuck'입니다." },
   shutted: { fix: "shut", noteKo: "shut의 과거·과거분사는 'shut' 그대로입니다." },
