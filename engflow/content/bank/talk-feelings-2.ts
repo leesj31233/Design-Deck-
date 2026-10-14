@@ -329,7 +329,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "오늘 아침 고객 회의에서 민수 씨가 말레이시아 고객 탄 씨를 다른 사람 이름으로 불렀습니다. 회의가 끝난 뒤 지수 씨가 위로합니다.",
     dialogue: [{ speaker: "Jisoo", en: "Don't worry about this morning. I don't think Mr. Tan even noticed.", ko: "오늘 아침 일은 걱정 마세요. 탄 사장님은 눈치도 못 채신 것 같아요." }],
     promptKo: "고마워요. 그래도 아직 너무 창피해요.",
-    segments: ["고마워요,", "하지만 저는 아직도", "너무 창피해요", "그 일 때문에"],
+    segments: ["고마워요.", "그래도 아직 너무 창피해요"],
     reference: "Thanks, but I'm still so embarrassed about it.",
     accepted: ["Thanks, but I'm still really embarrassed about it.", "Thank you, but I'm still so embarrassed about it.", "Thanks, Jisoo, but I'm still so embarrassed.", "Thanks, but I still feel so embarrassed about it.", "Thanks. I'm still really embarrassed, though.", "Thanks, but I still feel really embarrassed about it."],
     meaning: [
@@ -364,7 +364,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "출근길에 가벼운 접촉 사고가 났지만 다친 곳은 없습니다. 늦게 출근하자 김 팀장님이 걱정스럽게 묻습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Minsu! I heard you had a car accident this morning. Are you all right?", ko: "민수 씨! 오늘 아침에 교통사고가 났다고 들었어요. 괜찮아요?" }],
     promptKo: "괜찮아요, 감사해요. 다들 걱정하게 해서 죄송해요.",
-    segments: ["저는 괜찮아요,", "죄송해요", "걱정을 끼쳐서", "모두에게"],
+    segments: ["괜찮아요, 감사해요.", "다들 걱정하게 해서 죄송해요"],
     reference: "I'm fine, thanks. Sorry for worrying everyone.",
     accepted: ["I'm fine, thank you. Sorry for worrying everyone.", "I'm totally fine. Sorry for worrying everyone.", "I'm fine, thanks. Sorry I worried everyone.", "I'm okay, thanks. Sorry for making everyone worry.", "I'm fine, thanks. Sorry if I worried everyone.", "Yes, I'm fine. I'm sorry for worrying you."],
     meaning: [
@@ -399,7 +399,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "자카르타 장기 출장 두 달째, 점심을 먹으며 부디 씨가 안부를 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "You've been in Jakarta for two months now. How are you doing?", ko: "자카르타에 온 지 벌써 두 달이네요. 요즘 어떻게 지내요?" }],
     promptKo: "괜찮은데, 좀 향수병이 생겼어요. 가족이 정말 보고 싶어요.",
-    segments: ["저는 괜찮아요", "하지만 좀 향수병이 있어요", "저는 정말 그리워요", "제 가족을"],
+    segments: ["괜찮은데, 좀 향수병이 생겼어요.", "가족이 정말 보고 싶어요"],
     reference: "I'm okay, but I'm a bit homesick. I really miss my family.",
     accepted: ["I'm fine, but I'm a little homesick. I really miss my family.", "I'm okay, but I'm a bit homesick. I miss my family a lot.", "I'm doing okay, but I'm feeling a bit homesick. I really miss my family.", "Not bad, but I'm a bit homesick. I really miss my family.", "I'm okay, but I'm getting a bit homesick. I really miss my wife and kids."],
     meaning: [
@@ -437,7 +437,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "유럽 라이선서의 다니엘 씨가 데이터시트의 오류를 지적합니다. 설계 압력이 바뀐 것을 반영하는 걸 민수 씨가 깜빡했습니다.",
     dialogue: [{ speaker: "Daniel", en: "Minsu, the datasheet you sent yesterday still shows the old design pressure.", ko: "민수 씨, 어제 보내 준 데이터시트에 아직 예전 설계 압력이 나와 있어요." }],
     promptKo: "정말 죄송해요. 수정하는 걸 깜빡했어요. 정말 마음이 안 좋네요.",
-    segments: ["정말 죄송해요", "제가 깜빡했어요", "그것을 수정하는 것을", "그리고 마음이 정말 안 좋아요", "그 일에 대해"],
+    segments: ["정말 죄송해요.", "수정하는 걸 깜빡했어요.", "정말 마음이 안 좋네요"],
     reference: "I'm so sorry. I forgot to update it, and I feel terrible about it.",
     accepted: ["I'm really sorry. I forgot to update it, and I feel terrible about it.", "I'm so sorry. I forgot to update it, and I feel really bad about it.", "I'm so sorry, Daniel. I forgot to change it, and I feel terrible about it.", "I'm so sorry. I completely forgot to update it. I feel terrible.", "Sorry, that's my fault. I forgot to update it, and I feel really bad about it."],
     meaning: [
@@ -511,7 +511,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "한 달 넘게 해외 출장으로 연락을 못 했던 친구 엠마와 오랜만에 통화합니다.",
     dialogue: [{ speaker: "Emma", en: "It's been a really tough month. Ben and I broke up, and I had to move out of our apartment.", ko: "정말 힘든 한 달이었어. 벤이랑 헤어지고, 같이 살던 아파트에서도 나와야 했어." }],
     promptKo: "네가 힘들 때 곁에 있어 주지 못해서 정말 미안해. 그 얘기 좀 해 볼래?",
-    segments: ["정말 미안해", "내가 곁에 없어서", "네가 나를 필요로 했을 때", "얘기하고 싶어?", "그것에 대해"],
+    segments: ["정말 미안해", "네가 힘들 때 곁에 있어 주지 못해서.", "그 얘기 좀 해 볼래?"],
     reference: "I'm so sorry I wasn't there when you needed me. Do you want to talk about it?",
     accepted: ["I'm really sorry I wasn't there when you needed me. Do you want to talk about it?", "I'm so sorry I wasn't there for you when you needed me. Do you want to talk about it?", "I'm so sorry I wasn't around when you needed me. Do you want to talk about it?", "I'm so sorry I wasn't there when you needed me. Would you like to talk about it?", "I'm so sorry I couldn't be there when you needed me. Do you want to talk about it?"],
     meaning: [
@@ -550,7 +550,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "1년 동안 서울 사무실에 파견 근무했던 부디 씨가 자카르타로 돌아간 뒤 처음으로 화상통화를 합니다.",
     dialogue: [{ speaker: "Budi", en: "It's my first week back in Jakarta. How's everyone in Seoul? Do you guys miss me?", ko: "자카르타로 돌아온 지 첫 주예요. 서울은 다들 어때요? 저 보고 싶죠?" }],
     promptKo: "당연하죠! 부디 씨가 떠난 뒤로 예전 같지가 않아요. 같이 일하던 게 정말 그리워요.",
-    segments: ["당연하죠!", "(사무실이) 예전 같지 않았어요", "당신이 떠난 이후로", "저는 정말 그리워요", "당신과 함께 일하는 것을"],
+    segments: ["당연하죠!", "부디 씨가 떠난 뒤로 예전 같지가 않아요.", "같이 일하던 게 정말 그리워요"],
     reference: "Of course! It hasn't been the same since you left. I really miss working with you.",
     accepted: ["Of course we do! It hasn't been the same since you left. I really miss working with you.", "Of course! The office hasn't been the same since you left. I really miss working with you.", "Of course! It hasn't been the same without you. I really miss working with you.", "Of course! It hasn't been the same since you left. I miss working with you a lot.", "Of course! Things haven't been the same since you left. We all really miss working with you."],
     meaning: [
@@ -626,7 +626,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "친구 제이크가 몇 주 동안 준비한 회사 면접에서 최종 탈락했다고 연락해 왔습니다.",
     dialogue: [{ speaker: "Jake", en: "I didn't get the job. I made it to the final round, but they chose someone else.", ko: "나 그 회사 떨어졌어. 최종 면접까지 갔는데, 다른 사람을 뽑았대." }],
     promptKo: "잘 안 됐다니 안타깝지만, 넌 스스로를 자랑스러워해도 돼. 최종 면접까지 가는 사람은 많지 않잖아.",
-    segments: ["안타까워", "잘 안 됐다니", "하지만 너는 자랑스러워해야 해", "너 자신을", "많은 사람이 ~하지 못해", "최종 면접까지 가다"],
+    segments: ["잘 안 됐다니 안타깝지만,", "넌 스스로를 자랑스러워해도 돼.", "최종 면접까지 가는 사람은 많지 않잖아"],
     reference: "I'm sorry it didn't work out, but you should be proud of yourself. Not many people make it to the final round.",
     accepted: ["I'm sorry it didn't work out, but you should be really proud of yourself. Not many people make it to the final round.", "I'm sorry it didn't work out, but you should be proud of yourself. Not many people get to the final round.", "I'm so sorry it didn't work out, but you should still be proud of yourself. Not many people make it to the final round.", "Sorry it didn't work out, but you should be proud of yourself. Not a lot of people make it to the final round.", "I'm sorry you didn't get it, but you should be proud of yourself. Not many people make it to the final round."],
     meaning: [
@@ -665,7 +665,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "1년 넘게 준비한 펠릿 플랜트가 성능 시험을 통과했다는 소식을 김 팀장님이 팀 회의에서 전합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "The client just called. The plant passed the performance test on the first try!", ko: "방금 고객사에서 전화가 왔어요. 플랜트가 성능 시험을 한 번에 통과했대요!" }],
     promptKo: "정말 대단한 소식이네요! 이 프로젝트에 참여한 모든 분들이 정말 자랑스러워요.",
-    segments: ["정말 대단한 소식이네요!", "저는 정말 자랑스러워요", "모든 사람이", "(그 사람들이) 일했다", "이 프로젝트에서"],
+    segments: ["정말 대단한 소식이네요!", "모든 분들이 정말 자랑스러워요", "이 프로젝트에 참여한"],
     reference: "That's amazing news! I'm really proud of everyone who worked on this project.",
     accepted: ["That's fantastic news! I'm really proud of everyone who worked on this project.", "That's great news! I'm so proud of everyone who worked on this project.", "That's amazing! I'm really proud of everyone who worked on the project.", "That's amazing news! I'm really proud of everybody who worked on this project.", "That's amazing news! I'm really proud of all the people who worked on this project.", "That's amazing news! I'm really proud of everyone who has worked on this project."],
     meaning: [
@@ -702,7 +702,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "친구 엠마와 오랜만에 영상통화를 합니다. 민수 씨는 지난주 새 바이오매스 프로젝트의 리더로 뽑혔습니다.",
     dialogue: [{ speaker: "Emma", en: "So, what's new with you? Anything exciting at work?", ko: "그래서, 요즘 새로운 일 있어? 회사에서 신나는 일은?" }],
     promptKo: "응! 새 바이오매스 프로젝트를 이끌 사람으로 내가 뽑혔어. 진짜 설레!",
-    segments: ["응!", "나는 뽑혔어", "이끌 사람으로", "새 바이오매스 프로젝트를", "나는 정말 설레"],
+    segments: ["응! 내가 뽑혔어", "새 바이오매스 프로젝트를 이끌 사람으로.", "진짜 설레!"],
     reference: "Yes! I've been chosen to lead the new biomass project. I'm so excited!",
     accepted: ["Yes! I've been chosen to lead the new biomass project, and I'm so excited!", "Actually, yes! I've been chosen to lead the new biomass project. I'm really excited!", "Yes! I was chosen to lead the new biomass project. I'm so excited!", "Yes! I've been asked to lead the new biomass project. I'm so excited about it!", "Yes! I've been selected to lead the new biomass project. I'm so excited!"],
     meaning: [
@@ -739,7 +739,7 @@ export const TALK_FEELINGS_2: Question[] = [
     contextKo: "2주 전 갑자기 병원에 실려 가 맹장 수술을 받았던 인도 벤더의 프리야 씨가 처음으로 화상회의에 복귀했습니다.",
     dialogue: [{ speaker: "Priya", en: "Hi, everyone! I'm back. The doctor says I've fully recovered.", ko: "안녕하세요, 여러분! 저 돌아왔어요. 의사 선생님이 완전히 회복됐대요." }],
     promptKo: "정말 다행이에요! 병원에 실려 갔다는 소식을 들었을 때 다들 정말 걱정했어요.",
-    segments: ["정말 다행이에요!", "우리는 모두 정말 걱정했어요", "~했을 때", "우리가 들었다", "당신이 병원에 실려 갔다고"],
+    segments: ["정말 다행이에요!", "다들 정말 걱정했어요", "병원에 실려 갔다는 소식을 들었을 때"],
     reference: "That's great news! We were all really worried when we heard you'd been taken to the hospital.",
     accepted: ["That's great news! We were all really worried when we heard you had been taken to the hospital.", "That's wonderful news! We were all really worried when we heard you'd been taken to the hospital.", "That's great news! We were all so worried when we heard you'd been taken to hospital.", "I'm so glad to hear that! We were all really worried when we heard you were taken to the hospital.", "That's great news! We were all really worried when we heard you were in the hospital."],
     meaning: [

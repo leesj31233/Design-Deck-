@@ -18,7 +18,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["progressive", "verb-prep"],
     contextKo: "주간 회의에서 인도네시아 팀이 EFB 샘플 분석이 어떻게 됐는지 묻습니다. 당신은 아직 결과를 기다리는 중이라고 답합니다.",
     promptKo: "우리는 아직 실험실의 시험 결과를 기다리고 있습니다.",
-    segments: ["우리는", "아직 ~를 기다리고 있다", "시험 결과를", "실험실에서 온"],
+    segments: ["아직 시험 결과를 기다리고 있어요", "실험실에서 오는"],
     reference: "We are still waiting for the test results from the lab.",
     accepted: [
       "We are still waiting for the lab test results.",
@@ -59,7 +59,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["polite-request", "articles"],
     contextKo: "주간 설계 회의 마지막에 말레이시아 설계사 엔지니어에게 수정된 P&ID를 요청합니다.",
     promptKo: "금요일까지 수정된 P&ID를 저에게 보내 주실 수 있을까요?",
-    segments: ["~해 주실 수 있을까요", "저에게 보내다", "수정된 P&ID를", "금요일까지"],
+    segments: ["수정된 P&ID를 보내 주실 수 있을까요", "금요일까지"],
     reference: "Could you please send me the updated P&ID by Friday?",
     accepted: [
       "Could you send me the updated P&ID by Friday?",
@@ -147,7 +147,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["time-clause", "future-plan", "agreement"],
     contextKo: "공정 회의에서 다음 단계를 정리합니다. 배관 시공사가 설치를 끝내면 바로 압력 시험을 시작할 계획입니다.",
     promptKo: "시공사가 배관 설치를 끝내자마자 우리는 압력 시험을 시작할 것입니다.",
-    segments: ["우리는 시작할 것이다", "압력 시험을", "~하자마자", "시공사가", "끝내다", "배관 설치를"],
+    segments: ["압력 시험을 시작할 거예요", "시공사가 배관 설치를 끝내자마자"],
     reference: "We will start the pressure test as soon as the contractor finishes the piping installation.",
     accepted: [
       "As soon as the contractor finishes the piping installation, we will start the pressure test.",
@@ -332,7 +332,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["clarify-question", "articles"],
     contextKo: "베트남 고객 엔지니어가 '온도가 너무 높다'고만 말합니다. 어느 온도를 말하는지 확인합니다.",
     promptKo: "입구 온도를 말씀하시는 건가요, 아니면 출구 온도를 말씀하시는 건가요?",
-    segments: ["~를 말씀하시는 건가요", "입구 온도", "아니면", "출구 온도"],
+    segments: ["입구 온도를 말씀하시는 건가요,", "아니면 출구 온도요?"],
     reference: "Do you mean the inlet temperature or the outlet temperature?",
     accepted: [
       "Do you mean the inlet or the outlet temperature?",
@@ -372,7 +372,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["clarify-question", "polite-request"],
     contextKo: "베트남 고객사와 유틸리티 인터페이스를 검토하는데, 자료에 스팀 헤더 설계 압력이 빠져 있습니다.",
     promptKo: "스팀 헤더의 설계 압력이 얼마인지 알려 주실 수 있을까요?",
-    segments: ["알려 주실 수 있을까요", "무엇인지", "설계 압력이", "스팀 헤더의", "~인지"],
+    segments: ["알려 주실 수 있을까요", "스팀 헤더의 설계 압력이 얼마인지"],
     reference: "Could you tell me what the design pressure of the steam header is?",
     accepted: [
       "Can you tell me what the design pressure of the steam header is?",
@@ -415,7 +415,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["relative-clause", "polite-request", "verb-object"],
     contextKo: "인도네시아 현장 팀이 어제 회의에서 EFB 수분 분석 결과가 있다고 했습니다. 그 자료를 요청합니다.",
     promptKo: "어제 회의에서 말씀하신 실험실 분석 결과를 저희에게 보내 주실 수 있을까요?",
-    segments: ["보내 주실 수 있을까요", "저희에게", "실험실 분석 결과를", "(그것을) 말씀하신", "어제 회의에서"],
+    segments: ["실험실 분석 결과를 보내 주실 수 있을까요", "어제 회의에서 말씀하신"],
     reference: "Could you send us the lab results that you mentioned in yesterday's meeting?",
     accepted: [
       "Could you send us the lab results which you mentioned in yesterday's meeting?",
@@ -650,7 +650,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["be-adj", "polite-request", "degree"],
     contextKo: "시운전 중 현장 운전원에게 무전으로 응축수 탱크 상태를 알리고 조치를 요청합니다.",
     promptKo: "응축수 탱크가 거의 다 찼으니 드레인 밸브를 열어 주세요.",
-    segments: ["응축수 탱크가", "~이다", "거의 다 찬", "그러니", "열어 주세요", "드레인 밸브를"],
+    segments: ["응축수 탱크가 거의 다 찼으니", "드레인 밸브를 열어 주세요"],
     reference: "The condensate tank is almost full, so please open the drain valve.",
     accepted: [
       "The condensate tank is nearly full, so please open the drain valve.",
@@ -693,7 +693,7 @@ export const SENTENCES_B: Question[] = [
     skills: ["countability", "clarify-question"],
     contextKo: "말레이시아 벤더와 유틸리티 요구량을 확인합니다. 새 건조기가 최대 부하에서 스팀을 얼마나 쓰는지 묻습니다.",
     promptKo: "새 건조기는 최대 부하에서 스팀이 얼마나 필요한가요?",
-    segments: ["얼마나 많은 스팀을", "필요로 하나요", "새 건조기는", "최대 부하에서"],
+    segments: ["스팀이 얼마나 필요한가요", "새 건조기가 최대 부하에서"],
     reference: "How much steam does the new dryer need at full load?",
     accepted: [
       "How much steam does the new dryer use at full load?",

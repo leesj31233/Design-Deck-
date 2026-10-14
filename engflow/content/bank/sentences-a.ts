@@ -63,7 +63,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["progressive", "articles"],
     contextKo: "주간 화상회의에서 말레이시아 팀이 파일럿 플랜트 상황을 묻습니다. 당신은 지금 진행 중인 일을 짧게 답합니다.",
     promptKo: "우리는 이번 주에 파일럿 플랜트에서 새 건조기를 테스트하고 있습니다.",
-    segments: ["우리는", "테스트하고 있다", "새 건조기를", "파일럿 플랜트에서", "이번 주에"],
+    segments: ["새 건조기를 테스트하고 있어요", "파일럿 플랜트에서 이번 주에"],
     reference: "We are testing the new dryer at the pilot plant this week.",
     accepted: [
       "We are testing the new dryer in the pilot plant this week.",
@@ -105,7 +105,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["be-adj"],
     contextKo: "Pre-FEED 회의에서 고객이 열물질수지(HMB)를 보여 달라고 합니다. 당신은 아직 준비가 안 됐다고 답합니다.",
     promptKo: "열물질수지는 아직 준비되지 않았습니다.",
-    segments: ["열물질수지는", "~이 아니다", "준비된 (상태)", "아직"],
+    segments: ["열물질수지는", "아직 준비되지 않았어요"],
     reference: "The heat and mass balance is not ready yet.",
     accepted: [
       "The heat and material balance is not ready yet.",
@@ -146,7 +146,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["comparative"],
     contextKo: "아침 파일럿 회의에서 현장 운전원이 원료 상태를 묻습니다. 오늘 들어온 EFB 원료가 어제보다 더 젖어 있습니다.",
     promptKo: "오늘 원료의 수분 함량이 어제보다 높습니다.",
-    segments: ["수분 함량이", "원료의", "더 높다", "오늘", "어제보다"],
+    segments: ["원료의 수분 함량이", "오늘 더 높아요", "어제보다"],
     reference: "The moisture content of the feed is higher today than yesterday.",
     accepted: [
       "Today, the moisture content of the feed is higher than yesterday.",
@@ -190,7 +190,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["modal-necessity"],
     contextKo: "설계 변경이 결정된 뒤 내부 회의에서, 당신은 동료에게 PFD를 이번 주에 고쳐야 한다고 말합니다.",
     promptKo: "우리는 이번 주에 PFD를 수정해야 합니다.",
-    segments: ["우리는", "~해야 한다", "수정하다", "PFD를", "이번 주에"],
+    segments: ["PFD를 수정해야 해요", "이번 주에"],
     reference: "We need to update the PFD this week.",
     accepted: [
       "We have to revise the PFD this week.",
@@ -323,7 +323,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["prep-gerund", "modal-necessity"],
     contextKo: "파일럿 운전 중 현장 운전원이 투입량을 바로 올리려고 합니다. 당신은 먼저 원료 수분부터 확인하자고 말합니다.",
     promptKo: "투입량을 늘리기 전에 원료 수분을 확인해야 합니다.",
-    segments: ["우리는", "확인해야 한다", "원료 수분을", "~하기 전에", "늘리다", "투입량을"],
+    segments: ["원료 수분을 확인해야 해요", "투입량을 늘리기 전에"],
     reference: "We should check the feed moisture before increasing the feed rate.",
     accepted: [
       "We need to check the feed moisture before increasing the feed rate.",
@@ -457,7 +457,7 @@ export const SENTENCES_A: Question[] = [
     skills: ["if-when", "time-clause"],
     contextKo: "파일럿 테스트는 내일 오후에 끝나기로 확정되어 있습니다. 베트남 측 Ms. Nguyen이 데이터를 언제 받을 수 있는지 묻습니다.",
     promptKo: "(테스트는 내일 확실히 끝납니다) 내일 테스트가 끝나면 건조기 성능 데이터를 보내 드리겠습니다.",
-    segments: ["~하면 (확실히 일어날 때)", "테스트가 끝나다", "내일", "제가 보내 드리겠다", "당신에게", "건조기 성능 데이터를"],
+    segments: ["내일 테스트가 끝나면", "건조기 성능 데이터를 보내 드릴게요"],
     reference: "When the test finishes tomorrow, I will send you the dryer performance data.",
     accepted: [
       "I will send you the dryer performance data when the test finishes tomorrow.",

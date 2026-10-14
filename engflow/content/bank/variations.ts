@@ -366,7 +366,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-too-early", level: 2 },
     contextKo: "파일럿 시험 결과를 검토하기 전에 고객이 공정 방식을 확정하자고 합니다.",
     promptKo: "시험 결과를 확인하기 전에 최종 결정을 내리기에는 너무 이릅니다.",
-    segments: ["너무 이르다", "최종 결정을 내리기에는", "우리가 확인하기 전에", "시험 결과를"],
+    segments: ["최종 결정을 내리기에는 너무 일러요", "시험 결과를 확인하기 전에는요"],
     reference: "It's too early to make a final decision before we check the test results.",
     accepted: [
       "It's too early to make the final decision before checking the test results.",
@@ -782,7 +782,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-still-waiting", level: 3 },
     contextKo: "벤더와의 전화 회의입니다. 수정 견적서를 일주일째 기다리고 있어 정중하게 재촉합니다.",
     promptKo: "저희는 아직 수정된 견적서를 기다리고 있습니다. 이번 주 금요일까지 보내 주실 수 있을까요?",
-    segments: ["저희는", "아직 기다리고 있다", "귀사의 수정된 견적서를", "보내 주실 수 있을까요", "그것을", "이번 주 금요일까지"],
+    segments: ["저희는 아직 수정된 견적서를 기다리고 있어요.", "이번 주 금요일까지 보내 주실 수 있을까요?"],
     reference: "We are still waiting for your updated quotation. Could you please send it by this Friday?",
     accepted: [
       "We're still waiting for your revised quotation. Can you please send it by this Friday?",
@@ -1270,7 +1270,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-receive-when", level: 2 },
     contextKo: "고객이 월요일에 기본 설계 승인서를 보내기로 확정했습니다. 상세 설계 착수 계획을 말합니다.",
     promptKo: "(확정된 일정대로) 월요일에 고객의 승인을 받으면, 상세 설계를 시작하겠습니다.",
-    segments: ["~하면 (확실한 일)", "우리가 받다", "고객의 승인을", "월요일에", "우리는 시작하겠다", "상세 설계를"],
+    segments: ["월요일에 고객 승인을 받으면", "상세 설계를 시작할 거예요"],
     reference: "When we receive the client's approval on Monday, we will start the detailed design.",
     accepted: [
       "When we get the client's approval on Monday, we will start the detailed design.",
@@ -1528,7 +1528,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-before-ing", level: 2 },
     contextKo: "스케일업 회의에서 건조기 크기를 바로 확정하자는 의견에 답합니다.",
     promptKo: "건조기 크기를 확정하기 전에, 파일럿 시험을 한 번 더 해야 합니다.",
-    segments: ["~하기 전에", "확정하기", "건조기 크기를", "우리는 해야 한다", "파일럿 시험을", "한 번 더"],
+    segments: ["건조기 크기를 확정하기 전에", "파일럿 시험을 한 번 더 해야 해요"],
     reference: "Before finalizing the dryer size, we need to run one more pilot test.",
     accepted: [
       "Before we finalize the dryer size, we need to run one more pilot test.",
@@ -2162,7 +2162,7 @@ export const VARIATIONS: Question[] = [
     variation: { seed: "seed-object-order", level: 2 },
     contextKo: "후배 엔지니어가 수정한 P&ID를 바로 고객에게 보내려고 합니다.",
     promptKo: "고객에게 보내기 전에 수정된 P&ID를 다시 검토해 주세요.",
-    segments: ["검토해 주세요", "수정된 P&ID를", "다시", "~하기 전에", "당신이 그것을 보내다", "고객에게"],
+    segments: ["수정된 P&ID를 다시 검토해 주세요", "고객에게 보내기 전에요"],
     reference: "Please review the revised P&ID again before you send it to the client.",
     accepted: [
       "Please review the revised P&ID again before sending it to the client.",

@@ -321,7 +321,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "베트남 협력사 대상 발표. 새 슬라이드를 띄우자 Linh이 무엇을 보고 있는 건지 묻습니다.",
     dialogue: [{ speaker: "Linh", en: "What are we looking at on this slide?", ko: "이 슬라이드에서 보고 있는 게 뭔가요?" }],
     promptKo: "이 차트는 월별 스팀 사용량을 보여 줍니다.",
-    segments: ["이 차트는", "보여 줍니다", "스팀 사용량을", "매달의"],
+    segments: ["이 차트는", "월별 스팀 사용량을 보여 줍니다"],
     reference: "This chart shows the steam consumption for each month.",
     accepted: ["This chart shows the monthly steam consumption.", "This chart shows our steam consumption for each month.", "This chart shows how much steam we used each month.", "This chart shows the steam consumption by month.", "This graph shows the steam consumption for each month.", "Here you can see the steam consumption for each month."],
     meaning: [
@@ -357,7 +357,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "자카르타 팀 앞에서 파일럿 결과를 발표하기 직전. 청중이 파일럿 플랜트를 직접 본 적이 있는지 먼저 물어보려 합니다.",
     dialogue: [{ speaker: "Budi", en: "Everyone's here now. Go ahead, Minsu.", ko: "이제 다 모였어요. 시작하세요, 민수 씨." }],
     promptKo: "감사합니다. 시작하기 전에, 여러분 중 몇 분이나 저희 파일럿 플랜트에 가 보셨나요?",
-    segments: ["감사합니다.", "시작하기 전에,", "몇 분이나", "여러분 중", "가 보셨나요", "저희 파일럿 플랜트에"],
+    segments: ["감사합니다.", "시작하기 전에,", "여러분 중 몇 분이나 저희 파일럿 플랜트에 가 보셨나요?"],
     reference: "Thanks. Before we start, how many of you have visited our pilot plant?",
     accepted: ["Thanks. Before we start, how many of you have been to our pilot plant?", "Thank you. Before we begin, how many of you have visited our pilot plant?", "Thanks. Before I start, how many of you have been to our pilot plant?", "Thanks. Before we start, how many of you have ever visited our pilot plant?", "Thanks. First of all, how many of you have visited our pilot plant?"],
     meaning: [
@@ -395,7 +395,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "본사 발표 시작. 사회를 보는 Ms. Kim이 질문을 어떻게 받을지 청중에게 알려 달라고 합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Over to you, Minsu. Just let everyone know how you'd like to take questions.", ko: "민수 씨 차례예요. 질문을 어떻게 받을지만 모두에게 알려 주세요." }],
     promptKo: "감사합니다. 질문은 발표가 끝날 때까지 잠시 미뤄 주세요.",
-    segments: ["감사합니다.", "미뤄 주세요", "여러분의 질문을", "~까지", "발표의 끝"],
+    segments: ["감사합니다.", "질문은 잠시 미뤄 주세요", "발표가 끝날 때까지"],
     reference: "Thank you. Please hold your questions until the end of the presentation.",
     accepted: ["Thank you. Please save your questions until the end of the presentation.", "Thank you. Please keep your questions until the end of the presentation.", "Thank you. Could you please hold your questions until the end of the presentation?", "Thank you. Please hold your questions until the end.", "Thank you. I'd ask you to hold your questions until the end of the presentation."],
     meaning: [
@@ -431,7 +431,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "펠릿 수율 추세 그래프를 설명하는 중. Sari가 개선 이후에도 수율이 계속 올랐는지 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "So did the yield keep going up after the changes?", ko: "그러면 개선 이후에도 수율이 계속 올랐나요?" }],
     promptKo: "6월까지는 올랐다가, 그 뒤로는 더 이상 오르지 않고 비슷하게 유지됐어요.",
-    segments: ["그것은", "올랐어요", "6월까지", "그리고 그 뒤로", "그것은", "평평해졌어요"],
+    segments: ["6월까지는 올랐다가", "그 뒤로는 비슷하게 유지됐어요"],
     reference: "It went up until June, and then it levelled off.",
     accepted: ["It went up until June, and then it leveled off.", "It increased until June, and then it levelled off.", "It rose until June, but after that it levelled off.", "It went up until June, and after that it stayed about the same.", "It went up until June, and then it stayed flat.", "It went up until June, and then it didn't change much."],
     meaning: [
@@ -619,7 +619,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "고객사 임원 대상 발표. 숫자가 많아 Mr. Tan이 자기들에게 가장 중요한 결과가 뭐냐고 묻습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "There are a lot of numbers here. What's the main result for us?", ko: "숫자가 많네요. 저희에게 가장 중요한 결과는 뭔가요?" }],
     promptKo: "가장 중요한 숫자는 18%예요. 지금까지 그만큼 스팀을 절약했어요.",
-    segments: ["가장 중요한 숫자는", "18%예요.", "그게", "얼마나 많은 스팀을", "우리가 절약했는지", "지금까지"],
+    segments: ["가장 중요한 숫자는 18%예요.", "그만큼 스팀을 절약했어요", "지금까지"],
     reference: "The most important number is 18%. That's how much steam we've saved so far.",
     accepted: ["The key number is 18%. That's how much steam we've saved so far.", "The most important number is eighteen percent. That's how much steam we've saved so far.", "The most important figure is 18%. That's how much steam we've saved so far.", "The most important number is 18%. That's how much steam we have saved so far.", "The most important number is 18%, which is how much steam we've saved so far."],
     meaning: [
@@ -697,7 +697,7 @@ export const TALK_PRESENTATION_3: Question[] = [
     contextKo: "건조기 출구 수분 그래프를 보여 주는 중. 선이 두 개라 Sari가 어느 쪽이 새 건조기인지 묻습니다.",
     dialogue: [{ speaker: "Sari", en: "There are two lines here. Which one is the new dryer?", ko: "선이 두 개네요. 어느 쪽이 새 건조기예요?" }],
     promptKo: "파란 선이 새 건조기인데, 3월에 설치된 거예요.",
-    segments: ["파란 선이", "새 건조기예요", "그것은", "설치되었어요", "3월에"],
+    segments: ["파란 선이 새 건조기인데,", "3월에 설치된 거예요"],
     reference: "The blue line is the new dryer, which was installed in March.",
     accepted: ["The blue line is the new dryer, which we installed in March.", "The blue line shows the new dryer, which was installed in March.", "The blue line is the new dryer. It was installed in March.", "The blue one is the new dryer, which was installed in March.", "The blue line is the new dryer that was installed in March."],
     meaning: [

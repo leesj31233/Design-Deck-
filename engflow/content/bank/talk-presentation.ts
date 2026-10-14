@@ -242,7 +242,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "건조기 시험 결과 그래프를 보여 주며, 결과가 예상보다 훨씬 좋았다고 설명합니다.",
     dialogue: [{ speaker: "Daniel", en: "So, what does this graph tell us?", ko: "그래서 이 그래프는 무엇을 보여 주나요?" }],
     promptKo: "보시다시피, 결과가 저희 예상보다 훨씬 좋았습니다.",
-    segments: ["보시다시피,", "결과가", "훨씬 더 좋았다", "우리가 예상했던 것보다"],
+    segments: ["보시다시피,", "결과가 예상보다 훨씬 좋았습니다"],
     reference: "As you can see, the results were much better than we expected.",
     accepted: [
       "As you can see, the results were much better than expected.",
@@ -284,7 +284,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "발표 후 질의응답. 고객이 정확한 증기 소비량을 묻는데, 실험실 데이터가 아직 오지 않아 지금은 답할 수 없습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "What was the exact steam consumption during the second run?", ko: "두 번째 운전 때 정확한 증기 소비량은 얼마였나요?" }],
     promptKo: "좋은 질문입니다. 실험실 데이터를 받으면 확인해서 다시 알려 드리겠습니다.",
-    segments: ["좋은 질문입니다.", "제가 확인하겠다", "그리고 다시 알려 드리겠다", "~하면 (그때)", "제가 받다", "실험실 데이터를"],
+    segments: ["좋은 질문입니다.", "확인해서 다시 알려 드리겠습니다", "실험실 데이터를 받으면요"],
     reference: "Good question. I'll check and get back to you when I receive the lab data.",
     accepted: [
       "That's a good question. I'll check and get back to you when I receive the lab data.",
@@ -325,7 +325,7 @@ export const TALK_PRESENTATION: Question[] = [
     contextKo: "발표의 마지막 슬라이드. 발표를 마치고 질문을 받으려 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Thank you, Minsu. Is that the last slide?", ko: "고마워요, 민수 씨. 그게 마지막 슬라이드인가요?" }],
     promptKo: "네, 제 발표는 여기까지입니다. 질문이 있으시면 기꺼이 답변드리겠습니다.",
-    segments: ["네,", "그게 전부입니다", "저로서는", "만약 질문이 있으시면", "저는 기꺼이", "답하겠습니다"],
+    segments: ["네, 제 발표는 여기까지입니다.", "질문이 있으시면", "기꺼이 답변드리겠습니다"],
     reference: "Yes, that's all from me. If you have any questions, I'm happy to answer them.",
     accepted: [
       "Yes, that's all from me. If you have any questions, I'll be happy to answer them.",

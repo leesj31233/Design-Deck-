@@ -219,7 +219,7 @@ export const TALK_VISIT_2: Question[] = [
     contextKo: "서울에 처음 온 Linh에게 교통카드(T-money)를 건넸습니다. 잔액이 떨어지면 어떻게 하는지 묻자, 편의점에서 충전할 수 있다고 알려 줍니다.",
     dialogue: [{ speaker: "Linh", en: "Thanks for the card! What do I do when there's no money left on it?", ko: "카드 고마워요! 잔액이 다 떨어지면 어떻게 해요?" }],
     promptKo: "편의점 어디서든 충전하실 수 있어요.",
-    segments: ["당신은 ~할 수 있어요", "그것을 충전하다", "어느 편의점에서든"],
+    segments: ["충전하실 수 있어요", "편의점 어디서든"],
     reference: "You can top it up at any convenience store.",
     accepted: ["You can top up the card at any convenience store.", "You can reload it at any convenience store.", "You can add money to it at any convenience store.", "You can top it up at a convenience store.", "You can top it up at convenience stores."],
     meaning: [
@@ -253,7 +253,7 @@ export const TALK_VISIT_2: Question[] = [
     contextKo: "회의실에 들어온 고객사 Mr. Tan이 오늘 파일럿 플랜트를 누가 안내하는지 묻습니다. 파일럿 플랜트 책임자인 팀원 지원 씨를 소개합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So, who's going to show us the pilot plant today?", ko: "그럼 오늘 파일럿 플랜트는 누가 보여 주시나요?" }],
     promptKo: "저희 파일럿 플랜트 책임자인 지원 씨를 소개해 드릴게요.",
-    segments: ["제가 ~할게요", "당신을 소개하다", "지원 씨에게,", "저희 파일럿 플랜트 책임자"],
+    segments: ["지원 씨를 소개해 드릴게요", "저희 파일럿 플랜트 책임자예요"],
     reference: "Let me introduce you to Jiwon, our pilot plant manager.",
     accepted: [
       "I'd like to introduce you to Jiwon, our pilot plant manager.",
@@ -294,7 +294,7 @@ export const TALK_VISIT_2: Question[] = [
     contextKo: "일주일 일정을 마치고 하노이로 돌아가는 Linh을 인천공항까지 배웅합니다. 조심히 가라고 하고, 집에 도착하면 연락해 달라고 합니다.",
     dialogue: [{ speaker: "Linh", en: "Thank you for everything this week, Minsu.", ko: "이번 주 정말 다 고마웠어요, 민수 씨." }],
     promptKo: "조심히 가시고, 집에 도착하시면 알려 주세요.",
-    segments: ["안전한 비행 되세요,", "그리고 저에게 알려 주세요", "~하면", "당신이 도착하다", "집에"],
+    segments: ["조심히 가시고,", "알려 주세요", "집에 도착하시면"],
     reference: "Have a safe flight, and let me know when you get home.",
     accepted: [
       "Have a safe flight, and let me know when you get back home.",
@@ -334,7 +334,7 @@ export const TALK_VISIT_2: Question[] = [
     contextKo: "자카르타 공장 방문 중인 금요일 오전, Budi가 곧 금요 기도에 다녀와야 한다고 알려 줍니다. 돌아올 때까지 회의실에서 기다리겠다고 합니다.",
     dialogue: [{ speaker: "Budi", en: "Just so you know, we'll leave for Friday prayers at about 11:30.", ko: "참고로, 11시 반쯤 금요 기도에 다녀올 거예요." }],
     promptKo: "물론이죠. 돌아오실 때까지 회의실에서 기다릴게요.",
-    segments: ["물론이죠.", "우리는 기다릴게요", "회의실에서", "~할 때까지", "당신이 돌아오다"],
+    segments: ["물론이죠", "회의실에서 기다릴게요", "돌아오실 때까지"],
     reference: "Of course. We'll wait in the meeting room until you get back.",
     accepted: [
       "Of course. We'll wait in the meeting room until you come back.",
@@ -502,7 +502,7 @@ export const TALK_VISIT_2: Question[] = [
     contextKo: "현장 견학 중 잠깐 전화를 받고 온 Linh이 회의실이 어디였는지 다시 묻습니다. 2층, 아까 점심을 먹은 방 바로 옆이라고 알려 줍니다.",
     dialogue: [{ speaker: "Linh", en: "Sorry, where's the meeting room again?", ko: "죄송한데, 회의실이 어디였죠?" }],
     promptKo: "2층에 있어요. 아까 우리가 점심 먹은 방 바로 옆이에요.",
-    segments: ["그것은 있어요", "2층에,", "바로 옆에", "그 방의", "~한 (방)", "우리가 점심을 먹었다"],
+    segments: ["2층에 있어요", "바로 옆이에요", "우리가 점심 먹은 방"],
     reference: "It's on the second floor, right next to the room where we had lunch.",
     accepted: [
       "It's on the second floor, next to the room where we had lunch.",

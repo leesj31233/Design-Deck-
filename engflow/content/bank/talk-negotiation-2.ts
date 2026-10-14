@@ -348,7 +348,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Linh이 견적이 2주 동안만 유효하다고 합니다. 내부 승인에 시간이 걸려서 다음 달 말까지 이 가격을 유지해 달라고 요청합니다.",
     dialogue: [{ speaker: "Linh", en: "Just so you know, this quote is valid for two weeks.", ko: "참고로 이 견적은 2주 동안 유효해요." }],
     promptKo: "이 가격을 다음 달 말까지 유지해 주실 수 있을까요?",
-    segments: ["~해 주실 수 있을까요", "유지하다", "이 가격을", "~까지", "다음 달 말"],
+    segments: ["이 가격을 유지해 주실 수 있을까요?", "다음 달 말까지요"],
     reference: "Could you keep this price until the end of next month?",
     accepted: [
       "Could you hold this price until the end of next month?",
@@ -390,7 +390,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Daniel이 늘 하던 대로 미국 달러로 청구하겠다고 합니다. 이번에는 유로로 지급하고 싶다고 말합니다.",
     dialogue: [{ speaker: "Daniel", en: "We'll send the invoice in US dollars, as usual.", ko: "평소처럼 미국 달러로 청구서를 보낼게요." }],
     promptKo: "이번에는 유로로 지급하고 싶어요.",
-    segments: ["저희는 ~하고 싶어요", "지급하다", "유로로", "이번에는"],
+    segments: ["유로로 지급하고 싶어요", "이번에는요"],
     reference: "We'd prefer to pay in euros this time.",
     accepted: [
       "We'd rather pay in euros this time.",
@@ -433,7 +433,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 제어 밸브 단가가 1,200달러라고 합니다. 50개를 주문할 테니 단가를 더 낮춰 달라고 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "The unit price for the control valves is 1,200 dollars.", ko: "제어 밸브 단가는 1,200달러예요." }],
     promptKo: "50개를 주문하면 단가를 좀 더 좋게 해 주실 수 있을까요?",
-    segments: ["~해 주실 수 있을까요", "저희에게", "더 좋은 단가를", "50개에 대해"],
+    segments: ["단가를 좀 더 좋게 해 주실 수 있을까요?", "50개면요"],
     reference: "Could you give us a better unit price for 50 valves?",
     accepted: [
       "Can you give us a better unit price for 50 valves?",
@@ -606,7 +606,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 이게 정말 최종 가격이라고 합니다. 그렇다면 다른 공급사도 알아봐야 할 수도 있다고 부드럽게 압박합니다.",
     dialogue: [{ speaker: "Priya", en: "I'm sorry, but this really is our final price.", ko: "죄송하지만 이게 정말 최종 가격이에요." }],
     promptKo: "그게 최종 가격이라면, 저희는 다른 공급사들을 알아봐야 할 수도 있어요.",
-    segments: ["만약 그게 ~라면", "최종 가격", "저희는 ~해야 할 수도 있어요", "알아보다", "다른 공급사들을"],
+    segments: ["그게 최종 가격이라면", "다른 공급사들을", "알아봐야 할 수도 있어요"],
     reference: "If that's your final price, we might have to look at other suppliers.",
     accepted: [
       "If that's your final price, we may have to look at other suppliers.",
@@ -649,7 +649,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Daniel이 이제 라이선스 비용은 다들 괜찮은지 묻습니다. 비용은 합의했으니 지급 일정으로 넘어가자고 합니다.",
     dialogue: [{ speaker: "Daniel", en: "So, is everyone happy with the license fee now?", ko: "그럼 이제 라이선스 비용은 다들 괜찮으신가요?" }],
     promptKo: "네, 비용은 합의했으니까, 지급 일정으로 넘어가죠.",
-    segments: ["네,", "저희는 합의했어요", "비용에 대해,", "그러니", "넘어가죠", "지급 일정으로"],
+    segments: ["네, 비용은 합의했으니까", "넘어가죠", "지급 일정으로요"],
     reference: "Yes, we've agreed on the fee, so let's move on to the payment schedule.",
     accepted: [
       "Yes, we have agreed on the fee, so let's move on to the payment schedule.",
@@ -691,7 +691,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 지급 기한을 60일이 아니라 30일로 해 달라고 합니다. 2% 할인을 해 주면 30일 안에 지급할 수 있다고 조건을 겁니다.",
     dialogue: [{ speaker: "Priya", en: "We'd really prefer payment in 30 days, not 60.", ko: "지급은 60일 말고 30일 안에 해 주시면 좋겠어요." }],
     promptKo: "2% 할인을 해 주시면, 저희가 30일 안에 지급할 수도 있어요.",
-    segments: ["저희는 ~할 수도 있어요", "지급하다", "30일 안에", "만약 해 주시면", "2% 할인을"],
+    segments: ["30일 안에 지급할 수도 있어요", "2% 할인을 해 주시면"],
     reference: "We could pay in 30 days if you give us a 2% discount.",
     accepted: [
       "We could pay within 30 days if you give us a 2% discount.",
@@ -737,7 +737,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Priya가 밸브 가격을 6% 올릴 수밖에 없었다고 합니다. 지난 주문 이후로 왜 가격이 올랐는지 설명해 달라고 정중하게 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "I'm afraid we've had to raise our valve prices by 6%.", ko: "죄송하지만 밸브 가격을 6% 올릴 수밖에 없었어요." }],
     promptKo: "지난번 주문 이후로 가격이 왜 올랐는지 설명해 주실 수 있을까요?",
-    segments: ["설명해 주실 수 있을까요", "왜", "가격이 올랐는지", "~이후로", "저희 지난번 주문"],
+    segments: ["설명해 주실 수 있을까요?", "가격이 왜 올랐는지", "지난번 주문 이후로"],
     reference: "Could you explain why the price has gone up since our last order?",
     accepted: [
       "Could you tell us why the price has gone up since our last order?",
@@ -824,7 +824,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
     contextKo: "Linh이 지급 조건이 납품 후 30일이라고 합니다. 이번 주문은 60일로 늘려 줄 수 있을지 조심스럽게 묻습니다.",
     dialogue: [{ speaker: "Linh", en: "Our payment terms are 30 days after delivery.", ko: "저희 지급 조건은 납품 후 30일이에요." }],
     promptKo: "혹시 이번 주문은 그걸 60일로 늘려 주실 수 있을까 해서요.",
-    segments: ["혹시 ~해 주실 수 있을까 해서요", "늘리다", "그것을", "60일로", "이번 주문에 대해"],
+    segments: ["혹시 60일로 늘려 주실 수 있을까 해서요", "이번 주문은요"],
     reference: "I was wondering if you could extend that to 60 days for this order.",
     accepted: [
       "I was wondering whether you could extend that to 60 days for this order.",

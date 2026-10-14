@@ -330,7 +330,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "해외 파견지 집주인이 내년부터 월세를 1,500달러로 올린다고 합니다. 지금 내는 1,400달러로 1년만 더 유지해 줄 수 있는지 부탁합니다.",
     dialogue: [{ speaker: "Landlord", en: "The rent will go up to 1,500 dollars next year.", ko: "내년부터 월세가 1,500달러로 올라요." }],
     promptKo: "월세를 1년 더 1,400달러로 유지해 주실 수 있을까요?",
-    segments: ["~해 주실 수 있을까요", "유지하다", "월세를", "1,400달러로", "1년 더"],
+    segments: ["월세를 1,400달러로", "유지해 주실 수 있을까요?", "1년 더요"],
     reference: "Could you keep the rent at 1,400 for one more year?",
     accepted: [
       "Could you keep the rent at 1,400 dollars for one more year?",
@@ -372,7 +372,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "연말 면담 시간에 김 팀장님이 무슨 일로 보자고 했는지 묻습니다. 연봉에 대해 이야기하고 싶다고 정중하게 꺼냅니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "You wanted to see me, Minsu? What's up?", ko: "민수 씨, 저 보자고 했죠? 무슨 일이에요?" }],
     promptKo: "네, 제 연봉에 대해 팀장님과 이야기하고 싶어서요.",
-    segments: ["네,", "저는 ~하고 싶어요", "이야기하다", "팀장님과", "제 연봉에 대해"],
+    segments: ["네, 이야기하고 싶어요", "제 연봉에 대해서요"],
     reference: "Yes, I'd like to talk to you about my salary.",
     accepted: [
       "Yes, I'd like to talk about my salary.",
@@ -413,7 +413,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Priya가 지금 재고가 펌프 10대뿐이라고 합니다. 금요일에 발주 승인이 나니까 그때까지 6대를 저희 몫으로 잡아 달라고 부탁합니다.",
     dialogue: [{ speaker: "Priya", en: "We only have 10 pumps in stock right now.", ko: "지금 재고가 펌프 10대밖에 없어요." }],
     promptKo: "그중 6대를 금요일까지 저희 몫으로 잡아 두실 수 있을까요?",
-    segments: ["~해 주실 수 있을까요", "잡아 두다", "그중 6대를", "저희를 위해", "금요일까지"],
+    segments: ["그중 6대를 잡아 두실 수 있을까요?", "저희 몫으로", "금요일까지"],
     reference: "Could you hold six of them for us until Friday?",
     accepted: [
       "Could you keep six of them for us until Friday?",
@@ -587,7 +587,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "Priya가 필터백 단가가 개당 40달러라고 합니다. 2년 계약을 맺는 조건으로 가격을 10% 낮춰 줄 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "Our price for the filter bags is 40 dollars per piece.", ko: "필터백 가격은 개당 40달러예요." }],
     promptKo: "저희가 2년 계약을 하면, 가격을 10% 낮춰 주실 수 있나요?",
-    segments: ["만약 저희가 맺으면", "2년 계약을,", "~해 주실 수 있나요", "가격을 낮추다", "10%만큼"],
+    segments: ["저희가 2년 계약을 하면", "가격을 낮춰 주실 수 있나요?", "10%만큼요"],
     reference: "If we sign a two-year contract, could you lower the price by 10%?",
     accepted: [
       "If we sign a two-year contract, could you reduce the price by 10%?",
@@ -674,7 +674,7 @@ export const TALK_NEGOTIATION_3: Question[] = [
     contextKo: "집주인이 아파트가 15일이나 되어야 준비된다고 합니다. 1일에 입주하기로 했던 터라, 15일까지 못 들어가면 2주 동안 호텔에 묵어야 한다고 사정을 설명합니다.",
     dialogue: [{ speaker: "Landlord", en: "I'm afraid the apartment won't be ready until the 15th.", ko: "죄송하지만 아파트가 15일이나 돼야 준비될 것 같아요." }],
     promptKo: "15일까지 입주를 못 하면, 저는 2주 동안 호텔에 있어야 해요.",
-    segments: ["만약 제가 입주할 수 없으면", "15일까지(15일이 되기 전에는),", "저는 ~해야 할 거예요", "호텔에 머물다", "2주 동안"],
+    segments: ["15일까지 입주를 못 하면", "호텔에 있어야 해요", "2주 동안요"],
     reference: "If I can't move in until the 15th, I'll have to stay in a hotel for two weeks.",
     accepted: [
       "If I can't move in until the 15th, I'll need to stay in a hotel for two weeks.",

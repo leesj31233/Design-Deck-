@@ -338,7 +338,7 @@ export const TALK_PHONE_2: Question[] = [
     contextKo: "회의가 끝나고 보니 한 시간쯤 전에 모르는 번호로 부재중 전화가 와 있었습니다. 그 번호로 다시 걸었더니 어느 물류 회사 직원이 받습니다.",
     dialogue: [{ speaker: "Receptionist", en: "Good afternoon, Jaya Logistics. How can I help you?", ko: "안녕하세요, 자야 로지스틱스입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 한 시간쯤 전에 이 번호로 부재중 전화가 와 있어서요.",
-    segments: ["안녕하세요,", "제가 받았어요", "부재중 전화를", "이 번호에서", "한 시간쯤 전에"],
+    segments: ["안녕하세요, 부재중 전화가 와 있어서요", "이 번호로", "한 시간쯤 전에"],
     reference: "Hi, I got a missed call from this number about an hour ago.",
     accepted: [
       "Hi, I had a missed call from this number about an hour ago.",
@@ -381,7 +381,7 @@ export const TALK_PHONE_2: Question[] = [
     contextKo: "김 부장님이 출장 중이라, 부장님 부탁으로 라이선서의 다니엘 씨에게 내일 회의 건으로 대신 전화를 걸었습니다.",
     dialogue: [{ speaker: "Daniel", en: "Hello, Daniel speaking.", ko: "여보세요, 다니엘입니다." }],
     promptKo: "안녕하세요 다니엘 씨, 민수예요. 내일 회의 건으로 김 부장님 대신 전화드렸어요.",
-    segments: ["안녕하세요 다니엘 씨,", "민수예요.", "저는 전화하고 있어요", "김 부장님을 대신해서", "내일 회의에 관해"],
+    segments: ["안녕하세요 다니엘 씨, 민수예요", "김 부장님 대신 전화드렸어요", "내일 회의 건으로요"],
     reference: "Hi Daniel, it's Minsu. I'm calling on behalf of Ms. Kim about tomorrow's meeting.",
     accepted: [
       "Hi Daniel, this is Minsu. I'm calling on behalf of Ms. Kim about tomorrow's meeting.",
@@ -426,7 +426,7 @@ export const TALK_PHONE_2: Question[] = [
     contextKo: "자카르타 출장 중 오늘 저녁 식당을 4명으로 예약해 두었는데, 동료 두 명이 더 오게 되었습니다. 식당에 전화를 걸었습니다.",
     dialogue: [{ speaker: "Restaurant staff", en: "Good afternoon, Garden Terrace. How can I help you?", ko: "안녕하세요, 가든 테라스입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 오늘 저녁 예약 인원을 4명에서 6명으로 바꾸고 싶어요.",
-    segments: ["안녕하세요,", "저는 바꾸고 싶어요", "제 예약을", "오늘 저녁", "4명에서", "6명으로"],
+    segments: ["안녕하세요, 예약을 바꾸고 싶어요", "오늘 저녁 예약이요", "4명에서 6명으로"],
     reference: "Hi, I'd like to change my reservation for tonight from four to six people.",
     accepted: [
       "Hi, I'd like to change my booking for tonight from four to six people.",
@@ -699,7 +699,7 @@ export const TALK_PHONE_2: Question[] = [
     contextKo: "회의를 마치고 나오니 부디 씨에게서 부재중 전화가 세 통이나 와 있습니다. 무슨 일이 생겼나 싶어 바로 전화를 걸었습니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu! Finally!", ko: "민수 씨! 드디어 통화되네요!" }],
     promptKo: "미안해요, 회의 중이었어요. 방금 부재중 전화 봤어요. 무슨 일 있어요?",
-    segments: ["미안해요,", "저는 회의 중이었어요.", "저는 방금 봤어요", "당신의 부재중 전화들을.", "모든 게 괜찮나요?"],
+    segments: ["미안해요, 회의 중이었어요", "방금 부재중 전화 봤어요", "무슨 일 있어요?"],
     reference: "Sorry, I was in a meeting. I've just seen your missed calls. Is everything okay?",
     accepted: [
       "Sorry, I was in a meeting. I just saw your missed calls. Is everything okay?",
@@ -793,7 +793,7 @@ export const TALK_PHONE_2: Question[] = [
     contextKo: "모르는 사람이 사무실 전화로 건조기 프로젝트 담당자를 찾습니다. 담당자는 바로 당신인데, 이야기하기 전에 어느 회사에서 전화했는지 정중하게 확인하려 합니다.",
     dialogue: [{ speaker: "Caller", en: "Hi, I'd like to speak to the person in charge of the dryer project, please.", ko: "안녕하세요, 건조기 프로젝트 담당자분과 통화하고 싶은데요." }],
     promptKo: "네, 제가 담당자예요. 실례지만 어느 회사에서 전화하셨는지 말씀해 주시겠어요?",
-    segments: ["네, 그게 저예요.", "~해 주시겠어요", "저에게 말하다", "어느 회사에서", "당신이 전화하고 있는지"],
+    segments: ["네, 제가 담당자예요", "말씀해 주시겠어요?", "어느 회사에서 전화하셨는지"],
     reference: "Sure, that's me. Could you tell me which company you're calling from?",
     accepted: [
       "Sure, that's me. May I ask which company you're calling from?",
@@ -837,7 +837,7 @@ export const TALK_PHONE_2: Question[] = [
     contextKo: "현장의 부디 씨가 보일러 검사 일정은 검사 업체에 직접 물어보라며 번호를 알려 줬습니다. 그 번호로 처음 전화를 걸었습니다.",
     dialogue: [{ speaker: "Receptionist", en: "Good morning, Mitra Inspection Services. How can I help you?", ko: "안녕하세요, 미트라 검사 서비스입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 서울의 김민수입니다. 보일러 검사 일정 건으로 이 번호로 연락하라고 들었어요.",
-    segments: ["안녕하세요,", "저는 김민수예요", "서울의.", "저는 들었어요(지시받았어요)", "이 번호로 전화하라고", "보일러 검사 일정에 관해"],
+    segments: ["안녕하세요, 서울의 김민수입니다", "이 번호로 연락하라고 들었어요", "보일러 검사 일정 건으로요"],
     reference: "Good morning, this is Minsu Kim from Seoul. I was told to call this number about the boiler inspection schedule.",
     accepted: [
       "Good morning, this is Minsu Kim calling from Seoul. I was told to call this number about the boiler inspection schedule.",

@@ -195,7 +195,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "인도네시아 현장 견학 중 Budi가 새 간접 건조기를 보여 줍니다. 건조기 사진을 몇 장 찍어도 되는지 묻습니다.",
     dialogue: [{ speaker: "Budi", en: "And this is our new indirect dryer. We started it up last month.", ko: "그리고 이게 새 간접 건조기예요. 지난달에 가동을 시작했어요." }],
     promptKo: "건조기 사진 몇 장 찍어도 될까요?",
-    segments: ["제가 ~해도 될까요", "찍다", "사진 몇 장을", "그 건조기의"],
+    segments: ["사진 몇 장 찍어도 될까요?", "건조기 사진이요"],
     reference: "Can I take a few photos of the dryer?",
     accepted: ["Could I take a few photos of the dryer?", "Is it okay if I take some photos of the dryer?", "Do you mind if I take a few pictures of the dryer?"],
     meaning: [
@@ -231,7 +231,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "자카르타 출장 중 호텔에서 고객사 사무실로 가는 길에 차가 막힙니다. 로비에서 기다리는 Sari가 전화했습니다.",
     dialogue: [{ speaker: "Sari", en: "Hi Minsu, we're in the lobby. Are you on your way?", ko: "민수 씨, 저희 로비에 있어요. 오고 계세요?" }],
     promptKo: "죄송해요, 차가 막혀서 10분 정도 늦을 것 같아요.",
-    segments: ["죄송해요,", "제가 ~하고 있어요", "10분 정도", "늦어지다", "교통 체증 때문에"],
+    segments: ["죄송해요, 10분 정도", "늦을 것 같아요", "차가 막혀서요"],
     reference: "Sorry, I'm running about ten minutes late because of the traffic.",
     accepted: [
       "Sorry, I'm running about 10 minutes late because of the traffic.",
@@ -273,7 +273,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "차로 파일럿 플랜트에 가는 중입니다. Daniel이 오전 일정을 묻자, 도착하면 먼저 안전 교육을 한다고 알려 줍니다.",
     dialogue: [{ speaker: "Daniel", en: "So what's the plan for this morning?", ko: "그래서 오늘 오전 일정은 어떻게 돼요?" }],
     promptKo: "현장에 도착하면, 먼저 간단한 안전 교육을 해 드릴게요.",
-    segments: ["~하면", "우리가 도착하다", "현장에", "제가 해 드릴게요", "간단한 안전 교육을", "먼저"],
+    segments: ["현장에 도착하면", "간단한 안전 교육을 해 드릴게요", "먼저요"],
     reference: "When we get to the site, I'll give you a short safety briefing first.",
     accepted: [
       "When we arrive at the site, I'll give you a short safety briefing first.",
@@ -313,7 +313,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "말레이시아 공장 방문 첫날 저녁, Mr. Tan이 내일 일정을 설명합니다. 공장 견학이 몇 시에 시작하는지 묻습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Tomorrow we'll visit the plant, and then we'll have lunch with the plant manager.", ko: "내일은 공장을 견학하고, 그다음에 공장장님과 점심을 할 거예요." }],
     promptKo: "공장 견학이 몇 시에 시작하는지 알려 주실 수 있나요?",
-    segments: ["알려 주실 수 있나요", "몇 시에", "공장 견학이", "시작하는지"],
+    segments: ["알려 주실 수 있나요?", "공장 견학이 몇 시에 시작하는지"],
     reference: "Could you tell me what time the plant tour starts?",
     accepted: ["Can you tell me what time the plant tour starts?", "Could you tell me when the plant tour starts?", "What time does the plant tour start?"],
     meaning: [
@@ -352,7 +352,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "베트남에서 온 Linh 일행이 한국 파일럿 플랜트 정문에 도착했습니다. 들어가기 전에 경비실에서 출입 등록을 해야 한다고 안내합니다.",
     dialogue: [{ speaker: "Linh", en: "Can we go straight to the pilot plant?", ko: "바로 파일럿 플랜트로 가도 되나요?" }],
     promptKo: "공장에 들어가기 전에 경비실에서 출입 등록을 하셔야 해요.",
-    segments: ["~하기 전에", "들어가는 것", "공장에", "당신은 ~해야 할 거예요", "출입 등록을 하다", "경비실에서"],
+    segments: ["공장에 들어가기 전에", "출입 등록을 하셔야 해요", "경비실에서요"],
     reference: "Before entering the plant, you'll need to sign in at the security office.",
     accepted: [
       "Before you enter the plant, you'll need to sign in at the security office.",
@@ -396,7 +396,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "현장 견학을 시작하며 고객사 Mr. Tan에게 첫 번째 장비를 소개합니다. 지난달에 설치된 새 건조기입니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "What's this big unit here?", ko: "여기 이 큰 장비는 뭐예요?" }],
     promptKo: "이건 지난달에 설치된 새 건조기예요.",
-    segments: ["이것은", "새 건조기예요", "~인 (건조기)", "설치된", "지난달에"],
+    segments: ["이건 새 건조기예요", "지난달에 설치된"],
     reference: "This is the new dryer that was installed last month.",
     accepted: [
       "This is the new dryer which was installed last month.",
@@ -436,7 +436,7 @@ export const TALK_VISIT: Question[] = [
     contextKo: "Budi의 안내로 인도네시아 현장 견학을 마쳤습니다. 감사 인사를 하고, 앞으로 함께 일하기를 기대한다고 말합니다.",
     dialogue: [{ speaker: "Budi", en: "Well, that's the end of the tour. I hope it was useful.", ko: "자, 견학은 여기까지예요. 도움이 됐으면 좋겠네요." }],
     promptKo: "구경시켜 주셔서 정말 감사해요. 앞으로 팀분들과 함께 일하는 게 정말 기대돼요.",
-    segments: ["정말 감사해요", "구경시켜 주신 것에", "우리를.", "저는 정말 기대하고 있어요", "함께 일하는 것을", "당신 팀과"],
+    segments: ["구경시켜 주셔서 정말 감사해요", "정말 기대돼요", "팀분들과 함께 일하는 게"],
     reference: "Thank you so much for showing us around. I'm really looking forward to working with your team.",
     accepted: [
       "Thanks a lot for showing us around. I'm really looking forward to working with your team.",

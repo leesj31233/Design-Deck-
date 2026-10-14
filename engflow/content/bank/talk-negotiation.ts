@@ -283,7 +283,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya가 가격은 더 낮출 수 없다고 합니다. 그렇다면 2년 치 예비 부품을 가격에 포함해 줄 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "I'm sorry, but we can't go any lower on the price.", ko: "죄송하지만 가격을 더 낮출 수는 없어요." }],
     promptKo: "그럼 2년 치 예비 부품을 가격에 포함해 주실 수 있나요?",
-    segments: ["그럼", "~해 주실 수 있나요", "포함하다", "2년 치 예비 부품을", "가격에"],
+    segments: ["그럼 포함해 주실 수 있나요?", "2년 치 예비 부품을", "가격에요"],
     reference: "Then could you include two years of spare parts in the price?",
     accepted: [
       "In that case, could you include two years of spare parts in the price?",
@@ -324,7 +324,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya가 펌프 일반 납기가 14주라고 합니다. 5월 말까지 현장에 납품할 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "Our normal delivery time for these pumps is fourteen weeks.", ko: "이 펌프의 일반 납기는 14주예요." }],
     promptKo: "5월 말까지 펌프를 현장에 납품해 주실 수 있나요?",
-    segments: ["~해 주실 수 있나요", "납품하다", "펌프를", "현장에", "5월 말까지"],
+    segments: ["펌프를 납품해 주실 수 있나요?", "현장에", "5월 말까지"],
     reference: "Can you deliver the pumps to the site by the end of May?",
     accepted: [
       "Could you deliver the pumps to the site by the end of May?",
@@ -366,7 +366,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya와 건조기 가격과 납기를 정리했습니다. 다른 질문이 있냐고 해서 건조기 보증 기간을 묻습니다.",
     dialogue: [{ speaker: "Priya", en: "So we've covered the price and delivery. Any other questions?", ko: "가격과 납기는 정리했네요. 다른 질문 있으세요?" }],
     promptKo: "네, 건조기 보증 기간은 얼마나 되나요?",
-    segments: ["네,", "얼마나 긴가요", "보증은", "건조기에 대한"],
+    segments: ["네, 보증 기간은 얼마나 되나요?", "건조기 보증이요"],
     reference: "Yes, how long is the warranty on the dryer?",
     accepted: [
       "Yes, how long is the warranty for the dryer?",
@@ -492,7 +492,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "Priya가 건조기 기본 보증은 1년이라고 합니다. 이번 건조기는 새로운 설계라서 보증을 2년으로 늘려 달라고 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "The standard warranty on the dryer is one year.", ko: "건조기 기본 보증은 1년이에요." }],
     promptKo: "이번 건 새로운 설계니까, 보증을 2년으로 늘려 주실 수 있을까요?",
-    segments: ["~이니까", "이것은 새로운 설계", "~해 주실 수 있을까요", "늘리다", "보증을", "2년으로"],
+    segments: ["이번 건 새로운 설계니까", "보증을 늘려 주실 수 있을까요?", "2년으로요"],
     reference: "Since this is a new design, could you extend the warranty to two years?",
     accepted: [
       "Since it's a new design, could you extend the warranty to two years?",
@@ -663,7 +663,7 @@ export const TALK_NEGOTIATION: Question[] = [
     contextKo: "두 달 만에 Linh과 협상을 다시 시작합니다. 3월에 받은 견적 가격이 아직 유효한지 먼저 확인합니다.",
     dialogue: [{ speaker: "Linh", en: "Nice to talk again. Shall we pick up where we left off?", ko: "다시 이야기하게 돼서 반가워요. 지난번에 하던 데서 이어서 할까요?" }],
     promptKo: "네. 먼저, 3월에 주신 견적 가격이 아직 유효한가요?",
-    segments: ["네.", "먼저,", "그 가격이", "당신이 견적 낸", "3월에", "아직 유효한가요"],
+    segments: ["네, 먼저", "3월에 주신 견적 가격이", "아직 유효한가요?"],
     reference: "Sure. First, is the price you quoted in March still valid?",
     accepted: [
       "Sure. First, is the price that you quoted in March still valid?",

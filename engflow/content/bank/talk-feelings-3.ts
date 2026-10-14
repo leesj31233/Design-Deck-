@@ -314,7 +314,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "민수 씨가 고객에게 엉뚱한 파일을 보내 풀이 죽어 있자, 부디 씨가 자기 실수담을 들려주며 위로합니다.",
     dialogue: [{ speaker: "Budi", en: "Don't worry about it. Last month I sent the wrong drawing to the whole client team!", ko: "신경 쓰지 마요. 저는 지난달에 고객사 팀 전체에 엉뚱한 도면을 보냈다니까요!" }],
     promptKo: "부디 씨, 기운 나게 해 줘서 고마워요.",
-    segments: ["고마워요", "기운 나게 해 준 것", "나를", "부디 씨"],
+    segments: ["기운 나게 해 줘서 고마워요", "부디 씨"],
     reference: "Thanks for cheering me up, Budi.",
     accepted: ["Thank you for cheering me up, Budi.", "Thanks, Budi. That really cheered me up.", "Thanks for making me feel better, Budi.", "Thanks, Budi. You've really cheered me up.", "Thanks for trying to cheer me up, Budi."],
     meaning: [
@@ -387,7 +387,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "회의 중에 멍하니 있는 민수 씨에게 동료 지수 씨가 괜찮냐고 묻습니다. 민수 씨의 아버지는 어제 입원하셨습니다.",
     dialogue: [{ speaker: "Jisoo", en: "You seem a bit distracted today. Is everything okay?", ko: "오늘 좀 정신없어 보이네요. 괜찮아요?" }],
     promptKo: "사실 아버지 때문에 좀 걱정돼요. 어제 입원하셨거든요.",
-    segments: ["사실,", "나는 좀 걱정돼요", "아버지에 대해", "아버지가", "병원에 들어가셨어요", "어제"],
+    segments: ["사실 아버지 때문에 좀 걱정돼요.", "어제 입원하셨거든요"],
     reference: "Actually, I'm a bit worried about my dad. He went into the hospital yesterday.",
     accepted: ["Actually, I'm a bit worried about my father. He went into the hospital yesterday.", "To be honest, I'm a bit worried about my dad. He was taken to the hospital yesterday.", "Actually, I'm a little worried about my dad, because he went into the hospital yesterday.", "Actually, I'm a bit worried about my dad. He was admitted to the hospital yesterday.", "Not really. I'm a bit worried about my dad. He went into the hospital yesterday."],
     meaning: [
@@ -463,7 +463,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "고객 회의에서 민수 씨가 숫자를 잘못 말했는데, 회의 후 탄 씨가 웃으며 괜찮다고 말해 줍니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Don't worry, Minsu. We all knew what you meant!", ko: "걱정 마요, 민수 씨. 다들 무슨 뜻인지 알았어요!" }],
     promptKo: "정말 창피했어요! 긴장하면 늘 숫자를 헷갈리거든요.",
-    segments: ["그건 정말 창피했어요!", "저는 늘 헷갈려요", "숫자를", "제가 긴장할 때"],
+    segments: ["정말 창피했어요!", "긴장하면 늘 숫자를 헷갈리거든요"],
     reference: "That was so embarrassing! I always mix up numbers when I'm nervous.",
     accepted: ["That was so embarrassing! I always get numbers mixed up when I'm nervous.", "How embarrassing! I always mix up numbers when I get nervous.", "That was really embarrassing! I always mix up my numbers when I'm nervous.", "Thanks, but that was so embarrassing! I always mix up numbers when I'm nervous.", "I was so embarrassed! I always mix up numbers when I'm nervous."],
     meaning: [
@@ -501,7 +501,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "미국인 친구 제이크가 지난 주말 오래 사귄 여자 친구와 헤어졌다고 털어놓습니다.",
     dialogue: [{ speaker: "Jake", en: "Anna and I broke up last weekend. I'm still in shock.", ko: "애나랑 지난 주말에 헤어졌어. 아직도 충격이야." }],
     promptKo: "정말 안됐다, 제이크. 얘기하고 싶으면 언제든 전화해.",
-    segments: ["정말 안됐다", "그 얘기를 들으니", "제이크.", "전화해", "언제든", "네가 얘기하고 싶으면"],
+    segments: ["정말 안됐다, 제이크.", "언제든 전화해", "얘기하고 싶으면"],
     reference: "I'm so sorry to hear that, Jake. Call me anytime if you want to talk.",
     accepted: ["I'm really sorry to hear that, Jake. Call me anytime if you want to talk.", "I'm so sorry, Jake. If you want to talk, call me anytime.", "I'm so sorry to hear that. You can call me anytime if you want to talk.", "I'm so sorry, Jake. Call me whenever you want to talk.", "That's really tough, Jake. Call me anytime if you need to talk."],
     meaning: [
@@ -540,7 +540,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "점심시간, 사리 씨가 자기 팀장 때문에 속상하다며 민수 씨에게 하소연합니다.",
     dialogue: [{ speaker: "Sari", en: "My manager criticized my report in front of the whole team again. He does it all the time.", ko: "팀장님이 또 팀 전체 앞에서 제 보고서를 지적했어요. 맨날 그래요." }],
     promptKo: "그건 정말 부당하네요. 팀장님한테 그 얘기 해 봤어요?",
-    segments: ["그건 들리네요", "정말 부당하게.", "해 봤어요?", "그분에게 얘기를", "그것에 대해"],
+    segments: ["그건 정말 부당하네요.", "팀장님한테 그 얘기 해 봤어요?"],
     reference: "That sounds really unfair. Have you talked to him about it?",
     accepted: ["That sounds really unfair. Have you spoken to him about it?", "That's really unfair. Have you talked to him about it?", "That sounds so unfair. Have you told him how you feel?", "That sounds really unfair, Sari. Have you ever talked to him about it?", "That sounds really frustrating. Have you talked to him about it?", "That sounds really unfair. Did you talk to him about it?"],
     meaning: [
@@ -576,7 +576,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "민수 씨는 다음 달 새 프로젝트로 옮깁니다. 3년 동안 함께 일한 라이선서의 다니엘 씨와 마지막 정기 통화를 합니다.",
     dialogue: [{ speaker: "Daniel", en: "So this is our last call before you move to the new project?", ko: "그럼 이게 새 프로젝트로 가기 전 우리 마지막 통화인 거죠?" }],
     promptKo: "네. 지난 3년 동안 정말 많이 가르쳐 주셔서 정말 감사해요.",
-    segments: ["네.", "당신은 저에게 가르쳐 주셨어요", "정말 많이", "지난 3년 동안", "그리고 저는 정말 감사해요"],
+    segments: ["네. 정말 많이 가르쳐 주셨어요", "지난 3년 동안", "정말 감사해요"],
     reference: "Yes. You've taught me so much over the past three years, and I'm really grateful.",
     accepted: ["Yes. You've taught me so much over the past three years, and I'm really grateful for that.", "Yes, and I'm really grateful. You've taught me so much over the past three years.", "Yes. I've learned so much from you over the past three years, and I'm really grateful.", "Yes. You've taught me a lot over the last three years, and I really appreciate it.", "That's right. You've taught me so much over the past three years, and I'm really thankful."],
     meaning: [
@@ -613,7 +613,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "2주 전에 입사한 신입 엔지니어 하나 씨가 아직도 P&ID의 절반도 이해하지 못한다며 풀이 죽어 있습니다.",
     dialogue: [{ speaker: "Hana", en: "I still don't understand half of these P&IDs. I feel so slow.", ko: "아직도 이 P&ID들 절반도 이해를 못 하겠어요. 제가 너무 느린 것 같아요." }],
     promptKo: "걱정 마요, 여기 온 지 2주밖에 안 됐잖아요. 저는 익숙해지는 데 3개월 걸렸어요.",
-    segments: ["걱정 마요,", "당신은 여기 있었을 뿐이에요", "2주 동안.", "저는 걸렸어요", "3개월이", "익숙해지는 데"],
+    segments: ["걱정 마요,", "여기 온 지 2주밖에 안 됐잖아요.", "저는 익숙해지는 데 3개월 걸렸어요"],
     reference: "Don't worry, you've only been here for two weeks. It took me three months to get used to them.",
     accepted: ["Don't worry, you've only been here two weeks. It took me three months to get used to them.", "Don't worry. You've only been here for two weeks. It took me three months to understand them.", "Don't worry, you've only been here for two weeks. It took me about three months to get used to them.", "Don't worry, it's only been two weeks. It took me three months to get used to them.", "Don't be so hard on yourself. You've only been here for two weeks, and it took me three months to get used to them."],
     meaning: [
@@ -653,7 +653,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "인도 벤더의 프리야 씨가 몇 달 동안 준비한 열교환기 설계 개선안이 경영진 회의에서 채택되지 않았다고 말합니다.",
     dialogue: [{ speaker: "Priya", en: "Management rejected our proposal for the new heat exchanger design. I worked on it for months.", ko: "경영진이 새 열교환기 설계 제안을 거절했어요. 몇 달이나 준비했는데요." }],
     promptKo: "채택되지 않았다니 안타까워요. 올해 제가 본 아이디어 중 최고였는데요.",
-    segments: ["안타까워요", "그것이 채택되지 않았다니.", "그건 ~ 중 하나였어요", "최고의 아이디어들", "제가 본", "올해"],
+    segments: ["채택되지 않았다니 안타까워요.", "최고의 아이디어 중 하나였는데요", "올해 제가 본"],
     reference: "I'm sorry it wasn't accepted. It was one of the best ideas I've seen this year.",
     accepted: ["I'm sorry it wasn't accepted. It was one of the best ideas that I've seen this year.", "I'm sorry your proposal wasn't accepted. It was one of the best ideas I've seen this year.", "I'm so sorry it was rejected. It was one of the best ideas I've seen this year.", "I'm really sorry it wasn't approved. It was one of the best ideas I've seen all year.", "That's a shame it wasn't accepted. It was one of the best ideas I've seen this year."],
     meaning: [
@@ -692,7 +692,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "베트남 현장의 린 씨가 시료 봉투를 뒤바꾸는 실수를 해서 자책하고 있습니다. 다행히 실험실로 보내기 전에 발견됐습니다.",
     dialogue: [{ speaker: "Linh", en: "I can't believe I mixed up the sample bags. Now the whole batch has to be checked again.", ko: "제가 시료 봉투를 뒤바꾸다니 믿기지가 않아요. 이제 배치 전체를 다시 확인해야 해요." }],
     promptKo: "누구에게나 있는 일이에요. 다행히 샘플이 실험실로 보내지기 전에 문제가 발견됐잖아요.",
-    segments: ["그런 일은 누구에게나 일어나요.", "다행히,", "문제가 발견됐어요", "~ 전에", "샘플이 보내지기", "실험실로"],
+    segments: ["누구에게나 있는 일이에요.", "다행히 문제가 발견됐잖아요", "샘플이 실험실로 보내지기 전에"],
     reference: "It happens to everyone. Luckily, the problem was found before the samples were sent to the lab.",
     accepted: ["It happens to everyone. Luckily, the mistake was found before the samples were sent to the lab.", "It happens to everybody. Luckily, the problem was caught before the samples were sent to the lab.", "Everyone makes mistakes. Luckily, the problem was found before the samples were sent to the lab.", "It happens to everyone. At least the problem was found before the samples were sent to the lab.", "It happens to everyone. Luckily, we found the problem before the samples were sent to the lab."],
     meaning: [
@@ -730,7 +730,7 @@ export const TALK_FEELINGS_3: Question[] = [
     contextKo: "말레이시아 고객사의 탄 씨가 어머니가 넘어져 입원하셔서 내일 회의에 못 올 것 같다고 미안해합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "I'm sorry, Minsu. My mother had a fall and she's in the hospital, so I may not be able to join tomorrow's meeting.", ko: "미안해요, 민수 씨. 어머니가 넘어지셔서 입원하셨어요. 그래서 내일 회의에 못 갈 것 같아요." }],
     promptKo: "정말 안타깝네요. 회의는 걱정하지 마세요. 다음 주로 얼마든지 옮길 수 있어요.",
-    segments: ["정말 안타깝네요", "그 소식을 들으니.", "걱정하지 마세요", "회의는.", "그건 쉽게 옮겨질 수 있어요", "다음 주로"],
+    segments: ["정말 안타깝네요.", "회의는 걱정하지 마세요.", "다음 주로 얼마든지 옮길 수 있어요"],
     reference: "I'm so sorry to hear that. Please don't worry about the meeting. It can easily be moved to next week.",
     accepted: ["I'm very sorry to hear that. Don't worry about the meeting. It can easily be moved to next week.", "I'm so sorry to hear that. Please don't worry about the meeting, because it can easily be moved to next week.", "I'm so sorry to hear that. Please don't worry about the meeting. We can easily move it to next week.", "I'm so sorry to hear about your mother. Please don't worry about the meeting. It can easily be moved to next week.", "I'm so sorry to hear that. Please don't worry about the meeting. It can easily be postponed until next week.", "I'm so sorry to hear that. You don't have to worry about the meeting. We can easily move it to next week."],
     meaning: [

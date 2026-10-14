@@ -230,7 +230,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "세척 공정을 바꾼 뒤의 수율 변화를 보여 주는 그래프 슬라이드. 수율이 5%만큼 올랐습니다.",
     dialogue: [{ speaker: "Daniel", en: "So what happened after you changed the washing step?", ko: "그래서 세척 단계를 바꾼 뒤에 어떻게 됐나요?" }],
     promptKo: "보시다시피, 수율이 5% 올랐습니다.",
-    segments: ["보시다시피,", "수율이", "올랐습니다", "5%만큼"],
+    segments: ["보시다시피,", "수율이 5% 올랐습니다"],
     reference: "As you can see, the yield went up by 5%.",
     accepted: ["As you can see, the yield increased by 5%.", "As you can see, the yield rose by 5%.", "As you can see, the yield has gone up by 5%.", "As you can see, the yield went up 5%.", "As you can see, the yield increased 5%."],
     meaning: [
@@ -266,7 +266,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "건조기 사양 슬라이드. Mr. Tan이 건조기가 왜 이렇게 크냐고 묻습니다. 그 이유를 차례로 설명하려 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Why is the dryer so big? It looks bigger than our current one.", ko: "건조기가 왜 이렇게 크죠? 지금 쓰는 것보다 커 보이네요." }],
     promptKo: "네, 건조기가 왜 이렇게 큰지 설명드릴게요.",
-    segments: ["네.", "제가 설명드릴게요", "왜", "건조기가 이렇게 큰지"],
+    segments: ["네.", "건조기가 왜 이렇게 큰지 설명드릴게요"],
     reference: "Sure. Let me explain why the dryer is so big.",
     accepted: ["Sure, let me explain why the dryer is so big.", "Sure. Let me explain why the dryer is this big.", "Sure. Let me explain why we need such a big dryer.", "Of course. Let me explain why the dryer is so large."],
     meaning: [
@@ -435,7 +435,7 @@ export const TALK_PRESENTATION_2: Question[] = [
     contextKo: "질의응답 시간. Mr. Tan이 길고 복잡하게 질문했는데, POME 슬러지로 시험한 건조기를 EFB에도 쓸 수 있는지 묻는 것 같습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So, this dryer, the one you tested with sludge… what about our EFB? The fibre is very different, no?", ko: "그러니까 이 건조기, 슬러지로 시험한 거요… 저희 EFB는요? 섬유질이 아주 다르잖아요?" }],
     promptKo: "제가 제대로 이해했다면, 같은 건조기를 EFB에도 쓸 수 있는지 물으시는 거죠?",
-    segments: ["제가 제대로 이해했다면,", "당신은 묻고 있다", "~인지", "우리가 쓸 수 있다", "같은 건조기를", "EFB에도"],
+    segments: ["제가 제대로 이해했다면,", "물으시는 건", "같은 건조기를 EFB에도 쓸 수 있는지죠?"],
     reference: "If I understand correctly, you're asking whether we can use the same dryer for EFB.",
     accepted: [
       "If I understand correctly, you're asking if we can use the same dryer for EFB.",

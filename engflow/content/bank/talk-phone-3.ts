@@ -402,7 +402,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "해외 파견 중 몸이 계속 안 좋아서 동네 병원에 전화했습니다. 접수 직원이 전화를 받자 이 의사 선생님께 목요일 오전 진료를 예약하고 싶다고 말합니다.",
     dialogue: [{ speaker: "Receptionist", en: "Good morning, Riverside Clinic. How can I help you?", ko: "안녕하세요, 리버사이드 병원입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 이 선생님께 목요일 오전으로 진료 예약을 하고 싶어요.",
-    segments: ["안녕하세요,", "저는 예약을 하고 싶어요", "이 선생님과", "목요일 오전으로"],
+    segments: ["안녕하세요, 예약을 하고 싶어요", "이 선생님께", "목요일 오전으로요"],
     reference: "Hi, I'd like to make an appointment with Dr. Lee for Thursday morning.",
     accepted: [
       "Hi, I'd like to book an appointment with Dr. Lee for Thursday morning.",
@@ -486,7 +486,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "프리야 씨가 전화로 샘플을 보낼 인도 공장 주소를 불러 주었습니다. 받아 적은 주소가 맞는지 다시 읽어 확인하려고 합니다.",
     dialogue: [{ speaker: "Priya", en: "So it's 42 Park Street, Pune, 411001. Did you get all that?", ko: "그러니까 푸네 파크 스트리트 42번지, 우편번호 411001이에요. 다 받아 적으셨어요?" }],
     promptKo: "제가 주소를 다시 읽어 드릴게요.",
-    segments: ["제가 ~할게요", "읽다", "그 주소를", "다시", "당신에게"],
+    segments: ["제가 주소를", "다시 읽어 드릴게요"],
     reference: "Let me read the address back to you.",
     accepted: [
       "Let me read it back to you.",
@@ -666,7 +666,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "라이선서 회사의 다니엘 씨에게 전화했는데 안내 직원이 받았습니다. 다니엘 씨가 오늘 사무실에 없다고 해서, 수정 도면을 이미 보냈다는 메시지를 남깁니다.",
     dialogue: [{ speaker: "Receptionist", en: "I'm afraid Daniel is out of the office today. Would you like to leave a message?", ko: "죄송하지만 다니엘 씨는 오늘 사무실에 안 계세요. 메시지 남기시겠어요?" }],
     promptKo: "네, 제가 수정 도면을 보냈다고 전해 주시겠어요? 궁금한 점이 있으면 저한테 전화하셔도 된다고요.",
-    segments: ["네,", "그에게 전해 주시겠어요", "제가 보냈다고", "수정된 도면을?", "그는 저에게 전화해도 돼요", "만약 그가 질문이 있으면"],
+    segments: ["네, 전해 주시겠어요?", "제가 수정 도면을 보냈다고요", "저한테 전화하셔도 돼요", "궁금한 점이 있으면"],
     reference: "Yes, could you tell him that I've sent the revised drawings? He can call me if he has any questions.",
     accepted: [
       "Yes, could you tell him I sent the revised drawings? He can call me if he has any questions.",
@@ -711,7 +711,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "밤 11시에 김 부장님이 회사 메신저(영어로 쓰는 글로벌 팀 채널)로 미안하다며 내일 발표 자료에 대해 짧게 물어볼 게 있다고 합니다. 아직 깨어 있으니, 편하면 지금 전화하겠다고 답합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Sorry to message you so late. Are you still awake? I have a quick question about tomorrow's slides.", ko: "늦게 메시지해서 미안해요. 아직 안 자요? 내일 발표 자료 관련해서 잠깐 물어볼 게 있어서요." }],
     promptKo: "네, 아직 안 자요. 그게 더 편하시면 지금 전화드릴 수 있어요.",
-    segments: ["네,", "저는 아직 깨어 있어요.", "저는 전화드릴 수 있어요", "지금", "만약 그게 더 편하면"],
+    segments: ["네, 아직 안 자요", "지금 전화드릴 수 있어요", "그게 더 편하시면"],
     reference: "Yes, I'm still up. I can call you now if that's easier.",
     accepted: [
       "Yes, I'm still awake. I can call you now if that's easier.",
@@ -754,7 +754,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "사리 씨가 프로젝트 단체 채팅방에 질문을 올렸는데 아무도 답하지 않았다고 합니다. 메시지가 많아서 묻힌 것 같아, 다음에는 그 사람을 태그하라고 알려 줍니다.",
     dialogue: [{ speaker: "Sari", en: "I asked a question in the project chat yesterday, but nobody answered.", ko: "어제 프로젝트 채팅방에 질문을 올렸는데 아무도 답을 안 했어요." }],
     promptKo: "다음엔 그 사람을 태그하면 알림이 갈 거예요.",
-    segments: ["다음번에,", "만약 당신이 태그하면", "그 사람을,", "그들은 받을 거예요", "알림을"],
+    segments: ["다음엔 그 사람을 태그하면", "알림이 갈 거예요"],
     reference: "Next time, if you tag the person, they'll get a notification.",
     accepted: [
       "Next time, if you tag the person, they'll get notified.",
@@ -886,7 +886,7 @@ export const TALK_PHONE_3: Question[] = [
     contextKo: "출장지 호텔 앞에서 7시에 오기로 예약한 택시를 기다리는데 7시 20분이 되도록 오지 않습니다. 택시 회사에 전화합니다.",
     dialogue: [{ speaker: "Dispatcher", en: "City Taxi, how can I help you?", ko: "시티 택시입니다. 무엇을 도와드릴까요?" }],
     promptKo: "안녕하세요, 7시로 예약한 택시가 아직도 안 왔어요.",
-    segments: ["안녕하세요,", "택시가", "(제가 예약한)", "7시로", "아직도 도착하지 않았어요"],
+    segments: ["안녕하세요, 7시로 예약한 택시가", "아직도 안 왔어요"],
     reference: "Hi, the taxi I booked for seven still hasn't arrived.",
     accepted: [
       "Hi, the taxi that I booked for seven still hasn't arrived.",

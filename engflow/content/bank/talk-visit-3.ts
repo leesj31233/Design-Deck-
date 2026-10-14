@@ -351,7 +351,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "인도 벤더 공장을 방문해 펌프 성능 시험을 참관했습니다. Priya가 질문이 있는지 묻자, 시험 절차서 사본을 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "That's the end of the test. Do you have any questions?", ko: "시험은 여기까지예요. 질문 있으세요?" }],
     promptKo: "시험 절차서 사본을 받을 수 있을까요?",
-    segments: ["제가 받을 수 있을까요", "사본을", "시험 절차서의"],
+    segments: ["사본을 받을 수 있을까요?", "시험 절차서요"],
     reference: "Could I get a copy of the test procedure?",
     accepted: [
       "Could I have a copy of the test procedure?",
@@ -390,7 +390,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "건조기 앞에서 Mr. Tan이 이 건조기가 EFB를 얼마나 처리할 수 있는지 묻습니다. 시간당 약 5톤이라고 답합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "How much EFB can this dryer handle?", ko: "이 건조기는 EFB를 얼마나 처리할 수 있어요?" }],
     promptKo: "시간당 약 5톤을 처리할 수 있어요.",
-    segments: ["그것은 처리할 수 있어요", "약 5톤을", "시간당"],
+    segments: ["약 5톤을 처리할 수 있어요", "시간당"],
     reference: "It can handle about five tons per hour.",
     accepted: [
       "It can handle about 5 tons per hour.",
@@ -432,7 +432,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "자카르타 공장에서 온 Budi와 펠릿 공정 옆을 지나는데 기계 소리 때문에 말이 들리지 않습니다. 밖에 나가서 얘기하자고 합니다.",
     dialogue: [{ speaker: "Budi", en: "Sorry, what did you say? I can't hear you.", ko: "미안해요, 뭐라고 했어요? 안 들려요." }],
     promptKo: "여기 안은 너무 시끄러우니까 밖에서 얘기해요.",
-    segments: ["정말 시끄러워요", "여기 안은,", "그러니까", "얘기해요", "밖에서"],
+    segments: ["여기 안은 너무 시끄러우니까", "밖에서 얘기해요"],
     reference: "It's really loud in here, so let's talk outside.",
     accepted: [
       "It's too loud in here, so let's talk outside.",
@@ -517,7 +517,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "오전 내내 공장을 걸어 다닌 Sari가 많이 걸었다고 합니다. 건조동으로 가기 전에 잠깐 쉬자고 합니다.",
     dialogue: [{ speaker: "Sari", en: "Wow, that was a lot of walking!", ko: "와, 정말 많이 걸었네요!" }],
     promptKo: "건조동으로 가기 전에 잠깐 쉬어요.",
-    segments: ["잠깐 쉬어요", "~하기 전에", "우리가 가다", "건조동으로"],
+    segments: ["잠깐 쉬어요", "건조동으로 가기 전에"],
     reference: "Let's take a short break before we go to the dryer building.",
     accepted: [
       "Let's take a quick break before we go to the dryer building.",
@@ -603,7 +603,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "오후 회의가 끝나 가는데 Mr. Tan이 호텔로 어떻게 돌아가면 되는지 묻습니다. 5시까지 준비되면 회사 기사님이 호텔까지 모셔다 드릴 수 있다고 합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "How do I get back to my hotel after the meeting?", ko: "회의 끝나고 호텔까지 어떻게 돌아가면 돼요?" }],
     promptKo: "5시까지 준비되시면, 저희 기사님이 호텔까지 모셔다 드릴 수 있어요.",
-    segments: ["만약 당신이 준비되면", "5시까지,", "저희 기사님이", "모셔다 드릴 수 있어요", "당신을", "호텔까지"],
+    segments: ["5시까지 준비되시면", "저희 기사님이 모셔다 드릴 수 있어요", "호텔까지"],
     reference: "If you're ready by five, our driver can take you back to your hotel.",
     accepted: [
       "If you're ready by 5, our driver can take you back to your hotel.",
@@ -687,7 +687,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "공장 견학 중 펠릿 공정 건물에 들어왔습니다. Mr. Tan이 여기서 무엇을 하는지 묻자, 건조된 섬유를 펠릿으로 압축하는 곳이라고 설명합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "What happens in this building?", ko: "이 건물에서는 뭘 해요?" }],
     promptKo: "여기가 건조된 섬유를 펠릿으로 압축하는 곳이에요.",
-    segments: ["여기가 ~하는 곳이에요", "건조된 섬유가", "압축되다", "펠릿으로"],
+    segments: ["여기가 그곳이에요", "건조된 섬유를", "펠릿으로 압축하는"],
     reference: "This is where the dried fiber is pressed into pellets.",
     accepted: [
       "This is where the dried fiber is made into pellets.",
@@ -773,7 +773,7 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "펌프를 주문한 인도 벤더의 공장을 방문했습니다. Priya가 특별히 보고 싶은 게 있는지 묻자, 우리 펌프가 시험받을 시험대를 꼭 보고 싶다고 합니다.",
     dialogue: [{ speaker: "Priya", en: "Welcome to our factory! Is there anything in particular you'd like to see?", ko: "저희 공장에 오신 걸 환영해요! 특별히 보고 싶으신 게 있나요?" }],
     promptKo: "네, 저희 펌프가 시험받을 시험대를 꼭 보고 싶어요.",
-    segments: ["네,", "저는 꼭 보고 싶어요", "시험대를", "~하는 곳인", "저희 펌프가", "시험받을"],
+    segments: ["네, 시험대를 꼭 보고 싶어요", "저희 펌프가 시험받을"],
     reference: "Yes, I'd really like to see the test bench where our pumps will be tested.",
     accepted: [
       "Yes, I'd love to see the test bench where our pumps will be tested.",
