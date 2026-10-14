@@ -119,7 +119,8 @@ export function validateBank(questions: Question[], ctx: { skillIds: Set<string>
 /**
  * Speak-first style (communication before grammar): how a sentence question reads to someone who has to say it
  * in a meeting. Not errors — a report that drives the content passes (`check-content --style`).
- * - fine-chunks: more than 6 hint chips, or a chip that is only a linking word ("비록 ~이지만", "왜냐하면").
+ * - fine-chunks: more chips than the answer has breath groups (2 under 10 words, 3 under 16, 4 under 24, else 6),
+ *   or a chip that is only a linking word ("비록 ~이지만", "왜냐하면").
  *   Chips should be meaning units a speaker says in one breath.
  * - concession-first: the model answer opens with "Although/Even though …"; say the point first instead
  *   ("I don't think we should … . The results look good, but …") and keep the long form as `advanced`.
@@ -130,7 +131,9 @@ const LINK_CHIP = /^(비록|왜냐하면|만약|하지만|그래서|그리고|�
 export function speakFirstStyle(q: Question): SpeakFirstIssue[] {
   if (q.mode !== "sentence") return [];
   const out: SpeakFirstIssue[] = [];
-  if (q.segments.length > 6 || q.segments.some((s) => LINK_CHIP.test(s.trim()))) out.push("fine-chunks");
+  const words = q.reference.split(/\s+/).length;
+  const maxChunks = words < 10 ? 2 : words < 16 ? 3 : words < 24 ? 4 : 6;
+  if (q.segments.length > maxChunks || q.segments.some((s) => LINK_CHIP.test(s.trim()))) out.push("fine-chunks");
   if (/^(Although|Even though|Though)\b/.test(q.reference)) out.push("concession-first");
   const sentences = q.reference.split(/(?<=[.!?])\s+/).filter(Boolean);
   if (sentences.length === 1 && q.reference.split(/\s+/).length >= 25) out.push("long-single");

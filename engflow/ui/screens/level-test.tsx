@@ -298,7 +298,7 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
               <p className="ef-ko mt-2 text-[18px] font-semibold">{q.promptKo}</p>
               {q.mode === "sentence" ? (
                 <div className="mt-3">
-                  <MeaningChunks segments={q.segments} size="md" hint />
+                  <MeaningChunks segments={q.segments} size="md" hint={q.reference.split(" ").length >= 12} />
                 </div>
               ) : null}
               <label htmlFor="ef-test-answer" className="sr-only">영어 답안</label>

@@ -1177,7 +1177,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["progressive", "be-adj"],
       contextKo: "현장 점검 중 말레이시아 엔지니어가 공급 펌프가 지금 돌고 있는지 묻습니다.",
       promptKo: "아니요, 지금은 돌고 있지 않습니다. 운전원들이 필터를 청소하고 있습니다.",
-      segments: ["아니요", "그것은 돌고 있지 않다", "지금", "운전원들이", "청소하고 있다", "필터를"],
+      segments: ["아니요, 지금은 안 돌고 있어요", "운전원들이 필터를 청소하고 있어요"],
       reference: "No, it isn't running now. The operators are cleaning the filter.",
       accepted: [
         "No, it is not running now. The operators are cleaning the filter.",
@@ -1245,7 +1245,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["future-plan", "collocation"],
       contextKo: "인도네시아 팀 엔지니어가 화상회의에서 수정된 P&ID를 오늘 보내 달라고 요청합니다.",
       promptKo: "죄송하지만 오늘은 어렵습니다. 내일 오전까지 보내 드리겠습니다.",
-      segments: ["죄송합니다", "오늘은 안 됩니다", "제가 보내 드리겠습니다", "그것을", "당신에게", "내일 오전까지"],
+      segments: ["죄송하지만 오늘은 어렵습니다", "내일 오전까지 보내 드리겠습니다"],
       reference: "Sorry, not today. I will send it to you by tomorrow morning.",
       accepted: [
         "Sorry, I can't send it today. I will send it to you by tomorrow morning.",
@@ -1383,7 +1383,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["clarify-question"],
       contextKo: "말레이시아 고객사 엔지니어가 최종 데이터시트를 요청했는데, 어떤 장비 것인지 분명하지 않습니다.",
       promptKo: "어떤 데이터시트를 말씀하시는 건가요? 건조기 데이터시트인가요, 펌프 데이터시트인가요?",
-      segments: ["어떤 데이터시트를", "말씀하시나요", "건조기 데이터시트", "아니면", "펌프 데이터시트"],
+      segments: ["어떤 데이터시트를 말씀하시는 건가요?", "건조기 것인가요, 펌프 것인가요?"],
       reference: "Which datasheet do you mean? The dryer datasheet or the pump datasheet?",
       accepted: [
         "Which datasheet do you mean? Is it the dryer datasheet or the pump datasheet?",

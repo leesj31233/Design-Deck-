@@ -46,7 +46,7 @@ See `engflow/core/types.ts` (`Question`). Fields that matter most:
 | Field | Rule |
 | --- | --- |
 | `promptKo` | Natural Korean of the whole prompt. |
-| `segments` | Korean **meaning chunks in speaking order** — each one a unit a speaker says in one breath (≈4–16 Korean syllables), main point first. 2–5 chunks for a sentence question (never more than 6), no chip that is only a linking word (`비록 ~이지만`, `왜냐하면`, `하지만` go *inside* the chunk they introduce). Example: `아직 스케일업하면 안 된다고 생각한다 / 실험실 결과는 좋아 보이지만 / 현장의 원료 조성이 다를 수도 있다` |
+| `segments` | Korean **meaning chunks in speaking order** — each one a unit a speaker says in one breath (≈4–16 Korean syllables), main point first. Chip budget by reference length: 2 chips under 10 words, 3 under 16, 4 under 24, at most 6, no chip that is only a linking word (`비록 ~이지만`, `왜냐하면`, `하지만` go *inside* the chunk they introduce). Example: `아직 스케일업하면 안 된다고 생각한다 / 실험실 결과는 좋아 보이지만 / 현장의 원료 조성이 다를 수도 있다` |
 | `contextKo` | One line: who speaks, which meeting, why. |
 | `reference` | The **recommended version** shown first in feedback: clear, easy to say on the spot, main point first. Two or three short sentences are better than one long sentence with stacked clauses. |
 | `accepted` | Other fully correct answers: different structures, synonyms, contractions. Sentence mode 2–5, phrase 1–4. |
