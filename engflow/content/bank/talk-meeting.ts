@@ -1363,7 +1363,7 @@ export const TALK_MEETING: Question[] = [
     ],
     meaning: [
       { id: "see", en: "I see where you're coming from", ko: "무슨 말씀인지 알겠다", any: ["coming from", "see|understand|get ... point|mean", "understand", "i see"], critical: true },
-      { id: "but", en: "but", ko: "하지만", any: ["but|however|though"], critical: true },
+      { id: "but", en: "but", ko: "하지만", any: ["but|however|though|although"], critical: true },
       { id: "wait", en: "I'd rather wait", ko: "기다리는 게 낫겠다", any: ["wait|hold"], critical: true },
       { id: "results", en: "until the test results come out", ko: "시험 결과가 나올 때까지", any: ["result|results|data"], critical: true },
       { id: "next-week", en: "next week", ko: "다음 주", any: ["next week"] },
@@ -1948,7 +1948,7 @@ export const TALK_MEETING: Question[] = [
     ],
     meaning: [
       { id: "understand", en: "I understand why you'd like to save time", ko: "시간을 아끼고 싶으신 건 이해한다", any: ["understand|see|know|appreciate|agree"] },
-      { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
+      { id: "but", en: "but", ko: "하지만", any: ["but|however|though|although"], critical: true },
       { id: "concerned", en: "I'm a little concerned", ko: "조금 걱정된다", any: ["concerned|concern|worried|worry|afraid", "not sure"], critical: true },
       { id: "sand", en: "the new feed has a lot more sand", ko: "원료에 모래가 훨씬 많다", any: ["sand|sandy|abrasive|grit"], critical: true },
       { id: "if-same", en: "if we use the same pumps", ko: "같은 펌프를 쓰면", any: ["if ... same", "same ... pump|pumps"], critical: true },

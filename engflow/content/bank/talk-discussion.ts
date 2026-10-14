@@ -400,7 +400,7 @@ export const TALK_DISCUSSION: Question[] = [
     ],
     meaning: [
       { id: "see", en: "I see what you mean", ko: "무슨 말씀인지 알겠다", any: ["see|understand|get ... mean|point", "understand", "make sense", "fair point|enough", "i hear you"], critical: true },
-      { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
+      { id: "but", en: "but", ko: "하지만", any: ["but|however|though|although"], critical: true },
       { id: "not-sure", en: "I'm not sure", ko: "잘 모르겠다", any: ["not sure|certain|convinced", "not think", "doubt", "do we really need"], critical: true },
       { id: "need", en: "we need", ko: "필요하다", any: ["need|require"] },
       { id: "big-dryer", en: "such a big dryer", ko: "그렇게 큰 건조기", any: ["big|large|bigger|larger ... dryer", "dryer ... big|large"] },
@@ -572,7 +572,7 @@ export const TALK_DISCUSSION: Question[] = [
     ],
     meaning: [
       { id: "understand", en: "I understand", ko: "이해하지만", any: ["understand|see|agree|know"] },
-      { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
+      { id: "but", en: "but", ko: "하지만", any: ["but|however|though|although"], critical: true },
       { id: "worried", en: "I'm a little worried", ko: "좀 걱정된다", any: ["worried|worry|concerned|concern|afraid", "not sure"], critical: true },
       { id: "skip", en: "skipping the pilot test", ko: "파일럿 시험을 건너뛰기", any: ["skip|cancel|drop|=without ... pilot|test"], critical: true },
       { id: "if-different", en: "if the feed behaves differently", ko: "원료가 다르게 반응하면", any: ["if ... different|differently", "if ... not ... same"], critical: true },

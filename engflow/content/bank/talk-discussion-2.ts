@@ -851,7 +851,7 @@ export const TALK_DISCUSSION_2: Question[] = [
     ],
     meaning: [
       { id: "see-why", en: "I see why you need it", ko: "왜 필요한지 이해한다", any: ["see|understand|know ... why|need|reason"] },
-      { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
+      { id: "but", en: "but", ko: "하지만", any: ["but|however|though|although"], critical: true },
       { id: "not-sure", en: "I'm not sure … is realistic", ko: "현실적인지 모르겠다", any: ["not sure|certain", "not think", "doubt", "difficult|hard|tight|unrealistic"], critical: true },
       { id: "june", en: "the end of June", ko: "6월 말", any: ["june"], critical: true },
       { id: "no-data", en: "we haven't received the vendor data yet", ko: "벤더 데이터를 아직 못 받았다", any: ["not ... receive|get|got|have", "still ... wait|waiting"], critical: true },

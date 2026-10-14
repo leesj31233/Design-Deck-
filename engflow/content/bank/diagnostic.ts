@@ -1313,7 +1313,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["cause-effect", "comparative"],
       contextKo: "아침 운전 회의에서 베트남 공정 엔지니어가 건조기 출구 수분이 왜 높은지 묻습니다.",
       promptKo: "원료 수분이 평소보다 높기 때문인 것 같습니다. 오늘 오후에 다시 측정하겠습니다.",
-      segments: ["제 생각에는", "그것은 ~ 때문이다", "원료 수분이", "더 높다", "평소보다", "우리는 측정하겠다", "그것을", "다시", "오늘 오후에"],
+      segments: ["원료 수분이 평소보다 높아서인 것 같다", "오늘 오후에 다시 측정하겠다"],
       reference: "I think it's because the feed moisture is higher than usual. We will measure it again this afternoon.",
       accepted: [
         "I think it is because the feed moisture is higher than usual. We will measure it again this afternoon.",
@@ -1442,7 +1442,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["polite-disagree", "too-adj", "cause-effect"],
       contextKo: "프로젝트 매니저가 고객 요청(다음 주 월요일 성능 시험)을 전합니다. 스팀 라인이 아직 준비되지 않아 당신은 정중히 반대합니다.",
       promptKo: "무슨 말씀인지는 알겠지만, 다음 주 월요일은 너무 이른 것 같습니다. 스팀 라인이 아직 준비되지 않았기 때문입니다.",
-      segments: ["말씀은 이해합니다", "하지만", "제 생각에는", "다음 주 월요일은", "너무 이르다", "왜냐하면", "스팀 라인이", "아직 준비되지 않았다"],
+      segments: ["말씀은 이해하지만", "다음 주 월요일은 너무 이른 것 같다", "스팀 라인이 아직 준비되지 않았기 때문이다"],
       reference: "I see your point, but I think next Monday is too early because the steam line is not ready yet.",
       accepted: [
         "I understand, but I think next Monday is too early because the steam line isn't ready yet.",
@@ -1511,7 +1511,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["reporting", "modal-necessity"],
       contextKo: "주간 공정 회의에서 미국인 PM이 모터 납품에 대해 공급업체가 뭐라고 했는지 묻습니다.",
       promptKo: "공급업체는 모터가 2주 늦게 도착할 것이라고 했습니다. 그래서 설치 일정을 조정해야 합니다.",
-      segments: ["공급업체는 말했다", "모터가", "도착할 것이라고", "2주 늦게", "그래서", "우리는 조정해야 한다", "설치 일정을"],
+      segments: ["공급업체가 모터가 2주 늦게 도착한다고 했다", "그래서 설치 일정을 조정해야 한다"],
       reference: "The vendor said that the motor would arrive two weeks late, so we need to adjust the installation schedule.",
       accepted: [
         "The vendor said the motor would arrive two weeks late, so we need to adjust the installation schedule.",
@@ -1582,7 +1582,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["cond-1", "modal-possibility", "comparative"],
       contextKo: "고객사 엔지니어가 파일럿 시험을 건너뛰고 실험실 데이터만으로 상업용 건조기를 설계하자고 제안합니다.",
       promptKo: "그것은 위험할 수 있습니다. (이번에) 파일럿 시험을 먼저 하지 않으면, 실제 플랜트에서 건조기 성능이 예상보다 낮을 수도 있습니다.",
-      segments: ["제 생각에는", "그것은 위험할 수 있다", "만약", "우리가 하지 않는다면", "파일럿 시험을", "먼저", "건조기 성능이", "실제 플랜트에서", "더 낮을 수도 있다", "우리가 예상하는 것보다"],
+      segments: ["그건 위험할 수 있다", "파일럿 시험을 먼저 하지 않으면", "실제 플랜트에서 건조기 성능이", "예상보다 낮을 수도 있다"],
       reference: "I think that could be risky. If we don't run a pilot test first, the dryer performance in the real plant might be lower than we expect.",
       accepted: [
         "I think that could be risky. If we don't run a pilot test first, the dryer performance in the real plant might be lower than we expected.",
@@ -1652,7 +1652,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       skills: ["cond-3", "cause-effect"],
       contextKo: "스케일업 검토 회의에서 고객사 기술 책임자가 파일럿 결과가 실험실 결과와 왜 다른지 묻습니다.",
       promptKo: "주된 이유는 실험실에서 깨끗한 원료를 사용했기 때문입니다. (그때) 현장의 실제 원료로 시험했더라면, 이 문제를 더 일찍 발견했을 것입니다.",
-      segments: ["주된 이유는", "우리가 사용했다는 것이다", "깨끗한 원료를", "실험실에서", "만약 ~했더라면", "우리가 시험했다", "실제 원료로", "현장의", "우리는 발견했을 것이다", "이 문제를", "더 일찍"],
+      segments: ["주된 이유는 실험실에서 깨끗한 원료를 썼기 때문이다", "현장의 실제 원료로 시험했더라면", "이 문제를 더 일찍 발견했을 것이다"],
       reference: "The main reason is that we used clean feed in the lab. If we had tested the real feed from the site, we would have found this problem earlier.",
       accepted: [
         "The main reason is that we used clean feed in the lab. If we had tested the real feed from the site, we would have found the problem earlier.",
@@ -1723,7 +1723,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       contextKo:
         "인도네시아 파일럿 플랜트의 아침 회의입니다. 오늘 건조기 출구 수분이 14 wt%로 목표(10 wt%)보다 높습니다. 원료(EFB)가 평소보다 젖어 있었고, 오늘 오후에 원료 투입량을 줄일 계획입니다.",
       promptKo: "문제(출구 수분 14 wt%, 목표 10 wt%), 원인(원료가 평소보다 젖어 있음), 다음 조치(오늘 오후 원료 투입량 감소)를 2–3문장으로 설명하세요.",
-      segments: ["건조기 출구 수분이", "너무 높다", "14 wt% (목표 10 wt%)", "왜냐하면", "원료가 더 젖어 있다", "평소보다", "우리는 줄이겠다", "원료 투입량을", "오늘 오후에"],
+      segments: ["건조기 출구 수분이 너무 높다", "14 wt%인데 목표는 10 wt%다", "원료가 평소보다 젖어 있어서", "오늘 오후에 원료 투입량을 줄이겠다"],
       reference: "The dryer outlet moisture is too high. It is 14 wt%, but our target is 10 wt%. This is because the feed is wetter than usual, so we will reduce the feed rate this afternoon.",
       accepted: [
         "The dryer outlet moisture is 14 wt%, which is higher than our target of 10 wt%. This is because the feed is wetter than usual. We will reduce the feed rate this afternoon.",
@@ -1794,7 +1794,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       contextKo:
         "베트남 현장 프로젝트 주간 회의입니다. 공급업체가 방금 디캔터 납품이 3주 늦어진다고 알려 왔습니다. 공급업체 공장에서 기어박스 문제가 있었고, 이번 주 안에 공급업체와 새 납품 일정을 확인해야 합니다.",
       promptKo: "문제(디캔터 납품 3주 지연), 원인(공급업체 공장의 기어박스 문제), 다음 조치(이번 주에 새 납품 일정 확인)를 2–3문장으로 설명하세요.",
-      segments: ["공급업체가 방금 알려 왔다", "디캔터 납품이", "3주 늦어진다고", "그들은 문제가 있었다", "기어박스에", "우리는 확인해야 한다", "새 납품 일정을", "이번 주에"],
+      segments: ["공급업체가 방금 알려 왔다: 디캔터 납품이 3주 늦어진다", "공장의 기어박스에 문제가 있었다", "이번 주에 새 납품 일정을 확인해야 한다"],
       reference: "The vendor has just told us that the decanter delivery will be three weeks late. They had a problem with the gearbox in their factory. We need to confirm the new delivery schedule with them this week.",
       accepted: [
         "The vendor has just informed us that the decanter will be delivered three weeks late, because they had a gearbox problem in their factory. We need to confirm a new delivery date with them this week.",
@@ -1864,7 +1864,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       contextKo:
         "말레이시아 현장 시운전 회의입니다. 건조기 스팀 압력이 설계값 8 bar(g)보다 낮은 5 bar(g)밖에 안 됩니다. 보일러 두 대 중 한 대가 아직 정비 중이라서, 정비가 끝날 때까지 건조기를 낮은 부하로 운전하자고 제안하려 합니다.",
       promptKo: "문제(스팀 압력 5 bar(g), 설계값 8 bar(g)), 원인(보일러 한 대가 아직 정비 중), 제안(정비가 끝날 때까지 건조기를 낮은 부하로 운전)을 2–3문장으로 설명하세요.",
-      segments: ["스팀 압력이", "건조기에서", "5 bar(g)뿐이다", "하지만 설계값은 8 bar(g)이다", "왜냐하면", "보일러 한 대가", "아직 정비 중이다", "저는 제안합니다", "우리가 운전하자고", "건조기를 낮은 부하로", "정비가 끝날 때까지"],
+      segments: ["건조기의 스팀 압력이 5 bar(g)뿐이다", "하지만 설계값은 8 bar(g)이다", "보일러 한 대가 아직 정비 중이기 때문이다", "정비가 끝날 때까지 건조기를 낮은 부하로 운전하자고 제안한다"],
       reference: "The steam pressure at the dryer is only 5 bar(g), but the design value is 8 bar(g). This is because one boiler is still under maintenance. I suggest that we run the dryer at a lower load until the maintenance is finished.",
       accepted: [
         "The steam pressure at the dryer is only 5 bar(g), while the design pressure is 8 bar(g). One boiler is still under maintenance. I suggest running the dryer at a lower load until the maintenance is finished.",
@@ -1934,7 +1934,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       contextKo:
         "말레이시아 고객사와의 스케일업 검토 회의입니다. 파일럿 플랜트의 EFB 세척 효율이 실험실보다 약 15% 낮았습니다. 파일럿에서 쓴 EFB는 실험실 시료보다 섬유가 더 길었고, 다음 달에 원료를 더 잘게 분쇄해서 다시 시험할 계획입니다.",
       promptKo: "문제(파일럿 세척 효율이 실험실보다 약 15% 낮음), 원인(파일럿에서 사용한 EFB의 섬유가 실험실 시료보다 김), 다음 조치(다음 달에 원료를 더 잘게 분쇄해 재시험)를 2–3문장으로 설명하세요.",
-      segments: ["세척 효율이", "파일럿 플랜트에서", "약 15% 더 낮았다", "실험실보다", "EFB는", "우리가 파일럿에서 사용한", "섬유가 더 길었다", "실험실 시료보다", "우리는 분쇄할 계획이다", "원료를 더 잘게", "그리고 다시 시험할", "다음 달에"],
+      segments: ["파일럿의 세척 효율이 실험실보다 약 15% 낮았다", "파일럿에서 쓴 EFB는 실험실 시료보다 섬유가 길었다", "다음 달에 원료를 더 잘게 분쇄해서 다시 시험할 계획이다"],
       reference: "The washing efficiency in the pilot plant was about 15% lower than in the lab. The EFB that we used in the pilot had longer fibers than the lab sample. We plan to grind the feed into smaller pieces and test it again next month.",
       accepted: [
         "The washing efficiency in the pilot plant was about 15% lower than in the lab. This is because the EFB that we used in the pilot had longer fibers than the lab sample. Next month, we are going to grind the feed into smaller pieces and test it again.",
@@ -2005,7 +2005,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       contextKo:
         "Pre-FEED 결과 보고 회의입니다. CAPEX 추정치가 예산보다 약 12% 높습니다. 주된 원인은 원료의 염소(chloride) 함량이 높아 부식이 생길 수 있어서 건조기 재질을 SS316으로 바꾼 것입니다. 고객이 재질을 결정할 수 있도록 다음 주까지 두 옵션의 비용 비교를 보내려고 합니다.",
       promptKo: "문제(CAPEX가 예산보다 약 12% 높음), 원인(높은 염소 함량에 따른 부식 위험 때문에 건조기 재질을 SS316으로 변경), 다음 조치(고객이 결정할 수 있도록 다음 주까지 두 옵션의 비용 비교 송부)를 2–3문장으로 설명하세요.",
-      segments: ["CAPEX 추정치가", "약 12% 초과한다", "예산을", "주된 이유는", "우리가 바꾼 것이다", "건조기 재질을", "SS316으로", "왜냐하면", "높은 염소 함량이", "부식을 일으킬 수 있다", "우리는 보내겠다", "비용 비교를", "다음 주까지", "당신이 결정할 수 있도록"],
+      segments: ["CAPEX 추정치가 예산을 약 12% 넘는다", "주된 이유는 건조기 재질을 SS316으로 바꾼 것이다", "원료의 높은 염소 함량이 부식을 일으킬 수 있어서", "다음 주까지 두 옵션의 비용 비교를 보내겠다", "어떤 재질을 쓸지 결정하실 수 있도록"],
       reference: "Our CAPEX estimate is about 12% over the budget. The main reason is that we changed the dryer material to SS316, because the high chloride content in the feed could cause corrosion. We will send you a cost comparison of the two options by next week, so that you can decide which material to use.",
       accepted: [
         "The CAPEX estimate is about 12% higher than the budget. This is mainly because we changed the dryer material to SS316, since the high chloride content in the feed could cause corrosion. We will send you a cost comparison of the two options by next week so that you can decide.",
@@ -2075,7 +2075,7 @@ export const DIAGNOSTIC_ITEMS: DiagnosticItem[] = [
       contextKo:
         "인도네시아 현장 시운전 회고 회의입니다. 시운전 첫 주에 원료 이송 펌프에서 캐비테이션이 생겨 이틀 동안 생산을 하지 못했습니다. 설계 때 실제보다 낮은 원료 온도를 가정했기 때문이며, 이번 주에 펌프를 더 낮은 위치에 설치할 수 있는지 검토할 계획입니다.",
       promptKo: "문제(첫 주 펌프 캐비테이션으로 이틀 생산 손실), 원인(설계 때 실제보다 낮은 원료 온도를 가정), 교훈(설계 검토 때 실제 운전 온도를 확인했더라면 피할 수 있었음), 다음 조치(이번 주에 펌프를 더 낮은 위치에 설치할 수 있는지 검토)를 2–3문장으로 설명하세요.",
-      segments: ["원료 펌프에", "캐비테이션이 있었다", "시운전 첫 주에", "그래서 우리는 잃었다", "이틀의 생산을", "우리는 가정했다", "더 낮은 원료 온도를", "만약 ~했더라면", "우리가 확인했다", "실제 운전 온도를", "우리는 피할 수 있었을 것이다", "이번 주에", "우리는 검토하겠다", "펌프를 더 낮게 설치할 수 있는지"],
+      segments: ["시운전 첫 주에 원료 펌프에 캐비테이션이 생겨", "이틀치 생산을 잃었다", "설계 때 원료 온도를 더 낮게 가정했다", "설계 검토 때 실제 운전 온도를 확인했더라면 피할 수 있었을 것이다", "이번 주에 펌프를 더 낮게 설치할 수 있는지 검토하겠다"],
       reference: "The feed pump had cavitation in the first week of commissioning, so we lost two days of production. We assumed a lower feed temperature in the design, and if we had checked the real operating temperature during the design review, we could have avoided this problem. This week, we will check if we can install the pump at a lower level.",
       accepted: [
         "In the first week of commissioning, the feed pump had cavitation, so we lost two days of production. This happened because we assumed a lower feed temperature in the design. If we had checked the real operating temperature during the design review, we could have avoided this problem, so this week we will study whether we can install the pump at a lower level.",

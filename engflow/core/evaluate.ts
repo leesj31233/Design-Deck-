@@ -142,7 +142,7 @@ export function closestTarget(q: Question, w: Token[]): { target: string; tw: To
 }
 
 /** Linking words for reason, contrast and result. A meaning unit made only of these is the link, not the content. */
-const LINK_WORDS = new Set(["although", "though", "even", "but", "however", "while", "whereas", "yet", "still", "because", "since", "as", "so", "therefore", "thus", "reason", "why", "that", "means", "cause", "due", "to", "of"]);
+const LINK_WORDS = new Set(["although", "though", "even", "but", "however", "while", "whereas", "yet", "still", "because", "since", "as", "so", "therefore", "thus", "reason", "why", "that", "means", "cause", "due", "to", "of", "given", "result", "a", "consequence"]);
 const isLinkOnly = (any: string[]) =>
   any.length > 0 && any.every((p) => !p.startsWith("re:") && p.split(/\s*\.\.\.\s*|\s+|\|/).filter(Boolean).every((x) => LINK_WORDS.has(x.replace(/^=/, "").toLowerCase()))) &&
   any.some((p) => /\b(although|though|because|since|but|however|so|therefore|while)\b/.test(p));
@@ -151,14 +151,17 @@ const isLinkOnly = (any: string[]) =>
  * says the reason and the concession in their own sentences, so the "because"/"although" of the one-sentence model
  * is not missing — the link is carried by the sentence order or by another linking word.
  */
-const linksClauses = (w: Token[]) =>
-  w.some((t, i) => t.sentenceEnd && i < w.length - 1) || w.some((t) => /^(but|so|because|since|though|although|however|reason|therefore|means|while)$/.test(t.norm));
+const splitSentences = (w: Token[]) => w.some((t, i) => t.sentenceEnd && i < w.length - 1);
+const linksClauses = (w: Token[]) => splitSentences(w) || w.some((t) => /^(but|so|because|since|though|although|however|reason|therefore|means|while|given)$/.test(t.norm));
 
 export function checkMeaning(q: Question, w: Token[]): MeaningCheck[] {
   const linked = linksClauses(w);
+  // A critical link ("I see your point, but …" in polite disagreement) is carried only by separate sentences,
+  // where the order itself sets the two ideas against each other; in one sentence it still needs its word.
+  const split = splitSentences(w);
   return q.meaning.map((u) => {
     const m = matchAny(u.any, w, 2, true);
-    const present = !!m || (linked && !u.critical && isLinkOnly(u.any));
+    const present = !!m || ((u.critical ? split : linked) && isLinkOnly(u.any));
     return { id: u.id, en: u.en, ko: u.ko, present, fuzzy: m?.fuzzy || undefined, term: !!u.term, critical: !!u.critical };
   });
 }

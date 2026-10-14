@@ -283,6 +283,19 @@ describe("speak first: point first, short sentences", () => {
     }
   });
 
+  it("a critical contrast link is carried by separate sentences, not by a run-on", () => {
+    const polite = q({
+      mode: "sentence", skills: ["polite-disagree"], reference: "I see your point, but I'm worried about skipping the pilot test.",
+      meaning: [
+        { id: "but", en: "but", ko: "하지만", any: ["but|though|although|however"], critical: true },
+        { id: "worried", en: "worried", ko: "걱정", any: ["worried|concerned"], critical: true },
+        { id: "pilot", en: "pilot test", ko: "파일럿", any: ["pilot"] },
+      ],
+    });
+    expect(evaluateLocal(polite, "I'm worried about skipping the pilot test. I see your point.").meaning.every((m) => m.present)).toBe(true);
+    expect(evaluateLocal(polite, "I see your point I'm worried about skipping the pilot test.").meaning.find((m) => m.id === "but")!.present).toBe(false);
+  });
+
   it("a missing link still counts when nothing links the clauses, and a flipped opinion still fails", () => {
     const runOn = evaluateLocal(scaleUp, "The lab results look good, I don't think we should scale up yet, the feed composition at the site might be different.");
     expect(runOn.meaning.find((m) => m.id === "because")!.present).toBe(false);

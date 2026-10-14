@@ -948,7 +948,7 @@ export const TALK_NEGOTIATION: Question[] = [
     meaning: [
       { id: "understand", en: "I understand", ko: "이해해요", any: ["understand|see|know|appreciate"] },
       { id: "costs-up", en: "your costs have gone up", ko: "비용이 올랐다", any: ["cost|costs ... up|increase|increased|higher|risen|rise"], critical: true },
-      { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
+      { id: "but", en: "but", ko: "하지만", any: ["but|however|though|although"], critical: true },
       { id: "difficult", en: "difficult for us to accept", ko: "받아들이기 어렵다", any: ["difficult|hard|tough", "not ... accept", "too much|high", "=lot|=lots ... for us"], critical: true },
       { id: "fifteen", en: "a 15% increase", ko: "15% 인상", any: ["15|fifteen"], critical: true },
       { id: "together", en: "we've worked together for five years", ko: "5년 동안 함께 일해 왔다", any: ["together|relationship|partner|partners|partnership"] },
@@ -995,7 +995,7 @@ export const TALK_NEGOTIATION: Question[] = [
     meaning: [
       { id: "understand", en: "I understand", ko: "이해해요", any: ["understand|see|know"] },
       { id: "budget", en: "keep the same budget", ko: "같은 예산 유지", any: ["budget|fee|price|cost"], critical: true },
-      { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
+      { id: "but", en: "but", ko: "하지만", any: ["but|however|though|although"], critical: true },
       { id: "big-change", en: "a big change to the scope", ko: "범위의 큰 변경", any: ["big|major|large|significant ... change", "scope ... change", "change ... scope"], critical: true },
       { id: "four-weeks", en: "about four more weeks", ko: "약 4주 더", any: ["four|4 ... weeks|week"], critical: true },
       { id: "if-accept", en: "if you can accept", ko: "받아들여 주시면", any: ["if ... accept|agree|approve|okay|ok", "as long as ... accept|agree|approve|okay|ok"], critical: true },
