@@ -161,6 +161,12 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   const docOf = (item: IntelItem) => item.user?.docId && docs.some(doc => doc.id === item.user!.docId && !doc.deletedAt) ? item.user.docId : null;
   const toggle = <T,>(set: Set<T>, value: T) => { const next = new Set(set); if (next.has(value)) next.delete(value); else next.add(value); return next; };
 
+  /** A figure placed in a briefing: the item's case-file figure n (or its cover), its caption and a way to the item. */
+  const briefFigure = (id: string, index: number, caption: string, key: number) => {
+    const item = byId.get(id), figures = [...(item?.dossier?.figures ?? []), ...(item?.user?.figures ?? [])], picked = figures[index - 1] ?? (item?.cover ? { src: item.cover, caption: display(item) } : undefined);
+    if (!item || !picked) return null;
+    return <figure key={key} className="pf-brief-figure"><button type="button" onClick={() => setSelected(id)} aria-label={`${display(item)} 자세히`}><img src={picked.src} alt={caption || picked.caption} loading="lazy"/></button><figcaption><b>{caption || picked.caption}</b><span>{item.kind === "company" || item.kind === "project" ? companyName(item) : display(item)}</span></figcaption></figure>;
+  };
   /** The companies, projects and documents a briefing links to, in order of first mention, as a visual strip. */
   const briefCast = (body: string) => {
     const found = [...new Set([...body.matchAll(/\]\(intel:([\w.:-]+)\)/g)].map(match => match[1]))].map(id => byId.get(id)).filter((item): item is IntelItem => Boolean(item));
@@ -295,7 +301,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
           {briefs.length ? <>
             <nav aria-label="브리핑 목록">{briefGroups.map(([period, list]) => <div key={period} className="pf-intel-brief-group"><span>{PERIOD_LABEL[period]}</span>
               {list.map(brief => <button type="button" key={brief.id} aria-current={openBrief?.id === brief.id || undefined} onClick={() => setBriefId(brief.id)}>{brief.date && period !== "core" && <time>{brief.date}</time>}{brief.title}</button>)}</div>)}</nav>
-            {openBrief && <article className="pf-intel-brief"><BriefDocument key={openBrief.id} brief={openBrief} entity={entity} terms={terms} cast={briefCast(openBrief.body)}/></article>}
+            {openBrief && <article className="pf-intel-brief"><BriefDocument key={openBrief.id} brief={openBrief} entity={entity} terms={terms} cast={briefCast(openBrief.body)} figure={briefFigure}/></article>}
           </> : <p className="pf-intel-none">이 자료 팩에는 브리핑이 없습니다.</p>}
         </div>}
       </div>}

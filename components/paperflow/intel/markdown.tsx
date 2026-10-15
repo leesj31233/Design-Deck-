@@ -42,13 +42,17 @@ function inline(text: string, entity?: EntityRenderer, terms?: TermMarker): Reac
  * A briefing written in Markdown (headings, paragraphs, lists with one level of nesting, tables,
  * quotes), rendered as React elements. Briefings come in packs, so nothing is ever injected as HTML.
  */
-export function Markdown({ source, entity, terms }: { source: string; entity?: EntityRenderer; terms?: Omit<TermMarker, "seen"> }) {
+export function Markdown({ source, entity, terms, figure }: { source: string; entity?: EntityRenderer; terms?: Omit<TermMarker, "seen">;
+  /** A figure line, `![caption](intel:item-id#n)`: the item's n-th case-file figure (or its cover), rendered by the host. */
+  figure?: (id: string, index: number, caption: string, key: number) => ReactNode }) {
   const marker = terms ? { ...terms, seen: new Set<string>() } : undefined;
   const line = (text: string) => inline(text, entity, marker);
   const lines = source.replace(/\r\n/g, "\n").split("\n"), blocks: ReactNode[] = [];
   for (let at = 0; at < lines.length;) {
     const current = lines[at];
     if (!current.trim()) { at++; continue; }
+    const picture = /^!\[([^\]]*)\]\(intel:([\w.:-]+)(?:#(\d+))?\)\s*$/.exec(current.trim());
+    if (picture && figure) { blocks.push(figure(picture[2], Number(picture[3] ?? 1), picture[1], at)); at++; continue; }
     const heading = /^(#{1,4})\s+(.*)$/.exec(current);
     if (heading) { const level = Math.min(4, Math.max(2, heading[1].length)); const Tag = `h${level}` as "h2"; blocks.push(<Tag key={at}>{line(heading[2])}</Tag>); at++; continue; }
     if (/^\s*\|/.test(current)) {

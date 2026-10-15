@@ -11,11 +11,11 @@ import "./mobile-nav.css";
 
 const TABS = [
   { id: "library", label: "서재", icon: LibraryBig }, { id: "notes", label: "노트", icon: NotebookPen }, { id: "archive", label: "아카이브", icon: Archive },
-  { id: "map", label: "연구맵", icon: Network }, { id: "discover", label: "추천", icon: Compass }
+  { id: "map", label: "연구맵", icon: Network }, { id: "intel", label: "인텔리전스", icon: Radar }
 ] as const;
 
 /**
- * On a phone the sidebar gives way to a tab bar at the bottom (서재, 노트, 아카이브, 연구맵, 추천) and a
+ * On a phone the sidebar gives way to a tab bar at the bottom (서재, 노트, 아카이브, 연구맵, 인텔리전스) and a
  * 계정 tab that opens a sheet: the account, cloud storage, this month's credits, sync, 휴지통, theme.
  */
 export function MobileNav({ view, onView, trashCount = 0 }: { view: string; onView: (view: string) => void; trashCount?: number }) {
@@ -45,7 +45,7 @@ export function MobileNav({ view, onView, trashCount = 0 }: { view: string; onVi
         {left !== null && <p className="pf-mobile-credits">{name ? `${name} · ` : ""}이번 달 남은 크레딧 <b>{left.toLocaleString()}</b></p>}
         <div className="pf-mobile-account"><AccountCard/></div>
         <div className="pf-mobile-links">
-          <button type="button" aria-current={view === "intel" ? "page" : undefined} onClick={() => go("intel")}><Radar size={18}/>인텔리전스</button>
+          <button type="button" aria-current={view === "discover" ? "page" : undefined} onClick={() => go("discover")}><Compass size={18}/>추천 논문</button>
           <button type="button" aria-current={view === "trash" ? "page" : undefined} onClick={() => go("trash")}><Trash2 size={18}/>휴지통{trashCount > 0 && <i>{trashCount}</i>}</button>
           <button type="button" onClick={toggleTheme}>{dark ? <Sun size={18}/> : <Moon size={18}/>}{dark ? "라이트 모드" : "다크 모드"}</button>
         </div>
