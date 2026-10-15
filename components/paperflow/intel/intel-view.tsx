@@ -14,6 +14,7 @@ import { APPLICABILITY_LABEL, KIND_LABEL, LANG_LABEL, PERIOD_LABEL, PROFILE_LABE
 import { usePaperflow } from "../shell/paperflow-context";
 import { FolderGlyph } from "../library/archive-folders";
 import { BriefDocument } from "./brief-document";
+import { DossierView } from "./dossier-view";
 import { glossaryIndex, type GlossaryTerm } from "@/lib/paperflow/intel/glossary";
 import "./intel.css";
 
@@ -122,28 +123,38 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
     } catch (error) { notify(error instanceof Error ? error.message : "자료 팩을 읽지 못했습니다."); }
     finally { if (file.current) file.current.value = ""; }
   };
-  const toLibrary = async (item: IntelItem) => {
-    if (!item.pdfUrl || fetching) return;
-    setFetching(item.id);
+  /** An open PDF (an item's, or a case file's source) fetched by the server and imported into the library. */
+  const pdfToLibrary = async (url: string, title: string, busyKey: string, itemId?: string) => {
+    if (fetching) return;
+    setFetching(busyKey);
     try {
-      const response = await fetch(`/api/intel/pdf?url=${encodeURIComponent(item.pdfUrl)}`);
+      const response = await fetch(`/api/intel/pdf?url=${encodeURIComponent(url)}`);
       if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.error ?? "PDF를 가져오지 못했습니다."); }
-      const name = `${(item.title || item.id).replace(/[\\/:*?"<>|]+/g, " ").slice(0, 90).trim()}.pdf`;
+      const name = `${title.replace(/[\\/:*?"<>|]+/g, " ").slice(0, 90).trim()}.pdf`;
       const record = await importDocument(new File([await response.blob()], name, { type: "application/pdf" }));
-      await intelRepository.setUser(item.id, { docId: record.id, read: true });
+      if (itemId) await intelRepository.setUser(itemId, { docId: record.id, read: true });
       await client.invalidateQueries({ queryKey: ["documents"] });
       notify("서재에 담았습니다. 열어서 번역하고 마킹할 수 있습니다.");
     } catch (error) { notify(error instanceof Error ? error.message : "PDF를 가져오지 못했습니다."); }
     finally { setFetching(null); }
   };
+  const toLibrary = (item: IntelItem) => item.pdfUrl ? pdfToLibrary(item.pdfUrl, item.title || item.id, item.id, item.id) : Promise.resolve();
   const docOf = (item: IntelItem) => item.user?.docId && docs.some(doc => doc.id === item.user!.docId && !doc.deletedAt) ? item.user.docId : null;
   const toggle = <T,>(set: Set<T>, value: T) => { const next = new Set(set); if (next.has(value)) next.delete(value); else next.add(value); return next; };
 
+  /** A preview or term tip that would run past the window edge slides back inside it. */
+  const keepTipInView = (event: React.SyntheticEvent) => {
+    const host = (event.target as Element).closest?.(".pf-term, .pf-md-entity-wrap");
+    const tip = host?.querySelector<HTMLElement>(".pf-term-tip, .pf-md-preview");
+    if (!tip) return;
+    tip.style.left = "0px";
+    requestAnimationFrame(() => { const box = tip.getBoundingClientRect(); if (!box.width) return; const shift = Math.min(0, window.innerWidth - 12 - box.right), back = Math.max(shift, 12 - box.left); tip.style.left = `${back}px`; });
+  };
   if (items === null) return <div className="pf-empty" role="status">인텔리전스를 불러오는 중…</div>;
   const empty = !items.length;
   const scopeLabel = scope.type === "all" ? "전체" : scope.type === "star" ? "핵심 표시" : scope.type === "folder" ? folders.find(folder => folder.id === scope.id)?.name ?? "폴더" : scope.type === "kind" ? KIND_LABEL[scope.kind] : TOPIC_LABEL.get(scope.id) ?? scope.id;
 
-  return <section className="pf-intel" aria-label="인텔리전스">
+  return <section className="pf-intel" aria-label="인텔리전스" onMouseOver={keepTipInView} onFocus={keepTipInView}>
     <header className="pf-intel-head">
       <div><p className="pf-intel-eyebrow"><Radar size={14}/> Information flow</p><h2>EFB/POME 자원화 인텔리전스</h2><p>검증된 논문·정부 보고서·기업 자료·장비 벤더·시장 정보만 모아, 근거와 신뢰도를 함께 봅니다.</p></div>
       <div className="pf-intel-actions">
@@ -238,6 +249,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         <h3>{display(current)}</h3>
         {current.titleKo && current.titleKo !== current.title && <p className="pf-intel-original" lang={current.lang}>{current.title}</p>}
         <p className="pf-intel-meta">{[current.org, current.authors, current.date, current.country, current.lang ? LANG_LABEL[current.lang] ?? current.lang : null].filter(Boolean).join(" · ")}</p>
+        {current.dossier && <DossierView dossier={current.dossier} entity={entity} terms={terms} busy={fetching} onPdf={source => void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)}/>}
 
         <div className="pf-intel-buttons">
           {current.url && <a href={current.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={15}/>원문 열기</a>}

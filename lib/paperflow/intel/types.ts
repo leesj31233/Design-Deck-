@@ -22,10 +22,27 @@ export interface IntelItem {
   data?: IntelDatum[]; relations?: IntelRelation[]; equipment?: Record<string, string>; naysor?: IntelApplicability;
   /** A company or project at a glance: industry, role, headquarters, stock code, website, projects… */
   profile?: Record<string, string>;
+  /** A case file: the case taken apart from its primary documents, with their figures on the first page. */
+  dossier?: IntelDossier;
   checkedAt?: string;
   /** The pack it came in and when it was stored here. */
   pack?: string; addedAt?: string; updatedAt?: string;
   user?: IntelUserState;
+}
+
+/** A source of a case file; `ref` is how the text cites it ([1], [2]…). */
+export interface DossierSource { ref: string; title: string; org?: string; date?: string; url?: string; pdfUrl?: string; where?: string; kind?: string; reliability?: number }
+export interface DossierFigure { src: string; caption: string; ref?: string; where?: string }
+export interface DossierFact { label: string; value: string; ref?: string; status?: IntelStatus }
+export interface DossierEvent { date: string; event: string; ref?: string; status?: IntelStatus }
+/** Where sources disagree: each version with its source, and what is believed (if anything). */
+export interface DossierConflict { topic: string; versions: { value: string; ref?: string }[]; judgement?: string }
+export interface IntelDossier {
+  headline: string; asOf?: string;
+  facts?: DossierFact[]; figures?: DossierFigure[]; timeline?: DossierEvent[]; conflicts?: DossierConflict[];
+  /** Markdown sections (citations as [1], [2]; entity links allowed). */
+  sections?: { title: string; body: string }[];
+  sources?: DossierSource[];
 }
 
 /** A written briefing that comes with a pack (executive summary, benchmark, pilot implications…), Markdown. */

@@ -56,3 +56,16 @@ describe("briefing glossary", () => {
     expect(byKey.get("LHV")?.term).toBe("NCV");
   });
 });
+
+describe("case files", () => {
+  it("keeps a dossier's facts, figures and sources, and drops unsafe figures and links", () => {
+    const item = cleanItem({ id: "co-x", kind: "company", title: "X", url: "https://x.org", dossier: {
+      headline: "X builds a plant", facts: [{ label: "규모", value: "1만 t/년", ref: "1", status: "claimed" }],
+      figures: [{ src: "data:image/webp;base64,UklGRg==", caption: "공정도", ref: "1" }, { src: "javascript:alert(1)", caption: "bad" }, { src: "data:text/html;base64,PGI+", caption: "html" }],
+      sources: [{ ref: "1", title: "Report", url: "https://x.org/r.pdf", pdfUrl: "file:///c:/x.pdf" }]
+    } });
+    expect(item?.dossier?.figures?.map(figure => figure.caption)).toEqual(["공정도"]);
+    expect(item?.dossier?.facts?.[0]).toMatchObject({ value: "1만 t/년", status: "claimed" });
+    expect(item?.dossier?.sources?.[0].pdfUrl).toBeUndefined();
+  });
+});

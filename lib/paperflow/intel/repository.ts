@@ -38,6 +38,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     equipment: equipment && Object.keys(equipment).length ? equipment : undefined,
     naysor: naysor && Object.keys(naysor).length ? naysor : undefined,
     profile: record(value.profile),
+    dossier: dossierOf(value.dossier),
     checkedAt: text(value.checkedAt, 20), pack
   };
 }
@@ -65,6 +66,24 @@ function record(input: unknown) {
   if (!input || typeof input !== "object" || Array.isArray(input)) return undefined;
   const entries = Object.entries(input as Record<string, unknown>).slice(0, 30).flatMap(([key, entry]) => text(key, 40) && (typeof entry === "string" || typeof entry === "number") && text(String(entry), 600) ? [[text(key, 40)!, text(String(entry), 600)!]] : []);
   return entries.length ? Object.fromEntries(entries) : undefined;
+}
+/** A figure is an embedded image (WebP/PNG/JPEG, ≤ 600 KB) or a web image; nothing else is shown. */
+const figureSrc = (value: unknown) => typeof value === "string" && (/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value) && value.length < 820_000 || link(value)) ? value : undefined;
+function dossierOf(input: unknown): IntelItem["dossier"] {
+  if (!input || typeof input !== "object") return undefined;
+  const value = input as Record<string, unknown>, headline = text(value.headline, 400);
+  if (!headline) return undefined;
+  const rows = (list: unknown, max: number) => (Array.isArray(list) ? list.slice(0, max) : []).filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === "object");
+  const status = (entry: unknown) => STATUSES.includes(entry as IntelStatus) ? entry as IntelStatus : undefined;
+  return {
+    headline, asOf: text(value.asOf, 20),
+    facts: rows(value.facts, 24).flatMap(fact => text(fact.label, 80) && text(fact.value, 300) ? [{ label: text(fact.label, 80)!, value: text(fact.value, 300)!, ref: text(fact.ref, 20), status: status(fact.status) }] : []),
+    figures: rows(value.figures, 16).flatMap(figure => { const src = figureSrc(figure.src), caption = text(figure.caption, 400); return src && caption ? [{ src, caption, ref: text(figure.ref, 20), where: text(figure.where, 120) }] : []; }),
+    timeline: rows(value.timeline, 40).flatMap(event => text(event.date, 20) && text(event.event, 400) ? [{ date: text(event.date, 20)!, event: text(event.event, 400)!, ref: text(event.ref, 20), status: status(event.status) }] : []),
+    conflicts: rows(value.conflicts, 12).flatMap(conflict => { const topic = text(conflict.topic, 160), versions = rows(conflict.versions, 6).flatMap(version => text(version.value, 300) ? [{ value: text(version.value, 300)!, ref: text(version.ref, 20) }] : []); return topic && versions.length ? [{ topic, versions, judgement: text(conflict.judgement, 600) }] : []; }),
+    sections: rows(value.sections, 16).flatMap(section => text(section.title, 120) && longText(section.body, 12_000) ? [{ title: text(section.title, 120)!, body: longText(section.body, 12_000)! }] : []),
+    sources: rows(value.sources, 30).flatMap(source => text(source.ref, 20) && text(source.title, 300) ? [{ ref: text(source.ref, 20)!, title: text(source.title, 300)!, org: text(source.org, 160), date: text(source.date, 20), url: link(source.url), pdfUrl: link(source.pdfUrl), where: text(source.where, 160), kind: text(source.kind, 40), reliability: Number.isInteger(source.reliability) ? Number(source.reliability) : undefined }] : [])
+  };
 }
 const PERIODS = ["core", "daily", "weekly", "monthly", "quarterly"];
 

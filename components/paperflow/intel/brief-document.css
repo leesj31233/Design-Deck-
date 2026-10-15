@@ -96,3 +96,22 @@
   .pf-brief-count { display:none; }
 }
 .pf-md-preview, .pf-term-tip { font-family:var(--i-sans); letter-spacing:0; }
+
+/* Hidden previews and glossary tips take no room (they used to widen the page at the right edge);
+   shown on hover, flipped left by the view when they would spill past the window. */
+.pf-md-preview, .pf-term-tip { display:none; }
+.pf-md-entity-wrap:hover .pf-md-preview, .pf-md-entity:focus-visible + .pf-md-preview, .pf-term:hover .pf-term-tip, .pf-term:focus .pf-term-tip { display:grid; }
+@starting-style { .pf-md-entity-wrap:hover .pf-md-preview, .pf-term:hover .pf-term-tip { opacity:0; transform:translateY(4px); } }
+.pf-intel { overflow-x:clip; }
+/* Reading briefings: the topic tree (it filters items) steps aside so the document gets the width. */
+.pf-intel-body[data-mode="briefs"] { grid-template-columns:minmax(0,1fr); }
+.pf-intel-body[data-mode="briefs"][data-detail] { grid-template-columns:minmax(0,1fr) minmax(340px,420px); }
+.pf-intel-body[data-mode="briefs"] > .pf-intel-tree { display:none; }
+.pf-intel-briefs, .pf-brief-doc, .pf-brief-sheet, .pf-brief-body { min-width:0; }
+@media (max-width:1180px) { .pf-intel-body[data-mode="briefs"][data-detail] { grid-template-columns:minmax(0,1fr); } }
+@media (max-width:1100px) {
+  .pf-intel-briefs { grid-template-columns:minmax(0,1fr); }
+  .pf-intel-briefs > nav { position:static; display:flex; flex-wrap:wrap; gap:4px; }
+  .pf-intel-brief-group { display:contents; }
+  .pf-intel-brief-group > span { display:none; }
+}
