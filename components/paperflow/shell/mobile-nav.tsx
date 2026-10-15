@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Archive, Compass, LibraryBig, Moon, Network, NotebookPen, Sun, Trash2, UserRound, X } from "lucide-react";
+import { Archive, Compass, LibraryBig, Moon, Network, NotebookPen, Radar, Sun, Trash2, UserRound, X } from "lucide-react";
 import { useCloud } from "@/lib/paperflow/cloud/sync";
 import { AccountCard } from "./account-card";
 import { usePaperflow } from "./paperflow-context";
@@ -45,6 +45,7 @@ export function MobileNav({ view, onView, trashCount = 0 }: { view: string; onVi
         {left !== null && <p className="pf-mobile-credits">{name ? `${name} · ` : ""}이번 달 남은 크레딧 <b>{left.toLocaleString()}</b></p>}
         <div className="pf-mobile-account"><AccountCard/></div>
         <div className="pf-mobile-links">
+          <button type="button" aria-current={view === "intel" ? "page" : undefined} onClick={() => go("intel")}><Radar size={18}/>인텔리전스</button>
           <button type="button" aria-current={view === "trash" ? "page" : undefined} onClick={() => go("trash")}><Trash2 size={18}/>휴지통{trashCount > 0 && <i>{trashCount}</i>}</button>
           <button type="button" onClick={toggleTheme}>{dark ? <Sun size={18}/> : <Moon size={18}/>}{dark ? "라이트 모드" : "다크 모드"}</button>
         </div>

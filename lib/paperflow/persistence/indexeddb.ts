@@ -3,7 +3,7 @@ export function openDatabase(): Promise<IDBDatabase> {
   if (connection) return connection;
   connection = new Promise((resolve, reject) => {
     if (typeof indexedDB === "undefined") { reject(new Error("이 브라우저에서는 로컬 저장소를 사용할 수 없습니다.")); return; }
-    const request = indexedDB.open("paperflow-v1", 5);
+    const request = indexedDB.open("paperflow-v1", 6);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains("documents")) db.createObjectStore("documents", { keyPath: "id" });
@@ -15,6 +15,9 @@ export function openDatabase(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains("translationManifests")) db.createObjectStore("translationManifests", { keyPath: "documentId" });
       // v5: the library notebook's quick notes (added only; nothing older changes).
       if (!db.objectStoreNames.contains("notes")) db.createObjectStore("notes", { keyPath: "id" });
+      // v6: the Intelligence tab (collected sources, companies, vendors, market data) and its briefings.
+      if (!db.objectStoreNames.contains("intel")) db.createObjectStore("intel", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("intelBriefs")) db.createObjectStore("intelBriefs", { keyPath: "id" });
     };
     request.onsuccess = () => { request.result.onversionchange = () => { request.result.close(); connection = undefined; }; resolve(request.result); };
     request.onerror = () => { connection = undefined; reject(request.error); };

@@ -4,6 +4,10 @@ export interface TranslationResult { id: string; text: string }
 export interface TranslationBatchResult { results: TranslationResult[]; missing: string[] }
 
 const WORDS = /[A-Za-z]{2,}/g, GLUE = /\b(the|of|and|is|are|was|were|to|in|with|for|by|that|this|as|on|from|be|been|which|at|an|or|it|its|than|into)\b/g;
+/** Indonesian and Malay function words: their prose handed back as written is a failure too. */
+const GLUE_MALAY = /\b(yang|dan|untuk|dengan|dari|pada|ini|itu|dalam|adalah|tidak|akan|oleh|juga|atau|kepada|bagi|telah|sebagai|ke|di)\b/gi;
+/** Chinese or Japanese prose: Korean runs much longer than the same sentence in Han characters or kana. */
+export const isCjkSource = (source: string) => (source.match(/[぀-ヿ一-鿿]/g) ?? []).length >= Math.max(6, [...source].length * .25);
 /**
  * Prose must come back in Korean. A label, a symbol run, or a list that is correctly left as written
  * (author names, affiliations, keyword lists: capitalised words without the glue words of a
@@ -15,7 +19,7 @@ export function needsHangul(source: string) {
   const words = source.match(WORDS) ?? [];
   if (words.filter(word => word.length >= 3).length < 5) return false;
   const capitalised = words.filter(word => /^[A-Z]/.test(word)).length / words.length;
-  const glue = (source.match(GLUE) ?? []).length, sentence = /[.!?]["')\]]?\s*$/.test(source.trim());
+  const glue = (source.match(GLUE) ?? []).length + (source.match(GLUE_MALAY) ?? []).length, sentence = /[.!?]["')\]]?\s*$/.test(source.trim());
   return (glue >= 2 || (glue >= 1 && sentence)) && capitalised < .6;
 }
 
@@ -49,7 +53,7 @@ export function partitionTranslationResults(passages: TranslationPassage[], valu
     if (/\p{L}{3,}/u.test(passage.text) && !/\p{L}{2,}/u.test(text)) continue;
     // Korean runs shorter than English: a translation far longer than its source has borrowed the
     // next passage (finishing a sentence cut at a column), which would then appear twice.
-    if (strict && passage.text.length >= 60 && [...text].length > passage.text.length * 1.7) continue;
+    if (strict && passage.text.length >= 60 && [...text].length > passage.text.length * (isCjkSource(passage.text) ? 3.6 : 1.7)) continue;
     // A paper's key term must read the same on every page: a translation that dropped it is retried.
     if (strict && glossary.length && droppedTerms(passage.text, text, glossary).length) continue;
     found.set(item.id, text);

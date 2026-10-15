@@ -13,12 +13,16 @@ import { recordOf, rowOf, type DocumentRow } from "./records";
 import type { Annotation } from "../anchors/types";
 import { forgetTombstone, noteRepository, noteTombstones } from "../notes/note-repository";
 import type { QuickNote } from "../notes/notebook";
+import { intelRepository } from "../intel/repository";
+import type { IntelBrief, IntelItem } from "../intel/types";
 
 /**
  * Notebook notes travel in the annotations table under this document id (rows "note:<id>"), so they
  * sync with the account without a schema change; the annotation merge skips them.
  */
 const NOTEBOOK = "__notebook__";
+/** The Intelligence tab rides the same table: rows "intel:<id>" (items) and "intelbrief:<id>" (briefings). */
+const INTEL = "__intel__";
 
 export type CloudStatus = "disabled" | "loading" | "signed-out" | "signed-in";
 interface CloudState {
@@ -67,6 +71,17 @@ async function pushNote(id: string, deleted: boolean) {
   const local = deleted ? null : (await noteRepository.list()).find(note => note.id === id) ?? null;
   await supabase().from("annotations").upsert({ user_id: session.user.id, id: `note:${id}`, document_id: NOTEBOOK, data: local ?? {}, deleted: !local, updated_at: local?.updatedAt ?? noteTombstones()[id] ?? new Date().toISOString() }, { onConflict: "user_id,id" });
   if (!local) forgetTombstone(id);
+}
+
+/** Items and briefings of the Intelligence tab, a hundred rows per request (a pack brings hundreds at once). */
+async function pushIntel(ids: string[], briefIds: string[]) {
+  if (!session || (!ids.length && !briefIds.length)) return;
+  const items = new Map((await intelRepository.list()).map(item => [item.id, item])), briefs = new Map((await intelRepository.briefs()).map(brief => [brief.id, brief]));
+  const rows = [
+    ...ids.flatMap(id => { const item = items.get(id); return item ? [{ user_id: session!.user.id, id: `intel:${id}`, document_id: INTEL, data: item, deleted: false, updated_at: item.updatedAt ?? new Date().toISOString() }] : []; }),
+    ...briefIds.flatMap(id => { const brief = briefs.get(id); return brief ? [{ user_id: session!.user.id, id: `intelbrief:${id}`, document_id: INTEL, data: brief, deleted: false, updated_at: brief.updatedAt ?? new Date().toISOString() }] : []; })
+  ];
+  for (let at = 0; at < rows.length; at += 100) await supabase().from("annotations").upsert(rows.slice(at, at + 100), { onConflict: "user_id,id" });
 }
 
 async function pushTranslations(documentId: string, unitIds?: string[]) {
@@ -125,7 +140,7 @@ export async function syncAll() {
     const [{ data: notes }, localNotes] = await Promise.all([db.from("annotations").select("id, document_id, data, deleted, updated_at"), annotationRepository.listAll()]);
     // A device on an older version may have stored a notebook note as a mark (it has no document): drop it.
     for (const stray of localNotes.filter(note => !note.documentId)) await annotationRepository.removeRaw(stray.id);
-    const remoteNotes = new Map((notes ?? []).filter(row => row.document_id !== NOTEBOOK).map(row => [row.id as string, row])), localById = new Map(localNotes.map(note => [note.id, note]));
+    const remoteNotes = new Map((notes ?? []).filter(row => row.document_id !== NOTEBOOK && row.document_id !== INTEL).map(row => [row.id as string, row])), localById = new Map(localNotes.map(note => [note.id, note]));
     for (const row of remoteNotes.values()) {
       const note = localById.get(row.id);
       if (row.deleted) { if (note && note.updatedAt <= row.updated_at) await annotationRepository.removeRaw(row.id); continue; }
@@ -145,6 +160,26 @@ export async function syncAll() {
     const notebookRemote = new Map(notebookRows.map(row => [String(row.id).slice(5), row]));
     for (const note of localNotebook.values()) { const row = notebookRemote.get(note.id); if (!row || note.updatedAt > row.updated_at) await pushNote(note.id, false); }
     for (const id of Object.keys(tombstones)) await pushNote(id, true);
+
+    // Intelligence: newest wins, item by item (the reader's star/folder/memo travel inside the item).
+    const intelRows = (notes ?? []).filter(row => row.document_id === INTEL);
+    const localIntel = new Map((await intelRepository.list()).map(item => [item.id, item])), localBriefs = new Map((await intelRepository.briefs()).map(brief => [brief.id, brief]));
+    const intelPush: string[] = [], briefPush: string[] = [], seenIntel = new Set<string>(), seenBriefs = new Set<string>();
+    for (const row of intelRows) {
+      const rowId = String(row.id);
+      if (rowId.startsWith("intelbrief:")) {
+        const id = rowId.slice(11), mine = localBriefs.get(id); seenBriefs.add(id);
+        if (!mine || row.updated_at > (mine.updatedAt ?? "")) await intelRepository.putBriefRaw(row.data as IntelBrief);
+        else if ((mine.updatedAt ?? "") > row.updated_at) briefPush.push(id);
+      } else if (rowId.startsWith("intel:")) {
+        const id = rowId.slice(6), mine = localIntel.get(id); seenIntel.add(id);
+        if (!mine || row.updated_at > (mine.updatedAt ?? "")) await intelRepository.putRaw(row.data as IntelItem);
+        else if ((mine.updatedAt ?? "") > row.updated_at) intelPush.push(id);
+      }
+    }
+    for (const id of localIntel.keys()) if (!seenIntel.has(id)) intelPush.push(id);
+    for (const id of localBriefs.keys()) if (!seenBriefs.has(id)) briefPush.push(id);
+    await pushIntel(intelPush, briefPush);
 
     // Translations: pull what this device lacks, push what the account lacks.
     const { data: keys } = await db.from("translations").select("document_id, unit_id").eq("prompt_version", TRANSLATION_PROMPT_VERSION);
@@ -174,7 +209,7 @@ let timer: ReturnType<typeof setTimeout> | undefined;
 function queue(change: LocalChange) {
   if (change.kind === "purge") { setPendingPurges([...pendingPurges().filter(item => item.id !== change.id), change]); if (session) void flushPurges(); return; }
   if (!session) return;
-  const key = change.kind === "document" ? `d:${change.id}` : change.kind === "annotation" ? `a:${change.id}` : change.kind === "note" ? `n:${change.id}` : `t:${change.documentId}`;
+  const key = change.kind === "document" ? `d:${change.id}` : change.kind === "annotation" ? `a:${change.id}` : change.kind === "note" ? `n:${change.id}` : change.kind === "intel" ? `i:${change.brief ? "b" : ""}${change.id}` : `t:${change.documentId}`;
   const previous = queued.get(key);
   queued.set(key, change.kind === "translation" && previous?.kind === "translation" ? { ...change, unitIds: [...new Set([...previous.unitIds, ...change.unitIds])] } : change);
   clearTimeout(timer);
@@ -182,6 +217,9 @@ function queue(change: LocalChange) {
 }
 async function flush() {
   const changes = [...queued.values()]; queued.clear();
+  const intel = changes.filter(change => change.kind === "intel");
+  try { await pushIntel(intel.filter(change => !change.brief).map(change => change.id), intel.filter(change => change.brief).map(change => change.id)); }
+  catch { set({ error: "일부 변경을 계정에 저장하지 못했습니다. 다음 동기화 때 다시 시도합니다." }); }
   for (const change of changes) {
     try {
       if (change.kind === "document") { const doc = await documentRepository.getDocument(change.id); if (doc) await pushDocument(doc); }

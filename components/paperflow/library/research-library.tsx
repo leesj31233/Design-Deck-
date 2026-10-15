@@ -7,6 +7,7 @@ import { CollectionInsights } from "./collection-insights";
 import { NotesView } from "../notes/notes-view";
 import dynamic from "next/dynamic";
 // The research map pulls in WebGL graph code: load it only when the map is opened.
+const IntelView = dynamic(() => import("../intel/intel-view").then(module => module.IntelView), { ssr: false, loading: () => <div className="pf-empty" role="status">인텔리전스를 여는 중…</div> });
 const DiscoverView = dynamic(() => import("../discover/discover-view").then(module => module.DiscoverView), { ssr: false, loading: () => <div className="pf-empty" role="status">추천을 준비하는 중…</div> });
 const ResearchMapView = dynamic(() => import("../map/research-map-view").then(module => module.ResearchMapView), { ssr: false, loading: () => <div className="pf-empty" role="status">연구맵을 준비하는 중…</div> });
 import { useEffect, useMemo, useState } from "react";
@@ -70,7 +71,7 @@ export function ResearchLibrary() {
   const inFolder = (doc: StoredDocument) => view !== "archive" || folderView === "all" || (folderView === "none" ? !doc.archiveFolder || !folders.some(folder => folder.id === doc.archiveFolder!.id) : doc.archiveFolder?.id === folderView);
   const filtered = useMemo(() => live.filter(d => d.archived === (view === "archive") && inFolder(d) && (!guideOnly || guideBadge(d.guide)) && `${d.title} ${d.filename}`.toLowerCase().includes(search.toLowerCase())), [live, view, search, folderView, folders, guideOnly]); // eslint-disable-line react-hooks/exhaustive-deps
   const recent = live.find(d => !d.archived && d.lastOpenedAt);
-  const heading = view === "archive" ? "아카이브" : view === "notes" ? "노트" : view === "map" ? "연구맵" : view === "discover" ? "추천 논문" : view === "trash" ? "휴지통" : "서재";
+  const heading = view === "archive" ? "아카이브" : view === "notes" ? "노트" : view === "map" ? "연구맵" : view === "discover" ? "추천 논문" : view === "intel" ? "인텔리전스" : view === "trash" ? "휴지통" : "서재";
   const refresh = () => client.invalidateQueries({ queryKey: ["documents"] });
   const fileTo = async (doc: StoredDocument, folder: ArchiveFolder | null, moving: boolean) => {
     try { await documentRepository.updateDocument(doc.id, { archived: true, archiveFolder: folder }); await refresh(); notify(folder ? `${folder.name}에 ${moving ? "옮겼습니다" : "보관했습니다"}` : moving ? "미분류로 옮겼습니다" : "보관했습니다"); } catch (error) { notify(readableError(error)); }
@@ -130,6 +131,7 @@ export function ResearchLibrary() {
         {view === "notes" && <NotesView docs={live} annotations={liveNotes}/>}
         {view === "map" && <ResearchMapView docs={live} annotations={liveNotes}/>}
         {view === "discover" && <DiscoverView docs={live} annotations={liveNotes}/>}
+        {view === "intel" && <IntelView docs={docs.data ?? []}/>}
         {view === "trash" && <section className="pf-trash">
           <div className="pf-trash-head"><p>{TRASH_DAYS}일이 지나면 자동으로 영구 삭제됩니다.</p>{trashed.length > 0 && <Button size="sm" variant="danger" onClick={() => void purge(trashed)}><Trash2 size={14}/>휴지통 비우기</Button>}</div>
           {trashed.length === 0 ? <div className="pf-empty pf-collection-empty"><span className="pf-empty-book"><Trash2 size={32}/></span><h3>휴지통이 비어 있습니다</h3><p>서재나 아카이브의 논문 카드에서 휴지통 버튼을 누르면 여기로 옮겨집니다.</p></div>
