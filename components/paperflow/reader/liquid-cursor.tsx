@@ -52,8 +52,8 @@ const onText = (element: Element | null) => !!element && (!!element.closest(".pf
  * also bent at the rim like a real drop. With a finger the drop appears above the fingertip (like the
  * iOS loupe) while the finger is down; an Apple Pencil hovering above the screen moves it too.
  */
-export function LiquidCursor({ root }: { root: React.RefObject<HTMLElement | null> }) {
-  const drop = useRef<HTMLDivElement>(null), paper = useRef<HTMLCanvasElement>(null), stage = useRef<HTMLDivElement>(null), image = useRef<SVGFEImageElement>(null);
+export function LiquidCursor({ root, pageSelector = ".pf-pdf-page" }: { root: React.RefObject<HTMLElement | null>; /** What counts as a page: a PDF page, or a briefing document. */ pageSelector?: string }) {
+  const lens = useRef<HTMLDivElement>(null), drop = useRef<HTMLDivElement>(null), paper = useRef<HTMLCanvasElement>(null), stage = useRef<HTMLDivElement>(null), image = useRef<SVGFEImageElement>(null);
   useEffect(() => {
     const host = root.current, element = drop.current, lensPaper = paper.current, holder = stage.current;
     if (!host || !element || !lensPaper || !holder) return;
@@ -74,7 +74,12 @@ export function LiquidCursor({ root }: { root: React.RefObject<HTMLElement | nul
     const usePage = (next: HTMLElement | null) => {
       if (next === page) return;
       page = next; watcher.disconnect(); copy = null; holder.replaceChildren();
-      if (page) { watcher.observe(page, { subtree: true, childList: true, attributes: true, characterData: true }); dirty = true; }
+      if (page) {
+        watcher.observe(page, { subtree: true, childList: true, attributes: true, characterData: true }); dirty = true;
+        // The glass shows the page behind its copy: white for a PDF, the document colour elsewhere.
+        const behind = getComputedStyle(page).backgroundColor;
+        if (lens.current) lens.current.style.background = behind && !/rgba\(0, 0, 0, 0\)|transparent/.test(behind) ? behind : "var(--background, #fff)";
+      }
     };
     const show = () => { if (!visible) { visible = true; x = tx; y = ty; element.dataset.visible = "true"; } if (!frame) frame = requestAnimationFrame(tick); };
     const hide = () => { visible = false; element.dataset.visible = "false"; };
@@ -83,7 +88,7 @@ export function LiquidCursor({ root }: { root: React.RefObject<HTMLElement | nul
       tx = clientX; ty = clientY; targetLift = raise;
       const under = document.elementFromPoint(clientX, clientY);
       if (!under || !host.contains(under)) { hide(); return; }
-      usePage(under.closest<HTMLElement>(".pf-pdf-page"));
+      usePage(under.closest<HTMLElement>(pageSelector));
       const text = onText(under);
       targetZoom = text ? ZOOM_TEXT : ZOOM_PLAIN; targetGrow = text ? 1.06 : 1;
       element.dataset.text = text ? "true" : "false";
@@ -156,7 +161,7 @@ export function LiquidCursor({ root }: { root: React.RefObject<HTMLElement | nul
       host.removeEventListener("touchstart", touch); host.removeEventListener("touchmove", touch);
       host.removeEventListener("touchend", untouch); host.removeEventListener("touchcancel", untouch);
     };
-  }, [root]);
+  }, [root, pageSelector]);
   return <>
     <svg width="0" height="0" aria-hidden="true" style={{ position: "absolute" }}>
       <filter id="pf-liquid-lens" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
@@ -165,7 +170,7 @@ export function LiquidCursor({ root }: { root: React.RefObject<HTMLElement | nul
       </filter>
     </svg>
     <div ref={drop} className="pf-liquid-drop" data-visible="false" aria-hidden="true">
-      <div className="pf-lens"><canvas ref={paper} className="pf-lens-paper"/><div ref={stage} className="pf-lens-stage"/></div>
+      <div ref={lens} className="pf-lens"><canvas ref={paper} className="pf-lens-paper"/><div ref={stage} className="pf-lens-stage"/></div>
       <span className="pf-lens-glass"/>
     </div>
   </>;

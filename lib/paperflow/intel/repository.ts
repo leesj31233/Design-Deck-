@@ -37,6 +37,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     relations: list(value.relations, entry => { const to = text(entry.to, 160), type = text(entry.type, 40); return to && type ? { to, type } : null; }),
     equipment: equipment && Object.keys(equipment).length ? equipment : undefined,
     naysor: naysor && Object.keys(naysor).length ? naysor : undefined,
+    profile: record(value.profile),
     checkedAt: text(value.checkedAt, 20), pack
   };
 }
@@ -49,9 +50,23 @@ export function readPack(json: string): IntelPack {
   if (!raw || !Array.isArray(raw.items)) throw new Error("자료 팩에 items 목록이 없습니다.");
   const id = text(raw.id, 80) ?? `pack-${Date.now().toString(36)}`;
   const items = raw.items.slice(0, 5000).map(item => cleanItem(item, id)).filter((item): item is IntelItem => item !== null);
-  const briefs = (Array.isArray(raw.briefs) ? raw.briefs : []).slice(0, 40).flatMap((brief, index) => { const value = brief as Partial<IntelBrief>; const briefId = text(value?.id, 80), title = text(value?.title, 200), body = longText(value?.body, 60_000); return briefId && /^[\w.:-]+$/.test(briefId) && title && body ? [{ id: briefId, title, body, order: Number.isFinite(value.order) ? Number(value.order) : index, pack: id }] : []; });
+  const briefs = (Array.isArray(raw.briefs) ? raw.briefs : []).slice(0, 40).flatMap((brief, index) => { const value = brief as Partial<IntelBrief>; const briefId = text(value?.id, 80), title = text(value?.title, 200), body = longText(value?.body, 60_000); return briefId && /^[\w.:-]+$/.test(briefId) && title && body ? [{ id: briefId, title, body, order: Number.isFinite(value.order) ? Number(value.order) : index, period: PERIODS.includes(value.period as string) ? value.period : "core", date: text(value.date, 20), pack: id }] : []; });
+  // Terms the briefings use (FIT, LCA, GGL…), kept as a hidden briefing so they sync like the rest.
+  const glossary = (Array.isArray((raw as { glossary?: unknown }).glossary) ? (raw as { glossary: unknown[] }).glossary : []).slice(0, 500).flatMap(entry => {
+    const value = entry as Record<string, unknown>, term = text(value?.term, 60), full = text(value?.full, 200), meaning = text(value?.meaning, 600);
+    return term && full && meaning ? [{ term, full, meaning, note: text(value.note, 600), aliases: Array.isArray(value.aliases) ? value.aliases.flatMap(alias => text(alias, 60) ? [text(alias, 60)!] : []).slice(0, 6) : undefined }] : [];
+  });
+  if (glossary.length) briefs.push({ id: "__glossary__", title: "용어집", body: JSON.stringify(glossary), order: 999, period: "core", date: undefined, pack: id });
   return { format: "paperflow-intel", version: 1, id, title: text(raw.title, 200), generatedAt: text(raw.generatedAt, 40) ?? new Date().toISOString(), items, briefs };
 }
+
+/** A flat record of short texts (profile, equipment): anything else is dropped. */
+function record(input: unknown) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return undefined;
+  const entries = Object.entries(input as Record<string, unknown>).slice(0, 30).flatMap(([key, entry]) => text(key, 40) && (typeof entry === "string" || typeof entry === "number") && text(String(entry), 600) ? [[text(key, 40)!, text(String(entry), 600)!]] : []);
+  return entries.length ? Object.fromEntries(entries) : undefined;
+}
+const PERIODS = ["core", "daily", "weekly", "monthly", "quarterly"];
 
 const announce = () => { if (typeof window !== "undefined") window.dispatchEvent(new Event(INTEL_EVENT)); };
 
@@ -66,6 +81,7 @@ export const intelRepository = {
   async importPack(pack: IntelPack) {
     const db = await openDatabase(), now = new Date().toISOString();
     const existing = new Map((await intelRepository.list()).map(item => [item.id, item]));
+    const earlier = (await intelRepository.briefs()).find(brief => brief.id === "__glossary__");
     const tx = db.transaction(["intel", "intelBriefs"], "readwrite"), done = transactionDone(tx);
     let added = 0, updated = 0;
     for (const item of pack.items) {
@@ -73,7 +89,11 @@ export const intelRepository = {
       if (before) updated++; else added++;
       tx.objectStore("intel").put({ ...item, user: before?.user, addedAt: before?.addedAt ?? now, updatedAt: now });
     }
-    for (const brief of pack.briefs ?? []) tx.objectStore("intelBriefs").put({ ...brief, updatedAt: now });
+    for (const brief of pack.briefs ?? []) {
+      // A new pack's terms are added to (or replace) the ones already known, never wiping them.
+      if (brief.id === "__glossary__" && earlier) { try { const merged = new Map<string, unknown>([...JSON.parse(earlier.body), ...JSON.parse(brief.body)].map((term: { term: string }) => [term.term, term])); tx.objectStore("intelBriefs").put({ ...brief, body: JSON.stringify([...merged.values()]), updatedAt: now }); continue; } catch { /* replaced below */ } }
+      tx.objectStore("intelBriefs").put({ ...brief, updatedAt: now });
+    }
     await done;
     for (const item of pack.items) emitLocalChange({ kind: "intel", id: item.id });
     for (const brief of pack.briefs ?? []) emitLocalChange({ kind: "intel", id: brief.id, brief: true });

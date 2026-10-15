@@ -1,0 +1,98 @@
+/* Briefing nav: dated updates grouped by period, the standing analysis last */
+.pf-intel-brief-group { display:grid; gap:2px; margin-bottom:10px; }
+.pf-intel-brief-group > span { padding:4px 11px; font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--i-muted); }
+.pf-intel-briefs > nav button time { display:block; font-size:11px; color:var(--i-accent); font-variant-numeric:tabular-nums; }
+.pf-intel-brief-date { margin:0 0 6px; font-size:12px; font-weight:600; color:var(--i-accent); letter-spacing:.04em; }
+.pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-briefs { grid-template-columns:minmax(0,1fr); }
+.pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-briefs > nav { position:static; display:flex; flex-wrap:wrap; gap:4px; }
+.pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-brief-group { display:contents; }
+.pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-brief-group > span { display:none; }
+.pf-intel .pf-intel-brief { padding:0; border:0; background:none; overflow:visible; }
+
+/* Entity links in a briefing: preview on hover, full record in the side panel on click */
+.pf-md-entity-wrap { position:relative; display:inline; }
+.pf-md-entity { display:inline; padding:0 2px; margin:0 -2px; border:0; border-radius:4px; background:color-mix(in srgb,var(--i-accent) 9%,transparent); color:inherit; font:inherit; font-weight:600; text-decoration:underline; text-decoration-color:color-mix(in srgb,var(--i-accent) 60%,transparent); text-decoration-thickness:1.5px; text-underline-offset:3px; cursor:pointer; }
+.pf-md-entity[data-kind="project"] { text-decoration-style:dashed; }
+.pf-md-entity:hover, .pf-md-entity[data-open] { background:color-mix(in srgb,var(--i-accent) 18%,transparent); }
+.pf-md-entity[data-missing] { background:none; text-decoration:none; font-weight:inherit; cursor:default; }
+.pf-md-preview, .pf-term-tip { position:absolute; left:0; top:calc(100% + 6px); z-index:40; display:grid; gap:5px; width:min(340px,80vw); padding:12px 14px; border:1px solid var(--i-line); border-radius:14px; background:var(--background); box-shadow:0 18px 44px -18px rgba(10,30,24,.45); font-size:12.5px; line-height:1.55; font-weight:400; font-style:normal; text-align:left; white-space:normal; text-decoration:none; color:var(--i-ink); opacity:0; visibility:hidden; transform:translateY(4px); transition:opacity .15s ease .12s, transform .15s ease .12s, visibility 0s linear .27s; pointer-events:none; }
+.pf-md-entity-wrap:hover .pf-md-preview, .pf-md-entity:focus-visible + .pf-md-preview, .pf-term:hover .pf-term-tip, .pf-term:focus .pf-term-tip { opacity:1; visibility:visible; transform:none; transition-delay:.12s, .12s, 0s; }
+.pf-md-preview small, .pf-term-tip small { color:var(--i-muted); font-size:11px; }
+.pf-md-preview strong { font-size:13.5px; line-height:1.4; }
+.pf-md-preview em { font-style:normal; color:var(--i-ink); display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-md-preview-data { display:flex; flex-wrap:wrap; gap:4px; }
+.pf-md-preview-data span { padding:2px 7px; border-radius:6px; background:color-mix(in srgb,var(--i-accent) 8%,transparent); font-size:11.5px; }
+.pf-md-preview i { font-style:normal; font-size:11px; color:var(--i-accent); }
+
+/* Glossary terms: a dotted underline the first time, the explanation on hover or tap */
+.pf-term { position:relative; display:inline; text-decoration:underline dotted; text-decoration-color:color-mix(in srgb,var(--i-ink) 45%,transparent); text-underline-offset:3px; cursor:help; outline:none; }
+.pf-term:focus-visible { background:color-mix(in srgb,var(--i-accent) 12%,transparent); border-radius:3px; }
+.pf-term-tip strong { font-size:14px; }
+.pf-term-tip > span { color:var(--i-ink); }
+.pf-term-tip em { font-style:normal; padding-top:5px; border-top:1px solid var(--i-line); color:color-mix(in srgb,var(--i-accent) 70%,var(--i-ink)); }
+
+/* Mentions in the side panel */
+.pf-intel-mentions { display:grid; gap:4px; margin:0; padding:0; list-style:none; }
+.pf-intel-mentions button { display:grid; gap:1px; width:100%; padding:7px 10px; border:1px solid var(--i-line); border-radius:10px; background:transparent; color:var(--i-ink); font-size:13px; text-align:left; cursor:pointer; }
+.pf-intel-mentions button:hover { border-color:var(--i-accent); }
+.pf-intel-mentions span { font-size:11px; color:var(--i-muted); }
+
+/* The briefing as a document: tools, highlights, ink, text memos */
+.pf-brief-doc { position:relative; display:grid; border:1px solid var(--i-line); border-radius:20px; background:var(--i-card); }
+.pf-brief-tools { position:sticky; top:8px; z-index:20; display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin:10px 10px 0; padding:6px; border:1px solid var(--i-line); border-radius:14px; background:color-mix(in srgb,var(--background) 92%,transparent); backdrop-filter:blur(14px); }
+.pf-brief-tools > button, .pf-brief-pointers button { display:inline-flex; align-items:center; gap:5px; height:32px; padding:0 10px; border:0; border-radius:9px; background:transparent; color:var(--i-muted); font-size:12.5px; font-weight:600; cursor:pointer; }
+.pf-brief-tools > button:hover, .pf-brief-pointers button:hover { background:color-mix(in srgb,var(--i-ink) 6%,transparent); color:var(--i-ink); }
+.pf-brief-tools > button[aria-pressed="true"], .pf-brief-pointers button[aria-checked="true"] { background:var(--i-ink); color:var(--background); }
+.pf-brief-pointers { display:inline-flex; gap:2px; }
+.pf-brief-pointers button { padding:0 8px; }
+.pf-brief-colors { display:inline-flex; gap:5px; padding:0 6px; }
+.pf-brief-colors button { width:16px; height:16px; padding:0; border:2px solid var(--background); border-radius:50%; background:var(--swatch); box-shadow:0 0 0 1px color-mix(in srgb,var(--swatch) 60%,transparent); cursor:pointer; }
+.pf-brief-colors button[aria-checked="true"], .pf-brief-colors button[aria-pressed="true"] { box-shadow:0 0 0 2px var(--swatch); transform:scale(1.15); }
+.pf-brief-sep { width:1px; height:20px; margin:0 4px; background:var(--i-line); }
+.pf-brief-count { margin-left:auto; padding:0 6px; font-size:11.5px; color:var(--i-muted); }
+.pf-brief-sheet { position:relative; padding:24px 30px 34px; }
+.pf-brief-doc[data-tool="highlight"] .pf-brief-body { cursor:text; }
+.pf-brief-doc[data-tool="pen"] .pf-brief-sheet, .pf-brief-doc[data-tool="text"] .pf-brief-sheet { cursor:crosshair; user-select:none; -webkit-user-select:none; }
+.pf-brief-doc[data-tool="pen"] .pf-brief-sheet { touch-action:none; }
+.pf-brief-doc[data-tool="eraser"] .pf-brief-sheet { cursor:cell; }
+.pf-brief-doc[data-tool="highlight"] .pf-brief-body ::selection { background:rgba(255,214,10,.45); }
+::highlight(pf-brief-yellow) { background-color:rgba(255,221,46,.5); }
+::highlight(pf-brief-green) { background-color:rgba(87,210,145,.38); }
+::highlight(pf-brief-blue) { background-color:rgba(85,164,255,.34); }
+::highlight(pf-brief-pink) { background-color:rgba(246,107,157,.34); }
+::highlight(pf-brief-purple) { background-color:rgba(168,130,235,.36); }
+::highlight(pf-brief-yellow-noted) { background-color:rgba(255,221,46,.5); text-decoration:underline 2px #d3a000; }
+::highlight(pf-brief-green-noted) { background-color:rgba(87,210,145,.38); text-decoration:underline 2px #219960; }
+::highlight(pf-brief-blue-noted) { background-color:rgba(85,164,255,.34); text-decoration:underline 2px #257acb; }
+::highlight(pf-brief-pink-noted) { background-color:rgba(246,107,157,.34); text-decoration:underline 2px #ce4b7a; }
+::highlight(pf-brief-purple-noted) { background-color:rgba(168,130,235,.36); text-decoration:underline 2px #8c58cc; }
+.pf-brief-ink { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+.pf-brief-ink path { fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; opacity:.9; }
+.pf-brief-ink path[data-erasable] { pointer-events:stroke; stroke-width:4; cursor:pointer; }
+.pf-brief-ink path[data-erasable]:hover { opacity:.4; }
+.pf-brief-text { position:absolute; z-index:5; display:flex; gap:2px; }
+.pf-brief-text textarea { flex:1; min-height:40px; padding:7px 9px; border:1px dashed color-mix(in srgb,var(--i-accent) 50%,transparent); border-radius:9px; background:color-mix(in srgb,#fff7d6 85%,var(--background)); color:#1f2937; font:inherit; font-size:13px; line-height:1.5; resize:both; field-sizing:content; }
+.pf-brief-text button { align-self:flex-start; display:grid; place-items:center; width:22px; height:22px; border:0; border-radius:6px; background:color-mix(in srgb,var(--i-ink) 8%,transparent); color:var(--i-muted); cursor:pointer; opacity:0; }
+.pf-brief-text:hover button, .pf-brief-text:focus-within button { opacity:1; }
+.pf-brief-markpop { position:absolute; z-index:30; display:grid; gap:8px; width:280px; padding:12px; border:1px solid var(--i-line); border-radius:14px; background:var(--background); box-shadow:0 20px 44px -20px rgba(10,30,24,.5); }
+.pf-brief-markpop q { font-size:12.5px; color:var(--i-muted); line-height:1.5; }
+.pf-brief-markpop textarea { min-height:70px; padding:8px 10px; border:1px solid var(--i-line); border-radius:10px; background:var(--i-card); color:var(--i-ink); font:inherit; font-size:13px; resize:vertical; }
+.pf-brief-markpop div { display:flex; justify-content:space-between; }
+.pf-brief-markpop div button { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border:1px solid var(--i-line); border-radius:8px; background:transparent; color:var(--i-ink); font-size:12.5px; cursor:pointer; }
+.pf-brief-notes { display:grid; gap:6px; margin-top:26px; padding-top:16px; border-top:1px solid var(--i-line); }
+.pf-brief-notes h4 { margin:0; font-size:12px; color:var(--i-muted); letter-spacing:.04em; }
+.pf-brief-notes button { display:grid; gap:3px; padding:8px 11px; border:0; border-left:3px solid var(--swatch); border-radius:0 10px 10px 0; background:color-mix(in srgb,var(--swatch) 7%,transparent); color:var(--i-ink); font-size:13px; text-align:left; cursor:pointer; }
+.pf-brief-notes q { color:var(--i-muted); font-size:12px; }
+
+/* Focus: the briefing fills the screen */
+.pf-intel.pf-brief-focus-layer { position:fixed; inset:0; z-index:100; display:block; overflow:auto; padding:18px max(18px,calc((100vw - 980px) / 2)) 40px; background:color-mix(in srgb,var(--background) 97%,#000); }
+.pf-brief-focus-layer .pf-brief-doc { min-height:calc(100vh - 58px); }
+.pf-brief-focus-layer .pf-brief-sheet { padding:30px 48px 60px; }
+.pf-brief-focus-layer .pf-md { font-size:16px; line-height:1.9; }
+@media (max-width:760px) {
+  .pf-brief-tools > button span { display:none; }
+  .pf-brief-sheet, .pf-brief-focus-layer .pf-brief-sheet { padding:18px 16px 28px; }
+  .pf-intel.pf-brief-focus-layer { padding:0; }
+  .pf-brief-count { display:none; }
+}
+.pf-md-preview, .pf-term-tip { font-family:var(--i-sans); letter-spacing:0; }

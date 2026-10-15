@@ -20,6 +20,8 @@ export interface IntelItem {
   org?: string; authors?: string; date?: string; url: string; pdfUrl?: string; lang?: string; country?: string;
   sourceType?: string; reliability?: number; status?: IntelStatus; stage?: IntelStage;
   data?: IntelDatum[]; relations?: IntelRelation[]; equipment?: Record<string, string>; naysor?: IntelApplicability;
+  /** A company or project at a glance: industry, role, headquarters, stock code, website, projects… */
+  profile?: Record<string, string>;
   checkedAt?: string;
   /** The pack it came in and when it was stored here. */
   pack?: string; addedAt?: string; updatedAt?: string;
@@ -27,7 +29,10 @@ export interface IntelItem {
 }
 
 /** A written briefing that comes with a pack (executive summary, benchmark, pilot implications…), Markdown. */
-export interface IntelBrief { id: string; title: string; body: string; order?: number; pack?: string; updatedAt?: string }
+/** core: the standing analysis; daily/weekly/monthly/quarterly: dated updates, newest first. */
+export type BriefPeriod = "core" | "daily" | "weekly" | "monthly" | "quarterly";
+export const PERIOD_LABEL: Record<BriefPeriod, string> = { core: "핵심 분석", daily: "일간", weekly: "주간", monthly: "월간", quarterly: "분기" };
+export interface IntelBrief { id: string; title: string; body: string; order?: number; period?: BriefPeriod; date?: string; pack?: string; updatedAt?: string }
 export interface IntelPack { format: "paperflow-intel"; version: 1; id: string; title?: string; generatedAt: string; items: IntelItem[]; briefs?: IntelBrief[] }
 
 export interface TopicNode { id: string; label: string; children?: TopicNode[] }
@@ -51,6 +56,7 @@ export const STAGE_LABEL: Record<IntelStage, string> = { research: "연구", pil
 /** Source priority 1–7 (lower is stronger), as in the research brief. */
 export const RELIABILITY_LABEL: Record<number, string> = { 1: "정부·규제기관", 2: "실증·운전 보고서", 3: "SCI 논문·연구기관", 4: "상장사 보고서", 5: "특허·카탈로그", 6: "시장분석기관", 7: "언론·홍보" };
 export const LANG_LABEL: Record<string, string> = { en: "영어", ko: "한국어", ja: "일본어", zh: "중국어", id: "인도네시아어", ms: "말레이어", de: "독일어", fr: "프랑스어", nl: "네덜란드어", fi: "핀란드어", sv: "스웨덴어" };
+export const PROFILE_LABEL: Record<string, string> = { industry: "산업", role: "역할", hq: "본사", country: "국가", ticker: "종목코드", website: "웹사이트", founded: "설립", size: "규모", parent: "모회사", projects: "수행 프로젝트", products: "제품", capacity: "생산능력", status: "현황" };
 export const APPLICABILITY_LABEL: [keyof IntelApplicability, string][] = [
   ["new", "새로 확인한 것"], ["fit", "NAYSOR 가정과 비교"], ["designChange", "설계 변경 검토"], ["testVars", "파일럿 검증 변수"],
   ["capex", "CAPEX/OPEX 영향"], ["quality", "제품 품질·가격 영향"], ["scaleup", "스케일업 위험"], ["questions", "기업·벤더에 물을 것"]

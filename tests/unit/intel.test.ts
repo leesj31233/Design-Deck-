@@ -45,3 +45,14 @@ describe("translation from Indonesian, Malay, Chinese and Japanese", () => {
     expect(partitionTranslationResults([{ id: "a", text: source }], [{ id: "a", text: korean }]).results).toHaveLength(1);
   });
 });
+
+describe("briefing glossary", () => {
+  it("builds one pattern for every term, symbols included, and matches whole words only", async () => {
+    const { glossaryIndex } = await import("../../lib/paperflow/intel/glossary");
+    const { pattern, byKey } = glossaryIndex([{ term: "R&D (100%)", full: "x", meaning: "y" }]);
+    expect(pattern).not.toBeNull();
+    const found = [..."Japan FIT-compliant PKS, P&ID and 1.4 cal% under PROFIT; R&D (100%) done".matchAll(pattern!)].map(match => match[1]);
+    expect(found).toEqual(["FIT", "PKS", "P&ID", "cal%", "R&D (100%)"]);
+    expect(byKey.get("LHV")?.term).toBe("NCV");
+  });
+});

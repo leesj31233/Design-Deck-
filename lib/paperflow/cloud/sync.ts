@@ -173,7 +173,8 @@ export async function syncAll() {
         else if ((mine.updatedAt ?? "") > row.updated_at) briefPush.push(id);
       } else if (rowId.startsWith("intel:")) {
         const id = rowId.slice(6), mine = localIntel.get(id); seenIntel.add(id);
-        if (!mine || row.updated_at > (mine.updatedAt ?? "")) await intelRepository.putRaw(row.data as IntelItem);
+        // A pack delivered by the research routine carries the facts; the reader's star, folder and memo stay.
+        if (!mine || row.updated_at > (mine.updatedAt ?? "")) { const remote = row.data as IntelItem; const keep = mine?.user && (mine.user.updatedAt ?? "") > (remote.user?.updatedAt ?? ""); await intelRepository.putRaw(keep ? { ...remote, user: mine!.user } : remote); if (keep) intelPush.push(id); }
         else if ((mine.updatedAt ?? "") > row.updated_at) intelPush.push(id);
       }
     }
