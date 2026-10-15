@@ -28,7 +28,9 @@ const supportsHighlights = () => typeof CSS !== "undefined" && "highlights" in C
  * stored as annotations of the briefing (synced with the account like any paper's) and found again by
  * their text, so they survive a re-render or an updated briefing.
  */
-export function BriefDocument({ brief, entity, terms }: { brief: IntelBrief; entity: EntityRenderer; terms: Omit<TermMarker, "seen"> }) {
+export function BriefDocument({ brief, entity, terms, cast }: { brief: IntelBrief; entity: EntityRenderer; terms: Omit<TermMarker, "seen">;
+  /** Who and what the briefing is about, shown as a strip of logos and covers above it. */
+  cast?: React.ReactNode }) {
   const documentId = `brief:${brief.id}`;
   const [marks, setMarks] = useState<Annotation[]>([]), [tool, setTool] = useState<Tool>("select"), [color, setColor] = useState<AnnotationColor>("yellow");
   const [pointer, setPointer] = useState<PointerMode>("default"), [focus, setFocus] = useState(false);
@@ -172,6 +174,7 @@ export function BriefDocument({ brief, entity, terms }: { brief: IntelBrief; ent
     {toolbar}
     <div ref={sheet} className="pf-brief-sheet" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={event => void onPointerUp(event)}>
       {brief.date && brief.period && brief.period !== "core" && <p className="pf-intel-brief-date" data-brief-skip>{brief.date}</p>}
+      {cast && <div data-brief-skip>{cast}</div>}
       <div ref={body} className="pf-brief-body"><Markdown source={brief.body} entity={entity} terms={terms}/></div>
       <svg className="pf-brief-ink" width={width} height="100%" aria-hidden="true" data-brief-skip>
         {ink.map(mark => <path key={mark.id} d={path(mark.points!)} stroke={SWATCH[mark.color]} data-erasable={tool === "eraser" || undefined} onPointerDown={event => { if (tool !== "eraser") return; event.stopPropagation(); void removeAnnotation(mark, "메모 펜 지우기").then(reload); }}/>)}

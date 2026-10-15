@@ -47,7 +47,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   const [items, setItems] = useState<IntelItem[] | null>(null), [briefs, setBriefs] = useState<IntelBrief[]>([]);
   const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "briefs" | "companies">("items");
   const [query, setQuery] = useState(""), [kinds, setKinds] = useState<Set<IntelKind>>(new Set()), [statuses, setStatuses] = useState<Set<IntelStatus>>(new Set());
-  const [sort, setSort] = useState<"reliability" | "date">("reliability"), [showHidden, setShowHidden] = useState(false);
+  const [sort, setSort] = useState<"reliability" | "date">("date"), [showHidden, setShowHidden] = useState(false);
   const [selected, setSelected] = useState<string | null>(null), [briefId, setBriefId] = useState<string | null>(null);
   const [fetching, setFetching] = useState<string | null>(null);
   /** A company or project opened as its own page (the briefings' side panel is its small version). */
@@ -161,7 +161,15 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   const docOf = (item: IntelItem) => item.user?.docId && docs.some(doc => doc.id === item.user!.docId && !doc.deletedAt) ? item.user.docId : null;
   const toggle = <T,>(set: Set<T>, value: T) => { const next = new Set(set); if (next.has(value)) next.delete(value); else next.add(value); return next; };
 
-  /** A preview or term tip that would run past the window edge slides back inside it. */
+  /** The companies, projects and documents a briefing links to, in order of first mention, as a visual strip. */
+  const briefCast = (body: string) => {
+    const found = [...new Set([...body.matchAll(/\]\(intel:([\w.:-]+)\)/g)].map(match => match[1]))].map(id => byId.get(id)).filter((item): item is IntelItem => Boolean(item));
+    if (!found.length) return null;
+    return <section className="pf-brief-cast" aria-label="이 브리핑에 나오는 기업·자료"><h4>이 브리핑에 나오는 기업·자료 · {found.length}</h4><ul>{found.slice(0, 24).map(item => <li key={item.id}><button type="button" data-open={selected === item.id || undefined} onClick={() => setSelected(item.id)}>
+      {(item.kind === "company" || item.kind === "project") && !item.cover && !item.dossier ? <span className="pf-brief-cast-mark"><CompanyMark item={item} size={40}/></span> : <CardCover item={item}/>}
+      <span><small>{KIND_LABEL[item.kind]}{item.update ? ` · ${UPDATE_LABEL[item.update.type]}` : ""}</small><b>{item.kind === "company" || item.kind === "project" ? companyName(item) : display(item)}</b></span>
+    </button></li>)}</ul></section>;
+  };
   /**
    * A preview or term tip that would run past its frame (the window, the side panel, a wide case file)
    * slides back inside it. Listens on the document: the panel can be rendered outside this section.
@@ -242,14 +250,14 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
           <span>{scopeLabel} · {filtered.length}건</span>
           <div role="group" aria-label="구분">{KIND_ORDER.filter(kind => count(item => item.kind === kind)).map(kind => <button type="button" key={kind} aria-pressed={kinds.has(kind)} onClick={() => setKinds(toggle(kinds, kind))}>{KIND_LABEL[kind]}</button>)}</div>
           <div role="group" aria-label="확인 상태">{STATUS_ORDER.filter(status => count(item => item.status === status)).map(status => <button type="button" key={status} data-status={status} aria-pressed={statuses.has(status)} onClick={() => setStatuses(toggle(statuses, status))}>{STATUS_LABEL[status]}</button>)}</div>
-          <select aria-label="정렬" value={sort} onChange={event => setSort(event.target.value as typeof sort)}><option value="reliability">신뢰도 순</option><option value="date">최신 순</option></select>
+          <select aria-label="정렬" value={sort} onChange={event => setSort(event.target.value as typeof sort)}><option value="date">최신 순</option><option value="reliability">신뢰도 순</option></select>
           <label className="pf-intel-hidden"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)}/>숨긴 항목</label>
         </div>}
 
         {mode === "companies" ? <ul className="pf-intel-companies">
           {companies.filter(({ item }) => !query || [display(item), item.title, item.org, item.country, ...Object.values(item.profile ?? {})].join(" ").toLowerCase().includes(query.toLowerCase())).map(({ item, news }) => { const cover = item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src; return <li key={item.id}>
             <article className="pf-intel-company" data-selected={selected === item.id || undefined} tabIndex={0} onClick={() => { setPageId(item.id); setSelected(null); window.scrollTo({ top: 0 }); }} onKeyDown={event => { if (event.key === "Enter") { setPageId(item.id); setSelected(null); } }}>
-              <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : <Building2 size={26}/>}{item.logo && <i className="pf-intel-company-logo"><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
+              <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : item.logo ? <span className="pf-intel-company-logo-big"><img src={item.logo} alt=""/></span> : <CompanyMark item={item} size={64}/>}{item.logo && <i className="pf-intel-company-logo"><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
               <div className="pf-intel-company-body">
                 <header><span className="pf-intel-kind">{KIND_LABEL[item.kind]}</span>{item.stage && <span className="pf-intel-stage">{STAGE_LABEL[item.stage]}</span>}{item.profile?.ticker && <span className="pf-intel-stage">{item.profile.ticker}</span>}</header>
                 <h3>{companyName(item)}</h3>
@@ -287,7 +295,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
           {briefs.length ? <>
             <nav aria-label="브리핑 목록">{briefGroups.map(([period, list]) => <div key={period} className="pf-intel-brief-group"><span>{PERIOD_LABEL[period]}</span>
               {list.map(brief => <button type="button" key={brief.id} aria-current={openBrief?.id === brief.id || undefined} onClick={() => setBriefId(brief.id)}>{brief.date && period !== "core" && <time>{brief.date}</time>}{brief.title}</button>)}</div>)}</nav>
-            {openBrief && <article className="pf-intel-brief"><BriefDocument key={openBrief.id} brief={openBrief} entity={entity} terms={terms}/></article>}
+            {openBrief && <article className="pf-intel-brief"><BriefDocument key={openBrief.id} brief={openBrief} entity={entity} terms={terms} cast={briefCast(openBrief.body)}/></article>}
           </> : <p className="pf-intel-none">이 자료 팩에는 브리핑이 없습니다.</p>}
         </div>}
       </div>}

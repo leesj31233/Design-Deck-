@@ -29,7 +29,7 @@ export function CardCover({ item }: { item: IntelItem }) {
   }, [stored, item.url, item.kind]);
   const Icon = item.kind === "gap" ? HelpCircle : ICON[item.sourceType ?? ""] ?? FileText;
   const label = item.update ? UPDATE_LABEL[item.update.type] : item.kind === "gap" ? "확인 필요" : SOURCE_LABEL[item.sourceType ?? ""] ?? "자료";
-  const date = item.update?.date ?? item.date;
+  const raw = item.update?.date ?? item.date, date = raw && /^\d{4}/.test(raw) ? raw : undefined;
   return <div ref={box} className="pf-card-cover" data-source={item.sourceType} data-kind={item.kind} data-empty={!image || broken || undefined} data-pdf={item.cover && !item.dossier ? undefined : undefined}>
     {image && !broken ? <img src={image} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setBroken(true)}/> : <span className="pf-card-cover-mark"><Icon size={26}/><small>{item.org?.split(/[\/(—]/)[0].trim().slice(0, 28)}</small></span>}
     <span className="pf-card-cover-label">{label}</span>

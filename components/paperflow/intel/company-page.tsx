@@ -16,8 +16,8 @@ export const companyName = (item: IntelItem) => (item.profile?.name ?? display(i
 /** A company or project's identity mark: its logo when known, otherwise its initials on a tinted tile. */
 export function CompanyMark({ item, size = 56 }: { item: IntelItem; size?: number }) {
   if (item.logo) return <span className="pf-company-mark" data-logo style={{ height: size, minWidth: size }}><img src={item.logo} alt=""/></span>;
-  const name = companyName(item), initials = name.replace(/^(PT|Maatschappij)\s+/i, "").split(/[\s/·]+/).filter(Boolean).slice(0, 2).map(word => word[0]).join("").toUpperCase();
-  return <span className="pf-company-mark" style={{ width: size, height: size }}>{initials || <Building2 size={size / 2.4}/>}</span>;
+  const name = companyName(item), latin = /^[A-Za-z0-9]/.test(name.replace(/^(PT|Maatschappij)\s+/i, "")), initials = latin && name.replace(/^(PT|Maatschappij)\s+/i, "").split(/[\s/·]+/).filter(Boolean).slice(0, 2).map(word => word[0]).join("").toUpperCase();
+  return <span className="pf-company-mark" style={{ width: size, height: size }}>{initials ? initials : <Building2 size={size / 2.4}/>}</span>;
 }
 
 /**
