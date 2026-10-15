@@ -26,8 +26,8 @@ export function CompanyMark({ item, size = 56 }: { item: IntelItem; size?: numbe
  * figures, timeline with every news item, conflicts, analysis, sources), the chain of references,
  * related items as visual cards, NAYSOR's reading of it, and the reader's own marks, memos and figures.
  */
-export function CompanyPage({ item, read, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
-  item: IntelItem; /** Read the item's PDF in the reader (the library copy, or the original brought in). */ read?: { label: string; run: () => void }; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
+export function CompanyPage({ item, read, library, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
+  item: IntelItem; /** Read the item's PDF in the reader (the library copy, or the original brought in). */ read?: { label: string; run: () => void }; library?: { has: (id: string) => boolean; open: (id: string) => void }; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
   entity: EntityRenderer; terms: Omit<TermMarker, "seen">; onOpen: (id: string) => void; onBack: () => void; onPdf: (source: DossierSource) => void; busy?: string | null; notify: (message: string) => void;
 }) {
   const extraTimeline: DossierEvent[] = news.map(entry => ({ date: entry.update!.date, event: `[${UPDATE_LABEL[entry.update!.type]}] ${entry.update!.headline ?? display(entry)}`, status: entry.status }));
@@ -51,7 +51,7 @@ export function CompanyPage({ item, read, news, related, byId, mentions, entity,
     </header>
     <PanelMarks itemId={`page-${item.id}`}>
       {profile.length > 0 && <section className="pf-company-profile"><dl>{profile.map(([key, value]) => <div key={key}><dt>{PROFILE_LABEL[key] ?? key}</dt><dd>{/^https?:\/\//.test(value) ? <a href={value} target="_blank" rel="noreferrer noopener">{value.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a> : value}</dd></div>)}</dl></section>}
-      {item.dossier ? <DossierView dossier={item.dossier} entity={entity} terms={terms} onPdf={onPdf} busy={busy} layout="page" extraFigures={extraFigures} extraTimeline={extraTimeline}/>
+      {item.dossier ? <DossierView dossier={item.dossier} library={library} entity={entity} terms={terms} onPdf={onPdf} busy={busy} layout="page" extraFigures={extraFigures} extraTimeline={extraTimeline}/>
         : <section className="pf-company-plain">
           {item.summaryKo && <p className="pf-company-summary">{item.summaryKo}</p>}
           {news.length > 0 && <><h3>소식</h3><ol className="pf-dossier-timeline">{extraTimeline.sort((a, b) => b.date.localeCompare(a.date)).map((event, index) => <li key={index}><time>{event.date}</time><span>{event.event}</span></li>)}</ol></>}

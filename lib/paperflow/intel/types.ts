@@ -19,7 +19,9 @@ export interface IntelUserState { star?: boolean; folderId?: string | null; note
 export interface IntelItem {
   id: string; kind: IntelKind; topics: string[];
   title: string; titleKo?: string; summaryKo?: string;
-  org?: string; authors?: string; date?: string; url: string; pdfUrl?: string; lang?: string; country?: string;
+  org?: string; authors?: string; date?: string; url: string; pdfUrl?: string;
+  /** The library copy of its PDF, put there by the research routine (document id = SHA-256). */
+  libraryDoc?: string; lang?: string; country?: string;
   sourceType?: string; reliability?: number; status?: IntelStatus; stage?: IntelStage;
   data?: IntelDatum[]; relations?: IntelRelation[]; equipment?: Record<string, string>; naysor?: IntelApplicability;
   /** A company or project at a glance: industry, role, headquarters, stock code, website, projects… */
@@ -44,7 +46,7 @@ export const UPDATE_LABEL: Record<UpdateType, string> = { report: "보고서 공
 export interface IntelUpdate { type: UpdateType; date: string; entities: string[]; headline?: string }
 
 /** A source of a case file; `ref` is how the text cites it ([1], [2]…). */
-export interface DossierSource { ref: string; title: string; org?: string; date?: string; url?: string; pdfUrl?: string; where?: string; kind?: string; reliability?: number }
+export interface DossierSource { ref: string; title: string; org?: string; date?: string; url?: string; pdfUrl?: string; libraryDoc?: string; where?: string; kind?: string; reliability?: number }
 export interface DossierFigure { src: string; caption: string; ref?: string; where?: string }
 export interface DossierFact { label: string; value: string; ref?: string; status?: IntelStatus }
 export interface DossierEvent { date: string; event: string; ref?: string; status?: IntelStatus }

@@ -29,7 +29,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     id, kind, title, url: url ?? "",
     topics: (Array.isArray(value.topics) ? value.topics : []).flatMap(topic => text(topic, 40) ? [text(topic, 40)!] : []).slice(0, 12),
     titleKo: text(value.titleKo, 400), summaryKo: longText(value.summaryKo, 2400), org: text(value.org, 200), authors: text(value.authors, 300), date: text(value.date, 20),
-    pdfUrl: link(value.pdfUrl), lang: text(value.lang, 8), country: text(value.country, 120), sourceType: text(value.sourceType, 40),
+    pdfUrl: link(value.pdfUrl), libraryDoc: (typeof value.libraryDoc === "string" && /^[a-f0-9]{64}$/.test(value.libraryDoc) ? value.libraryDoc : undefined), lang: text(value.lang, 8), country: text(value.country, 120), sourceType: text(value.sourceType, 40),
     reliability: Number.isInteger(reliability) && reliability >= 1 && reliability <= 7 ? reliability : undefined,
     status: STATUSES.includes(value.status as IntelStatus) ? value.status as IntelStatus : undefined,
     stage: STAGES.includes(value.stage as IntelStage) ? value.stage as IntelStage : undefined,
@@ -85,7 +85,7 @@ function dossierOf(input: unknown): IntelItem["dossier"] {
     timeline: rows(value.timeline, 40).flatMap(event => text(event.date, 20) && text(event.event, 400) ? [{ date: text(event.date, 20)!, event: text(event.event, 400)!, ref: text(event.ref, 20), status: status(event.status) }] : []),
     conflicts: rows(value.conflicts, 12).flatMap(conflict => { const topic = text(conflict.topic, 160), versions = rows(conflict.versions, 6).flatMap(version => text(version.value, 300) ? [{ value: text(version.value, 300)!, ref: text(version.ref, 20) }] : []); return topic && versions.length ? [{ topic, versions, judgement: text(conflict.judgement, 600) }] : []; }),
     sections: rows(value.sections, 16).flatMap(section => text(section.title, 120) && longText(section.body, 12_000) ? [{ title: text(section.title, 120)!, body: longText(section.body, 12_000)! }] : []),
-    sources: rows(value.sources, 30).flatMap(source => text(source.ref, 20) && text(source.title, 300) ? [{ ref: text(source.ref, 20)!, title: text(source.title, 300)!, org: text(source.org, 160), date: text(source.date, 20), url: link(source.url), pdfUrl: link(source.pdfUrl), where: text(source.where, 160), kind: text(source.kind, 40), reliability: Number.isInteger(source.reliability) ? Number(source.reliability) : undefined }] : [])
+    sources: rows(value.sources, 30).flatMap(source => text(source.ref, 20) && text(source.title, 300) ? [{ ref: text(source.ref, 20)!, title: text(source.title, 300)!, org: text(source.org, 160), date: text(source.date, 20), url: link(source.url), pdfUrl: link(source.pdfUrl), libraryDoc: typeof source.libraryDoc === "string" && /^[a-f0-9]{64}$/.test(source.libraryDoc) ? source.libraryDoc : undefined, where: text(source.where, 160), kind: text(source.kind, 40), reliability: Number.isInteger(source.reliability) ? Number(source.reliability) : undefined }] : [])
   };
 }
 const UPDATE_TYPES = ["report", "vision", "news", "contract", "plant", "certification", "exit", "price", "policy", "research"];

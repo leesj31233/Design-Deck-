@@ -12,10 +12,12 @@ export const libraryName = (title: string) => `${title.replace(/[\\/:*?"<>|]+/g,
 
 const live = (docs: StoredDocument[]) => docs.filter(doc => !doc.deletedAt);
 
-/** The library copy of an item: the one the reader linked, or one already imported under the same name. */
+/** The library copy of an item: the one the reader linked, the one the research routine put there, or one already imported under the same name. */
 export function linkedDoc(item: IntelItem, docs: StoredDocument[]): StoredDocument | undefined {
   const active = live(docs);
-  return (item.user?.docId ? active.find(doc => doc.id === item.user!.docId) : undefined) ?? active.find(doc => doc.filename === libraryName(item.title || item.id));
+  return (item.user?.docId ? active.find(doc => doc.id === item.user!.docId) : undefined)
+    ?? (item.libraryDoc ? active.find(doc => doc.id === item.libraryDoc) : undefined)
+    ?? active.find(doc => doc.filename === libraryName(item.title || item.id));
 }
 
 const COMMON = new Set(["the", "and", "for", "with", "from", "report", "annual", "market", "markets", "issue", "palm", "biomass", "pdf", "final", "draft", "efb", "2024", "2025", "2026"]);

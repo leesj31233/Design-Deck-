@@ -1,17 +1,10 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import { adminClient } from "@/lib/paperflow/cloud/server";
 import { readPack } from "@/lib/paperflow/intel/repository";
+import { ingestAuthorized, ownerId } from "@/lib/paperflow/intel/ingest-auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 const LIMIT = 8 * 1024 * 1024;
-
-const digest = (value: string) => createHash("sha256").update(value).digest();
-function authorized(request: Request) {
-  const expected = process.env.INTEL_INGEST_TOKEN, given = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
-  // Compared as hashes so the comparison takes the same time whatever was sent.
-  return Boolean(expected && expected.length >= 32 && given && timingSafeEqual(digest(expected), digest(given)));
-}
 
 /**
  * The research routine's delivery point: a pack (items, briefings, glossary) is checked field by field
@@ -20,21 +13,16 @@ function authorized(request: Request) {
  * may write; items keep the reader's own decisions (star, folder, memo), which live on the devices.
  */
 export async function POST(request: Request) {
-  if (!authorized(request)) return Response.json({ error: "unauthorized" }, { status: 401 });
-  const admin = adminClient(), owner = (process.env.PAPERFLOW_OWNER_EMAILS ?? "").split(",")[0]?.trim().toLowerCase();
-  if (!admin || !owner) return Response.json({ error: "server not configured" }, { status: 503 });
+  if (!ingestAuthorized(request)) return Response.json({ error: "unauthorized" }, { status: 401 });
+  const admin = adminClient();
+  if (!admin || !process.env.PAPERFLOW_OWNER_EMAILS) return Response.json({ error: "server not configured" }, { status: 503 });
   const body = await request.text();
   if (body.length > LIMIT) return Response.json({ error: "pack too large" }, { status: 413 });
   let pack;
   try { pack = readPack(body); } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "invalid pack" }, { status: 400 }); }
 
-  let userId: string | null = null;
-  for (let page = 1; page <= 20 && !userId; page++) {
-    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
-    if (error) return Response.json({ error: "user lookup failed" }, { status: 502 });
-    userId = data.users.find(user => user.email?.toLowerCase() === owner)?.id ?? null;
-    if (data.users.length < 200) break;
-  }
+  const userId = await ownerId(admin);
+  if (userId === "error") return Response.json({ error: "user lookup failed" }, { status: 502 });
   if (!userId) return Response.json({ error: "owner account not found" }, { status: 404 });
 
   const now = new Date().toISOString();

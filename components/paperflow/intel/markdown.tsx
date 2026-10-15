@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from "react";
+import { Globe } from "lucide-react";
 
 /** Renders an entity link (`[label](intel:item-id)`): the Intelligence tab turns it into a preview and the side panel. */
 export type EntityRenderer = (id: string, label: string, key: number) => ReactNode;
@@ -22,15 +23,27 @@ function plain(text: string, terms?: TermMarker, at = 0): ReactNode[] {
   return out;
 }
 
-function inline(text: string, entity?: EntityRenderer, terms?: TermMarker): ReactNode[] {
-  const out: ReactNode[] = [], pattern = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\[([^\]]+)\]\(intel:([\w.:-]+)\)|\*([^*\s][^*]*)\*/g;
+/** A citation: `[1]`, `[2, 3]` (a case file's numbered sources) or `[^label](https://…)` (a web source in a briefing). */
+export type CiteRenderer = (refs: string[], key: number) => ReactNode;
+const host = (url: string) => { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; } };
+
+/** A web source as a small chip: its site's name, the page on hover, opens in a new tab. */
+export function WebCite({ url, label }: { url: string; label?: string }) {
+  return <a className="pf-cite" href={url} target="_blank" rel="noreferrer noopener" title={url}><Globe size={11} aria-hidden="true"/>{label || host(url)}</a>;
+}
+
+function inline(text: string, entity?: EntityRenderer, terms?: TermMarker, cite?: CiteRenderer): ReactNode[] {
+  const out: ReactNode[] = [], pattern = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\[([^\]]+)\]\(intel:([\w.:-]+)\)|\*([^*\s][^*]*)\*|\[(\d+(?:\s*[,–-]\s*\d+)*)\](?!\()/g;
   let last = 0, match: RegExpExecArray | null;
   while ((match = pattern.exec(text))) {
+    if (match[8] && !cite) continue;
     if (match.index > last) out.push(...plain(text.slice(last, match.index), terms, last));
-    if (match[1]) out.push(<strong key={match.index}>{inline(match[1], entity, terms)}</strong>);
+    if (match[1]) out.push(<strong key={match.index}>{inline(match[1], entity, terms, cite)}</strong>);
     else if (match[2]) out.push(<code key={match.index}>{match[2]}</code>);
+    else if (match[3]?.startsWith("^")) out.push(<WebCite key={match.index} url={match[4]} label={match[3].slice(1).trim()}/>);
     else if (match[3]) out.push(<a key={match.index} href={match[4]} target="_blank" rel="noreferrer noopener">{match[3]}</a>);
     else if (match[5]) out.push(entity ? entity(match[6], match[5], match.index) : match[5]);
+    else if (match[8]) out.push(cite!(refsOf(match[8]), match.index));
     else out.push(<em key={match.index}>{match[7]}</em>);
     last = match.index + match[0].length;
   }
@@ -38,15 +51,26 @@ function inline(text: string, entity?: EntityRenderer, terms?: TermMarker): Reac
   return out;
 }
 
+/** "2, 3" → ["2","3"]; "4–6" → ["4","5","6"]. */
+export function refsOf(text: string): string[] {
+  const out: string[] = [];
+  for (const part of text.split(/\s*,\s*/)) {
+    const range = /^(\d+)\s*[–-]\s*(\d+)$/.exec(part);
+    if (range && Number(range[2]) >= Number(range[1]) && Number(range[2]) - Number(range[1]) < 12) for (let n = Number(range[1]); n <= Number(range[2]); n++) out.push(String(n));
+    else if (part) out.push(part);
+  }
+  return out;
+}
+
 /**
  * A briefing written in Markdown (headings, paragraphs, lists with one level of nesting, tables,
  * quotes), rendered as React elements. Briefings come in packs, so nothing is ever injected as HTML.
  */
-export function Markdown({ source, entity, terms, figure }: { source: string; entity?: EntityRenderer; terms?: Omit<TermMarker, "seen">;
+export function Markdown({ source, entity, terms, figure, cite }: { source: string; entity?: EntityRenderer; terms?: Omit<TermMarker, "seen">; cite?: CiteRenderer;
   /** A figure line, `![caption](intel:item-id#n)`: the item's n-th case-file figure (or its cover), rendered by the host. */
   figure?: (id: string, index: number, caption: string, key: number) => ReactNode }) {
   const marker = terms ? { ...terms, seen: new Set<string>() } : undefined;
-  const line = (text: string) => inline(text, entity, marker);
+  const line = (text: string) => inline(text, entity, marker, cite);
   const lines = source.replace(/\r\n/g, "\n").split("\n"), blocks: ReactNode[] = [];
   for (let at = 0; at < lines.length;) {
     const current = lines[at];

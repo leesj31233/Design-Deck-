@@ -25,3 +25,12 @@ describe("intel library link", () => {
     expect(suggestDoc(argus, [doc("p", "biomass market report 2025.pdf")])).toBeUndefined();
   });
 });
+
+import { refsOf } from "@/components/paperflow/intel/markdown";
+describe("citation refs", () => {
+  it("expands lists and short ranges", () => {
+    expect(refsOf("2, 3")).toEqual(["2", "3"]);
+    expect(refsOf("4–6")).toEqual(["4", "5", "6"]);
+    expect(refsOf("1-40")).toEqual(["1-40"]);
+  });
+});
