@@ -157,8 +157,19 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
   let body: Flow | null = null;
   for (const block of blocks) {
     if (!shown(block)) {
-      if (block.role === "EQUATION" || block.role === "HEADING" || block.role === "TITLE" || block.role === "BODY" || block.role === "ABSTRACT") body = null;
+      // A table in between ends the flow too: the next paragraph has its own place below the table.
+      if (block.role === "EQUATION" || block.role === "HEADING" || block.role === "TITLE" || block.role === "BODY" || block.role === "ABSTRACT" || block.role === "TABLE") body = null;
       continue;
+    }
+    // A new paragraph in another column, or set in a clearly different size (a title on a coloured bar
+    // above its text), starts its own flow: longer Korean must not push the next paragraph out of its place.
+    // A paragraph that itself runs on into the next column stays one flow.
+    const previous = body?.blocks.at(-1);
+    if (previous && previous.unitId !== block.unitId) {
+      const overlap = Math.min(previous.x + previous.width, block.x + block.width) - Math.max(previous.x, block.x);
+      const otherColumn = overlap < Math.min(previous.width, block.width) * .5 || block.y + .002 < previous.y;
+      const sizes = [previous.fontSize ?? 9, block.fontSize ?? 9], otherSize = Math.max(...sizes) / Math.min(...sizes) > 1.2;
+      if (otherColumn || otherSize) body = null;
     }
     const kind: FlowKind = block.role === "HEADING" ? "heading" : block.role === "CAPTION" ? "caption" : block.role === "TABLE" ? "cell" : "body";
     if (kind !== "body") { flows.push({ kind, blocks: [block], paragraphs: [], areas: [], obstacles: [], size: 0, pitch: 0, bold: kind === "heading" || kind === "cell" && block.fontWeight >= 600, sans: (kind === "heading" || kind === "cell") && block.fontFamily === "sans-serif", extra: [], extended: true }); body = kind === "heading" ? null : body; continue; }
@@ -179,7 +190,7 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       const gap = first.y * page.height - previousBottom;
       const firstX = first.lines[0].x * page.width, bodyX = first.lines.length > 1 ? Math.min(...first.lines.slice(1).map(line => line.x)) * page.width : firstX;
       const hang = startsUnit && LIST_MARKER.test(first.text) && bodyX - firstX > flow.size * .6 && bodyX - firstX < flow.size * 4 ? { first: firstX, body: bodyX } : undefined;
-      flow.paragraphs.push({ unitId, text: flow.kind === "cell" ? tableEnding(unitTextForPage(unit, translations.get(unitId)!, pageIndex)) : unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0, hang, top: startsUnit && LIST_MARKER.test(first.text) ? first.lines[0].y * page.height : undefined });
+      flow.paragraphs.push({ unitId, text: flow.kind === "cell" ? tableEnding(unitTextForPage(unit, translations.get(unitId)!, pageIndex)) : unitTextForPage(unit, translations.get(unitId)!, pageIndex), indent: startsUnit ? first.indent ?? 0 : 0, startsUnit, endsUnit, gapBefore: startsUnit && !(first.indent ?? 0) && gap > flow.pitch * .9 && gap < flow.pitch * 3 ? flow.pitch * .5 : 0, hang, top: startsUnit && (LIST_MARKER.test(first.text) || gap > flow.pitch * .8) ? first.lines[0].y * page.height : undefined });
       previousBottom = Math.max(...unitBlocks.map(block => (block.y + block.height) * page.height));
     }
     const regions = flow.blocks.flatMap(block => blockRegions(block, page));
@@ -238,7 +249,8 @@ export function typesetPage({ manifest, pageIndex, measure, translations, inkAt 
       return null;
     };
     flow.paragraphs.forEach((paragraph, index) => {
-      // When the Korean above came out shorter, a list item still starts on its own first line instead of
+      // When the Korean above came out shorter, a list item (or a paragraph set apart by a gap, such as a
+      // table title on its bar) still starts on its own first line instead of
       // creeping up into the space the item above left free (beside a figure, say). Prose simply flows on.
       const home = index && paragraph.startsUnit && flow.anchored !== false && paragraph.top !== undefined && y < paragraph.top - pitch * .3
         ? flow.areas.findIndex((rect, at) => at >= area && paragraph.top! >= rect.y - 1 && paragraph.top! <= rect.y + rect.height) : -1;

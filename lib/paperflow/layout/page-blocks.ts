@@ -56,6 +56,10 @@ function headingLine(line: TextLine, columnWidth: number, bodySize: number) {
   if (line.size < bodySize * .9 || text.length > 120) return false;
   if (SECTION_NAMES.test(text)) return true;
   if (capsHeading(text) && line.right - line.x < columnWidth * 1.03) return true;
+  // An unnumbered section title set bold and clearly larger than the text ("Asia biomass specifications",
+  // often white on a coloured bar): a short phrase starting with a capital, no sentence end.
+  const wordsIn = text.split(/\s+/).length;
+  if (line.bold && line.size >= bodySize * 1.18 && wordsIn <= 10 && /^\p{Lu}/u.test(text) && !SENTENCE_END.test(text) && !/[,;]$/.test(text) && line.right - line.x < columnWidth * 1.03) return true;
   // "1. Photography and Videography: DCs are widely" is a list item with a run-in label (one-level number,
   // a sentence after the colon); "2.4.1. Alkali metals: potassium and sodium" is a heading.
   const label = /^\d{1,2}[.)]?\s+[^:]{2,70}:\s+(.+)$/.exec(text);

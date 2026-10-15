@@ -27,27 +27,47 @@ function backgroundSampler(canvas: HTMLCanvasElement, width: number, height: num
   const columns = 240, rows = Math.max(1, Math.round(columns * height / width));
   const probe = document.createElement("canvas"); probe.width = columns; probe.height = rows;
   const context = probe.getContext("2d", { willReadFrequently: true });
-  if (!context || !canvas.width) return () => "#fff";
+  if (!context || !canvas.width) return (): Paper => ({ color: "#fff" });
   context.drawImage(canvas, 0, 0, columns, rows);
   const data = context.getImageData(0, 0, columns, rows).data;
-  return (rect: Rect) => {
+  return (rect: Rect): Paper => {
     const x0 = Math.max(0, Math.floor(rect.x / width * columns)), x1 = Math.min(columns - 1, Math.ceil((rect.x + rect.width) / width * columns));
     const y0 = Math.max(0, Math.floor(rect.y / height * rows)), y1 = Math.min(rows - 1, Math.ceil((rect.y + rect.height) / height * rows));
+    type Bin = { count: number; r: number; g: number; b: number };
+    const tally = (keep: (sum: number) => boolean) => {
+      const bins = new Map<number, Bin>();
+      let total = 0;
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        const offset = (y * columns + x) * 4, r = data[offset], g = data[offset + 1], b = data[offset + 2];
+        if (!keep(r + g + b)) continue;
+        const key = (r >> 3) << 10 | (g >> 3) << 5 | b >> 3, bin = bins.get(key) ?? { count: 0, r: 0, g: 0, b: 0 };
+        bin.count++; bin.r += r; bin.g += g; bin.b += b; bins.set(key, bin); total++;
+      }
+      let best: Bin | null = null;
+      for (const bin of bins.values()) if (!best || bin.count > best.count) best = bin;
+      return { best, total };
+    };
+    const rgb = (bin: Bin) => [bin.r / bin.count, bin.g / bin.count, bin.b / bin.count].map(Math.round);
     let lightest = 0;
     for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const offset = (y * columns + x) * 4; lightest = Math.max(lightest, data[offset] + data[offset + 1] + data[offset + 2]); }
-    const bins = new Map<number, { count: number; r: number; g: number; b: number }>();
-    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-      const offset = (y * columns + x) * 4, r = data[offset], g = data[offset + 1], b = data[offset + 2];
-      // Glyph pixels (and anti-aliased glyph edges) are not paper.
-      if (r + g + b < lightest - 90) continue;
-      const key = (r >> 3) << 10 | (g >> 3) << 5 | b >> 3, bin = bins.get(key) ?? { count: 0, r: 0, g: 0, b: 0 };
-      bin.count++; bin.r += r; bin.g += g; bin.b += b; bins.set(key, bin);
+    // Light text on a coloured bar (a white title on a blue band): the bar is most of the area and much
+    // darker than the text, so it is the paper here, and the Korean goes on it in the light colour.
+    // A bar is one even colour over a large share of the area, at least as much as the light text on it;
+    // dark glyphs on paper break up into many anti-aliased greys and never form such a block.
+    const dark = tally(sum => sum < lightest - 150), light = tally(sum => sum >= lightest - 90);
+    if (dark.best && dark.best.count >= (x1 - x0 + 1) * (y1 - y0 + 1) * .25 && dark.best.count >= (light.best?.count ?? 0) * .8) {
+      const [r, g, b] = rgb(dark.best);
+      if (r * .299 + g * .587 + b * .114 < 150) return { color: `rgb(${r},${g},${b})`, ink: "#fff" };
     }
-    let best: { count: number; r: number; g: number; b: number } | null = null;
-    for (const bin of bins.values()) if (!best || bin.count > best.count) best = bin;
-    return best ? `rgb(${Math.round(best.r / best.count)},${Math.round(best.g / best.count)},${Math.round(best.b / best.count)})` : "#fff";
+    // Otherwise glyph pixels (and anti-aliased glyph edges) are not paper.
+    const { best } = tally(sum => sum >= lightest - 90);
+    if (!best) return { color: "#fff" };
+    const [r, g, b] = rgb(best);
+    return { color: `rgb(${r},${g},${b})` };
   };
 }
+/** The paper under a mask, and the ink the Korean takes there when the paper is dark. */
+type Paper = { color: string; ink?: string };
 
 export type OverlayState = "none" | "pending" | "ready" | "error";
 /** Ink probe on the rendered page: any pixel clearly darker than the paper around it. */
@@ -105,10 +125,15 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
   }, [manifest, pageIndex, version, onState, canvas, canvasVersion]);
   useEffect(() => { onState?.(typesetFailed ? "error" : layout ? "ready" : "none"); }, [layout, typesetFailed, onState]);
 
-  const colors = useMemo(() => {
+  const papers = useMemo(() => {
     if (!layout || !canvas || !canvasVersion) return null;
     const sample = backgroundSampler(canvas, layout.width, layout.height);
-    return layout.masks.map(sample);
+    // A mask is judged with the band around its line: bold white text can cover most of its own box,
+    // while the bar it sits on runs on beside it. Each Korean line takes light ink where the source under it is light text on a dark band.
+    return { masks: layout.masks.map(mask => { const h = mask.height, band = { y: mask.y + h * .2, height: h * .55 };
+      // The line itself first (a bar as tall as its text), then with the bar beside it (bold white text fills its own box).
+      const inner = sample({ x: mask.x, width: mask.width, ...band }), wide = inner.ink ? inner : sample({ x: mask.x - h, width: mask.width + h * 3, ...band });
+      return wide.ink ? wide : sample(mask); }), lines: new Map(layout.lines.map(line => [line, sample({ x: line.x, y: line.y, width: line.width, height: line.fontSize }).ink])) };
   }, [layout, canvas, canvasVersion]);
 
   // A primitive selector: the page re-renders only when its own pending/failed set changes.
@@ -158,9 +183,9 @@ export const TranslationOverlay = memo(function TranslationOverlay({ pageIndex, 
 
   return <>
     {layout && <div ref={root} className="pf-tx-layer" data-unfit={layout.unfit.length || undefined} data-body-scale={layout.bodyScale} style={{ width: layout.width * K, height: layout.height * K, transform: K === scale ? undefined : `scale(${scale / K})`, fontFamily: paperFontStack() }}>
-      {layout.masks.map((mask, index) => <div key={index} className="pf-tx-mask" style={{ left: mask.x * K, top: mask.y * K, width: mask.width * K, height: mask.height * K, background: colors?.[index] ?? "#fff" }}/>)}
+      {layout.masks.map((mask, index) => <div key={index} className="pf-tx-mask" style={{ left: mask.x * K, top: mask.y * K, width: mask.width * K, height: mask.height * K, background: papers?.masks[index]?.color ?? "#fff" }}/>)}
       {[...byUnit].map(([unitId, lines]) => <div key={unitId} className="pf-tx-unit" data-paragraph-id={unitId} data-kind={lines[0].kind}>
-        {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08 - Math.max(0, line.lineHeight - line.fontSize * 1.15) / 2) * K, width: line.width * K, fontSize: line.fontSize * K, lineHeight: `${Math.max(line.lineHeight, line.fontSize * 1.15) * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: line.kind === "heading" ? headingInk.get(unitId) : undefined }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{paint(run.text, line.kind === "body")}</b> : <span key={part}>{paint(run.text, line.kind !== "heading")}</span>)}</span>)}
+        {lines.map((line, index) => <span key={index} className="pf-tx-line" data-w={(line.width * K).toFixed(2)} data-ws={(line.wordSpacing * K).toFixed(3)} data-ls={(line.letterSpacing * K).toFixed(3)} data-justify={line.wordSpacing || line.letterSpacing ? "1" : "0"} style={{ left: line.x * K, top: (line.y - line.fontSize * .08 - Math.max(0, line.lineHeight - line.fontSize * 1.15) / 2) * K, width: line.width * K, fontSize: line.fontSize * K, lineHeight: `${Math.max(line.lineHeight, line.fontSize * 1.15) * K}px`, wordSpacing: line.wordSpacing * K, letterSpacing: line.letterSpacing * K, fontWeight: line.bold ? 700 : 400, fontFamily: line.sans ? paperFontStack(true) : undefined, color: papers?.lines.get(line) ?? (line.kind === "heading" ? headingInk.get(unitId) : undefined) }}>{line.runs.map((run, part) => run.bold && !line.bold ? <b key={part}>{paint(run.text, line.kind === "body")}</b> : <span key={part}>{paint(run.text, line.kind !== "heading")}</span>)}</span>)}
       </div>)}
     </div>}
     {(pending > 0 || pendingTables || failed.length > 0) && <div className="pf-tx-page-status" role="status">
