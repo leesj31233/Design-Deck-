@@ -84,6 +84,17 @@ async function pushIntel(ids: string[], briefIds: string[]) {
   for (let at = 0; at < rows.length; at += 100) await supabase().from("annotations").upsert(rows.slice(at, at + 100), { onConflict: "user_id,id" });
 }
 
+/** Every intelligence row's id and date, a thousand at a time (the Intelligence tab keeps growing). */
+async function intelDates() {
+  const rows: { id: string; updated_at: string }[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase().from("annotations").select("id, updated_at").eq("document_id", INTEL).order("id").range(from, from + 999);
+    if (error) return { data: rows.length ? rows : null };
+    rows.push(...(data ?? []));
+    if (!data || data.length < 1000) return { data: rows };
+  }
+}
+
 async function pushTranslations(documentId: string, unitIds?: string[]) {
   if (!session) return;
   const items = (await translationRepository.listByDocument(documentId)).filter(item => item.unitId && item.promptVersion === TRANSLATION_PROMPT_VERSION && (!unitIds || unitIds.includes(item.unitId)));
@@ -137,7 +148,12 @@ export async function syncAll() {
     const uploads = useCloud.getState().plan?.mode === "cloud";
     for (const doc of local) { if (purged.has(doc.id)) continue; const row = remote.get(doc.id); if (!row || doc.updatedAt > row.updated_at || (uploads && !row.storage_path && doc.sourceStatus !== "remote")) await pushDocument(doc, row); }
 
-    const [{ data: notes }, localNotes] = await Promise.all([db.from("annotations").select("id, document_id, data, deleted, updated_at"), annotationRepository.listAll()]);
+    const [{ data: notes }, { data: intelIndex }, localNotes] = await Promise.all([
+      db.from("annotations").select("id, document_id, data, deleted, updated_at").neq("document_id", INTEL),
+      // The Intelligence tab grows with images: list it by date first and fetch only what changed.
+      intelDates(),
+      annotationRepository.listAll()
+    ]);
     // A device on an older version may have stored a notebook note as a mark (it has no document): drop it.
     for (const stray of localNotes.filter(note => !note.documentId)) await annotationRepository.removeRaw(stray.id);
     const remoteNotes = new Map((notes ?? []).filter(row => row.document_id !== NOTEBOOK && row.document_id !== INTEL).map(row => [row.id as string, row])), localById = new Map(localNotes.map(note => [note.id, note]));
@@ -162,19 +178,22 @@ export async function syncAll() {
     for (const id of Object.keys(tombstones)) await pushNote(id, true);
 
     // Intelligence: newest wins, item by item (the reader's star/folder/memo travel inside the item).
-    const intelRows = (notes ?? []).filter(row => row.document_id === INTEL);
     const localIntel = new Map((await intelRepository.list()).map(item => [item.id, item])), localBriefs = new Map((await intelRepository.briefs()).map(brief => [brief.id, brief]));
+    const newer = (intelIndex ?? []).filter(row => { const id = String(row.id), mine = id.startsWith("intelbrief:") ? localBriefs.get(id.slice(11)) : localIntel.get(id.slice(6)); return !mine || row.updated_at > (mine.updatedAt ?? ""); }).map(row => String(row.id));
+    const fetched = new Map<string, unknown>();
+    for (let at = 0; at < newer.length; at += 40) { const { data } = await db.from("annotations").select("id, data").eq("document_id", INTEL).in("id", newer.slice(at, at + 40)); for (const row of data ?? []) fetched.set(String(row.id), row.data); }
+    const intelRows = (intelIndex ?? []).map(row => ({ ...row, data: fetched.get(String(row.id)) }));
     const intelPush: string[] = [], briefPush: string[] = [], seenIntel = new Set<string>(), seenBriefs = new Set<string>();
     for (const row of intelRows) {
       const rowId = String(row.id);
       if (rowId.startsWith("intelbrief:")) {
         const id = rowId.slice(11), mine = localBriefs.get(id); seenBriefs.add(id);
-        if (!mine || row.updated_at > (mine.updatedAt ?? "")) await intelRepository.putBriefRaw(row.data as IntelBrief);
+        if (!mine || row.updated_at > (mine.updatedAt ?? "")) { if (row.data) await intelRepository.putBriefRaw(row.data as IntelBrief); }
         else if ((mine.updatedAt ?? "") > row.updated_at) briefPush.push(id);
       } else if (rowId.startsWith("intel:")) {
         const id = rowId.slice(6), mine = localIntel.get(id); seenIntel.add(id);
         // A pack delivered by the research routine carries the facts; the reader's star, folder and memo stay.
-        if (!mine || row.updated_at > (mine.updatedAt ?? "")) { const remote = row.data as IntelItem; const keep = mine?.user && (mine.user.updatedAt ?? "") > (remote.user?.updatedAt ?? ""); await intelRepository.putRaw(keep ? { ...remote, user: mine!.user } : remote); if (keep) intelPush.push(id); }
+        if (!mine || row.updated_at > (mine.updatedAt ?? "")) { if (!row.data) continue; const remote = row.data as IntelItem; const keep = mine?.user && (mine.user.updatedAt ?? "") > (remote.user?.updatedAt ?? ""); await intelRepository.putRaw(keep ? { ...remote, user: mine!.user } : remote); if (keep) intelPush.push(id); }
         else if ((mine.updatedAt ?? "") > row.updated_at) intelPush.push(id);
       }
     }

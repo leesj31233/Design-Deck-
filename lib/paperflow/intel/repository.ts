@@ -39,6 +39,9 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     naysor: naysor && Object.keys(naysor).length ? naysor : undefined,
     profile: record(value.profile),
     dossier: dossierOf(value.dossier),
+    update: updateOf(value.update),
+    logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
+    cover: typeof value.cover === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.cover) && value.cover.length < 140_000 ? value.cover : undefined,
     checkedAt: text(value.checkedAt, 20), pack
   };
 }
@@ -84,6 +87,14 @@ function dossierOf(input: unknown): IntelItem["dossier"] {
     sections: rows(value.sections, 16).flatMap(section => text(section.title, 120) && longText(section.body, 12_000) ? [{ title: text(section.title, 120)!, body: longText(section.body, 12_000)! }] : []),
     sources: rows(value.sources, 30).flatMap(source => text(source.ref, 20) && text(source.title, 300) ? [{ ref: text(source.ref, 20)!, title: text(source.title, 300)!, org: text(source.org, 160), date: text(source.date, 20), url: link(source.url), pdfUrl: link(source.pdfUrl), where: text(source.where, 160), kind: text(source.kind, 40), reliability: Number.isInteger(source.reliability) ? Number(source.reliability) : undefined }] : [])
   };
+}
+const UPDATE_TYPES = ["report", "vision", "news", "contract", "plant", "certification", "exit", "price", "policy", "research"];
+function updateOf(input: unknown): IntelItem["update"] {
+  if (!input || typeof input !== "object") return undefined;
+  const value = input as Record<string, unknown>, date = text(value.date, 20);
+  if (!UPDATE_TYPES.includes(value.type as string) || !date || !/^\d{4}-\d{2}(-\d{2})?$/.test(date)) return undefined;
+  const entities = (Array.isArray(value.entities) ? value.entities : []).flatMap(entity => text(entity, 120) && /^[\w.:-]+$/.test(String(entity)) ? [text(entity, 120)!] : []).slice(0, 12);
+  return { type: value.type as NonNullable<IntelItem["update"]>["type"], date, entities, headline: text(value.headline, 300) };
 }
 const PERIODS = ["core", "daily", "weekly", "monthly", "quarterly"];
 

@@ -12,7 +12,9 @@ export interface IntelDatum { label: string; value: string; unit?: string; basis
 export interface IntelRelation { to: string; type: string }
 export interface IntelApplicability { new?: string; fit?: string; designChange?: string; testVars?: string; capex?: string; quality?: string; scaleup?: string; questions?: string }
 /** What the reader decided about an item: kept, filed, noted. Synced; never overwritten by a new pack. */
-export interface IntelUserState { star?: boolean; folderId?: string | null; note?: string; hidden?: boolean; read?: boolean; docId?: string; updatedAt?: string }
+export interface IntelUserState { star?: boolean; folderId?: string | null; note?: string; hidden?: boolean; read?: boolean; docId?: string; updatedAt?: string;
+  /** Figures the reader added (a pasted screenshot, a photo), compressed to WebP; shown with the case's own. */
+  figures?: { src: string; caption: string; addedAt: string }[] }
 
 export interface IntelItem {
   id: string; kind: IntelKind; topics: string[];
@@ -24,11 +26,22 @@ export interface IntelItem {
   profile?: Record<string, string>;
   /** A case file: the case taken apart from its primary documents, with their figures on the first page. */
   dossier?: IntelDossier;
+  /** A small cover (WebP data URL): page 1 of a paper or report, an article's lead image or front page. */
+  cover?: string;
+  /** A company's (or project owner's) logo, from its own website (WebP/PNG data URL, small). */
+  logo?: string;
+  /** News about companies/projects (a report, a new plan, an article, a withdrawal…): shown under "오늘자 업데이트" and in each company's archive. */
+  update?: IntelUpdate;
   checkedAt?: string;
   /** The pack it came in and when it was stored here. */
   pack?: string; addedAt?: string; updatedAt?: string;
   user?: IntelUserState;
 }
+
+export type UpdateType = "report" | "vision" | "news" | "contract" | "plant" | "certification" | "exit" | "price" | "policy" | "research";
+export const UPDATE_LABEL: Record<UpdateType, string> = { report: "보고서 공개", vision: "비전·계획 발표", news: "관련 기사", contract: "계약·제휴", plant: "공장·설비", certification: "인증", exit: "사업 철수·중단", price: "가격", policy: "정책·규제", research: "연구 결과" };
+/** `date`: when it happened (or was published); `entities`: the companies/projects it is about (item ids). */
+export interface IntelUpdate { type: UpdateType; date: string; entities: string[]; headline?: string }
 
 /** A source of a case file; `ref` is how the text cites it ([1], [2]…). */
 export interface DossierSource { ref: string; title: string; org?: string; date?: string; url?: string; pdfUrl?: string; where?: string; kind?: string; reliability?: number }
@@ -72,6 +85,8 @@ export const STATUS_LABEL: Record<IntelStatus, string> = { verified: "확인됨"
 export const STAGE_LABEL: Record<IntelStage, string> = { research: "연구", pilot: "파일럿", construction: "건설", commissioning: "시운전", "commercial-production": "상업생산", "commercial-sales": "상업판매", stopped: "중단" };
 /** Source priority 1–7 (lower is stronger), as in the research brief. */
 export const RELIABILITY_LABEL: Record<number, string> = { 1: "정부·규제기관", 2: "실증·운전 보고서", 3: "SCI 논문·연구기관", 4: "상장사 보고서", 5: "특허·카탈로그", 6: "시장분석기관", 7: "언론·홍보" };
+/** What kind of document a source is, as a reader names it on a card. */
+export const SOURCE_LABEL: Record<string, string> = { paper: "논문", gov: "정부 자료", "test-report": "실증 보고서", "annual-report": "기업 보고서", patent: "특허", "vendor-catalog": "카탈로그", "market-analyst": "시장 분석", press: "기사" };
 export const LANG_LABEL: Record<string, string> = { en: "영어", ko: "한국어", ja: "일본어", zh: "중국어", id: "인도네시아어", ms: "말레이어", de: "독일어", fr: "프랑스어", nl: "네덜란드어", fi: "핀란드어", sv: "스웨덴어" };
 export const PROFILE_LABEL: Record<string, string> = { industry: "산업", role: "역할", hq: "본사", country: "국가", ticker: "종목코드", website: "웹사이트", founded: "설립", size: "규모", parent: "모회사", projects: "수행 프로젝트", products: "제품", capacity: "생산능력", status: "현황" };
 export const APPLICABILITY_LABEL: [keyof IntelApplicability, string][] = [

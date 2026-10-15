@@ -69,3 +69,15 @@ describe("case files", () => {
     expect(item?.dossier?.sources?.[0].pdfUrl).toBeUndefined();
   });
 });
+
+describe("link previews", () => {
+  it("reads title, image, site and date from a page head in any attribute order", async () => {
+    const { linkMeta } = await import("../../lib/paperflow/intel/link-meta");
+    const html = `<html><head><title>Fallback</title><meta content="Wilhelmina &amp; Ecoscience EPC" property="og:title"><meta property='og:image' content='/img/plant.jpg'><meta name="description" content="RM200m TG2 plant"><meta property="og:site_name" content="The Edge"><meta property="article:published_time" content="2024-11-12T08:00:00Z"></head>`;
+    const result = linkMeta(html, new URL("https://www.theedgemalaysia.com/node/1"));
+    expect(result).toMatchObject({ title: "Wilhelmina & Ecoscience EPC", image: "https://www.theedgemalaysia.com/img/plant.jpg", site: "The Edge", description: "RM200m TG2 plant", host: "theedgemalaysia.com" });
+    expect(result.published?.slice(0, 10)).toBe("2024-11-12");
+    expect(linkMeta("<title>Only title</title>", new URL("https://a.org/x")).title).toBe("Only title");
+    expect(linkMeta(`<meta property="og:image" content="javascript:alert(1)">`, new URL("https://a.org")).image).toBeUndefined();
+  });
+});
