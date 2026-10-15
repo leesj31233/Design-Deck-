@@ -10,6 +10,7 @@ import { archiveFolders } from "@/lib/paperflow/library/archive-folders";
 import { importDocument } from "@/lib/paperflow/pdf/import-document";
 import { INTEL_EVENT, intelRepository, readPack } from "@/lib/paperflow/intel/repository";
 import { registerCsv, registerMarkdown } from "@/lib/paperflow/intel/export";
+import { linkedDoc, libraryName, pdfUrlOf, suggestDoc } from "@/lib/paperflow/intel/library-link";
 import { APPLICABILITY_LABEL, UPDATE_LABEL, KIND_LABEL, LANG_LABEL, PERIOD_LABEL, PROFILE_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, TOPIC_LABEL, TOPIC_TREE, topicIds, type BriefPeriod, type IntelBrief, type IntelItem, type IntelKind, type IntelStatus } from "@/lib/paperflow/intel/types";
 import { usePaperflow } from "../shell/paperflow-context";
 import { FolderGlyph } from "../library/archive-folders";
@@ -23,7 +24,7 @@ import { CompanyMark, CompanyPage, companyName } from "./company-page";
 import { glossaryIndex, type GlossaryTerm } from "@/lib/paperflow/intel/glossary";
 import "./intel.css";
 
-type Scope = { type: "all" } | { type: "star" } | { type: "topic"; id: string } | { type: "folder"; id: string } | { type: "kind"; kind: IntelKind };
+type Scope = { type: "all" } | { type: "star" } | { type: "pdf" } | { type: "topic"; id: string } | { type: "folder"; id: string } | { type: "kind"; kind: IntelKind };
 const KIND_ORDER: IntelKind[] = ["source", "project", "company", "vendor", "equipment", "market", "gap"];
 const STATUS_ORDER: IntelStatus[] = ["verified", "claimed", "estimate", "unverified"];
 /** Dated updates first (newest on top), the standing analysis after them. */
@@ -81,11 +82,12 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   const visible = useMemo(() => (items ?? []).filter(item => showHidden || !item.user?.hidden), [items, showHidden]);
   const inScope = useCallback((item: IntelItem) => {
     if (scope.type === "star") return Boolean(item.user?.star);
+    if (scope.type === "pdf") return Boolean(pdfUrlOf(item) || linkedDoc(item, docs));
     if (scope.type === "folder") return item.user?.folderId === scope.id;
     if (scope.type === "kind") return item.kind === scope.kind;
     if (scope.type === "topic") { const node = TOPIC_TREE.find(group => group.id === scope.id); const ids = node ? topicIds(node) : [scope.id]; return item.topics.some(topic => ids.includes(topic)); }
     return true;
-  }, [scope]);
+  }, [scope, docs]);
   const filtered = useMemo(() => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
     return visible.filter(item => inScope(item) && (!kinds.size || kinds.has(item.kind)) && (!statuses.size || (item.status && statuses.has(item.status)))
@@ -145,20 +147,24 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   /** An open PDF (an item's, or a case file's source) fetched by the server and imported into the library. */
   const pdfToLibrary = async (url: string, title: string, busyKey: string, itemId?: string) => {
     if (fetching) return;
+    const existing = docs.find(doc => !doc.deletedAt && doc.filename === libraryName(title));
+    if (existing) { if (itemId) await intelRepository.setUser(itemId, { docId: existing.id, read: true }); router.push(`/reader/${existing.id}`); return; }
     setFetching(busyKey);
     try {
       const response = await fetch(`/api/intel/pdf?url=${encodeURIComponent(url)}`);
       if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.error ?? "PDF를 가져오지 못했습니다."); }
-      const name = `${title.replace(/[\\/:*?"<>|]+/g, " ").slice(0, 90).trim()}.pdf`;
+      const name = libraryName(title);
       const record = await importDocument(new File([await response.blob()], name, { type: "application/pdf" }));
       if (itemId) await intelRepository.setUser(itemId, { docId: record.id, read: true });
       await client.invalidateQueries({ queryKey: ["documents"] });
-      notify("서재에 담았습니다. 열어서 번역하고 마킹할 수 있습니다.");
+      notify("서재에 담았습니다. 리더에서 번역하고 마킹할 수 있습니다.");
+      router.push(`/reader/${record.id}`);
     } catch (error) { notify(error instanceof Error ? error.message : "PDF를 가져오지 못했습니다."); }
     finally { setFetching(null); }
   };
-  const toLibrary = (item: IntelItem) => item.pdfUrl ? pdfToLibrary(item.pdfUrl, item.title || item.id, item.id, item.id) : Promise.resolve();
-  const docOf = (item: IntelItem) => item.user?.docId && docs.some(doc => doc.id === item.user!.docId && !doc.deletedAt) ? item.user.docId : null;
+  const toLibrary = (item: IntelItem) => { const pdf = pdfUrlOf(item); return pdf ? pdfToLibrary(pdf, item.title || item.id, item.id, item.id) : Promise.resolve(); };
+  const docOf = (item: IntelItem) => linkedDoc(item, docs)?.id ?? null;
+  const linkDoc = (item: IntelItem, docId: string | null) => void intelRepository.setUser(item.id, { docId }).then(() => notify(docId ? "서재의 PDF를 연결했습니다." : "연결을 풀었습니다."));
   const toggle = <T,>(set: Set<T>, value: T) => { const next = new Set(set); if (next.has(value)) next.delete(value); else next.add(value); return next; };
 
   /** A figure placed in a briefing: the item's case-file figure n (or its cover), its caption and a way to the item. */
@@ -198,7 +204,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   }, []);
   if (items === null) return <div className="pf-empty" role="status">인텔리전스를 불러오는 중…</div>;
   const empty = !items.length;
-  const scopeLabel = scope.type === "all" ? "전체" : scope.type === "star" ? "핵심 표시" : scope.type === "folder" ? folders.find(folder => folder.id === scope.id)?.name ?? "폴더" : scope.type === "kind" ? KIND_LABEL[scope.kind] : TOPIC_LABEL.get(scope.id) ?? scope.id;
+  const scopeLabel = scope.type === "all" ? "전체" : scope.type === "star" ? "핵심 표시" : scope.type === "pdf" ? "PDF 보고서" : scope.type === "folder" ? folders.find(folder => folder.id === scope.id)?.name ?? "폴더" : scope.type === "kind" ? KIND_LABEL[scope.kind] : TOPIC_LABEL.get(scope.id) ?? scope.id;
 
   return <section className="pf-intel" aria-label="인텔리전스">
     <header className="pf-intel-head">
@@ -219,6 +225,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
       <nav className="pf-intel-tree" aria-label="주제">
         <button type="button" aria-current={scope.type === "all" || undefined} onClick={() => setScope({ type: "all" })}><Layers size={15}/>전체<i>{visible.length}</i></button>
         <button type="button" aria-current={scope.type === "star" || undefined} onClick={() => setScope({ type: "star" })}><Star size={15}/>핵심 표시<i>{count(item => Boolean(item.user?.star))}</i></button>
+<button type="button" aria-current={scope.type === "pdf" || undefined} title="리더에서 열어 번역할 수 있는 PDF 보고서·논문" onClick={() => setScope({ type: "pdf" })}><FileText size={15}/>PDF 보고서<i>{count(item => Boolean(pdfUrlOf(item) || docOf(item)))}</i></button>
         {TOPIC_TREE.map(group => <div key={group.id} className="pf-intel-group">
           <button type="button" className="pf-intel-group-head" aria-current={scope.type === "topic" && scope.id === group.id || undefined} onClick={() => setScope({ type: "topic", id: group.id })}>{group.label}<i>{count(item => item.topics.some(topic => topicIds(group).includes(topic)))}</i></button>
           {group.children?.map(child => { const total = count(item => item.topics.includes(child.id)); return <button type="button" key={child.id} data-empty={!total || undefined} aria-current={scope.type === "topic" && scope.id === child.id || undefined} onClick={() => setScope({ type: "topic", id: child.id })}><ChevronRight size={13}/>{child.label}<i>{total}</i></button>; })}
@@ -233,7 +240,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         </div>}
       </nav>
 
-      {pageItem ? <CompanyPage item={pageItem} news={newsOf(pageItem.id)} related={relatedOf(pageItem)} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
+      {pageItem ? <CompanyPage item={pageItem} read={docOf(pageItem) ? { label: "리더에서 읽기·번역", run: () => router.push(`/reader/${docOf(pageItem)}`) } : pdfUrlOf(pageItem) ? { label: "PDF 번역해서 읽기", run: () => void toLibrary(pageItem) } : undefined} news={newsOf(pageItem.id)} related={relatedOf(pageItem)} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
         onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}
         onBack={() => setPageId(null)} onPdf={source => void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)} busy={fetching} notify={notify}/> : <div className="pf-intel-main">
         <div className="pf-intel-toolbar">
@@ -276,7 +283,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         </ul> : mode === "items" ? <ul className="pf-intel-list">
           {filtered.map(item => <li key={item.id}>
             <article className="pf-intel-card" data-kind={item.kind} data-selected={selected === item.id || undefined} data-hidden={item.user?.hidden || undefined} tabIndex={0} onClick={() => setSelected(item.id)} onKeyDown={event => { if (event.key === "Enter") setSelected(item.id); }}>
-              <CardCover item={item}/>
+              <CardCover item={item} library={linkedDoc(item, docs)?.cover}/>
               <header>
                 <span className="pf-intel-kind">{KIND_LABEL[item.kind]}</span>
                 {item.reliability && item.kind !== "gap" && <span className="pf-intel-tier" data-tier={item.reliability} title={RELIABILITY_LABEL[item.reliability]}>R{item.reliability} {RELIABILITY_LABEL[item.reliability]}</span>}
@@ -292,7 +299,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
               <footer>
                 {item.topics.slice(0, 3).map(topic => <span key={topic}>{TOPIC_LABEL.get(topic) ?? topic}</span>)}
                 {docOf(item) && <span className="pf-intel-inlib"><Library size={12}/>서재에 있음</span>}
-                {item.pdfUrl && !docOf(item) && <span className="pf-intel-pdf"><FileText size={12}/>PDF</span>}
+                {pdfUrlOf(item) && !docOf(item) && <span className="pf-intel-pdf"><FileText size={12}/>PDF</span>}
               </footer>
             </article>
           </li>)}
@@ -326,8 +333,8 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
 
         <div className="pf-intel-buttons">
           {current.url && <a href={current.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={15}/>원문 열기</a>}
-          {docOf(current) ? <button type="button" className="pf-intel-primary" onClick={() => router.push(`/reader/${docOf(current)}`)}><BookOpenText size={15}/>서재에서 읽기·번역</button>
-            : current.pdfUrl ? <button type="button" className="pf-intel-primary" disabled={fetching === current.id} onClick={() => void toLibrary(current)}>{fetching === current.id ? <Loader2 size={15} className="pf-spin"/> : <Download size={15}/>}PDF 서재에 담기</button> : null}
+          {docOf(current) ? <button type="button" className="pf-intel-primary" onClick={() => router.push(`/reader/${docOf(current)}`)}><BookOpenText size={15}/>리더에서 읽기·번역</button>
+            : pdfUrlOf(current) ? <button type="button" className="pf-intel-primary" disabled={fetching === current.id} onClick={() => void toLibrary(current)}>{fetching === current.id ? <Loader2 size={15} className="pf-spin"/> : <BookOpenText size={15}/>}PDF 번역해서 읽기</button> : null}
           <button type="button" aria-pressed={Boolean(current.user?.star)} onClick={() => void intelRepository.setUser(current.id, { star: !current.user?.star })}><Star size={15}/>{current.user?.star ? "핵심" : "핵심 표시"}</button>
           <button type="button" onClick={() => void intelRepository.setUser(current.id, { hidden: !current.user?.hidden })}><EyeOff size={15}/>{current.user?.hidden ? "다시 보이기" : "숨기기"}</button>
         </div>
@@ -337,6 +344,19 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
           </select>
           {!folders.length && <small>아카이브에서 폴더를 만들면 여기서 고를 수 있습니다.</small>}
         </label>
+        {(() => {
+          // A report the reader owns (a paid subscription PDF, say) lives in the library: link it here to read and translate it from the item.
+          const linked = docOf(current), guess = !linked ? suggestDoc(current, docs) : undefined;
+          return <div className="pf-intel-doclink">
+            {guess && <button type="button" onClick={() => linkDoc(current, guess.id)}><Library size={14}/><span>서재의 <b>{guess.title || guess.filename}</b> 이(가) 이 자료로 보입니다 — 연결</span></button>}
+            <label><FileText size={15}/><span>서재 PDF</span>
+              <select value={linked ?? ""} onChange={event => linkDoc(current, event.target.value || null)}>
+                <option value="">{pdfUrlOf(current) ? "연결 안 함 (원문 PDF를 가져와 읽기)" : "연결 안 함"}</option>
+                {docs.filter(doc => !doc.deletedAt).sort((a, b) => (b.lastOpenedAt ?? b.createdAt).localeCompare(a.lastOpenedAt ?? a.createdAt)).map(doc => <option key={doc.id} value={doc.id}>{(doc.title || doc.filename).slice(0, 70)}</option>)}
+              </select>
+            </label>
+          </div>;
+        })()}
 
         <SourceTree item={current} byId={byId} mentions={mentions} onOpen={setSelected}/>
         {current.profile && <section><h4>{current.kind === "project" ? "프로젝트 정보" : "기업 정보"}</h4><dl className="pf-intel-specs">{Object.entries(current.profile).map(([key, value]) => <div key={key}><dt>{PROFILE_LABEL[key] ?? key}</dt><dd>{/^https?:\/\//.test(value) ? <a href={value} target="_blank" rel="noreferrer noopener">{value.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a> : value}</dd></div>)}</dl></section>}

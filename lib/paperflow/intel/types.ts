@@ -12,7 +12,7 @@ export interface IntelDatum { label: string; value: string; unit?: string; basis
 export interface IntelRelation { to: string; type: string }
 export interface IntelApplicability { new?: string; fit?: string; designChange?: string; testVars?: string; capex?: string; quality?: string; scaleup?: string; questions?: string }
 /** What the reader decided about an item: kept, filed, noted. Synced; never overwritten by a new pack. */
-export interface IntelUserState { star?: boolean; folderId?: string | null; note?: string; hidden?: boolean; read?: boolean; docId?: string; updatedAt?: string;
+export interface IntelUserState { star?: boolean; folderId?: string | null; note?: string; hidden?: boolean; read?: boolean; docId?: string | null; updatedAt?: string;
   /** Figures the reader added (a pasted screenshot, a photo), compressed to WebP; shown with the case's own. */
   figures?: { src: string; caption: string; addedAt: string }[] }
 

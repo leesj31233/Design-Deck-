@@ -1,0 +1,27 @@
+import { describe, expect, it } from "vitest";
+import { libraryName, linkedDoc, pdfUrlOf, suggestDoc } from "@/lib/paperflow/intel/library-link";
+import type { StoredDocument } from "@/lib/paperflow/persistence/types";
+import type { IntelItem } from "@/lib/paperflow/intel/types";
+
+const doc = (id: string, filename: string, extra: Partial<StoredDocument> = {}) => ({ id, filename, title: filename.replace(/\.pdf$/, ""), createdAt: "2026-10-01" } as StoredDocument & typeof extra);
+const item = (extra: Partial<IntelItem>) => ({ id: "x", kind: "source", title: "", url: "https://example.org", topics: [], ...extra } as IntelItem);
+
+describe("intel library link", () => {
+  it("finds the PDF behind an item", () => {
+    expect(pdfUrlOf({ url: "https://a.org/r.pdf" })).toBe("https://a.org/r.pdf");
+    expect(pdfUrlOf({ url: "https://a.org/r.PDF?x=1" })).toBe("https://a.org/r.PDF?x=1");
+    expect(pdfUrlOf({ url: "https://a.org/page", pdfUrl: "https://a.org/b.pdf" })).toBe("https://a.org/b.pdf");
+    expect(pdfUrlOf({ url: "https://a.org/pdfs/page" })).toBeUndefined();
+  });
+  it("reuses a copy already imported under the same name and skips deleted ones", () => {
+    const report = item({ title: "IEA Task 32: EFB leaching" });
+    expect(linkedDoc(report, [doc("1", libraryName(report.title))])?.id).toBe("1");
+    expect(linkedDoc(report, [{ ...doc("1", libraryName(report.title)), deletedAt: "2026-10-02" }])).toBeUndefined();
+    expect(linkedDoc(item({ title: "t", user: { docId: "2" } }), [doc("2", "other.pdf")])?.id).toBe("2");
+  });
+  it("suggests the reader's own copy of a paid report, not a generic match", () => {
+    const argus = item({ title: "Argus Biomass Markets, Issue 26-26 — Asian palm kernel shells / EFB market commentary", org: "Argus Media" });
+    expect(suggestDoc(argus, [doc("p", "palm-biomass-review.pdf"), doc("a", "argus-biomass-markets.pdf")])?.id).toBe("a");
+    expect(suggestDoc(argus, [doc("p", "biomass market report 2025.pdf")])).toBeUndefined();
+  });
+});

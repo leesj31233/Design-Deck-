@@ -11,8 +11,8 @@ const ICON = { paper: BookOpen, gov: Landmark, "test-report": Gauge, "annual-rep
  * case file's key figure — stored with the item, or (for a web page without one) the page's own lead
  * image, fetched only when the card comes into view. Over it: what the document is and its date.
  */
-export function CardCover({ item }: { item: IntelItem }) {
-  const stored = item.cover ?? item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src;
+export function CardCover({ item, library }: { item: IntelItem; /** The first page of the reader's library copy, when linked. */ library?: string }) {
+  const stored = item.cover ?? library ?? item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src;
   const [image, setImage] = useState<string | undefined>(stored), [broken, setBroken] = useState(false), box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setImage(stored); setBroken(false);

@@ -290,3 +290,17 @@ html[data-pf-theme="dark"] .pf-card-cover-mark { background:linear-gradient(135d
 .pf-brief-figure img { display:block; width:100%; max-height:460px; object-fit:contain; background:#fff; }
 .pf-brief-figure figcaption { display:grid; gap:2px; font-size:12.5px; line-height:1.5; color:var(--i-muted); }
 .pf-brief-figure figcaption b { color:var(--i-ink); font-weight:600; }
+
+/* With the side panel open the reading column keeps its own width: nothing inside (a long toolbar,
+   a wide table) can push it under the panel, and the panel stays above the briefing's sticky toolbar. */
+.pf-intel-body > .pf-intel-main { min-width:0; contain:inline-size; }
+.pf-intel-body[data-detail] > .pf-intel-main { overflow-x:clip; }
+.pf-intel-detail { z-index:30; background:linear-gradient(var(--i-card),var(--i-card)),var(--background); }
+
+/* Linking a library PDF to an item (a paid report the reader uploaded). */
+.pf-intel-doclink { display:grid; gap:6px; }
+.pf-intel-doclink > button { display:flex; align-items:flex-start; gap:8px; padding:9px 11px; border:1px dashed var(--i-accent); border-radius:12px; background:color-mix(in srgb,var(--i-accent) 6%,transparent); color:var(--i-ink); font:inherit; font-size:12.5px; line-height:1.5; text-align:left; cursor:pointer; }
+.pf-intel-doclink > button svg { flex:none; margin-top:2px; color:var(--i-accent); }
+.pf-intel-doclink label { display:grid; grid-template-columns:auto auto minmax(0,1fr); align-items:center; gap:6px; font-size:12.5px; color:var(--i-muted); }
+.pf-intel-doclink select { min-width:0; height:34px; padding:0 8px; border:1px solid var(--i-line); border-radius:10px; background:var(--background); color:var(--i-ink); font:inherit; font-size:12.5px; }
+.pf-company-actions .pf-company-read { background:var(--i-ink); color:var(--background); border-color:var(--i-ink); }

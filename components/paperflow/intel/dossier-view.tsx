@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { AlertTriangle, ArrowUpRight, Download, FileSearch, Maximize2, X } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, BookOpenText, FileSearch, Maximize2, X } from "lucide-react";
 import { RELIABILITY_LABEL, STATUS_LABEL, type DossierEvent, type DossierFigure, type DossierSource, type IntelDossier } from "@/lib/paperflow/intel/types";
 import { Markdown, type EntityRenderer, type TermMarker } from "./markdown";
 import "./dossier.css";
+/** A source's PDF: its pdfUrl, or its own URL when that is a PDF. */
+const pdfOf = (source: DossierSource) => source.pdfUrl ?? (source.url && /\.pdf($|[?#])/i.test(source.url) ? source.url : undefined);
 
 /**
  * A case file: one case taken apart from its primary documents. The first page shows what matters
@@ -33,7 +35,7 @@ export function DossierView({ dossier, entity, terms, onPdf, busy, layout = "pan
   const sourceList = dossier.sources?.length ? <section><h5>출처 ({dossier.sources.length})</h5><ol className="pf-dossier-sources">{dossier.sources.map(source => <li key={source.ref} id={`dossier-src-${source.ref}`}>
     <span className="pf-dossier-ref">[{source.ref}]</span>
     <div><strong>{source.title}</strong><small>{[source.org, source.date, source.where, source.reliability ? `R${source.reliability} ${RELIABILITY_LABEL[source.reliability] ?? ""}` : null].filter(Boolean).join(" · ")}</small>
-      <span className="pf-dossier-links">{source.url && <a href={source.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={13}/>원문</a>}{source.pdfUrl && <button type="button" disabled={busy === source.pdfUrl} onClick={() => onPdf(source)}><Download size={13}/>{busy === source.pdfUrl ? "가져오는 중…" : "PDF 서재에 담기"}</button>}</span></div>
+      <span className="pf-dossier-links">{source.url && <a href={source.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={13}/>원문</a>}{pdfOf(source) && <button type="button" disabled={busy === pdfOf(source)} onClick={() => onPdf({ ...source, pdfUrl: pdfOf(source) })}><BookOpenText size={13}/>{busy === pdfOf(source) ? "가져오는 중…" : "PDF 번역해서 읽기"}</button>}</span></div>
   </li>)}</ol></section> : null;
 
   const head = <header className="pf-dossier-head"><p><FileSearch size={13}/>케이스 파일{dossier.asOf ? ` · ${dossier.asOf} 기준` : ""}</p><h4>{dossier.headline}</h4></header>;

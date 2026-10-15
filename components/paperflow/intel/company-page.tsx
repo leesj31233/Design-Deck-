@@ -1,5 +1,5 @@
 "use client";
-import { ArrowLeft, ArrowUpRight, Building2, Star } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, BookOpenText, Building2, Star } from "lucide-react";
 import { intelRepository } from "@/lib/paperflow/intel/repository";
 import { APPLICABILITY_LABEL, KIND_LABEL, PROFILE_LABEL, STAGE_LABEL, STATUS_LABEL, UPDATE_LABEL, type DossierEvent, type DossierFigure, type DossierSource, type IntelItem } from "@/lib/paperflow/intel/types";
 import type { EntityRenderer, TermMarker } from "./markdown";
@@ -26,8 +26,8 @@ export function CompanyMark({ item, size = 56 }: { item: IntelItem; size?: numbe
  * figures, timeline with every news item, conflicts, analysis, sources), the chain of references,
  * related items as visual cards, NAYSOR's reading of it, and the reader's own marks, memos and figures.
  */
-export function CompanyPage({ item, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
-  item: IntelItem; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
+export function CompanyPage({ item, read, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
+  item: IntelItem; /** Read the item's PDF in the reader (the library copy, or the original brought in). */ read?: { label: string; run: () => void }; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
   entity: EntityRenderer; terms: Omit<TermMarker, "seen">; onOpen: (id: string) => void; onBack: () => void; onPdf: (source: DossierSource) => void; busy?: string | null; notify: (message: string) => void;
 }) {
   const extraTimeline: DossierEvent[] = news.map(entry => ({ date: entry.update!.date, event: `[${UPDATE_LABEL[entry.update!.type]}] ${entry.update!.headline ?? display(entry)}`, status: entry.status }));
@@ -43,6 +43,7 @@ export function CompanyPage({ item, news, related, byId, mentions, entity, terms
         <p className="pf-company-sub">{display(item)}</p>
         <div className="pf-company-actions">
           {item.profile?.website && /^https?:/.test(item.profile.website) && <a href={item.profile.website} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={14}/>공식 웹사이트</a>}
+          {read && <button type="button" className="pf-company-read" onClick={read.run}><BookOpenText size={14}/>{read.label}</button>}
           {item.url && <a href={item.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={14}/>대표 원문</a>}
           <button type="button" aria-pressed={Boolean(item.user?.star)} onClick={() => void intelRepository.setUser(item.id, { star: !item.user?.star })}><Star size={14}/>{item.user?.star ? "핵심" : "핵심 표시"}</button>
         </div>
