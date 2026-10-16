@@ -34,3 +34,28 @@ describe("citation refs", () => {
     expect(refsOf("1-40")).toEqual(["1-40"]);
   });
 });
+
+describe("library suggestions", () => {
+  it("does not offer a PDF filed for another item or match on generic words", () => {
+    const abc = item({ title: "4-5TPH EFB Pellet Plant in Malaysia", org: "ABC Machinery" });
+    const wilhelmina = doc("w", "Wilhelmina TG2 steam-exploded EFB black pellet plant (Gebeng, Kuantan).pdf");
+    expect(suggestDoc(abc, [wilhelmina])).toBeUndefined();
+    const argus = item({ title: "Argus Biomass Markets methodology", org: "Argus Media" });
+    expect(suggestDoc(argus, [doc("a", "argus-biomass-markets.pdf")], new Set(["a"]))).toBeUndefined();
+  });
+});
+
+import { cleanItem } from "@/lib/paperflow/intel/repository";
+describe("map places", () => {
+  it("keeps only well-formed places", () => {
+    const raw = { id: "x", kind: "company", title: "T", url: "https://a.org", topics: ["vendors"], geo: [
+      { lat: 3.1, lng: 101.7, label: "본사", kind: "hq", precision: "city" },
+      { lat: "bad", lng: 1, label: "x", kind: "hq", precision: "city" },
+      { lat: 1, lng: 1, label: "y", kind: "nowhere", precision: "city" },
+      { lat: 95, lng: 1, label: "z", kind: "plant", precision: "exact" }
+    ] };
+    const item = cleanItem(raw as never);
+    expect(item?.geo).toEqual([{ lat: 3.1, lng: 101.7, label: "본사", kind: "hq", precision: "city", address: undefined, ref: undefined }]);
+    expect(cleanItem({ ...raw, geo: "none" } as never)?.geo).toBeUndefined();
+  });
+});

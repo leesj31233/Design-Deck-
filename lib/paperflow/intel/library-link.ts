@@ -20,17 +20,19 @@ export function linkedDoc(item: IntelItem, docs: StoredDocument[]): StoredDocume
     ?? active.find(doc => doc.filename === libraryName(item.title || item.id));
 }
 
-const COMMON = new Set(["the", "and", "for", "with", "from", "report", "annual", "market", "markets", "issue", "palm", "biomass", "pdf", "final", "draft", "efb", "2024", "2025", "2026"]);
+const COMMON = new Set(["the", "and", "for", "with", "from", "report", "annual", "market", "markets", "issue", "palm", "biomass", "pdf", "final", "draft", "efb", "2024", "2025", "2026",
+  "pellet", "pellets", "plant", "plants", "mill", "oil", "fuel", "fuels", "energy", "power", "process", "steam", "black", "white", "wood", "washed", "washing", "case", "study", "project", "company", "group", "malaysia", "indonesia", "japan", "korea", "china", "sdn", "bhd", "ltd", "inc", "co", "corporation", "technology", "biochar", "carbon", "empty", "fruit", "bunch", "bunches", "kernel", "shell", "shells", "production", "industrial", "specifications", "methodology"]);
 const words = (text: string) => new Set(text.toLowerCase().normalize("NFKD").split(/[^\p{L}\p{N}]+/u).filter(word => word.length >= 3 && !/^\d{1,2}$/.test(word)));
 
 /**
  * A library PDF that looks like the item's document (a paid report the reader uploaded, say): at
- * least two shared words, one of them distinctive (a name, not "market" or "report").
+ * least two shared words, one of them distinctive (a name, not "market" or "pellet plant"), and not a
+ * PDF already filed for another item.
  */
-export function suggestDoc(item: IntelItem, docs: StoredDocument[]): StoredDocument | undefined {
+export function suggestDoc(item: IntelItem, docs: StoredDocument[], taken: ReadonlySet<string> = new Set()): StoredDocument | undefined {
   const mine = words(`${item.title} ${item.org ?? ""}`);
   let best: { doc: StoredDocument; score: number } | undefined;
-  for (const doc of live(docs)) {
+  for (const doc of live(docs).filter(entry => !taken.has(entry.id))) {
     const shared = [...words(`${doc.filename.replace(/\.pdf$/i, "")} ${doc.title}`)].filter(word => mine.has(word));
     const distinctive = shared.filter(word => !COMMON.has(word)).length;
     const score = shared.length + distinctive;

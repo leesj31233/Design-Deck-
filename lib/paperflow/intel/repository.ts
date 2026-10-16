@@ -13,6 +13,18 @@ const longText = (value: unknown, max = 4000) => typeof value === "string" ? val
 const link = (value: unknown) => { const url = text(value, 1000); try { return url && /^https?:$/.test(new URL(url).protocol) ? url : undefined; } catch { return undefined; } };
 
 /** One item from a pack, checked field by field; anything malformed is dropped rather than trusted. */
+const PLACE_KINDS = new Set(["hq", "plant", "project", "site", "port", "other"]), PRECISIONS = new Set(["exact", "street", "city", "region"]);
+/** Map places: finite coordinates in range, a short label, a known kind and precision; at most 6. */
+function placesOf(value: unknown) {
+  if (!Array.isArray(value)) return undefined;
+  const out = value.flatMap((place: Record<string, unknown>) => {
+    const lat = Number(place?.lat), lng = Number(place?.lng), label = text(place?.label, 80), kind = text(place?.kind, 10), precision = text(place?.precision, 10);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180 || !label || !PLACE_KINDS.has(kind ?? "") || !PRECISIONS.has(precision ?? "")) return [];
+    return [{ lat, lng, label, kind: kind as "hq", precision: precision as "exact", address: text(place?.address, 200), ref: link(place?.ref) }];
+  }).slice(0, 6);
+  return out.length ? out : undefined;
+}
+
 export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
   if (!raw || typeof raw !== "object") return null;
   const value = raw as Record<string, unknown>;
@@ -40,7 +52,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     profile: record(value.profile),
     dossier: dossierOf(value.dossier),
     update: updateOf(value.update),
-    logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
+    logoDark: value.logoDark === true ? true : undefined, geo: placesOf(value.geo), logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
     cover: typeof value.cover === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.cover) && value.cover.length < 140_000 ? value.cover : undefined,
     checkedAt: text(value.checkedAt, 20), pack
   };

@@ -4,9 +4,8 @@ import { createPortal } from "react-dom";
 import { AlertTriangle, ArrowUpRight, BookOpenText, FileSearch, Maximize2, X } from "lucide-react";
 import { RELIABILITY_LABEL, STATUS_LABEL, type DossierEvent, type DossierFigure, type DossierSource, type IntelDossier } from "@/lib/paperflow/intel/types";
 import { Markdown, type EntityRenderer, type TermMarker } from "./markdown";
+import { SourceChip, pdfOf } from "./dossier-parts";
 import "./dossier.css";
-/** A source's PDF: its pdfUrl, or its own URL when that is a PDF. */
-const pdfOf = (source: DossierSource) => source.pdfUrl ?? (source.url && /\.pdf($|[?#])/i.test(source.url) ? source.url : undefined);
 
 /**
  * A case file: one case taken apart from its primary documents. The first page shows what matters
@@ -72,25 +71,4 @@ export function DossierView({ dossier, entity, terms, onPdf, busy, layout = "pan
     </div>, document.body)}
     {lightbox}
   </>;
-}
-
-/** host name of a URL, without www. */
-const site = (url?: string) => { if (!url) return undefined; try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return undefined; } };
-
-/**
- * A citation as a chip: the first source's publisher (or site) and "+n" for the rest, like a
- * footnote you can read in place — hover or focus shows each source with a link to the original.
- */
-function SourceChip({ refs, sources }: { refs: string[]; sources: Map<string, DossierSource> }) {
-  const found = refs.map(ref => sources.get(ref)).filter((source): source is DossierSource => Boolean(source));
-  if (!found.length) return <span className="pf-cite" data-missing>[{refs.join(", ")}]</span>;
-  const first = found[0], label = (site(first.url) || first.org?.split(/[\/(—,]/)[0].trim() || first.title).slice(0, 24);
-  return <span className="pf-cite-wrap" tabIndex={0}>
-    <a className="pf-cite" href={first.url ?? `#dossier-src-${first.ref}`} target={first.url ? "_blank" : undefined} rel="noreferrer noopener">{label}{found.length > 1 && <i>+{found.length - 1}</i>}</a>
-    <span className="pf-cite-card" role="tooltip">{found.map(source => <span key={source.ref}>
-      <small>[{source.ref}] {[site(source.url) ?? source.org, source.date].filter(Boolean).join(" · ")}</small>
-      {source.url ? <a href={source.url} target="_blank" rel="noreferrer noopener">{source.title}</a> : <b>{source.title}</b>}
-      {source.where && <em>{source.where}</em>}
-    </span>)}</span>
-  </span>;
 }

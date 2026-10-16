@@ -60,6 +60,10 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   // so there it is rendered into <body>.
   const [narrow, setNarrow] = useState(false);
   useEffect(() => { const query = window.matchMedia("(max-width: 1180px)"), sync = () => setNarrow(query.matches); sync(); query.addEventListener("change", sync); return () => query.removeEventListener("change", sync); }, []);
+  // On a wide screen an item opens as the page itself, in the middle, with the list as a rail on the right.
+  const focusDetail = !narrow && mode === "items" && Boolean(selected);
+  // The opened item starts at the top of the page.
+  useEffect(() => { if (focusDetail) document.querySelector(".pf-intel-body")?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" }); }, [selected, focusDetail, reduced]);
   // A briefing read full-screen also needs the panel above it.
   const [briefFocus, setBriefFocus] = useState(false);
   useEffect(() => { const watch = new MutationObserver(() => setBriefFocus(Boolean(document.querySelector(".pf-brief-focus-layer")))); watch.observe(document.body, { childList: true }); return () => watch.disconnect(); }, []);
@@ -221,7 +225,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
       <Radar size={34}/><h3>아직 자료가 없습니다</h3>
       <p>Claude가 조사해 검증한 자료 팩(.json)을 가져오면 주제별 트리, 기업·벤더·시장 정보, 브리핑이 채워집니다. 계정에 로그인되어 있으면 다른 기기에도 같이 보입니다.</p>
       <button type="button" className="pf-intel-primary" onClick={() => file.current?.click()}><Upload size={15}/>자료 팩 가져오기</button>
-    </div> : <div className="pf-intel-body" data-detail={current ? "open" : undefined} data-mode={pageItem ? "page" : mode}>
+    </div> : <div className="pf-intel-body" data-detail={current ? "open" : undefined} data-mode={pageItem ? "page" : mode} data-focus={focusDetail || undefined}>
       <nav className="pf-intel-tree" aria-label="주제">
         <button type="button" aria-current={scope.type === "all" || undefined} onClick={() => setScope({ type: "all" })}><Layers size={15}/>전체<i>{visible.length}</i></button>
         <button type="button" aria-current={scope.type === "star" || undefined} onClick={() => setScope({ type: "star" })}><Star size={15}/>핵심 표시<i>{count(item => Boolean(item.user?.star))}</i></button>
@@ -270,7 +274,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         {mode === "companies" ? <ul className="pf-intel-companies">
           {companies.filter(({ item }) => !query || [display(item), item.title, item.org, item.country, ...Object.values(item.profile ?? {})].join(" ").toLowerCase().includes(query.toLowerCase())).map(({ item, news }) => { const cover = item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src; return <li key={item.id}>
             <article className="pf-intel-company" data-selected={selected === item.id || undefined} tabIndex={0} onClick={() => { setPageId(item.id); setSelected(null); window.scrollTo({ top: 0 }); }} onKeyDown={event => { if (event.key === "Enter") { setPageId(item.id); setSelected(null); } }}>
-              <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : item.logo ? <span className="pf-intel-company-logo-big"><img src={item.logo} alt=""/></span> : <CompanyMark item={item} size={64}/>}{item.logo && <i className="pf-intel-company-logo"><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
+              <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : item.logo ? <span className="pf-intel-company-logo-big"><img src={item.logo} alt=""/></span> : <CompanyMark item={item} size={64}/>}{item.logo && <i className="pf-intel-company-logo" data-dark={item.logoDark || undefined}><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
               <div className="pf-intel-company-body">
                 <header><span className="pf-intel-kind">{KIND_LABEL[item.kind]}</span>{item.stage && <span className="pf-intel-stage">{STAGE_LABEL[item.stage]}</span>}{item.profile?.ticker && <span className="pf-intel-stage">{item.profile.ticker}</span>}</header>
                 <h3>{companyName(item)}</h3>
@@ -329,7 +333,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         <h3>{display(current)}</h3>
         {current.titleKo && current.titleKo !== current.title && <p className="pf-intel-original" lang={current.lang}>{current.title}</p>}
         <p className="pf-intel-meta">{[current.org, current.authors, current.date, current.country, current.lang ? LANG_LABEL[current.lang] ?? current.lang : null].filter(Boolean).join(" · ")}</p>
-        {current.dossier && <DossierView dossier={current.dossier} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} entity={entity} terms={terms} busy={fetching} onOpenPage={current.kind === "company" || current.kind === "project" ? () => { setPageId(current.id); setSelected(null); window.scrollTo({ top: 0 }); } : undefined} onPdf={source => void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)}/>}
+        {current.dossier && <DossierView dossier={current.dossier} layout={focusDetail ? "page" : "panel"} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} entity={entity} terms={terms} busy={fetching} onOpenPage={current.kind === "company" || current.kind === "project" ? () => { setPageId(current.id); setSelected(null); window.scrollTo({ top: 0 }); } : undefined} onPdf={source => void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)}/>}
 
         <div className="pf-intel-buttons">
           {current.url && <a href={current.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={15}/>원문 열기</a>}
@@ -346,7 +350,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         </label>
         {(() => {
           // A report the reader owns (a paid subscription PDF, say) lives in the library: link it here to read and translate it from the item.
-          const linked = docOf(current), guess = !linked ? suggestDoc(current, docs) : undefined;
+          const linked = docOf(current), guess = !linked ? suggestDoc(current, docs, new Set((items ?? []).flatMap(entry => entry.id === current.id ? [] : [entry.libraryDoc, entry.user?.docId].filter((id): id is string => Boolean(id))))) : undefined;
           return <div className="pf-intel-doclink">
             {guess && <button type="button" onClick={() => linkDoc(current, guess.id)}><Library size={14}/><span>서재의 <b>{guess.title || guess.filename}</b> 이(가) 이 자료로 보입니다 — 연결</span></button>}
             <label><FileText size={15}/><span>서재 PDF</span>

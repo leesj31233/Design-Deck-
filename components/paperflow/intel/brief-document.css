@@ -39,7 +39,7 @@
 
 /* The briefing as a document: tools, highlights, ink, text memos */
 .pf-brief-doc { position:relative; display:grid; border:1px solid var(--i-line); border-radius:20px; background:var(--i-card); }
-.pf-brief-tools { position:sticky; top:8px; z-index:20; display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin:10px 10px 0; padding:6px; border:1px solid var(--i-line); border-radius:14px; background:color-mix(in srgb,var(--background) 92%,transparent); backdrop-filter:blur(14px); }
+.pf-brief-tools { position:sticky; top:8px; z-index:20; display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin:10px 10px 0; padding:6px; border:1px solid var(--i-line); border-radius:14px; background:var(--background);  }
 .pf-brief-tools > button, .pf-brief-pointers button { display:inline-flex; align-items:center; gap:5px; height:32px; padding:0 10px; border:0; border-radius:9px; background:transparent; color:var(--i-muted); font-size:12.5px; font-weight:600; cursor:pointer; }
 .pf-brief-tools > button:hover, .pf-brief-pointers button:hover { background:color-mix(in srgb,var(--i-ink) 6%,transparent); color:var(--i-ink); }
 .pf-brief-tools > button[aria-pressed="true"], .pf-brief-pointers button[aria-checked="true"] { background:var(--i-ink); color:var(--background); }
@@ -115,3 +115,7 @@
   .pf-intel-brief-group { display:contents; }
   .pf-intel-brief-group > span { display:none; }
 }
+
+/* The app's touch rule (buttons with an aria-label grow to 44px under 1200px) would turn the colour dots into
+   big discs; they stay dots, a little larger for a finger. */
+@media (max-width:1200px) { .paperflow .pf-brief-colors button { min-width:0; min-height:0; width:22px; height:22px; } }

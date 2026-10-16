@@ -12,6 +12,9 @@ export interface IntelDatum { label: string; value: string; unit?: string; basis
 export interface IntelRelation { to: string; type: string }
 export interface IntelApplicability { new?: string; fit?: string; designChange?: string; testVars?: string; capex?: string; quality?: string; scaleup?: string; questions?: string }
 /** What the reader decided about an item: kept, filed, noted. Synced; never overwritten by a new pack. */
+export type PlaceKind = "hq" | "plant" | "project" | "site" | "port" | "other";
+export interface IntelPlace { lat: number; lng: number; label: string; kind: PlaceKind; address?: string; precision: "exact" | "street" | "city" | "region"; ref?: string }
+export const PLACE_LABEL: Record<PlaceKind, string> = { hq: "본사", plant: "공장", project: "프로젝트", site: "현장", port: "항만", other: "기타" };
 export interface IntelUserState { star?: boolean; folderId?: string | null; note?: string; hidden?: boolean; read?: boolean; docId?: string | null; updatedAt?: string;
   /** Figures the reader added (a pasted screenshot, a photo), compressed to WebP; shown with the case's own. */
   figures?: { src: string; caption: string; addedAt: string }[] }
@@ -32,6 +35,10 @@ export interface IntelItem {
   cover?: string;
   /** A company's (or project owner's) logo, from its own website (WebP/PNG data URL, small). */
   logo?: string;
+  /** The logo is light on a dark ground, so its tile is dark. */
+  logoDark?: boolean;
+  /** Where it is: headquarters, plants, project sites — for the map. Only places a source states. */
+  geo?: IntelPlace[];
   /** News about companies/projects (a report, a new plan, an article, a withdrawal…): shown under "오늘자 업데이트" and in each company's archive. */
   update?: IntelUpdate;
   checkedAt?: string;
