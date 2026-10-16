@@ -154,3 +154,4 @@
   .pf-cdoc-table td:last-child { grid-column:2; width:auto; padding-top:0; }
   .pf-cdoc-table td:last-child:empty { display:none; }
 }
+.pf-cdoc-table td:last-child .pf-cdoc-src { display:flex; }

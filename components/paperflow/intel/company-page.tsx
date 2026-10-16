@@ -55,7 +55,13 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
   // Company information as one table — field, value, source — in a fixed order, like a research report's
   // first page. A source is a case-file number, a URL, or the website itself.
   const srcLink = (url: string) => <a className="pf-cdoc-src" href={url} target="_blank" rel="noreferrer noopener">{siteOf(url)}</a>;
-  const sourceOf = (key: string): React.ReactNode => { const ref = refs[key]; if (!ref) return null; return /^https?:\/\//.test(ref) ? srcLink(ref) : cite(ref); };
+  // In the table a numbered source shows its number and site, so the column reads without hovering.
+  const sourceOf = (key: string): React.ReactNode => {
+    const ref = refs[key];
+    if (!ref) return null;
+    if (/^https?:\/\//.test(ref)) return srcLink(ref);
+    return ref.split(/\s*,\s*/).map(number => { const source = sources.get(number); return source?.url ? <a key={number} className="pf-cdoc-src" href={source.url} target="_blank" rel="noreferrer noopener" title={source.title}>[{number}] {siteOf(source.url)}</a> : <span key={number} className="pf-cdoc-src">[{number}] {source?.org ?? ""}</span>; });
+  };
   const infoRows: { key: string; label: string; value: React.ReactNode; source?: React.ReactNode }[] = [];
   const add = (key: string, label: string, value: React.ReactNode, source?: React.ReactNode) => { if (value) infoRows.push({ key, label, value, source: source === undefined ? sourceOf(key) : source }); };
   add("name", "기업명", <>{companyName(item)}{item.profile?.legalName && item.profile.legalName !== companyName(item) && <small>{item.profile.legalName}</small>}</>, sourceOf("legalName"));
