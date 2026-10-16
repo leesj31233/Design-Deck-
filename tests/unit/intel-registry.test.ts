@@ -35,3 +35,10 @@ describe("entity registry", () => {
     expect(JSON.parse(brief!.body).entities).toHaveLength(3);
   });
 });
+
+describe("equipment types", () => {
+  it("keeps known equipment kinds only", () => {
+    const clean = cleanRegistry({ entities: [{ code: "MY-01", name: "Bioenergy Machinery", category: "vendor", equipmentTypes: ["washer", "dryer", "spaceship", "washer"] }] })!;
+    expect(clean.entities[0].equipmentTypes).toEqual(["washer", "dryer"]);
+  });
+});

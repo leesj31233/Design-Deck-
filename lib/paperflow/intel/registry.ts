@@ -11,10 +11,17 @@ export interface IntelEntity {
   code: string; name: string; legalName?: string; category: EntityCategory; tier?: 1 | 2 | 3;
   parentCode?: string; country?: string; website?: string; aliases: string[];
   canonicalItemId?: string; itemIds: string[]; mentionIds: string[]; focus?: string; note?: string;
+  /** What an equipment supplier supplies (several kinds per supplier). */
+  equipmentTypes?: EquipmentType[];
 }
 export interface IntelRegistry { version: 1; generatedAt: string; entities: IntelEntity[] }
 
-export const CATEGORY_LABEL: Record<EntityCategory, string> = { company: "기업", vendor: "벤더", certification: "인증", market: "마켓", agency: "기관", association: "협회", research: "연구" };
+export const CATEGORY_LABEL: Record<EntityCategory, string> = { company: "기업", vendor: "장비 벤더", certification: "인증", market: "마켓", agency: "기관", association: "협회", research: "연구" };
+/** Equipment kinds along the EFB line, in process order, then utilities and services. */
+export const EQUIPMENT_TYPES = [["shredder", "파쇄기"], ["washer", "세척기"], ["screw-press", "스크류 프레스"], ["dewatering", "탈수기"], ["dryer", "건조기"], ["pelletizing", "펠릿화"], ["thermal", "반탄화·탄화"], ["water", "필터·수처리"], ["boiler", "보일러·에너지"], ["piping", "배관·이송"], ["epc", "플랜트 EPC·토목"], ["service", "부품·대리점"]] as const;
+export type EquipmentType = typeof EQUIPMENT_TYPES[number][0];
+export const EQUIPMENT_LABEL = Object.fromEntries(EQUIPMENT_TYPES) as Record<EquipmentType, string>;
+const EQUIPMENT_KEYS = new Set<string>(EQUIPMENT_TYPES.map(([key]) => key));
 export const CATEGORY_ORDER: EntityCategory[] = ["company", "vendor", "certification", "market", "agency", "association", "research"];
 export const FOCUS_LABEL: Record<string, string> = { biochar: "바이오차", "white-pellet": "화이트 펠릿", "black-pellet": "블랙 펠릿", cofiring: "혼소", cdr: "탄소제거", pome: "POME", equipment: "설비", market: "시장", policy: "정책" };
 const CATEGORIES = new Set<string>(CATEGORY_ORDER);
@@ -37,7 +44,8 @@ export function cleanRegistry(value: unknown): IntelRegistry | null {
       parentCode: str(e.parentCode, 12), country: str(e.country, 60), website: typeof e.website === "string" && /^https?:\/\//.test(e.website) ? e.website.slice(0, 300) : undefined,
       aliases: Array.isArray(e.aliases) ? e.aliases.flatMap(alias => str(alias, 120) ? [str(alias, 120)!] : []).slice(0, 20) : [],
       canonicalItemId: typeof e.canonicalItemId === "string" && /^[\w.:-]{1,120}$/.test(e.canonicalItemId) ? e.canonicalItemId : undefined,
-      itemIds: ids(e.itemIds), mentionIds: ids(e.mentionIds), focus: str(e.focus, 30), note: str(e.note, 400) }];
+      itemIds: ids(e.itemIds), mentionIds: ids(e.mentionIds), focus: str(e.focus, 30), note: str(e.note, 400),
+      equipmentTypes: Array.isArray(e.equipmentTypes) ? [...new Set(e.equipmentTypes.filter((type): type is EquipmentType => typeof type === "string" && EQUIPMENT_KEYS.has(type)))] : undefined }];
   });
   for (const entity of entities) if (entity.parentCode && !seen.has(entity.parentCode)) entity.parentCode = undefined;
   return entities.length ? { version: 1, generatedAt: str(raw.generatedAt, 40) ?? new Date().toISOString(), entities } : null;

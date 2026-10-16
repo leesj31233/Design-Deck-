@@ -44,3 +44,14 @@
 }
 .pf-dir-tabs button, .pf-dir-countries button { flex:none; }
 @media (max-width:760px) { .pf-dir-tabs button { padding:0 11px; font-size:13.5px; } }
+
+/* 장비 벤더: equipment kinds along the line */
+.pf-dir-equipment { display:flex; flex-wrap:wrap; gap:6px; padding:8px 10px; border:1px solid var(--i-line); border-radius:12px; background:var(--i-card); }
+.pf-dir-equipment button { flex:none; display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 12px; border:1px solid transparent; border-radius:8px; background:transparent; color:var(--i-ink); font:inherit; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.pf-dir-equipment button i { font-style:normal; font-size:11px; font-weight:500; color:var(--i-muted); }
+.pf-dir-equipment button:hover { border-color:var(--i-line); }
+.pf-dir-equipment button[aria-pressed="true"] { background:var(--i-accent); color:#fff; }
+.pf-dir-equipment button[aria-pressed="true"] i { color:inherit; opacity:.8; }
+.pf-dir-types { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+.pf-dir-types i { padding:1px 7px; border-radius:5px; background:color-mix(in srgb,var(--i-accent) 10%,transparent); color:color-mix(in srgb,var(--i-accent) 75%,var(--i-ink)); font-style:normal; font-size:11px; font-weight:600; }
+@media (max-width:760px) { .pf-dir-equipment { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; } }

@@ -9,7 +9,7 @@ import { SourceTree } from "./source-tree";
 import { PanelMarks } from "./panel-marks";
 import { FigureAdder } from "./figure-adder";
 import { CardCover, CoverImage } from "./card-cover";
-import { CATEGORY_LABEL, type IntelEntity } from "@/lib/paperflow/intel/registry";
+import { CATEGORY_LABEL, EQUIPMENT_LABEL, type IntelEntity } from "@/lib/paperflow/intel/registry";
 import { countryOf } from "./entity-directory";
 import "./company-document.css";
 
@@ -75,6 +75,7 @@ export function CompanyPage({ item, read, library, org, news, related, byId, men
   add("hq", "본사·국가", [item.profile?.hq, item.profile?.country ?? item.country].filter((part, index, all) => part && all.indexOf(part) === index).join(" · "), sourceOf("hq") ?? sourceOf("country"));
   add("founded", "설립", item.profile?.founded);
   add("industry", "분야", item.profile?.industry);
+  if (org?.entity.equipmentTypes?.length) add("equipment", "공급 장비", org.entity.equipmentTypes.map(type => EQUIPMENT_LABEL[type]).join(" · "), null);
   add("role", "역할", item.profile?.role);
   add("ceo", "대표", item.profile?.ceo);
   add("employees", "직원 수", item.profile?.employees ?? fin?.employees, sourceOf("employees") ?? (fin?.employees ? srcLink(fin.source) : null));
