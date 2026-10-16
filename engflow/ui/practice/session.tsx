@@ -20,7 +20,7 @@ import { skillName } from "../../content";
 import { AIUnavailableError } from "../../platform/types";
 import { useApp } from "../store";
 import { Card, ConfirmDialog, Eyebrow, LevelBadge, ScoreRing, StatusChip, TONE_TEXT, cn, relTimeKo, scoreTone, useReduced } from "../kit";
-import { ChatThread, MeaningChunks, MyTurn, type SaidLine } from "./parts";
+import { ChatThread, MeaningChunks, MyTurn, SentencePrompt, type SaidLine } from "./parts";
 import { situationOf } from "../../core/situations";
 import { SITUATION_INFO } from "../../content";
 import { FeedbackPanel } from "./feedback";
@@ -137,7 +137,9 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const [said, setSaid] = React.useState<Record<string, SaidLine[]>>({});
   const [celebration, setCelebration] = React.useState<Celebration | null>(null);
   const [finished, setFinished] = React.useState(false);
-  const [showNatural, setShowNatural] = React.useState(app.state.settings.showNaturalKorean);
+  // Sentence turns: the natural Korean is the prompt; the speaking-order chips are a hint the learner opens
+  // only when stuck (per question), so the order is not handed over before they think in English.
+  const [chunksFor, setChunksFor] = React.useState<{ id: string; open: boolean } | null>(null);
   const [showKo, setShowKo] = React.useState(false);
   const [confirmExit, setConfirmExit] = React.useState(false);
   const [guide, setGuide] = React.useState<{ skill: string; tab: GuideTab } | null>(null);
@@ -456,6 +458,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   }
 
   const isSentence = q.mode === "sentence";
+  const showChunks = chunksFor?.id === q.id ? chunksFor.open : app.state.settings.showNaturalKorean;
   const progress = queue.length ? (idx + (phase === "feedback" ? 1 : 0)) / queue.length : 0;
 
   return (
@@ -536,13 +539,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
             {q.dialogue?.length ? (
               <MyTurn>
                 {isSentence ? (
-                  <>
-                    <MeaningChunks segments={q.segments} size="md" hint={q.reference.split(" ").length >= 12} />
-                    <button onClick={() => setShowNatural((v) => !v)} className="dd-focus mt-2.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showNatural}>
-                      <ChevronDown className={cn("size-3.5 transition", showNatural && "rotate-180")} /> 자연스러운 한국어 {showNatural ? "숨기기" : "보기"}
-                    </button>
-                    {showNatural ? <p className="ef-ko mt-1 text-[14px] text-[var(--ef-ink-2)]">{q.promptKo}</p> : null}
-                  </>
+                  <SentencePrompt q={q} size="md" open={showChunks} onToggle={() => setChunksFor({ id: q.id, open: !showChunks })} />
                 ) : (
                   <>
                     <p className="ef-ko text-[19px] font-semibold leading-snug tracking-[-.02em] md:text-[22px]">{q.promptKo}</p>
@@ -555,13 +552,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                 )}
               </MyTurn>
             ) : isSentence ? (
-              <>
-                <MeaningChunks segments={q.segments} hint={q.reference.split(" ").length >= 12} />
-                <button onClick={() => setShowNatural((v) => !v)} className="dd-focus mt-3 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showNatural}>
-                  <ChevronDown className={cn("size-3.5 transition", showNatural && "rotate-180")} /> 자연스러운 한국어 {showNatural ? "숨기기" : "보기"}
-                </button>
-                {showNatural ? <p className="ef-ko mt-1 text-[14px] text-[var(--ef-ink-2)]">{q.promptKo}</p> : null}
-              </>
+              <SentencePrompt q={q} size="lg" open={showChunks} onToggle={() => setChunksFor({ id: q.id, open: !showChunks })} />
             ) : (
               <div>
                 <p className="ef-ko text-[22px] font-semibold leading-snug tracking-[-.02em] md:text-[26px]">{q.promptKo}</p>

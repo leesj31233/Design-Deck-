@@ -37,6 +37,8 @@ test("level test gives a qualified CEFR estimate", async ({ page }) => {
     if ((await radios.count()) > 0) {
       await radios.first().click();
     } else if (await page.locator("#ef-test-answer").isVisible()) {
+      // A test of how the learner would say it: no English-order chunks on the screen.
+      await expect(page.getByRole("list", { name: /말하는 순서 힌트/ })).toHaveCount(0);
       await page.locator("#ef-test-answer").fill("We are still checking the data, so we need more time before we decide.");
     } else {
       const pool = page.locator("[data-chunk='pool']");
@@ -64,6 +66,11 @@ test("full-sentence lesson: feedback, grammar guide, mistake saved", async ({ pa
   await page.getByRole("button", { name: "문장 말하기", exact: true }).click();
   await page.getByRole("button", { name: /^시작/ }).click();
   await expect(page.locator("textarea#ef-answer")).toBeVisible();
+  // The English speaking order is a hint the learner opens, not shown up front.
+  const chunks = page.getByRole("list", { name: /말하는 순서 힌트/ });
+  await expect(chunks).toHaveCount(0);
+  await page.getByRole("button", { name: /말하는 순서 힌트 보기/ }).click();
+  await expect(chunks).toBeVisible();
   await page.locator("#ef-answer").fill("If we will decide it now, we must change it later because data different.");
   await page.getByRole("button", { name: /제출/ }).click();
   await expect(page.getByRole("img", { name: /종합/ })).toBeVisible();

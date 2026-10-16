@@ -206,8 +206,8 @@ export function SettingsScreen() {
         <Row label="자동 수정 (iOS·Android)" hint="끄면 키보드가 철자를 고치지 않아 실제 실력대로 평가됩니다. 권장: 끄기.">
           <Choice value={s.autocorrect ? "on" : "off"} label="자동 수정" options={[{ v: "off", label: "끄기" }, { v: "on", label: "켜기" }]} onChange={(v) => set({ autocorrect: v === "on" })} />
         </Row>
-        <Row label="자연스러운 한국어 기본 표시" hint="문장 말하기 문제에서 영어 어순 의미 단위와 함께 자연스러운 한국어 문장을 처음부터 보여 줍니다.">
-          <Choice value={s.showNaturalKorean ? "on" : "off"} label="자연스러운 한국어" options={[{ v: "off", label: "숨김" }, { v: "on", label: "표시" }]} onChange={(v) => set({ showNaturalKorean: v === "on" })} />
+        <Row label="말하는 순서 힌트 기본 표시" hint="문장 말하기 문제에서 의미 단위로 나눈 말하는 순서 힌트를 처음부터 펼쳐 둡니다. 꺼 두면 먼저 스스로 영어로 생각해 볼 수 있습니다.">
+          <Choice value={s.showNaturalKorean ? "on" : "off"} label="말하는 순서 힌트" options={[{ v: "off", label: "숨김" }, { v: "on", label: "표시" }]} onChange={(v) => set({ showNaturalKorean: v === "on" })} />
         </Row>
         <Row label="테마">
           <Choice

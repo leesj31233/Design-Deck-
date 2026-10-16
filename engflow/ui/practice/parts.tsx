@@ -8,14 +8,13 @@ import type { DialogueTurn, ErrorSpan, MeaningCheck, ScoreBucket } from "../../c
 
 /* ───────────── Meaning chunks (numbered like process streams) ───────────── */
 
-/** Shown under the chunks of a multi-chunk sentence: say the point first, short sentences are fine. */
-export const SPEAK_FIRST_HINT_KO = "핵심 먼저 → 이유 → 덧붙임 순서로 말해 보세요. 두세 문장으로 나눠도 정답입니다.";
+/** Shown with a longer sentence prompt: the point first, short sentences are fine. */
+export const SPEAK_FIRST_HINT_KO = "핵심부터 말해 보세요. 두세 문장으로 나눠도 정답입니다.";
 
-export function MeaningChunks({ segments, size = "lg", hint = false }: { segments: string[]; size?: "lg" | "md"; hint?: boolean }) {
+export function MeaningChunks({ segments, size = "lg" }: { segments: string[]; size?: "lg" | "md" }) {
   const reduced = useReduced();
   return (
-    <div>
-    <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label="한국어 의미 단위 (말하는 순서)">
+    <ol className="flex flex-wrap items-center gap-x-1 gap-y-2" aria-label="말하는 순서 힌트 (의미 단위)">
       {segments.map((s, i) => (
         <motion.li
           key={`${i}-${s}`}
@@ -39,7 +38,31 @@ export function MeaningChunks({ segments, size = "lg", hint = false }: { segment
         </motion.li>
       ))}
     </ol>
-    {hint && segments.length > 1 ? <p className="ef-ko mt-2 text-[12px] text-[var(--muted)]" data-testid="speak-first-hint">{SPEAK_FIRST_HINT_KO}</p> : null}
+  );
+}
+
+/**
+ * A sentence turn: the natural Korean is what the learner wants to say. The chunks (one way to order it in
+ * English) stay closed until the learner asks for them, so the English order is not handed over up front.
+ */
+export function SentencePrompt({ q, size, open, onToggle }: { q: { promptKo: string; segments: string[]; reference: string }; size: "lg" | "md"; open: boolean; onToggle: () => void }) {
+  const long = q.reference.split(" ").length >= 12;
+  return (
+    <div>
+      <p className={cn("ef-ko font-semibold leading-snug tracking-[-.02em]", size === "lg" ? "text-[22px] md:text-[26px]" : "text-[19px] md:text-[22px]")}>{q.promptKo}</p>
+      {long ? <p className="ef-ko mt-1.5 text-[12px] text-[var(--muted)]" data-testid="speak-first-hint">{SPEAK_FIRST_HINT_KO}</p> : null}
+      {q.segments.length > 1 ? (
+        <>
+          <button onClick={onToggle} className="dd-focus mt-2.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={open}>
+            <ChevronRight className={cn("size-3.5 transition", open && "rotate-90")} /> 말하는 순서 힌트 {open ? "숨기기" : "보기"}
+          </button>
+          {open ? (
+            <div className="mt-2">
+              <MeaningChunks segments={q.segments} size="md" />
+            </div>
+          ) : null}
+        </>
+      ) : null}
     </div>
   );
 }

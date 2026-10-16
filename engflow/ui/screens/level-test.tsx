@@ -18,7 +18,7 @@ import { useNav } from "../app";
 import { useStartLesson } from "./today";
 import { Card, ConfirmDialog, Eyebrow, LevelBadge, Meter, cn, dateKo, useReduced } from "../kit";
 import { CefrScale } from "../charts";
-import { MeaningChunks } from "../practice/parts";
+import { SPEAK_FIRST_HINT_KO } from "../practice/parts";
 
 export function LevelTestScreen() {
   const app = useApp();
@@ -296,11 +296,8 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
               ) : null}
               {q.contextKo ? <p className="ef-ko text-[14px] text-[var(--ef-ink-2)]">{q.contextKo}</p> : null}
               <p className="ef-ko mt-2 text-[18px] font-semibold">{q.promptKo}</p>
-              {q.mode === "sentence" ? (
-                <div className="mt-3">
-                  <MeaningChunks segments={q.segments} size="md" hint={q.reference.split(" ").length >= 12} />
-                </div>
-              ) : null}
+              {/* A test of how the learner would say it: no English-order chunks, any 2–3 sentence answer counts. */}
+              {q.mode === "sentence" ? <p className="ef-ko mt-1.5 text-[12px] text-[var(--muted)]">{SPEAK_FIRST_HINT_KO}</p> : null}
               <label htmlFor="ef-test-answer" className="sr-only">영어 답안</label>
               <textarea
                 id="ef-test-answer"

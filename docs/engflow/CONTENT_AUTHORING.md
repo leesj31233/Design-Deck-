@@ -29,7 +29,7 @@ Default speaking order: **Main point → Reason → Extra detail** (condition, e
 | *Although the lab results look promising, I don't think we should scale up yet because the feedstock composition at the site may be different.* | *I don't think we should scale up yet. The lab results look promising, but the feed composition at the site could be different.* |
 | chips: `비록 ~이지만 / 실험실 결과가 / 좋아 보인다 / 나는 생각하지 않는다 / … / 왜냐하면 / …` (10) | chips: `아직 스케일업하면 안 된다고 생각한다 / 실험실 결과는 좋아 보이지만 / 현장의 원료 조성이 다를 수도 있다` (3) |
 
-- Write `promptKo` in the same order (point first) so the Korean already models the thinking.
+- Write `promptKo` in the same order (point first) so the Korean already models the thinking. `promptKo` is what the learner sees; the chips are a hint they open only when stuck, and the level test never shows them (it measures how the learner would say it, not how well they follow a given order).
 - A two- or three-sentence answer is always correct if it carries the meaning: the grader treats a missing *because / although / so* as said when the answer links its ideas with sentence order or another linking word (`checkMeaning` in `engflow/core/evaluate.ts`). Keep such linking-word units non-critical.
 - Questions that teach a structure (third conditional, relative clause, *although* itself) keep that structure in the reference; their chips still follow meaning units.
 - Growth by level is about communication, not length: L1 one core sentence → L2 opinion + reason (*I think / I don't think / We need to / We should … because …*) → L3 point + reason + extra (*but, so, because, if*; split into 2–3 sentences when it helps) → L4 meeting moves (concern, alternative, uncertainty, conditional agreement or disagreement).
