@@ -4,7 +4,7 @@ import { WEB_LABEL, WEB_ORDER, type WebLink } from "@/lib/paperflow/intel/web";
 import type { IntelEntity } from "@/lib/paperflow/intel/registry";
 import "./entity-web.css";
 
-const COLOR: Record<string, string> = { investor: "#7b5cd6", operator: "#2f6fdb", partner: "#1f7a5a", buyer: "#c24f8a", supplier: "#d98a1c", vendor: "#b4691b", certifier: "#3a8f96", competitor: "#d0533f", mentions: "#8a9097" };
+const COLOR: Record<string, string> = { investor: "#7b5cd6", operator: "#2f6fdb", partner: "#1f7a5a", buyer: "#c24f8a", supplier: "#d98a1c", vendor: "#b4691b", certifier: "#3a8f96", competitor: "#d0533f", technology: "#5b6bd6", mentions: "#8a9097" };
 const short = (text: string, max = 18) => text.length > max ? `${text.slice(0, max - 1)}…` : text;
 const labelOf = (link: WebLink) => link.entity?.name ?? (link.item ? (link.item.titleKo ?? link.item.title).split(/ [—–] /)[0] : link.key);
 

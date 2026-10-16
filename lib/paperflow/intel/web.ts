@@ -6,8 +6,8 @@ import type { IntelItem } from "./types";
  * its items point to, or whose items point at it — investor, operator, partner, supplier, buyer, vendor,
  * certifier — with the items that carry each link, so every line on the map can be traced to a source.
  */
-export const WEB_LABEL: Record<string, string> = { investor: "투자·모회사", operator: "운영", partner: "협력", supplier: "공급", buyer: "구매", vendor: "장비 공급", certifier: "인증", competitor: "경쟁", mentions: "언급" };
-export const WEB_ORDER = ["investor", "operator", "partner", "buyer", "supplier", "vendor", "certifier", "competitor", "mentions"];
+export const WEB_LABEL: Record<string, string> = { investor: "투자·모회사", operator: "운영", partner: "협력", supplier: "공급", buyer: "구매", vendor: "장비 공급", certifier: "인증", competitor: "경쟁", technology: "기술 기반", mentions: "언급" };
+export const WEB_ORDER = ["investor", "operator", "partner", "buyer", "supplier", "vendor", "certifier", "competitor", "technology", "mentions"];
 export interface WebLink { key: string; entity?: IntelEntity; item?: IntelItem; types: string[]; via: string[]; direction: "out" | "in" | "both" }
 
 type Index = ReturnType<typeof indexRegistry>;
