@@ -26,7 +26,7 @@ export function EntityWeb({ center, links, onEntity, onItem }: { center: IntelEn
   return <div className="pf-web">
     <svg viewBox="0 0 720 400" role="img" aria-label={`${center.name} 연결망`}>
       {nodes.map(({ link, x, y }) => <line key={`l-${link.key}`} x1={360} y1={200} x2={x} y2={y} stroke={COLOR[link.types[0]] ?? COLOR.mentions} strokeWidth={focus === link.key ? 2.6 : 1.4} strokeDasharray={link.entity ? undefined : "4 3"} opacity={focus && focus !== link.key ? .25 : .7}/>)}
-      <g className="pf-web-center"><circle cx={360} cy={200} r={44}/><text x={360} y={196} textAnchor="middle">{short(center.name, 14)}</text><text x={360} y={213} textAnchor="middle" className="pf-web-code">{center.code}</text></g>
+      <g className="pf-web-center"><circle cx={360} cy={200} r={56}/><text x={360} y={196} textAnchor="middle">{short(center.name, 12)}</text><text x={360} y={213} textAnchor="middle" className="pf-web-code">{center.code}</text></g>
       {nodes.map(({ link, x, y }) => <g key={link.key} className="pf-web-node" tabIndex={0} role="button" aria-label={`${labelOf(link)} — ${link.types.map(type => WEB_LABEL[type] ?? type).join(", ")}`}
         onMouseEnter={() => setFocus(link.key)} onMouseLeave={() => setFocus(null)} onFocus={() => setFocus(link.key)} onBlur={() => setFocus(null)} onClick={() => open(link)} onKeyDown={event => { if (event.key === "Enter") open(link); }}>
         <circle cx={x} cy={y} r={link.entity ? 9 : 6} fill={COLOR[link.types[0]] ?? COLOR.mentions}/>

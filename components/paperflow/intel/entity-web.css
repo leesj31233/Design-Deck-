@@ -2,7 +2,7 @@
 .pf-web { display:grid; gap:12px; min-width:0; }
 .pf-web svg { width:100%; height:auto; max-height:420px; border:1px solid var(--i-line); border-radius:16px; background:color-mix(in srgb,var(--i-card) 70%,var(--background)); }
 .pf-web-center circle { fill:var(--i-ink); }
-.pf-web-center text { fill:var(--background); font:700 13px/1 var(--i-sans,system-ui); }
+.pf-web-center text { fill:var(--background); font:700 12px/1 var(--i-sans,system-ui); }
 .pf-web-center .pf-web-code { font:600 10px/1 var(--font-mono,ui-monospace,monospace); opacity:.75; }
 .pf-web-node { cursor:pointer; outline:none; }
 .pf-web-node text { fill:var(--i-ink); font:500 11.5px/1 var(--i-sans,system-ui); paint-order:stroke; stroke:var(--background); stroke-width:3px; }
