@@ -155,3 +155,22 @@
   .pf-cdoc-table td:last-child:empty { display:none; }
 }
 .pf-cdoc-table td:last-child .pf-cdoc-src { display:flex; }
+
+/* Registry code, parent, the logo and the organisation's photo side by side, subsidiaries */
+.pf-cdoc-code { margin-right:8px; padding:1px 7px; border-radius:5px; background:var(--i-ink); color:var(--background); font:600 11.5px/1.6 var(--i-sans); letter-spacing:.03em; }
+.pf-cdoc-parent { display:flex; align-items:center; gap:6px; margin:8px 0 0; font-size:13px; color:var(--i-muted); }
+.pf-cdoc-parent button { display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border:1px solid var(--i-line); border-radius:8px; background:var(--background); color:var(--i-ink); font:inherit; font-size:13px; cursor:pointer; }
+.pf-cdoc-parent code, .pf-cdoc-family code { padding:0 5px; border-radius:4px; background:color-mix(in srgb,var(--i-ink) 10%,transparent); font:600 11px/1.6 var(--i-sans); }
+.pf-cdoc-visual { display:grid; grid-auto-flow:column; gap:12px; align-items:stretch; }
+.pf-cdoc-visual .pf-cdoc-logo { align-self:start; }
+.pf-cdoc-hero { width:300px; height:170px; border:1px solid var(--i-line); border-radius:14px; overflow:hidden; background:color-mix(in srgb,var(--i-ink) 5%,#fff); }
+.pf-cdoc-hero img { width:100%; height:100%; object-fit:cover; object-position:center 30%; }
+.pf-cdoc-family { display:grid; gap:8px; margin-top:12px; }
+.pf-cdoc-family h3 { margin:0; font-size:13.5px; font-weight:700; }
+.pf-cdoc-family ul { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; margin:0; padding:0; list-style:none; }
+.pf-cdoc-family button { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; column-gap:8px; width:100%; padding:9px 11px; border:1px solid var(--i-line); border-radius:10px; background:var(--background); color:var(--i-ink); font:inherit; text-align:left; cursor:pointer; }
+.pf-cdoc-family button:hover { border-color:var(--i-ink); }
+.pf-cdoc-family b { font-size:13.5px; }
+.pf-cdoc-family small { grid-column:2; font-size:11.5px; color:var(--i-muted); }
+@media (max-width:1180px) { .pf-cdoc-hero { width:220px; height:130px; } }
+@media (max-width:900px) { .pf-cdoc-visual { grid-auto-flow:row; } .pf-cdoc-hero { display:none; } }

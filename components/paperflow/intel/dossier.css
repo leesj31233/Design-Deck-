@@ -349,3 +349,8 @@ html[data-pf-theme="dark"] .pf-card-cover-mark { background:linear-gradient(135d
   .pf-intel-body[data-focus][data-detail] .pf-intel-modes button { justify-content:center; padding:7px 4px; font-size:12.5px; }
   .pf-intel-body[data-focus][data-detail] .pf-intel-modes button i, .pf-intel-body[data-focus][data-detail] .pf-intel-modes button svg { display:none; }
 }
+
+/* The Intelligence tab is a working surface: on wide screens it uses the width instead of a centred 1280px column. */
+.pf-library-content:has(> .pf-view > .pf-intel) { max-width:min(1720px,100%); padding-left:28px; padding-right:28px; }
+@media (max-width:760px) { .pf-library-content:has(> .pf-view > .pf-intel) { padding-left:16px; padding-right:16px; } }
+.pf-intel-code { display:inline-flex; align-items:center; height:20px; margin-right:6px; padding:0 6px; border-radius:5px; background:var(--i-ink); color:var(--background); font:600 10.5px/1 var(--i-sans); letter-spacing:.03em; }

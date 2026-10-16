@@ -1,5 +1,6 @@
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
 import { emitLocalChange } from "../persistence/changes";
+import { REGISTRY_BRIEF, cleanRegistry } from "./registry";
 import type { IntelBrief, IntelItem, IntelKind, IntelPack, IntelStage, IntelStatus, IntelUserState } from "./types";
 
 const KINDS: IntelKind[] = ["source", "company", "project", "vendor", "equipment", "market", "gap"];
@@ -95,6 +96,9 @@ export function readPack(json: string): IntelPack {
     return term && full && meaning ? [{ term, full, meaning, note: text(value.note, 600), aliases: Array.isArray(value.aliases) ? value.aliases.flatMap(alias => text(alias, 60) ? [text(alias, 60)!] : []).slice(0, 6) : undefined }] : [];
   });
   if (glossary.length) briefs.push({ id: "__glossary__", title: "용어집", body: JSON.stringify(glossary), order: 999, period: "core", date: undefined, pack: id });
+  // The entity registry (organisations, their codes and items) travels as a hidden briefing too.
+  const registry = cleanRegistry((raw as { registry?: unknown }).registry);
+  if (registry) briefs.push({ id: REGISTRY_BRIEF, title: "기업 레지스트리", body: JSON.stringify(registry), order: 998, period: "core", date: undefined, pack: id });
   return { format: "paperflow-intel", version: 1, id, title: text(raw.title, 200), generatedAt: text(raw.generatedAt, 40) ?? new Date().toISOString(), items, briefs };
 }
 

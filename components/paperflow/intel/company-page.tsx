@@ -8,7 +8,9 @@ import { CompactTimeline, Lightbox, SourceChip, pdfOf, siteOf } from "./dossier-
 import { SourceTree } from "./source-tree";
 import { PanelMarks } from "./panel-marks";
 import { FigureAdder } from "./figure-adder";
-import { CardCover } from "./card-cover";
+import { CardCover, CoverImage } from "./card-cover";
+import { CATEGORY_LABEL, type IntelEntity } from "@/lib/paperflow/intel/registry";
+import { countryOf } from "./entity-directory";
 import "./company-document.css";
 
 const display = (item: IntelItem) => item.titleKo || item.title;
@@ -35,8 +37,10 @@ const STATUS_SHORT: Record<string, string> = { verified: "확인됨", claimed: "
  * and the numbered sources. The history sits in a column on the right (a fold on phones). Every
  * statement keeps its source number; the card shows the source on hover.
  */
-export function CompanyPage({ item, read, library, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
-  item: IntelItem; read?: { label: string; run: () => void }; library?: { has: (id: string) => boolean; open: (id: string) => void }; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
+export function CompanyPage({ item, read, library, org, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
+  item: IntelItem; read?: { label: string; run: () => void };
+  /** The organisation in the registry: its code, parent and subsidiaries, and a way to open them. */
+  org?: { entity: IntelEntity; parent?: IntelEntity; children: IntelEntity[]; open: (entity: IntelEntity) => void }; library?: { has: (id: string) => boolean; open: (id: string) => void }; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
   entity: EntityRenderer; terms: Omit<TermMarker, "seen">; onOpen: (id: string) => void; onBack: () => void; onPdf: (source: DossierSource) => void; busy?: string | null; notify: (message: string) => void;
 }) {
   const dossier = item.dossier;
@@ -87,7 +91,8 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
   const infoTable = infoRows.length > 0 && <table className="pf-cdoc-table"><tbody>{infoRows.map(row => <tr key={row.key}><th scope="row">{row.label}</th><td>{row.value}</td><td>{row.source}</td></tr>)}</tbody></table>;
   const peopleTable = people.length > 0 && <table className="pf-cdoc-table pf-cdoc-people"><thead><tr><th>경영진</th><th>직책·배경</th><th>출처</th></tr></thead><tbody>{people.map((person, index) => <tr key={index}><th scope="row">{person.name}</th><td><b>{person.title}</b>{person.background && <><br/>{person.background}</>}</td><td>{person.url ? srcLink(person.url) : cite(person.ref)}</td></tr>)}</tbody></table>;
   const checked = dossier?.asOf ?? item.checkedAt;
-  const kicker = [item.country, item.profile?.industry, KIND_LABEL[item.kind], item.stage ? STAGE_LABEL[item.stage] : null].filter(Boolean).join(" · ");
+  const kicker = [org ? CATEGORY_LABEL[org.entity.category] : KIND_LABEL[item.kind], item.profile?.industry, item.stage ? STAGE_LABEL[item.stage] : null].filter(Boolean).join(" · ");
+  const title = org?.entity.name ?? companyName(item);
   let number = 0;
   const heading = (title: string) => <h2 className="pf-cdoc-h"><span>{String(++number).padStart(2, "0")}</span>{title}</h2>;
 
@@ -97,8 +102,9 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
     <nav className="pf-company-back"><button type="button" onClick={onBack}><ArrowLeft size={15}/>인텔리전스로 돌아가기</button></nav>
     <header className="pf-cdoc-head">
       <div className="pf-cdoc-id">
-        <p className="pf-cdoc-kicker">{kicker}</p>
-        <h1>{companyName(item)}</h1>
+        <p className="pf-cdoc-kicker">{org && <code className="pf-cdoc-code">{org.entity.code}</code>}{org ? `${countryOf(org.entity.code)} · ` : item.country ? `${item.country} · ` : ""}{kicker}</p>
+        <h1>{title}</h1>
+        {org?.parent && <p className="pf-cdoc-parent">모회사 <button type="button" onClick={() => org.open(org.parent!)}><code>{org.parent.code}</code>{org.parent.name}</button></p>}
         {tagline(item) && <p className="pf-cdoc-tagline">{tagline(item)}</p>}
         <div className="pf-cdoc-actions">
           {item.profile?.website && /^https?:/.test(item.profile.website) && <a href={item.profile.website} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={14}/>{siteOf(item.profile.website)}</a>}
@@ -108,7 +114,10 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
           {checked && <span className="pf-cdoc-checked">자료 확인 {checked}</span>}
         </div>
       </div>
-      <div className="pf-cdoc-logo" data-dark={item.logoDark || undefined}>{item.logo ? <img src={item.logo} alt={`${companyName(item)} 로고`}/> : <CompanyMark item={item} size={64}/>}</div>
+      <div className="pf-cdoc-visual">
+        <div className="pf-cdoc-logo" data-dark={item.logoDark || undefined}>{item.logo ? <img src={item.logo} alt={`${title} 로고`}/> : <CompanyMark item={item} size={64}/>}</div>
+        {(item.cover || item.hasCover) && <div className="pf-cdoc-hero"><CoverImage item={item} alt={`${title} 사진`} loading="eager"/></div>}
+      </div>
     </header>
 
     <div className="pf-cdoc-body">
@@ -118,6 +127,7 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
             <section>
               {heading("기업 정보")}
               {infoTable}{peopleTable}
+              {org && org.children.length > 0 && <div className="pf-cdoc-family"><h3>자회사·관계사 {org.children.length}</h3><ul>{org.children.map(child => <li key={child.code}><button type="button" onClick={() => org.open(child)}><code>{child.code}</code><b>{child.name}</b><small>{countryOf(child.code)} · {CATEGORY_LABEL[child.category]}</small></button></li>)}</ul></div>}
             </section>
             <section>
               {heading("개요")}
@@ -157,6 +167,7 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
           </> : <section>
             {heading("기업 정보")}
             {infoTable}{peopleTable}
+            {org && org.children.length > 0 && <div className="pf-cdoc-family"><h3>자회사·관계사 {org.children.length}</h3><ul>{org.children.map(child => <li key={child.code}><button type="button" onClick={() => org.open(child)}><code>{child.code}</code><b>{child.name}</b><small>{countryOf(child.code)} · {CATEGORY_LABEL[child.category]}</small></button></li>)}</ul></div>}
             {heading("개요")}
             {item.summaryKo && <p className="pf-cdoc-lede">{item.summaryKo}</p>}
             {item.status && <p className="pf-cdoc-none">상태: {STATUS_LABEL[item.status]}</p>}
@@ -165,7 +176,7 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
 
           <details className="pf-cdoc-fold"><summary>연혁 · {events.length}</summary>{timeline}</details>
           <SourceTree item={item} byId={byId} mentions={mentions} onOpen={onOpen}/>
-          {related.length > 0 && <section>{heading(`관련 자료 (${related.length})`)}<ul className="pf-company-related">{related.map(entry => <li key={entry.id}><button type="button" onClick={() => onOpen(entry.id)}><CardCover item={entry}/><span><small>{KIND_LABEL[entry.kind]}{entry.date ? ` · ${entry.date}` : ""}</small><b>{display(entry)}</b></span></button></li>)}</ul></section>}
+          {related.length > 0 && <section>{heading(org ? `이 기업의 프로젝트·소식·자료 (${related.length})` : `관련 자료 (${related.length})`)}<ul className="pf-company-related">{related.map(entry => <li key={entry.id}><button type="button" onClick={() => onOpen(entry.id)}><CardCover item={entry}/><span><small>{KIND_LABEL[entry.kind]}{entry.date ? ` · ${entry.date}` : ""}</small><b>{display(entry)}</b></span></button></li>)}</ul></section>}
           <FigureAdder item={item} notify={notify}/>
         </div>
       </PanelMarks>
