@@ -75,16 +75,47 @@ export function mediaUrl(base: string, id: string, at: string, figure?: number) 
   return `${base}/api/public/intel/media?item=${encodeURIComponent(id)}${figure === undefined ? "&cover=1" : `&fig=${figure}`}&v=${version(at)}`;
 }
 
-/** An item as the public sees it (null: an open question, which stays internal). */
+/**
+ * Every field, however deep: a short text that speaks about NAYSOR goes, and so does the row it sits in (a data
+ * point, a fact, a timeline entry, an equipment line); a long text keeps its other sentences; Markdown keeps its
+ * other sections and lines.
+ */
+function scrub(value: unknown, key = ""): unknown {
+  if (typeof value === "string") {
+    if (!SELF.test(value)) return value;
+    if (key === "body") return publicMarkdown(value) || undefined;
+    return value.length > 160 ? factsOnly(value) || undefined : undefined;
+  }
+  if (Array.isArray(value)) return value.flatMap(entry => {
+    if (entry && typeof entry === "object" && !Array.isArray(entry) && Object.values(entry).some(field => typeof field === "string" && field.length <= 160 && SELF.test(field))) return [];
+    const clean = scrub(entry, key);
+    return clean === undefined ? [] : [clean];
+  });
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [field, entry] of Object.entries(value)) {
+      if (field.startsWith("data:")) continue;
+      if (SELF.test(field)) continue;
+      const clean = scrub(entry, field);
+      if (clean !== undefined) out[field] = clean;
+    }
+    return out;
+  }
+  return value;
+}
+
+/** An item as the public sees it (null: an open question, or NAYSOR's own analysis, which stay internal). */
 export function publicItem(raw: IntelItem, base: string, at: string, hasCover: boolean): IntelItem | null {
-  if (raw.kind === "gap") return null;
-  const { user: _user, libraryDoc: _doc, cover: _cover, naysor: _naysor, ...item } = raw;
+  if (raw.kind === "gap" || SELF.test(`${raw.title} ${raw.titleKo ?? ""} ${raw.org ?? ""}`)) return null;
+  const { user: _user, libraryDoc: _doc, cover: _cover, naysor: _naysor, ...rest } = raw;
+  // Pictures become URLs first, by their place in the stored list (the media route reads that same place).
+  if (rest.dossier?.figures) rest.dossier = { ...rest.dossier, figures: rest.dossier.figures.map((figure, index) => ({ ...figure, src: figure.src.startsWith("data:") ? mediaUrl(base, rest.id, at, index) : figure.src })) };
+  const item = scrub(rest) as typeof rest;
   void _user; void _doc; void _cover; void _naysor;
   const dossier = item.dossier ? {
     ...item.dossier,
     headline: item.dossier.headline ? factsOnly(item.dossier.headline) : item.dossier.headline,
     sections: item.dossier.sections?.flatMap(section => JUDGEMENT.test(section.title) ? [] : [{ ...section, body: publicMarkdown(section.body) }]).filter(section => section.body),
-    figures: item.dossier.figures?.map((figure, index) => ({ ...figure, src: figure.src.startsWith("data:") ? mediaUrl(base, item.id, at, index) : figure.src })),
     sources: item.dossier.sources?.map(source => { const { libraryDoc: _lib, ...rest } = source; void _lib; return rest; })
   } : undefined;
   return { ...item, summaryKo: item.summaryKo ? factsOnly(item.summaryKo) : item.summaryKo, dossier, hasCover: hasCover || undefined, updatedAt: at };
