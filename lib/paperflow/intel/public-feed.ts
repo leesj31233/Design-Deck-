@@ -50,9 +50,12 @@ export function publicMarkdown(body: string) {
 }
 export function publicBrief(brief: IntelBrief): IntelBrief | null {
   if (brief.id === REGISTRY_BRIEF) {
-    try { const registry = JSON.parse(brief.body); for (const entity of registry.entities ?? []) delete entity.note; return { ...brief, body: JSON.stringify(registry) }; } catch { return null; }
+    // NAYSOR itself is not one of the organisations the site describes.
+    try { const registry = JSON.parse(brief.body); registry.entities = (registry.entities ?? []).filter((entity: { name?: string }) => !SELF.test(entity.name ?? "")); for (const entity of registry.entities) delete entity.note; return { ...brief, body: JSON.stringify(registry) }; } catch { return null; }
   }
-  if (brief.id === "__glossary__" || brief.id === PRICES_BRIEF || brief.id === PLACES_BRIEF) return brief;
+  // A price worked out by NAYSOR is shown as worked out, without the name.
+  if (brief.id === PRICES_BRIEF) return { ...brief, body: brief.body.replace(/\s*NAYSOR\s*(계산|추정|산정)/g, " $1").replace(/NAYSOR|나이소르|네이소르/g, "") };
+  if (brief.id === "__glossary__" || brief.id === PLACES_BRIEF) return brief;
   if (PRIVATE_BRIEFS.test(brief.id) || JUDGEMENT.test(brief.title)) return null;
   const body = publicMarkdown(brief.body);
   return body ? { ...brief, body } : null;
