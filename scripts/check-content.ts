@@ -6,8 +6,9 @@
  *   npx tsx scripts/check-content.ts --only phrases # one bank: sentences-a | sentences-b | phrases | variations | any talk-* or roleplay-* file name | overlay | diagnostic | guide
  *   npx tsx scripts/check-content.ts --quiet        # summary + errors only
  *   npx tsx scripts/check-content.ts --style        # also list the questions that break the speak-first style
+ *   npx tsx scripts/check-content.ts --plain        # also list references that are not easy English
  */
-import { speakFirstStyle, validateBank, validateQuestion, type QcIssue } from "../engflow/core/validate";
+import { plainEnglish, speakFirstStyle, validateBank, validateQuestion, type QcIssue } from "../engflow/core/validate";
 import { SKILLS } from "../engflow/content/skills";
 import { SEEDS } from "../engflow/content/seeds";
 import { SENTENCES_A } from "../engflow/content/bank/sentences-a";
@@ -25,6 +26,7 @@ const args = process.argv.slice(2);
 const only = args.includes("--only") ? args[args.indexOf("--only") + 1] : null;
 const quiet = args.includes("--quiet");
 const style = args.includes("--style");
+const plain = args.includes("--plain");
 const skillIds = new Set(SKILLS.map((s) => s.id));
 const seedIds = new Set(SEEDS.map((s) => s.id));
 const ctx = { skillIds, seedIds };
@@ -165,6 +167,11 @@ const styleRows = [...all, ...(only && only !== "diagnostic" ? [] : DIAGNOSTIC_I
 const styleCount = styleRows.reduce<Record<string, number>>((m, r) => { for (const i of r.issues) m[i] = (m[i] ?? 0) + 1; return m; }, {});
 console.log("  speak-first ", Object.keys(styleCount).length ? styleCount : "all clear");
 if (style) for (const r of styleRows) console.log(`style   ${r.id}: ${r.issues.join(", ")}`);
+// Easy English report (counts always; ids and suggestions with --plain).
+const plainRows = all.map((q) => ({ id: q.id, issues: plainEnglish(q) })).filter((r) => r.issues.length);
+const plainCount = plainRows.reduce<Record<string, number>>((m, r) => { for (const i of r.issues) m[i.kind] = (m[i.kind] ?? 0) + 1; return m; }, {});
+console.log("  easy English", Object.keys(plainCount).length ? plainCount : "all clear");
+if (plain) for (const r of plainRows) console.log(`plain   ${r.id}: ${r.issues.map((i) => (i.kind === "hard-word" ? `"${i.word}" → ${i.plain}` : `sentence of ${i.words} words`)).join("; ")}`);
 
 const errors = issues.filter((i) => i.level === "error");
 const warnings = issues.filter((i) => i.level === "warning");

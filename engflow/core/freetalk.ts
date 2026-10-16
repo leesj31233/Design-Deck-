@@ -239,8 +239,8 @@ Automatic pre-check (may be wrong — verify): ${preText}
 
 Do two things, briefly (Minsu is waiting):
 1) Grade Minsu's latest line as spoken English in this moment. List only real errors (at most 3): the exact wrong text, the fix, and ONE short polite Korean sentence (~입니다) saying why. Contractions, casual openers and short replies are fine. "corrected" = his line with only the errors fixed ("" if none). "natural" = how a native speaker would most commonly say it, only if clearly better ("" otherwise). "score": 100 with no errors; about -10 for a small slip, -30 for a real grammar error, -45 if the meaning is wrong or unclear.
-2) Reply as ${topic.partner} with 1–2 short, natural sentences in simple everyday English that move the conversation toward the goal, usually ending with a question so Minsu speaks again. "ko" = natural Korean translation of your reply. ${canEnd ? 'Set "done": true when the conversation has reached a natural end; then close it politely without a question.' : 'Keep the conversation going ("done": false).'}
-3) "hint": one short, natural thing Minsu could say next (B1-friendly), with its Korean meaning ("" when done).
+2) Reply as ${topic.partner} with 1–2 short, natural sentences in easy everyday English (common words, no idioms or slang, at most 15 words each) that move the conversation toward the goal, usually ending with a question so Minsu speaks again. "ko" = natural Korean translation of your reply. ${canEnd ? 'Set "done": true when the conversation has reached a natural end; then close it politely without a question.' : 'Keep the conversation going ("done": false).'}
+3) "hint": one short, natural thing Minsu could say next (easy English: common words, one short sentence), with its Korean meaning ("" when done).
 
 Reply with ONLY this JSON:
 {"feedback":{"score":0-100,"notes":[{"text":"…","fix":"…","whyKo":"…"}],"corrected":"","natural":""},"reply":{"en":"…","ko":"…"},"hint":{"en":"…","ko":"…"},"done":false}`;

@@ -13,6 +13,17 @@ Avoid: *"Due to the insufficiency of operational datasets, the equipment sizing 
 
 Difficulty comes from **grammar complexity, reasoning, sentence length and communicative demand** — never from rare words. Avoid idioms and slangy phrasal verbs (*touch base, ballpark, circle back*). Prefer *check, confirm, send, finish, delay, change, decide, increase, reduce*.
 
+## Easy English
+
+The learner speaks **easy English** — plain engineering English at work and plain everyday English outside it. Every reference (the recommended answer) is written that way:
+
+- **Common words.** *use, get, need, buy, help, start, check, send, fix, about, more, enough, so, but* — not *utilize, obtain, require, purchase, assist, commence, verify, approximately, additional, sufficient, therefore*. Technical terms the engineer really uses (dryer, decanter, feed rate, P&ID, heat and mass balance, wt%) are fine.
+- **Short sentences.** At most 18 words per sentence; most turns are 6–14 words. Split longer thoughts into two sentences.
+- **No idioms or slang** in the reference (*ballpark, circle back, touch base, swamped, heads-up, in a nutshell*). A common idiom may stay in `accepted`/`advanced` so the learner recognises it when others say it; the questions in `talk-idioms` keep the idiom as the advanced form and teach the plain sentence.
+- **Everyday talk is easy too.** *I'm really busy this week* rather than *I'm swamped*; *That's very kind of you* rather than *I'm flattered*.
+- Learners' correct plain answers are never marked down for being simple; the grader and Claude's prompt both say so.
+- `npx tsx scripts/check-content.ts --plain` lists references with a hard word (and the plain word to use) or a sentence over 18 words. The word list lives in `PLAIN_ALTERNATIVES` (`engflow/core/validate.ts`).
+
 ## Speak first: communication before grammar
 
 The app trains **saying what you think in a meeting**, not assembling long written sentences. When writing or reviewing a sentence question, judge it in this order:

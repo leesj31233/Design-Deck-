@@ -139,3 +139,32 @@ export function speakFirstStyle(q: Question): SpeakFirstIssue[] {
   if (sentences.length === 1 && q.reference.split(/\s+/).length >= 25) out.push("long-single");
   return out;
 }
+
+/**
+ * Easy English: the learner speaks plain engineering English and plain everyday English. A reference (the
+ * recommended answer shown first) uses common words, sentences of at most 18 words, and no idioms or formal
+ * words; technical terms (dryer, P&ID, feed rate) are fine. `check-content --plain` lists what breaks it.
+ */
+export const PLAIN_ALTERNATIVES: Record<string, string> = {
+  purchase: "buy", require: "need", additional: "more / extra", approximately: "about", utilize: "use", assist: "help",
+  obtain: "get", commence: "start", terminate: "end / stop", inquire: "ask", regarding: "about", prior: "before",
+  sufficient: "enough", numerous: "many", indicate: "show", demonstrate: "show", initiate: "start", subsequently: "later",
+  furthermore: "also", moreover: "also", nevertheless: "but / still", consequently: "so", therefore: "so", hence: "so",
+  thus: "so", whereas: "but", accordingly: "so", feasible: "possible", expedite: "speed up", ascertain: "find out",
+  elaborate: "explain more", contingency: "backup / extra", underestimated: "thought it was smaller", swamped: "really busy",
+  flattered: "happy / honored", upfront: "in advance / first", kickoff: "first meeting / start", ballpark: "rough",
+  nutshell: "in short", "heads-up": "early notice", "win-win": "good for both of us",
+  "circle back": "come back to", "touch base": "talk / check in", "on the same page": "agree / understand the same way",
+  "bear with me": "give me a moment", "rule out": "say it's not", "cut corners": "skip steps", "up in the air": "not decided yet",
+  "at the end of the day": "in the end", "in the loop": "updated", "keep me posted": "let me know", "deep dive": "close look",
+};
+const HARD_RE = new RegExp(`\\b(${Object.keys(PLAIN_ALTERNATIVES).sort((a, b) => b.length - a.length).map((k) => k.replace(/-/g, "\\-")).join("|")})\\b`, "i");
+export type PlainIssue = { kind: "hard-word"; word: string; plain: string } | { kind: "long-sentence"; words: number };
+export function plainEnglish(q: Question): PlainIssue[] {
+  const out: PlainIssue[] = [];
+  const m = q.reference.match(HARD_RE);
+  if (m) out.push({ kind: "hard-word", word: m[1], plain: PLAIN_ALTERNATIVES[m[1].toLowerCase()] });
+  const longest = Math.max(...q.reference.split(/(?<=[.!?])\s+/).map((s) => s.split(/\s+/).filter(Boolean).length));
+  if (longest > 18) out.push({ kind: "long-sentence", words: longest });
+  return out;
+}
