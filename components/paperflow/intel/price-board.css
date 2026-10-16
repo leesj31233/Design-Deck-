@@ -69,3 +69,8 @@
 .pf-price-spark { align-self:center; }
 .pf-prices-more { justify-self:start; height:30px; padding:0 12px; border:1px dashed var(--i-line); border-radius:999px; background:transparent; color:var(--i-muted); font-size:12px; font-weight:600; cursor:pointer; }
 .pf-prices-more:hover { color:var(--i-ink); border-color:var(--i-ink); }
+/* The price board is a tab of its own: the topic tree steps aside so the tickers get the width. */
+.pf-intel-body[data-mode="prices"] { grid-template-columns:minmax(0,1fr); }
+.pf-intel-body[data-mode="prices"][data-detail] { grid-template-columns:minmax(0,1fr) minmax(340px,420px); }
+.pf-intel-body[data-mode="prices"] > .pf-intel-tree { display:none; }
+@media (max-width:1180px) { .pf-intel-body[data-mode="prices"][data-detail] { grid-template-columns:minmax(0,1fr); } }

@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight, BookOpenText, Building2, MapPinned, Newspaper, ChevronRight, Download, EyeOff, FileDown, FileText, FolderOpen, Layers, Library, Loader2, Radar, Search, Star, Upload, X } from "lucide-react";
+import { ArrowUpRight, TrendingUp, BookOpenText, Building2, MapPinned, Newspaper, ChevronRight, Download, EyeOff, FileDown, FileText, FolderOpen, Layers, Library, Loader2, Radar, Search, Star, Upload, X } from "lucide-react";
 import type { StoredDocument } from "@/lib/paperflow/persistence/types";
 import { archiveFolders } from "@/lib/paperflow/library/archive-folders";
 import { importDocument } from "@/lib/paperflow/pdf/import-document";
@@ -55,7 +55,7 @@ export type IntelSite = { loading: boolean; paperflow: string };
 
 export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site?: IntelSite; launch?: { item: string; read: boolean; related?: boolean } }) {
   const [items, setItems] = useState<IntelItem[] | null>(null), [briefs, setBriefs] = useState<IntelBrief[]>([]);
-  const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "briefs" | "companies" | "map">("items");
+  const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "prices" | "briefs" | "companies" | "map">("items");
   const [query, setQuery] = useState(""), [kinds, setKinds] = useState<Set<IntelKind>>(new Set()), [statuses, setStatuses] = useState<Set<IntelStatus>>(new Set());
   const [sort, setSort] = useState<"reliability" | "date">("date"), [showHidden, setShowHidden] = useState(false);
   const [selected, setSelected] = useState<string | null>(null), [briefId, setBriefId] = useState<string | null>(null);
@@ -325,6 +325,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
           <label className="pf-intel-search"><Search size={16}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="기업, 장비, 수치, 국가로 찾기 (예: screw press, Malakoff, K 제거)" aria-label="인텔리전스 검색"/>{query && <button type="button" aria-label="지우기" onClick={() => setQuery("")}><X size={14}/></button>}</label>
           <div className="pf-intel-modes" role="tablist" aria-label="보기">
             <button type="button" role="tab" aria-selected={mode === "items"} onClick={() => setMode("items")}><Layers size={14}/>항목</button>
+            <button type="button" role="tab" aria-selected={mode === "prices"} onClick={() => setMode("prices")}><TrendingUp size={14}/>가격 보드<i>{classPrices?.series.length ?? 0}</i></button>
             <button type="button" role="tab" aria-selected={mode === "briefs"} onClick={() => setMode("briefs")}><BookOpenText size={14}/>브리핑<i>{classBriefs.length}</i></button>
             <button type="button" role="tab" aria-selected={mode === "companies"} onClick={() => setMode("companies")}><Building2 size={14}/>기업 분석<i>{registry ? (klass === "all" ? registry.entities.length : registry.entities.filter(entity => entityClasses(entity, byId).includes(klass)).length) : companies.length}</i></button>
             <button type="button" role="tab" aria-selected={mode === "map"} onClick={() => setMode("map")}><MapPinned size={14}/>지도<i>{visible.filter(item => item.geo?.length).length}</i></button>
@@ -346,7 +347,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
           <label className="pf-intel-hidden"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)}/>숨긴 항목</label>
         </div>}
 
-        {mode === "map" ? <IntelMap items={visible} query={query} selected={selected} places={places} klass={klass} onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}/> : mode === "companies" && registry ? <EntityDirectory index={registryIndex} byId={byId} query={query} klass={klass} onOpen={openEntity}/> : mode === "companies" ? <ul className="pf-intel-companies">
+        {mode === "prices" ? (classPrices ? <PriceBoard board={classPrices} title={klass === "c2" ? "석탄 가격 (저품위탄·기준가)" : klass === "c3" ? "캐슈넛·껍질·CNSL 가격" : klass === "c1" ? "펠릿·바이오차 가격" : "가격 보드 — 펠릿·바이오차·석탄·캐슈넛"} onItem={setSelected}/> : <p className="pf-intel-none">이 분류에는 아직 가격 시리즈가 없습니다.</p>) : mode === "map" ? <IntelMap items={visible} query={query} selected={selected} places={places} klass={klass} onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}/> : mode === "companies" && registry ? <EntityDirectory index={registryIndex} byId={byId} query={query} klass={klass} onOpen={openEntity}/> : mode === "companies" ? <ul className="pf-intel-companies">
           {companies.filter(({ item }) => !query || [display(item), item.title, item.org, item.country, ...Object.values(item.profile ?? {})].join(" ").toLowerCase().includes(query.toLowerCase())).map(({ item, news }) => { const cover = item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src; return <li key={item.id}>
             <article className="pf-intel-company" data-selected={selected === item.id || undefined} tabIndex={0} onClick={() => { setPageId(item.id); setSelected(null); window.scrollTo({ top: 0 }); }} onKeyDown={event => { if (event.key === "Enter") { setPageId(item.id); setSelected(null); } }}>
               <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : item.logo ? <span className="pf-intel-company-logo-big"><img src={item.logo} alt=""/></span> : <CompanyMark item={item} size={64}/>}{item.logo && <i className="pf-intel-company-logo" data-dark={item.logoDark || undefined}><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
@@ -383,7 +384,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
             </article>
           </li>)}
           {!filtered.length && <li className="pf-intel-none">조건에 맞는 항목이 없습니다.</li>}
-        </ul> : <>{classPrices && <PriceBoard board={classPrices} title={klass === "c2" ? "석탄 가격 (저품위탄·기준가)" : klass === "c3" ? "캐슈넛·껍질·CNSL 가격" : klass === "c1" ? "펠릿·바이오차 가격" : "가격 보드 — 펠릿·바이오차·석탄·캐슈넛"} onItem={setSelected}/>}<div className="pf-intel-briefs">
+        </ul> : <><div className="pf-intel-briefs">
           {classBriefs.length ? <>
             <nav aria-label="브리핑 목록">{briefGroups.map(([period, list]) => <div key={period} className="pf-intel-brief-group"><span>{PERIOD_LABEL[period]}</span>
               {list.map(brief => <button type="button" key={brief.id} aria-current={openBrief?.id === brief.id || undefined} onClick={() => setBriefId(brief.id)}>{brief.date && period !== "core" && <time>{brief.date}</time>}{brief.title}</button>)}</div>)}</nav>
