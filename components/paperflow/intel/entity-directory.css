@@ -42,3 +42,5 @@
   .pf-dir-photo { height:120px; }
   .pf-dir-logo { top:82px; }
 }
+.pf-dir-tabs button, .pf-dir-countries button { flex:none; }
+@media (max-width:760px) { .pf-dir-tabs button { padding:0 11px; font-size:13.5px; } }
