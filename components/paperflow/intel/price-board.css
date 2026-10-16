@@ -1,0 +1,65 @@
+/* 가격 보드: tickers by product, EFB pellets first and larger; green up, red down. */
+.pf-prices { --p-up:#16824a; --p-down:#cf3a3a; --p-flat:var(--i-muted); display:grid; gap:16px; margin:0 0 22px; padding:18px 20px 20px; border:1px solid var(--i-line); border-radius:20px; background:var(--i-card); min-width:0; }
+:root[data-pf-theme="dark"] .pf-prices { --p-up:#4cc983; --p-down:#ff7a7a; }
+.pf-prices [data-direction="up"] { color:var(--p-up); }
+.pf-prices [data-direction="down"] { color:var(--p-down); }
+.pf-prices-head { display:flex; flex-wrap:wrap; align-items:end; justify-content:space-between; gap:10px 18px; }
+.pf-prices-head h3 { margin:0; font-size:17px; letter-spacing:-.01em; color:var(--i-ink); }
+.pf-prices-head p { margin:3px 0 0; font-size:12px; color:var(--i-muted); font-variant-numeric:tabular-nums; }
+.pf-prices-filter { display:flex; flex-wrap:wrap; gap:4px; }
+.pf-prices-filter button { display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 11px; border:1px solid var(--i-line); border-radius:999px; background:transparent; color:var(--i-muted); font-size:12.5px; font-weight:600; cursor:pointer; }
+.pf-prices-filter button i { font-style:normal; font-size:11px; opacity:.7; }
+.pf-prices-filter button[aria-pressed="true"] { background:var(--i-ink); border-color:var(--i-ink); color:var(--background); }
+.pf-prices-group { display:grid; gap:8px; min-width:0; }
+.pf-prices-group h4 { display:flex; align-items:baseline; gap:8px; margin:0; font-size:12px; letter-spacing:.05em; color:var(--i-muted); }
+.pf-prices-group h4 small { font-size:11px; letter-spacing:0; color:var(--i-accent); font-weight:600; }
+.pf-prices-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px; }
+.pf-prices-group[data-product="efb-pellet"] .pf-prices-grid { grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); }
+
+.pf-price { display:grid; align-content:start; min-width:0; border:1px solid var(--i-line); border-radius:14px; background:var(--background); overflow:hidden; }
+.pf-price[data-hero] { border-color:color-mix(in srgb,var(--i-accent) 45%,var(--i-line)); box-shadow:inset 0 3px 0 var(--i-accent); }
+.pf-price[data-open] { grid-column:1 / -1; }
+.pf-price-main { display:grid; gap:4px; padding:12px 14px 8px; border:0; background:none; color:var(--i-ink); font:inherit; text-align:left; cursor:pointer; min-width:0; }
+.pf-price-main:hover { background:color-mix(in srgb,var(--i-ink) 3%,transparent); }
+.pf-price-meta { display:flex; align-items:center; gap:6px; min-width:0; font-size:11px; color:var(--i-muted); }
+.pf-price-meta span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-price-meta code { flex:none; padding:1px 5px; border-radius:5px; background:var(--i-ink); color:var(--background); font:700 10px/1.4 var(--font-mono, ui-monospace, monospace); }
+.pf-price-meta em { flex:none; margin-left:auto; padding:1px 6px; border-radius:999px; background:color-mix(in srgb,var(--i-accent) 14%,transparent); color:var(--i-accent); font-size:10px; font-style:normal; font-weight:700; }
+.pf-price-name { font-size:13.5px; line-height:1.35; }
+.pf-price-grade { font-size:11px; color:var(--i-muted); line-height:1.35; }
+.pf-price-row { display:flex; align-items:end; justify-content:space-between; gap:10px; margin-top:4px; }
+.pf-price-value { display:flex; align-items:baseline; gap:5px; min-width:0; }
+.pf-price-value strong { font-size:24px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.1; }
+.pf-price[data-hero] .pf-price-value strong { font-size:30px; }
+.pf-price-value small { font-size:11.5px; color:var(--i-muted); white-space:nowrap; }
+.pf-price-move { display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+.pf-price-move small { margin-left:4px; font-weight:500; font-size:11px; color:var(--i-muted); }
+.pf-price[data-direction="up"] .pf-price-move { color:var(--p-up); }
+.pf-price[data-direction="down"] .pf-price-move { color:var(--p-down); }
+.pf-price[data-direction="flat"] .pf-price-move, .pf-price[data-direction="new"] .pf-price-move { color:var(--p-flat); }
+.pf-price-spark { flex:none; width:96px; height:30px; overflow:visible; }
+.pf-price-spark path, .pf-price-spark line { fill:none; stroke:var(--p-flat); stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+.pf-price-spark circle { fill:var(--p-flat); }
+.pf-price-spark[data-direction="up"] path { stroke:var(--p-up); } .pf-price-spark[data-direction="up"] circle { fill:var(--p-up); }
+.pf-price-spark[data-direction="down"] path { stroke:var(--p-down); } .pf-price-spark[data-direction="down"] circle { fill:var(--p-down); }
+.pf-price-foot { display:grid; gap:2px; padding:7px 14px 10px; border-top:1px dashed var(--i-line); font-size:10.5px; line-height:1.45; color:var(--i-muted); min-width:0; }
+.pf-price-foot i { font-style:normal; font-weight:600; }
+.pf-price-foot i[data-status="verified"] { color:var(--i-accent); }
+.pf-price-src { overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.pf-price-src a { color:inherit; text-decoration:underline; text-decoration-color:var(--i-line); text-underline-offset:2px; }
+.pf-price-src a svg { margin-left:2px; vertical-align:-1px; }
+.pf-price-src button { margin-left:6px; padding:0; border:0; background:none; color:var(--i-accent); font:inherit; font-weight:600; cursor:pointer; }
+.pf-price-history { width:100%; border-collapse:collapse; font-size:12px; border-top:1px solid var(--i-line); }
+.pf-price-history th { padding:7px 14px; text-align:left; font-size:11px; font-weight:600; color:var(--i-muted); background:color-mix(in srgb,var(--i-ink) 3%,transparent); }
+.pf-price-history td { padding:7px 14px; border-top:1px solid var(--i-line); color:var(--i-ink); vertical-align:top; }
+.pf-price-history td small { color:var(--i-muted); }
+.pf-price-history a { color:var(--i-ink); }
+.pf-price-num { font-variant-numeric:tabular-nums; white-space:nowrap; }
+@media (max-width:760px) {
+  .pf-prices { padding:14px 12px 16px; border-radius:16px; }
+  .pf-prices-grid, .pf-prices-group[data-product="efb-pellet"] .pf-prices-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  .pf-price-value strong, .pf-price[data-hero] .pf-price-value strong { font-size:20px; }
+  .pf-price-spark { display:none; }
+  .pf-price-history th:nth-child(4), .pf-price-history td:nth-child(4) { display:none; }
+}
+@media (max-width:420px) { .pf-prices-grid, .pf-prices-group[data-product="efb-pellet"] .pf-prices-grid { grid-template-columns:minmax(0,1fr); } }

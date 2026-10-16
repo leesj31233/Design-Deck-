@@ -2,7 +2,8 @@
 import { useMemo, useState } from "react";
 import { Building2, ChevronRight } from "lucide-react";
 import type { IntelItem } from "@/lib/paperflow/intel/types";
-import { CATEGORY_LABEL, CATEGORY_ORDER, EQUIPMENT_LABEL, EQUIPMENT_TYPES, FOCUS_LABEL, entityItems, type EquipmentType, type EntityCategory, type IntelEntity, type indexRegistry } from "@/lib/paperflow/intel/registry";
+import { CATEGORY_LABEL, CATEGORY_ORDER, EQUIPMENT_LABEL, EQUIPMENT_TYPES, FOCUS_LABEL, entityClasses, entityItems, type EquipmentType, type EntityCategory, type IntelEntity, type indexRegistry } from "@/lib/paperflow/intel/registry";
+import { CLASS_SHORT, type IntelClass } from "@/lib/paperflow/intel/types";
 import { CoverImage } from "./card-cover";
 import "./entity-directory.css";
 
@@ -19,8 +20,9 @@ export const countryOf = (code: string) => COUNTRY_KO[code.slice(0, 2)] ?? code.
  * (기업 · 벤더 · 인증 · 마켓 · 기관), filterable by country. A parent shows its subsidiaries; a tile shows
  * the organisation's photo, logo, code and how much is collected about it.
  */
-export function EntityDirectory({ index, byId, query, onOpen }: { index: Index; byId: Map<string, IntelItem>; query: string; onOpen: (entity: IntelEntity) => void }) {
-  const all = useMemo(() => [...index.byCode.values()], [index]);
+export function EntityDirectory({ index, byId, query, klass = "all", onOpen }: { index: Index; byId: Map<string, IntelItem>; query: string; klass?: IntelClass | "all"; onOpen: (entity: IntelEntity) => void }) {
+  // An organisation in both lines of business (a coal miner that also runs palm mills) shows under both classes.
+  const all = useMemo(() => [...index.byCode.values()].filter(entity => klass === "all" || entityClasses(entity, byId).includes(klass)), [index, byId, klass]);
   const [category, setCategory] = useState<EntityCategory | "all">("company"), [country, setCountry] = useState<string | null>(null), [equipment, setEquipment] = useState<EquipmentType | null>(null);
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const matches = (entity: IntelEntity) => words.every(word => [entity.code, entity.name, entity.legalName, entity.country, ...entity.aliases].join(" ").toLowerCase().includes(word));
@@ -64,7 +66,7 @@ function EntityTile({ entity, index, byId, subs, onOpen }: { entity: IntelEntity
       <span className="pf-dir-logo" data-dark={page?.logoDark || undefined}>{page?.logo ? <img src={page.logo} alt=""/> : <b>{entity.name.replace(/^(PT|CV)\s+/i, "").slice(0, 2).toUpperCase()}</b>}</span>
       <span className="pf-dir-body">
         <span className="pf-dir-meta"><code>{entity.code}</code>{countryOf(entity.code)} · {CATEGORY_LABEL[entity.category]}{entity.tier ? ` · ${TIER_LABEL[entity.tier]}` : ""}{entity.focus && FOCUS_LABEL[entity.focus] ? ` · ${FOCUS_LABEL[entity.focus]}` : ""}</span>
-        <b className="pf-dir-name">{entity.name}</b>
+        <b className="pf-dir-name">{entity.name}{entityClasses(entity, byId).map(key => <small key={key} className="pf-class-tag" data-class={key}>{CLASS_SHORT[key]}</small>)}</b>
         {line && <span className="pf-dir-line">{line}</span>}
         {entity.equipmentTypes?.length ? <span className="pf-dir-types">{entity.equipmentTypes.map(type => <i key={type}>{EQUIPMENT_LABEL[type]}</i>)}</span> : null}
         <span className="pf-dir-stats">{page?.dossier ? <em>케이스 파일</em> : null}{projects > 0 && <span>프로젝트 {projects}</span>}<span>자료 {items.length + (page ? 1 : 0)}</span>{news[0] && <span>최근 {news[0].update!.date}</span>}</span>

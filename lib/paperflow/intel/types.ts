@@ -23,7 +23,7 @@ export interface IntelUserState { star?: boolean; folderId?: string | null; note
   figures?: { src: string; caption: string; addedAt: string }[] }
 
 export interface IntelItem {
-  id: string; kind: IntelKind; topics: string[];
+  id: string; kind: IntelKind; topics: string[]; classes?: IntelClass[];
   title: string; titleKo?: string; summaryKo?: string;
   org?: string; authors?: string; date?: string; url: string; pdfUrl?: string;
   /** The library copy of its PDF, put there by the research routine (document id = SHA-256). */
@@ -82,7 +82,7 @@ export interface IntelDossier {
 /** core: the standing analysis; daily/weekly/monthly/quarterly: dated updates, newest first. */
 export type BriefPeriod = "core" | "daily" | "weekly" | "monthly" | "quarterly";
 export const PERIOD_LABEL: Record<BriefPeriod, string> = { core: "핵심 분석", daily: "일간", weekly: "주간", monthly: "월간", quarterly: "분기" };
-export interface IntelBrief { id: string; title: string; body: string; order?: number; period?: BriefPeriod; date?: string; pack?: string; updatedAt?: string }
+export interface IntelBrief { id: string; title: string; body: string; order?: number; period?: BriefPeriod; date?: string; pack?: string; updatedAt?: string; classes?: IntelClass[] }
 export interface IntelPack { format: "paperflow-intel"; version: 1; id: string; title?: string; generatedAt: string; items: IntelItem[]; briefs?: IntelBrief[] }
 
 export interface TopicNode { id: string; label: string; children?: TopicNode[] }
@@ -95,8 +95,35 @@ export const TOPIC_TREE: TopicNode[] = [
   { id: "g-biochar", label: "바이오차", children: [{ id: "biochar-quality", label: "바이오차 품질" }, { id: "biochar-production", label: "바이오차 생산" }, { id: "cdr", label: "탄소제거·인증 (CDR)" }] },
   { id: "g-env", label: "환경·정책", children: [{ id: "efb-pome-impact", label: "EFB/POME 환경피해" }, { id: "palm-byproducts", label: "팜오일공장 부산물" }, { id: "policy", label: "정부 보고서·정책" }] },
   { id: "g-market", label: "시장", children: [{ id: "market-price", label: "가격·시중판매가" }, { id: "market-demand", label: "수요·구매처" }, { id: "producers", label: "생산지·생산기업" }, { id: "cofiring", label: "석탄 혼소" }] },
-  { id: "g-industry", label: "기업·장비", children: [{ id: "vendors", label: "장비 벤더" }] }
+  { id: "g-industry", label: "기업·장비", children: [{ id: "vendors", label: "장비 벤더" }, { id: "pellet-standard", label: "펠릿 등급·규격 (SNI·ISO)" }] },
+  { id: "g-coal", label: "저품위탄 고품위화", children: [
+    { id: "coal-market", label: "저품위탄 시장·수급" }, { id: "coal-price", label: "석탄 기준가 (HBA·지수)" }, { id: "coal-drying", label: "석탄 건조 기술" },
+    { id: "coal-coating", label: "잔사유·중질유 코팅" }, { id: "coal-stability", label: "자연발화·안정화" }, { id: "coal-policy", label: "석탄 정책·규제" }
+  ] },
+  { id: "g-cashew", label: "캐슈넛 부산물", children: [
+    { id: "cashew-market", label: "캐슈넛 시장·가격" }, { id: "cashew-processing", label: "가공지·가공기업" }, { id: "cnsl", label: "CNSL (껍질 오일)" }, { id: "cashew-pyrolysis", label: "껍질 열분해·탄화" }
+  ] },
+  { id: "g-feedstock", label: "원료 수급", children: [{ id: "feedstock-supply", label: "원료 생산·공급지·주요 기업" }] }
 ];
+
+/**
+ * Lines of business, kept apart and shared where they meet: Class 1 is palm EFB/POME turned into ashless white
+ * pellets, black pellets and biochar (with certification, standards, co-firing); Class 2 is upgrading low-rank
+ * coal (drying, residue-oil coating); Class 3 is cashew-nut by-products (shell oil, shell pyrolysis). An item or
+ * organisation can carry several.
+ */
+export type IntelClass = "c1" | "c2" | "c3";
+export const CLASS_ORDER: IntelClass[] = ["c1", "c2", "c3"];
+export const CLASS_LABEL: Record<IntelClass, string> = { c1: "EFB/POME 펠릿·바이오차", c2: "저품위탄 고품위화", c3: "캐슈넛 부산물·열분해" };
+export const CLASS_SHORT: Record<IntelClass, string> = { c1: "C1", c2: "C2", c3: "C3" };
+export const isClass = (value: unknown): value is IntelClass => value === "c1" || value === "c2" || value === "c3";
+const TOPIC_CLASS: Record<string, IntelClass> = Object.fromEntries([...["coal-market", "coal-price", "coal-drying", "coal-coating", "coal-stability", "coal-policy"].map(id => [id, "c2"]), ...["cashew-market", "cashew-processing", "cnsl", "cashew-pyrolysis"].map(id => [id, "c3"])]);
+/** An item's classes: as written, or read from its topics (coal topics Class 2, cashew topics Class 3, the rest Class 1). */
+export function itemClasses(item: Pick<IntelItem, "classes" | "topics">): IntelClass[] {
+  if (item.classes?.length) return item.classes;
+  const found = new Set(item.topics.map(topic => TOPIC_CLASS[topic] ?? (topic === "feedstock-supply" ? undefined : "c1")).filter((klass): klass is IntelClass => Boolean(klass)));
+  return found.size ? CLASS_ORDER.filter(klass => found.has(klass)) : ["c1"];
+}
 export const TOPIC_LABEL = new Map(TOPIC_TREE.flatMap(group => [[group.id, group.label] as const, ...(group.children ?? []).map(child => [child.id, child.label] as const)]));
 export const topicIds = (node: TopicNode): string[] => [node.id, ...(node.children ?? []).flatMap(topicIds)];
 

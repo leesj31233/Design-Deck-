@@ -168,3 +168,16 @@ html[data-pf-theme="dark"] .pf-intel-tier[data-tier="6"], html[data-pf-theme="da
 .pf-spin { animation:pf-intel-spin 1s linear infinite; }
 @keyframes pf-intel-spin { to { transform:rotate(360deg); } }
 .pf-intel.pf-intel-portal { display:contents; }
+
+/* Class 1 / 2 / 3: the business line the tab shows, and a small tag wherever an item or organisation sits. */
+.pf-intel-classes { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.pf-intel-classes button { display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 14px; border:1px solid var(--i-line); border-radius:12px; background:var(--i-card); color:var(--i-muted); font-size:13px; font-weight:600; cursor:pointer; }
+.pf-intel-classes button b { font-size:11px; letter-spacing:.04em; color:var(--i-ink); }
+.pf-intel-classes button i { font-style:normal; font-size:11px; opacity:.65; font-variant-numeric:tabular-nums; }
+.pf-intel-classes button[aria-selected="true"] { border-color:var(--i-ink); background:var(--i-ink); color:var(--background); }
+.pf-intel-classes button[aria-selected="true"] b { color:var(--background); }
+.pf-class-tag { display:inline-block; margin:0 4px 0 0; padding:0 5px; border-radius:5px; font:700 9.5px/16px var(--font-mono, ui-monospace, monospace); letter-spacing:.03em; vertical-align:middle; color:#fff; background:#2f6f4f; }
+.pf-class-tag[data-class="c2"] { background:#3d4a5c; }
+.pf-class-tag[data-class="c3"] { background:#a5652a; }
+.pf-dir-name .pf-class-tag { margin:0 0 0 6px; }
+@media (max-width:760px) { .pf-intel-classes button { height:34px; padding:0 10px; font-size:12px; } }

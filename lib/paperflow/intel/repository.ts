@@ -1,7 +1,11 @@
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
 import { emitLocalChange } from "../persistence/changes";
 import { REGISTRY_BRIEF, cleanRegistry } from "./registry";
-import type { IntelBrief, IntelItem, IntelKind, IntelPack, IntelStage, IntelStatus, IntelUserState } from "./types";
+import { PRICES_BRIEF, cleanPrices } from "./prices";
+import { isClass, type IntelBrief, type IntelClass, type IntelItem, type IntelKind, type IntelPack, type IntelStage, type IntelStatus, type IntelUserState } from "./types";
+
+/** Class 1 / Class 2 tags, known ones only, each once. */
+export const classesOf = (value: unknown): IntelClass[] | undefined => { const list = Array.isArray(value) ? [...new Set(value.filter(isClass))] : []; return list.length ? list : undefined; };
 
 const KINDS: IntelKind[] = ["source", "company", "project", "vendor", "equipment", "market", "gap"];
 const STATUSES: IntelStatus[] = ["verified", "claimed", "estimate", "unverified"];
@@ -62,6 +66,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
   return {
     id, kind, title, url: url ?? "",
     topics: (Array.isArray(value.topics) ? value.topics : []).flatMap(topic => text(topic, 40) ? [text(topic, 40)!] : []).slice(0, 12),
+    classes: classesOf(value.classes),
     titleKo: text(value.titleKo, 400), summaryKo: longText(value.summaryKo, 2400), org: text(value.org, 200), authors: text(value.authors, 300), date: text(value.date, 20),
     pdfUrl: link(value.pdfUrl), libraryDoc: (typeof value.libraryDoc === "string" && /^[a-f0-9]{64}$/.test(value.libraryDoc) ? value.libraryDoc : undefined), lang: text(value.lang, 8), country: text(value.country, 120), sourceType: text(value.sourceType, 40),
     reliability: Number.isInteger(reliability) && reliability >= 1 && reliability <= 7 ? reliability : undefined,
@@ -89,7 +94,7 @@ export function readPack(json: string): IntelPack {
   if (!raw || !Array.isArray(raw.items)) throw new Error("자료 팩에 items 목록이 없습니다.");
   const id = text(raw.id, 80) ?? `pack-${Date.now().toString(36)}`;
   const items = raw.items.slice(0, 5000).map(item => cleanItem(item, id)).filter((item): item is IntelItem => item !== null);
-  const briefs = (Array.isArray(raw.briefs) ? raw.briefs : []).slice(0, 40).flatMap((brief, index) => { const value = brief as Partial<IntelBrief>; const briefId = text(value?.id, 80), title = text(value?.title, 200), body = longText(value?.body, 60_000); return briefId && /^[\w.:-]+$/.test(briefId) && title && body ? [{ id: briefId, title, body, order: Number.isFinite(value.order) ? Number(value.order) : index, period: PERIODS.includes(value.period as string) ? value.period : "core", date: text(value.date, 20), pack: id }] : []; });
+  const briefs: IntelBrief[] = (Array.isArray(raw.briefs) ? raw.briefs : []).slice(0, 40).flatMap((brief, index) => { const value = brief as Partial<IntelBrief>; const briefId = text(value?.id, 80), title = text(value?.title, 200), body = longText(value?.body, 60_000); return briefId && /^[\w.:-]+$/.test(briefId) && title && body ? [{ id: briefId, title, body, order: Number.isFinite(value.order) ? Number(value.order) : index, period: PERIODS.includes(value.period as string) ? value.period : "core", date: text(value.date, 20), pack: id, classes: classesOf(value.classes) }] : []; });
   // Terms the briefings use (FIT, LCA, GGL…), kept as a hidden briefing so they sync like the rest.
   const glossary = (Array.isArray((raw as { glossary?: unknown }).glossary) ? (raw as { glossary: unknown[] }).glossary : []).slice(0, 500).flatMap(entry => {
     const value = entry as Record<string, unknown>, term = text(value?.term, 60), full = text(value?.full, 200), meaning = text(value?.meaning, 600);
@@ -99,6 +104,9 @@ export function readPack(json: string): IntelPack {
   // The entity registry (organisations, their codes and items) travels as a hidden briefing too.
   const registry = cleanRegistry((raw as { registry?: unknown }).registry);
   if (registry) briefs.push({ id: REGISTRY_BRIEF, title: "기업 레지스트리", body: JSON.stringify(registry), order: 998, period: "core", date: undefined, pack: id });
+  // So does the price board (pellet, PKS, biochar prices by market, each point with its source).
+  const prices = cleanPrices((raw as { prices?: unknown }).prices);
+  if (prices) briefs.push({ id: PRICES_BRIEF, title: "가격 보드", body: JSON.stringify(prices), order: 997, period: "core", date: undefined, pack: id });
   return { format: "paperflow-intel", version: 1, id, title: text(raw.title, 200), generatedAt: text(raw.generatedAt, 40) ?? new Date().toISOString(), items, briefs };
 }
 

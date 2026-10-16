@@ -1,4 +1,4 @@
-import type { IntelItem } from "./types";
+import { isClass, itemClasses, type IntelClass, type IntelItem } from "./types";
 
 /**
  * The entity registry: every organisation once, with NAYSOR's own code (home country + number, "JP-01"),
@@ -13,6 +13,8 @@ export interface IntelEntity {
   canonicalItemId?: string; itemIds: string[]; mentionIds: string[]; focus?: string; note?: string;
   /** What an equipment supplier supplies (several kinds per supplier). */
   equipmentTypes?: EquipmentType[];
+  /** Class 1 (EFB/POME pellets, biochar) and/or Class 2 (low-rank coal upgrading); read from its items when unset. */
+  classes?: IntelClass[];
 }
 export interface IntelRegistry { version: 1; generatedAt: string; entities: IntelEntity[] }
 
@@ -45,7 +47,8 @@ export function cleanRegistry(value: unknown): IntelRegistry | null {
       aliases: Array.isArray(e.aliases) ? e.aliases.flatMap(alias => str(alias, 120) ? [str(alias, 120)!] : []).slice(0, 20) : [],
       canonicalItemId: typeof e.canonicalItemId === "string" && /^[\w.:-]{1,120}$/.test(e.canonicalItemId) ? e.canonicalItemId : undefined,
       itemIds: ids(e.itemIds), mentionIds: ids(e.mentionIds), focus: str(e.focus, 30), note: str(e.note, 400),
-      equipmentTypes: Array.isArray(e.equipmentTypes) ? [...new Set(e.equipmentTypes.filter((type): type is EquipmentType => typeof type === "string" && EQUIPMENT_KEYS.has(type)))] : undefined }];
+      equipmentTypes: Array.isArray(e.equipmentTypes) ? [...new Set(e.equipmentTypes.filter((type): type is EquipmentType => typeof type === "string" && EQUIPMENT_KEYS.has(type)))] : undefined,
+      classes: Array.isArray(e.classes) && e.classes.some(isClass) ? [...new Set(e.classes.filter(isClass))] : undefined }];
   });
   for (const entity of entities) if (entity.parentCode && !seen.has(entity.parentCode)) entity.parentCode = undefined;
   return entities.length ? { version: 1, generatedAt: str(raw.generatedAt, 40) ?? new Date().toISOString(), entities } : null;
@@ -61,6 +64,14 @@ export function indexRegistry(registry: IntelRegistry | null) {
   }
   for (const entity of registry?.entities ?? []) if (entity.parentCode) children.set(entity.parentCode, [...(children.get(entity.parentCode) ?? []), entity]);
   return { byCode, byItem, children };
+}
+
+/** An organisation's classes: as written, else every class its own items carry (Class 1 when it has none). */
+export function entityClasses(entity: IntelEntity, byId: Map<string, IntelItem>): IntelClass[] {
+  if (entity.classes?.length) return entity.classes;
+  const found = new Set<IntelClass>();
+  for (const id of [entity.canonicalItemId, ...entity.itemIds]) { const item = id ? byId.get(id) : undefined; if (item) for (const klass of itemClasses(item)) found.add(klass); }
+  return found.size ? [...found].sort() as IntelClass[] : ["c1"];
 }
 
 /** Everything that belongs to an entity and its subsidiaries: their pages, projects, news and documents. */
