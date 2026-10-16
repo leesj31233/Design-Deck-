@@ -40,11 +40,13 @@ export function NewsSite() {
     let alive = true;
     (async () => {
       try {
-        const response = await fetch("/api/public/intel");
-        if (!response.ok) throw new Error(String(response.status));
-        const feed = await response.json() as { items: IntelItem[]; briefs: IntelBrief[]; covers: Record<string, string> };
-        setRemoteCovers(feed.covers ?? {});
-        await intelRepository.replaceFeed(feed.items ?? [], feed.briefs ?? []);
+        // The list comes in parts; the first says how many there are and carries the briefings.
+        type Part = { items: IntelItem[]; briefs: IntelBrief[]; covers: Record<string, string>; parts?: number };
+        const get = async (part: number) => { const response = await fetch(`/api/public/intel?part=${part}`); if (!response.ok) throw new Error(String(response.status)); return await response.json() as Part; };
+        const first = await get(0), rest = await Promise.all(Array.from({ length: Math.max(0, (first.parts ?? 1) - 1) }, (_, index) => get(index + 1)));
+        const all = [first, ...rest];
+        setRemoteCovers(Object.assign({}, ...all.map(part => part.covers ?? {})));
+        await intelRepository.replaceFeed(all.flatMap(part => part.items ?? []), first.briefs ?? []);
       } catch { if (alive) notifyText("새 자료를 불러오지 못했습니다. 이 기기에 저장된 자료를 보여 줍니다."); }
       finally { if (alive) setLoading(false); }
     })();
