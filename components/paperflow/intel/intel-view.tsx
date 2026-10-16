@@ -63,6 +63,25 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   useEffect(() => { const query = window.matchMedia("(max-width: 1180px)"), sync = () => setNarrow(query.matches); sync(); query.addEventListener("change", sync); return () => query.removeEventListener("change", sync); }, []);
   // On a wide screen an item opens as the page itself, in the middle, with the list as a rail on the right.
   const focusDetail = !narrow && mode === "items" && Boolean(selected);
+  // The browser's back button closes what is open (an item, a company page) instead of leaving the tab:
+  // opening adds one history entry at the same address; moving between items replaces it; back closes.
+  const openKey = pageId ? `page:${pageId}` : selected ? `item:${selected}` : null;
+  useEffect(() => {
+    const state = window.history.state as Record<string, unknown> | null;
+    if (!openKey) return;
+    if (state?.pfIntel === openKey) return;
+    if (state?.pfIntel) window.history.replaceState({ ...state, pfIntel: openKey }, "", window.location.href);
+    else window.history.pushState({ ...(state ?? {}), pfIntel: openKey }, "", window.location.href);
+  }, [openKey]);
+  useEffect(() => {
+    const back = (event: PopStateEvent) => {
+      const key = (event.state as Record<string, unknown> | null)?.pfIntel as string | undefined;
+      if (!key) { setSelected(null); setPageId(null); return; }
+      if (key.startsWith("page:")) { setPageId(key.slice(5)); setSelected(null); } else { setSelected(key.slice(5)); setPageId(null); }
+    };
+    window.addEventListener("popstate", back);
+    return () => window.removeEventListener("popstate", back);
+  }, []);
   // The opened item starts at the top of the page.
   useEffect(() => { if (focusDetail) document.querySelector(".pf-intel-body")?.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" }); }, [selected, focusDetail, reduced]);
   // A briefing read full-screen also needs the panel above it.

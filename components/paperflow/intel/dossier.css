@@ -341,3 +341,11 @@ html[data-pf-theme="dark"] .pf-card-cover-mark { background:linear-gradient(135d
    every click relayout the whole list); they keep their last size so the scrollbar does not jump. */
 .pf-company-related > li { content-visibility:auto; contain-intrinsic-size:auto 300px; }
 .pf-brief-cast li { content-visibility:auto; contain-intrinsic-size:auto 150px; }
+
+/* In the rail the view tabs share a narrow column: labels stay on one line, counts step aside. */
+.pf-intel-modes button { white-space:nowrap; }
+@media (min-width:1181px) {
+  .pf-intel-body[data-focus][data-detail] .pf-intel-modes { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; }
+  .pf-intel-body[data-focus][data-detail] .pf-intel-modes button { justify-content:center; padding:7px 4px; font-size:12.5px; }
+  .pf-intel-body[data-focus][data-detail] .pf-intel-modes button i, .pf-intel-body[data-focus][data-detail] .pf-intel-modes button svg { display:none; }
+}
