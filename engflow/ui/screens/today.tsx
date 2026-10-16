@@ -7,7 +7,7 @@ import { localDayKey } from "../../core/mastery";
 import { SKILLS, SKILL_BY_ID, skillName } from "../../content";
 import { useApp } from "../store";
 import { useNav } from "../app";
-import { Card, Eyebrow, MasteryTrack, ProgressRing, StatusChip, cn, dateKo, relTimeKo } from "../kit";
+import { Button, Card, Eyebrow, MasteryTrack, NumberTicker, Pressable, ProgressRing, Spotlight, StatusChip, cn, dateKo, relTimeKo } from "../kit";
 import { WeekBars } from "../charts";
 import { CATEGORY_LABEL } from "../practice/session";
 import { ExpressionCollection } from "../expressions";
@@ -68,25 +68,26 @@ export function TodayScreen() {
               </p>
             </div>
             <div className="flex shrink-0 gap-2">
-              <button onClick={() => nav.go("test")} className="dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]">
+              <Button variant="primary" onClick={() => nav.go("test")} className="h-11 gap-1.5 text-[14px] font-semibold">
                 <ClipboardCheck className="size-4" /> 레벨 테스트
-              </button>
-              <button onClick={() => app.updateProfile({ onboarded: true })} className="dd-focus h-11 rounded-xl border border-[var(--line)] px-4 text-[14px] font-medium">
+              </Button>
+              <Button variant="secondary" onClick={() => app.updateProfile({ onboarded: true })} className="h-11 text-[14px]">
                 B1로 시작
-              </button>
+              </Button>
             </div>
           </div>
         </Card>
       ) : null}
 
       <div className="grid gap-3 lg:grid-cols-[1.35fr_1fr]">
-        <Card className="p-5">
+        <Card className="overflow-hidden p-0">
+          <Spotlight className="h-full p-5">
           <div className="flex items-center gap-5">
             <ScoreRingTarget answered={answered} target={target} />
             <div className="min-w-0 flex-1">
               <Eyebrow>오늘의 목표</Eyebrow>
               <div className="mt-1 text-[22px] font-semibold tracking-[-.03em]">
-                <span className="ef-num">{answered}</span>
+                <NumberTicker value={answered} className="ef-num" />
                 <span className="text-[var(--muted)]"> / {target}문항</span>
               </div>
               <p className="ef-ko mt-0.5 text-[13px] text-[var(--muted)]">
@@ -94,12 +95,10 @@ export function TodayScreen() {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => start()}
-            className="dd-focus mt-5 flex h-[52px] w-full items-center justify-center gap-2 rounded-[14px] bg-[var(--foreground)] text-[16px] font-semibold text-[var(--background)] transition active:scale-[.99]"
-          >
+          <Button variant="primary" size="lg" onClick={() => start()} className="mt-5 h-[52px] w-full text-[16px] font-semibold">
             {answered ? "이어서 학습하기" : "학습 시작하기"} <ArrowRight className="size-4" />
-          </button>
+          </Button>
+          </Spotlight>
         </Card>
 
         <Card className="flex flex-col p-5">
@@ -110,7 +109,7 @@ export function TodayScreen() {
           <div className="mt-1 text-[22px] font-semibold tracking-[-.03em]">
             {due.length ? (
               <>
-                <span className="ef-num">{due.length}</span>개 대기 중
+                <NumberTicker value={due.length} className="ef-num" />개 대기 중
               </>
             ) : (
               "대기 없음"
@@ -119,54 +118,55 @@ export function TodayScreen() {
           <p className="ef-ko mt-0.5 text-[13px] text-[var(--muted)]">
             {due.length ? `가장 오래된 항목: ${due[0].label}` : nextDue ? `다음 복습: ${nextDue.label} · ${relTimeKo(nextDue.due, now)}` : "틀린 문장이 생기면 여기에 쌓입니다."}
           </p>
-          <button
+          <Button
+            variant="secondary"
             disabled={!due.length}
             onClick={() => start({ reviewOnly: true, size: Math.min(15, due.length), title: "복습" })}
-            className="dd-focus mt-5 flex h-11 items-center justify-center gap-2 rounded-xl border border-[var(--line)] text-[14px] font-semibold disabled:opacity-40 lg:mt-auto"
+            className="mt-5 h-11 text-[14px] font-semibold lg:mt-auto"
           >
             복습 시작 <ArrowRight className="size-4" />
-          </button>
+          </Button>
         </Card>
       </div>
 
       {/* Phones: one compact row; wider screens: three cards with the week chart. */}
       <Card className="grid grid-cols-3 divide-x divide-[var(--line)] p-0 sm:hidden">
-        <button onClick={() => nav.go("test")} className="dd-focus px-3 py-3 text-left">
+        <Pressable lift={0} onClick={() => nav.go("test")} className="rounded-l-[var(--radius)] px-3 py-3">
           <div className="text-[11px] text-[var(--muted)]">레벨</div>
           <div className="mt-0.5 truncate text-[16px] font-semibold">{lvl.label}</div>
-        </button>
+        </Pressable>
         <div className="px-3 py-3">
           <div className="text-[11px] text-[var(--muted)]">연속 학습</div>
           <div className="mt-0.5 flex items-center gap-1 text-[16px] font-semibold">
             <Flame className={cn("size-4", streak ? "text-[var(--ef-warn-fill)]" : "text-[var(--muted)]")} />
-            <span className="ef-num">{streak}</span>일
+            <NumberTicker value={streak} className="ef-num" />일
           </div>
         </div>
         <div className="px-3 py-3">
           <div className="text-[11px] text-[var(--muted)]">이번 주</div>
-          <div className="ef-num mt-0.5 text-[16px] font-semibold">{weekTotal}문항</div>
+          <div className="ef-num mt-0.5 text-[16px] font-semibold"><NumberTicker value={weekTotal} />문항</div>
         </div>
       </Card>
       <div className="hidden gap-3 sm:grid sm:grid-cols-3">
-        <button onClick={() => nav.go("test")} className="dd-focus text-left">
+        <Pressable onClick={() => nav.go("test")} className="rounded-[var(--radius)]">
           <Card className="h-full p-4">
             <Eyebrow>레벨 추정</Eyebrow>
             <div className="mt-1.5 text-[20px] font-semibold tracking-[-.02em]">{lvl.label}</div>
             <p className="ef-ko mt-0.5 text-[12px] text-[var(--muted)]">{lvl.source === "diagnostic" ? `작문 기반 추정 · 신뢰도 ${lvl.confidence === "high" ? "높음" : lvl.confidence === "medium" ? "보통" : "낮음"}` : "레벨 테스트 전 가정값"}</p>
           </Card>
-        </button>
+        </Pressable>
         <Card className="p-4">
           <Eyebrow>연속 학습</Eyebrow>
           <div className="mt-1.5 flex items-center gap-1.5 text-[20px] font-semibold">
             <Flame className={cn("size-5", streak ? "text-[var(--ef-warn-fill)]" : "text-[var(--muted)]")} />
-            <span className="ef-num">{streak}</span>일
+            <NumberTicker value={streak} className="ef-num" />일
           </div>
           <p className="ef-ko mt-0.5 text-[12px] text-[var(--muted)]">하루 한 문항 이상 풀면 이어집니다.</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-baseline justify-between">
             <Eyebrow>이번 주</Eyebrow>
-            <span className="ef-num text-[12px] text-[var(--muted)]">{weekTotal}문항</span>
+            <span className="ef-num text-[12px] text-[var(--muted)]"><NumberTicker value={weekTotal} />문항</span>
           </div>
           <div className="mt-2">
             <WeekBars data={week} target={target} />
@@ -190,12 +190,12 @@ export function TodayScreen() {
               {suggestionCategory ? ` · ${CATEGORY_LABEL[suggestionCategory]} 상황` : ""}
             </p>
             <div className="mt-4 flex gap-2">
-              <button onClick={() => nav.practiceSkill(suggestion.id)} className="dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]">
+              <Button variant="primary" onClick={() => nav.practiceSkill(suggestion.id)} className="h-11 gap-1.5 text-[14px] font-semibold">
                 이 문법 연습 <ArrowRight className="size-4" />
-              </button>
-              <button onClick={() => nav.openGuide(suggestion.id)} className="dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl border border-[var(--line)] px-4 text-[14px] font-medium">
+              </Button>
+              <Button variant="secondary" onClick={() => nav.openGuide(suggestion.id)} className="h-11 gap-1.5 text-[14px]">
                 <BookOpen className="size-4" /> 설명 보기
-              </button>
+              </Button>
             </div>
           </Card>
         ) : null}
@@ -249,15 +249,15 @@ function SceneShortcuts() {
           const d = app.state.settings.difficulty?.[sc];
           const n = bank.filter((q) => situationOf(q) === sc).length;
           return (
-            <button
+            <Pressable
               key={sc}
               onClick={() => start({ size: 6, situation: sc, difficulty: d, title: `${SITUATION_INFO[sc].ko}${d ? ` · 난이도 ${d}` : ""}` })}
               disabled={!n}
-              className="dd-focus rounded-2xl border border-[var(--line)] px-3 py-2.5 text-left hover:bg-black/[.03] disabled:opacity-40 dark:hover:bg-white/[.05]"
+              className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-2.5 hover:bg-black/[.03] disabled:opacity-40 dark:hover:bg-white/[.05]"
             >
               <div className="text-[14px] font-semibold">{SITUATION_INFO[sc].ko}</div>
               <div className="ef-num mt-0.5 text-[11px] text-[var(--muted)]">{d ? `난이도 ${d}` : "난이도 자동"} · {n}문항</div>
-            </button>
+            </Pressable>
           );
         })}
       </div>

@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "sonner";
 import { CalendarCheck2, ChartColumn, ClipboardCheck, NotebookPen, PenLine, RotateCcw, Settings } from "lucide-react";
 import type { Platform } from "../platform/types";
 import { AppProvider, clock, useApp, usePreferences } from "./store";
-import { cn, LevelBadge, useMediaQuery } from "./kit";
+import { Badge, Button, IconButton, cn, LevelBadge, useMediaQuery } from "./kit";
 import { levelEstimate } from "../core/store";
 import { dueItems } from "../core/session";
 import { SessionRunner, type SessionSpec } from "./practice/session";
@@ -181,13 +181,13 @@ function Shell() {
                 ))}
               </nav>
               <div className="mt-auto space-y-2 px-2 text-[12px]">
-                <button onClick={() => go("test")} className="dd-focus flex w-full items-center justify-between rounded-xl border border-[var(--line)] px-3 py-2.5 text-left">
+                <Button variant="secondary" onClick={() => go("test")} className="h-auto w-full justify-between px-3 py-2.5 text-left text-[12px] font-normal">
                   <span>
                     <span className="block text-[11px] text-[var(--muted)]">현재 레벨 추정</span>
                     <span className="font-semibold">{lvl.label}</span>
                   </span>
                   <ClipboardCheck className="size-4 text-[var(--muted)]" />
-                </button>
+                </Button>
                 <StorageDot />
               </div>
             </aside>
@@ -198,13 +198,13 @@ function Shell() {
                 <div className="flex h-14 items-center gap-2 px-4">
                   <Brand compact />
                   <div className="ml-auto flex items-center gap-1.5">
-                    <button onClick={() => go("test")} className="dd-focus inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] px-2.5 text-[12px]" aria-label={`레벨 테스트 · 현재 추정 ${lvl.label}`}>
+                    <Button variant="secondary" size="sm" onClick={() => go("test")} className="h-9 gap-1.5 px-2.5 text-[12px]" aria-label={`레벨 테스트 · 현재 추정 ${lvl.label}`}>
                       <ClipboardCheck className="size-4 text-[var(--muted)]" />
                       <LevelBadge level={lvl.label.split(" ")[0]} className="border-0 bg-transparent px-0" />
-                    </button>
-                    <button onClick={() => go("settings")} className={cn("dd-focus grid size-9 place-items-center rounded-xl", route === "settings" ? "bg-[var(--foreground)] text-[var(--background)]" : "text-[var(--muted)]")} aria-label="설정">
+                    </Button>
+                    <IconButton label="설정" variant={route === "settings" ? "primary" : "ghost"} onClick={() => go("settings")} className={cn("size-9", route !== "settings" && "text-[var(--muted)]")}>
                       <Settings className="size-[18px]" />
-                    </button>
+                    </IconButton>
                   </div>
                 </div>
               </header>
@@ -221,11 +221,11 @@ function Shell() {
                 const Icon = n.icon;
                 const active = route === n.id;
                 return (
-                  <button key={n.id} onClick={() => go(n.id)} className={cn("dd-focus relative flex h-[58px] flex-1 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium", active ? "text-[var(--foreground)]" : "text-[var(--muted)]")} aria-current={active ? "page" : undefined}>
+                  <Button key={n.id} variant="ghost" onClick={() => go(n.id)} className={cn("relative h-[58px] flex-1 flex-col gap-0.5 rounded-none px-0 text-[10.5px] hover:bg-transparent dark:hover:bg-transparent", active ? "text-[var(--foreground)]" : "text-[var(--muted)]")} aria-current={active ? "page" : undefined}>
                     <Icon className={cn("size-[21px]", active && "stroke-[2.3]")} />
                     {n.label}
                     {n.id === "review" && due ? <span className="ef-num absolute right-[calc(50%-20px)] top-1.5 min-w-4 rounded-full bg-[var(--ef-bad-fill)] px-1 text-center text-[9.5px] font-bold leading-4 text-white">{due > 99 ? "99+" : due}</span> : null}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -258,15 +258,16 @@ function Brand({ compact }: { compact?: boolean }) {
 function NavButton({ item, active, onClick, badge }: { item: (typeof NAV_ITEMS)[number]; active: boolean; onClick: () => void; badge?: number }) {
   const Icon = item.icon;
   return (
-    <button
+    <Button
+      variant={active ? "primary" : "ghost"}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      className={cn("dd-focus flex h-10 items-center gap-3 rounded-xl px-3 text-[14px] font-medium transition", active ? "bg-[var(--foreground)] text-[var(--background)] shadow-sm" : "text-[var(--ef-ink-2)] hover:bg-black/[.05] dark:hover:bg-white/[.07]")}
+      className={cn("justify-start gap-3 px-3 text-[14px]", !active && "text-[var(--ef-ink-2)]")}
     >
       <Icon className="size-[18px]" />
       <span className="flex-1 text-left">{item.label}</span>
-      {badge ? <span className={cn("ef-num rounded-md px-1.5 py-0.5 text-[11px] font-semibold", active ? "bg-white/20" : "bg-[var(--ef-bad-soft)] text-[var(--ef-bad)]")}>{badge}</span> : null}
-    </button>
+      {badge ? <Badge tone={active ? "neutral" : "red"} className={cn("ef-num rounded-md px-1.5 py-0.5", active && "border-transparent bg-white/20 text-current dark:bg-black/10")}>{badge}</Badge> : null}
+    </Button>
   );
 }
 

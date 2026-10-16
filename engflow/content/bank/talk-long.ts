@@ -18,12 +18,13 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Budi", en: "Okay, I think everyone's here. Shall we start?", ko: "자, 다 오신 것 같네요. 시작할까요?" }],
     promptKo: "네, 그런데 시작하기 전에 안건이 조금 바뀌었어요. Sari 씨가 11시에 나가셔야 해서, Sari 씨의 일정 업데이트를 먼저 하고 그다음에 건조기 문제로 넘어가죠.",
     segments: ["네, 그런데 시작하기 전에", "안건이 조금 바뀌었어요", "Sari 씨가 11시에 나가야 해서", "Sari 씨 일정 업데이트를 먼저 하고", "그다음에 건조기 문제로 넘어가요"],
-    reference: "Yes, but before we start, there's a small change to the agenda. Sari has to leave at eleven, so let's go through her schedule update first and then move on to the dryer issues.",
+    reference: "Yes, but before we start, there's a small change to the agenda. Sari has to leave at eleven. So let's go through her schedule update first and then move on to the dryer issues.",
     accepted: [
       "Yes, but before we start, there's a small change to the agenda. Sari needs to leave at eleven, so let's start with her schedule update and then move on to the dryer issues.",
       "Sure, but before we begin, we have a small change to the agenda. Sari has to leave at 11, so let's do her schedule update first, and then we'll move on to the dryer issues.",
       "Yes. Before we start, there's one small change to the agenda: Sari has to leave at eleven, so we'll go through her schedule update first and then move on to the dryer issues.",
       "Yes, but before we start, there's been a small change to the agenda. Sari has to leave at eleven, so let's go through her schedule update first and then move on to the dryer issues.",
+      "Yes, but before we start, there's a small change to the agenda. Sari has to leave at eleven, so let's go through her schedule update first and then move on to the dryer issues.",
     ],
     meaning: [
       { id: "change", en: "a small change to the agenda", ko: "안건 변경", any: ["change|changes|switch|swap|update ... agenda|order", "agenda|order ... change|changed|different"], critical: true },
@@ -37,7 +38,7 @@ export const TALK_LONG: Question[] = [
       { id: "sari-have-to", pattern: "sari =have to", category: "agreement", severity: "major", fix: "Sari has to", messageKo: "주어 Sari는 3인칭 단수라서 'has to'를 씁니다: 'Sari has to leave at eleven'.", skill: "agreement" },
       { id: "move-on-the", pattern: "move on the|=dryer", category: "preposition", severity: "major", fix: "move on to the", messageKo: "'~로 넘어가다'는 'move on to + 명사'입니다. to를 빠뜨리면 'move on'(계속 나아가다)과 목적어가 이어지지 않습니다.", skill: "verb-prep" },
     ],
-    hints: { pattern: "Before we start, there's a change to … 주어 + has to …, so let's … first and then move on to …", skeleton: "Yes, but before we start, there's a small ______ to the agenda. Sari ___ __ leave at eleven, so let's …", partial: "Yes, but before we start, there's a small change to the agenda…" },
+    hints: { pattern: "Before we start, there's a change to … 주어 + has to …, so let's … first and then move on to …", skeleton: "Yes, but before we start, there's a small ______ to the agenda. Sari ___ __ leave at eleven. So let's …", partial: "Yes, but before we start, there's a small change to the agenda…" },
     explanationKo: "안건 순서를 바꿀 때는 'There's a small change to the agenda'로 먼저 알리고, 이유(Sari has to leave at eleven)와 새 순서(let's … first and then move on to …)를 이어 말합니다. 주어 Sari는 3인칭 단수라 'has to'이고, '~로 넘어가다'는 'move on to'처럼 to가 필요합니다.",
     probes: [
       { answer: "Sure, but before we start, I'd like to change the agenda a little. Sari has to leave at eleven, so let's do her schedule update first and then move on to the dryer issues.", expect: "pass" },
@@ -102,11 +103,12 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Mr. Tan", en: "Is Priya joining us today? I had a few questions about the pumps.", ko: "오늘 Priya 씨도 들어오나요? 펌프에 대해 몇 가지 물어볼 게 있었는데요." }],
     promptKo: "아쉽게도 못 들어와요. 오늘 아침에 첸나이로 출장을 가야 했는데, 메시지를 전해 달라고 했어요. 펌프 데이터시트는 목요일까지 준비될 거라고 했고, 저희가 아직 예비 부품 목록이 필요한지 알고 싶어 했어요.",
     segments: ["아쉽게도 못 들어와요", "오늘 아침 첸나이로 가야 했는데", "메시지를 전해 달라고 했어요", "펌프 데이터시트는 목요일까지 준비될 거래요", "그리고 예비 부품 목록이 아직 필요한지 알고 싶어 했어요"],
-    reference: "Unfortunately not. She had to fly to Chennai this morning, but she asked me to pass on a message. She said the pump datasheets would be ready by Thursday, and she wanted to know whether we still need the spare parts list.",
+    reference: "Unfortunately not. She had to fly to Chennai this morning, but she asked me to pass on a message. She said the pump datasheets would be ready by Thursday. She also wanted to know whether we still need the spare parts list.",
     accepted: [
       "Unfortunately not. She had to fly to Chennai this morning, but she asked me to pass on a message. She said that the pump datasheets would be ready by Thursday, and she wanted to know if we still needed the spare parts list.",
       "I'm afraid not. She had to go to Chennai this morning, but she asked me to pass on a message. She said the pump datasheets will be ready by Thursday, and she asked whether we still need the spare parts list.",
       "Unfortunately, she can't. She had to fly to Chennai this morning, but she asked me to give you a message. According to her, the pump datasheets will be ready by Thursday, and she'd like to know if we still need the spare parts list.",
+      "Unfortunately not. She had to fly to Chennai this morning, but she asked me to pass on a message. She said the pump datasheets would be ready by Thursday, and she wanted to know whether we still need the spare parts list.",
     ],
     meaning: [
       { id: "not-joining", en: "unfortunately not", ko: "아쉽게도 못 들어와요", any: ["unfortunately|afraid|sorry|not"] },
@@ -123,7 +125,7 @@ export const TALK_LONG: Question[] = [
       { id: "said-me", pattern: "=said|=says me|us", category: "word-choice", severity: "major", fix: "told me", messageKo: "say는 사람을 바로 목적어로 받지 않습니다. '~에게 말했다'는 'told me (that) …' 또는 'said (that) …'입니다.", skill: "reporting" },
       { id: "would-ready", pattern: "=would|=will ready", category: "be-verb", severity: "major", fix: "would be ready", messageKo: "ready는 형용사라서 be가 필요합니다: 'would be ready', 'will be ready'.", skill: "be-adj" },
     ],
-    hints: { pattern: "She said (that) + 주어 + would …, and she wanted to know whether + 주어 + 동사.", skeleton: "… She said the pump datasheets _____ __ ready by Thursday, and she wanted to know _______ we still need …", partial: "Unfortunately not. She had to fly to Chennai this morning, but she asked me to pass on a message…" },
+    hints: { pattern: "She said (that) + 주어 + would … She also wanted to know whether + 주어 + 동사.", skeleton: "… She said the pump datasheets _____ __ ready by Thursday. She also wanted to know _______ we still need …", partial: "Unfortunately not. She had to fly to Chennai this morning, but she asked me to pass on a message…" },
     explanationKo: "다른 사람의 말은 'She said (that) + 주어 + would …'로, 질문은 'she wanted to know whether/if + 주어 + 동사'처럼 평서문 어순으로 전합니다(know do we need ×). say는 사람을 바로 목적어로 받지 않으므로 'said me'가 아니라 'told me'이고, 'will/would ready'에는 be가 빠지면 안 됩니다.",
     probes: [
       { answer: "Unfortunately not. She had to travel to Chennai this morning, but she asked me to pass on a message. She told me the pump datasheets would be ready by Thursday, and she wanted to know whether we still need the spare parts list.", expect: "pass" },
@@ -145,12 +147,13 @@ export const TALK_LONG: Question[] = [
     contextKo: "라이선서 Daniel이 화상회의에서 제어 방식을 오늘 바로 정하자고 합니다. 실제로 공장을 운전할 Budi 팀이 빠져 있어서, 정중하게 반대하고 그 팀이 들어올 수 있는 목요일까지 기다리자고 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "I think we can decide on the control philosophy today. It'll save us a week.", ko: "제어 방식은 오늘 결정해도 될 것 같아요. 그러면 일주일을 아낄 수 있어요." }],
     promptKo: "일을 늦추고 싶지는 않지만, Budi 팀 없이 이걸 결정하는 건 마음이 편하지 않아요. 실제로 공장을 운전할 사람들이 그분들이라서, 지금 제어 방식을 바꾸면 적어도 의견을 낼 기회는 있어야 해요. 그분들이 들어올 수 있는 목요일까지 기다릴 수 있을까요?",
-    segments: ["일을 늦추고 싶지는 않지만", "Budi 팀 없이 이걸 결정하는 건 마음이 편치 않아요", "실제로 공장을 운전할 사람들이 그분들이에요", "그래서 지금 제어 방식을 바꾼다면", "적어도 의견을 낼 기회는 있어야 해요", "그분들이 들어올 수 있는 목요일까지 기다릴 수 있을까요?"],
-    reference: "I don't want to slow things down, but I'm not comfortable deciding this without Budi's team. They're the ones who'll operate the plant, so if we change the control philosophy now, they should at least have a say. Could we wait until Thursday, when they can join?",
+    segments: ["일을 늦추고 싶지는 않지만", "Budi 팀 없이 이걸 결정하는 건 마음이 편치 않아요", "실제로 공장을 운전할 사람들이 그분들이에요", "지금 제어 방식을 바꾼다면", "적어도 의견을 낼 기회는 있어야 해요", "그분들이 들어올 수 있는 목요일까지 기다릴 수 있을까요?"],
+    reference: "I don't want to slow things down, but I'm not comfortable deciding this without Budi's team. They're the ones who'll operate the plant. If we change the control philosophy now, they should at least give their opinion. Could we wait until Thursday, when they can join?",
     accepted: [
       "I don't want to slow things down, but I'm not comfortable making this decision without Budi's team. They're the ones who'll be operating the plant, so if we change the control philosophy now, they should at least have a say. Could we wait until Thursday, when they can join?",
       "I don't want to hold things up, but I don't feel comfortable deciding this without Budi's team. They're the people who will operate the plant, so if we change the control philosophy now, they should at least be involved. Could we wait until Thursday, when they're able to join?",
       "I don't mean to slow things down, but I'm not comfortable deciding this without Budi's team, because they're the ones who'll actually run the plant. If we change the control philosophy now, they should at least have a say. Can we wait until Thursday, when they can join us?",
+      "I don't want to slow things down, but I'm not comfortable deciding this without Budi's team. They're the ones who'll operate the plant, so if we change the control philosophy now, they should at least have a say. Could we wait until Thursday, when they can join?",
     ],
     meaning: [
       { id: "not-slow", en: "I don't want to slow things down", ko: "일을 늦추고 싶지 않다", any: ["slow|delay|hold|=held"] },
@@ -186,19 +189,20 @@ export const TALK_LONG: Question[] = [
     level: "B2",
     difficulty: 8,
     skills: ["opinion", "signpost", "time-clause"],
-    expression: "As you can see on this graph, … So I'd suggest + V-ing …",
+    expression: "Please look at this graph. … as soon as … So I'd suggest + V-ing …",
     contextKo: "파일럿 건조기 결과 발표. 스팀 압력을 6 bar로 올리자마자 출구 수분이 10% 아래로 떨어진 그래프를 설명하고, 실규모 설계 압력으로 6 bar를 제안합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So what does this graph tell us?", ko: "그래서 이 그래프가 말해 주는 게 뭔가요?" }],
-    promptKo: "이 그래프에서 보시다시피, 스팀 압력을 6 bar로 올리자마자 출구 수분이 10% 아래로 떨어졌습니다. 그래서 실규모 건조기의 설계 압력으로 6 bar를 쓰는 걸 제안드립니다.",
-    segments: ["이 그래프에서 보시다시피", "출구 수분이 10% 아래로 떨어졌어요", "스팀 압력을 6 bar로 올리자마자", "그래서 실규모 건조기의 설계 압력으로 6 bar를 제안해요"],
-    reference: "As you can see on this graph, the outlet moisture dropped below 10% as soon as we raised the steam pressure to 6 bar. So I'd suggest using 6 bar as the design pressure for the full-scale dryer.",
+    promptKo: "이 그래프를 봐 주세요. 스팀 압력을 6 bar로 올리자마자 출구 수분이 10% 아래로 떨어졌습니다. 그래서 실규모 건조기의 설계 압력으로 6 bar를 쓰는 걸 제안드립니다.",
+    segments: ["이 그래프를 봐 주세요", "출구 수분이 10% 아래로 떨어졌어요", "스팀 압력을 6 bar로 올리자마자", "그래서 실규모 건조기의 설계 압력으로 6 bar를 제안해요"],
+    reference: "Please look at this graph. The outlet moisture dropped below 10% as soon as we raised the steam pressure to 6 bar. So I'd suggest using 6 bar as the design pressure for the full-scale dryer.",
     accepted: [
       "As you can see on this graph, the outlet moisture dropped below 10% once we raised the steam pressure to 6 bar. So I'd suggest using 6 bar as the design pressure for the full-scale dryer.",
       "As you can see in this graph, the outlet moisture fell below 10% as soon as we increased the steam pressure to 6 bar. So I'd recommend using 6 bar as the design pressure for the full-scale dryer.",
       "As this graph shows, the outlet moisture went below 10% as soon as we raised the steam pressure to 6 bar, so I suggest that we use 6 bar as the design pressure for the full-scale dryer.",
+      "As you can see on this graph, the outlet moisture dropped below 10% as soon as we raised the steam pressure to 6 bar. So I'd suggest using 6 bar as the design pressure for the full-scale dryer.",
     ],
     meaning: [
-      { id: "see", en: "as you can see", ko: "보시다시피", any: ["see|show|shows"] },
+      { id: "see", en: "as you can see", ko: "보시다시피", any: ["see|show|shows|look"] },
       { id: "dropped", en: "the outlet moisture dropped", ko: "출구 수분이 떨어졌다", any: ["drop|dropped|fell|=fall|went|decrease|decreased|reduce|reduced|lower|=down|below"], critical: true },
       { id: "ten", en: "below 10%", ko: "10% 아래로", any: ["10|ten"], critical: true },
       { id: "raised", en: "we raised the steam pressure", ko: "스팀 압력을 올렸다", any: ["raise|raised|increase|increased|higher|=up|=went ... pressure", "pressure ... =to|=up|higher|increase|increased|raised"], critical: true },
@@ -210,7 +214,7 @@ export const TALK_LONG: Question[] = [
       { id: "suggest-to", pattern: "suggest|recommend to use|=go|apply|keep|set", category: "verb-form", severity: "major", fix: "suggest using", messageKo: "suggest/recommend 뒤에는 to부정사가 아니라 동사ing나 that절이 옵니다: 'I'd suggest using 6 bar' 또는 'I suggest that we use 6 bar'.", skill: "opinion" },
       { id: "was-dropped", pattern: "moisture =is|=was|=were =dropped|=decreased|=fallen|=fell", category: "verb-form", severity: "major", fix: "moisture dropped", messageKo: "drop/decrease는 '스스로 떨어지다'라는 자동사로 씁니다: 'the moisture dropped'. 'was dropped'는 누군가 떨어뜨렸다는 수동태가 됩니다.", skill: "passive" },
     ],
-    hints: { pattern: "As you can see …, 주어 + 과거형 + as soon as + 주어 + 과거형. So I'd suggest + V-ing …", skeleton: "As you can see on this graph, the outlet moisture _______ below 10% as soon as we raised … So I'd suggest _____ 6 bar …", partial: "As you can see on this graph, the outlet moisture dropped below 10% as soon as we…" },
+    hints: { pattern: "Please look at this graph. 주어 + 과거형 + as soon as + 주어 + 과거형. So I'd suggest + V-ing …", skeleton: "Please look at this graph. The outlet moisture _______ below 10% as soon as we raised … So I'd suggest _____ 6 bar …", partial: "Please look at this graph. The outlet moisture dropped below 10% as soon as we…" },
     explanationKo: "그래프의 변화는 'As you can see …'로 시작해 과거형(dropped, raised)으로 설명합니다. drop은 자동사라서 'was dropped'라고 하지 않습니다. 결론은 'I'd suggest + 동명사(using)'로 제안하고, 'suggest to use'는 틀린 형태입니다.",
     probes: [
       { answer: "As you can see on this graph, the outlet moisture went down below 10% as soon as we increased the steam pressure to 6 bar. So I'd suggest using 6 bar as the design pressure for the full-scale unit.", expect: "pass" },
@@ -278,11 +282,12 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Sari", en: "That's very clear, thanks. Can we move on to the drying part?", ko: "아주 명확하네요, 고마워요. 건조 부분으로 넘어갈까요?" }],
     promptKo: "네, 그런데 건조 파트로 넘어가기 전에 세척 단계를 빠르게 요약할게요. 칼륨 함량을 약 40% 줄였고, 세척수는 최소 세 번까지 재사용할 수 있습니다. 계속하기 전에 질문 있으신가요?",
     segments: ["네, 그런데 건조 파트로 넘어가기 전에", "세척 단계를 빠르게 요약할게요", "칼륨 함량을 약 40% 줄였고", "세척수는 최소 세 번 재사용할 수 있어요", "계속하기 전에 질문 있으신가요?"],
-    reference: "Sure, but before I move on to the drying part, let me quickly summarize the washing step. We've reduced the potassium content by about 40%, and the wash water can be reused at least three times. Any questions before I continue?",
+    reference: "Sure, but before I move on to the drying part, let me quickly summarize the washing step. We've reduced the potassium content by about 40%. The wash water can also be reused at least three times. Any questions before I continue?",
     accepted: [
       "Sure, but before I move on to the drying part, let me quickly sum up the washing step. We've reduced the potassium content by about 40%, and the wash water can be reused at least three times. Are there any questions before I continue?",
       "Sure. Before we move on to drying, let me briefly summarize the washing step. We've cut the potassium content by about 40%, and the wash water can be reused at least three times. Does anyone have any questions before I go on?",
       "Of course, but before I move on to the drying part, I'll quickly recap the washing step. We've managed to reduce the potassium content by about 40%, and we can reuse the wash water at least three times. Any questions before I continue?",
+      "Sure, but before I move on to the drying part, let me quickly summarize the washing step. We've reduced the potassium content by about 40%, and the wash water can be reused at least three times. Any questions before I continue?",
     ],
     meaning: [
       { id: "before-move", en: "before I move on to the drying part", ko: "건조 파트로 넘어가기 전에", any: ["before ... move|go|continue|drying|dry", "drying|dryer|dry"] },
@@ -298,7 +303,7 @@ export const TALK_LONG: Question[] = [
       { id: "water-can-reuse", pattern: "water can =reuse|=reused|=recycle|=recycled", category: "verb-form", severity: "major", fix: "water can be reused", messageKo: "물은 재사용'되는' 대상이므로 수동태 'can be reused'를 씁니다. 'the wash water can reuse'는 물이 무언가를 재사용한다는 뜻이 됩니다.", skill: "passive" },
       { id: "let-me-summary", pattern: "let me quickly|briefly? =summary", category: "verb-form", severity: "major", fix: "let me summarize", messageKo: "summary는 명사입니다. 'let me' 뒤에는 동사원형 summarize가 와야 합니다.", skill: "signpost" },
     ],
-    hints: { pattern: "Before I move on to …, let me quickly summarize … We've + p.p. …, and … can be + p.p. …", skeleton: "Sure, but before I ____ __ to the drying part, let me quickly _________ the washing step. …", partial: "Sure, but before I move on to the drying part, let me quickly summarize…" },
+    hints: { pattern: "Before I move on to …, let me quickly summarize … We've + p.p. … The … can also be + p.p. …", skeleton: "Sure, but before I ____ __ to the drying part, let me quickly _________ the washing step. …", partial: "Sure, but before I move on to the drying part, let me quickly summarize…" },
     explanationKo: "발표에서 다음 부분으로 넘어가기 전에는 'Before I move on to …, let me quickly summarize …'로 흐름을 정리합니다. 지금까지의 성과는 현재완료(We've reduced), 물이 '재사용될 수 있다'는 수동태 'can be reused'로 말합니다(can reuse ×). before 뒤에는 '주어 + 동사' 또는 동명사가 옵니다.",
     probes: [
       { answer: "Sure, but before I move on to the drying part, let me quickly summarize the washing step. We've lowered the potassium content by about 40%, and the wash water can be reused at least three times. Any questions so far?", expect: "pass" },
@@ -321,11 +326,12 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Mr. Tan", en: "Honestly, these numbers look almost too good. Are you sure they're realistic?", ko: "솔직히 이 수치들은 너무 좋아 보이는데요. 현실적인 게 확실한가요?" }],
     promptKo: "왜 그렇게 물으시는지 이해해요. 솔직히 저희도 놀라서 시험을 두 번 더 했는데, 결과가 거의 같았어요. 물론 파일럿 플랜트가 실규모 공장과 같지는 않아서, 모든 설계 수치에 10% 여유를 두었습니다.",
     segments: ["왜 물으시는지 이해해요", "솔직히 저희도 놀라서", "시험을 두 번 더 했는데 결과가 거의 같았어요", "물론 파일럿 플랜트는 실규모 공장과 같지 않아요", "그래서 모든 설계 수치에 10% 여유를 두었어요"],
-    reference: "I understand why you're asking. To be honest, we were surprised too, so we ran the test two more times, and the results were almost the same. Of course, a pilot plant isn't the same as a full-scale plant, so we've added a 10% margin to all the design figures.",
+    reference: "I understand why you're asking. To be honest, we were surprised too, so we ran the test two more times. The results were almost the same. Of course, a pilot plant isn't the same as a full-scale plant. So we've added a 10% margin to all the design figures.",
     accepted: [
       "I understand why you're asking. To be honest, we were surprised as well, so we ran the test two more times, and the results were almost the same. Of course, a pilot plant isn't the same as a full-scale plant, so we've added a 10% margin to all the design figures.",
       "I can see why you're asking. Honestly, we were surprised too, so we repeated the test two more times, and we got almost the same results. Of course, a pilot plant is different from a full-scale plant, so we've included a 10% margin in all the design figures.",
       "That's a fair question. To be honest, we were surprised too, so we ran the test two more times, and the results were almost identical. Of course, a pilot plant isn't the same as a full-scale plant, which is why we've added a 10% margin to all the design figures.",
+      "I understand why you're asking. To be honest, we were surprised too, so we ran the test two more times, and the results were almost the same. Of course, a pilot plant isn't the same as a full-scale plant, so we've added a 10% margin to all the design figures.",
     ],
     meaning: [
       { id: "understand", en: "I understand why you're asking", ko: "왜 물으시는지 이해해요", any: ["understand|see|fair|good|question"] },
@@ -342,7 +348,7 @@ export const TALK_LONG: Question[] = [
       { id: "same-with", pattern: "same with", category: "preposition", severity: "major", fix: "same as", messageKo: "'~와 같다'는 'the same as'입니다. 'the same with'라고 하지 않습니다." },
       { id: "different-with", pattern: "different with", category: "preposition", severity: "major", fix: "different from", messageKo: "'~와 다르다'는 'different from'입니다. 'different with'라고 하지 않습니다." },
     ],
-    hints: { pattern: "I understand why you're asking. To be honest, we were + p.p. … Of course, A isn't the same as B, so we've + p.p. …", skeleton: "I understand why you're asking. To be honest, we were _________ too, so we ran the test two more times …", partial: "I understand why you're asking. To be honest, we were surprised too, so we…" },
+    hints: { pattern: "I understand why you're asking. To be honest, we were + p.p. … Of course, A isn't the same as B. So we've + p.p. …", skeleton: "I understand why you're asking. To be honest, we were _________ too, so we ran the test two more times …", partial: "I understand why you're asking. To be honest, we were surprised too, so we…" },
     explanationKo: "의심을 받을 때는 먼저 'I understand why you're asking'으로 질문을 인정하고, 확인한 사실(we ran the test two more times)과 한계(Of course, …)를 차례로 말합니다. 사람이 놀란 것은 'we were surprised'(surprising ×), '~와 같다'는 'the same as'(same with ×)입니다.",
     probes: [
       { answer: "I understand why you're asking. To be honest, we were surprised too, so we ran the test two more times, and the results were very similar. Of course, a pilot plant isn't the same as a full-scale plant, so we've added a 10% safety margin to all the design numbers.", expect: "pass" },
@@ -403,7 +409,7 @@ export const TALK_LONG: Question[] = [
     level: "C1",
     difficulty: 9,
     skills: ["reporting", "comparative", "offer-suggest"],
-    expression: "So it sounds like we have two options. A prefers …, while B thinks … Why don't we …?",
+    expression: "So it sounds like we have two options. A prefers … But B thinks … Why don't we …?",
     contextKo: "건조기 선택을 두고 Budi와 Linh의 의견이 갈립니다. 두 의견을 공정하게 정리하고, 결정하기 전에 10년간 총 운전비를 비교해 보자고 제안합니다.",
     dialogue: [
       { speaker: "Linh", en: "Honestly, I think the paddle dryer would be much easier for our operators.", ko: "솔직히 패들 건조기가 운전원들한테 훨씬 쉬울 것 같아요." },
@@ -411,12 +417,13 @@ export const TALK_LONG: Question[] = [
     ],
     promptKo: "그러니까 선택지가 두 개인 것 같네요. Budi 씨는 구매비가 더 싸서 로터리 건조기를 선호하고, Linh 씨는 패들 건조기가 운전하기 더 쉬울 거라고 생각하시죠. 결정하기 전에 두 건조기의 10년간 총 운전비를 비교해 보는 게 어때요?",
     segments: ["그러니까 선택지가 두 개인 것 같네요", "Budi 씨는 구매비가 더 싸서 로터리 건조기를 선호하고", "Linh 씨는 패들 건조기가 운전하기 더 쉬울 거라고 생각해요", "10년간 총 운전비를 비교해 보는 게 어때요", "결정하기 전에"],
-    reference: "So it sounds like we have two options. Budi prefers the rotary dryer because it's cheaper to buy, while Linh thinks the paddle dryer would be easier to operate. Why don't we compare the total operating costs over ten years before we decide?",
+    reference: "So it sounds like we have two options. Budi prefers the rotary dryer because it's cheaper to buy. But Linh thinks the paddle dryer would be easier to operate. Why don't we compare the total operating costs over ten years before we decide?",
     accepted: [
       "So it sounds like we have two options. Budi prefers the rotary dryer because it's cheaper to buy, while Linh thinks the paddle dryer would be easier to operate. Why don't we compare the total operating costs over ten years before we make a decision?",
       "So it seems we have two options. Budi would rather go with the rotary dryer because it's cheaper, but Linh feels the paddle dryer would be easier to operate. How about comparing the total operating costs over ten years before we decide?",
       "So it sounds like there are two options. Budi prefers the rotary dryer since it costs less to buy, whereas Linh thinks the paddle dryer would be easier to run. Before we decide, why don't we compare the total operating costs over ten years?",
       "So it sounds like we have two options. Budi prefers the rotary dryer because it's cheaper to buy, while Linh thinks the paddle dryer would be easier to operate. Why don't we compare the total operating costs over ten years before deciding?",
+      "So it sounds like we have two options. Budi prefers the rotary dryer because it's cheaper to buy, while Linh thinks the paddle dryer would be easier to operate. Why don't we compare the total operating costs over ten years before we decide?",
     ],
     meaning: [
       { id: "two-options", en: "we have two options", ko: "선택지가 두 개", any: ["two|2 ... option|options|choice|choices|way|ways"] },
@@ -433,7 +440,7 @@ export const TALK_LONG: Question[] = [
       { id: "more-easier", pattern: "more easier|=cheaper", category: "word-choice", severity: "major", fix: "easier", messageKo: "easier, cheaper는 이미 비교급이라 more를 붙이지 않습니다. 강조할 때는 'much easier'라고 합니다.", skill: "comparative" },
       { id: "why-we-dont", pattern: "why we do not", category: "word-order", severity: "major", fix: "why don't we", messageKo: "제안하는 'Why don't we …?'는 의문문 어순이라 don't가 we 앞에 옵니다. 'Why we don't …'는 질문 어순이 아닙니다.", skill: "offer-suggest" },
     ],
-    hints: { pattern: "So it sounds like … A prefers … because …, while B thinks … would be + 비교급 … Why don't we …?", skeleton: "So it sounds like we have two options. Budi _______ the rotary dryer because it's _______ to buy, while Linh …", partial: "So it sounds like we have two options. Budi prefers the rotary dryer because…" },
+    hints: { pattern: "So it sounds like … A prefers … because … But B thinks … would be + 비교급 … Why don't we …?", skeleton: "So it sounds like we have two options. Budi _______ the rotary dryer because it's _______ to buy, while Linh …", partial: "So it sounds like we have two options. Budi prefers the rotary dryer because…" },
     explanationKo: "의견이 갈릴 때는 'So it sounds like we have two options'로 정리하고, 'A prefers … because …, while B thinks …'로 양쪽 입장을 공정하게 전달한 뒤 'Why don't we …?'로 결정 방법을 제안합니다. 3인칭 단수 주어(Budi, Linh)에는 -s를 붙이고, easier는 이미 비교급이라 more를 붙이지 않습니다.",
     probes: [
       { answer: "So it sounds like we have two options. Budi prefers the rotary dryer because it's cheaper to buy, while Linh believes the paddle dryer would be easier to operate. Why don't we compare the total running costs over ten years before we decide?", expect: "pass" },
@@ -451,16 +458,17 @@ export const TALK_LONG: Question[] = [
     level: "C1",
     difficulty: 9,
     skills: ["cond-3", "relative-clause", "modal-necessity"],
-    expression: "Looking back, if we had …, we would have … Now we'll probably need to …",
+    expression: "Looking back, … If we had …, we would have … Now we'll probably need …, which will …",
     contextKo: "말레이시아 프로젝트 회의. 원료의 염소 함량이 예상보다 높아 건조기 재질을 바꿔야 합니다. 원료를 더 일찍 시험했더라면 재질을 고르기 전에 알아챘을 거라고 돌아보고, 이제 스테인리스강으로 바꿔야 해서 일정이 두 달 정도 늘어날 거라고 말합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "So the chloride level in our EFB is much higher than you assumed?", ko: "그러니까 저희 EFB의 염소 농도가 가정하신 것보다 훨씬 높다는 거죠?" }],
-    promptKo: "네. 돌이켜 보면, (그때) 원료를 더 일찍 시험했더라면 재질을 고르기 전에 높은 염소 함량을 알아챘을 거예요. 이제는 아마 건조기를 스테인리스강으로 바꿔야 할 텐데, 그러면 일정이 두 달 정도 늘어날 거예요.",
-    segments: ["네. 돌이켜 보면", "(그때) 원료를 더 일찍 시험했더라면", "재질을 고르기 전에 높은 염소 함량을 알아챘을 거예요", "이제는 아마 건조기를 스테인리스강으로 바꿔야 해요", "그러면 일정이 두 달 정도 늘어날 거예요"],
-    reference: "Yes. Looking back, if we had tested the feed earlier, we would have noticed the high chloride content before choosing the material. Now we'll probably need to upgrade the dryer to stainless steel, which will add about two months to the schedule.",
+    promptKo: "네. 돌이켜 보면 원료를 시험하기 전에 재질을 골랐어요. (그때) 원료를 더 일찍 시험했더라면 높은 염소 함량을 알아챘을 거예요. 이제는 아마 스테인리스강 건조기가 필요할 텐데, 그러면 일정이 두 달 정도 늘어날 거예요.",
+    segments: ["네. 돌이켜 보면 시험 전에 재질을 골랐어요", "(그때) 원료를 더 일찍 시험했더라면", "높은 염소 함량을 알아챘을 거예요", "이제는 아마 스테인리스강 건조기가 필요해요", "그러면 일정이 두 달 정도 늘어날 거예요"],
+    reference: "Yes. Looking back, we chose the material before testing the feed. If we had tested it earlier, we would have noticed the high chloride content. Now we'll probably need a stainless steel dryer, which will add about two months to the schedule.",
     accepted: [
       "Yes. Looking back, if we'd tested the feed earlier, we would have noticed the high chloride content before choosing the material. Now we'll probably need to upgrade the dryer to stainless steel, which will add about two months to the schedule.",
       "Yes. In hindsight, if we had tested the feed earlier, we'd have noticed the high chloride content before we chose the material. Now we'll probably need to change the dryer to stainless steel, and that will add about two months to the schedule.",
       "Yes. Looking back, if we had tested the feed earlier, we would have seen the high chloride content before we selected the material. Now we'll probably need to upgrade the dryer to stainless steel, which will add around two months to the schedule.",
+      "Yes. Looking back, if we had tested the feed earlier, we would have noticed the high chloride content before choosing the material. Now we'll probably need to upgrade the dryer to stainless steel, which will add about two months to the schedule.",
     ],
     meaning: [
       { id: "looking-back", en: "looking back", ko: "돌이켜 보면", any: ["looking|look ... back", "hindsight", "back"] },
@@ -477,7 +485,7 @@ export const TALK_LONG: Question[] = [
       { id: "would-notice", pattern: "we would =notice", category: "tense", severity: "major", fix: "we would have noticed", messageKo: "과거에 대한 가정의 결과는 'would have + 과거분사'입니다: 'we would have noticed'. 'would notice'는 지금이나 앞으로에 대한 가정입니다.", skill: "cond-3" },
       { id: "will-have-noticed", pattern: "we will have =noticed|=found|=seen|=known", category: "tense", severity: "major", fix: "we would have noticed", messageKo: "과거 사실과 반대되는 가정(If + had p.p.)의 결과는 'would have + 과거분사'입니다. 'will have'가 아니라 'would have'를 씁니다.", skill: "cond-3" },
     ],
-    hints: { pattern: "Looking back, if we had + p.p. …, we would have + p.p. … Now we'll probably need to …, which will …", skeleton: "Yes. Looking back, if we ___ ______ the feed earlier, we would ____ noticed the high chloride content …", partial: "Yes. Looking back, if we had tested the feed earlier, we would have…" },
+    hints: { pattern: "If we had + p.p. …, we would have + p.p. … Now we'll probably need …, which will …", skeleton: "Yes. Looking back, we chose the material before testing the feed. If we ___ ______ it earlier, we would ____ noticed …", partial: "Yes. Looking back, we chose the material before testing the feed. If we had tested it earlier…" },
     explanationKo: "이미 지난 일을 돌아볼 때는 3형 조건문 'if we had tested …, we would have noticed …'를 씁니다(if we tested, we would notice는 지금에 대한 가정). 이어서 지금의 결과는 'Now we'll probably need to …'로 말하고, 추가 정보는 관계절 'which will add …'로 붙입니다. before 뒤에는 동명사(before choosing)가 옵니다.",
     probes: [
       { answer: "Yes. Looking back, if we had tested the feed earlier, we would have noticed the high chloride level before choosing the material. Now we'll probably need to switch the dryer to stainless steel, which will add around two months to the schedule.", expect: "pass" },
@@ -495,16 +503,17 @@ export const TALK_LONG: Question[] = [
     level: "C1",
     difficulty: 10,
     skills: ["polite-disagree", "comparative", "modal-possibility"],
-    expression: "I agree …, but I'm not sure … Before we commit, could we …?",
+    expression: "I agree …, but I'm not sure … Before we decide, could we …?",
     contextKo: "말레이시아 EFB 프로젝트 회의. Daniel이 한국 공장의 건조기 설계를 그대로 쓰자고 합니다. 검증된 설계라는 데는 동의하지만, 현지 EFB가 한국에서 쓰는 톱밥보다 훨씬 젖어 있고 섬유질이 많아 피더가 막힐 수 있다고 우려하고, 확정 전에 현지 EFB로 시험해 보자고 제안합니다.",
     dialogue: [{ speaker: "Daniel", en: "Why don't we just copy the dryer design from your Korean plant? It's already proven.", ko: "그냥 한국 공장의 건조기 설계를 그대로 쓰면 어때요? 이미 검증된 거잖아요." }],
     promptKo: "검증된 설계라는 데는 동의하지만, 여기서도 그만큼 잘 될지는 잘 모르겠어요. 말레이시아 EFB는 한국에서 쓰는 톱밥보다 훨씬 젖어 있고 섬유질이 많아서 피더가 막힐 수도 있어요. 확정하기 전에 벤더 시험 센터에서 현지 EFB로 몇 번 시험해 볼 수 있을까요?",
     segments: ["검증된 설계라는 데는 동의하지만", "여기서도 그만큼 잘 될지는 모르겠어요", "말레이시아 EFB는 한국에서 쓰는 톱밥보다 훨씬 젖어 있고 섬유질이 많아요", "그래서 피더가 막힐 수도 있어요", "확정하기 전에", "벤더 시험 센터에서 현지 EFB로 몇 번 시험해 볼 수 있을까요?"],
-    reference: "I agree it's a proven design, but I'm not sure it'll work as well here. Malaysian EFB is much wetter and more fibrous than the sawdust we use in Korea, so the feeder might get blocked. Before we commit, could we run a few trials with local EFB at the vendor's test center?",
+    reference: "I agree it's a proven design, but I'm not sure it'll work as well here. Malaysian EFB is much wetter and more fibrous than the sawdust we use in Korea. So the feeder might get blocked. Before we decide, could we run a few tests with local EFB at the vendor's test center?",
     accepted: [
       "I agree that it's a proven design, but I'm not sure it'll work as well here. Malaysian EFB is much wetter and more fibrous than the sawdust we use in Korea, so the feeder could get blocked. Before we commit, could we run a few trials with local EFB at the vendor's test center?",
       "I agree it's a proven design, but I'm not sure it would work as well here. Malaysian EFB is a lot wetter and more fibrous than the sawdust we use in Korea, so the feeder might get blocked. Before we decide, could we do a few tests with local EFB at the vendor's test center?",
       "It's a proven design, I agree, but I'm not sure it'll work as well here, because Malaysian EFB is much wetter and more fibrous than the sawdust we use in Korea. The feeder might get blocked. Before we commit, why don't we run a few trials with local EFB at the vendor's test center?",
+      "I agree it's a proven design, but I'm not sure it'll work as well here. Malaysian EFB is much wetter and more fibrous than the sawdust we use in Korea, so the feeder might get blocked. Before we commit, could we run a few trials with local EFB at the vendor's test center?",
     ],
     meaning: [
       { id: "agree", en: "I agree it's a proven design", ko: "검증된 설계라는 데 동의", any: ["agree|true|right|proven|understand|see"] },
@@ -521,7 +530,7 @@ export const TALK_LONG: Question[] = [
       { id: "might-blocked", pattern: "might|could|may =blocked", category: "verb-form", severity: "major", fix: "might get blocked", messageKo: "'막힐 수 있다'는 조동사 뒤에 'get/be + 과거분사'를 씁니다: 'might get blocked'. 조동사 바로 뒤에 과거분사를 쓰지 않습니다.", skill: "modal-possibility" },
       { id: "what-we-use", pattern: "sawdust|one what we", category: "sentence-structure", severity: "major", fix: "sawdust (that) we", messageKo: "명사를 꾸미는 관계절은 that(또는 생략)을 씁니다: 'the sawdust (that) we use'. what은 '~하는 것'이라는 뜻이라 명사 뒤에 쓰지 않습니다.", skill: "relative-clause" },
     ],
-    hints: { pattern: "I agree …, but I'm not sure … A is much + 비교급 … than B …, so … might get + p.p. Before we commit, could we …?", skeleton: "I agree it's a proven design, but I'm not ____ it'll work as well here. Malaysian EFB is ____ wetter …", partial: "I agree it's a proven design, but I'm not sure it'll work as well here…" },
+    hints: { pattern: "I agree …, but I'm not sure … A is much + 비교급 … than B. So … might get + p.p. Before we decide, could we …?", skeleton: "I agree it's a proven design, but I'm not ____ it'll work as well here. Malaysian EFB is ____ wetter …", partial: "I agree it's a proven design, but I'm not sure it'll work as well here…" },
     explanationKo: "상대 제안에 반대할 때는 먼저 맞는 점을 인정하고(I agree it's a proven design), 'but I'm not sure …'로 부드럽게 의문을 제기한 뒤 근거와 대안을 말합니다. 비교급 강조는 'much wetter'(more wetter ×)이고, '막힐 수 있다'는 'might get blocked'처럼 get/be + 과거분사로 말합니다.",
     probes: [
       { answer: "I agree it's a proven design, but I'm not sure it'll work as well here. Malaysian EFB is much wetter and more fibrous than the sawdust we use in Korea, so the feeder might get clogged. Before we commit, could we run a few tests with local EFB at the vendor's test center?", expect: "pass" },
@@ -546,12 +555,13 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Priya", en: "So, are you happy with the quotation for the new dryer?", ko: "새 건조기 견적은 괜찮으세요?" }],
     promptKo: "전반적으로는 괜찮아요. 그런데 저희가 3년째 귀사에서 구매해 왔고, 내년에 건조기 두 대를 더 주문할 계획이에요. 그 점을 고려해서 이번 주문은 가격을 좀 더 잘 해 주실 수 있을까요?",
     segments: ["전반적으로는 괜찮아요", "그런데 저희가 3년째 귀사에서 구매해 왔고", "내년에 건조기 두 대를 더 주문할 계획이에요", "그 점을 고려해서", "이번 주문은 가격을 더 잘 해 주실 수 있을까요?"],
-    reference: "Overall, it looks fine. But we've been buying from you for three years now, and we're planning to order two more dryers next year. With that in mind, could you give us a better price on this order?",
+    reference: "Overall, it looks fine. But we've been buying from you for three years now. We're also planning to order two more dryers next year. With that in mind, could you give us a better price on this order?",
     accepted: [
       "Overall, it looks fine. But we've been buying from you for three years, and we're planning to order two more dryers next year. Considering that, could you offer us a better price on this order?",
       "Overall, it looks good. But we've been working with you for three years now, and we plan to order two more dryers next year. With that in mind, could you give us a better price for this order?",
       "It looks fine overall. However, we've been buying from you for three years now, and we're going to order two more dryers next year. Given that, would you be able to give us a better price on this order?",
       "Overall, it looks fine. But we've bought from you for three years now, and we're planning to order two more dryers next year. With that in mind, could you give us a better price on this order?",
+      "Overall, it looks fine. But we've been buying from you for three years now, and we're planning to order two more dryers next year. With that in mind, could you give us a better price on this order?",
     ],
     meaning: [
       { id: "fine", en: "overall, it looks fine", ko: "전반적으로 괜찮다", any: ["fine|good|okay|ok|overall|reasonable"] },
@@ -567,7 +577,7 @@ export const TALK_LONG: Question[] = [
       { id: "since-years", pattern: "since|from three|3 years", category: "preposition", severity: "major", fix: "for three years", messageKo: "기간(3년 동안)은 for를 씁니다. since는 시작 시점(since 2023) 앞에 씁니다.", skill: "present-perfect" },
       { id: "are-buying-for", pattern: "re:\\bwe (are )?(buying|buy)(?= from you (now )?(for|since)\\b)", category: "tense", severity: "major", fix: "we've been buying", messageKo: "과거부터 지금까지 이어지는 일은 현재완료 진행형으로 말합니다: 'we've been buying from you for three years'. 현재형이나 현재진행형은 기간(for three years)과 함께 쓰지 않습니다.", skill: "present-perfect" },
     ],
-    hints: { pattern: "We've been + V-ing … for + 기간, and we're planning to … With that in mind, could you …?", skeleton: "Overall, it looks fine. But we've ____ buying from you ___ three years now, and …", partial: "Overall, it looks fine. But we've been buying from you for three years now…" },
+    hints: { pattern: "We've been + V-ing … for + 기간. We're also planning to … With that in mind, could you …?", skeleton: "Overall, it looks fine. But we've ____ buying from you ___ three years now. …", partial: "Overall, it looks fine. But we've been buying from you for three years now…" },
     explanationKo: "과거부터 지금까지 이어지는 거래는 현재완료 진행형 'we've been buying from you'로 말하고, 기간 앞에는 since가 아니라 for를 씁니다(since three years ×). 근거를 말한 뒤 'With that in mind, could you …?'로 요청하면 자연스럽게 조건을 협상할 수 있습니다.",
     probes: [
       { answer: "Overall, it looks fine. But we've been buying from you for three years now, and we're planning to order two more dryers next year. With that in mind, could you offer us a lower price on this order?", expect: "pass" },
@@ -590,12 +600,13 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Priya", en: "Okay, here's what we can do: 5% off, but we'd need 40% up front. Delivery stays at fourteen weeks.", ko: "좋아요, 이렇게 해 드릴 수 있어요. 5% 할인, 대신 40% 선금이 필요해요. 납기는 14주 그대로예요." }],
     promptKo: "제가 제대로 이해했는지 확인할게요. 저희가 40%를 선금으로 내는 경우에만 가격을 5% 깎아 주시고, 납기는 14주 그대로라는 거죠. 맞나요? 선금 부분은 저희 재무팀에 확인해 봐야 해요.",
     segments: ["제가 제대로 이해했는지 확인할게요", "가격을 5% 깎아 주시는데", "저희가 40%를 선금으로 내는 경우에만이고", "납기는 14주 그대로죠. 맞나요?", "선금 부분은 재무팀에 확인해 봐야 해요"],
-    reference: "Let me make sure I've understood correctly. You'll take 5% off the price, but only if we pay 40% up front, and the delivery time stays at fourteen weeks. Is that right? I'll need to check the advance payment with our finance team.",
+    reference: "Let me make sure I've understood correctly. You'll take 5% off the price, but only if we pay 40% in advance. The delivery time stays at fourteen weeks. Is that right? I'll need to check the advance payment with our finance team.",
     accepted: [
       "Let me make sure I've understood this correctly. You'll give us 5% off the price, but only if we pay 40% up front, and the delivery time stays at fourteen weeks. Is that right? I'll need to check the advance payment with our finance team.",
       "Let me just check that I've understood correctly. You can reduce the price by 5%, but only if we pay 40% in advance, and the delivery time will stay at fourteen weeks. Is that correct? I'll have to check the advance payment with our finance team.",
       "Just to make sure I've understood correctly: you'll take 5% off, but only if we pay 40% up front, and delivery stays at fourteen weeks. Is that right? I'll need to discuss the advance payment with our finance team.",
       "Let me make sure I understood correctly. You'll take 5% off the price, but only if we pay 40% up front, and the delivery time stays at fourteen weeks. Is that right? I'll need to check the advance payment with our finance team.",
+      "Let me make sure I've understood correctly. You'll take 5% off the price, but only if we pay 40% up front, and the delivery time stays at fourteen weeks. Is that right? I'll need to check the advance payment with our finance team.",
     ],
     meaning: [
       { id: "make-sure", en: "let me make sure I've understood", ko: "제대로 이해했는지 확인", any: ["make sure", "check|confirm|understood|understand"] },
@@ -611,7 +622,7 @@ export const TALK_LONG: Question[] = [
       { id: "delivery-stay", pattern: "time|delivery =stay at", category: "agreement", severity: "major", fix: "time stays at", messageKo: "주어 the delivery time은 3인칭 단수라서 동사에 -s를 붙입니다: 'the delivery time stays at fourteen weeks'.", skill: "agreement" },
       { id: "advanced-payment", pattern: "=advanced payment", category: "word-choice", severity: "minor", fix: "advance payment", messageKo: "'선금'은 'advance payment'입니다. advanced는 '고급의, 앞선'이라는 뜻의 형용사입니다." },
     ],
-    hints: { pattern: "Let me make sure I've understood correctly. You'll …, but only if we + 현재형 …, and … stays … Is that right?", skeleton: "Let me make sure I've __________ correctly. You'll take 5% off the price, but ____ __ we pay 40% up front, …", partial: "Let me make sure I've understood correctly. You'll take 5% off the price, but only if…" },
+    hints: { pattern: "Let me make sure I've understood correctly. You'll …, but only if we + 현재형 … The … stays … Is that right?", skeleton: "Let me make sure I've __________ correctly. You'll take 5% off the price, but ____ __ we pay 40% in advance. …", partial: "Let me make sure I've understood correctly. You'll take 5% off the price, but only if…" },
     explanationKo: "협상에서 조건을 확인할 때는 'Let me make sure I've understood correctly'로 시작해 상대 제안을 다시 정리하고 'Is that right?'으로 확인합니다. 조건은 'only if we pay …'처럼 if절에 현재형을 쓰고(will ×), 'the delivery time stays'처럼 3인칭 단수 주어에는 -s를 붙입니다.",
     probes: [
       { answer: "Let me make sure I've understood correctly. You'll take 5% off the price, but only if we pay 40% in advance, and the delivery time stays at fourteen weeks. Is that right? I'll need to check the advance payment with our finance people.", expect: "pass" },
@@ -634,11 +645,12 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Priya", en: "So, do we have a deal? I'd really like to close this today.", ko: "그럼 합의된 건가요? 오늘 꼭 마무리하고 싶어요." }],
     promptKo: "거의 다 된 것 같아요. 1년 치 예비 부품을 포함하고 운송비를 부담해 주시면, 지금 가격을 받아들일 수 있어요. 재무팀 승인을 받아야 하지만 문제는 없을 것 같아요. 금요일까지 수정된 제안서를 보내 주실 수 있을까요?",
     segments: ["거의 다 된 것 같아요", "1년 치 예비 부품을 포함하고 운송비를 부담해 주시면", "지금 가격을 받아들일 수 있어요", "재무팀 승인이 필요하지만 문제는 없을 것 같아요", "금요일까지 수정된 제안서를 보내 주실 수 있을까요?"],
-    reference: "I think we're almost there. If you can include spare parts for the first year and cover the shipping, we can accept your price. I'll need to get it approved by our finance team, but I don't expect any problems. Could you send us the updated offer by Friday?",
+    reference: "I think we're almost there. If you can include one year of spare parts and pay for shipping, we can accept your price. I'll need to get it approved by our finance team, but I don't expect any problems. Could you send us the updated offer by Friday?",
     accepted: [
       "I think we're nearly there. If you can include first-year spare parts and cover the shipping, we can accept your price. I'll need to get it approved by our finance team, but I don't expect any problems. Could you send us the revised offer by Friday?",
       "I think we're almost there. As long as you include first-year spare parts and cover the shipping, we can accept your price. I'll have to get approval from our finance team, but I don't think there will be any problems. Could you send us the updated offer by Friday?",
       "I think we're almost there. If you can include first-year spare parts and pay for the shipping, we're happy to accept your price. I'll need to run it by our finance team, but I don't expect any issues. Can you send us the updated offer by Friday?",
+      "I think we're almost there. If you can include spare parts for the first year and cover the shipping, we can accept your price. I'll need to get it approved by our finance team, but I don't expect any problems. Could you send us the updated offer by Friday?",
     ],
     meaning: [
       { id: "almost", en: "we're almost there", ko: "거의 다 됐다", any: ["almost|nearly|close"] },
@@ -655,7 +667,7 @@ export const TALK_LONG: Question[] = [
       { id: "until-friday", pattern: "until|till friday", category: "preposition", severity: "major", fix: "by Friday", messageKo: "마감(~까지)은 'by Friday'입니다. 'until Friday'는 '금요일까지 계속'이라는 뜻입니다." },
       { id: "get-it-approve", pattern: "get|=got it =approve", category: "verb-form", severity: "major", fix: "get it approved", messageKo: "'(남에게) 승인받다'는 'get + 목적어 + 과거분사'입니다: 'get it approved by our finance team'.", skill: "passive" },
     ],
-    hints: { pattern: "If you can … and …, we can accept … I'll need to …, but I don't expect any problems. Could you … by …?", skeleton: "I think we're almost there. If you ___ include spare parts for the first year and cover the shipping, we can ______ your price. …", partial: "I think we're almost there. If you can include spare parts for the first year…" },
+    hints: { pattern: "If you can … and …, we can accept … I'll need to …, but I don't expect any problems. Could you … by …?", skeleton: "I think we're almost there. If you ___ include one year of spare parts and pay for shipping, we can ______ your price. …", partial: "I think we're almost there. If you can include one year of spare parts…" },
     explanationKo: "협상을 마무리할 때는 'If you can A and B, we can accept C'처럼 조건과 수락을 한 문장에 묶습니다(if절에 will ×). 내부 승인이 남았으면 'I'll need to get it approved …, but I don't expect any problems'로 여지를 두고, 마감은 until이 아니라 by Friday로 요청합니다.",
     probes: [
       { answer: "I think we're almost there. If you can include first-year spare parts and cover the shipping, we can agree to your price. I'll need to get it approved by our finance team, but I don't expect any problems. Could you send us the updated offer by Friday?", expect: "pass" },
@@ -678,11 +690,12 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Priya", en: "I'm sorry, but this is really our final price. We can't go any lower.", ko: "죄송하지만 이게 정말 최종 가격이에요. 더는 못 내려요." }],
     promptKo: "유연하게 해 주신 건 감사해요. 그런데 솔직히 말씀드리면, 귀사 가격이 저희가 받은 다른 견적들보다 아직 12% 정도 높아요. 이 차이를 줄이지 못하면 경영진에 귀사를 추천하기 어려울 거예요. 보증 기간 연장이나 무료 교육 같은 다른 걸 제안해 주실 수 있을까요?",
     segments: ["유연하게 해 주신 건 감사하지만", "솔직히 귀사 가격이 저희가 받은 다른 견적보다 아직 12% 정도 높아요", "이 차이를 줄이지 못하면", "경영진에 귀사를 추천하기 어려울 거예요", "보증 연장이나 무료 교육 같은 다른 걸 제안해 주실 수 있을까요?"],
-    reference: "I appreciate your flexibility, but to be honest, your price is still about 12% higher than the other quotes we've received. If we can't close that gap, it'll be hard to recommend you to our management. Could you offer anything else, like a longer warranty or free training?",
+    reference: "I appreciate your flexibility. But to be honest, your price is still about 12% higher than the other quotes we've received. If we can't close that gap, it'll be hard to recommend you to our management. Could you offer anything else, like a longer warranty or free training?",
     accepted: [
       "I appreciate your flexibility, but to be honest, your price is still about 12% higher than the other quotes we've received. If we can't close that gap, it'll be difficult to recommend you to our management. Could you offer anything else, such as a longer warranty or free training?",
       "I really appreciate your flexibility, but honestly, your price is still around 12% higher than the other quotes we've got. If we can't close that gap, it'll be hard to recommend you to our management. Is there anything else you could offer, like a longer warranty or free training?",
       "Thank you for being flexible, but to be honest, your price is still about 12% above the other quotes we've received. Unless we can close that gap, it'll be hard to recommend you to our management. Could you offer something else instead, like a longer warranty or free training?",
+      "I appreciate your flexibility, but to be honest, your price is still about 12% higher than the other quotes we've received. If we can't close that gap, it'll be hard to recommend you to our management. Could you offer anything else, like a longer warranty or free training?",
     ],
     meaning: [
       { id: "appreciate", en: "I appreciate your flexibility", ko: "유연하게 해 주셔서 감사", any: ["appreciate|thank|thanks|grateful"] },
@@ -698,7 +711,7 @@ export const TALK_LONG: Question[] = [
       { id: "more-higher", pattern: "more higher", category: "word-choice", severity: "major", fix: "higher", messageKo: "higher는 이미 비교급이라 more를 붙이지 않습니다. 차이는 'about 12% higher'처럼 숫자를 비교급 앞에 둡니다.", skill: "comparative" },
       { id: "higher-about-12", pattern: "higher about|around? 12|twelve than|=percent", category: "word-order", severity: "major", fix: "about 12% higher than", messageKo: "차이를 말할 때는 '숫자 + 비교급 + than' 순서입니다: 'about 12% higher than the other quotes'. 'higher 12% than'은 어순이 틀립니다.", skill: "comparative" },
     ],
-    hints: { pattern: "I appreciate …, but … is still about 12% higher than … If we can't …, it'll be hard to … Could you …?", skeleton: "I appreciate your flexibility, but to be honest, your price is still _____ 12% ______ than the other quotes we've received. …", partial: "I appreciate your flexibility, but to be honest, your price is still about 12% higher…" },
+    hints: { pattern: "I appreciate … But … is still about 12% higher than … If we can't …, it'll be hard to … Could you …?", skeleton: "I appreciate your flexibility. But to be honest, your price is still _____ 12% ______ than the other quotes we've received. …", partial: "I appreciate your flexibility. But to be honest, your price is still about 12% higher…" },
     explanationKo: "상대의 '최종 가격'에 맞설 때는 먼저 양보를 인정하고(I appreciate your flexibility), 객관적 근거(about 12% higher than the other quotes we've received)와 결과(If we can't close that gap, it'll be hard to …)를 말한 뒤 다른 조건을 묻습니다. 차이는 '숫자 + 비교급 + than' 순서(about 12% higher than)이고, higher 앞에 more를 붙이지 않습니다.",
     probes: [
       { answer: "I appreciate your flexibility, but to be honest, your price is still about 12% higher than the other offers we've received. If we can't close that gap, it'll be hard to recommend you to our management. Could you offer anything else, like an extended warranty or free training?", expect: "pass" },
@@ -942,12 +955,13 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Sari", en: "Is it still cold in Seoul? I saw snow on the news last week!", ko: "서울은 아직 추워요? 지난주에 뉴스에서 눈 오는 걸 봤어요!" }],
     promptKo: "다행히 이제는 아니에요. 지난주에는 정말 추웠는데, 월요일부터는 계속 따뜻해요. 주말쯤이면 벚꽃이 필 것 같아서 아이들 데리고 보러 갈 계획이에요.",
     segments: ["다행히 이제는 아니에요", "지난주에는 정말 추웠는데", "월요일부터는 계속 따뜻해요", "주말쯤이면 벚꽃이 필 거예요", "그래서 아이들 데리고 보러 갈 계획이에요"],
-    reference: "Not anymore, thankfully. It was freezing last week, but it's been really warm since Monday. The cherry blossoms should be out by the weekend, so I'm planning to take my kids to see them.",
+    reference: "Not anymore, thankfully. It was very cold last week, but it's been really warm since Monday. The cherry blossoms should bloom by the weekend, so I'm planning to take my kids to see them.",
     accepted: [
       "Not anymore, thank goodness. It was freezing last week, but it's been really warm since Monday. The cherry blossoms should be out by the weekend, so I'm planning to take my kids to see them.",
       "Not anymore, luckily. It was really cold last week, but it's been very warm since Monday. The cherry blossoms should bloom by the weekend, so I'm going to take my kids to see them.",
       "No, thankfully. Last week it was freezing, but it's been really warm since Monday. The cherry blossoms will probably be out by the weekend, so I'm planning to take the kids to see them.",
       "Not anymore, thankfully. It was freezing last week, but it's been really warm since Monday. The cherry blossoms should be out by the weekend, so I'm thinking of taking my kids to see them.",
+      "Not anymore, thankfully. It was freezing last week, but it's been really warm since Monday. The cherry blossoms should be out by the weekend, so I'm planning to take my kids to see them.",
     ],
     meaning: [
       { id: "not-anymore", en: "not anymore, thankfully", ko: "다행히 이제는 아니다", any: ["anymore|longer|thankfully|luckily|=no"] },
@@ -963,7 +977,7 @@ export const TALK_LONG: Question[] = [
       { id: "is-warm-since", pattern: "=is|=was really|very|so? warm since", category: "tense", severity: "major", fix: "has been really warm since", messageKo: "'월요일부터 지금까지 계속'은 현재완료로 말합니다: 'it's been really warm since Monday'. 'it's warm since'처럼 현재형과 since를 함께 쓰지 않습니다.", skill: "present-perfect" },
       { id: "warm-from", pattern: "warm from monday", category: "preposition", severity: "major", fix: "warm since Monday", messageKo: "현재완료와 함께 '~부터 (지금까지)'는 from이 아니라 since를 씁니다: 'since Monday'.", skill: "present-perfect" },
     ],
-    hints: { pattern: "It was … last week, but it's been … since Monday. … should be …, so I'm planning to …", skeleton: "Not anymore, thankfully. It was freezing last week, but it's ____ really warm _____ Monday. …", partial: "Not anymore, thankfully. It was freezing last week, but it's been really warm…" },
+    hints: { pattern: "It was … last week, but it's been … since Monday. … should …, so I'm planning to …", skeleton: "Not anymore, thankfully. It was very cold last week, but it's ____ really warm _____ Monday. …", partial: "Not anymore, thankfully. It was very cold last week, but it's been really warm…" },
     explanationKo: "지난주처럼 끝난 때는 과거형(It was freezing last week), 월요일부터 지금까지 이어지는 날씨는 현재완료 'it's been really warm since Monday'로 말합니다(it's warm since ×, from Monday ×). 앞으로의 계획은 'I'm planning to …'로 덧붙입니다.",
     probes: [
       { answer: "Not anymore, thankfully. It was freezing last week, but it's been really warm since Monday. The cherry blossoms should be out by the weekend, so I'm going to take my kids to see them.", expect: "pass" },
@@ -986,12 +1000,13 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Budi", en: "A few of us play football on Sunday mornings. Do you still play?", ko: "저희 몇 명이 일요일 아침마다 축구를 해요. 민수 씨는 아직 축구 하세요?" }],
     promptKo: "아쉽게도 이제는 안 해요. 대학 다닐 때는 매주 토요일마다 했는데, 몇 년 전에 무릎을 다친 뒤로는 안 했어요. 요즘은 일주일에 한두 번 수영만 해요.",
     segments: ["아쉽게도 이제는 안 해요", "대학 다닐 때는 매주 토요일마다 했어요", "하지만 몇 년 전에 무릎을 다친 뒤로는 안 했어요", "요즘은 일주일에 한두 번 수영만 해요"],
-    reference: "Not anymore, unfortunately. I used to play every Saturday when I was at university, but I haven't played since I hurt my knee a few years ago. These days, I just go swimming once or twice a week.",
+    reference: "Not anymore, unfortunately. I used to play every Saturday at university. But I haven't played since I hurt my knee a few years ago. These days, I just go swimming once or twice a week.",
     accepted: [
       "Not anymore, unfortunately. I used to play every Saturday when I was in university, but I haven't played since I hurt my knee a few years ago. These days I just swim once or twice a week.",
       "Unfortunately not. I used to play every Saturday at university, but I haven't played since I injured my knee a few years ago. Now I just go swimming once or twice a week.",
       "Not anymore, sadly. I used to play every Saturday when I was a student, but I haven't played at all since I hurt my knee a few years ago. Nowadays, I just go swimming once or twice a week.",
       "Not anymore, unfortunately. I used to play every Saturday when I was at university, but I haven't played since I hurt my knee a few years ago. These days, I just go for a swim once or twice a week.",
+      "Not anymore, unfortunately. I used to play every Saturday when I was at university, but I haven't played since I hurt my knee a few years ago. These days, I just go swimming once or twice a week.",
     ],
     meaning: [
       { id: "not-anymore", en: "not anymore", ko: "이제는 안 한다", any: ["anymore|longer", "not|unfortunately|sadly"] },
@@ -1008,7 +1023,7 @@ export const TALK_LONG: Question[] = [
       { id: "used-to-playing", pattern: "used to =playing", category: "verb-form", severity: "major", fix: "used to play", messageKo: "과거의 습관은 'used to + 동사원형'입니다: 'I used to play'. (be used to + 동사ing는 '~에 익숙하다'라는 다른 뜻입니다.)", skill: "present-perfect" },
       { id: "go-to-swimming", pattern: "go|=went|=goes to swimming|swim", category: "preposition", severity: "major", fix: "go swimming", messageKo: "'수영하러 가다'는 'go swimming'입니다. go + 동사ing에는 to를 넣지 않습니다(go shopping, go hiking)." },
     ],
-    hints: { pattern: "I used to + 동사원형 …, but I haven't + p.p. since + 주어 + 과거형 … These days, I just …", skeleton: "Not anymore, unfortunately. I ____ __ play every Saturday when I was at university, but I haven't ______ since …", partial: "Not anymore, unfortunately. I used to play every Saturday when I was at university, but…" },
+    hints: { pattern: "I used to + 동사원형 … But I haven't + p.p. since + 주어 + 과거형 … These days, I just …", skeleton: "Not anymore, unfortunately. I ____ __ play every Saturday at university. But I haven't ______ since …", partial: "Not anymore, unfortunately. I used to play every Saturday at university. But…" },
     explanationKo: "지금은 하지 않는 과거의 습관은 'used to + 동사원형', 그 이후 지금까지 안 한 것은 현재완료 'I haven't played since + 과거 사건'으로 말합니다. 'didn't play since'처럼 과거형과 since를 함께 쓰지 않고, 기간만 말할 때는 since가 아니라 for(for a few years)입니다. '수영하러 가다'는 'go swimming'(to 없음)입니다.",
     probes: [
       { answer: "Not anymore, unfortunately. I used to play every Saturday when I was at university, but I haven't played since I injured my knee a few years ago. These days, I only go swimming once or twice a week.", expect: "pass" },
@@ -1033,11 +1048,12 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Daniel", en: "Everything on the menu looks great. What would you recommend?", ko: "메뉴가 다 맛있어 보이네요. 뭘 추천하세요?" }],
     promptKo: "처음 오셨으니까 삼겹살이랑 해물파전을 시켜서 같이 나눠 먹는 게 어때요? 한국에서는 보통 음식을 나눠 먹어서 여러 가지를 조금씩 맛보실 수 있어요.",
     segments: ["처음 오셨으니까", "삼겹살이랑 해물파전을 시켜서 나눠 먹는 게 어때요?", "한국에서는 보통 음식을 나눠 먹어요", "그래서 여러 가지를 조금씩 맛볼 수 있어요"],
-    reference: "Since it's your first time here, why don't we order the grilled pork belly and a seafood pancake to share? In Korea, we usually share dishes, so you can try a little bit of everything.",
+    reference: "Since it's your first time here, why don't we order pork belly and a seafood pancake to share? In Korea, we usually share dishes, so you can try a little bit of everything.",
     accepted: [
       "Since it's your first time here, why don't we order the grilled pork belly and a seafood pancake to share? In Korea, we usually share our food, so you can try a little bit of everything.",
       "As it's your first time in Korea, how about ordering the grilled pork belly and a seafood pancake to share? Here, we usually share dishes, so you can try a bit of everything.",
       "Since this is your first time here, why don't we get the grilled pork belly and a seafood pancake and share them? In Korea, people usually share dishes, so you can try a little of everything.",
+      "Since it's your first time here, why don't we order the grilled pork belly and a seafood pancake to share? In Korea, we usually share dishes, so you can try a little bit of everything.",
     ],
     meaning: [
       { id: "first-time", en: "since it's your first time here", ko: "처음 오셨으니까", any: ["first time|visit"], critical: true },
@@ -1051,7 +1067,7 @@ export const TALK_LONG: Question[] = [
       { id: "why-we-dont", pattern: "why we do not", category: "word-order", severity: "major", fix: "why don't we", messageKo: "제안하는 'Why don't we …?'는 의문문 어순이라 don't가 we 앞에 옵니다. 'Why we don't …'는 질문 어순이 아닙니다.", skill: "offer-suggest" },
       { id: "try-little-bit", pattern: "try|taste =little bit", category: "article", severity: "major", fix: "try a little bit", messageKo: "'조금씩'은 'a little bit of …'입니다. a가 없는 little은 '거의 없는'이라는 반대 뜻이 됩니다.", skill: "degree" },
     ],
-    hints: { pattern: "Since + 이유, why don't we + 동사원형 … to share? In Korea, we usually …, so you can …", skeleton: "Since it's your first time here, ___ _____ we order the grilled pork belly and a seafood pancake to share? …", partial: "Since it's your first time here, why don't we order…" },
+    hints: { pattern: "Since + 이유, why don't we + 동사원형 … to share? In Korea, we usually …, so you can …", skeleton: "Since it's your first time here, ___ _____ we order pork belly and a seafood pancake to share? …", partial: "Since it's your first time here, why don't we order…" },
     explanationKo: "이유를 먼저 말하고(Since it's your first time here) 'Why don't we + 동사원형?'으로 제안하면 자연스럽습니다. don't가 we 앞에 오는 의문문 어순이고(Why we don't ×), 'How about'을 쓸 때는 뒤에 동명사(How about ordering …)가 옵니다.",
     probes: [
       { answer: "Since it's your first time here, why don't we order the pork belly and a seafood pancake to share? In Korea, we usually share dishes, so you can try a bit of everything.", expect: "pass" },
@@ -1209,11 +1225,12 @@ export const TALK_LONG: Question[] = [
     dialogue: [{ speaker: "Linh (voicemail)", en: "Hi, this is Linh. I can't take your call right now. Please leave a message after the beep.", ko: "안녕하세요, Linh입니다. 지금은 전화를 받을 수 없어요. 삐 소리 후에 메시지를 남겨 주세요." }],
     promptKo: "안녕하세요 Linh 씨, 민수예요. 시료를 오늘 아침에 보냈고, 금요일에 호치민에 도착할 거라는 걸 알려 드리고 싶었어요. 운송장 번호는 나중에 이메일로 보내 드릴게요. 궁금한 게 있으면 편하게 전화 주세요.",
     segments: ["안녕하세요 Linh 씨, 민수예요", "시료를 오늘 아침에 보냈다고 알려 드리고 싶었어요", "금요일에 호치민에 도착할 거예요", "운송장 번호는 나중에 이메일로 보내 드릴게요", "궁금한 게 있으면 편하게 전화 주세요"],
-    reference: "Hi Linh, it's Minsu. I just wanted to let you know that the samples were sent this morning, and they should arrive in Ho Chi Minh City on Friday. I'll email you the tracking number later. If you have any questions, just give me a call.",
+    reference: "Hi Linh, it's Minsu. I just wanted to let you know that the samples were sent this morning. They should arrive in Ho Chi Minh City on Friday. I'll email you the tracking number later. If you have any questions, just give me a call.",
     accepted: [
       "Hi Linh, it's Minsu. I just wanted to let you know that we sent the samples this morning, and they should arrive in Ho Chi Minh City on Friday. I'll email you the tracking number later. If you have any questions, just give me a call.",
       "Hi Linh, this is Minsu. I just wanted to let you know that the samples were shipped this morning, and they should get to Ho Chi Minh City on Friday. I'll send you the tracking number by email later. If you have any questions, feel free to call me.",
       "Hi Linh, it's Minsu. Just to let you know, the samples went out this morning, and they should arrive in Ho Chi Minh City on Friday. I'll email you the tracking number later. If you have any questions, just give me a call.",
+      "Hi Linh, it's Minsu. I just wanted to let you know that the samples were sent this morning, and they should arrive in Ho Chi Minh City on Friday. I'll email you the tracking number later. If you have any questions, just give me a call.",
     ],
     meaning: [
       { id: "minsu", en: "it's Minsu", ko: "민수예요", any: ["minsu"], critical: true },
@@ -1229,7 +1246,7 @@ export const TALK_LONG: Question[] = [
       { id: "samples-sent", pattern: "samples =sent|=shipped|=dispatched this|today|yesterday", category: "verb-form", severity: "major", fix: "samples were sent this", messageKo: "시료는 보내진 대상이라 수동태로 말합니다: 'the samples were sent this morning'. be가 빠지면 시료가 스스로 무언가를 보낸 것처럼 됩니다.", skill: "passive" },
       { id: "arrive-to", pattern: "arrive|=arrives|=arriving to", category: "preposition", severity: "major", fix: "arrive in", messageKo: "'~에 도착하다'는 도시·나라 앞에서 'arrive in', 건물·장소 앞에서 'arrive at'입니다. 'arrive to'라고 하지 않습니다.", skill: "verb-prep" },
     ],
-    hints: { pattern: "Hi …, it's … I just wanted to let you know that … were + p.p. …, and they should arrive in … If …, just give me a call.", skeleton: "Hi Linh, it's Minsu. I just wanted to let you know that the samples ____ ____ this morning, and they should arrive __ …", partial: "Hi Linh, it's Minsu. I just wanted to let you know that the samples were sent this morning…" },
+    hints: { pattern: "Hi …, it's … I just wanted to let you know that … were + p.p. … They should arrive in … If …, just give me a call.", skeleton: "Hi Linh, it's Minsu. I just wanted to let you know that the samples ____ ____ this morning. They should arrive __ …", partial: "Hi Linh, it's Minsu. I just wanted to let you know that the samples were sent this morning…" },
     explanationKo: "음성 메시지는 이름 → 용건(I just wanted to let you know that …) → 다음 조치 → 연락 방법 순서로 짧게 남깁니다. 시료는 보내진 대상이라 'the samples were sent'(samples sent ×)이고, 도시에 '도착하다'는 'arrive in'(arrive to ×)입니다.",
     probes: [
       { answer: "Hi Linh, it's Minsu. I just wanted to let you know that the samples were sent out this morning, and they should arrive in Ho Chi Minh City on Friday. I'll email you the tracking number later today. If you have any questions, just call me.", expect: "pass" },
