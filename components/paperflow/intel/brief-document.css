@@ -119,3 +119,12 @@
 /* The app's touch rule (buttons with an aria-label grow to 44px under 1200px) would turn the colour dots into
    big discs; they stay dots, a little larger for a finger. */
 @media (max-width:1200px) { .paperflow .pf-brief-colors button { min-width:0; min-height:0; width:22px; height:22px; } }
+
+/* The briefing sits whole in its column: the toolbar keeps one row (labels give way to icons when the
+   column is narrow) and the cast of companies and documents wraps into rows instead of running off the edge. */
+.pf-brief-doc { container-type:inline-size; }
+@container (max-width:1000px) { .pf-brief-tools > button span { display:none; } }
+.pf-brief-tools > .pf-brief-focus { margin-left:auto; }
+.pf-intel .pf-brief-cast ul { display:grid; grid-template-columns:repeat(auto-fill,minmax(138px,1fr)); overflow:visible; padding:0; }
+.pf-intel .pf-brief-cast li { width:auto; min-width:0; }
+.pf-intel.pf-brief-focus-layer { padding-inline:max(18px,calc((100vw - 1240px) / 2)); }
