@@ -5,7 +5,8 @@
  */
 export type PriceProduct = "efb-pellet" | "wood-pellet" | "pks" | "white-pellet" | "black-pellet" | "biochar" | "biochar-cdr" | "coal" | "cashew";
 export type PriceStatus = "verified" | "reported" | "estimate";
-export interface PricePoint { date: string; value: number; source: { title: string; org?: string; url?: string }; itemId?: string; status: PriceStatus; note?: string }
+/** A point; a source that gave a range keeps it (value is then its middle), an average names its period. */
+export interface PricePoint { date: string; value: number; range?: [number, number]; period?: "month" | "quarter" | "year"; source: { title: string; org?: string; url?: string }; itemId?: string; status: PriceStatus; note?: string }
 export interface PriceSeries { id: string; product: PriceProduct; name: string; grade?: string; country?: string; market?: string; unit: string; points: PricePoint[] }
 export interface PriceBoard { generatedAt: string; series: PriceSeries[] }
 
@@ -29,11 +30,13 @@ export function cleanPrices(value: unknown): PriceBoard | null {
   const series = raw.series.slice(0, 300).flatMap(entry => {
     const s = entry as Record<string, unknown>, id = str(s?.id, 80), name = str(s?.name, 120), product = str(s?.product, 20), unit = str(s?.unit, 20);
     if (!id || !/^[\w.-]+$/.test(id) || seen.has(id) || !name || !product || !PRODUCTS.has(product) || !unit) return [];
-    const points = (Array.isArray(s.points) ? s.points : []).slice(0, 400).flatMap(item => {
+    const points = (Array.isArray(s.points) ? s.points : []).slice(0, 400).flatMap((item): PricePoint[] => {
       const p = item as Record<string, unknown>, date = str(p?.date, 10), number = typeof p?.value === "number" ? p.value : Number(p?.value);
       const source = p?.source as Record<string, unknown> | undefined, title = str(source?.title, 300);
       if (!date || !/^\d{4}-\d{2}(-\d{2})?$/.test(date) || !Number.isFinite(number) || !title) return [];
-      return [{ date, value: number, source: { title, org: str(source?.org, 160), url: url(source?.url) }, itemId: str(p.itemId, 120), status: (STATUSES.has(String(p.status)) ? p.status : "reported") as PriceStatus, note: str(p.note, 300) }];
+      const range = Array.isArray(p.range) && p.range.length === 2 && p.range.every(entry => typeof entry === "number" && Number.isFinite(entry)) ? [p.range[0], p.range[1]] as [number, number] : undefined;
+      const period = p.period === "month" || p.period === "quarter" || p.period === "year" ? p.period as PricePoint["period"] : undefined;
+      return [{ date, value: number, range, period, source: { title, org: str(source?.org, 160), url: url(source?.url) }, itemId: str(p.itemId, 120), status: (STATUSES.has(String(p.status)) ? p.status : "reported") as PriceStatus, note: str(p.note, 300) }];
     }).sort((a, b) => a.date.localeCompare(b.date));
     if (!points.length) return [];
     seen.add(id);

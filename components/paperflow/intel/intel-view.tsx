@@ -25,7 +25,7 @@ import { IntelMap } from "./intel-map";
 import { EntityDirectory } from "./entity-directory";
 import { PriceBoard } from "./price-board";
 import { PRICES_BRIEF, cleanPrices, productClass, type PriceBoard as PriceBoardData } from "@/lib/paperflow/intel/prices";
-import { REGISTRY_BRIEF, entityItems, indexRegistry, type IntelEntity, type IntelRegistry } from "@/lib/paperflow/intel/registry";
+import { REGISTRY_BRIEF, entityClasses, entityItems, indexRegistry, type IntelEntity, type IntelRegistry } from "@/lib/paperflow/intel/registry";
 import { glossaryIndex, type GlossaryTerm } from "@/lib/paperflow/intel/glossary";
 import "./intel.css";
 
@@ -141,7 +141,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   const byId = useMemo(() => new Map((items ?? []).map(item => [item.id, item])), [items]);
   // Items that point at the one open (a company's projects, the reports that mention it).
   /** News items (reports, plans, articles, withdrawals…), newest first. */
-  const updates = useMemo(() => (items ?? []).filter(item => item.update && !item.user?.hidden).sort((a, b) => b.update!.date.localeCompare(a.update!.date) || (b.addedAt ?? "").localeCompare(a.addedAt ?? "")), [items]);
+  const updates = useMemo(() => (items ?? []).filter(item => item.update && !item.user?.hidden && inClass(item)).sort((a, b) => b.update!.date.localeCompare(a.update!.date) || (b.addedAt ?? "").localeCompare(a.addedAt ?? "")), [items, inClass]);
   const latestDay = updates[0]?.update!.date ?? null;
   const [allRecent, setAllRecent] = useState(false);
   const shownUpdates = useMemo(() => { if (!latestDay) return []; if (!allRecent) return updates.filter(item => item.update!.date === latestDay); const week = new Date(Date.parse(latestDay) - 7 * 864e5).toISOString().slice(0, 10); return updates.filter(item => item.update!.date >= week); }, [updates, latestDay, allRecent]);
@@ -305,7 +305,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
           <div className="pf-intel-modes" role="tablist" aria-label="보기">
             <button type="button" role="tab" aria-selected={mode === "items"} onClick={() => setMode("items")}><Layers size={14}/>항목</button>
             <button type="button" role="tab" aria-selected={mode === "briefs"} onClick={() => setMode("briefs")}><BookOpenText size={14}/>브리핑<i>{classBriefs.length}</i></button>
-            <button type="button" role="tab" aria-selected={mode === "companies"} onClick={() => setMode("companies")}><Building2 size={14}/>기업 분석<i>{registry ? registry.entities.length : companies.length}</i></button>
+            <button type="button" role="tab" aria-selected={mode === "companies"} onClick={() => setMode("companies")}><Building2 size={14}/>기업 분석<i>{registry ? (klass === "all" ? registry.entities.length : registry.entities.filter(entity => entityClasses(entity, byId).includes(klass)).length) : companies.length}</i></button>
             <button type="button" role="tab" aria-selected={mode === "map"} onClick={() => setMode("map")}><MapPinned size={14}/>지도<i>{visible.filter(item => item.geo?.length).length}</i></button>
           </div>
         </div>
@@ -362,7 +362,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
             </article>
           </li>)}
           {!filtered.length && <li className="pf-intel-none">조건에 맞는 항목이 없습니다.</li>}
-        </ul> : <>{classPrices && <PriceBoard board={classPrices} onItem={setSelected}/>}<div className="pf-intel-briefs">
+        </ul> : <>{classPrices && <PriceBoard board={classPrices} title={klass === "c2" ? "석탄 가격 (저품위탄·기준가)" : klass === "c3" ? "캐슈넛·껍질·CNSL 가격" : klass === "c1" ? "펠릿·바이오차 가격" : "가격 보드 — 펠릿·바이오차·석탄·캐슈넛"} onItem={setSelected}/>}<div className="pf-intel-briefs">
           {classBriefs.length ? <>
             <nav aria-label="브리핑 목록">{briefGroups.map(([period, list]) => <div key={period} className="pf-intel-brief-group"><span>{PERIOD_LABEL[period]}</span>
               {list.map(brief => <button type="button" key={brief.id} aria-current={openBrief?.id === brief.id || undefined} onClick={() => setBriefId(brief.id)}>{brief.date && period !== "core" && <time>{brief.date}</time>}{brief.title}</button>)}</div>)}</nav>

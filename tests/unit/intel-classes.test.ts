@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { itemClasses } from "@/lib/paperflow/intel/types";
+import { itemClasses, type IntelItem } from "@/lib/paperflow/intel/types";
 import { readPack } from "@/lib/paperflow/intel/repository";
 import { cleanRegistry, entityClasses } from "@/lib/paperflow/intel/registry";
 
@@ -18,7 +18,7 @@ describe("business classes", () => {
   });
   it("gives an organisation the classes of its items", () => {
     const registry = cleanRegistry({ entities: [{ code: "ID-01", name: "Miner", category: "company", itemIds: ["a", "b"] }, { code: "ID-02", name: "Fixed", category: "company", classes: ["c3"] }] })!;
-    const byId = new Map([["a", { id: "a", topics: ["coal-market"] }], ["b", { id: "b", topics: ["pelletizing"] }]] as never);
+    const byId = new Map<string, IntelItem>([["a", { id: "a", topics: ["coal-market"] } as IntelItem], ["b", { id: "b", topics: ["pelletizing"] } as IntelItem]]);
     expect(entityClasses(registry.entities[0], byId)).toEqual(["c1", "c2"]);
     expect(entityClasses(registry.entities[1], byId)).toEqual(["c3"]);
   });
