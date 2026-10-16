@@ -354,3 +354,7 @@ html[data-pf-theme="dark"] .pf-card-cover-mark { background:linear-gradient(135d
 .pf-library-content:has(> .pf-view > .pf-intel) { max-width:min(1720px,100%); padding-left:28px; padding-right:28px; }
 @media (max-width:760px) { .pf-library-content:has(> .pf-view > .pf-intel) { padding-left:16px; padding-right:16px; } }
 .pf-intel-code { display:inline-flex; align-items:center; height:20px; margin-right:6px; padding:0 6px; border-radius:5px; background:var(--i-ink); color:var(--background); font:600 10.5px/1 var(--i-sans); letter-spacing:.03em; }
+/* The card's date sits top right as a small dateline chip (the kind of document is top left). */
+.pf-card-cover-date { left:auto; bottom:auto; top:9px; right:9px; padding:2px 8px; border-radius:7px; background:rgba(16,22,20,.62); color:#fff; font-size:12.5px; font-weight:700; text-shadow:none; backdrop-filter:blur(4px); }
+.pf-card-cover[data-empty] .pf-card-cover-date { background:var(--i-ink); color:var(--background); }
+.pf-brief-cast .pf-card-cover-date { top:5px; right:5px; padding:1px 5px; font-size:10.5px; }

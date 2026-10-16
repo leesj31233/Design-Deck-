@@ -143,3 +143,17 @@ export const APPLICABILITY_LABEL: [keyof IntelApplicability, string][] = [
   ["new", "새로 확인한 것"], ["fit", "NAYSOR 가정과 비교"], ["designChange", "설계 변경 검토"], ["testVars", "파일럿 검증 변수"],
   ["capex", "CAPEX/OPEX 영향"], ["quality", "제품 품질·가격 영향"], ["scaleup", "스케일업 위험"], ["questions", "기업·벤더에 물을 것"]
 ];
+
+const DAY = /\b(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?\b/g;
+/**
+ * An item's date for sorting and for its card: the newest real date among its own date (which may read "n.d." or
+ * "2021 (datasheet); 2026-08 (customer story)"), its news date and the dates of the sources it is built on. A date
+ * in the future (a planned start) does not count; an item with no date at all has none.
+ */
+export function itemDate(item: Pick<IntelItem, "date" | "update" | "dossier">, today = new Date().toISOString().slice(0, 10)): string | undefined {
+  const found: string[] = [];
+  const take = (text: string | undefined) => { for (const match of (text ?? "").matchAll(DAY)) { const year = Number(match[1]); if (year >= 1950 && year <= 2100) found.push([match[1], match[2], match[3]].filter(Boolean).join("-")); } };
+  take(item.date); take(item.update?.date);
+  for (const source of item.dossier?.sources ?? []) take(source.date);
+  return found.filter(date => date <= today).sort().pop();
+}

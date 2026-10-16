@@ -11,7 +11,7 @@ import { importDocument } from "@/lib/paperflow/pdf/import-document";
 import { INTEL_EVENT, intelRepository, readPack } from "@/lib/paperflow/intel/repository";
 import { registerCsv, registerMarkdown } from "@/lib/paperflow/intel/export";
 import { linkedDoc, libraryName, pdfUrlOf, suggestDoc } from "@/lib/paperflow/intel/library-link";
-import { APPLICABILITY_LABEL, UPDATE_LABEL, KIND_LABEL, LANG_LABEL, PERIOD_LABEL, PROFILE_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, TOPIC_LABEL, TOPIC_TREE, topicIds, type BriefPeriod, type IntelBrief, type IntelItem, type IntelKind, type IntelStatus, CLASS_LABEL, CLASS_ORDER, CLASS_SHORT, itemClasses, type IntelClass } from "@/lib/paperflow/intel/types";
+import { APPLICABILITY_LABEL, UPDATE_LABEL, KIND_LABEL, LANG_LABEL, PERIOD_LABEL, PROFILE_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, TOPIC_LABEL, TOPIC_TREE, topicIds, type BriefPeriod, type IntelBrief, type IntelItem, type IntelKind, type IntelStatus, CLASS_LABEL, CLASS_ORDER, CLASS_SHORT, itemClasses, itemDate, type IntelClass } from "@/lib/paperflow/intel/types";
 import { usePaperflow } from "../shell/paperflow-context";
 import { FolderGlyph } from "../library/archive-folders";
 import { BriefDocument } from "./brief-document";
@@ -24,6 +24,7 @@ import { CompanyMark, CompanyPage, companyName } from "./company-page";
 import { IntelMap } from "./intel-map";
 import { EntityDirectory } from "./entity-directory";
 import { PriceBoard } from "./price-board";
+import { entityWeb } from "@/lib/paperflow/intel/web";
 import { PLACES_BRIEF, cleanPlaces, type BasePlaces } from "@/lib/paperflow/intel/places";
 import { PRICES_BRIEF, cleanPrices, productClass, type PriceBoard as PriceBoardData } from "@/lib/paperflow/intel/prices";
 import { REGISTRY_BRIEF, entityClasses, entityItems, indexRegistry, type IntelEntity, type IntelRegistry } from "@/lib/paperflow/intel/registry";
@@ -135,13 +136,15 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
     if (scope.type === "topic") { const node = TOPIC_TREE.find(group => group.id === scope.id); const ids = node ? topicIds(node) : [scope.id]; return item.topics.some(topic => ids.includes(topic)); }
     return true;
   }, [scope, docs]);
+  // Each item's date: the newest real one among its own, its news and its sources ("n.d." sorts last, not first).
+  const dates = useMemo(() => new Map((items ?? []).flatMap(item => { const date = itemDate(item); return date ? [[item.id, date] as const] : []; })), [items]);
   const filtered = useMemo(() => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
     return visible.filter(item => inScope(item) && (!kinds.size || kinds.has(item.kind)) && (!statuses.size || (item.status && statuses.has(item.status)))
       && words.every(word => [item.title, item.titleKo, item.summaryKo, item.org, item.country, item.authors, ...(item.data ?? []).map(datum => `${datum.label} ${datum.value}`), ...Object.values(item.equipment ?? {})].join(" ").toLowerCase().includes(word)))
       // Open questions sit after the evidence; among evidence, the stronger source (or the newer) first.
-      .sort((a, b) => Number(a.kind === "gap") - Number(b.kind === "gap") || (sort === "date" ? (b.date ?? "").localeCompare(a.date ?? "") : (a.reliability ?? 9) - (b.reliability ?? 9) || (b.date ?? "").localeCompare(a.date ?? "")));
-  }, [visible, inScope, kinds, statuses, query, sort]);
+      .sort((a, b) => Number(a.kind === "gap") - Number(b.kind === "gap") || (sort === "date" ? (dates.get(b.id) ?? "").localeCompare(dates.get(a.id) ?? "") : (a.reliability ?? 9) - (b.reliability ?? 9) || (dates.get(b.id) ?? "").localeCompare(dates.get(a.id) ?? "")));
+  }, [visible, inScope, kinds, statuses, query, sort, dates]);
   const count = useCallback((test: (item: IntelItem) => boolean) => visible.filter(test).length, [visible]);
   const current = useMemo(() => (items ?? []).find(item => item.id === selected) ?? null, [items, selected]);
   const byId = useMemo(() => new Map((items ?? []).map(item => [item.id, item])), [items]);
@@ -318,7 +321,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
         </div>}
       </nav>
 
-      {pageItem ? <CompanyPage item={pageItem} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} read={site ? (pdfUrlOf(pageItem) ? { label: "PAPERFLOW에서 번역·마킹", run: () => void window.open(inPaperflow(pageItem), "_blank", "noopener") } : undefined) : docOf(pageItem) ? { label: "리더에서 읽기·번역", run: () => router.push(`/reader/${docOf(pageItem)}`) } : pdfUrlOf(pageItem) ? { label: "PDF 번역해서 읽기", run: () => void toLibrary(pageItem) } : undefined} news={newsOf(pageItem.id)} related={pageEntity ? entityItems(pageEntity, registryIndex, byId) : relatedOf(pageItem)} org={pageEntity ? { entity: pageEntity, parent: pageEntity.parentCode ? registryIndex.byCode.get(pageEntity.parentCode) : undefined, children: registryIndex.children.get(pageEntity.code) ?? [], open: openEntity } : undefined} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
+      {pageItem ? <CompanyPage item={pageItem} web={pageEntity ? entityWeb(pageEntity, registryIndex, byId, items ?? []) : undefined} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} read={site ? (pdfUrlOf(pageItem) ? { label: "PAPERFLOW에서 번역·마킹", run: () => void window.open(inPaperflow(pageItem), "_blank", "noopener") } : undefined) : docOf(pageItem) ? { label: "리더에서 읽기·번역", run: () => router.push(`/reader/${docOf(pageItem)}`) } : pdfUrlOf(pageItem) ? { label: "PDF 번역해서 읽기", run: () => void toLibrary(pageItem) } : undefined} news={newsOf(pageItem.id)} related={pageEntity ? entityItems(pageEntity, registryIndex, byId) : relatedOf(pageItem)} org={pageEntity ? { entity: pageEntity, parent: pageEntity.parentCode ? registryIndex.byCode.get(pageEntity.parentCode) : undefined, children: registryIndex.children.get(pageEntity.code) ?? [], open: openEntity } : undefined} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
         onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}
         onBack={() => setPageId(null)} onPdf={source => site ? void window.open(source.pdfUrl!, "_blank", "noopener") : void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)} busy={fetching} notify={notify}/> : <div className="pf-intel-main">
         <div className="pf-intel-toolbar">
@@ -373,7 +376,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
               </header>
               <h3>{display(item)}</h3>
               {item.titleKo && item.titleKo !== item.title && <p className="pf-intel-original" lang={item.lang}>{item.title}</p>}
-              <p className="pf-intel-meta">{[item.org, item.date, item.country, item.lang && item.lang !== "ko" ? LANG_LABEL[item.lang] ?? item.lang : null].filter(Boolean).join(" · ")}</p>
+              <p className="pf-intel-meta">{[item.org, dates.get(item.id) ?? null, item.country, item.lang && item.lang !== "ko" ? LANG_LABEL[item.lang] ?? item.lang : null].filter(Boolean).join(" · ")}</p>
               {item.summaryKo && <p className="pf-intel-summary">{item.summaryKo}</p>}
               {item.data?.length ? <div className="pf-intel-data">{item.data.slice(0, 3).map((datum, index) => <span key={index} title={[datum.basis, datum.where].filter(Boolean).join(" · ")}><em>{datum.label}</em><b>{datum.value}</b>{datum.unit && <small>{datum.unit}</small>}</span>)}</div> : null}
               <footer>

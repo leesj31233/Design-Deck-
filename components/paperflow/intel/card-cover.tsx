@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, Building2, FileText, Gauge, HelpCircle, Landmark, Newspaper, Wrench } from "lucide-react";
-import { SOURCE_LABEL, UPDATE_LABEL, type IntelItem } from "@/lib/paperflow/intel/types";
+import { SOURCE_LABEL, UPDATE_LABEL, itemDate, type IntelItem } from "@/lib/paperflow/intel/types";
 import { intelRepository } from "@/lib/paperflow/intel/repository";
 import { previewOf } from "./source-tree";
 
@@ -33,7 +33,8 @@ export function CardCover({ item, library }: { item: IntelItem; /** The first pa
   }, [stored, item.url, item.kind, item.hasCover, item.id, item.dossier, item.user]);
   const Icon = item.kind === "gap" ? HelpCircle : ICON[item.sourceType ?? ""] ?? FileText;
   const label = item.update ? UPDATE_LABEL[item.update.type] : item.kind === "gap" ? "확인 필요" : SOURCE_LABEL[item.sourceType ?? ""] ?? "자료";
-  const raw = item.update?.date ?? item.date, date = raw && /^\d{4}/.test(raw) ? raw : undefined;
+  // The newest real date behind the item (its own, its news, its sources), top right like a dateline.
+  const date = itemDate(item);
   return <div ref={box} className="pf-card-cover" data-source={item.sourceType} data-kind={item.kind} data-empty={!image || broken || undefined} data-pdf={item.cover && !item.dossier ? undefined : undefined}>
     {image && !broken ? <img src={image} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={() => setBroken(true)}/> : <span className="pf-card-cover-mark"><Icon size={26}/><small>{item.org?.split(/[\/(—]/)[0].trim().slice(0, 28)}</small></span>}
     <span className="pf-card-cover-label">{label}</span>

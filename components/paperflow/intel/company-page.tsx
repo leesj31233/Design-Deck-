@@ -12,6 +12,8 @@ import { CardCover, CoverImage } from "./card-cover";
 import { CATEGORY_LABEL, EQUIPMENT_LABEL, type IntelEntity } from "@/lib/paperflow/intel/registry";
 import { countryOf } from "./entity-directory";
 import "./company-document.css";
+import { EntityWeb } from "./entity-web";
+import type { WebLink } from "@/lib/paperflow/intel/web";
 
 const display = (item: IntelItem) => item.titleKo || item.title;
 /** The company's name without the descriptive tail ("X — 세척 EFB 펠릿 …"). */
@@ -37,10 +39,12 @@ const STATUS_SHORT: Record<string, string> = { verified: "확인됨", claimed: "
  * and the numbered sources. The history sits in a column on the right (a fold on phones). Every
  * statement keeps its source number; the card shows the source on hover.
  */
-export function CompanyPage({ item, read, library, org, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
+export function CompanyPage({ item, read, library, org, web, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
   item: IntelItem; read?: { label: string; run: () => void };
   /** The organisation in the registry: its code, parent and subsidiaries, and a way to open them. */
-  org?: { entity: IntelEntity; parent?: IntelEntity; children: IntelEntity[]; open: (entity: IntelEntity) => void }; library?: { has: (id: string) => boolean; open: (id: string) => void }; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
+  org?: { entity: IntelEntity; parent?: IntelEntity; children: IntelEntity[]; open: (entity: IntelEntity) => void };
+  /** Everything the organisation is linked to (partners, suppliers, buyers, certifiers…), for the 연결망 map. */
+  web?: WebLink[]; library?: { has: (id: string) => boolean; open: (id: string) => void }; news: IntelItem[]; related: IntelItem[]; byId: Map<string, IntelItem>; mentions: IntelItem[];
   entity: EntityRenderer; terms: Omit<TermMarker, "seen">; onOpen: (id: string) => void; onBack: () => void; onPdf: (source: DossierSource) => void; busy?: string | null; notify: (message: string) => void;
 }) {
   const dossier = item.dossier;
@@ -175,6 +179,7 @@ export function CompanyPage({ item, read, library, org, news, related, byId, men
             <p className="pf-cdoc-none">아직 케이스 파일이 없습니다. 매일 수집 작업이 이 기업의 원 자료(공시·보고서·보도자료)와 그림으로 케이스 파일을 만들어 채웁니다.</p>
           </section>}
 
+          {org && web && web.length > 0 && <section className="pf-cdoc-web">{heading(`연결망 (${web.length})`)}<EntityWeb center={org.entity} links={web} onEntity={org.open} onItem={onOpen}/></section>}
           <details className="pf-cdoc-fold"><summary>연혁 · {events.length}</summary>{timeline}</details>
           <SourceTree item={item} byId={byId} mentions={mentions} onOpen={onOpen}/>
           {related.length > 0 && <section>{heading(org ? `이 기업의 프로젝트·소식·자료 (${related.length})` : `관련 자료 (${related.length})`)}<ul className="pf-company-related">{related.map(entry => <li key={entry.id}><button type="button" onClick={() => onOpen(entry.id)}><CardCover item={entry}/><span><small>{KIND_LABEL[entry.kind]}{entry.date ? ` · ${entry.date}` : ""}</small><b>{display(entry)}</b></span></button></li>)}</ul></section>}

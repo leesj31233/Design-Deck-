@@ -1,0 +1,25 @@
+/* 연결망: a radial map of an organisation's links and the same links as grouped lists. */
+.pf-web { display:grid; gap:12px; min-width:0; }
+.pf-web svg { width:100%; height:auto; max-height:420px; border:1px solid var(--i-line); border-radius:16px; background:color-mix(in srgb,var(--i-card) 70%,var(--background)); }
+.pf-web-center circle { fill:var(--i-ink); }
+.pf-web-center text { fill:var(--background); font:700 13px/1 var(--i-sans,system-ui); }
+.pf-web-center .pf-web-code { font:600 10px/1 var(--font-mono,ui-monospace,monospace); opacity:.75; }
+.pf-web-node { cursor:pointer; outline:none; }
+.pf-web-node text { fill:var(--i-ink); font:500 11.5px/1 var(--i-sans,system-ui); paint-order:stroke; stroke:var(--background); stroke-width:3px; }
+.pf-web-node:hover circle, .pf-web-node:focus circle { stroke:var(--i-ink); stroke-width:2px; }
+.pf-web-legend { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12px; color:var(--i-muted); }
+.pf-web-legend span { display:inline-flex; align-items:center; gap:5px; }
+.pf-web-legend i { width:9px; height:9px; border-radius:50%; }
+.pf-web-groups { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; }
+.pf-web-groups section { padding:10px 12px; border:1px solid var(--i-line); border-radius:12px; background:var(--i-card); min-width:0; }
+.pf-web-groups h4 { margin:0 0 6px; font-size:12px; letter-spacing:.04em; }
+.pf-web-groups ul { display:grid; gap:4px; margin:0; padding:0; list-style:none; }
+.pf-web-groups li { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; }
+.pf-web-groups li > button { display:flex; align-items:baseline; gap:6px; min-width:0; padding:3px 0; border:0; background:none; color:var(--i-ink); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
+.pf-web-groups li > button b { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-web-groups li > button:hover b { text-decoration:underline; }
+.pf-web-groups code { flex:none; padding:0 4px; border-radius:4px; background:var(--i-ink); color:var(--background); font:700 9.5px/1.6 var(--font-mono,ui-monospace,monospace); }
+.pf-web-groups small { color:var(--i-muted); font-size:11px; white-space:nowrap; }
+.pf-web-via { flex:none; font-size:11px; color:var(--i-muted); }
+.pf-web-via button { margin-left:3px; padding:0 4px; border:1px solid var(--i-line); border-radius:5px; background:transparent; color:var(--i-muted); font:inherit; cursor:pointer; }
+@media (max-width:760px) { .pf-web svg { max-height:300px; } .pf-web-node text { font-size:13px; } }
