@@ -4,10 +4,24 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GlassPanel } from "@/components/ui/glass-panel";
+import { Button } from "@/components/ui/button";
 import type { Cefr, MasteryStatus } from "../core/types";
 import { STATUS_LABEL_KO } from "../core/mastery";
 
 export { cn };
+// EngFlow is built on Design Deck: these are the deck's own primitives and effects, re-exported for the product.
+export { Button, buttonVariants } from "@/components/ui/button";
+export { IconButton } from "@/components/ui/icon-button";
+export { Badge } from "@/components/ui/badge";
+export { GlassPanel } from "@/components/ui/glass-panel";
+export { Progress } from "@/components/ui/progress";
+export { SegmentedControl } from "@/components/ui/segmented-control";
+export { EmptyState } from "@/components/ui/empty-state";
+export { Skeleton } from "@/components/ui/skeleton";
+export { Tooltip } from "@/components/ui/tooltip";
+export { Kbd } from "@/components/ui/kbd";
+export { NumberTicker, ShimmerText, Reveal, RevealGroup, RevealItem, Pressable, Spotlight, BorderBeam, LiveDot } from "@/components/motion/effects";
 
 /* ───────────── Hooks ───────────── */
 
@@ -203,11 +217,12 @@ export function Eyebrow({ children, className }: { children: React.ReactNode; cl
   return <div className={cn("text-[11px] font-semibold uppercase tracking-[.12em] text-[var(--muted)]", className)}>{children}</div>;
 }
 
+/** A Design Deck glass panel tuned for long reading: a quieter shadow than the deck default. */
 export function Card({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface-strong)] shadow-[0_1px_2px_rgba(16,17,20,.04)]", className)} {...props}>
+    <GlassPanel className={cn("ef-card", className)} {...props}>
       {children}
-    </div>
+    </GlassPanel>
   );
 }
 
@@ -267,16 +282,20 @@ export function ConfirmDialog({ open, onOpenChange, title, body, confirmLabel, d
           <DialogPrimitive.Title className="text-[17px] font-semibold">{title}</DialogPrimitive.Title>
           <DialogPrimitive.Description className="ef-ko mt-2 text-[14px] text-[var(--ef-ink-2)]">{body}</DialogPrimitive.Description>
           <div className="mt-5 flex justify-end gap-2">
-            <DialogPrimitive.Close className="dd-focus h-11 rounded-xl border border-[var(--line)] px-4 text-[14px] font-medium">취소</DialogPrimitive.Close>
-            <button
-              className={cn("dd-focus h-11 rounded-xl px-4 text-[14px] font-semibold text-white", danger ? "bg-[var(--ef-bad-fill)]" : "bg-[var(--foreground)] text-[var(--background)]")}
+            <DialogPrimitive.Close asChild>
+              <Button variant="secondary" size="lg">취소</Button>
+            </DialogPrimitive.Close>
+            <Button
+              variant={danger ? "danger" : "primary"}
+              size="lg"
+              className="font-semibold"
               onClick={() => {
                 onConfirm();
                 onOpenChange(false);
               }}
             >
               {confirmLabel}
-            </button>
+            </Button>
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

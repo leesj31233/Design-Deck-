@@ -28,3 +28,5 @@ export * from "./product/annotation-toolbar";
 export * from "./product/knowledge-graph";
 export * from "./product/inspector-panel";
 export * from "./product/document-rail";
+export * from "./motion/animated-controls";
+export * from "./motion/effects";

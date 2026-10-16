@@ -228,3 +228,9 @@
   .ef-mic-ring, .ef-mic-dot { animation: none; }
 }
 .ef-reduce-motion .ef-mic-ring, .ef-reduce-motion .ef-mic-dot { animation: none; }
+
+/* Design Deck glass card, quieter for long reading (kit Card). */
+.ef-root .ef-card {
+  box-shadow: 0 1px 2px rgba(16, 17, 20, .04), 0 8px 28px rgba(16, 17, 20, .05);
+  background: var(--surface-strong);
+}
