@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { AlertTriangle, ArrowLeft, ArrowUpRight, BookOpenText, Building2, Star } from "lucide-react";
 import { intelRepository } from "@/lib/paperflow/intel/repository";
-import { KIND_LABEL, PROFILE_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, UPDATE_LABEL, type DossierEvent, type DossierFigure, type DossierSource, type IntelItem } from "@/lib/paperflow/intel/types";
+import { FINANCIAL_LABEL, KIND_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, UPDATE_LABEL, type DossierEvent, type DossierFigure, type DossierSource, type IntelItem } from "@/lib/paperflow/intel/types";
 import { Markdown, type EntityRenderer, type TermMarker } from "./markdown";
 import { CompactTimeline, Lightbox, SourceChip, pdfOf, siteOf } from "./dossier-parts";
 import { SourceTree } from "./source-tree";
@@ -27,7 +27,6 @@ export function CompanyMark({ item, size = 56 }: { item: IntelItem; size?: numbe
 /** Analysis addressed to NAYSOR is kept out of a company's own page: the page states what is known about the company. */
 const isOpinion = (title: string) => /NAYSOR|나이소르|시사점|해야 할 일/.test(title);
 const STATUS_SHORT: Record<string, string> = { verified: "확인됨", claimed: "회사 발표", estimate: "추정", unverified: "미확인" };
-const PROFILE_ORDER = ["parent", "hq", "country", "founded", "ticker", "size", "industry", "role", "capacity", "status", "projects", "products"];
 
 /**
  * A company, project or vendor as a research document: who it is first (name, country, business,
@@ -51,15 +50,42 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
   const figures: DossierFigure[] = [...(dossier?.figures ?? []), ...(item.user?.figures ?? []).map(figure => ({ src: figure.src, caption: `${figure.caption} (내가 추가)` }))];
   const sections = (dossier?.sections ?? []).filter(section => !isOpinion(section.title));
   const [overview, ...rest] = sections;
-  const profile = PROFILE_ORDER.flatMap(key => item.profile?.[key] ? [[key, item.profile[key]] as const] : []);
   const kpis = (item.data ?? []).slice(0, 5);
+  const fin = item.financials, refs = item.profileRefs ?? {};
+  // Company information as one table — field, value, source — in a fixed order, like a research report's
+  // first page. A source is a case-file number, a URL, or the website itself.
+  const srcLink = (url: string) => <a className="pf-cdoc-src" href={url} target="_blank" rel="noreferrer noopener">{siteOf(url)}</a>;
+  const sourceOf = (key: string): React.ReactNode => { const ref = refs[key]; if (!ref) return null; return /^https?:\/\//.test(ref) ? srcLink(ref) : cite(ref); };
+  const infoRows: { key: string; label: string; value: React.ReactNode; source?: React.ReactNode }[] = [];
+  const add = (key: string, label: string, value: React.ReactNode, source?: React.ReactNode) => { if (value) infoRows.push({ key, label, value, source: source === undefined ? sourceOf(key) : source }); };
+  add("name", "기업명", <>{companyName(item)}{item.profile?.legalName && item.profile.legalName !== companyName(item) && <small>{item.profile.legalName}</small>}</>, sourceOf("legalName"));
+  add("ticker", "종목코드", item.profile?.ticker ?? ((item.kind === "company" || item.kind === "vendor") ? <em>비상장 또는 미확인</em> : null));
+  if (item.profile?.listing) add("listing", "상장", item.profile.listing);
+  add("parent", "모회사·주요 주주", [item.profile?.parent, item.profile?.owners].filter(Boolean).join(" · "), sourceOf("parent") ?? sourceOf("owners"));
+  add("hq", "본사·국가", [item.profile?.hq, item.profile?.country ?? item.country].filter((part, index, all) => part && all.indexOf(part) === index).join(" · "), sourceOf("hq") ?? sourceOf("country"));
+  add("founded", "설립", item.profile?.founded);
+  add("industry", "분야", item.profile?.industry);
+  add("role", "역할", item.profile?.role);
+  add("ceo", "대표", item.profile?.ceo);
+  add("employees", "직원 수", item.profile?.employees ?? fin?.employees, sourceOf("employees") ?? (fin?.employees ? srcLink(fin.source) : null));
+  if (fin) add("financials", "재무 정보", <>{fin.fiscalYear}{fin.currency ? " (" + fin.currency + ")" : ""}{fin.note ? ", " + fin.note : ""}<br/>{FINANCIAL_LABEL.filter(([key]) => fin[key] && key !== "employees").map(([key, label]) => label + " " + fin[key]).join(" · ") || "공개 수치 없음"}</>, srcLink(fin.source));
+  else add("revenue", "매출", item.profile?.revenue);
+  add("capital", "자본금", item.profile?.capital);
+  add("size", "규모", item.profile?.size);
+  add("products", "제품", item.profile?.products);
+  add("capacity", "생산능력", item.profile?.capacity);
+  add("projects", "프로젝트 실적", item.profile?.projects);
+  add("status", "현황", item.profile?.status);
+  if (item.profile?.website && /^https?:/.test(item.profile.website)) add("website", "웹사이트", <a href={item.profile.website} target="_blank" rel="noreferrer noopener">{item.profile.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a>, null);
+  const people = item.people ?? [];
+  const infoTable = infoRows.length > 0 && <table className="pf-cdoc-table"><tbody>{infoRows.map(row => <tr key={row.key}><th scope="row">{row.label}</th><td>{row.value}</td><td>{row.source}</td></tr>)}</tbody></table>;
+  const peopleTable = people.length > 0 && <table className="pf-cdoc-table pf-cdoc-people"><thead><tr><th>경영진</th><th>직책·배경</th><th>출처</th></tr></thead><tbody>{people.map((person, index) => <tr key={index}><th scope="row">{person.name}</th><td><b>{person.title}</b>{person.background && <><br/>{person.background}</>}</td><td>{person.url ? srcLink(person.url) : cite(person.ref)}</td></tr>)}</tbody></table>;
   const checked = dossier?.asOf ?? item.checkedAt;
   const kicker = [item.country, item.profile?.industry, KIND_LABEL[item.kind], item.stage ? STAGE_LABEL[item.stage] : null].filter(Boolean).join(" · ");
   let number = 0;
   const heading = (title: string) => <h2 className="pf-cdoc-h"><span>{String(++number).padStart(2, "0")}</span>{title}</h2>;
 
   const timeline = events.length ? <CompactTimeline events={events} cite={cite}/> : <p className="pf-cdoc-none">기록된 사건이 없습니다.</p>;
-  const link = (value: string) => /^https?:\/\//.test(value) ? <a href={value} target="_blank" rel="noreferrer noopener">{value.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a> : value;
 
   return <article className="pf-cdoc">
     <nav className="pf-company-back"><button type="button" onClick={onBack}><ArrowLeft size={15}/>인텔리전스로 돌아가기</button></nav>
@@ -68,7 +94,6 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
         <p className="pf-cdoc-kicker">{kicker}</p>
         <h1>{companyName(item)}</h1>
         {tagline(item) && <p className="pf-cdoc-tagline">{tagline(item)}</p>}
-        {profile.length > 0 && <dl className="pf-cdoc-profile">{profile.filter(([key]) => key !== "website").map(([key, value]) => <div key={key} data-long={value.length > 70 || undefined}><dt>{PROFILE_LABEL[key] ?? key}</dt><dd>{link(value)}</dd></div>)}</dl>}
         <div className="pf-cdoc-actions">
           {item.profile?.website && /^https?:/.test(item.profile.website) && <a href={item.profile.website} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={14}/>{siteOf(item.profile.website)}</a>}
           {read && <button type="button" className="pf-company-read" onClick={read.run}><BookOpenText size={14}/>{read.label}</button>}
@@ -84,6 +109,10 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
       <PanelMarks itemId={`page-${item.id}`}>
         <div className="pf-cdoc-main">
           {dossier ? <>
+            <section>
+              {heading("기업 정보")}
+              {infoTable}{peopleTable}
+            </section>
             <section>
               {heading("개요")}
               <p className="pf-cdoc-lede">{dossier.headline}</p>
@@ -120,6 +149,8 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
               </li>)}</ol>
             </section> : null}
           </> : <section>
+            {heading("기업 정보")}
+            {infoTable}{peopleTable}
             {heading("개요")}
             {item.summaryKo && <p className="pf-cdoc-lede">{item.summaryKo}</p>}
             {item.status && <p className="pf-cdoc-none">상태: {STATUS_LABEL[item.status]}</p>}
@@ -132,7 +163,7 @@ export function CompanyPage({ item, read, library, news, related, byId, mentions
           <FigureAdder item={item} notify={notify}/>
         </div>
       </PanelMarks>
-      <aside className="pf-cdoc-rail" aria-label="연혁"><h2 className="pf-cdoc-h"><span>연혁</span>{events.length}건</h2>{timeline}</aside>
+      <aside className="pf-cdoc-rail" aria-label="연혁"><section><h2 className="pf-cdoc-h"><span>연혁</span>{events.length}건</h2>{timeline}</section></aside>
     </div>
     <Lightbox figure={figureAt !== null ? figures[figureAt] ?? null : null} source={figureAt !== null && figures[figureAt]?.ref ? sources.get(figures[figureAt].ref!) : undefined} onClose={() => setFigureAt(null)}/>
   </article>;

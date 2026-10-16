@@ -12,6 +12,9 @@ export interface IntelDatum { label: string; value: string; unit?: string; basis
 export interface IntelRelation { to: string; type: string }
 export interface IntelApplicability { new?: string; fit?: string; designChange?: string; testVars?: string; capex?: string; quality?: string; scaleup?: string; questions?: string }
 /** What the reader decided about an item: kept, filed, noted. Synced; never overwritten by a new pack. */
+export interface IntelPerson { name: string; title: string; background?: string; ref?: string; url?: string }
+export interface IntelFinancials { fiscalYear: string; currency?: string; revenue?: string; operatingProfit?: string; netIncome?: string; totalAssets?: string; equity?: string; employees?: string; marketCap?: string; source: string; note?: string }
+export const FINANCIAL_LABEL: [keyof IntelFinancials, string][] = [["revenue", "매출"], ["operatingProfit", "영업이익"], ["netIncome", "순이익"], ["totalAssets", "총자산"], ["equity", "자본총계"], ["marketCap", "시가총액"], ["employees", "직원 수"]];
 export type PlaceKind = "hq" | "plant" | "project" | "site" | "port" | "other";
 export interface IntelPlace { lat: number; lng: number; label: string; kind: PlaceKind; address?: string; precision: "exact" | "street" | "city" | "region"; ref?: string }
 export const PLACE_LABEL: Record<PlaceKind, string> = { hq: "본사", plant: "공장", project: "프로젝트", site: "현장", port: "항만", other: "기타" };
@@ -37,6 +40,12 @@ export interface IntelItem {
   logo?: string;
   /** The logo is light on a dark ground, so its tile is dark. */
   logoDark?: boolean;
+  /** Latest reported figures from the annual report or filing, as printed (with units), and where they come from. */
+  financials?: IntelFinancials;
+  /** Source of each profile field: a case-file source number ("2" or "2, 4") or a URL. */
+  profileRefs?: Record<string, string>;
+  /** Executives named in public sources: name, title, professional background — no contact details, no photos. */
+  people?: IntelPerson[];
   /** Where it is: headquarters, plants, project sites — for the map. Only places a source states. */
   geo?: IntelPlace[];
   /** News about companies/projects (a report, a new plan, an article, a withdrawal…): shown under "오늘자 업데이트" and in each company's archive. */
@@ -97,7 +106,10 @@ export const RELIABILITY_LABEL: Record<number, string> = { 1: "정부·규제기
 /** What kind of document a source is, as a reader names it on a card. */
 export const SOURCE_LABEL: Record<string, string> = { paper: "논문", gov: "정부 자료", "test-report": "실증 보고서", "annual-report": "기업 보고서", patent: "특허", "vendor-catalog": "카탈로그", "market-analyst": "시장 분석", press: "기사" };
 export const LANG_LABEL: Record<string, string> = { en: "영어", ko: "한국어", ja: "일본어", zh: "중국어", id: "인도네시아어", ms: "말레이어", de: "독일어", fr: "프랑스어", nl: "네덜란드어", fi: "핀란드어", sv: "스웨덴어" };
-export const PROFILE_LABEL: Record<string, string> = { industry: "산업", role: "역할", hq: "본사", country: "국가", ticker: "종목코드", website: "웹사이트", founded: "설립", size: "규모", parent: "모회사", projects: "수행 프로젝트", products: "제품", capacity: "생산능력", status: "현황" };
+export const PROFILE_LABEL: Record<string, string> = { legalName: "정식 명칭", industry: "산업", role: "역할", hq: "본사", country: "국가", ticker: "종목코드", listing: "상장", website: "웹사이트", founded: "설립", size: "규모", revenue: "매출", employees: "직원 수", capital: "자본금", parent: "모회사", owners: "주요 주주", ceo: "대표", projects: "수행 프로젝트", products: "제품", capacity: "생산능력", status: "현황" };
+/** Identity fields shown in the company info box (short values); the rest describe the business. */
+export const PROFILE_IDENTITY = ["legalName", "ticker", "listing", "parent", "owners", "hq", "country", "industry", "founded", "ceo", "revenue", "employees", "capital", "size"] as const;
+export const PROFILE_BUSINESS = ["role", "products", "capacity", "projects", "status"] as const;
 export const APPLICABILITY_LABEL: [keyof IntelApplicability, string][] = [
   ["new", "새로 확인한 것"], ["fit", "NAYSOR 가정과 비교"], ["designChange", "설계 변경 검토"], ["testVars", "파일럿 검증 변수"],
   ["capex", "CAPEX/OPEX 영향"], ["quality", "제품 품질·가격 영향"], ["scaleup", "스케일업 위험"], ["questions", "기업·벤더에 물을 것"]

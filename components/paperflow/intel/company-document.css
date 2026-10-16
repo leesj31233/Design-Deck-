@@ -7,12 +7,6 @@
 .pf-cdoc-kicker { margin:0 0 6px; font-size:12.5px; color:var(--i-muted); }
 .pf-cdoc-id h1 { margin:0; font-size:clamp(24px,2.4vw,32px); line-height:1.2; font-weight:700; }
 .pf-cdoc-tagline { margin:6px 0 0; font-size:15px; line-height:1.55; color:var(--i-muted); }
-.pf-cdoc-profile { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); column-gap:28px; row-gap:6px; margin:14px 0 0; }
-.pf-cdoc-profile > div[data-long] { grid-column:1 / -1; }
-.pf-cdoc-profile > div { display:grid; grid-template-columns:auto minmax(0,1fr); gap:10px; font-size:13.5px; line-height:1.5; }
-.pf-cdoc-profile dt { color:var(--i-muted); white-space:nowrap; }
-.pf-cdoc-profile dd { margin:0; overflow-wrap:anywhere; }
-.pf-cdoc-profile a { color:var(--i-ink); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--i-line); }
 .pf-cdoc-actions { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; }
 .pf-cdoc-actions a, .pf-cdoc-actions button { display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 11px; border:1px solid var(--i-line); border-radius:8px; background:var(--background); color:var(--i-ink); font:inherit; font-size:12.5px; text-decoration:none; cursor:pointer; }
 .pf-cdoc-actions .pf-company-read { background:var(--i-ink); border-color:var(--i-ink); color:var(--background); font-weight:600; }
@@ -132,4 +126,31 @@
   .pf-cdoc-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .pf-cdoc-thumbs { grid-template-columns:repeat(3,minmax(0,1fr)); }
   .pf-cdoc-thumbs img { height:70px; }
+}
+
+/* Company information: field · value · source, the first thing in the document. */
+.pf-cdoc-table { width:100%; border-collapse:collapse; border:1px solid var(--i-line); font-size:14px; line-height:1.55; }
+.pf-cdoc-table th, .pf-cdoc-table td { padding:9px 12px; border-bottom:1px solid var(--i-line); vertical-align:top; text-align:left; }
+.pf-cdoc-table tbody th { width:128px; background:color-mix(in srgb,var(--i-ink) 3%,transparent); color:var(--i-ink); font-weight:600; white-space:nowrap; }
+.pf-cdoc-table thead th { background:color-mix(in srgb,var(--i-ink) 3%,transparent); font-size:12.5px; color:var(--i-muted); font-weight:600; }
+.pf-cdoc-table td { overflow-wrap:anywhere; }
+.pf-cdoc-table td:last-child { width:170px; font-size:12.5px; color:var(--i-muted); }
+.pf-cdoc-table td small { display:block; font-size:12px; color:var(--i-muted); }
+.pf-cdoc-table td em { font-style:normal; color:var(--i-muted); }
+.pf-cdoc-table tr:last-child th, .pf-cdoc-table tr:last-child td { border-bottom:0; }
+.pf-cdoc-table a { color:var(--i-ink); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--i-line); }
+.pf-cdoc-src { display:inline-flex; align-items:center; gap:4px; max-width:100%; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-cdoc-src::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--i-accent); flex:none; }
+.pf-cdoc-table td:last-child .pf-cite { vertical-align:baseline; font-size:12px; }
+.pf-cdoc-people { margin-top:12px; }
+.pf-cdoc-people tbody th { white-space:normal; }
+@media (max-width:700px) {
+  .pf-cdoc-table, .pf-cdoc-table tbody, .pf-cdoc-table tr { display:block; }
+  .pf-cdoc-table thead { display:none; }
+  .pf-cdoc-table tr { display:grid; grid-template-columns:96px minmax(0,1fr); border-bottom:1px solid var(--i-line); }
+  .pf-cdoc-table tr:last-child { border-bottom:0; }
+  .pf-cdoc-table th, .pf-cdoc-table td { border-bottom:0; padding:8px 10px; }
+  .pf-cdoc-table tbody th { width:auto; white-space:normal; }
+  .pf-cdoc-table td:last-child { grid-column:2; width:auto; padding-top:0; }
+  .pf-cdoc-table td:last-child:empty { display:none; }
 }

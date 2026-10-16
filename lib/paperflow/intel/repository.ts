@@ -13,6 +13,27 @@ const longText = (value: unknown, max = 4000) => typeof value === "string" ? val
 const link = (value: unknown) => { const url = text(value, 1000); try { return url && /^https?:$/.test(new URL(url).protocol) ? url : undefined; } catch { return undefined; } };
 
 /** One item from a pack, checked field by field; anything malformed is dropped rather than trusted. */
+/** Reported figures: a fiscal year and a source link are required; every figure is a short printed string. */
+function financialsOf(value: unknown) {
+  if (!value || typeof value !== "object") return undefined;
+  const raw = value as Record<string, unknown>, fiscalYear = text(raw.fiscalYear, 20), source = link(raw.source);
+  if (!fiscalYear || !source) return undefined;
+  const field = (key: string) => text(raw[key], 40);
+  return { fiscalYear, source, currency: text(raw.currency, 12), revenue: field("revenue"), operatingProfit: field("operatingProfit"), netIncome: field("netIncome"), totalAssets: field("totalAssets"), equity: field("equity"), employees: field("employees"), marketCap: field("marketCap"), note: text(raw.note, 160) };
+}
+
+function refsOf(value: unknown) {
+  if (!value || typeof value !== "object") return undefined;
+  const out: Record<string, string> = {};
+  for (const [key, ref] of Object.entries(value as Record<string, unknown>).slice(0, 30)) { const clean = typeof ref === "string" && /^https?:/.test(ref) ? link(ref) : text(ref, 20); if (clean && /^[\w-]{1,24}$/.test(key)) out[key] = clean; }
+  return Object.keys(out).length ? out : undefined;
+}
+function peopleOf(value: unknown) {
+  if (!Array.isArray(value)) return undefined;
+  const out = value.flatMap((person: Record<string, unknown>) => { const name = text(person?.name, 60), title = text(person?.title, 80); return name && title ? [{ name, title, background: text(person?.background, 240), ref: text(person?.ref, 20), url: link(person?.url) }] : []; }).slice(0, 8);
+  return out.length ? out : undefined;
+}
+
 const PLACE_KINDS = new Set(["hq", "plant", "project", "site", "port", "other"]), PRECISIONS = new Set(["exact", "street", "city", "region"]);
 /** Map places: finite coordinates in range, a short label, a known kind and precision; at most 6. */
 function placesOf(value: unknown) {
@@ -52,7 +73,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     profile: record(value.profile),
     dossier: dossierOf(value.dossier),
     update: updateOf(value.update),
-    logoDark: value.logoDark === true ? true : undefined, geo: placesOf(value.geo), logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
+    logoDark: value.logoDark === true ? true : undefined, geo: placesOf(value.geo), financials: financialsOf(value.financials), profileRefs: refsOf(value.profileRefs), people: peopleOf(value.people), logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
     cover: typeof value.cover === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.cover) && value.cover.length < 140_000 ? value.cover : undefined,
     checkedAt: text(value.checkedAt, 20), pack
   };

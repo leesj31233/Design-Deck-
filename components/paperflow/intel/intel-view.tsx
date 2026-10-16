@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight, BookOpenText, Building2, Newspaper, ChevronRight, Download, EyeOff, FileDown, FileText, FolderOpen, Layers, Library, Loader2, Radar, Search, Star, Upload, X } from "lucide-react";
+import { ArrowUpRight, BookOpenText, Building2, MapPinned, Newspaper, ChevronRight, Download, EyeOff, FileDown, FileText, FolderOpen, Layers, Library, Loader2, Radar, Search, Star, Upload, X } from "lucide-react";
 import type { StoredDocument } from "@/lib/paperflow/persistence/types";
 import { archiveFolders } from "@/lib/paperflow/library/archive-folders";
 import { importDocument } from "@/lib/paperflow/pdf/import-document";
@@ -21,6 +21,7 @@ import { PanelMarks } from "./panel-marks";
 import { SourceTree } from "./source-tree";
 import { CardCover } from "./card-cover";
 import { CompanyMark, CompanyPage, companyName } from "./company-page";
+import { IntelMap } from "./intel-map";
 import { glossaryIndex, type GlossaryTerm } from "@/lib/paperflow/intel/glossary";
 import "./intel.css";
 
@@ -46,7 +47,7 @@ const display = (item: IntelItem) => item.titleKo || item.title;
  */
 export function IntelView({ docs }: { docs: StoredDocument[] }) {
   const [items, setItems] = useState<IntelItem[] | null>(null), [briefs, setBriefs] = useState<IntelBrief[]>([]);
-  const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "briefs" | "companies">("items");
+  const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "briefs" | "companies" | "map">("items");
   const [query, setQuery] = useState(""), [kinds, setKinds] = useState<Set<IntelKind>>(new Set()), [statuses, setStatuses] = useState<Set<IntelStatus>>(new Set());
   const [sort, setSort] = useState<"reliability" | "date">("date"), [showHidden, setShowHidden] = useState(false);
   const [selected, setSelected] = useState<string | null>(null), [briefId, setBriefId] = useState<string | null>(null);
@@ -253,9 +254,10 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
             <button type="button" role="tab" aria-selected={mode === "items"} onClick={() => setMode("items")}><Layers size={14}/>항목</button>
             <button type="button" role="tab" aria-selected={mode === "briefs"} onClick={() => setMode("briefs")}><BookOpenText size={14}/>브리핑<i>{briefs.length}</i></button>
             <button type="button" role="tab" aria-selected={mode === "companies"} onClick={() => setMode("companies")}><Building2 size={14}/>기업 분석<i>{companies.length}</i></button>
+            <button type="button" role="tab" aria-selected={mode === "map"} onClick={() => setMode("map")}><MapPinned size={14}/>지도<i>{visible.filter(item => item.geo?.length).length}</i></button>
           </div>
         </div>
-        {latestDay && <section className="pf-intel-today" aria-label="오늘자 업데이트">
+        {latestDay && mode !== "map" && <section className="pf-intel-today" aria-label="오늘자 업데이트">
           <header><Newspaper size={15}/><strong>{allRecent ? "최근 7일 업데이트" : "오늘자 업데이트"}</strong><time>{latestDay}</time><span>{shownUpdates.length}건</span>
             <button type="button" onClick={() => setAllRecent(!allRecent)}>{allRecent ? "최신 날짜만" : "최근 7일 보기"}</button></header>
           <ul>{shownUpdates.slice(0, allRecent ? 30 : 12).map(item => <li key={item.id}><button type="button" data-open={selected === item.id || undefined} onClick={() => setSelected(item.id)}>
@@ -271,7 +273,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
           <label className="pf-intel-hidden"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)}/>숨긴 항목</label>
         </div>}
 
-        {mode === "companies" ? <ul className="pf-intel-companies">
+        {mode === "map" ? <IntelMap items={visible} query={query} selected={selected} onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}/> : mode === "companies" ? <ul className="pf-intel-companies">
           {companies.filter(({ item }) => !query || [display(item), item.title, item.org, item.country, ...Object.values(item.profile ?? {})].join(" ").toLowerCase().includes(query.toLowerCase())).map(({ item, news }) => { const cover = item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src; return <li key={item.id}>
             <article className="pf-intel-company" data-selected={selected === item.id || undefined} tabIndex={0} onClick={() => { setPageId(item.id); setSelected(null); window.scrollTo({ top: 0 }); }} onKeyDown={event => { if (event.key === "Enter") { setPageId(item.id); setSelected(null); } }}>
               <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : item.logo ? <span className="pf-intel-company-logo-big"><img src={item.logo} alt=""/></span> : <CompanyMark item={item} size={64}/>}{item.logo && <i className="pf-intel-company-logo" data-dark={item.logoDark || undefined}><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
