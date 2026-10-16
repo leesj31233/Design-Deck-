@@ -12,6 +12,12 @@ const adminEmails = () => (process.env.PAPERFLOW_OWNER_EMAILS ?? "").split(",").
  * The session cookie is refreshed here on the way through. Without cloud config nothing is gated.
  */
 export async function proxy(request: NextRequest) {
+  // NAYSOR News (its own address): open to everyone, no account. Its front page is /news; the app's other
+  // pages are not part of it.
+  if (request.headers.get("host")?.startsWith("naysor-news.")) {
+    if (request.nextUrl.pathname === "/") return NextResponse.rewrite(new URL("/news", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
+  }
   if (!url || !anonKey) return NextResponse.next();
   let response = NextResponse.next({ request });
   const supabase = createServerClient(url, anonKey, {
@@ -41,7 +47,8 @@ export async function proxy(request: NextRequest) {
   }
   if (!signedIn) {
     const login = new URL("/login", request.url);
-    if (path !== "/" && path !== "/library") login.searchParams.set("next", path + request.nextUrl.search);
+    // The library keeps its query (a NAYSOR News link to an item) through sign-in.
+    if (path !== "/" && (path !== "/library" || request.nextUrl.search)) login.searchParams.set("next", path + request.nextUrl.search);
     return redirect(login);
   }
   return response;

@@ -2,7 +2,8 @@ import type { Annotation } from "../anchors/types";
 import type { ScholarWork } from "../scholar/openalex";
 import type { PaperGuide } from "../guide/guide";
 /** An archive folder: a name, a lucide icon and a tint. `removed` marks a deleted folder. */
-export type ArchiveFolder = { id: string; name: string; icon: string; color: string; createdAt: string; updatedAt?: string; removed?: boolean };
+/** An archive folder; a sub-folder names its parent (and carries it, so the tree travels with the papers). */
+export type ArchiveFolder = { id: string; name: string; icon: string; color: string; createdAt: string; updatedAt?: string; removed?: boolean; parentId?: string; parent?: ArchiveFolder };
 export type StoredDocument = {
   id: string; filename: string; title: string; mimeType: "application/pdf"; byteLength: number;
   createdAt: string; updatedAt: string; pageCount: number; fingerprint?: string; blobKey: string;

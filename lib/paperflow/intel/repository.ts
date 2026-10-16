@@ -2,6 +2,7 @@ import { openDatabase, requestResult, transactionDone } from "../persistence/ind
 import { emitLocalChange } from "../persistence/changes";
 import { REGISTRY_BRIEF, cleanRegistry } from "./registry";
 import { PRICES_BRIEF, cleanPrices } from "./prices";
+import { PLACES_BRIEF, cleanPlaces } from "./places";
 import { isClass, type IntelBrief, type IntelClass, type IntelItem, type IntelKind, type IntelPack, type IntelStage, type IntelStatus, type IntelUserState } from "./types";
 
 /** Class 1 / Class 2 tags, known ones only, each once. */
@@ -106,6 +107,9 @@ export function readPack(json: string): IntelPack {
   if (registry) briefs.push({ id: REGISTRY_BRIEF, title: "기업 레지스트리", body: JSON.stringify(registry), order: 998, period: "core", date: undefined, pack: id });
   // So does the price board (pellet, PKS, biochar prices by market, each point with its source).
   const prices = cleanPrices((raw as { prices?: unknown }).prices);
+  // And the map's base layers (palm mills, coal power plants).
+  const places = cleanPlaces((raw as { places?: unknown }).places);
+  if (places) briefs.push({ id: PLACES_BRIEF, title: "지도 기본 레이어", body: JSON.stringify(places), order: 996, period: "core", date: undefined, pack: id });
   if (prices) briefs.push({ id: PRICES_BRIEF, title: "가격 보드", body: JSON.stringify(prices), order: 997, period: "core", date: undefined, pack: id });
   return { format: "paperflow-intel", version: 1, id, title: text(raw.title, 200), generatedAt: text(raw.generatedAt, 40) ?? new Date().toISOString(), items, briefs };
 }
@@ -155,6 +159,9 @@ function splitCover(item: IntelItem): { item: IntelItem; cover?: string } {
 }
 type IntelMedia = { id: string; cover: string; updatedAt: string };
 const coverUrls = new Map<string, string>();
+/** NAYSOR News: covers are pictures on the server (cached by the browser), not copies on the device. */
+const remoteCovers = new Map<string, string>();
+export function setRemoteCovers(urls: Record<string, string>) { for (const [id, url] of Object.entries(urls)) remoteCovers.set(id, url); }
 const dataUrlToObjectUrl = (dataUrl: string) => { try { const [head, body] = dataUrl.split(","), type = /data:([^;]+)/.exec(head)?.[1] ?? "image/webp", bytes = Uint8Array.from(atob(body), char => char.charCodeAt(0)); return URL.createObjectURL(new Blob([bytes], { type })); } catch { return dataUrl; } };
 
 export const intelRepository = {
@@ -172,7 +179,7 @@ export const intelRepository = {
   },
   /** The cover as an object URL (made once per device session), or nothing when the item has none. */
   async cover(id: string): Promise<string | undefined> {
-    const hit = coverUrls.get(id);
+    const hit = coverUrls.get(id) ?? remoteCovers.get(id);
     if (hit) return hit;
     const db = await openDatabase(), media = await requestResult<IntelMedia | undefined>(db.transaction("intelMedia").objectStore("intelMedia").get(id));
     if (!media?.cover) return undefined;
@@ -229,6 +236,19 @@ export const intelRepository = {
     if (cover) { tx.objectStore("intelMedia").put({ id: item.id, cover, updatedAt: item.updatedAt ?? new Date().toISOString() }); coverUrls.delete(item.id); }
     const has = item.hasCover || Boolean(cover) || Boolean(await requestResult<IntelMedia | undefined>(tx.objectStore("intelMedia").get(item.id)));
     tx.objectStore("intel").put({ ...item, hasCover: has || undefined });
+    await done; announce();
+  },
+  /**
+   * NAYSOR News: the device holds exactly what the site publishes. Items and briefings no longer published go;
+   * the visitor's own decisions on the rest (star, hidden) stay.
+   */
+  async replaceFeed(items: IntelItem[], briefs: IntelBrief[]) {
+    const db = await openDatabase(), before = new Map((await intelRepository.list()).map(item => [item.id, item]));
+    const tx = db.transaction(["intel", "intelBriefs"], "readwrite"), done = transactionDone(tx), keep = new Set(items.map(item => item.id)), keepBriefs = new Set(briefs.map(brief => brief.id));
+    for (const id of before.keys()) if (!keep.has(id)) tx.objectStore("intel").delete(id);
+    for (const item of items) tx.objectStore("intel").put({ ...item, user: before.get(item.id)?.user, addedAt: before.get(item.id)?.addedAt ?? item.updatedAt });
+    for (const brief of await requestResult<IntelBrief[]>(tx.objectStore("intelBriefs").getAll())) if (!keepBriefs.has(brief.id)) tx.objectStore("intelBriefs").delete(brief.id);
+    for (const brief of briefs) tx.objectStore("intelBriefs").put(brief);
     await done; announce();
   },
   async putBriefRaw(brief: IntelBrief) { const db = await openDatabase(), tx = db.transaction("intelBriefs", "readwrite"), done = transactionDone(tx); tx.objectStore("intelBriefs").put(brief); await done; announce(); }

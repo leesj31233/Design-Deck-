@@ -1,9 +1,13 @@
 let connection: Promise<IDBDatabase> | undefined;
+/** The device database. The public NAYSOR News site keeps its own ("naysor-news-v1"), so a visitor's marks and a
+ * signed-in reader's library never share a store, even on the same address. Chosen before anything opens it. */
+let databaseName = "paperflow-v1";
+export function selectDatabase(name: string) { if (name !== databaseName) { databaseName = name; connection = undefined; } }
 export function openDatabase(): Promise<IDBDatabase> {
   if (connection) return connection;
   connection = new Promise((resolve, reject) => {
     if (typeof indexedDB === "undefined") { reject(new Error("이 브라우저에서는 로컬 저장소를 사용할 수 없습니다.")); return; }
-    const request = indexedDB.open("paperflow-v1", 7);
+    const request = indexedDB.open(databaseName, 7);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains("documents")) db.createObjectStore("documents", { keyPath: "id" });

@@ -23,11 +23,22 @@ function write(folders: ArchiveFolder[]) {
 export function archiveFolders(docs: StoredDocument[]): ArchiveFolder[] {
   const byId = new Map(read().map(folder => [folder.id, folder]));
   for (const doc of docs) if (doc.archiveFolder && !doc.deletedAt) {
-    const known = byId.get(doc.archiveFolder.id);
-    // The newest edit of a folder wins (a rename on another device).
-    if (!known || (doc.archiveFolder.updatedAt ?? "") > (known.updatedAt ?? "")) byId.set(doc.archiveFolder.id, doc.archiveFolder);
+    // A sub-folder brings its parents along (the intelligence tree: 인텔리전스 PDF › Class › kind).
+    for (let folder: ArchiveFolder | undefined = doc.archiveFolder; folder; folder = folder.parent) {
+      const known = byId.get(folder.id), { parent: _parent, ...plain } = folder;
+      void _parent;
+      // The newest edit of a folder wins (a rename on another device).
+      if (!known || (folder.updatedAt ?? "") > (known.updatedAt ?? "")) byId.set(folder.id, plain);
+    }
   }
   return [...byId.values()].filter(folder => !folder.removed).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+/** A folder and the folders above it, nearest first. */
+export function folderChain(id: string | undefined, folders: ArchiveFolder[]) {
+  const byId = new Map(folders.map(folder => [folder.id, folder])), chain: ArchiveFolder[] = [];
+  for (let folder = id ? byId.get(id) : undefined; folder && chain.length < 8; folder = folder.parentId ? byId.get(folder.parentId) : undefined) chain.push(folder);
+  return chain;
 }
 
 export function newFolder(name: string, icon: string, color: string): ArchiveFolder {

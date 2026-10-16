@@ -24,6 +24,7 @@ import { CompanyMark, CompanyPage, companyName } from "./company-page";
 import { IntelMap } from "./intel-map";
 import { EntityDirectory } from "./entity-directory";
 import { PriceBoard } from "./price-board";
+import { PLACES_BRIEF, cleanPlaces, type BasePlaces } from "@/lib/paperflow/intel/places";
 import { PRICES_BRIEF, cleanPrices, productClass, type PriceBoard as PriceBoardData } from "@/lib/paperflow/intel/prices";
 import { REGISTRY_BRIEF, entityClasses, entityItems, indexRegistry, type IntelEntity, type IntelRegistry } from "@/lib/paperflow/intel/registry";
 import { glossaryIndex, type GlossaryTerm } from "@/lib/paperflow/intel/glossary";
@@ -49,7 +50,10 @@ const display = (item: IntelItem) => item.titleKo || item.title;
  * (source type, reliability, confirmed / claimed / estimate). Open-access PDFs go straight into the
  * library, where they are read, translated (any language into Korean) and marked like any paper.
  */
-export function IntelView({ docs }: { docs: StoredDocument[] }) {
+/** NAYSOR News (the public site): no library, no pack import; PDFs are read and marked in PAPERFLOW. */
+export type IntelSite = { loading: boolean; paperflow: string };
+
+export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site?: IntelSite; launch?: { item: string; read: boolean; related?: boolean } }) {
   const [items, setItems] = useState<IntelItem[] | null>(null), [briefs, setBriefs] = useState<IntelBrief[]>([]);
   const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "briefs" | "companies" | "map">("items");
   const [query, setQuery] = useState(""), [kinds, setKinds] = useState<Set<IntelKind>>(new Set()), [statuses, setStatuses] = useState<Set<IntelStatus>>(new Set());
@@ -98,10 +102,11 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
   // The entity registry travels the same way ("__registry__"): organisations, their codes and items.
   const [registry, setRegistry] = useState<IntelRegistry | null>(null);
   // And the price board ("__prices__"): pellet, PKS and biochar prices by market, shown above the briefings.
-  const [prices, setPrices] = useState<PriceBoardData | null>(null);
+  const [prices, setPrices] = useState<PriceBoardData | null>(null), [places, setPlaces] = useState<BasePlaces | null>(null);
   const load = useCallback(async () => {
     const [list, written] = await Promise.all([intelRepository.list(), intelRepository.briefs()]);
-    setItems(list); setBriefs(written.filter(brief => brief.id !== "__glossary__" && brief.id !== REGISTRY_BRIEF && brief.id !== PRICES_BRIEF));
+    setItems(list); setBriefs(written.filter(brief => brief.id !== "__glossary__" && brief.id !== REGISTRY_BRIEF && brief.id !== PRICES_BRIEF && brief.id !== PLACES_BRIEF));
+    try { const stored = written.find(brief => brief.id === PLACES_BRIEF); setPlaces(stored ? cleanPlaces(JSON.parse(stored.body)) : null); } catch { setPlaces(null); }
     try { const stored = written.find(brief => brief.id === PRICES_BRIEF); setPrices(stored ? cleanPrices(JSON.parse(stored.body)) : null); } catch { setPrices(null); }
     try { const stored = written.find(brief => brief.id === REGISTRY_BRIEF); setRegistry(stored ? JSON.parse(stored.body) : null); } catch { setRegistry(null); }
     try { const glossary = written.find(brief => brief.id === "__glossary__"); setExtraTerms(glossary ? JSON.parse(glossary.body) : []); } catch { setExtraTerms([]); }
@@ -112,6 +117,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
     return { pattern, render: (key: string, label: string, nodeKey: string) => { const term = byKey.get(key)!; return <span key={nodeKey} className="pf-term" tabIndex={0}>{label}<span className="pf-term-tip" role="tooltip"><strong>{term.term}</strong><small>{term.full}</small><span>{term.meaning}</span>{term.note && <em>{term.note}</em>}</span></span>; } };
   }, [extraTerms]);
   useEffect(() => { void load(); window.addEventListener(INTEL_EVENT, load); return () => window.removeEventListener(INTEL_EVENT, load); }, [load]);
+  const launched = useRef<object | null>(null);
 
   // Class 1 (EFB/POME pellets, biochar) or Class 2 (low-rank coal upgrading): the whole tab follows the choice.
   const [klass, setKlassState] = useState<IntelClass | "all">("all");
@@ -255,6 +261,21 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
     document.addEventListener("mouseover", place); document.addEventListener("focusin", place);
     return () => { document.removeEventListener("mouseover", place); document.removeEventListener("focusin", place); };
   }, []);
+  // Arriving from NAYSOR News ("…/library?intel=<id>&read=1"): the item opens, and its PDF goes to the reader.
+  useEffect(() => {
+    if (!launch || launched.current === launch || !items) return;
+    const target = byId.get(launch.item);
+    if (!target) return;
+    launched.current = launch;
+    // 관련 이슈: the organisation (or project) the document belongs to, else the item itself.
+    const owner = launch.related ? registryIndex.byItem.get(target.id) : undefined;
+    if (owner) { openEntity(owner); return; }
+    if (launch.related && (target.kind === "company" || target.kind === "project")) { setPageId(target.id); return; }
+    setMode("items"); setSelected(target.id);
+    if (launch.read) { const doc = linkedDoc(target, docs)?.id; if (doc) router.push(`/reader/${doc}`); else if (pdfUrlOf(target)) void toLibrary(target); }
+  });
+  /** On NAYSOR News a PDF is read in PAPERFLOW (translated, marked, kept with the reader's account). */
+  const inPaperflow = (item: IntelItem) => site ? `${site.paperflow}/library?intel=${encodeURIComponent(item.id)}&read=1` : "";
   if (items === null) return <div className="pf-empty" role="status">인텔리전스를 불러오는 중…</div>;
   const empty = !items.length;
   const scopeLabel = scope.type === "all" ? "전체" : scope.type === "star" ? "핵심 표시" : scope.type === "pdf" ? "PDF 보고서" : scope.type === "folder" ? folders.find(folder => folder.id === scope.id)?.name ?? "폴더" : scope.type === "kind" ? KIND_LABEL[scope.kind] : TOPIC_LABEL.get(scope.id) ?? scope.id;
@@ -268,13 +289,13 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         </div></div>
       <div className="pf-intel-actions">
         <input ref={file} type="file" accept="application/json,.json" hidden onChange={event => void importFile(event.target.files?.[0])}/>
-        <button type="button" className="pf-intel-primary" onClick={() => file.current?.click()}><Upload size={15}/>자료 팩 가져오기</button>
+        {!site && <button type="button" className="pf-intel-primary" onClick={() => file.current?.click()}><Upload size={15}/>자료 팩 가져오기</button>}
         {!empty && <><button type="button" onClick={() => download(`source-register-${new Date().toISOString().slice(0, 10)}.csv`, registerCsv(filtered), "text/csv;charset=utf-8")}><FileDown size={15}/>출처 대장 CSV</button>
           <button type="button" onClick={() => download(`source-register-${new Date().toISOString().slice(0, 10)}.md`, registerMarkdown(filtered), "text/markdown;charset=utf-8")}><FileText size={15}/>Markdown</button></>}
       </div>
     </header>
 
-    {empty ? <div className="pf-intel-empty">
+    {empty && site ? <div className="pf-empty" role="status">{site.loading ? "NAYSOR News를 불러오는 중…" : "아직 공개된 자료가 없습니다."}</div> : empty ? <div className="pf-intel-empty">
       <Radar size={34}/><h3>아직 자료가 없습니다</h3>
       <p>Claude가 조사해 검증한 자료 팩(.json)을 가져오면 주제별 트리, 기업·벤더·시장 정보, 브리핑이 채워집니다. 계정에 로그인되어 있으면 다른 기기에도 같이 보입니다.</p>
       <button type="button" className="pf-intel-primary" onClick={() => file.current?.click()}><Upload size={15}/>자료 팩 가져오기</button>
@@ -297,9 +318,9 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
         </div>}
       </nav>
 
-      {pageItem ? <CompanyPage item={pageItem} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} read={docOf(pageItem) ? { label: "리더에서 읽기·번역", run: () => router.push(`/reader/${docOf(pageItem)}`) } : pdfUrlOf(pageItem) ? { label: "PDF 번역해서 읽기", run: () => void toLibrary(pageItem) } : undefined} news={newsOf(pageItem.id)} related={pageEntity ? entityItems(pageEntity, registryIndex, byId) : relatedOf(pageItem)} org={pageEntity ? { entity: pageEntity, parent: pageEntity.parentCode ? registryIndex.byCode.get(pageEntity.parentCode) : undefined, children: registryIndex.children.get(pageEntity.code) ?? [], open: openEntity } : undefined} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
+      {pageItem ? <CompanyPage item={pageItem} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} read={site ? (pdfUrlOf(pageItem) ? { label: "PAPERFLOW에서 번역·마킹", run: () => void window.open(inPaperflow(pageItem), "_blank", "noopener") } : undefined) : docOf(pageItem) ? { label: "리더에서 읽기·번역", run: () => router.push(`/reader/${docOf(pageItem)}`) } : pdfUrlOf(pageItem) ? { label: "PDF 번역해서 읽기", run: () => void toLibrary(pageItem) } : undefined} news={newsOf(pageItem.id)} related={pageEntity ? entityItems(pageEntity, registryIndex, byId) : relatedOf(pageItem)} org={pageEntity ? { entity: pageEntity, parent: pageEntity.parentCode ? registryIndex.byCode.get(pageEntity.parentCode) : undefined, children: registryIndex.children.get(pageEntity.code) ?? [], open: openEntity } : undefined} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
         onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}
-        onBack={() => setPageId(null)} onPdf={source => void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)} busy={fetching} notify={notify}/> : <div className="pf-intel-main">
+        onBack={() => setPageId(null)} onPdf={source => site ? void window.open(source.pdfUrl!, "_blank", "noopener") : void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)} busy={fetching} notify={notify}/> : <div className="pf-intel-main">
         <div className="pf-intel-toolbar">
           <label className="pf-intel-search"><Search size={16}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="기업, 장비, 수치, 국가로 찾기 (예: screw press, Malakoff, K 제거)" aria-label="인텔리전스 검색"/>{query && <button type="button" aria-label="지우기" onClick={() => setQuery("")}><X size={14}/></button>}</label>
           <div className="pf-intel-modes" role="tablist" aria-label="보기">
@@ -325,7 +346,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
           <label className="pf-intel-hidden"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)}/>숨긴 항목</label>
         </div>}
 
-        {mode === "map" ? <IntelMap items={visible} query={query} selected={selected} onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}/> : mode === "companies" && registry ? <EntityDirectory index={registryIndex} byId={byId} query={query} klass={klass} onOpen={openEntity}/> : mode === "companies" ? <ul className="pf-intel-companies">
+        {mode === "map" ? <IntelMap items={visible} query={query} selected={selected} places={places} klass={klass} onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}/> : mode === "companies" && registry ? <EntityDirectory index={registryIndex} byId={byId} query={query} klass={klass} onOpen={openEntity}/> : mode === "companies" ? <ul className="pf-intel-companies">
           {companies.filter(({ item }) => !query || [display(item), item.title, item.org, item.country, ...Object.values(item.profile ?? {})].join(" ").toLowerCase().includes(query.toLowerCase())).map(({ item, news }) => { const cover = item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src; return <li key={item.id}>
             <article className="pf-intel-company" data-selected={selected === item.id || undefined} tabIndex={0} onClick={() => { setPageId(item.id); setSelected(null); window.scrollTo({ top: 0 }); }} onKeyDown={event => { if (event.key === "Enter") { setPageId(item.id); setSelected(null); } }}>
               <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : item.logo ? <span className="pf-intel-company-logo-big"><img src={item.logo} alt=""/></span> : <CompanyMark item={item} size={64}/>}{item.logo && <i className="pf-intel-company-logo" data-dark={item.logoDark || undefined}><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
@@ -391,12 +412,13 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
 
         <div className="pf-intel-buttons">
           {current.url && <a href={current.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={15}/>원문 열기</a>}
-          {docOf(current) ? <button type="button" className="pf-intel-primary" onClick={() => router.push(`/reader/${docOf(current)}`)}><BookOpenText size={15}/>리더에서 읽기·번역</button>
+          {site ? (pdfUrlOf(current) ? <a className="pf-intel-primary" href={inPaperflow(current)} target="_blank" rel="noopener" title="PAPERFLOW 계정으로 PDF를 번역하고 마킹·메모합니다"><BookOpenText size={15}/>PAPERFLOW에서 번역·마킹</a> : null)
+            : docOf(current) ? <button type="button" className="pf-intel-primary" onClick={() => router.push(`/reader/${docOf(current)}`)}><BookOpenText size={15}/>리더에서 읽기·번역</button>
             : pdfUrlOf(current) ? <button type="button" className="pf-intel-primary" disabled={fetching === current.id} onClick={() => void toLibrary(current)}>{fetching === current.id ? <Loader2 size={15} className="pf-spin"/> : <BookOpenText size={15}/>}PDF 번역해서 읽기</button> : null}
           <button type="button" aria-pressed={Boolean(current.user?.star)} onClick={() => void intelRepository.setUser(current.id, { star: !current.user?.star })}><Star size={15}/>{current.user?.star ? "핵심" : "핵심 표시"}</button>
           <button type="button" onClick={() => void intelRepository.setUser(current.id, { hidden: !current.user?.hidden })}><EyeOff size={15}/>{current.user?.hidden ? "다시 보이기" : "숨기기"}</button>
         </div>
-        <label className="pf-intel-folderpick"><FolderOpen size={15}/><span>폴더</span>
+        {!site && <><label className="pf-intel-folderpick"><FolderOpen size={15}/><span>폴더</span>
           <select value={current.user?.folderId ?? ""} onChange={event => void intelRepository.setUser(current.id, { folderId: event.target.value || null })}>
             <option value="">폴더 없음</option>{folders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
           </select>
@@ -414,7 +436,7 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
               </select>
             </label>
           </div>;
-        })()}
+        })()}</>}
 
         <SourceTree item={current} byId={byId} mentions={mentions} onOpen={setSelected}/>
         {current.profile && <section><h4>{current.kind === "project" ? "프로젝트 정보" : "기업 정보"}</h4><dl className="pf-intel-specs">{Object.entries(current.profile).map(([key, value]) => <div key={key}><dt>{PROFILE_LABEL[key] ?? key}</dt><dd>{/^https?:\/\//.test(value) ? <a href={value} target="_blank" rel="noreferrer noopener">{value.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a> : value}</dd></div>)}</dl></section>}

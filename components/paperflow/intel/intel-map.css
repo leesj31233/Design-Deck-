@@ -9,10 +9,11 @@
 .pf-map-filters button b { width:9px; height:9px; border-radius:50%; background:var(--pin,#59626b); }
 .pf-map-filters button[data-kind="company"] { --pin:#1f7a5a; } .pf-map-filters button[data-kind="project"] { --pin:#2f6fdb; } .pf-map-filters button[data-kind="vendor"] { --pin:#d98a1c; } .pf-map-filters button[data-kind="market"] { --pin:#c24f8a; } .pf-map-filters button[data-kind="source"] { --pin:#59626b; } .pf-map-filters button[data-kind="equipment"] { --pin:#7b5cd6; }
 .pf-map-count { display:inline-flex; align-items:center; gap:4px; margin-left:auto; color:var(--i-muted); }
-.pf-map-stage { position:relative; min-width:0; border:1px solid var(--i-line); border-radius:18px; overflow:hidden; background:#e9eef0; }
+.pf-map-stage { position:relative; min-width:0; border:1px solid var(--i-line); border-radius:18px; overflow:hidden; background:#f2f3f1; }
+html[data-pf-theme="dark"] .pf-map-stage { background:#1b1d1f; }
 .pf-map-canvas { height:clamp(420px,calc(100vh - 230px),820px); width:100%; z-index:0; }
-.pf-map-canvas .leaflet-tile-pane { filter:saturate(.85); }
-html[data-pf-theme="dark"] .pf-map-canvas .leaflet-tile-pane { filter:brightness(.72) saturate(.7) contrast(1.05); }
+.pf-map-canvas .leaflet-tile-pane { filter:none; }
+html[data-pf-theme="dark"] .pf-map-canvas .leaflet-tile-pane { filter:none; }
 .pf-map-note { position:absolute; inset:0; display:grid; place-items:center; margin:0; padding:20px; text-align:center; font-size:13.5px; color:var(--i-muted); background:color-mix(in srgb,var(--background) 70%,transparent); pointer-events:none; }
 
 /* Pins: a dot per place, coloured by what is there; a number when several share the spot. */
@@ -55,3 +56,19 @@ html[data-pf-theme="dark"] .pf-map-canvas .leaflet-tile-pane { filter:brightness
   .pf-map-canvas { height:62vh; }
   .pf-map-list { left:8px; right:8px; bottom:8px; width:auto; max-height:50%; }
 }
+
+/* Clusters: one quiet circle with the count; base layers are dots on a canvas, so 1,500 mills stay smooth. */
+.pf-map-cluster { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:color-mix(in srgb,#1d4434 88%,transparent); color:#fff; font:700 12px/1 var(--i-sans,system-ui); border:3px solid color-mix(in srgb,#fff 70%,transparent); box-shadow:0 2px 10px rgba(0,0,0,.25); }
+.pf-map-pin { width:22px; height:22px; border-width:2px; box-shadow:0 1px 5px rgba(0,0,0,.28); }
+.pf-map-pin:empty { width:13px; height:13px; margin:6.5px; }
+.pf-map-filters .pf-map-layer[data-layer="mill"][aria-pressed="true"] { background:#c98a2b; border-color:#c98a2b; color:#fff; }
+.pf-map-filters .pf-map-layer[data-layer="plant"][aria-pressed="true"] { background:#2b7a78; border-color:#2b7a78; color:#fff; }
+.pf-map-credit { position:absolute; right:8px; bottom:22px; z-index:400; margin:0; padding:2px 7px; border-radius:6px; background:color-mix(in srgb,var(--background) 80%,transparent); font-size:10.5px; color:var(--i-muted); pointer-events:none; }
+.pf-map-pop { display:grid; gap:2px; min-width:180px; font:12.5px/1.45 var(--i-sans,system-ui); }
+.pf-map-pop small { font-size:10.5px; color:#7a8088; letter-spacing:.03em; }
+.pf-map-pop b { font-size:13.5px; }
+.pf-map-pop span { color:#4a5058; }
+.pf-map-stage .leaflet-popup-content-wrapper { border-radius:12px; box-shadow:0 12px 32px -14px rgba(10,30,24,.45); }
+.pf-map-stage .leaflet-control-attribution { font-size:10px; background:color-mix(in srgb,var(--background) 75%,transparent); }
+.pf-map-stage .leaflet-control-zoom a { border-radius:8px !important; }
+.pf-map-stage .leaflet-bar { border:1px solid var(--i-line); border-radius:10px; box-shadow:none; overflow:hidden; }
