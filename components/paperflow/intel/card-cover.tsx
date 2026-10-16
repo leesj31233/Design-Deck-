@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, Building2, FileText, Gauge, HelpCircle, Landmark, Newspaper, Wrench } from "lucide-react";
 import { SOURCE_LABEL, UPDATE_LABEL, type IntelItem } from "@/lib/paperflow/intel/types";
+import { intelRepository } from "@/lib/paperflow/intel/repository";
 import { previewOf } from "./source-tree";
 
 const ICON = { paper: BookOpen, gov: Landmark, "test-report": Gauge, "annual-report": Building2, patent: FileText, "vendor-catalog": Wrench, "market-analyst": Gauge, press: Newspaper } as Record<string, typeof BookOpen>;
@@ -12,21 +13,24 @@ const ICON = { paper: BookOpen, gov: Landmark, "test-report": Gauge, "annual-rep
  * image, fetched only when the card comes into view. Over it: what the document is and its date.
  */
 export function CardCover({ item, library }: { item: IntelItem; /** The first page of the reader's library copy, when linked. */ library?: string }) {
-  const stored = item.cover ?? library ?? item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src;
+  const stored = item.cover ?? library ?? (item.hasCover ? undefined : item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src);
   const [image, setImage] = useState<string | undefined>(stored), [broken, setBroken] = useState(false), box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setImage(stored); setBroken(false);
-    if (stored || !item.url || item.kind === "gap") return;
+    if (stored || item.kind === "gap" || (!item.hasCover && !item.url)) return;
     const element = box.current;
     if (!element) return;
+    let alive = true;
+    // Covers are read from the device store, web lead images fetched, only once the card is near the screen.
     const observer = new IntersectionObserver(entries => {
       if (!entries.some(entry => entry.isIntersecting)) return;
       observer.disconnect();
-      void previewOf(item.url).then(preview => { if (preview?.image) setImage(preview.image); });
-    }, { rootMargin: "200px" });
+      if (item.hasCover) void intelRepository.cover(item.id).then(url => { if (!alive) return; if (url) setImage(url); else setImage(item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src); });
+      else void previewOf(item.url).then(preview => { if (alive && preview?.image) setImage(preview.image); });
+    }, { rootMargin: "300px" });
     observer.observe(element);
-    return () => observer.disconnect();
-  }, [stored, item.url, item.kind]);
+    return () => { alive = false; observer.disconnect(); };
+  }, [stored, item.url, item.kind, item.hasCover, item.id, item.dossier, item.user]);
   const Icon = item.kind === "gap" ? HelpCircle : ICON[item.sourceType ?? ""] ?? FileText;
   const label = item.update ? UPDATE_LABEL[item.update.type] : item.kind === "gap" ? "확인 필요" : SOURCE_LABEL[item.sourceType ?? ""] ?? "자료";
   const raw = item.update?.date ?? item.date, date = raw && /^\d{4}/.test(raw) ? raw : undefined;
@@ -35,4 +39,12 @@ export function CardCover({ item, library }: { item: IntelItem; /** The first pa
     <span className="pf-card-cover-label">{label}</span>
     {date && <time className="pf-card-cover-date">{date}</time>}
   </div>;
+}
+
+/** The item's cover (or a case-file figure) as a plain image, loaded from the device store when needed. */
+export function CoverImage({ item, alt, loading = "lazy" }: { item: IntelItem; alt: string; loading?: "lazy" | "eager" }) {
+  const fallback = item.cover ?? item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src;
+  const [src, setSrc] = useState<string | undefined>(item.cover ?? (item.hasCover ? undefined : fallback));
+  useEffect(() => { let alive = true; if (!item.cover && item.hasCover) void intelRepository.cover(item.id).then(url => { if (alive) setSrc(url ?? fallback); }); return () => { alive = false; }; }, [item.id, item.cover, item.hasCover, fallback]);
+  return src ? <img src={src} alt={alt} loading={loading} decoding="async"/> : null;
 }

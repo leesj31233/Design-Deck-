@@ -19,7 +19,7 @@ import { DossierView } from "./dossier-view";
 import { FigureAdder } from "./figure-adder";
 import { PanelMarks } from "./panel-marks";
 import { SourceTree } from "./source-tree";
-import { CardCover } from "./card-cover";
+import { CardCover, CoverImage } from "./card-cover";
 import { CompanyMark, CompanyPage, companyName } from "./company-page";
 import { IntelMap } from "./intel-map";
 import { glossaryIndex, type GlossaryTerm } from "@/lib/paperflow/intel/glossary";
@@ -174,16 +174,16 @@ export function IntelView({ docs }: { docs: StoredDocument[] }) {
 
   /** A figure placed in a briefing: the item's case-file figure n (or its cover), its caption and a way to the item. */
   const briefFigure = (id: string, index: number, caption: string, key: number) => {
-    const item = byId.get(id), figures = [...(item?.dossier?.figures ?? []), ...(item?.user?.figures ?? [])], picked = figures[index - 1] ?? (item?.cover ? { src: item.cover, caption: display(item) } : undefined);
+    const item = byId.get(id), figures = [...(item?.dossier?.figures ?? []), ...(item?.user?.figures ?? [])], picked = figures[index - 1] ?? (item?.cover || item?.hasCover ? { src: item.cover, caption: display(item) } : undefined);
     if (!item || !picked) return null;
-    return <figure key={key} className="pf-brief-figure"><button type="button" onClick={() => setSelected(id)} aria-label={`${display(item)} 자세히`}><img src={picked.src} alt={caption || picked.caption} loading="lazy"/></button><figcaption><b>{caption || picked.caption}</b><span>{item.kind === "company" || item.kind === "project" ? companyName(item) : display(item)}</span></figcaption></figure>;
+    return <figure key={key} className="pf-brief-figure"><button type="button" onClick={() => setSelected(id)} aria-label={`${display(item)} 자세히`}>{picked.src ? <img src={picked.src} alt={caption || picked.caption} loading="lazy"/> : <CoverImage item={item} alt={caption || picked.caption}/>}</button><figcaption><b>{caption || picked.caption}</b><span>{item.kind === "company" || item.kind === "project" ? companyName(item) : display(item)}</span></figcaption></figure>;
   };
   /** The companies, projects and documents a briefing links to, in order of first mention, as a visual strip. */
   const briefCast = (body: string) => {
     const found = [...new Set([...body.matchAll(/\]\(intel:([\w.:-]+)\)/g)].map(match => match[1]))].map(id => byId.get(id)).filter((item): item is IntelItem => Boolean(item));
     if (!found.length) return null;
     return <section className="pf-brief-cast" aria-label="이 브리핑에 나오는 기업·자료"><h4>이 브리핑에 나오는 기업·자료 · {found.length}</h4><ul>{found.slice(0, 24).map(item => <li key={item.id}><button type="button" data-open={selected === item.id || undefined} onClick={() => setSelected(item.id)}>
-      {(item.kind === "company" || item.kind === "project") && !item.cover && !item.dossier ? <span className="pf-brief-cast-mark"><CompanyMark item={item} size={40}/></span> : <CardCover item={item}/>}
+      {(item.kind === "company" || item.kind === "project") && !item.cover && !item.hasCover && !item.dossier ? <span className="pf-brief-cast-mark"><CompanyMark item={item} size={40}/></span> : <CardCover item={item}/>}
       <span><small>{KIND_LABEL[item.kind]}{item.update ? ` · ${UPDATE_LABEL[item.update.type]}` : ""}</small><b>{item.kind === "company" || item.kind === "project" ? companyName(item) : display(item)}</b></span>
     </button></li>)}</ul></section>;
   };

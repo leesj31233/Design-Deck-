@@ -178,15 +178,22 @@ export async function syncAll() {
     for (const id of Object.keys(tombstones)) await pushNote(id, true);
 
     // Intelligence: newest wins, item by item (the reader's star/folder/memo travel inside the item).
-    const localIntel = new Map((await intelRepository.list()).map(item => [item.id, item])), localBriefs = new Map((await intelRepository.briefs()).map(brief => [brief.id, brief]));
-    const newer = (intelIndex ?? []).filter(row => { const id = String(row.id), mine = id.startsWith("intelbrief:") ? localBriefs.get(id.slice(11)) : localIntel.get(id.slice(6)); return !mine || row.updated_at > (mine.updatedAt ?? ""); }).map(row => String(row.id));
+    const localIntel = new Map((await intelRepository.list()).map(item => [item.id, item])), localBriefs = new Map((await intelRepository.briefs()).map(brief => [brief.id, brief])), localMedia = await intelRepository.mediaDates();
+    const newer = (intelIndex ?? []).filter(row => {
+      const id = String(row.id);
+      if (id.startsWith("intelmedia:")) return row.updated_at > (localMedia.get(id.slice(11)) ?? "");
+      const mine = id.startsWith("intelbrief:") ? localBriefs.get(id.slice(11)) : localIntel.get(id.slice(6)); return !mine || row.updated_at > (mine.updatedAt ?? "");
+    }).map(row => String(row.id));
     const fetched = new Map<string, unknown>();
     for (let at = 0; at < newer.length; at += 40) { const { data } = await db.from("annotations").select("id, data").eq("document_id", INTEL).in("id", newer.slice(at, at + 40)); for (const row of data ?? []) fetched.set(String(row.id), row.data); }
     const intelRows = (intelIndex ?? []).map(row => ({ ...row, data: fetched.get(String(row.id)) }));
     const intelPush: string[] = [], briefPush: string[] = [], seenIntel = new Set<string>(), seenBriefs = new Set<string>();
     for (const row of intelRows) {
       const rowId = String(row.id);
-      if (rowId.startsWith("intelbrief:")) {
+      if (rowId.startsWith("intelmedia:")) {
+        const id = rowId.slice(11), cover = (row.data as { cover?: string } | undefined)?.cover;
+        if (cover && row.updated_at > (localMedia.get(id) ?? "")) await intelRepository.putCover(id, cover, row.updated_at);
+      } else if (rowId.startsWith("intelbrief:")) {
         const id = rowId.slice(11), mine = localBriefs.get(id); seenBriefs.add(id);
         if (!mine || row.updated_at > (mine.updatedAt ?? "")) { if (row.data) await intelRepository.putBriefRaw(row.data as IntelBrief); }
         else if ((mine.updatedAt ?? "") > row.updated_at) briefPush.push(id);

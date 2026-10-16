@@ -36,6 +36,8 @@ export interface IntelItem {
   dossier?: IntelDossier;
   /** A small cover (WebP data URL): page 1 of a paper or report, an article's lead image or front page. */
   cover?: string;
+  /** The cover is kept apart from the item (its own store and sync row); this says one exists. */
+  hasCover?: boolean;
   /** A company's (or project owner's) logo, from its own website (WebP/PNG data URL, small). */
   logo?: string;
   /** The logo is light on a dark ground, so its tile is dark. */

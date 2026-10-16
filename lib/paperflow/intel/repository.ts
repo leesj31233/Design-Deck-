@@ -74,6 +74,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     dossier: dossierOf(value.dossier),
     update: updateOf(value.update),
     logoDark: value.logoDark === true ? true : undefined, geo: placesOf(value.geo), financials: financialsOf(value.financials), profileRefs: refsOf(value.profileRefs), people: peopleOf(value.people), logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
+    hasCover: value.hasCover === true ? true : undefined,
     cover: typeof value.cover === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.cover) && value.cover.length < 140_000 ? value.cover : undefined,
     checkedAt: text(value.checkedAt, 20), pack
   };
@@ -134,8 +135,46 @@ const PERIODS = ["core", "daily", "weekly", "monthly", "quarterly"];
 const announce = () => { if (typeof window !== "undefined") window.dispatchEvent(new Event(INTEL_EVENT)); };
 
 /** The Intelligence tab's items and briefings, kept on this device and mirrored to the account. */
+/** An item's cover goes to the media store; the item keeps only the fact that it has one. */
+function splitCover(item: IntelItem): { item: IntelItem; cover?: string } {
+  if (!item.cover) return { item };
+  const { cover, ...rest } = item;
+  return { item: { ...rest, hasCover: true }, cover };
+}
+type IntelMedia = { id: string; cover: string; updatedAt: string };
+const coverUrls = new Map<string, string>();
+const dataUrlToObjectUrl = (dataUrl: string) => { try { const [head, body] = dataUrl.split(","), type = /data:([^;]+)/.exec(head)?.[1] ?? "image/webp", bytes = Uint8Array.from(atob(body), char => char.charCodeAt(0)); return URL.createObjectURL(new Blob([bytes], { type })); } catch { return dataUrl; } };
+
 export const intelRepository = {
-  async list(): Promise<IntelItem[]> { const db = await openDatabase(); return requestResult<IntelItem[]>(db.transaction("intel").objectStore("intel").getAll()); },
+  async list(): Promise<IntelItem[]> {
+    const db = await openDatabase(), items = await requestResult<IntelItem[]>(db.transaction("intel").objectStore("intel").getAll());
+    // Items written before v7 still carry their cover inline: move it out once.
+    const legacy = items.filter(item => item.cover);
+    if (legacy.length) {
+      const tx = db.transaction(["intel", "intelMedia"], "readwrite"), done = transactionDone(tx);
+      for (const old of legacy) { const { item, cover } = splitCover(old); tx.objectStore("intel").put(item); tx.objectStore("intelMedia").put({ id: item.id, cover: cover!, updatedAt: item.updatedAt ?? new Date().toISOString() }); }
+      await done;
+      return items.map(item => item.cover ? splitCover(item).item : item);
+    }
+    return items;
+  },
+  /** The cover as an object URL (made once per device session), or nothing when the item has none. */
+  async cover(id: string): Promise<string | undefined> {
+    const hit = coverUrls.get(id);
+    if (hit) return hit;
+    const db = await openDatabase(), media = await requestResult<IntelMedia | undefined>(db.transaction("intelMedia").objectStore("intelMedia").get(id));
+    if (!media?.cover) return undefined;
+    const url = dataUrlToObjectUrl(media.cover); coverUrls.set(id, url); return url;
+  },
+  /** Sync only: a cover delivered on its own row. */
+  async putCover(id: string, cover: string, updatedAt: string) {
+    const db = await openDatabase(), tx = db.transaction(["intel", "intelMedia"], "readwrite"), done = transactionDone(tx);
+    tx.objectStore("intelMedia").put({ id, cover, updatedAt });
+    const item = await requestResult<IntelItem | undefined>(tx.objectStore("intel").get(id));
+    if (item && !item.hasCover) tx.objectStore("intel").put({ ...item, hasCover: true });
+    await done; coverUrls.delete(id); announce();
+  },
+  async mediaDates(): Promise<Map<string, string>> { const db = await openDatabase(); const rows = await requestResult<IntelMedia[]>(db.transaction("intelMedia").objectStore("intelMedia").getAll()); return new Map(rows.map(row => [row.id, row.updatedAt])); },
   async briefs(): Promise<IntelBrief[]> { const db = await openDatabase(); return (await requestResult<IntelBrief[]>(db.transaction("intelBriefs").objectStore("intelBriefs").getAll())).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)); },
   /**
    * Merge a pack: new items are added, items already here are refreshed with the pack's facts while
@@ -145,12 +184,13 @@ export const intelRepository = {
     const db = await openDatabase(), now = new Date().toISOString();
     const existing = new Map((await intelRepository.list()).map(item => [item.id, item]));
     const earlier = (await intelRepository.briefs()).find(brief => brief.id === "__glossary__");
-    const tx = db.transaction(["intel", "intelBriefs"], "readwrite"), done = transactionDone(tx);
+    const tx = db.transaction(["intel", "intelBriefs", "intelMedia"], "readwrite"), done = transactionDone(tx);
     let added = 0, updated = 0;
-    for (const item of pack.items) {
-      const before = existing.get(item.id);
+    for (const packed of pack.items) {
+      const before = existing.get(packed.id), { item, cover } = splitCover(packed);
       if (before) updated++; else added++;
-      tx.objectStore("intel").put({ ...item, user: before?.user, addedAt: before?.addedAt ?? now, updatedAt: now });
+      if (cover) { tx.objectStore("intelMedia").put({ id: item.id, cover, updatedAt: now }); coverUrls.delete(item.id); }
+      tx.objectStore("intel").put({ ...item, hasCover: item.hasCover || before?.hasCover || undefined, user: before?.user, addedAt: before?.addedAt ?? now, updatedAt: now });
     }
     for (const brief of pack.briefs ?? []) {
       // A new pack's terms are added to (or replace) the ones already known, never wiping them.
@@ -172,6 +212,12 @@ export const intelRepository = {
     await done; emitLocalChange({ kind: "intel", id }); announce();
   },
   /** Sync only: write what the account holds without announcing a local change. */
-  async putRaw(item: IntelItem) { const db = await openDatabase(), tx = db.transaction("intel", "readwrite"), done = transactionDone(tx); tx.objectStore("intel").put(item); await done; announce(); },
+  async putRaw(raw: IntelItem) {
+    const db = await openDatabase(), tx = db.transaction(["intel", "intelMedia"], "readwrite"), done = transactionDone(tx), { item, cover } = splitCover(raw);
+    if (cover) { tx.objectStore("intelMedia").put({ id: item.id, cover, updatedAt: item.updatedAt ?? new Date().toISOString() }); coverUrls.delete(item.id); }
+    const has = item.hasCover || Boolean(cover) || Boolean(await requestResult<IntelMedia | undefined>(tx.objectStore("intelMedia").get(item.id)));
+    tx.objectStore("intel").put({ ...item, hasCover: has || undefined });
+    await done; announce();
+  },
   async putBriefRaw(brief: IntelBrief) { const db = await openDatabase(), tx = db.transaction("intelBriefs", "readwrite"), done = transactionDone(tx); tx.objectStore("intelBriefs").put(brief); await done; announce(); }
 };

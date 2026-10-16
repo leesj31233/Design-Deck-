@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { adminClient } from "@/lib/paperflow/cloud/server";
 import { readPack } from "@/lib/paperflow/intel/repository";
 import { ingestAuthorized, ownerId } from "@/lib/paperflow/intel/ingest-auth";
@@ -26,8 +27,21 @@ export async function POST(request: Request) {
   if (!userId) return Response.json({ error: "owner account not found" }, { status: 404 });
 
   const now = new Date().toISOString();
+  // Covers are big and change rarely: each lives on its own row ("intelmedia:<id>"), rewritten only when the
+  // picture itself changed, so a text edit never makes every device download the pictures again.
+  const mediaIds = pack.items.map(item => `intelmedia:${item.id}`), knownHash = new Map<string, string>();
+  for (let at = 0; at < mediaIds.length; at += 200) {
+    const { data } = await admin.from("annotations").select("id, data->>hash").eq("user_id", userId).in("id", mediaIds.slice(at, at + 200));
+    for (const row of (data ?? []) as { id: string; hash: string | null }[]) knownHash.set(row.id, row.hash ?? "");
+  }
+  const mediaRows = pack.items.flatMap(item => {
+    if (!item.cover) return [];
+    const hash = createHash("sha1").update(item.cover).digest("hex");
+    return knownHash.get(`intelmedia:${item.id}`) === hash ? [] : [{ user_id: userId, id: `intelmedia:${item.id}`, document_id: "__intel__", data: { cover: item.cover, hash }, deleted: false, updated_at: now }];
+  });
   const rows = [
-    ...pack.items.map(item => ({ user_id: userId, id: `intel:${item.id}`, document_id: "__intel__", data: { ...item, addedAt: item.addedAt ?? now, updatedAt: now }, deleted: false, updated_at: now })),
+    ...pack.items.map(({ cover, ...item }) => ({ user_id: userId, id: `intel:${item.id}`, document_id: "__intel__", data: { ...item, hasCover: Boolean(cover) || knownHash.has(`intelmedia:${item.id}`) || item.hasCover || undefined, addedAt: item.addedAt ?? now, updatedAt: now }, deleted: false, updated_at: now })),
+    ...mediaRows,
     ...(pack.briefs ?? []).map(brief => ({ user_id: userId, id: `intelbrief:${brief.id}`, document_id: "__intel__", data: { ...brief, updatedAt: now }, deleted: false, updated_at: now }))
   ];
   // A glossary merges with the one already in the account rather than replacing it.
