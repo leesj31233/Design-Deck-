@@ -11,6 +11,6 @@ export async function GET(request: Request) {
   try {
     const feed = await publicFeed(admin, new URL(request.url).origin);
     if (!feed) return Response.json({ error: "no feed" }, { status: 404 });
-    return Response.json(feed, { headers: { "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400", "Access-Control-Allow-Origin": "*" } });
+    return Response.json(feed, { headers: { "Cache-Control": "public, max-age=60, s-maxage=1800, stale-while-revalidate=604800", "Access-Control-Allow-Origin": "*" } });
   } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "feed failed" }, { status: 502 }); }
 }
