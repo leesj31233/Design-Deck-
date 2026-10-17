@@ -51,3 +51,24 @@ describe("adaptive diagnostic", () => {
     expect(creditFromOrder(["a", "b", "c", "d"], ["d", "c", "b", "a"])).toBe(0);
   });
 });
+
+describe("grading sheets", () => {
+  it("the result keeps every answered item's sheet, in order, and only the latest three results keep them", async () => {
+    let s = startDiagnostic("standard", 0);
+    const items = DIAGNOSTIC_ITEMS.slice(0, 3);
+    for (const [i, item] of items.entries()) {
+      s = recordDiagnosticResponse(s, {
+        itemId: item.id, part: item.part, kind: item.kind, b: item.b, score: 0.5, skills: item.skills, responseMs: 1000, firstKeyMs: null, words: 0,
+        sheet: { itemId: item.id, part: item.part, kind: item.kind, level: item.level, b: item.b, score: 50, promptKo: `문항 ${i}`, answer: `answer ${i}`, correct: "ok", responseMs: 1000 },
+      });
+    }
+    const r = finishDiagnostic(s, 1);
+    expect(r.sheets!.map((x) => x.itemId)).toEqual(items.map((x) => x.id));
+    expect(r.sheets![1].answer).toBe("answer 1");
+
+    const { applyDiagnostic, createInitialState } = await import("@/engflow/core/store");
+    let st = createInitialState(0);
+    for (let k = 0; k < 5; k++) st = applyDiagnostic(st, { ...r, id: `r${k}`, at: k + 1 });
+    expect(st.diagnostics.map((d) => !!d.sheets)).toEqual([false, false, true, true, true]);
+  });
+});

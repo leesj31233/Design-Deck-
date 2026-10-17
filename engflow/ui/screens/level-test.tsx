@@ -12,13 +12,13 @@ import {
 } from "../../core/diagnostic";
 import { evaluateLocal } from "../../core/evaluate";
 import { tokenize, words } from "../../core/text";
-import { CEFR_ORDER, type Cefr, type DiagnosticResultRecord } from "../../core/types";
+import { CEFR_ORDER, type Cefr, type DiagnosticResultRecord, type DiagnosticSheet } from "../../core/types";
 import { useApp } from "../store";
 import { useNav } from "../app";
 import { useStartLesson } from "./today";
-import { Card, ConfirmDialog, Eyebrow, LevelBadge, Meter, cn, dateKo, useReduced } from "../kit";
+import { Badge, Button, Card, ConfirmDialog, Eyebrow, LevelBadge, Meter, RevealGroup, RevealItem, SegmentedControl, cn, dateKo, scoreTone, useReduced } from "../kit";
 import { CefrScale } from "../charts";
-import { SPEAK_FIRST_HINT_KO } from "../practice/parts";
+import { AnswerHighlight, CATEGORY_KO, DiffLine, SEVERITY_KO, SPEAK_FIRST_HINT_KO } from "../practice/parts";
 
 export function LevelTestScreen() {
   const app = useApp();
@@ -169,18 +169,30 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
     let score = 0;
     let sub: { grammar: number; organization: number; terminology: number; meaning: number; comprehensibility: number } | undefined;
     let wordCount = 0;
-    if (item.kind === "choice") score = choice === item.answerIndex ? 1 : 0;
-    else if (item.kind === "order") score = creditFromOrder(item.chunks!, order);
-    else if (item.question) {
-      const ev = evaluateLocal(item.question, text);
+    // The grading sheet keeps what was asked, what was answered and how it was graded: the evidence on the result page.
+    const base = { itemId: item.id, part: item.part, kind: item.kind, level: item.level, b: item.b, responseMs, explanationKo: item.explanationKo ?? item.question?.explanationKo };
+    let sheet: DiagnosticSheet;
+    if (item.kind === "choice") {
+      score = choice === item.answerIndex ? 1 : 0;
+      sheet = { ...base, score: score * 100, promptKo: item.stemKo ?? "", promptEn: item.stemEn, answer: item.options![choice!], correct: item.options![item.answerIndex!] };
+    } else if (item.kind === "order") {
+      score = creditFromOrder(item.chunks!, order);
+      sheet = { ...base, score: Math.round(score * 100), promptKo: item.meaningKo ?? "", answer: order.join(" "), correct: item.chunks!.join(" ") };
+    } else {
+      const q = item.question!;
+      const ev = evaluateLocal(q, text);
       score = creditFromEvaluation(ev);
       sub = { grammar: ev.scores.grammar.score, organization: ev.scores.organization.score, terminology: ev.scores.terminology.score, meaning: ev.scores.meaning.score, comprehensibility: ev.scores.comprehensibility.score };
       wordCount = words(tokenize(text)).length;
+      sheet = {
+        ...base, score: Math.round(score * 100), contextKo: q.contextKo, promptKo: q.promptKo, promptEn: item.promptEn, answer: text.trim(), correct: q.reference,
+        corrected: ev.corrected, errors: ev.errors.filter((e) => !e.advisory), missing: ev.meaning.filter((m) => !m.present).map((m) => m.ko), sub,
+      };
     }
     setSession((s) =>
       recordDiagnosticResponse(s, {
         itemId: item.id, part: item.part, kind: item.kind, b: item.b, score, skills: item.skills, responseMs,
-        firstKeyMs: firstKey.current ? firstKey.current - t0.current : null, words: wordCount, sub,
+        firstKeyMs: firstKey.current ? firstKey.current - t0.current : null, words: wordCount, sub, sheet,
       }),
     );
   };
@@ -491,10 +503,122 @@ function TestResult({ r, onBack }: { r: DiagnosticResultRecord; onBack: () => vo
             </div>
           ))}
         </div>
-        <button onClick={() => nav.go("today")} className="dd-focus mt-4 inline-flex h-11 items-center gap-1.5 rounded-xl border border-[var(--line)] px-4 text-[14px] font-medium">
-          <ClipboardCheck className="size-4" /> 오늘 화면으로
-        </button>
       </Card>
+
+      <AnswerSheets r={r} />
+
+      <Button variant="secondary" size="lg" onClick={() => nav.go("today")}>
+        <ClipboardCheck className="size-4" /> 오늘 화면으로
+      </Button>
+    </div>
+  );
+}
+
+/* ───────────── Grading sheets: the evidence behind the estimate ───────────── */
+
+const KIND_KO = { choice: "객관식", order: "어순 배열", produce: "작문" } as const;
+
+function AnswerSheets({ r }: { r: DiagnosticResultRecord }) {
+  const sheets = r.sheets ?? [];
+  const [filter, setFilter] = React.useState<"all" | "lost">("all");
+  const [open, setOpen] = React.useState<string | null>(null);
+  const shown = sheets.map((s, i) => ({ s, i })).filter(({ s }) => filter === "all" || s.score < 100);
+  return (
+    <Card className="p-4 md:p-5" data-testid="answer-sheets">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <Eyebrow>문항별 채점지 · 추정 근거</Eyebrow>
+          <p className="ef-ko mt-1 text-[13px] text-[var(--ef-ink-2)]">
+            각 문항의 난이도(CEFR)와 받은 점수가 추정에 그대로 쓰였습니다. 어려운 문항에서 점수가 높을수록 추정이 올라가고, 쉬운 문항에서 감점되면 내려갑니다.
+          </p>
+        </div>
+        {sheets.length ? (
+          <SegmentedControl
+            value={filter}
+            onValueChange={(v) => setFilter(v as "all" | "lost")}
+            items={[
+              { value: "all", label: `전체 ${sheets.length}` },
+              { value: "lost", label: `감점 ${sheets.filter((s) => s.score < 100).length}` },
+            ]}
+          />
+        ) : null}
+      </div>
+      {!sheets.length ? (
+        <p className="ef-ko mt-3 rounded-xl bg-[var(--background)] p-3 text-[13px] text-[var(--muted)]">
+          이 결과는 채점지를 저장하기 전에 치른 테스트라 문항별 답안이 남아 있지 않습니다. 레벨 테스트를 다시 보면 여기에서 문항별 채점지를 볼 수 있습니다.
+        </p>
+      ) : (
+        <RevealGroup as="ol" className="mt-3 divide-y divide-[var(--line)]">
+          {shown.map(({ s, i }) => {
+            const isOpen = open === s.itemId;
+            const tone = scoreTone(s.score);
+            return (
+              <RevealItem as="li" key={s.itemId} className="py-1">
+                <button
+                  onClick={() => setOpen(isOpen ? null : s.itemId)}
+                  aria-expanded={isOpen}
+                  className="dd-focus flex w-full items-center gap-3 rounded-xl px-1 py-2.5 text-left hover:bg-black/[.03] dark:hover:bg-white/[.04]"
+                >
+                  <span className="ef-num w-6 shrink-0 text-[12px] text-[var(--muted)]">{i + 1}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-1.5 text-[11px] text-[var(--muted)]">
+                      Part {s.part} · {KIND_KO[s.kind]} <LevelBadge level={s.level} />
+                    </span>
+                    <span className="ef-ko mt-0.5 block truncate text-[14px]">{s.promptKo || s.promptEn}</span>
+                  </span>
+                  <span className={cn("ef-num shrink-0 text-[17px] font-semibold", tone === "ok" ? "text-[var(--ef-ok)]" : tone === "warn" ? "text-[var(--ef-warn)]" : "text-[var(--ef-bad)]")}>{s.score}</span>
+                </button>
+                {isOpen ? <SheetDetail s={s} /> : null}
+              </RevealItem>
+            );
+          })}
+        </RevealGroup>
+      )}
+    </Card>
+  );
+}
+
+function SheetDetail({ s }: { s: DiagnosticSheet }) {
+  const errors = s.errors ?? [];
+  return (
+    <div className="mb-3 ml-9 space-y-3 rounded-2xl bg-[var(--background)] p-3.5 text-[13px]">
+      {s.contextKo ? <p className="ef-ko text-[var(--muted)]">{s.contextKo}</p> : null}
+      {s.promptEn ? <p className="ef-en">동료: “{s.promptEn}”</p> : null}
+      {s.promptKo ? <p className="ef-ko font-medium">{s.promptKo}</p> : null}
+      <div>
+        <div className="text-[11px] font-semibold text-[var(--muted)]">내 답</div>
+        {s.kind === "produce" ? <AnswerHighlight text={s.answer} errors={errors} /> : <p className="ef-en mt-0.5 text-[15px]">{s.answer}</p>}
+      </div>
+      {errors.length ? (
+        <ul className="space-y-1.5" aria-label="감점 이유">
+          {errors.map((e) => (
+            <li key={e.id} className="flex flex-wrap items-baseline gap-1.5">
+              <Badge tone={e.severity === "minor" ? "neutral" : "red"}>{CATEGORY_KO[e.category] ?? e.category} · {SEVERITY_KO[e.severity]}</Badge>
+              <span className="ef-en">{e.text ? <s className="opacity-70">{e.text}</s> : null}{e.fix ? <> → <b>{e.fix}</b></> : e.text ? " (빼기)" : null}</span>
+              <span className="ef-ko w-full text-[12px] text-[var(--ef-ink-2)]">{e.messageKo}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {s.missing?.length ? <p className="ef-ko text-[12px] text-[var(--ef-bad)]">빠진 의미: {s.missing.join(", ")}</p> : null}
+      {s.kind === "produce" && s.corrected && s.corrected.trim() !== s.answer.trim() ? (
+        <div>
+          <div className="text-[11px] font-semibold text-[var(--muted)]">최소 수정</div>
+          <DiffLine from={s.answer} to={s.corrected} />
+        </div>
+      ) : null}
+      <div>
+        <div className="text-[11px] font-semibold text-[var(--muted)]">{s.kind === "produce" ? "추천 답안" : "정답"}</div>
+        <p className="ef-en mt-0.5 text-[15px] text-[var(--ef-ok)]">{s.correct}</p>
+      </div>
+      {s.sub ? (
+        <p className="ef-num text-[11px] text-[var(--muted)]">
+          문법 {s.sub.grammar} · 구성 {s.sub.organization} · 어휘 {s.sub.terminology} · 의미 {s.sub.meaning} · 전달력 {s.sub.comprehensibility} · 응답 {Math.round(s.responseMs / 1000)}초
+        </p>
+      ) : (
+        <p className="ef-num text-[11px] text-[var(--muted)]">응답 {Math.round(s.responseMs / 1000)}초</p>
+      )}
+      {s.explanationKo ? <p className="ef-ko text-[12px] text-[var(--ef-ink-2)]">{s.explanationKo}</p> : null}
     </div>
   );
 }

@@ -435,6 +435,36 @@ export interface DiagnosticResultRecord {
   weaknesses: string[];
   recommendedLevel: Cefr;
   partScores: Record<string, number>;
+  /** The grading sheet of every item, in order: the evidence behind the estimate (added later; missing on old results). */
+  sheets?: DiagnosticSheet[];
+}
+
+/** One answered level-test item as it was graded. */
+export interface DiagnosticSheet {
+  itemId: string;
+  part: number;
+  kind: "choice" | "order" | "produce";
+  /** Item difficulty: the CEFR level it was written for and its logit difficulty b. */
+  level: Cefr;
+  b: number;
+  /** 0–100 credit the estimate used. */
+  score: number;
+  /** What was asked (Korean context and prompt, or the choice stem). */
+  contextKo?: string;
+  promptKo: string;
+  promptEn?: string;
+  /** The learner's answer (typed text, the chosen option, or the built order). */
+  answer: string;
+  /** A correct answer to compare with. */
+  correct: string;
+  /** Produce items: the grader's minimal correction, findings and sub-scores. */
+  corrected?: string;
+  errors?: ErrorSpan[];
+  /** Meaning chunks (Korean) the answer did not carry. */
+  missing?: string[];
+  sub?: { grammar: number; organization: number; terminology: number; meaning: number; comprehensibility: number };
+  explanationKo?: string;
+  responseMs: number;
 }
 
 export interface SeenRecord {

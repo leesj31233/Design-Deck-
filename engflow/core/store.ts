@@ -298,7 +298,8 @@ export function rememberApproved(prev: LearnerState, q: Question, ev: Evaluation
 export function applyDiagnostic(prev: LearnerState, result: DiagnosticResultRecord): LearnerState {
   return {
     ...prev,
-    diagnostics: [...prev.diagnostics, result].slice(-20),
+    // Grading sheets are the bulky part of a result: the latest three keep them, older results keep their scores only.
+    diagnostics: [...prev.diagnostics, result].slice(-20).map((d, i, all) => (i < all.length - 3 && d.sheets ? { ...d, sheets: undefined } : d)),
     profile: { ...prev.profile, startLevel: result.recommendedLevel, levelSource: "diagnostic", focusSkills: result.weaknesses, onboarded: true },
     updatedAt: result.at,
   };

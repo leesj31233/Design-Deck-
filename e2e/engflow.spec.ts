@@ -57,6 +57,11 @@ test("level test gives a qualified CEFR estimate", async ({ page }) => {
   await expect(page.getByText("평가하지 않음")).toBeVisible();
   await expect(page.getByText(/TOEIC Speaking 참고/)).toBeVisible();
   await expect(page.getByText(/점수 아님/)).toBeVisible();
+  // The evidence: one grading sheet per answered item, each opening to the answer and how it was graded.
+  const sheets = page.getByTestId("answer-sheets");
+  await expect(sheets.getByText(/문항별 채점지/)).toBeVisible();
+  await sheets.locator("li button[aria-expanded]").first().click();
+  await expect(sheets.getByText("내 답").first()).toBeVisible();
   await noHorizontalOverflow(page);
 });
 

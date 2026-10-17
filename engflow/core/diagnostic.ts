@@ -1,5 +1,5 @@
 import type { DiagnosticItem } from "../content/types";
-import type { Cefr, DiagnosticResultRecord } from "./types";
+import type { Cefr, DiagnosticResultRecord, DiagnosticSheet } from "./types";
 import { CEFR_ORDER } from "./types";
 
 /**
@@ -49,6 +49,8 @@ export interface DiagResponse {
   firstKeyMs: number | null;
   words: number;
   sub?: { grammar: number; organization: number; terminology: number; meaning: number; comprehensibility: number };
+  /** The grading sheet shown on the result page (what was asked, what was answered, how it was graded). */
+  sheet?: DiagnosticSheet;
 }
 
 export interface DiagnosticSession {
@@ -214,6 +216,7 @@ export function finishDiagnostic(s: DiagnosticSession, now: number): DiagnosticR
     weaknesses,
     recommendedLevel: recommended === "A1" ? "A2" : recommended === "C2" ? "C1" : recommended,
     partScores,
+    sheets: s.responses.flatMap((r) => (r.sheet ? [r.sheet] : [])),
   };
 }
 
