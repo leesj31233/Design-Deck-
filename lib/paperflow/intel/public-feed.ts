@@ -124,6 +124,22 @@ export function publicItem(raw: IntelItem, base: string, at: string, hasCover: b
   return { ...item, summaryKo: item.summaryKo ? factsOnly(item.summaryKo) : item.summaryKo, dossier, hasCover: hasCover || undefined, updatedAt: at };
 }
 
+type RegistryEntity = { code: string; parentCode?: string; canonicalItemId?: string; itemIds?: string[]; mentionIds?: string[] };
+function withPublicItems(brief: IntelBrief, ids: Set<string>): IntelBrief {
+  try {
+    const registry = JSON.parse(brief.body) as { entities?: RegistryEntity[] };
+    const entities = registry.entities ?? [];
+    for (const entity of entities) {
+      if (entity.canonicalItemId && !ids.has(entity.canonicalItemId)) delete entity.canonicalItemId;
+      entity.itemIds = (entity.itemIds ?? []).filter(id => ids.has(id)); entity.mentionIds = (entity.mentionIds ?? []).filter(id => ids.has(id));
+    }
+    const grounded = new Set(entities.filter(entity => entity.canonicalItemId || entity.itemIds!.length || entity.mentionIds!.length).map(entity => entity.code));
+    for (const entity of entities) if (grounded.has(entity.code) && entity.parentCode) grounded.add(entity.parentCode);
+    registry.entities = entities.filter(entity => grounded.has(entity.code));
+    return { ...brief, body: JSON.stringify(registry) };
+  } catch { return brief; }
+}
+
 export async function publicFeed(admin: SupabaseClient, base: string) {
   const userId = await feedOwner(admin);
   if (!userId) return null;
@@ -134,7 +150,9 @@ export async function publicFeed(admin: SupabaseClient, base: string) {
   return {
     generatedAt: new Date().toISOString(),
     items: shown,
-    briefs: briefs.flatMap(row => { const brief = publicBrief(row.data as IntelBrief); return brief ? [brief] : []; }),
+    // An organisation stays in the public directory only with at least one public item (its own page, a
+    // subsidiary's, or an item about it); otherwise it would show as an empty name.
+    briefs: briefs.flatMap(row => { const brief = publicBrief(row.data as IntelBrief); return brief ? [brief.id === REGISTRY_BRIEF ? withPublicItems(brief, ids) : brief] : []; }),
     covers: Object.fromEntries([...covers].filter(([id]) => ids.has(id)).map(([id, at]) => [id, mediaUrl(base, id, at)]))
   };
 }

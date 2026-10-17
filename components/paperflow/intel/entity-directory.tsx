@@ -9,7 +9,7 @@ import "./entity-directory.css";
 
 type Index = ReturnType<typeof indexRegistry>;
 const TIER_LABEL = { 1: "1차 벤더", 2: "2차 벤더", 3: "서비스" } as const;
-const COUNTRY_KO: Record<string, string> = { ID: "인도네시아", MY: "말레이시아", JP: "일본", KR: "한국", SG: "싱가포르", CN: "중국", DE: "독일", AT: "오스트리아", FI: "핀란드", NL: "네덜란드", NO: "노르웨이", SE: "스웨덴", US: "미국", GB: "영국", CH: "스위스", DK: "덴마크", ES: "스페인", FR: "프랑스", IT: "이탈리아", VN: "베트남", TH: "태국", AU: "호주", CA: "캐나다", BR: "브라질", IN: "인도", HK: "홍콩", RU: "러시아", PH: "필리핀", BE: "벨기에", TW: "대만", NZ: "뉴질랜드", PL: "폴란드", EE: "에스토니아", IE: "아일랜드", AE: "아랍에미리트", XX: "국제" };
+const COUNTRY_KO: Record<string, string> = { ID: "인도네시아", MY: "말레이시아", JP: "일본", KR: "한국", SG: "싱가포르", CN: "중국", DE: "독일", AT: "오스트리아", FI: "핀란드", NL: "네덜란드", NO: "노르웨이", SE: "스웨덴", US: "미국", GB: "영국", CH: "스위스", DK: "덴마크", ES: "스페인", FR: "프랑스", IT: "이탈리아", VN: "베트남", TH: "태국", AU: "호주", CA: "캐나다", BR: "브라질", IN: "인도", HK: "홍콩", RU: "러시아", PH: "필리핀", BE: "벨기에", TW: "대만", NZ: "뉴질랜드", PL: "폴란드", EE: "에스토니아", IE: "아일랜드", AE: "아랍에미리트", CI: "코트디부아르", BJ: "베냉", NG: "나이지리아", GH: "가나", BF: "부르키나파소", TZ: "탄자니아", KH: "캄보디아", BO: "볼리비아", MN: "몽골", MZ: "모잠비크", GN: "기니", SN: "세네갈", KE: "케냐", ZA: "남아공", MM: "미얀마", LK: "스리랑카", CO: "콜롬비아", PG: "파푸아뉴기니", TR: "튀르키예", IL: "이스라엘", XX: "국제" };
 /** NAYSOR's markets first: Indonesia, Malaysia, Japan, Korea, Singapore, then the rest. */
 const COUNTRY_ORDER = ["ID", "MY", "JP", "KR", "SG", "TH", "VN", "CN"];
 const rank = (code: string) => { const at = COUNTRY_ORDER.indexOf(code.slice(0, 2)); return (at < 0 ? 50 : at) * 10000 + Number(code.slice(3)); };
@@ -22,7 +22,9 @@ export const countryOf = (code: string) => COUNTRY_KO[code.slice(0, 2)] ?? code.
  */
 export function EntityDirectory({ index, byId, query, klass = "all", onOpen }: { index: Index; byId: Map<string, IntelItem>; query: string; klass?: IntelClass | "all"; onOpen: (entity: IntelEntity) => void }) {
   // An organisation in both lines of business (a coal miner that also runs palm mills) shows under both classes.
-  const all = useMemo(() => [...index.byCode.values()].filter(entity => klass === "all" || entityClasses(entity, byId).includes(klass)), [index, byId, klass]);
+  // Only organisations with evidence: an item of their own, an item about them, or a subsidiary that has one.
+  const grounded = (entity: IntelEntity): boolean => [entity.canonicalItemId, ...entity.itemIds, ...entity.mentionIds].some(id => id && byId.has(id)) || (index.children.get(entity.code) ?? []).some(grounded);
+  const all = useMemo(() => [...index.byCode.values()].filter(entity => grounded(entity) && (klass === "all" || entityClasses(entity, byId).includes(klass))), [index, byId, klass]); // eslint-disable-line react-hooks/exhaustive-deps
   const [category, setCategory] = useState<EntityCategory | "all">("company"), [country, setCountry] = useState<string | null>(null), [equipment, setEquipment] = useState<EquipmentType | null>(null);
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const matches = (entity: IntelEntity) => words.every(word => [entity.code, entity.name, entity.legalName, entity.country, ...entity.aliases].join(" ").toLowerCase().includes(word));
