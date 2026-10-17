@@ -1,0 +1,22 @@
+/* NAYSOR News: the Intelligence tab as a site of its own — a slim brand bar, the view, a short note. */
+.pf-news { min-height:100vh; min-height:100dvh; background:var(--background); }
+.pf-news-bar { position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:18px; padding:12px max(16px, calc((100vw - 1720px) / 2 + 28px)); border-bottom:1px solid var(--border, rgba(0,0,0,.08)); background:color-mix(in srgb, var(--background) 92%, transparent); backdrop-filter:saturate(1.4) blur(10px); -webkit-backdrop-filter:saturate(1.4) blur(10px); }
+:root[data-pf-lite] .pf-news-bar { backdrop-filter:none; -webkit-backdrop-filter:none; background:var(--background); }
+.pf-news-brand { display:inline-flex; align-items:center; gap:9px; color:inherit; text-decoration:none; flex:none; }
+.pf-news-brand img { display:block; width:auto; height:22px; }
+.pf-news-brand span { padding:2px 8px; border-radius:6px; background:#1d4434; color:#fff; font:700 12px/1.5 var(--font-guide-sans, system-ui), sans-serif; letter-spacing:.06em; text-transform:uppercase; }
+:root[data-pf-theme="dark"] .pf-news-brand span { background:#e86f45; }
+.pf-news-bar p { margin:0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12.5px; color:var(--muted-foreground, #667); }
+.pf-news-bar nav { display:flex; align-items:center; gap:8px; margin-left:auto; flex:none; }
+.pf-news-bar nav button, .pf-news-bar nav a { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 12px; border:1px solid var(--border, rgba(0,0,0,.1)); border-radius:10px; background:transparent; color:inherit; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; }
+.pf-news-bar nav button { width:34px; padding:0; justify-content:center; }
+.pf-news-main { max-width:min(1720px, 100%); margin:0 auto; padding:22px 28px 12px; }
+.pf-news-foot { max-width:1720px; margin:0 auto; padding:18px 28px 40px; font-size:12px; color:var(--muted-foreground, #667); }
+@media (max-width:760px) {
+  .pf-news-bar { gap:10px; padding:10px 16px; }
+  .pf-news-bar p { display:none; }
+  .pf-news-bar nav a { padding:0 10px; font-size:12px; }
+  .pf-news-main { padding:14px 16px 8px; }
+  .pf-news-foot { padding:14px 16px 32px; }
+}
+@media (max-width:400px) { .pf-news-bar nav a span, .pf-news-bar nav a { font-size:0; gap:0; width:34px; padding:0; justify-content:center; } .pf-news-bar nav a svg { width:16px; height:16px; } }

@@ -1,0 +1,63 @@
+import { test, expect } from "@playwright/test";
+import { makePdf } from "../fixtures/make-pdf";
+import { mockResearch } from "./mock-research";
+
+test("continuous pages keep translated text and allow annotations on Korean text", async ({ page }) => {
+  await mockResearch(page, "이 model은 heat flux를 예측한다.");
+  await page.goto("/library");
+  await page.getByLabel("Import PDF file").setInputFiles({ name: "Engineering reading.pdf", mimeType: "application/pdf", buffer: makePdf() });
+  await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
+  await expect(page.locator("[data-pdf-page='1'][data-ready=true]")).toBeVisible();
+  await page.locator("[data-pdf-page='0'] .textLayer span").filter({ hasText: "realizable turbulence" }).click();
+  await expect(page.locator("[data-pdf-page='0'] .pf-tx-line").first()).toContainText("예측한다");
+  await page.locator("[data-pdf-page='0'] .pf-tx-line").first().evaluate(line => { const text = line.querySelector("span")?.firstChild; if (!text) return; const range = document.createRange(); range.setStart(text, 0); range.setEnd(text, Math.min(text.textContent?.length ?? 0, 2)); const selection = getSelection()!; selection.removeAllRanges(); selection.addRange(range); document.dispatchEvent(new Event("selectionchange")); });
+  await expect(page.getByRole("toolbar", { name: "선택한 원문 작업" })).toBeVisible();
+  await page.getByRole("button", { name: "Highlight selection" }).click();
+  await expect(page.locator("[data-pdf-page='0'] .pf-translated-marks [data-testid='highlight-rect']")).toHaveCount(1);
+  let conceptCalls = 0;
+  await page.route("**/api/concept", route => { conceptCalls++; return route.fulfill({ json: { concept: { term: "heat flux", definition: "단위 면적을 통과하는 열전달률이다.", inPaper: "이 문단에서 model이 예측하는 대상이다.", evidence: [], quantities: [], related: ["radiation"], questions: ["어떻게 측정하는가?"], needsMoreContext: false } } }); });
+  await page.getByRole("button", { name: "선택 개념 공부" }).click();
+  // The selection only fills the term in; nothing is asked of the model until 설명 is pressed.
+  await expect(page.getByText("‘설명’을 누르면 AI가 설명합니다.")).toBeVisible();
+  expect(conceptCalls).toBe(0);
+  await page.getByLabel("공부할 개념").fill("heat flux");
+  await page.getByRole("button", { name: "설명", exact: true }).click();
+  await expect(page.getByText("이 논문에서의 의미")).toBeVisible();
+  await expect(page.getByText("이 문단에서 model이 예측하는 대상이다.")).toBeVisible();
+  expect(conceptCalls).toBe(1);
+  await page.getByLabel("Next page").click();
+  await expect(page.getByLabel("Page number")).toHaveValue("2");
+  await page.getByLabel("Previous page").click();
+  await expect(page.locator("[data-pdf-page='0'] .pf-tx-line").first()).toContainText("예측한다");
+  await page.reload();
+  await expect(page.locator("[data-pdf-page='0'] .pf-tx-line").first()).toContainText("예측한다");
+  await expect(page.locator("[data-pdf-page='0'] .pf-translated-marks [data-testid='highlight-rect']")).toHaveCount(1);
+});
+
+test("page notes and pen strokes stay in the reader and appear in the notebook", async ({ page }) => {
+  await page.goto("/library");
+  await page.getByLabel("Import PDF file").setInputFiles({ name: "Research notes.pdf", mimeType: "application/pdf", buffer: makePdf() });
+  await expect(page.locator("[data-pdf-page='0'][data-ready=true]")).toBeVisible();
+  await page.getByRole("button", { name: "텍스트 메모", exact: true }).click();
+  { const surface = page.locator("[data-pdf-page='0']"), at = (await surface.boundingBox())!;
+    await page.mouse.move(at.x + at.width * .5, at.y + at.height * .08); await page.mouse.down(); await page.mouse.up();
+    await page.getByLabel("텍스트 메모", { exact: true }).fill("실험 조건을 다시 확인한다.");
+    await page.mouse.move(at.x + at.width * .1, at.y + at.height * .5); await page.mouse.down(); await page.mouse.up(); }
+  await page.getByRole("button", { name: "선택", exact: true }).click();
+  await expect(page.getByText("실험 조건을 다시 확인한다.").first()).toBeVisible();
+  await page.getByRole("button", { name: "메모 펜" }).click();
+  const ink = page.locator("[data-pdf-page='0'] .pf-ink-layer");
+  const box = await ink.boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.move(box!.x + 100, box!.y + 100);
+  await page.mouse.down();
+  await page.mouse.move(box!.x + 130, box!.y + 125, { steps: 6 });
+  await page.mouse.up();
+  await expect(ink.locator("polyline")).toHaveCount(2);
+  await expect(page.locator(".pf-reader-shell")).toBeVisible();
+  await page.reload();
+  await expect(page.locator("[data-pdf-page='0'] .pf-ink-layer polyline")).toHaveCount(2);
+  await page.goto("/library");
+  await page.getByRole("button", { name: "노트", exact: true }).click();
+  await expect(page.getByText("실험 조건을 다시 확인한다.").first()).toBeVisible();
+});
