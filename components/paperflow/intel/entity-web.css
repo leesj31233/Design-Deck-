@@ -14,7 +14,7 @@
 .pf-web-groups section { padding:10px 12px; border:1px solid var(--i-line); border-radius:12px; background:var(--i-card); min-width:0; }
 .pf-web-groups h4 { margin:0 0 6px; font-size:12px; letter-spacing:.04em; }
 .pf-web-groups ul { display:grid; gap:4px; margin:0; padding:0; list-style:none; }
-.pf-web-groups li { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; }
+
 .pf-web-groups li > button { display:flex; align-items:baseline; gap:6px; min-width:0; padding:3px 0; border:0; background:none; color:var(--i-ink); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
 .pf-web-groups li > button b { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .pf-web-groups li > button:hover b { text-decoration:underline; }
@@ -23,3 +23,31 @@
 .pf-web-via { flex:none; font-size:11px; color:var(--i-muted); }
 .pf-web-via button { margin-left:3px; padding:0 4px; border:1px solid var(--i-line); border-radius:5px; background:transparent; color:var(--i-muted); font:inherit; cursor:pointer; }
 @media (max-width:760px) { .pf-web svg { max-height:300px; } .pf-web-node text { font-size:13px; } }
+
+/* Why a link exists: a card next to the pointed node, and under each row its first reason (all of them on hover). */
+.pf-web-stage { position:relative; }
+.pf-web-tip { position:absolute; z-index:5; width:min(360px,70%); transform:translate(16px,-50%); padding:12px 14px; border:1px solid var(--i-line); border-radius:14px; background:var(--background); box-shadow:0 18px 40px -18px rgba(10,30,24,.45); }
+.pf-web-tip[data-side="left"] { transform:translate(calc(-100% - 16px),-50%); }
+.pf-web-tip-actions { display:flex; gap:6px; margin-top:8px; }
+.pf-web-tip-actions button { height:28px; padding:0 10px; border:1px solid var(--i-line); border-radius:8px; background:transparent; color:var(--i-ink); font-size:12px; font-weight:600; cursor:pointer; }
+.pf-web-reasons-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 6px; margin:0 0 6px; font-size:13px; }
+.pf-web-reasons-head code { padding:0 4px; border-radius:4px; background:var(--i-ink); color:var(--background); font:700 9.5px/1.6 var(--font-mono,ui-monospace,monospace); }
+.pf-web-reasons-head span { flex-basis:100%; font-size:11.5px; color:var(--i-muted); }
+.pf-web-reasons ul { display:grid; gap:8px; margin:0; padding:0; list-style:none; }
+.pf-web-reasons li { display:grid; gap:3px; padding-top:7px; border-top:1px dashed var(--i-line); }
+.pf-web-reasons li small { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--i-muted); font-weight:600; }
+.pf-web-reasons li small i { width:7px; height:7px; border-radius:50%; }
+.pf-web-reasons q { font-size:12.5px; line-height:1.5; color:var(--i-ink); quotes:none; }
+.pf-web-reasons q[data-quoted]::before { content:"“"; } .pf-web-reasons q[data-quoted]::after { content:"”"; }
+.pf-web-reasons li button { justify-self:start; padding:0; border:0; background:none; color:var(--i-accent); font-size:11.5px; font-weight:600; text-align:left; cursor:pointer; }
+.pf-web-more { font-size:11px; color:var(--i-muted); }
+.pf-web-row { position:relative; display:grid !important; gap:2px; padding:4px 0; }
+.pf-web-row-main { display:flex; align-items:baseline; gap:6px; min-width:0; padding:0; border:0; background:none; color:var(--i-ink); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
+.pf-web-row-main b { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-web-row-main:hover b { text-decoration:underline; }
+.pf-web-row-why { margin:0; font-size:11.5px; line-height:1.45; color:var(--i-muted); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-web-row-why time { margin-right:5px; font-weight:700; color:var(--i-ink); font-variant-numeric:tabular-nums; }
+.pf-web-row-tip { display:none; position:absolute; left:0; top:100%; z-index:6; width:min(380px,92vw); padding:12px 14px; border:1px solid var(--i-line); border-radius:14px; background:var(--background); box-shadow:0 18px 40px -18px rgba(10,30,24,.45); }
+.pf-web-row:hover .pf-web-row-tip, .pf-web-row:focus-within .pf-web-row-tip { display:block; }
+@media (hover:none) { .pf-web-row-tip { display:none !important; } }
+@media (max-width:760px) { .pf-web-tip { left:4% !important; right:4%; width:auto; transform:translateY(-50%) !important; } }

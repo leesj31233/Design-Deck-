@@ -9,7 +9,8 @@ export type IntelStatus = "verified" | "claimed" | "estimate" | "unverified";
 export type IntelStage = "research" | "pilot" | "construction" | "commissioning" | "commercial-production" | "commercial-sales" | "stopped";
 
 export interface IntelDatum { label: string; value: string; unit?: string; basis?: string; where?: string }
-export interface IntelRelation { to: string; type: string }
+/** A link to another item; `evidence` is the sentence (from either item) that states the relation. */
+export interface IntelRelation { to: string; type: string; evidence?: string }
 export interface IntelApplicability { new?: string; fit?: string; designChange?: string; testVars?: string; capex?: string; quality?: string; scaleup?: string; questions?: string }
 /** What the reader decided about an item: kept, filed, noted. Synced; never overwritten by a new pack. */
 export interface IntelPerson { name: string; title: string; background?: string; ref?: string; url?: string }

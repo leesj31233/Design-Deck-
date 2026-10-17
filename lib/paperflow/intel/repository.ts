@@ -74,7 +74,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     status: STATUSES.includes(value.status as IntelStatus) ? value.status as IntelStatus : undefined,
     stage: STAGES.includes(value.stage as IntelStage) ? value.stage as IntelStage : undefined,
     data: list(value.data, entry => { const label = text(entry.label, 160), datum = text(entry.value === undefined ? undefined : String(entry.value), 160); return label && datum ? { label, value: datum, unit: text(entry.unit, 40), basis: text(entry.basis, 160), where: text(entry.where, 160) } : null; }),
-    relations: list(value.relations, entry => { const to = text(entry.to, 160), type = text(entry.type, 40); return to && type ? { to, type } : null; }),
+    relations: list(value.relations, entry => { const to = text(entry.to, 160), type = text(entry.type, 40); const evidence = text(entry.evidence, 300); return to && type ? (evidence ? { to, type, evidence } : { to, type }) : null; }),
     equipment: equipment && Object.keys(equipment).length ? equipment : undefined,
     naysor: naysor && Object.keys(naysor).length ? naysor : undefined,
     profile: record(value.profile),
