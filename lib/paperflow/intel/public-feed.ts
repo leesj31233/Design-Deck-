@@ -86,7 +86,7 @@ export function mediaUrl(base: string, id: string, at: string, figure?: number) 
 function scrub(value: unknown, key = ""): unknown {
   if (typeof value === "string") {
     if (!SELF.test(value)) return value;
-    if (key === "body") return publicMarkdown(value) || undefined;
+    if (key === "body" || key === "article") return publicMarkdown(value) || undefined;
     return value.length > 160 ? factsOnly(value) || undefined : undefined;
   }
   if (Array.isArray(value)) return value.flatMap(entry => {

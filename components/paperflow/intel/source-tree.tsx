@@ -50,11 +50,9 @@ export function LinkCard({ url, label, where, compact }: { url: string; label?: 
  * pages. A branch opens one level at a time (three at most) and never loops back on itself.
  */
 export function SourceTree({ item, byId, mentions, onOpen }: { item: IntelItem; byId: Map<string, IntelItem>; mentions: IntelItem[]; onOpen: (id: string) => void }) {
-  const wheres = [...new Set((item.data ?? []).map(datum => datum.where).filter(Boolean))].slice(0, 6) as string[];
   const children = (node: IntelItem) => (node.relations ?? []).map(relation => ({ relation, target: byId.get(relation.to) })).filter(entry => entry.target);
-  return <section className="pf-sourcetree"><h4><Link2 size={13}/>근거 자료 · 출처 체인</h4>
-    {item.url && <LinkCard url={item.url} label={item.title} where={wheres.length ? `근거 위치: ${wheres.join(", ")}` : undefined}/>}
-    {item.pdfUrl && item.pdfUrl !== item.url && <LinkCard url={item.pdfUrl} label={`${item.title} (PDF)`} compact/>}
+  if (!item.dossier?.sources?.length && !children(item).length && !mentions.length) return null;
+  return <section className="pf-sourcetree"><h4><Link2 size={13}/>이 항목과 이어진 자료</h4>
     {item.dossier?.sources?.length ? <div className="pf-sourcetree-group"><span>케이스 파일 출처</span>{item.dossier.sources.filter(source => source.url).map(source => <LinkCard key={source.ref} url={source.url!} label={`[${source.ref}] ${source.title}`} where={source.where} compact/>)}</div> : null}
     {children(item).length > 0 && <div className="pf-sourcetree-group"><span>이 항목이 기대는 자료</span><ul>{children(item).map(({ relation, target }) => <Branch key={target!.id} item={target!} type={relation.type} byId={byId} onOpen={onOpen} depth={1} seen={new Set([item.id])} children={children}/>)}</ul></div>}
     {mentions.length > 0 && <div className="pf-sourcetree-group"><span>이 항목을 근거로 쓰는 자료</span><ul>{mentions.slice(0, 12).map(mention => <Branch key={mention.id} item={mention} type="cites" byId={byId} onOpen={onOpen} depth={1} seen={new Set([item.id])} children={children}/>)}</ul></div>}

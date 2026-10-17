@@ -39,8 +39,10 @@ const STATUS_SHORT: Record<string, string> = { verified: "확인됨", claimed: "
  * and the numbered sources. The history sits in a column on the right (a fold on phones). Every
  * statement keeps its source number; the card shows the source on hover.
  */
-export function CompanyPage({ item, read, library, org, web, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
+export function CompanyPage({ article, item, read, library, org, web, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
   item: IntelItem; read?: { label: string; run: () => void };
+  /** The item written up as a document; it replaces the overview. */
+  article?: React.ReactNode;
   /** The organisation in the registry: its code, parent and subsidiaries, and a way to open them. */
   org?: { entity: IntelEntity; parent?: IntelEntity; children: IntelEntity[]; open: (entity: IntelEntity) => void };
   /** Everything the organisation is linked to (partners, suppliers, buyers, certifiers…), for the 연결망 map. */
@@ -136,8 +138,8 @@ export function CompanyPage({ item, read, library, org, web, news, related, byId
             </section>
             <section>
               {heading("개요")}
-              <p className="pf-cdoc-lede">{dossier.headline}</p>
-              {overview && <Markdown source={overview.body} entity={entity} terms={terms} cite={citeMany}/>}
+              {article ?? <><p className="pf-cdoc-lede">{dossier.headline}</p>
+              {overview && <Markdown source={overview.body} entity={entity} terms={terms} cite={citeMany}/>}</>}
               {kpis.length > 0 && <ul className="pf-cdoc-kpis">{kpis.map((datum, index) => <li key={index}><small>{datum.label}</small><b>{datum.value}{datum.unit && <i> {datum.unit}</i>}</b>{datum.basis && <span>{datum.basis}</span>}</li>)}</ul>}
               {dossier.facts?.length ? <table className="pf-cdoc-facts"><tbody>{dossier.facts.map((fact, index) => <tr key={index}><th scope="row">{fact.label}</th><td>{fact.value}{cite(fact.ref)}</td><td>{fact.status && <span data-status={fact.status}>{STATUS_SHORT[fact.status]}</span>}</td></tr>)}</tbody></table> : null}
             </section>
@@ -174,9 +176,9 @@ export function CompanyPage({ item, read, library, org, web, news, related, byId
             {infoTable}{peopleTable}
             {org && org.children.length > 0 && <div className="pf-cdoc-family"><h3>자회사·관계사 {org.children.length}</h3><ul>{org.children.map(child => <li key={child.code}><button type="button" onClick={() => org.open(child)}><code>{child.code}</code><b>{child.name}</b><small>{countryOf(child.code)} · {CATEGORY_LABEL[child.category]}</small></button></li>)}</ul></div>}
             {heading("개요")}
-            {item.summaryKo && <p className="pf-cdoc-lede">{item.summaryKo}</p>}
+            {article ?? (item.summaryKo && <p className="pf-cdoc-lede">{item.summaryKo}</p>)}
             {item.status && <p className="pf-cdoc-none">상태: {STATUS_LABEL[item.status]}</p>}
-            <p className="pf-cdoc-none">아직 케이스 파일이 없습니다. 매일 수집 작업이 이 기업의 원 자료(공시·보고서·보도자료)와 그림으로 케이스 파일을 만들어 채웁니다.</p>
+            {!article && <p className="pf-cdoc-none">아직 케이스 파일이 없습니다. 매일 수집 작업이 이 기업의 원 자료(공시·보고서·보도자료)와 그림으로 케이스 파일을 만들어 채웁니다.</p>}
           </section>}
 
           {org && web && web.length > 0 && <section className="pf-cdoc-web">{heading(`연결망 (${web.length})`)}<EntityWeb center={org.entity} links={web} onEntity={org.open} onItem={onOpen}/></section>}

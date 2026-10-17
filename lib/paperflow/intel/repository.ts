@@ -68,7 +68,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     id, kind, title, url: url ?? "",
     topics: (Array.isArray(value.topics) ? value.topics : []).flatMap(topic => text(topic, 40) ? [text(topic, 40)!] : []).slice(0, 12),
     classes: classesOf(value.classes),
-    titleKo: text(value.titleKo, 400), summaryKo: longText(value.summaryKo, 2400), org: text(value.org, 200), authors: text(value.authors, 300), date: text(value.date, 20),
+    titleKo: text(value.titleKo, 400), summaryKo: longText(value.summaryKo, 2400), article: longText(value.article, 24_000), org: text(value.org, 200), authors: text(value.authors, 300), date: text(value.date, 20),
     pdfUrl: link(value.pdfUrl), libraryDoc: (typeof value.libraryDoc === "string" && /^[a-f0-9]{64}$/.test(value.libraryDoc) ? value.libraryDoc : undefined), lang: text(value.lang, 8), country: text(value.country, 120), sourceType: text(value.sourceType, 40),
     reliability: Number.isInteger(reliability) && reliability >= 1 && reliability <= 7 ? reliability : undefined,
     status: STATUSES.includes(value.status as IntelStatus) ? value.status as IntelStatus : undefined,

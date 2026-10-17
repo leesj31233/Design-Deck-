@@ -4,9 +4,13 @@
 .pf-intel-briefs > nav button time { display:block; font-size:11px; color:var(--i-accent); font-variant-numeric:tabular-nums; }
 .pf-intel-brief-date { margin:0 0 6px; font-size:12px; font-weight:600; color:var(--i-accent); letter-spacing:.04em; }
 .pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-briefs { grid-template-columns:minmax(0,1fr); }
+.pf-intel-body[data-mode="analysis"][data-detail] .pf-intel-briefs { grid-template-columns:minmax(0,1fr); }
 .pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-briefs > nav { position:static; display:flex; flex-wrap:wrap; gap:4px; }
+.pf-intel-body[data-mode="analysis"][data-detail] .pf-intel-briefs > nav { position:static; display:flex; flex-wrap:wrap; gap:4px; }
 .pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-brief-group { display:contents; }
+.pf-intel-body[data-mode="analysis"][data-detail] .pf-intel-brief-group { display:contents; }
 .pf-intel-body[data-mode="briefs"][data-detail] .pf-intel-brief-group > span { display:none; }
+.pf-intel-body[data-mode="analysis"][data-detail] .pf-intel-brief-group > span { display:none; }
 .pf-intel .pf-intel-brief { padding:0; border:0; background:none; overflow:visible; }
 
 /* Entity links in a briefing: preview on hover, full record in the side panel on click */
@@ -105,10 +109,14 @@
 .pf-intel { overflow-x:clip; }
 /* Reading briefings: the topic tree (it filters items) steps aside so the document gets the width. */
 .pf-intel-body[data-mode="briefs"] { grid-template-columns:minmax(0,1fr); }
+.pf-intel-body[data-mode="analysis"] { grid-template-columns:minmax(0,1fr); }
 .pf-intel-body[data-mode="briefs"][data-detail] { grid-template-columns:minmax(0,1fr) minmax(340px,420px); }
+.pf-intel-body[data-mode="analysis"][data-detail] { grid-template-columns:minmax(0,1fr) minmax(340px,420px); }
 .pf-intel-body[data-mode="briefs"] > .pf-intel-tree { display:none; }
+.pf-intel-body[data-mode="analysis"] > .pf-intel-tree { display:none; }
 .pf-intel-briefs, .pf-brief-doc, .pf-brief-sheet, .pf-brief-body { min-width:0; }
 @media (max-width:1180px) { .pf-intel-body[data-mode="briefs"][data-detail] { grid-template-columns:minmax(0,1fr); } }
+@media (max-width:1180px) { .pf-intel-body[data-mode="analysis"][data-detail] { grid-template-columns:minmax(0,1fr); } }
 @media (max-width:1100px) {
   .pf-intel-briefs { grid-template-columns:minmax(0,1fr); }
   .pf-intel-briefs > nav { position:static; display:flex; flex-wrap:wrap; gap:4px; }
@@ -128,3 +136,7 @@
 .pf-intel .pf-brief-cast ul { display:grid; grid-template-columns:repeat(auto-fill,minmax(138px,1fr)); overflow:visible; padding:0; }
 .pf-intel .pf-brief-cast li { width:auto; min-width:0; }
 .pf-intel.pf-brief-focus-layer { padding-inline:max(18px,calc((100vw - 1240px) / 2)); }
+/* The briefing list: Executive Summary first, then dated briefings (the daily ones folded after three). */
+.pf-intel-brief-group[data-group="exec"] > button { font-weight:600; color:var(--i-ink); }
+.pf-intel-brief-more { margin:2px 0 0 11px; padding:4px 0 !important; border:0; background:none !important; color:var(--i-accent) !important; font-size:12px !important; font-weight:600; cursor:pointer; box-shadow:none !important; }
+.pf-brief-cast-end { margin-top:28px; padding-top:18px; border-top:1px solid var(--i-line); }

@@ -26,6 +26,8 @@ export interface IntelUserState { star?: boolean; folderId?: string | null; note
 export interface IntelItem {
   id: string; kind: IntelKind; topics: string[]; classes?: IntelClass[];
   title: string; titleKo?: string; summaryKo?: string;
+  /** The item written up as a short document (Markdown): agenda, sections, conclusion, figures with one-line captions, numbered references at the end. Never repeats the title. */
+  article?: string;
   org?: string; authors?: string; date?: string; url: string; pdfUrl?: string;
   /** The library copy of its PDF, put there by the research routine (document id = SHA-256). */
   libraryDoc?: string; lang?: string; country?: string;
@@ -158,3 +160,5 @@ export function itemDate(item: Pick<IntelItem, "date" | "update" | "dossier">, t
   for (const source of item.dossier?.sources ?? []) take(source.date);
   return found.filter(date => date <= today).sort().pop();
 }
+/** What kind of document the original is. */
+export const SOURCE_TYPE_LABEL: Record<string, string> = { press: "보도·기사", gov: "정부·공공 자료", paper: "논문", "market-analyst": "시장 분석", "vendor-catalog": "제조사 자료", "annual-report": "연차·지속가능 보고서", "test-report": "시험 성적서", patent: "특허", ir: "IR 자료", company: "기업 자료" };
