@@ -4,7 +4,7 @@ import { publicFeed } from "@/lib/paperflow/intel/public-feed";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 /** Items per part: each response stays well under the platform's response size limit as the base grows. */
-const PART = 400;
+const PART = 250;
 
 /**
  * NAYSOR News: the intelligence list for anyone (no account), in parts (?part=0,1,…). Part 0 carries the

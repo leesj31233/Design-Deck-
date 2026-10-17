@@ -62,15 +62,32 @@ export function publicBrief(brief: IntelBrief): IntelBrief | null {
 }
 
 type Row = { id: string; data: unknown; updated_at: string };
+const base = (admin: SupabaseClient, userId: string, columns: string) => admin.from("annotations").select(columns).eq("user_id", userId).eq("document_id", "__intel__").eq("deleted", false);
+/**
+ * Every row under a prefix. The ids come first (small), then the rows in small groups a few at a time: items
+ * carry whole documents now, and a hundred of them in one statement runs past the database's time limit.
+ */
 async function rows(admin: SupabaseClient, userId: string, prefix: string, columns = "id, data, updated_at") {
-  const out: Row[] = [];
-  for (let from = 0; from < 5000; from += 100) {
-    const { data, error } = await admin.from("annotations").select(columns).eq("user_id", userId).eq("document_id", "__intel__").eq("deleted", false).like("id", `${prefix}%`).order("id").range(from, from + 99);
+  const ids: string[] = [];
+  for (let from = 0; from < 20000; from += 1000) {
+    const { data, error } = await base(admin, userId, "id").like("id", `${prefix}%`).order("id").range(from, from + 999);
     if (error) throw new Error(error.message);
-    out.push(...(data as unknown as Row[]));
-    if (!data || data.length < 100) break;
+    ids.push(...(data as unknown as { id: string }[]).map(row => row.id));
+    if (!data || data.length < 1000) break;
   }
-  return out;
+  if (!ids.length) return [];
+  const groups: string[][] = [];
+  for (let at = 0; at < ids.length; at += 40) groups.push(ids.slice(at, at + 40));
+  const out: Row[] = [];
+  for (let at = 0; at < groups.length; at += 6) {
+    const parts = await Promise.all(groups.slice(at, at + 6).map(async group => {
+      const { data, error } = await base(admin, userId, columns).in("id", group);
+      if (error) throw new Error(error.message);
+      return data as unknown as Row[];
+    }));
+    for (const part of parts) out.push(...part);
+  }
+  return out.sort((a, b) => a.id.localeCompare(b.id));
 }
 
 const version = (at: string) => Date.parse(at).toString(36);
@@ -140,7 +157,16 @@ function withPublicItems(brief: IntelBrief, ids: Set<string>): IntelBrief {
   } catch { return brief; }
 }
 
-export async function publicFeed(admin: SupabaseClient, base: string) {
+/** The parts of one visit arrive together: they share one build of the feed for two minutes. */
+let built: { base: string; at: number; feed: ReturnType<typeof buildFeed> } | null = null;
+export function publicFeed(admin: SupabaseClient, base: string) {
+  if (built && built.base === base && Date.now() - built.at < 120_000) return built.feed;
+  const feed = buildFeed(admin, base);
+  built = { base, at: Date.now(), feed };
+  feed.catch(() => { if (built?.feed === feed) built = null; });
+  return feed;
+}
+async function buildFeed(admin: SupabaseClient, base: string) {
   const userId = await feedOwner(admin);
   if (!userId) return null;
   const [items, briefs, media] = await Promise.all([rows(admin, userId, "intel:"), rows(admin, userId, "intelbrief:"), rows(admin, userId, "intelmedia:", "id, updated_at")]);
