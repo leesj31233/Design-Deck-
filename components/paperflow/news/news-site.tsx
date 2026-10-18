@@ -52,8 +52,10 @@ export function NewsSite() {
       if (held) setLoading(false);
       try {
         // The site keeps a ready-made copy on the CDN; the device downloads it only when it has changed.
-        let manifest: Manifest | null = null;
-        if (SNAPSHOT) try { const response = await fetch(`${SNAPSHOT}/manifest.json?t=${Math.floor(Date.now() / 60_000)}`); if (response.ok) manifest = await response.json() as Manifest; } catch { /* the server assembles it instead */ }
+        // The page's first script has usually started it already (window.__naysorFeed); otherwise start it now.
+        const early = await ((window as unknown as { __naysorFeed?: Promise<{ manifest: Manifest; parts: Promise<Part>[] | null } | null> }).__naysorFeed ?? Promise.resolve(null));
+        let manifest: Manifest | null = early?.manifest ?? null;
+        if (!manifest && SNAPSHOT) try { const response = await fetch(`${SNAPSHOT}/manifest.json?t=${Math.floor(Date.now() / 60_000)}`); if (response.ok) manifest = await response.json() as Manifest; } catch { /* the server assembles it instead */ }
         if (manifest && held && read(VERSION_KEY) === manifest.version) return;
         const label = held ? "일일 업데이트 및 기존 뉴스 반영 중" : "NAYSOR News 전체 자료를 받는 중";
         let received = 0;
@@ -61,7 +63,8 @@ export function NewsSite() {
         let all: Part[];
         if (manifest) {
           progress(manifest.total);
-          all = await Promise.all(manifest.parts.map(async url => { const response = await fetch(url); if (!response.ok) throw new Error(String(response.status)); const part = await response.json() as Part; received += part.items.length; progress(manifest!.total); return part; }));
+          const started = early?.manifest.version === manifest.version ? early.parts : null;
+          all = await Promise.all(manifest.parts.map(async (url, index) => { const part = started?.[index] ? await started[index] : await fetch(url).then(response => { if (!response.ok) throw new Error(String(response.status)); return response.json() as Promise<Part>; }); received += part.items.length; progress(manifest!.total); return part; }));
         } else {
           // No copy yet: the server assembles the list in parts; the first says how many there are.
           const get = async (part: number) => { const response = await fetch(`/api/public/intel?part=${part}`); if (!response.ok) throw new Error(String(response.status)); const body = await response.json() as Part & { total?: number }; received += body.items.length; progress(body.total ?? received); return body; };
