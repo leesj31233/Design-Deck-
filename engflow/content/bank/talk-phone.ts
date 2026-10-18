@@ -990,7 +990,7 @@ export const TALK_PHONE: Question[] = [
     dialogue: [{ speaker: "Mr. Tan", en: "Let's just agree on the design conditions now on the phone. There's no need for more paperwork.", ko: "그냥 지금 전화로 설계 조건을 합의합시다. 서류 작업을 더 할 필요는 없어요." }],
     promptKo: "지금 이야기하는 건 좋은데, 통화로는 세부 사항을 놓칠까 봐 조금 걱정돼요. 숫자가 많거든요. 통화가 끝나면 짧게 요약해서 보내 드려도 될까요? 그러면 둘 다 같은 숫자를 갖고 있게 될 거예요.",
     segments: ["지금 이야기하는 건 좋은데", "통화로는 세부 사항을 놓칠까 봐 걱정돼요.", "숫자가 많거든요.", "통화 끝나고 짧은 요약을 보내 드려도 될까요?", "그러면 둘 다 같은 숫자를 갖게 돼요"],
-    reference: "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone. There are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
+    reference: "I'm happy to discuss it now. But I'm a bit worried that we might miss some details over the phone. There are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
     accepted: [
       "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone, because there are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
       "I'm happy to discuss it now, but I'm a little worried that we might miss some details over the phone, because there are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
@@ -999,6 +999,7 @@ export const TALK_PHONE: Question[] = [
       "I'm happy to discuss it now, but there are a lot of numbers, so I'm a bit worried that we might miss some details over the phone. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
       "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone, because there are a lot of numbers. Would you mind if I send you a short summary after the call? That way, we'll both have the same numbers.",
     ],
+    advanced: "I'm happy to discuss it now, but I'm a bit worried that we might miss some details over the phone. There are a lot of numbers. Would you mind if I sent you a short summary after the call? That way, we'll both have the same numbers.",
     meaning: [
       { id: "happy", en: "I'm happy to discuss it now", ko: "지금 이야기하는 건 좋다", any: ["happy|glad|fine|okay|ok", "sure"] },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
@@ -1013,7 +1014,7 @@ export const TALK_PHONE: Question[] = [
       { id: "am-worry", pattern: "=am|=are a? bit|little? =worry", category: "be-verb", severity: "major", fix: "am a bit worried", messageKo: "'걱정된다'는 형용사 'worried'를 써서 'I'm worried'입니다. 'I'm worry'처럼 be동사 뒤에 동사원형 worry를 쓰지 않습니다.", skill: "be-adj" },
       { id: "send-to-you-a", pattern: "send|sent to you a|the", category: "word-order", severity: "major", fix: "send you a", messageKo: "'~에게 …을 보내다'는 'send + 사람 + 물건'(send you a summary) 또는 'send + 물건 + to + 사람'입니다. 'send to you a summary'라고 하지 않습니다." },
     ],
-    hints: { pattern: "I'm happy to …, but I'm a bit worried that … Would you mind if I + 과거동사 …?", skeleton: "I'm happy to discuss it now, but I'm a bit _______ that we might ____ some details … Would you ____ if I sent you a summary …?", partial: "I'm happy to discuss it now, but I'm a bit worried that…" },
+    hints: { pattern: "I'm happy to …. But I'm a bit worried that … Would you mind if I + 과거동사 …?", skeleton: "I'm happy to discuss it now. But I'm a bit _______ that we might ____ some details … Would you ____ if I sent you a summary …?", partial: "I'm happy to discuss it now. But I'm a bit worried that…" },
     explanationKo: "상대 제안을 먼저 받아들인 뒤(I'm happy to …) 'but I'm a bit worried that …'으로 우려를 말하고, 'Would you mind if I sent …?'로 대안을 정중하게 제안합니다. '걱정된다'는 'I'm worried'(형용사)이고, 'send you a summary'처럼 '사람 + 물건' 순서로 말합니다.",
     probes: [
       { answer: "I'm happy to discuss it now, but I'm a little worried we might miss some details on the phone because there are so many numbers. Would you mind if I emailed you a short summary after the call? Then we'll both have the same numbers.", expect: "pass" },

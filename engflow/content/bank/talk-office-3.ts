@@ -1255,9 +1255,9 @@ export const TALK_OFFICE_3: Question[] = [
     expression: "I'm not sure it's a good idea to … What if he … first?",
     contextKo: "김 팀장님이 이번 주에 입사한 톰 씨를 바로 자카르타 프로젝트에 투입하자고 합니다. 톰 씨는 아직 회사 시스템도 다 못 익혔습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Let's put Tom on the Jakarta project right away. We really need more people.", ko: "톰 씨를 바로 자카르타 프로젝트에 넣읍시다. 사람이 정말 부족해요." }],
-    promptKo: "사람이 더 필요한 건 이해하지만, 입사 첫 주에 바로 넣는 게 좋은 생각인지 잘 모르겠어요. 아직 우리 시스템을 다 못 익혀서 버거워할 수도 있어요. 일주일 동안 먼저 저랑 같이 일하고 나서 프로젝트에 들어가면 어떨까요?",
+    promptKo: "사람이 더 필요한 건 이해해요. 하지만 입사 첫 주에 바로 넣는 게 좋은 생각인지 잘 모르겠어요. 아직 우리 시스템을 다 못 익혀서 버거워할 수도 있어요. 일주일 동안 먼저 저랑 같이 일하고 나서 프로젝트에 들어가면 어떨까요?",
     segments: ["사람이 더 필요한 건 이해하지만", "첫 주에 바로 넣는 게 좋은 생각인지 잘 모르겠어요", "아직 우리 시스템을 못 익혀서 버거워할 수도 있어요", "일주일 동안 먼저 저랑 같이 일하고 나서", "프로젝트에 들어가면 어떨까요?"],
-    reference: "I understand we need more people, but I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. What if he worked with me for a week first and then joined the project?",
+    reference: "I understand we need more people. But I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. What if he worked with me for a week first and then joined the project?",
     accepted: [
       "I understand we need more people, but I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. Could he work with me for a week first and then join the project?",
       "I know we need more people, but I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. What if he worked with me for a week first and then joined the project?",
@@ -1266,6 +1266,7 @@ export const TALK_OFFICE_3: Question[] = [
       "I understand we need more people, but I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. How about letting him work with me for a week first, and then he can join the project?",
       "I understand we need more people, but I'm not sure it's a good idea to put Tom on the project in his first week. He hasn't learned our systems yet, so it might be too much for him. Why don't we let him work with me for a week first and then join the project?",
     ],
+    advanced: "I understand we need more people, but I'm not sure it's a good idea to put Tom on it in his first week. He hasn't learned our systems yet, so he might feel overwhelmed. What if he worked with me for a week first and then joined the project?",
     meaning: [
       { id: "understand", en: "I understand we need more people", ko: "사람이 더 필요한 건 이해해요", any: ["understand|know|see|agree|true|right", "need ... people|help|hands"] },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
@@ -1284,7 +1285,7 @@ export const TALK_OFFICE_3: Question[] = [
       { id: "what-if-he-work", pattern: "re:\\bwhat if he (?:work|join|shadow)\\b", category: "agreement", severity: "major", fix: "what if he worked", messageKo: "'What if he …?' 뒤에는 과거형(worked, 가정) 또는 3인칭 현재형(works)을 씁니다. 'he work'라고 하지 않습니다.", skill: "agreement" },
       { id: "has-learned-flip", pattern: "re:\\b(?:he|tom) (?:has|already) (?:already )?learned\\b", category: "meaning-shift", severity: "critical", fix: "He hasn't learned", messageKo: "not이 빠지면 '이미 다 익혔다'는 반대 뜻이 됩니다. 'He hasn't learned our systems yet.'이라고 합니다." },
     ],
-    hints: { pattern: "I understand …, but I'm not sure it's a good idea to … He hasn't + p.p. … yet, so … What if he + 과거동사 …?", skeleton: "I understand we need more people, but I'm not ____ … He hasn't _______ our systems yet, so … What if he ______ with me …?", partial: "I understand we need more people, but I'm not sure it's a good idea…" },
+    hints: { pattern: "I understand …. But I'm not sure it's a good idea to … He hasn't + p.p. … yet, so … What if he + 과거동사 …?", skeleton: "I understand we need more people. But I'm not ____ … He hasn't _______ our systems yet, so … What if he ______ with me …?", partial: "I understand we need more people. But I'm not sure it's a good idea…" },
     explanationKo: "윗사람의 제안에 반대할 때는 'I understand …, but I'm not sure it's a good idea to …'로 먼저 인정한 뒤 부드럽게 반대합니다. '아직 못 익혔다'는 현재완료 'hasn't learned … yet', 사람이 버거운 것은 'feel overwhelmed'이며, 대안은 'What if he worked …?'처럼 과거형으로 부드럽게 제안합니다.",
     probes: [
       { answer: "I know we really need people, but I don't think it's a good idea to put Tom on the project in his first week. He doesn't know our systems yet, so it might be too much for him. Why don't we let him work with me for a week and then join the project?", expect: "pass" },
@@ -1306,9 +1307,9 @@ export const TALK_OFFICE_3: Question[] = [
     expression: "I understand …, but I've already booked … What if …?",
     contextKo: "다음 주 탄 사장님 방문이 하필 몇 달 전에 잡아 둔 가족 휴가 기간과 겹칩니다. 김 팀장님이 휴가를 미룰 수 있는지 묻습니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Mr. Tan is visiting next week, during your vacation. Is there any way you could move your vacation?", ko: "다음 주 탄 사장님 방문이 민수 씨 휴가 기간이에요. 혹시 휴가를 옮길 수 있을까요?" }],
-    promptKo: "방문이 중요한 건 알지만, 가족 항공권을 이미 예약했고 환불이 안 돼요. 제가 떠나기 전에 자료를 다 준비해 두고, 지수 씨가 탄 사장님을 맡으면 어떨까요? 필요하면 회의에는 온라인으로 들어갈 수도 있어요.",
+    promptKo: "방문이 중요한 건 알아요. 하지만 가족 항공권을 이미 예약했고 환불이 안 돼요. 제가 떠나기 전에 자료를 다 준비해 두고, 지수 씨가 탄 사장님을 맡으면 어떨까요? 필요하면 회의에는 온라인으로 들어갈 수도 있어요.",
     segments: ["방문이 중요한 건 알지만", "가족 항공권을 이미 예약했고 환불이 안 돼요", "제가 떠나기 전에 자료를 다 준비해 두고", "지수 씨가 탄 사장님을 맡으면 어떨까요?", "필요하면 회의에는 온라인으로 들어갈 수도 있어요"],
-    reference: "I understand the visit is important, but I've already booked flights for my family, and they can't be refunded. What if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
+    reference: "I understand the visit is important. But I've already booked flights for my family, and they can't be refunded. What if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
     accepted: [
       "I know the visit is important, but I've already booked flights for my family, and they can't be refunded. What if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
       "I understand the visit is important, but I've already booked flights for my family, and they're non-refundable. What if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
@@ -1317,6 +1318,7 @@ export const TALK_OFFICE_3: Question[] = [
       "I understand the visit is important, but I've already booked flights for my family, and they can't be refunded. How about if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I can also join the meetings online if needed.",
       "I understand the visit is important, but I've already booked flights for my family, and they can't be refunded. Would it be okay if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
     ],
+    advanced: "I understand the visit is important, but I've already booked flights for my family, and they can't be refunded. What if I prepared all the materials before I left, and Jisoo looked after Mr. Tan? I could also join the meetings online if needed.",
     meaning: [
       { id: "understand", en: "I understand the visit is important", ko: "방문이 중요한 건 알아요", any: ["understand|know|see|realize|realise|appreciate", "important"] },
       { id: "but", en: "but", ko: "하지만", any: ["but|however|unfortunately"], critical: true },
@@ -1336,7 +1338,7 @@ export const TALK_OFFICE_3: Question[] = [
       { id: "can-be-refunded-flip", pattern: "re:(?<!\\bnot )\\b(?:can|could) be refunded\\b", category: "meaning-shift", severity: "critical", fix: "can't be refunded", messageKo: "not이 빠지면 '환불할 수 있다'는 반대 뜻이 됩니다. 'they can't be refunded'라고 합니다." },
       { id: "online-join-to", pattern: "join to|in the meetings?", category: "preposition", severity: "major", fix: "join the meetings", messageKo: "join은 전치사 없이 씁니다: 'join the meetings online'.", skill: "verb-object" },
     ],
-    hints: { pattern: "I understand …, but I've already + p.p. …, and they can't be + p.p. What if I + 과거동사 …? I could also …", skeleton: "I understand the visit is important, but I've already ______ flights … they can't be ________. What if I …? I could also …", partial: "I understand the visit is important, but I've already booked…" },
+    hints: { pattern: "I understand …. But I've already + p.p. …, and they can't be + p.p. What if I + 과거동사 …? I could also …", skeleton: "I understand the visit is important. But I've already ______ flights … they can't be ________. What if I …? I could also …", partial: "I understand the visit is important. But I've already booked…" },
     explanationKo: "먼저 상대의 입장을 인정하고(I understand …), 이미 해 둔 일은 현재완료 'I've already booked'로, 환불 불가는 수동태 'can't be refunded'로 말합니다. 대안은 'What if I prepared …, and Jisoo looked after …?'처럼 과거형으로 부드럽게 제안하고, before절에는 will을 쓰지 않습니다.",
     probes: [
       { answer: "I know the visit is really important, but I've already booked flights for my family and they're non-refundable. What if I got all the materials ready before I left and Jisoo hosted Mr. Tan? I could also join the meetings online if necessary.", expect: "pass" },

@@ -718,11 +718,12 @@ export const TALK_VISIT_2: Question[] = [
     dialogue: [{ speaker: "Daniel", en: "I've been to many plants like this. Can we skip the safety briefing? We're really short on time.", ko: "이런 공장은 많이 가 봤어요. 안전 교육은 건너뛸 수 있을까요? 시간이 정말 부족해서요." }],
     promptKo: "시간이 부족하신 건 이해하지만, 죄송하게도 공정 구역에 들어가기 전에는 모든 분이 안전 교육을 받으셔야 해요. 10분 정도밖에 안 걸려요. 지금 바로 시작하면 점심 전에 건조기를 보실 시간이 충분할 거예요.",
     segments: ["시간이 부족하신 건 알지만", "죄송하게도 모든 분이 안전 교육을 받아야 해요", "공정 구역에 들어가기 전에.", "10분 정도밖에 안 걸려요.", "지금 바로 시작하면", "점심 전에 건조기를 볼 시간이 충분해요"],
-    reference: "I understand you're short on time, but I'm afraid everyone has to attend the safety briefing before going into the process area. It only takes about ten minutes. If we start right now, we'll have enough time to see the dryer before lunch.",
+    reference: "I understand you're short on time. But I'm afraid everyone has to attend the safety briefing before going into the process area. It only takes about ten minutes. If we start right now, we'll have enough time to see the dryer before lunch.",
     accepted: [
       "I understand you're short on time, but I'm afraid everyone needs to attend the safety briefing before entering the process area. It only takes about ten minutes. If we start right now, we'll have enough time to see the dryer before lunch.",
       "I know you're short on time, but I'm afraid everyone has to do the safety briefing before going into the process area. It only takes about 10 minutes. If we start now, we'll have enough time to see the dryer before lunch.",
       "I understand that you're short on time, but I'm afraid the safety briefing is required for everyone before entering the process area. It only takes about ten minutes, so if we start right now, we'll have enough time to see the dryer before lunch.",
+      "I understand you're short on time, but I'm afraid everyone has to attend the safety briefing before going into the process area. It only takes about ten minutes. If we start right now, we'll have enough time to see the dryer before lunch.",
     ],
     meaning: [
       { id: "understand", en: "I understand", ko: "이해해요", any: ["understand|know|see"] },
@@ -738,7 +739,7 @@ export const TALK_VISIT_2: Question[] = [
       { id: "before-go", pattern: "before =go", category: "verb-form", severity: "major", fix: "before going", messageKo: "before 뒤에 동사를 바로 쓸 때는 동명사입니다: 'before going into …' 또는 'before you go into …'.", skill: "prep-gerund" },
       { id: "before-enter", pattern: "before =enter", category: "verb-form", severity: "major", fix: "before entering", messageKo: "before 뒤에 동사를 바로 쓸 때는 동명사입니다: 'before entering the process area' 또는 'before you enter …'.", skill: "prep-gerund" },
     ],
-    hints: { pattern: "I understand …, but I'm afraid everyone has to + 동사원형 + before + V-ing. If + 현재형, we'll …", skeleton: "I understand you're short on time, but I'm ______ everyone ___ __ attend the safety briefing before _____ into the process area. …", partial: "I understand you're short on time, but I'm afraid everyone has to attend the safety briefing…" },
+    hints: { pattern: "I understand …. But I'm afraid everyone has to + 동사원형 + before + V-ing. If + 현재형, we'll …", skeleton: "I understand you're short on time. But I'm ______ everyone ___ __ attend the safety briefing before _____ into the process area. …", partial: "I understand you're short on time. But I'm afraid everyone has to attend the safety briefing…" },
     explanationKo: "상대의 요청을 거절할 때는 먼저 사정을 인정하고(I understand …, but), 'I'm afraid'로 부드럽게 규칙을 전한 뒤 짧은 이유와 대안을 덧붙입니다. everyone은 단수라서 'everyone has to'이고, before 뒤의 동사는 V-ing(before going)입니다. 'If we start now'처럼 조건절에는 will을 쓰지 않습니다.",
     probes: [
       { answer: "I understand you're short on time, but I'm afraid everyone has to attend the safety briefing before they go into the process area. It only takes about ten minutes. If we start right now, we'll have enough time to see the dryer before lunch.", expect: "pass" },

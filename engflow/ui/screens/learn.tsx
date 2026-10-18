@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { buildSession } from "../../core/session";
 import { difficultyLevel, sceneDifficulty, situationOf } from "../../core/situations";
 import { SITUATIONS, type Category, type QuestionMode, type Situation } from "../../core/types";
@@ -8,7 +8,7 @@ import { DIFFICULTY_INFO, SITUATION_INFO, SKILLS, SKILL_GROUPS, skillName } from
 import { AIUnavailableError } from "../../platform/types";
 import { useApp } from "../store";
 import { useNav } from "../app";
-import { Card, Eyebrow, cn } from "../kit";
+import { Button, Card, Eyebrow, Pressable, ShimmerText, Spotlight, cn } from "../kit";
 import { CATEGORY_LABEL } from "../practice/session";
 import { RoleplayList } from "../roleplay";
 import { LadderCard, MeetingCard, SpeedCard } from "../ladder";
@@ -25,17 +25,16 @@ const TECH_CATS: (Category | "all")[] = ["all", "process", "pilot", "meeting", "
 
 function Pill({ active, onClick, children, label }: { active: boolean; onClick: () => void; children: React.ReactNode; label?: string }) {
   return (
-    <button
+    <Button
+      variant={active ? "primary" : "secondary"}
+      size="sm"
       onClick={onClick}
       aria-pressed={active}
       aria-label={label}
-      className={cn(
-        "dd-focus h-9 whitespace-nowrap rounded-full border px-3.5 text-[13px] font-medium transition",
-        active ? "border-transparent bg-[var(--foreground)] text-[var(--background)]" : "border-[var(--line)] text-[var(--ef-ink-2)] hover:bg-black/[.04] dark:hover:bg-white/[.06]",
-      )}
+      className={cn("h-9 whitespace-nowrap rounded-full px-3.5 text-[13px] shadow-none", !active && "text-[var(--ef-ink-2)]")}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -143,15 +142,17 @@ export function LearnScreen() {
           const n = sc === "all" ? lessonBank.length : lessonBank.filter((q) => situationOf(q) === sc).length;
           const saved = app.state.settings.difficulty?.[sc];
           return (
-            <button key={sc} role="radio" aria-checked={active} onClick={() => setSituation(sc)} className="dd-focus rounded-[var(--radius)] text-left">
-              <Card className={cn("h-full p-3.5 transition", active ? "border-[var(--foreground)]/40 ring-2 ring-[var(--foreground)]/10" : "hover:border-[var(--foreground)]/20")}>
+            <Pressable key={sc} type="button" role="radio" aria-checked={active} onClick={() => setSituation(sc)} className="rounded-[var(--radius)]">
+              <Card className={cn("h-full overflow-hidden p-0 transition", active ? "border-[var(--foreground)]/40 ring-2 ring-[var(--foreground)]/10" : "hover:border-[var(--foreground)]/20")}>
+                <Spotlight className="h-full p-3.5">
                 <div className="text-[14px] font-semibold">{sc === "all" ? "상황 섞기" : SITUATION_INFO[sc].ko}</div>
                 <p className="ef-ko mt-1 line-clamp-2 text-[12px] text-[var(--muted)]">{sc === "all" ? "온라인 미팅·발표·스몰토크·식사·기술 논의를 골고루" : SITUATION_INFO[sc].descKo}</p>
                 <div className="ef-num mt-2 text-[11px] text-[var(--muted)]">
                   {n}문항{saved ? ` · 난이도 ${saved}` : ""}
                 </div>
+                </Spotlight>
               </Card>
-            </button>
+            </Pressable>
           );
         })}
       </div>
@@ -169,19 +170,18 @@ export function LearnScreen() {
             </Pill>
             <div className="grid grid-cols-10 gap-1" role="radiogroup" aria-label="난이도 1–10">
               {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-                <button
+                <Button
                   key={n}
+                  variant={difficulty === n ? "primary" : "secondary"}
+                  size="sm"
                   role="radio"
                   aria-checked={difficulty === n}
                   aria-label={`난이도 ${n}`}
                   onClick={() => setDifficulty(n)}
-                  className={cn(
-                    "dd-focus ef-num grid h-9 w-[30px] place-items-center rounded-lg border text-[13px] font-semibold transition sm:w-9",
-                    difficulty === n ? "border-transparent bg-[var(--foreground)] text-[var(--background)]" : "border-[var(--line)] text-[var(--ef-ink-2)] hover:bg-black/[.04] dark:hover:bg-white/[.06]",
-                  )}
+                  className={cn("ef-num h-9 w-[30px] rounded-lg px-0 text-[13px] font-semibold shadow-none sm:w-9", difficulty !== n && "text-[var(--ef-ink-2)]")}
                 >
                   {n}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -264,9 +264,9 @@ export function LearnScreen() {
             조건에 맞는 문항 {matching.length}개 · 최근 3일 안에 푼 문항은 제외 · 복습은 같은 문법을 다른 문장으로 출제
           </p>
         </div>
-        <button onClick={start} disabled={!plan.items.length} className="dd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[14px] bg-[var(--foreground)] px-6 text-[15px] font-semibold text-[var(--background)] disabled:opacity-40">
+        <Button variant="primary" size="lg" onClick={start} disabled={!plan.items.length} className="px-6 text-[15px] font-semibold">
           시작 <ArrowRight className="size-4" />
-        </button>
+        </Button>
       </Card>
 
       <Card className="p-4 md:p-5">
@@ -281,10 +281,10 @@ export function LearnScreen() {
                 : "Claude 연결이 없어 사용할 수 없습니다. 검수된 기본 문제은행으로 학습하세요."}
             </p>
           </div>
-          <button onClick={generate} disabled={!app.ai.available || gen === "working"} className="dd-focus inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[var(--line)] px-4 text-[14px] font-semibold disabled:opacity-40">
-            {gen === "working" ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
-            {gen === "working" ? "생성·검증 중…" : "새 문제 생성"}
-          </button>
+          <Button variant="secondary" onClick={generate} disabled={!app.ai.available || gen === "working"} className="h-11 text-[14px] font-semibold">
+            <Sparkles className="size-4" />
+            {gen === "working" ? <ShimmerText>생성·검증 중…</ShimmerText> : "새 문제 생성"}
+          </Button>
         </div>
       </Card>
 
@@ -334,9 +334,9 @@ function BankOverview({ onPick }: { onPick: (s: Situation, d: number) => void })
                     return (
                       <td key={n} className="py-1 text-center">
                         {c ? (
-                          <button onClick={() => onPick(sc, n)} className="dd-focus h-7 min-w-7 rounded-md px-1 hover:bg-black/[.05] dark:hover:bg-white/[.08]" aria-label={`${SITUATION_INFO[sc].ko} 난이도 ${n}: ${c}문항`}>
+                          <Button variant="ghost" size="sm" onClick={() => onPick(sc, n)} className="h-7 min-w-7 rounded-md px-1 text-[inherit] font-[inherit]" aria-label={`${SITUATION_INFO[sc].ko} 난이도 ${n}: ${c}문항`}>
                             {c}
-                          </button>
+                          </Button>
                         ) : (
                           <span className="text-[var(--muted)]">·</span>
                         )}

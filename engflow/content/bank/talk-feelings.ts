@@ -1524,11 +1524,12 @@ export const TALK_FEELINGS: Question[] = [
     dialogue: [{ speaker: "Emma", en: "I'm so sorry, but I can't make it to your birthday dinner tonight. My boss just asked me to finish a report.", ko: "정말 미안한데, 오늘 저녁 네 생일 저녁에 못 갈 것 같아. 상사가 방금 보고서를 끝내라고 해서." }],
     promptKo: "괜찮아, 이해해. 솔직히 좀 서운하긴 해. 너랑 밀린 얘기 하는 거 정말 기대했거든. 그래도 너무 미안해하지 마. 대신 토요일에 점심 어때? 네가 좋아하는 그 이탈리안 식당 예약할게.",
     segments: ["괜찮아, 이해해.", "솔직히 좀 서운해", "너랑 밀린 얘기 하는 거 정말 기대했거든.", "그래도 너무 미안해하지 마.", "대신 토요일에 점심 어때?", "네가 좋아하는 그 이탈리안 식당 예약할게"],
-    reference: "That's okay, I understand. I have to admit I'm a little disappointed, because I was really looking forward to catching up with you. But don't feel bad about it. How about lunch on Saturday instead? I'll book that Italian place you like.",
+    reference: "That's okay, I understand. I have to admit I'm a little disappointed. I was really looking forward to catching up with you. But don't feel bad about it. How about lunch on Saturday instead? I'll book that Italian place you like.",
     accepted: [
       "That's okay, I understand. To be honest, I'm a little disappointed, because I was really looking forward to catching up with you. But don't feel bad about it. How about lunch on Saturday instead? I'll book that Italian place you like.",
       "It's okay, I understand. I have to admit I'm a bit disappointed, because I was really looking forward to catching up with you. But don't feel bad. How about lunch on Saturday instead? I'll book the Italian restaurant you like.",
       "That's fine, I understand. I have to admit I'm a little disappointed, because I was really looking forward to seeing you. But please don't feel bad about it. Why don't we have lunch on Saturday instead? I'll book that Italian place you like.",
+      "That's okay, I understand. I have to admit I'm a little disappointed, because I was really looking forward to catching up with you. But don't feel bad about it. How about lunch on Saturday instead? I'll book that Italian place you like.",
     ],
     meaning: [
       { id: "understand", en: "that's okay, I understand", ko: "괜찮아, 이해해", any: ["understand|understandable", "okay|ok|fine|alright", "no worries|problem"] },
@@ -1544,7 +1545,7 @@ export const TALK_FEELINGS: Question[] = [
       { id: "forward-to-see", pattern: "forward to =see|=meet", category: "verb-form", severity: "major", fix: "forward to seeing", messageKo: "'look forward to'의 to는 전치사라서 뒤에 동사ing가 옵니다: 'looking forward to seeing you.'", skill: "thanks-looking-forward" },
       { id: "you-like-it", pattern: "re:(?<=\\b(place|restaurant) (that )?you (like|love) )it\\b", category: "sentence-structure", severity: "major", fix: "", messageKo: "관계절 '(that) you like'의 목적어는 이미 앞의 'that Italian place'이므로 it을 다시 쓰지 않습니다.", skill: "relative-clause" },
     ],
-    hints: { pattern: "I understand. I have to admit I'm a little disappointed, because I was looking forward to + V-ing. How about … instead?", skeleton: "That's okay, I understand. I have to _____ I'm a little ____________, because I was really looking forward to ________ up with you. …", partial: "That's okay, I understand. I have to admit…" },
+    hints: { pattern: "I understand. I have to admit I'm a little disappointed. I was looking forward to + V-ing. How about … instead?", skeleton: "That's okay, I understand. I have to _____ I'm a little ____________. I was really looking forward to ________ up with you. …", partial: "That's okay, I understand. I have to admit…" },
     explanationKo: "친구의 갑작스러운 취소에 '이해한다'와 '서운하다'를 함께 전할 때 'I understand. I have to admit I'm a little disappointed, …'처럼 감정을 솔직하지만 부드럽게 말합니다. 내 감정은 disappointed이고, 'looking forward to' 뒤에는 동사ing(catching up)가 옵니다. 'Don't feel bad about it.'으로 상대를 배려하고 'How about … instead?'로 대안을 제안합니다.",
     probes: [
       { answer: "That's fine, I understand. Honestly, I'm a bit disappointed, because I was really looking forward to seeing you. But don't feel bad about it. Why don't we have lunch on Saturday instead? I'll book that Italian restaurant you like.", expect: "pass" },

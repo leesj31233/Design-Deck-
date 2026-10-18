@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { Volume2 } from "lucide-react";
-import { cn } from "./kit";
+import { IconButton, cn } from "./kit";
 
 /**
  * Reading lines aloud with the device's own voices (Web Speech API). Works in
@@ -71,9 +71,11 @@ export function SpeakButton({ text, slow, className, label = "읽어 주기" }: 
   React.useEffect(() => () => stopSpeaking(), []);
   if (!supported) return null;
   return (
-    <button
+    <IconButton
       type="button"
-      aria-label={label}
+      variant="ghost"
+      size="sm"
+      label={label}
       aria-pressed={on}
       onClick={() => {
         if (on) {
@@ -84,13 +86,9 @@ export function SpeakButton({ text, slow, className, label = "읽어 주기" }: 
         setOn(true);
         speak(text, { slow, onEnd: () => setOn(false) });
       }}
-      className={cn(
-        "dd-focus inline-grid size-8 shrink-0 place-items-center rounded-full text-[var(--muted)] transition hover:bg-black/5 dark:hover:bg-white/10",
-        on && "bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)]",
-        className,
-      )}
+      className={cn("shrink-0 rounded-full text-[var(--muted)]", on && "bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)] hover:bg-[var(--ef-accent-soft)] dark:hover:bg-[var(--ef-accent-soft)]", className)}
     >
       <Volume2 className={cn("size-4", on && "animate-pulse")} />
-    </button>
+    </IconButton>
   );
 }

@@ -1048,9 +1048,9 @@ export const TALK_NEGOTIATION_2: Question[] = [
     expression: "Just to confirm, … I'll … Could you …?",
     contextKo: "협상이 끝나 갈 때 Priya가 다 다룬 것 같다고 합니다. 가격·지급·납기를 숫자로 다시 확인하고, 수요일까지 발주서를 보내겠다며 주문 확인서를 요청합니다.",
     dialogue: [{ speaker: "Priya", en: "So, I think we've covered everything.", ko: "그럼 다 다룬 것 같네요." }],
-    promptKo: "좋아요. 확인차 말씀드리면, 가격은 9만 5천 달러, 지급은 45일 안에, 납기는 14주예요. 수요일까지 발주서를 보내 드릴게요. 받으시면 주문 확인서를 보내 주시겠어요?",
-    segments: ["좋아요. 확인차 말씀드리면", "가격은 9만 5천 달러, 지급은 45일 안에, 납기는 14주예요", "수요일까지 발주서를 보내 드릴게요", "받으시면 주문 확인서를 보내 주시겠어요?"],
-    reference: "Great. Just to confirm, the price is 95,000 dollars, payment is in 45 days, and delivery is in 14 weeks. I'll send you the purchase order by Wednesday. Could you send us the order confirmation once you receive it?",
+    promptKo: "좋아요. 확인차 말씀드리면, 가격은 9만 5천 달러예요. 지급은 45일 안에, 납기는 14주예요. 수요일까지 PO(발주서)를 보내 드릴게요. 받으시면 주문 확인서를 보내 주시겠어요?",
+    segments: ["좋아요. 확인차 말씀드리면", "가격은 9만 5천 달러예요", "지급은 45일 안에, 납기는 14주예요", "수요일까지 PO를 보내 드릴게요", "받으시면 주문 확인서를 보내 주시겠어요?"],
+    reference: "Great. Just to confirm: the price is 95,000 dollars. Payment is in 45 days, and delivery is in 14 weeks. I'll send you the PO by Wednesday. Could you send us the order confirmation once you receive it?",
     accepted: [
       "Great. Just to confirm, the price is 95,000 dollars, payment is within 45 days, and delivery is in 14 weeks. I'll send you the purchase order by Wednesday. Could you send us the order confirmation once you receive it?",
       "Great. Just to confirm: the price is 95,000 dollars, payment is in 45 days, and delivery is in 14 weeks. I'll send you the purchase order by Wednesday. Could you send us an order confirmation when you receive it?",
@@ -1059,6 +1059,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
       "Great. Let me just confirm. The price is 95,000 dollars, payment is in 45 days, and delivery is in 14 weeks. I'll send you the purchase order by Wednesday. Could you send us the order confirmation once you receive it?",
       "Great. Just to confirm, the price is 95,000 dollars, payment is in 45 days, and delivery is in 14 weeks. I'll send the purchase order by Wednesday. Could you please send us the order confirmation once you receive it?",
     ],
+    advanced: "Great. Just to confirm, the price is 95,000 dollars, payment is in 45 days, and delivery is in 14 weeks. I'll send you the purchase order by Wednesday. Could you send us the order confirmation once you receive it?",
     meaning: [
       { id: "confirm", en: "just to confirm", ko: "확인차", any: ["confirm|recap|summarize|summarise|clarify|check|sum|so"] },
       { id: "price", en: "95,000 dollars", ko: "9만 5천 달러", any: ["95000", "ninety-five ... thousand", "ninety five thousand"], critical: true },
@@ -1074,7 +1075,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
       { id: "fourteen-week", pattern: "14|fourteen =week", category: "countability", severity: "major", fix: "14 weeks", messageKo: "2 이상의 숫자 뒤에는 복수형을 씁니다: '14 weeks'." },
       { id: "send-to-you-po", pattern: "send to you the", category: "word-order", severity: "major", fix: "send you the", messageKo: "send는 'send you the purchase order' 또는 'send the purchase order to you' 순서로 씁니다." },
     ],
-    hints: { pattern: "Just to confirm, A, B, and C. I'll + 동사원형 … by + 요일. Could you … once you + 현재형?", skeleton: "Great. Just to _______, the price is …, payment is …, and delivery is … I'll send you the purchase order __ Wednesday. …", partial: "Great. Just to confirm, the price is 95,000 dollars…" },
+    hints: { pattern: "Just to confirm: A. B, and C. I'll + 동사원형 … by + 요일. Could you … once you + 현재형?", skeleton: "Great. Just to _______: the price is …. Payment is …, and delivery is … I'll send you the PO __ Wednesday. …", partial: "Great. Just to confirm: the price is 95,000 dollars…" },
     explanationKo: "합의를 마무리할 때 'Just to confirm, …'으로 숫자를 다시 정리하면 오해를 막을 수 있습니다. 마감은 by Wednesday, 시간 부사절(once you receive it)에는 will 없이 현재형을 씁니다. 숫자가 하나라도 다르면 뜻이 달라지니 정확히 말하세요.",
     probes: [
       { answer: "Great. Just to confirm, the price is 95,000 dollars, payment is in 45 days, and delivery takes 14 weeks. I'll send you the purchase order by Wednesday. Could you send us the order confirmation after you receive it?", expect: "pass" },
@@ -1140,12 +1141,12 @@ export const TALK_NEGOTIATION_2: Question[] = [
     level: "C1",
     difficulty: 10,
     skills: ["polite-disagree", "hedging", "cause-effect"],
-    expression: "Unfortunately, we're still too far apart …, so I don't think we can …",
+    expression: "Unfortunately, the price gap is still too big. So I don't think we can …",
     contextKo: "Linh이 8만 달러 밑으로는 정말 안 된다고 합니다. 그동안의 노력에 감사하면서, 가격 차이가 너무 커서 이번에는 진행하기 어렵겠다고 하고, 다음 프로젝트에서는 함께하고 싶다고 관계를 남겨 둡니다.",
     dialogue: [{ speaker: "Linh", en: "I'm sorry, but we really can't go below 80,000 dollars.", ko: "죄송하지만 8만 달러 밑으로는 정말 안 돼요." }],
     promptKo: "이해합니다. 그리고 그동안 애써 주셔서 감사해요. 아쉽지만 가격 차이가 아직 너무 커서, 이번에는 진행하기 어려울 것 같아요. 그래도 앞으로 다른 프로젝트에서는 함께 일하면 좋겠어요.",
     segments: ["이해합니다. 그동안 애써 주셔서 감사해요", "아쉽지만 가격 차이가 아직 너무 커요", "그래서 이번에는 진행하기 어려울 것 같아요", "그래도 앞으로 다른 프로젝트에서 함께 일하면 좋겠어요"],
-    reference: "I understand, and thank you for all your work on this. Unfortunately, we're still too far apart on the price, so I don't think we can go ahead this time. But we'd be happy to work with you on future projects.",
+    reference: "I understand, and thank you for all your work on this. Unfortunately, the price gap is still too big. So I don't think we can go ahead this time. But we'd be happy to work with you on future projects.",
     accepted: [
       "I understand, and thank you for all your work on this. Unfortunately, we're still too far apart on the price, so I don't think we can move forward this time. But we'd be happy to work with you on future projects.",
       "I understand, and thanks for all your work on this. Unfortunately, the gap on the price is still too big, so I don't think we can go ahead this time. But we'd be happy to work with you on future projects.",
@@ -1154,6 +1155,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
       "I understand, and thank you for all your work on this. Unfortunately, we're still too far apart on the price, so I don't think we can go ahead this time. We'd be happy to work with you on future projects, though.",
       "I understand, and thank you for all your hard work on this. Unfortunately, we're still too far apart on the price, so I don't think we can go ahead with it this time. But we'd be happy to work with you on future projects.",
     ],
+    advanced: "I understand, and thank you for all your work on this. Unfortunately, we're still too far apart on the price, so I don't think we can go ahead this time. But we'd be happy to work with you on future projects.",
     meaning: [
       { id: "thanks", en: "thank you for all your work", ko: "애써 주셔서 감사해요", any: ["thank|thanks|appreciate|grateful"], critical: true },
       { id: "unfortunately", en: "unfortunately", ko: "아쉽지만", any: ["unfortunately|afraid|sorry|sadly|regret"] },
@@ -1168,7 +1170,7 @@ export const TALK_NEGOTIATION_2: Question[] = [
       { id: "thank-you-for-work-hard", pattern: "thank|thanks you? for =work =hard", category: "word-order", severity: "major", fix: "thank you for working hard", messageKo: "'애써 주셔서 감사해요'는 'thank you for all your work' 또는 'thank you for working so hard'입니다. for 뒤의 동사는 -ing 형태입니다." },
       { id: "future-project", pattern: "on =future =project", category: "countability", severity: "minor", fix: "on future projects", messageKo: "'앞으로의 프로젝트들'은 'future projects'처럼 복수형으로 말합니다." },
     ],
-    hints: { pattern: "I understand, and thank you for … Unfortunately, …, so I don't think we can … But we'd be happy to …", skeleton: "… Unfortunately, we're still too ___ _____ on the price, so I ____ _____ we can go ahead this time. …", partial: "I understand, and thank you for all your work on this. Unfortunately,…" },
+    hints: { pattern: "I understand, and thank you for … Unfortunately, …. So I don't think we can … But we'd be happy to …", skeleton: "… Unfortunately, the price gap is still ___ ___. So I ____ _____ we can go ahead this time. …", partial: "I understand, and thank you for all your work on this. Unfortunately,…" },
     explanationKo: "협상을 접을 때는 '감사 → 아쉬운 이유 → 결론(I don't think we can …) → 관계 유지' 순서로 말하면 정중합니다. 영어는 'I think we can't'보다 'I don't think we can'처럼 부정을 think 쪽에 두는 것이 부드럽고, 부정어가 빠지면 '진행할 수 있다'는 반대 뜻이 됩니다.",
     probes: [
       { answer: "I understand, and thank you for all your work on this. Unfortunately, we're still too far apart on the price, so I don't think we can proceed this time. But we'd be happy to work with you on future projects.", expect: "pass" },

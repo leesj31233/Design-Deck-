@@ -1286,15 +1286,16 @@ export const TALK_DAILY_2: Question[] = [
     dialogue: [{ speaker: "Customer service", en: "According to our system, your package was delivered at two o'clock yesterday.", ko: "저희 시스템상으로는 어제 2시에 배송 완료되었습니다." }],
     promptKo: "시스템에 그렇게 나온다는 건 알지만, 저는 어제 오후 내내 집에 있었는데 아무도 오지 않았어요. 기사님께 한번 확인해 주실 수 있을까요? 못 찾으면 교환품이나 환불을 받고 싶어요.",
     segments: ["시스템에 그렇게 나오는 건 알지만", "어제 오후 내내 집에 있었는데", "아무도 오지 않았어요.", "기사님께 확인해 주실 수 있을까요?", "못 찾으면 교환이나 환불을 받고 싶어요"],
-    reference: "I understand that's what the system says, but I was home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If it can't be found, I'd like a replacement or a refund.",
+    reference: "I understand that's what the system says. But I was home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If it can't be found, I'd like a replacement or a refund.",
     accepted: [
-      "I understand that's what the system says, but I was at home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If it can't be found, I'd like a replacement or a refund.",
+      "I understand that's what the system says. But I was at home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If it can't be found, I'd like a replacement or a refund.",
       "I understand that's what the system says, but I was home all afternoon yesterday, and no one came to the door. Could you check with the driver? If it can't be found, I'd like a replacement or a refund.",
       "I understand what the system says, but I was home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If it can't be found, I'd like a replacement or a refund.",
       "I understand that's what the system says, but I was home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If they can't find it, I'd like a replacement or a refund.",
       "I understand that's what the system shows, but I was home all afternoon yesterday, and nobody came to the door. Could you please check with the driver? If it can't be found, I'd like a replacement or a refund.",
       "I understand that's what the system says, but I was home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If it can't be found, could you send a replacement or give me a refund?",
     ],
+    advanced: "I understand that's what the system says, but I was home all afternoon yesterday, and nobody came to the door. Could you check with the driver? If it can't be found, I'd like a replacement or a refund.",
     meaning: [
       { id: "understand", en: "I understand that's what the system says, but", ko: "시스템에 그렇게 나온다는 건 알지만", any: ["understand|see|know|realize|appreciate", "system|=says|=shows"], critical: true },
       { id: "home", en: "I was home all afternoon", ko: "오후 내내 집에 있었다", any: ["home|house|apartment|flat", "was ... in ... all"], critical: true },
@@ -1311,7 +1312,7 @@ export const TALK_DAILY_2: Question[] = [
       { id: "cannot-find", pattern: "re:\\bcan not find(?= (?:i|please|could|can|send|then)\\b)", category: "sentence-structure", severity: "major", fix: "can't find it", messageKo: "find는 목적어가 필요한 동사입니다: 'If you can't find it, …'. 한국어처럼 목적어(it)를 빼지 않습니다.", skill: "verb-object" },
       { id: "in-home", pattern: "=was =in =home", category: "preposition", severity: "minor", fix: "was home", messageKo: "'집에 있었다'는 'I was home' 또는 'I was at home'입니다. 'in home'이라고 하지 않습니다." },
     ],
-    hints: { pattern: "I understand …, but … Could you check with …? If it can't be + p.p., I'd like …", skeleton: "I understand that's what the system ____, but I was home all afternoon yesterday, and nobody ____ to the door. …", partial: "I understand that's what the system says, but I was home all afternoon yesterday…" },
+    hints: { pattern: "I understand …. But … Could you check with …? If it can't be + p.p., I'd like …", skeleton: "I understand that's what the system ____. But I was home all afternoon yesterday, and nobody ____ to the door. …", partial: "I understand that's what the system says. But I was home all afternoon yesterday…" },
     explanationKo: "상대 말을 먼저 인정하고(I understand that's what the system says, but …) 사실을 말한 뒤, 'Could you check with ~?'로 요청하고 'If it can't be found, I'd like ~'로 대안을 제시하면 정중하면서도 분명합니다. nobody에는 이미 부정의 뜻이 있어 'nobody didn't come'처럼 not을 겹쳐 쓰지 않고, '~에게 확인하다'는 'check with ~'입니다.",
     probes: [
       { answer: "I see that the system says it was delivered, but I was at home all afternoon yesterday, and nobody came to the door. Could you please check with the driver? If they can't find it, could you send a replacement or refund me?", expect: "pass" },

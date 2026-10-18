@@ -8,7 +8,7 @@ import type { Evaluation, Question, Situation } from "../core/types";
 import { SITUATION_INFO } from "../content";
 import { useApp } from "./store";
 import { useNav } from "./app";
-import { Card, Eyebrow, cn, useReduced } from "./kit";
+import { Button, Card, Eyebrow, Pressable, Tag, cn, useReduced } from "./kit";
 import { LEARNER_SPEAKER } from "./practice/parts";
 import { canSpeak, speakSequence, stopSpeaking } from "./speech";
 
@@ -45,7 +45,7 @@ export function RoleplayList({ situation = "all", limit }: { situation?: Situati
       <p className="ef-ko mt-1 text-[13px] text-[var(--muted)]">한 대화 안에서 여러 번 말합니다. 내가 앞에서 한 말이 대화창에 그대로 남아 실제 회의처럼 이어집니다.</p>
       <div className="mt-2 grid gap-2.5 md:grid-cols-2">
         {shown.map((s) => (
-          <button key={s.id} onClick={() => start(s)} className="dd-focus rounded-[var(--radius)] text-left" aria-label={`롤플레이 ${s.titleKo} 시작`}>
+          <Pressable key={s.id} type="button" onClick={() => start(s)} className="rounded-[var(--radius)]" aria-label={`롤플레이 ${s.titleKo} 시작`}>
             <Card className="h-full p-4 transition hover:border-[var(--foreground)]/25">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -60,7 +60,7 @@ export function RoleplayList({ situation = "all", limit }: { situation?: Situati
                 <Dots s={s} />
               </div>
             </Card>
-          </button>
+          </Pressable>
         ))}
       </div>
     </section>
@@ -109,8 +109,9 @@ export function RoleplayReplay({ turns, slow }: { turns: PlayedTurn[]; slow?: bo
           </p>
         </div>
         {supported ? (
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => {
               if (playing !== null) {
                 stopSpeaking();
@@ -121,14 +122,14 @@ export function RoleplayReplay({ turns, slow }: { turns: PlayedTurn[]; slow?: bo
               speakSequence(audio, { slow, onLine: setPlaying, onEnd: () => setPlaying(null) });
             }}
             className={cn(
-              "dd-focus inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-[13px] font-semibold",
-              playing !== null ? "border-transparent bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)]" : "border-[var(--line)]",
+              "shrink-0 gap-1.5 px-3 text-[13px] font-semibold",
+              playing !== null && "border-transparent bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)] hover:bg-[var(--ef-accent-soft)] dark:hover:bg-[var(--ef-accent-soft)]",
             )}
             aria-pressed={playing !== null}
           >
             {playing !== null ? <Square className="size-3.5" /> : <Play className="size-3.5" />}
             {playing !== null ? "멈추기" : "전체 듣기"}
-          </button>
+          </Button>
         ) : null}
       </div>
       <ol className="mt-3 space-y-2.5" aria-label="대화 기록">
@@ -161,9 +162,9 @@ export function RoleplayReplay({ turns, slow }: { turns: PlayedTurn[]; slow?: bo
                 <div className={cn("flex items-center gap-1.5 text-[11px] font-semibold", me ? "justify-end text-[var(--ef-accent-ink)]" : "text-[var(--muted)]")}>
                   {me ? "나" : l.speaker}
                   {ev ? (
-                    <span className={cn("ef-num rounded-full px-1.5 py-px text-[10px]", ev.scores.overall >= 85 ? "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]" : "bg-[var(--ef-warn-soft)] text-[var(--ef-warn)]")}>
+                    <Tag tone={ev.scores.overall >= 85 ? "ok" : "warn"} className="ef-num px-1.5 py-px text-[10px]">
                       {ev.scores.overall}
-                    </span>
+                    </Tag>
                   ) : null}
                 </div>
                 <p className={cn("ef-en text-[15px] leading-snug", me && "text-right")}>{l.en}</p>
@@ -202,9 +203,9 @@ export function RoleplayShortcut() {
       </p>
       <div className="mt-3 flex items-center justify-between gap-3">
         <Dots s={s} />
-        <button onClick={() => start(s)} className="dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]">
+        <Button variant="primary" onClick={() => start(s)} className="h-11 gap-1.5 text-[14px] font-semibold">
           대화 시작 <ArrowRight className="size-4" />
-        </button>
+        </Button>
       </div>
     </Card>
   );

@@ -530,14 +530,15 @@ export const TALK_PRESENTATION: Question[] = [
     expression: "To sum up, …",
     contextKo: "발표 마지막 요약. 새 건조기는 잘 작동하지만 출구 수분이 아직 목표보다 약간 높아서, 설계를 확정하기 전에 최대 부하로 시험을 한 번 더 해야 합니다.",
     dialogue: [{ speaker: "Daniel", en: "Can you summarize the main points for us?", ko: "핵심 내용을 요약해 주시겠어요?" }],
-    promptKo: "요약하자면, 새 건조기는 잘 작동하지만 출구 수분이 아직 목표보다 약간 높습니다. 그래서 설계를 확정하기 전에 최대 부하에서 시험을 한 번 더 해야 합니다.",
+    promptKo: "요약하자면, 새 건조기는 잘 작동합니다. 하지만 출구 수분이 아직 목표보다 약간 높습니다. 그래서 설계를 확정하기 전에 최대 부하에서 시험을 한 번 더 해야 합니다.",
     segments: ["요약하자면, 새 건조기는 잘 작동해요", "하지만 출구 수분이 아직 목표보다 약간 높아요", "그래서 최대 부하에서 시험을 한 번 더 해야 해요", "설계를 확정하기 전에"],
-    reference: "To sum up, the new dryer works well, but the outlet moisture is still slightly higher than the target. So we need to run one more test at full load before finalizing the design.",
+    reference: "To sum up, the new dryer works well. But the outlet moisture is still slightly higher than the target. So we need to run one more test at full load before finalizing the design.",
     accepted: [
       "To summarize, the new dryer works well, but the outlet moisture is still slightly higher than the target. So we need to run one more test at full load before finalizing the design.",
       "To sum up, the new dryer works well, but the outlet moisture is still a little higher than the target. So we need to run one more test at full load before we finalize the design.",
       "To sum up, the new dryer works well, but the outlet moisture is still slightly above the target. So we have to run one more test at full load before finalizing the design.",
       "In summary, the new dryer is working well, but the outlet moisture is still slightly higher than the target, so we need to do one more test at full load before finalizing the design.",
+      "To sum up, the new dryer works well, but the outlet moisture is still slightly higher than the target. So we need to run one more test at full load before finalizing the design.",
     ],
     meaning: [
       { id: "sum", en: "to sum up", ko: "요약하자면", any: ["sum|summarize|summarise|summary|conclusion|overall|short|brief|briefly|basically"] },
@@ -553,7 +554,7 @@ export const TALK_PRESENTATION: Question[] = [
       { id: "need-base", pattern: "need =run|=do|=make|=carry", category: "verb-form", severity: "major", fix: "need to run", messageKo: "'need' 뒤에 동사가 오면 'need to + 동사원형'입니다: 'we need to run one more test'." },
       { id: "high-than", pattern: "=high than", category: "word-choice", severity: "major", fix: "higher than", messageKo: "비교할 때는 비교급을 씁니다: 'high than'이 아니라 'higher than'입니다.", skill: "comparative" },
     ],
-    hints: { pattern: "To sum up, …, but … So we need to + 동사원형 … before + 동사ing …", skeleton: "To sum up, … So we ____ __ run one more test at full load before __________ the design.", partial: "To sum up, the new dryer works well, but the outlet moisture is still slightly higher…" },
+    hints: { pattern: "To sum up, …. But … So we need to + 동사원형 … before + 동사ing …", skeleton: "To sum up, … So we ____ __ run one more test at full load before __________ the design.", partial: "To sum up, the new dryer works well. But the outlet moisture is still slightly higher…" },
     explanationKo: "필요는 'need to + 동사원형'(to를 빼지 않음)으로 말하고, 전치사 before 뒤에는 'finalizing'처럼 동사ing 또는 'before we finalize'처럼 '주어 + 동사'가 옵니다. 비교는 'higher than'처럼 비교급을 씁니다.",
     probes: [
       { answer: "To sum up, the new dryer works well, but the outlet moisture is still a bit higher than the target. So we need to do one more test at full load before we finalize the design.", expect: "pass" },

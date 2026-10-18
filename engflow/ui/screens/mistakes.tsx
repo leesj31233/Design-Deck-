@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { ArrowRight, BookOpen, RotateCcw } from "lucide-react";
+import { ArrowRight, BookOpen, ListX, RotateCcw } from "lucide-react";
 import { SearchField } from "@/components/ui/search-field";
 import { SKILL_BY_ID, SKILL_GROUPS, SEED_BY_ID, GUIDE, skillName } from "../../content";
 import type { SkillGroup } from "../../content/skills";
@@ -8,7 +8,7 @@ import type { MasteryStatus, MistakeRecord } from "../../core/types";
 import { STATUS_LABEL_KO, masteryGapKo, newSkillState } from "../../core/mastery";
 import { useApp } from "../store";
 import { useNav } from "../app";
-import { Card, Eyebrow, MasteryTrack, Sheet, StatusChip, cn, dateKo, relTimeKo } from "../kit";
+import { Button, Card, EmptyState, Eyebrow, MasteryTrack, Pressable, RevealGroup, RevealItem, Sheet, StatusChip, Tag, cn, dateKo, relTimeKo } from "../kit";
 import { CATEGORY_KO } from "../practice/parts";
 import { pickReviewQuestion } from "../../core/session";
 import { ExpressionCollection, ExpressionIndex } from "../expressions";
@@ -79,20 +79,22 @@ export function MistakesScreen() {
         <div className="ef-scroll-x">
           <div className="flex w-max gap-1.5">
             {(["all", "learning", "improving", "mastered"] as Filter[]).map((f) => (
-              <button
+              <Button
                 key={f}
+                variant={filter === f ? "primary" : "secondary"}
+                size="sm"
                 onClick={() => setFilter(f)}
                 aria-pressed={filter === f}
-                className={cn("dd-focus h-9 rounded-full border px-3.5 text-[13px] font-medium", filter === f ? "border-transparent bg-[var(--foreground)] text-[var(--background)]" : "border-[var(--line)] text-[var(--ef-ink-2)]")}
+                className={cn("h-9 rounded-full px-3.5 text-[13px] shadow-none", filter !== f && "text-[var(--ef-ink-2)]")}
               >
                 {f === "all" ? `전체 ${all.length}` : `${STATUS_LABEL_KO[f]} ${counts[f] ?? 0}`}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
       </div>
 
-      {!filtered.length ? <Card className="p-6 text-center text-[14px] text-[var(--muted)]">{all.length ? "조건에 맞는 실수가 없습니다." : "아직 저장된 실수가 없습니다."}</Card> : null}
+      {!filtered.length ? <EmptyState className="ef-ko min-h-40" icon={<ListX className="size-5" />} title={all.length ? "조건에 맞는 실수가 없습니다." : "아직 저장된 실수가 없습니다."} /> : null}
 
       {ordered.map(([g, bySkill]) => (
         <section key={g}>
@@ -115,14 +117,14 @@ export function MistakesScreen() {
                     <div className="px-4 pt-3">
                       <MasteryTrack status={st.status} mastery={st.mastery} />
                     </div>
-                    <ul className="divide-y divide-[var(--line)]">
+                    <RevealGroup as="ul" className="divide-y divide-[var(--line)]">
                       {ms
                         .sort((a, b) => b.lastAt - a.lastAt)
                         .map((m) => {
                           const item = s.items[m.reviewItemId];
                           return (
-                            <li key={m.id}>
-                              <button onClick={() => setOpen(m)} className="dd-focus block w-full px-4 py-3 text-left hover:bg-black/[.02] dark:hover:bg-white/[.03]">
+                            <RevealItem as="li" key={m.id}>
+                              <Pressable type="button" lift={0} onClick={() => setOpen(m)} className="block w-full px-4 py-3 hover:bg-black/[.02] dark:hover:bg-white/[.03]">
                                 <div className="flex items-start gap-3">
                                   <div className="min-w-0 flex-1">
                                     <p className="ef-en text-[15px]">
@@ -132,16 +134,16 @@ export function MistakesScreen() {
                                     <p className="ef-ko mt-1 line-clamp-2 text-[13px] text-[var(--ef-ink-2)]">{m.whyKo}</p>
                                   </div>
                                   <div className="shrink-0 text-right text-[11px] text-[var(--muted)]">
-                                    {m.origin === "imported" ? <div className="mb-1 rounded-full bg-[var(--ef-accent-soft)] px-1.5 py-0.5 font-semibold text-[var(--ef-accent-ink)]">가져온 기록</div> : null}
+                                    {m.origin === "imported" ? <Tag tone="accent" className="mb-1 px-1.5 text-[11px]">가져온 기록</Tag> : null}
                                     <div className="ef-num">{m.count}회</div>
                                     <div>{item ? (item.due <= now ? "복습 대기" : `다음 ${relTimeKo(item.due, now)}`) : ""}</div>
                                   </div>
                                 </div>
-                              </button>
-                            </li>
+                              </Pressable>
+                            </RevealItem>
                           );
                         })}
-                    </ul>
+                    </RevealGroup>
                   </Card>
                 );
               })}
@@ -222,18 +224,20 @@ function MistakeDetail({ m, onClose, onReview }: { m: MistakeRecord; onClose: ()
           {item ? <p className="ef-ko mt-2 text-[12px] text-[var(--muted)]">{item.scheduleNote}</p> : null}
         </div>
         <div className="flex gap-2">
-          <button onClick={onReview} className="dd-focus inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-[14px] bg-[var(--foreground)] text-[15px] font-semibold text-[var(--background)]">
+          <Button variant="primary" size="lg" onClick={onReview} className="flex-1 text-[15px] font-semibold">
             <RotateCcw className="size-4" /> 지금 복습 <ArrowRight className="size-4" />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
+            size="lg"
             onClick={() => {
               onClose();
               nav.openGuide(m.skill);
             }}
-            className="dd-focus inline-flex h-12 items-center gap-2 rounded-[14px] border border-[var(--line)] px-4 text-[14px] font-medium"
+            className="px-4 text-[14px]"
           >
             <BookOpen className="size-4" /> 문법
-          </button>
+          </Button>
         </div>
       </div>
     </Sheet>

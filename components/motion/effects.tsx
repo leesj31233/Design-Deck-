@@ -128,7 +128,7 @@ export function LiveDot({ tone = "green", className }: { tone?: "green" | "blue"
   return (
     <span className={cn("relative inline-flex size-2.5", className)} aria-hidden>
       {reduced ? null : <motion.span animate={{ scale: [1, 2], opacity: [0.55, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut" }} className={cn("absolute inline-flex size-full rounded-full", color)} />}
-      <span className={cn("relative inline-flex size-2.5 rounded-full", color)} />
+      <span className={cn("relative inline-flex size-full rounded-full", color)} />
     </span>
   );
 }

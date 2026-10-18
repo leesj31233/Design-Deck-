@@ -8,7 +8,7 @@ import type { Situation } from "../core/types";
 import { SITUATION_INFO } from "../content";
 import { useApp } from "./store";
 import { useNav } from "./app";
-import { Card, Eyebrow, cn, useReduced } from "./kit";
+import { Button, Card, Eyebrow, cn, useReduced } from "./kit";
 
 const LADDER_SIZE = 8;
 
@@ -75,13 +75,13 @@ export function LadderCard({ situation, compact }: { situation: Situation | "all
         </div>
         <div className="flex shrink-0 items-end gap-3 sm:w-[260px]">
           <Staircase steps={steps} className="flex-1 pt-4" />
-          <button
+          <Button
             onClick={() => start(situation)}
-            className="dd-focus inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]"
+            variant="primary" className="h-11 shrink-0 gap-1.5 text-[14px] font-semibold"
             aria-label={`짧은 말에서 긴 말까지 ${scene} 계단 시작`}
           >
             시작 <ArrowRight className="size-4" />
-          </button>
+          </Button>
         </div>
       </div>
     </Card>
@@ -108,9 +108,9 @@ export function MeetingCard() {
           <div className="mt-1 text-[16px] font-semibold">실제 회의에서 가장 자주 쓰는 말 8개</div>
           <p className="ef-ko mt-1 text-[13px] text-[var(--muted)]">회의 시작, 끼어들기, 다시 묻기, 동의·반대, 정리와 마무리까지. 짧은 말부터 조금 긴 말 순서로 연습합니다.</p>
         </div>
-        <button onClick={start} className="dd-focus inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]" aria-label="회의 필수 표현 시작">
+        <Button onClick={start} variant="primary" className="h-11 shrink-0 gap-1.5 text-[14px] font-semibold" aria-label="회의 필수 표현 시작">
           시작 <ArrowRight className="size-4" />
-        </button>
+        </Button>
       </div>
     </Card>
   );
@@ -136,9 +136,9 @@ export function SpeedCard() {
           <div className="mt-1 text-[16px] font-semibold">짧은 대답 10개, 바로 말하기</div>
           <p className="ef-ko mt-1 text-[13px] text-[var(--muted)]">"Got it.", "Sounds good.", "No worries." 같은 한마디를 생각하지 않고 바로. 대답까지 걸린 시간을 재 줍니다.</p>
         </div>
-        <button onClick={start} className="dd-focus inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]" aria-label="순발력 훈련 시작">
+        <Button onClick={start} variant="primary" className="h-11 shrink-0 gap-1.5 text-[14px] font-semibold" aria-label="순발력 훈련 시작">
           시작 <ArrowRight className="size-4" />
-        </button>
+        </Button>
       </div>
     </Card>
   );

@@ -1764,13 +1764,14 @@ export const TALK_DAILY: Question[] = [
     dialogue: [{ speaker: "Shop assistant", en: "Sorry, we don't give refunds. We can only give you store credit.", ko: "죄송하지만 환불은 안 돼요. 매장 적립금으로만 드릴 수 있어요." }],
     promptKo: "그게 규정인 건 이해하지만, 제가 내일 출국해서 적립금은 쓸 수가 없어요. 대신 제 카드로 환불해 주실 수는 없을까요? 그게 안 되면 오늘 다른 물건으로라도 교환할 수 있을까요?",
     segments: ["규정인 건 이해하지만", "제가 내일 출국해서", "적립금은 쓸 수가 없어요.", "대신 제 카드로 환불해 주실 수 있을까요?", "안 되면 오늘 다른 물건으로 교환할 수 있을까요?"],
-    reference: "I understand that's your policy, but I'm leaving the country tomorrow, so I won't be able to use store credit. Would it be possible to refund it to my card instead? If not, could I exchange it for something else today?",
+    reference: "I understand that's your policy. But I'm leaving the country tomorrow, so I won't be able to use store credit. Would it be possible to refund it to my card instead? If not, could I exchange it for something else today?",
     accepted: [
       "I understand that's your policy, but I'm leaving the country tomorrow, so I won't be able to use store credit. Would it be possible to put the refund on my card instead? If not, could I exchange it for something else today?",
       "I understand that's your policy, but I'm flying home tomorrow, so I won't be able to use store credit. Would it be possible to refund it to my card instead? If not, could I exchange it for something else today?",
       "I understand that's your policy, but I'm leaving the country tomorrow, so store credit won't be much use to me. Would it be possible to refund it to my card instead? If not, could I exchange it for something else today?",
       "I understand that's your policy, but I'm leaving the country tomorrow, so I won't be able to use store credit. Could you refund it to my card instead? If not, could I exchange it for something else today?",
       "I see that's your policy, but I'm leaving the country tomorrow, so I can't use store credit. Would it be possible to refund it to my card instead? If that's not possible, could I exchange it for something else today?",
+      "I understand that's your policy, but I'm leaving the country tomorrow, so I won't be able to use store credit. Would it be possible to refund it to my card instead? If not, could I exchange it for something else today?",
     ],
     meaning: [
       { id: "policy", en: "I understand that's your policy", ko: "규정인 건 이해한다", any: ["policy|rule|rules", "understand|see"] },
@@ -1786,7 +1787,7 @@ export const TALK_DAILY: Question[] = [
       { id: "could-i-ing", pattern: "re:(?<=\\b(?:could|can) i )(exchanging|swapping|getting|returning)\\b", category: "verb-form", severity: "major", fix: "exchange", messageKo: "조동사(could/can) 뒤에는 동사원형이 옵니다: 'could I exchange it for something else?'", skill: "polite-request" },
       { id: "to-refunding", pattern: "re:(?<=\\bto )refunding\\b", category: "verb-form", severity: "major", fix: "refund", messageKo: "'Would it be possible to + 동사원형'입니다: 'to refund it to my card'. to 뒤에 동사ing를 쓰지 않습니다.", skill: "polite-request" },
     ],
-    hints: { pattern: "I understand …, but … so I won't be able to … Would it be possible to …? If not, could I …?", skeleton: "I understand that's your ______, but … so I won't be ____ to use store credit. Would it be ________ to …? If ___, …", partial: "I understand that's your policy, but I'm leaving the country tomorrow, so…" },
+    hints: { pattern: "I understand …. But … so I won't be able to … Would it be possible to …? If not, could I …?", skeleton: "I understand that's your ______. But … so I won't be ____ to use store credit. Would it be ________ to …? If ___, …", partial: "I understand that's your policy. But I'm leaving the country tomorrow, so…" },
     explanationKo: "규정을 먼저 인정하고(I understand that's your policy, but …) 내 사정을 설명한 뒤, 'Would it be possible to ~ instead?'로 대안을 제안하고 'If not, could I ~?'로 차선책까지 제시하면 정중하면서도 분명합니다. '~할 수 없을 것이다'는 'won't be able to'이며 'won't able to'처럼 be를 빼지 않습니다.",
     probes: [
       { answer: "I see that's the policy, but I'm flying back to Korea tomorrow, so store credit is no use to me. Could you put the refund on my card instead? Otherwise, could I swap it for something else today?", expect: "pass" },

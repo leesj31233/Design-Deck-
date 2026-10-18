@@ -822,13 +822,14 @@ export const TALK_TROUBLE: Question[] = [
     dialogue: [{ speaker: "Mr. Tan", en: "Three of the valves arrived damaged. This will delay our installation.", ko: "밸브 세 개가 파손된 채 도착했어요. 이러면 설치가 늦어져요." }],
     promptKo: "정말 죄송합니다. 이번 주에 새 밸브 세 개를 특송으로 보내 드릴게요. 그러면 다음 배송을 기다리실 필요가 없어요.",
     segments: ["정말 죄송합니다", "이번 주에 새 밸브 세 개를 특송으로 보내 드릴게요", "그러면 다음 배송을 기다리실 필요가 없어요"],
-    reference: "I'm really sorry about that. We'll send three new valves by express this week, so you don't have to wait for the next shipment.",
+    reference: "I'm really sorry about that. We'll send three new valves by express this week. So you don't have to wait for the next shipment.",
     accepted: [
       "I'm really sorry about that. We'll send you three new valves by express this week, so you don't have to wait for the next shipment.",
       "I'm very sorry about that. We'll send three new valves by express this week, so you won't have to wait for the next shipment.",
       "I'm really sorry about that. We'll send three replacement valves by express this week, so you don't need to wait for the next shipment.",
       "I'm really sorry about that. We'll send three new valves by express courier this week, so you don't have to wait for the next shipment.",
       "I apologize for that. We'll send three new valves by express this week, so you don't have to wait for the next shipment.",
+      "I'm really sorry about that. We'll send three new valves by express this week, so you don't have to wait for the next shipment.",
     ],
     meaning: [
       { id: "sorry", en: "I'm really sorry", ko: "정말 죄송합니다", any: ["sorry|apologize|apologise|apologies"], critical: true },
@@ -842,7 +843,7 @@ export const TALK_TROUBLE: Question[] = [
       { id: "must-not-wait", pattern: "must not", category: "meaning-shift", severity: "major", fix: "don't have to", messageKo: "'must not'은 '~하면 안 된다'(금지)입니다. '~할 필요가 없다'는 'don't have to' 또는 'don't need to'입니다." },
       { id: "new-three", pattern: "new three|3", category: "word-order", severity: "major", fix: "three new", messageKo: "수량과 형용사의 순서는 '숫자 + 형용사 + 명사'입니다: 'three new valves'. 'new three valves'라고 하지 않습니다." },
     ],
-    hints: { pattern: "We'll send + 숫자 + 형용사 + 명사 …, so you don't have to + 동사원형", skeleton: "I'm really sorry about that. We'll send _____ ___ valves by express this week, so you _____ ____ to wait …", partial: "I'm really sorry about that. We'll send three new valves…" },
+    hints: { pattern: "We'll send + 숫자 + 형용사 + 명사 …. So you don't have to + 동사원형", skeleton: "I'm really sorry about that. We'll send _____ ___ valves by express this week. So you _____ ____ to wait …", partial: "I'm really sorry about that. We'll send three new valves…" },
     explanationKo: "'~할 필요가 없다'는 'don't have to'이고, 'must not'은 '~하면 안 된다'는 금지라서 뜻이 정반대가 됩니다. 수량은 'three new valves'처럼 숫자를 형용사 앞에 둡니다.",
     probes: [
       { answer: "I'm so sorry about that. We'll ship three new valves by express this week, so you won't need to wait for the next delivery.", expect: "pass" },
@@ -999,15 +1000,16 @@ export const TALK_TROUBLE: Question[] = [
     expression: "I appreciate …, but this is the third time … If …, I'm afraid I'll have to …",
     contextKo: "벤더 프리야 씨가 납기를 또 미루겠다고 합니다. 벌써 세 번째라 전체 일정에 영향을 주고 있어서, 금요일까지 확정 날짜를 받지 못하면 경영진에게 보고하겠다고 정중하게 말합니다.",
     dialogue: [{ speaker: "Priya", en: "I'm sorry, but we need to move the delivery date again, maybe by one more week.", ko: "죄송하지만 납기를 또 미뤄야 할 것 같아요. 아마 일주일 더요." }],
-    promptKo: "애써 주시는 건 감사하지만, 납기가 바뀐 게 이번이 세 번째이고 전체 일정에 영향을 주고 있어요. 금요일까지 확정된 날짜를 받지 못하면, 죄송하지만 저희 경영진에게 이 문제를 보고할 수밖에 없어요.",
-    segments: ["애써 주시는 건 감사하지만", "납기가 바뀐 게 이번이 세 번째예요", "그리고 전체 일정에 영향을 주고 있어요", "금요일까지 확정된 날짜를 받지 못하면", "죄송하지만 저희 경영진에게 보고할 수밖에 없어요"],
-    reference: "I appreciate your efforts, but this is the third time the delivery date has changed, and it's affecting our whole schedule. If we don't get a firm date by Friday, I'm afraid I'll have to raise this with our management.",
+    promptKo: "애써 주시는 건 감사하지만, 납기가 바뀐 게 이번이 세 번째예요. 그게 전체 일정에 영향을 주고 있어요. 금요일까지 확정된 날짜를 받지 못하면, 죄송하지만 저희 경영진에게 알릴 수밖에 없어요.",
+    segments: ["애써 주시는 건 감사하지만", "납기가 바뀐 게 이번이 세 번째예요", "그게 전체 일정에 영향을 주고 있어요", "금요일까지 확정된 날짜를 받지 못하면", "죄송하지만 저희 경영진에게 알릴 수밖에 없어요"],
+    reference: "I appreciate your efforts, but this is the third time the delivery date has changed. It's affecting our whole schedule. If we don't get a firm date by Friday, I'm afraid I'll have to tell our management.",
     accepted: [
       "I appreciate your efforts, but this is the third time the delivery date has been changed, and it's affecting our whole schedule. If we don't get a firm date by Friday, I'm afraid I'll have to raise this with our management.",
       "I appreciate your efforts, but this is the third time the delivery date has changed, and it's affecting our entire schedule. If we don't get a firm date by Friday, I'm afraid I'll have to raise this with our management.",
       "I appreciate your efforts, but this is the third time the delivery date has changed, and it's affecting our whole schedule. If we can't get a firm date by Friday, I'm afraid I'll have to escalate this to our management.",
       "I appreciate your efforts, but the delivery date has now changed three times, and it's affecting our whole schedule. If we don't get a firm date by Friday, I'm afraid I'll have to raise this with our management.",
       "I appreciate your efforts, but this is the third time the delivery date has changed, and it's affecting our whole schedule. Unless we get a firm date by Friday, I'm afraid I'll have to raise this with our management.",
+      "I appreciate your efforts, but this is the third time the delivery date has changed, and it's affecting our whole schedule. If we don't get a firm date by Friday, I'm afraid I'll have to raise this with our management.",
     ],
     meaning: [
       { id: "appreciate", en: "I appreciate your efforts", ko: "노력에 감사하다", any: ["appreciate|thank|thanks|understand"], critical: true },
@@ -1022,7 +1024,7 @@ export const TALK_TROUBLE: Question[] = [
       { id: "third-time-past", pattern: "re:third time (that )?the delivery date (changed|changes|is changed)\\b", category: "tense", severity: "major", fix: "third time the delivery date has changed", messageKo: "'이번이 세 번째로 ~했다'는 'This is the third time + 주어 + has + 과거분사'처럼 현재완료를 씁니다: 'the third time the delivery date has changed'.", skill: "present-perfect" },
       { id: "until-friday", pattern: "until|till friday", category: "preposition", severity: "major", fix: "by Friday", messageKo: "'금요일까지 (받다)'처럼 마감 시점은 'by Friday'입니다. 'until Friday'는 '금요일까지 계속'이라는 뜻입니다.", skill: "time-clause" },
     ],
-    hints: { pattern: "I appreciate …, but this is the third time + 주어 + has + p.p. … If we don't …, I'm afraid I'll have to …", skeleton: "I appreciate your efforts, but this is the third time the delivery date ___ _______, and it's affecting our whole schedule. …", partial: "I appreciate your efforts, but this is the third time the delivery date has changed…" },
+    hints: { pattern: "I appreciate …, but this is the third time + 주어 + has + p.p. … If we don't …, I'm afraid I'll have to …", skeleton: "I appreciate your efforts, but this is the third time the delivery date ___ _______. It's affecting our whole schedule. …", partial: "I appreciate your efforts, but this is the third time the delivery date has changed…" },
     explanationKo: "'이번이 세 번째로 ~했다'는 'This is the third time + 현재완료'로 말합니다(the third time the date has changed). 단호한 말도 'I appreciate …, but …'와 'I'm afraid I'll have to …'로 부드럽게 전하고, 마감 '금요일까지'는 until이 아니라 by입니다.",
     probes: [
       { answer: "I appreciate your efforts, but this is the third time the delivery date has changed, and it's affecting our entire project schedule. If we don't receive a firm date by Friday, I'm afraid I'll need to escalate this to our management.", expect: "pass" },

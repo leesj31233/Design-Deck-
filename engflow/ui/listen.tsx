@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { Mic, Square } from "lucide-react";
-import { cn } from "./kit";
+import { IconButton, LiveDot, cn } from "./kit";
 
 /**
  * Answering by voice with the browser's own speech recognition (Web Speech
@@ -183,23 +183,19 @@ export function MicButton({ dictation, disabled, className, size = "md" }: { dic
   if (!dictation.supported) return null;
   const on = dictation.listening;
   return (
-    <button
+    <IconButton
       type="button"
+      variant={on ? "danger" : "ghost"}
       onClick={dictation.toggle}
       disabled={disabled}
       aria-pressed={on}
-      aria-label={on ? "듣기 멈추기" : "말로 답하기"}
+      label={on ? "듣기 멈추기" : "말로 답하기"}
       title={on ? "듣기 멈추기" : "말로 답하기 (⌥M)"}
-      className={cn(
-        "dd-focus relative inline-grid shrink-0 place-items-center rounded-full transition disabled:opacity-40",
-        size === "sm" ? "size-9" : "size-10",
-        on ? "bg-[var(--ef-bad)] text-white" : "text-[var(--muted)] hover:bg-black/5 hover:text-[var(--foreground)] dark:hover:bg-white/10",
-        className,
-      )}
+      className={cn("relative shrink-0 rounded-full", size === "sm" ? "size-9" : "size-10", on ? "bg-[var(--ef-bad)]" : "text-[var(--muted)] hover:text-[var(--foreground)]", className)}
     >
-      {on ? <span aria-hidden className="ef-mic-ring absolute inset-0 rounded-full" /> : null}
+      {/* While listening, the pulsing dot in the note below is the one moving thing. */}
       {on ? <Square className="relative size-3.5 fill-current" /> : <Mic className="size-[18px]" />}
-    </button>
+    </IconButton>
   );
 }
 
@@ -208,7 +204,7 @@ export function DictationNote({ dictation }: { dictation: Dictation }) {
   if (dictation.listening)
     return (
       <p className="ef-ko mt-1.5 flex items-center gap-1.5 px-1 text-[12px] text-[var(--ef-bad)]" aria-live="polite">
-        <span className="ef-mic-dot size-1.5 rounded-full bg-[var(--ef-bad)]" /> 듣고 있어요 — 영어로 말하면 글로 바뀝니다. 말을 마치면 자동으로 멈춰요.
+        <LiveDot tone="red" className="size-2" /> 듣고 있어요 — 영어로 말하면 글로 바뀝니다. 말을 마치면 자동으로 멈춰요.
       </p>
     );
   if (dictation.errorKo)

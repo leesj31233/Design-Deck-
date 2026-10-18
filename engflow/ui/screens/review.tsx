@@ -9,7 +9,7 @@ import { skillName } from "../../content";
 import { useApp } from "../store";
 import { useNav } from "../app";
 import { useStartLesson } from "./today";
-import { Card, Eyebrow, cn, relTimeKo } from "../kit";
+import { Button, Card, EmptyState, Eyebrow, NumberTicker, Tag, cn, relTimeKo } from "../kit";
 
 function ItemRow({ item, now }: { item: ReviewItem; now: number }) {
   const nav = useNav();
@@ -21,10 +21,10 @@ function ItemRow({ item, now }: { item: ReviewItem; now: number }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[14px] font-semibold">{item.label}</span>
-            <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-semibold", item.origin === "imported" ? "bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)]" : "bg-[var(--ef-track)] text-[var(--ef-ink-2)]")}>
+            <Tag tone={item.origin === "imported" ? "accent" : "neutral"} className={cn("px-1.5 text-[10px]", item.origin !== "imported" && "text-[var(--ef-ink-2)]")}>
               {item.origin === "imported" ? "가져온 기록" : item.origin === "error" ? "학습 중 오류" : "학습"}
-            </span>
-            {isOverdue(item, now) ? <span className="rounded-full bg-[var(--ef-bad-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--ef-bad)]">밀림</span> : null}
+            </Tag>
+            {isOverdue(item, now) ? <Tag tone="bad" className="px-1.5 text-[10px]">밀림</Tag> : null}
           </div>
           {item.originalAnswer ? (
             <p className="ef-en mt-1 truncate text-[13px]">
@@ -43,9 +43,9 @@ function ItemRow({ item, now }: { item: ReviewItem; now: number }) {
           {last ? <div className="mt-0.5 text-[11px] text-[var(--muted)]">최근: {GRADE_LABEL_KO[last.grade]}</div> : null}
         </div>
       </div>
-      <button onClick={() => nav.openGuide(item.skill)} className="mt-2 text-[12px] text-[var(--ef-accent-ink)] underline-offset-4 hover:underline">
+      <Button variant="ghost" size="sm" onClick={() => nav.openGuide(item.skill)} className="-ml-2 mt-1 h-7 px-2 text-[12px] font-normal text-[var(--ef-accent-ink)]">
         {skillName(item.skill)} 설명
-      </button>
+      </Button>
     </li>
   );
 }
@@ -82,7 +82,7 @@ export function ReviewScreen() {
         ].map(([label, n, cls]) => (
           <Card key={label as string} className="p-4">
             <div className="text-[12px] text-[var(--muted)]">{label}</div>
-            <div className={cn("ef-num mt-1 text-[24px] font-semibold", cls as string)}>{n as number}</div>
+            <div className={cn("ef-num mt-1 text-[24px] font-semibold", cls as string)}><NumberTicker value={n as number} /></div>
           </Card>
         ))}
       </div>
@@ -99,13 +99,15 @@ export function ReviewScreen() {
             힌트·응답 시간·반복 오류가 간격에 반영됩니다. {reviewedToday ? `오늘 ${reviewedToday}개 복습함.` : ""}
           </p>
         </div>
-        <button
+        <Button
+          variant="primary"
+          size="lg"
           disabled={!due.length}
           onClick={() => start({ reviewOnly: true, size: Math.min(15, due.length), title: "복습" })}
-          className="dd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[14px] bg-[var(--foreground)] px-6 text-[15px] font-semibold text-[var(--background)] disabled:opacity-40"
+          className="px-6 text-[15px] font-semibold"
         >
           시작 <ArrowRight className="size-4" />
-        </button>
+        </Button>
       </Card>
 
       {due.length ? (
@@ -136,7 +138,7 @@ export function ReviewScreen() {
             </ul>
           </Card>
         ) : (
-          <Card className="p-5 text-[14px] text-[var(--muted)]">예정된 복습이 없습니다.</Card>
+          <EmptyState className="ef-ko min-h-40" icon={<CalendarClock className="size-5" />} title="예정된 복습이 없습니다." />
         )}
       </section>
     </div>

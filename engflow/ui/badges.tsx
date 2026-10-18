@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { BadgeCheck, Compass, Crown, Flame, Library, MessageSquareText, MessagesSquare, Mountain, PartyPopper, Repeat, Target, Zap, MessageCircle, type LucideIcon } from "lucide-react";
 import { badgeStatuses, type BadgeIcon, type BadgeStatus } from "../core/badges";
 import { useApp } from "./store";
-import { Card, Eyebrow, cn, useReduced } from "./kit";
+import { Card, Eyebrow, NumberTicker, RevealGroup, RevealItem, cn, useReduced } from "./kit";
 
 const ICONS: Record<BadgeIcon, LucideIcon> = {
   perfect: PartyPopper, streak: Flame, collection: Library, roleplay: MessagesSquare, long: Crown, speed: Zap,
@@ -29,18 +29,12 @@ export function Medal({ icon, tier, size = "md" }: { icon: BadgeIcon; tier: numb
   );
 }
 
-function BadgeTile({ s, i }: { s: BadgeStatus; i: number }) {
-  const reduced = useReduced();
+function BadgeTile({ s }: { s: BadgeStatus }) {
   const goal = s.next ?? s.family.goals[s.family.goals.length - 1];
   const prevGoal = s.tier > 0 ? s.family.goals[s.tier - 1] : 0;
   const pct = s.next === null ? 100 : Math.max(0, Math.min(100, ((s.value - prevGoal) / Math.max(1, goal - prevGoal)) * 100));
   return (
-    <motion.li
-      initial={reduced ? false : { opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: reduced ? 0 : 0.03 * i, duration: 0.2 }}
-      className={cn("rounded-2xl border p-3", s.tier ? "border-[var(--line)] bg-[var(--surface)]" : "border-dashed border-[var(--line)]")}
-    >
+    <RevealItem as="li" className={cn("rounded-2xl border p-3", s.tier ? "border-[var(--line)] bg-[var(--surface)]" : "border-dashed border-[var(--line)]")}>
       <div className="flex items-center gap-2.5">
         <Medal icon={s.family.icon} tier={s.tier} />
         <div className="min-w-0">
@@ -65,7 +59,7 @@ function BadgeTile({ s, i }: { s: BadgeStatus; i: number }) {
           </>
         )}
       </div>
-    </motion.li>
+    </RevealItem>
   );
 }
 
@@ -81,14 +75,14 @@ export function BadgeShelf() {
     <Card className="p-4 md:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <Eyebrow>배지</Eyebrow>
-        <span className="ef-num text-[12px] text-[var(--muted)]">획득 {earned}/{total}</span>
+        <span className="ef-num text-[12px] text-[var(--muted)]">획득 <NumberTicker value={earned} />/{total}</span>
       </div>
       <p className="ef-ko mt-1 text-[12px] text-[var(--muted)]">100점, 연속 학습, 롤플레이 완주, 번개 대답… 연습할수록 브론즈 → 실버 → 골드로 올라갑니다.</p>
-      <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4" aria-label="배지 목록">
-        {sorted.map((s, i) => (
-          <BadgeTile key={s.family.id} s={s} i={i} />
+      <RevealGroup as="ul" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4" aria-label="배지 목록">
+        {sorted.map((s) => (
+          <BadgeTile key={s.family.id} s={s} />
         ))}
-      </ul>
+      </RevealGroup>
     </Card>
   );
 }

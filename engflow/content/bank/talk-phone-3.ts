@@ -1263,7 +1263,7 @@ export const TALK_PHONE_3: Question[] = [
     dialogue: [{ speaker: "Linh", en: "Sorry for calling so late again. The night shift had a small question about the dryer temperature.", ko: "또 늦게 전화해서 미안해요. 야간 조에서 건조기 온도에 대해 작은 질문이 있었어요." }],
     promptKo: "언제든 기꺼이 도와드리지만, 밤 9시 이후에는 급하지 않은 질문은 메시지로 보내 주실 수 있을까요? 아침에 가장 먼저 답할게요. 물론 현장에 진짜 비상 상황이 생기면 언제든 전화 주세요.",
     segments: ["언제든 기꺼이 도울게요, 그런데", "급하지 않은 질문은 메시지로 보내 주시겠어요?", "밤 9시 이후에는요.", "아침에 가장 먼저 답할게요.", "물론 현장에 진짜 비상 상황이면", "언제든 전화 주세요"],
-    reference: "I'm always happy to help, but would it be possible to send non-urgent questions by message after 9 p.m.? I'll answer them first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
+    reference: "I'm always happy to help. But would it be possible to send non-urgent questions by message after 9 p.m.? I'll answer them first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
     accepted: [
       "I'm always happy to help, but would it be possible to send non-urgent questions by message after 9 p.m.? I'll reply to them first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
       "I'm always happy to help, but could you send non-urgent questions by message after 9 p.m.? I'll answer them first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
@@ -1272,6 +1272,7 @@ export const TALK_PHONE_3: Question[] = [
       "I'm always happy to help, but would it be possible to text me non-urgent questions after 9 p.m.? I'll answer them first thing in the morning. Of course, if there's a real emergency on site, please feel free to call me anytime.",
       "I'm always glad to help, but would it be possible to send non-urgent questions by message after 9 p.m.? I'll get back to you first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
     ],
+    advanced: "I'm always happy to help, but would it be possible to send non-urgent questions by message after 9 p.m.? I'll answer them first thing in the morning. Of course, if there's a real emergency on site, please call me anytime.",
     meaning: [
       { id: "happy-help", en: "I'm always happy to help", ko: "언제든 기꺼이 돕는다", any: ["happy|glad|=pleased|=fine|=okay ... help", "help"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
@@ -1288,7 +1289,7 @@ export const TALK_PHONE_3: Question[] = [
       { id: "in-first-morning", pattern: "re:\\b(first in the morning|in the morning first|early tomorrow first)\\b", category: "word-order", severity: "minor", fix: "first thing in the morning", messageKo: "'아침에 가장 먼저'는 'first thing in the morning'이라는 고정 표현을 씁니다." },
       { id: "emergency-situation-will", pattern: "re:\\bif there (will be|will have)\\b", category: "tense", severity: "major", fix: "if there's", messageKo: "if 조건절에는 will을 쓰지 않습니다: 'if there's a real emergency'.", skill: "if-when" },
     ],
-    hints: { pattern: "I'm always happy to help, but would it be possible to …? I'll …. Of course, if there's …, please ….", skeleton: "I'm always happy to help, but would it be ________ to send … after 9 p.m.? … Of course, if there's …, please ____ me anytime.", partial: "I'm always happy to help, but would it be possible to…" },
+    hints: { pattern: "I'm always happy to help. But would it be possible to …? I'll …. Of course, if there's …, please ….", skeleton: "I'm always happy to help. But would it be ________ to send … after 9 p.m.? … Of course, if there's …, please ____ me anytime.", partial: "I'm always happy to help. But would it be possible to…" },
     explanationKo: "부탁이 부담스러울 때는 'I'm always happy to help, but …'으로 호의를 먼저 보여 주고, 'Would it be possible to + 동사원형?'으로 부드럽게 요청합니다. 예외는 'Of course, if there's …, please …'로 덧붙이며, if 절에는 will을 쓰지 않습니다.",
     probes: [
       { answer: "I'm always happy to help, but would it be possible to send questions that aren't urgent by message after 9 p.m.? I'll answer them first thing in the morning. Of course, if there's a real emergency on site, you can call me anytime.", expect: "pass" },
@@ -1311,7 +1312,7 @@ export const TALK_PHONE_3: Question[] = [
     dialogue: [{ speaker: "Priya", en: "I'll keep sending you voice messages with the updates. It's much quicker for me than typing.", ko: "진행 상황은 계속 음성 메시지로 보낼게요. 저는 타이핑보다 그게 훨씬 빨라서요." }],
     promptKo: "빠르게 알려 주셔서 고맙지만, 음성 메시지로는 숫자를 다 알아듣기가 가끔 어려워요. 핵심 수치는 글로 보내 주실 수 있을까요? 짧은 문자라도 정말 도움이 될 거예요.",
     segments: ["빠른 업데이트는 고맙지만", "가끔 숫자를 다 알아듣기 어려워요", "음성 메시지로는.", "핵심 수치는 글로 보내 주실 수 있을까요?", "짧은 문자라도 정말 도움이 될 거예요"],
-    reference: "I appreciate the quick updates, but it's sometimes hard for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would be really helpful.",
+    reference: "I appreciate the quick updates. But it's sometimes hard for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would be really helpful.",
     accepted: [
       "I appreciate the quick updates, but it's sometimes difficult for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would be really helpful.",
       "I appreciate the quick updates, but sometimes it's hard for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would be really helpful.",
@@ -1320,6 +1321,7 @@ export const TALK_PHONE_3: Question[] = [
       "Thanks for the quick updates, but it's sometimes hard for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would really help.",
       "I appreciate the quick updates, but it's sometimes hard for me to catch all the numbers in a voice message. Would you mind sending the key figures in writing? Even a short message would be really helpful.",
     ],
+    advanced: "I appreciate the quick updates, but it's sometimes hard for me to catch all the numbers in voice messages. Would you mind sending the key figures in writing? Even a short text would be really helpful.",
     meaning: [
       { id: "appreciate", en: "I appreciate the quick updates", ko: "빠른 업데이트에 감사한다", any: ["appreciate|thanks|thank|=grateful|=great|=nice"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
@@ -1335,7 +1337,7 @@ export const TALK_PHONE_3: Question[] = [
       { id: "listen-numbers", pattern: "re:\\b(listen|hear) (to )?all (the )?numbers\\b", category: "word-choice", severity: "minor", fix: "catch all the numbers", messageKo: "숫자를 '알아듣다, 놓치지 않다'는 'catch'를 쓰면 자연스럽습니다: 'catch all the numbers'." },
       { id: "by-letter", pattern: "re:\\b(by|in) (letter|letters|character|characters)\\b", category: "word-choice", severity: "major", fix: "in writing", messageKo: "'글로'를 'by letter'라고 하면 '편지로'라는 뜻이 됩니다. 'in writing' 또는 'by text'라고 합니다." },
     ],
-    hints: { pattern: "I appreciate …, but it's sometimes hard for me to …. Would you mind + 동사ing …? Even … would be ….", skeleton: "I appreciate …, but it's sometimes ____ for me to … Would you mind _______ the key figures in writing? …", partial: "I appreciate the quick updates, but it's sometimes hard for me…" },
+    hints: { pattern: "I appreciate …. But it's sometimes hard for me to …. Would you mind + 동사ing …? Even … would be ….", skeleton: "I appreciate …. But it's sometimes ____ for me to … Would you mind _______ the key figures in writing? …", partial: "I appreciate the quick updates. But it's sometimes hard for me…" },
     explanationKo: "'I appreciate …, but …'으로 상대의 노력을 인정한 뒤 내 어려움을 'it's sometimes hard for me to …'로 부드럽게 말합니다. 'Would you mind' 뒤에는 동사ing가 오고, '글로'는 'in writing'(by letter ✗)입니다.",
     probes: [
       { answer: "I really appreciate the quick updates, but it's sometimes hard for me to catch all the numbers in voice messages. Would you mind sending me the key figures in writing? Even a short text would be very helpful.", expect: "pass" },

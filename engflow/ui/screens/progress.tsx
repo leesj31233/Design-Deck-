@@ -9,7 +9,7 @@ import { levelEstimate, streakDays } from "../../core/store";
 import { DAY_MS } from "../../core/fsrs";
 import { useApp } from "../store";
 import { useNav } from "../app";
-import { Card, Eyebrow, StatusChip, cn, dateKo, relTimeKo } from "../kit";
+import { Button, Card, Eyebrow, NumberTicker, Progress, StatusChip, Tag, cn, dateKo, relTimeKo } from "../kit";
 import { Heatmap, TrendLine } from "../charts";
 import { SITUATIONS } from "../../core/types";
 import { situationOf } from "../../core/situations";
@@ -52,19 +52,19 @@ export function ProgressScreen() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card className="p-4">
           <div className="text-[12px] text-[var(--muted)]">총 답변</div>
-          <div className="ef-num mt-1 text-[24px] font-semibold">{attempts.length}</div>
+          <div className="ef-num mt-1 text-[24px] font-semibold"><NumberTicker value={attempts.length} /></div>
         </Card>
         <Card className="p-4">
           <div className="text-[12px] text-[var(--muted)]">7일 통과율</div>
-          <div className="ef-num mt-1 text-[24px] font-semibold">{acc7 === null ? "—" : `${acc7}%`}</div>
+          <div className="ef-num mt-1 text-[24px] font-semibold">{acc7 === null ? "—" : <><NumberTicker value={acc7} />%</>}</div>
         </Card>
         <Card className="p-4">
           <div className="text-[12px] text-[var(--muted)]">연속 학습</div>
-          <div className="ef-num mt-1 text-[24px] font-semibold">{streakDays(s, now)}일</div>
+          <div className="ef-num mt-1 text-[24px] font-semibold"><NumberTicker value={streakDays(s, now)} />일</div>
         </Card>
         <Card className="p-4">
           <div className="text-[12px] text-[var(--muted)]">복습 완료</div>
-          <div className="ef-num mt-1 text-[24px] font-semibold">{reviews}</div>
+          <div className="ef-num mt-1 text-[24px] font-semibold"><NumberTicker value={reviews} /></div>
         </Card>
       </div>
 
@@ -72,7 +72,7 @@ export function ProgressScreen() {
         <Card className="p-4 md:p-5">
           <div className="flex items-baseline justify-between">
             <Eyebrow>CEFR 진행</Eyebrow>
-            <button onClick={() => nav.go("test")} className="text-[12px] text-[var(--ef-accent-ink)] hover:underline">레벨 테스트</button>
+            <Button variant="ghost" size="sm" onClick={() => nav.go("test")} className="-mr-2 h-7 px-2 text-[12px] font-normal text-[var(--ef-accent-ink)]">레벨 테스트</Button>
           </div>
           <div className="mt-1.5 text-[22px] font-semibold">{lvl.label}</div>
           <p className="ef-ko mt-0.5 text-[12px] text-[var(--muted)]">현재 학습 기준 레벨 {s.profile.startLevel} · 목표 B2–C1 회의 소통</p>
@@ -94,8 +94,8 @@ export function ProgressScreen() {
           <div className="mt-4 grid grid-cols-4 gap-2 text-center text-[11px]">
             {(["new", "learning", "improving", "mastered"] as const).map((st) => (
               <div key={st} className="rounded-xl bg-[var(--background)] py-2">
-                <div className="ef-num text-[18px] font-semibold">{statusCount(st)}</div>
-                <StatusChip status={st} className="mt-1 border-0 bg-transparent px-0" />
+                <div className="ef-num text-[18px] font-semibold"><NumberTicker value={statusCount(st)} /></div>
+                <StatusChip status={st} className="mt-1 border-0 bg-transparent px-0 dark:bg-transparent" />
               </div>
             ))}
           </div>
@@ -132,13 +132,13 @@ export function ProgressScreen() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 text-[14px] font-medium">
                     {skillName(w.skill)}
-                    {w.neglected ? <span className="rounded-full bg-[var(--ef-warn-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--ef-warn)]">7일+ 미연습</span> : null}
+                    {w.neglected ? <Tag tone="warn" className="px-1.5 text-[10px]">7일+ 미연습</Tag> : null}
                   </div>
                   <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--ef-track)]">
                     <div className="h-full rounded-full bg-[var(--ef-bad-fill)]" style={{ width: `${Math.round(w.mastery * 100)}%` }} />
                   </div>
                 </div>
-                <button onClick={() => nav.practiceSkill(w.skill)} className="dd-focus h-9 shrink-0 rounded-xl border border-[var(--line)] px-3 text-[13px] font-medium">연습</button>
+                <Button variant="secondary" size="sm" onClick={() => nav.practiceSkill(w.skill)} className="h-9 shrink-0 px-3 text-[13px]">연습</Button>
               </li>
             ))}
           </ul>
@@ -161,16 +161,14 @@ export function ProgressScreen() {
             const avg = skills.reduce((a, k) => a + (s.skills[k.id]?.mastery ?? 0), 0) / skills.length;
             return (
               <Card key={g} className="overflow-hidden">
-                <button onClick={() => setOpenGroup(open ? null : g)} className="dd-focus flex w-full items-center gap-3 px-4 py-3 text-left" aria-expanded={open}>
+                <Button variant="ghost" onClick={() => setOpenGroup(open ? null : g)} className="h-auto w-full justify-start gap-3 rounded-none px-4 py-3 text-left font-normal" aria-expanded={open}>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[14px] font-semibold">{SKILL_GROUPS[g].ko}</span>
-                    <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-[var(--ef-track)]">
-                      <span className="block h-full rounded-full bg-[var(--accent)] transition-[width] duration-700" style={{ width: `${Math.round(avg * 100)}%` }} />
-                    </span>
+                    <Progress className="mt-1" value={Math.round(avg * 100)} />
                   </span>
                   <span className="ef-num text-[12px] text-[var(--muted)]">{Math.round(avg * 100)}%</span>
                   <ChevronDown className={cn("size-4 text-[var(--muted)] transition", open && "rotate-180")} />
-                </button>
+                </Button>
                 {open ? (
                   <ul className="divide-y divide-[var(--line)] border-t border-[var(--line)]">
                     {skills.map((k) => {
@@ -192,9 +190,9 @@ export function ProgressScreen() {
                               {st.lastAt ? ` · ${relTimeKo(st.lastAt, now)}` : ""}
                               {st.imported && !st.attempts ? " · 가져온 오류에서 확인된 약점" : ""}
                             </span>
-                            <button onClick={() => nav.openGuide(k.id)} className="inline-flex items-center gap-1 text-[var(--ef-accent-ink)]">
+                            <Button variant="ghost" size="sm" onClick={() => nav.openGuide(k.id)} className="-mr-1.5 h-6 gap-1 px-1.5 text-[11px] font-normal text-[var(--ef-accent-ink)]">
                               <BookOpen className="size-3" /> 설명
-                            </button>
+                            </Button>
                           </div>
                           {st.status !== "mastered" && st.attempts ? <p className="ef-ko mt-1 text-[11px] text-[var(--muted)]">숙달까지: {gap.join(" · ")}</p> : null}
                         </li>
@@ -258,13 +256,15 @@ function SceneMap() {
                   />
                 ))}
               </span>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => start({ size: 6, situation: sc, difficulty: next, title: `${SITUATION_INFO[sc].ko} · 난이도 ${next} 도전` })}
-                className="dd-focus ef-num h-7 shrink-0 rounded-lg border border-[var(--line)] px-2 text-[11px] font-semibold"
+                className="ef-num h-7 shrink-0 rounded-lg px-2 text-[11px] font-semibold"
                 aria-label={`${SITUATION_INFO[sc].ko} 난이도 ${next} 도전`}
               >
                 {next}단계 도전
-              </button>
+              </Button>
             </li>
           );
         })}

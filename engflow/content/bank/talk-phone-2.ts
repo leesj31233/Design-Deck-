@@ -1170,7 +1170,7 @@ export const TALK_PHONE_2: Question[] = [
     dialogue: [{ speaker: "Mr. Tan", en: "During the start-up, can my engineers just call your operators directly on their mobiles? It would be much faster.", ko: "시운전 기간에 우리 엔지니어들이 그쪽 운전원들한테 휴대폰으로 직접 전화해도 될까요? 그게 훨씬 빠를 것 같아서요." }],
     promptKo: "왜 그게 더 빠를지는 이해하지만, 기술적인 질문은 저나 부디 씨를 통하는 게 좋을 것 같아요. 시운전 중에는 운전원들이 아주 바쁠 거고, 서로 다른 답을 주면 혼란이 생길 수 있어요. 대신 매일 오후에 짧게 통화하는 건 어떨까요?",
     segments: ["왜 그게 더 빠를지는 알지만", "기술 질문은 저나 부디 씨를 거치는 게 좋겠어요.", "시운전 중엔 운전원들이 아주 바쁠 거예요.", "서로 다른 답을 주면 혼란이 생길 수 있어요.", "대신 매일 오후에 짧게 통화하면 어떨까요?"],
-    reference: "I understand why that would be faster, but I think it's better if technical questions go through me or Budi. The operators will be very busy during start-up, and if they give different answers, it could cause confusion. Why don't we have a short call every afternoon instead?",
+    reference: "I understand why that would be faster. But I think it's better if technical questions go through me or Budi. The operators will be very busy during start-up. If they give different answers, it could cause confusion. Why don't we have a short call every afternoon instead?",
     accepted: [
       "I understand why that would be faster, but I think it's better if technical questions go through me or Budi. The operators will be very busy during the start-up, and if they give different answers, it could cause confusion. Why don't we have a short call every afternoon instead?",
       "I understand that it would be faster, but I think it's better if technical questions go through me or Budi. The operators will be very busy during start-up, and if they give different answers, it could cause confusion. Why don't we have a short call every afternoon instead?",
@@ -1179,6 +1179,7 @@ export const TALK_PHONE_2: Question[] = [
       "I understand why that would be faster, but I think it's better if technical questions go through me or Budi. The operators will be really busy during start-up, and if they give different answers, it could be confusing. How about a short call every afternoon instead?",
       "I understand why that would be faster, but I think it's better to send technical questions through me or Budi. The operators will be very busy during start-up, and if they give different answers, it could cause confusion. Could we have a short call every afternoon instead?",
     ],
+    advanced: "I understand why that would be faster, but I think it's better if technical questions go through me or Budi. The operators will be very busy during start-up, and if they give different answers, it could cause confusion. Why don't we have a short call every afternoon instead?",
     meaning: [
       { id: "understand", en: "I understand why that would be faster", ko: "더 빠를지는 이해한다", any: ["understand|see|know|appreciate|get"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
@@ -1195,7 +1196,7 @@ export const TALK_PHONE_2: Question[] = [
       { id: "how-about-have", pattern: "how about =have|=make|=do", category: "verb-form", severity: "major", fix: "how about having", messageKo: "'How about' 뒤에 동작이 오면 동사ing를 씁니다: 'How about having a short call …?' 또는 'How about a short call …?'", skill: "prep-gerund" },
       { id: "questions-goes", pattern: "re:(?<=\\bquestions )goes\\b", category: "agreement", severity: "major", fix: "go", messageKo: "주어 technical questions는 복수라서 동사에 -s를 붙이지 않습니다: 'if technical questions go through me or Budi'.", skill: "agreement" },
     ],
-    hints: { pattern: "I understand why …, but I think it's better if … If they …, it could … Why don't we … instead?", skeleton: "I understand why that would be faster, but I think it's ______ if technical questions __ through me or Budi. …", partial: "I understand why that would be faster, but I think it's better if…" },
+    hints: { pattern: "I understand why …. But I think it's better if … If they …, it could … Why don't we … instead?", skeleton: "I understand why that would be faster. But I think it's ______ if technical questions __ through me or Budi. …", partial: "I understand why that would be faster. But I think it's better if…" },
     explanationKo: "상대 요청을 거절할 때는 'I understand why …, but …'으로 먼저 이유를 인정하고, 'I think it's better if …'로 부드럽게 내 입장을 말합니다. '혼란을 일으키다'는 'cause confusion'('make confusion' ✗)이고, if 조건절에는 현재시제를 쓰며, 대안은 'Why don't we … instead?'로 제안합니다.",
     probes: [
       { answer: "I understand why that would be quicker, but I think it's better if all technical questions go through me or Budi. The operators will be extremely busy during start-up, and if they give different answers, it could lead to confusion. Why don't we set up a short call every afternoon instead?", expect: "pass" },
@@ -1218,7 +1219,7 @@ export const TALK_PHONE_2: Question[] = [
     dialogue: [{ speaker: "Budi", en: "Let's just use the group chat for everything from now on. It's much faster than email.", ko: "이제부터 그냥 전부 단체 채팅방으로 해요. 메일보다 훨씬 빠르잖아요." }],
     promptKo: "단체 채팅방은 빠른 질문에는 좋은데, 중요한 결정이 수많은 메시지 속에 묻힐까 봐 걱정돼요. 결정 사항은 메일로 확인하기로 하면 어떨까요? 나머지는 계속 채팅방으로 하면 되고요.",
     segments: ["단체 채팅방은 빠른 질문엔 좋은데", "중요한 결정이 메시지 속에 묻힐까 봐 걱정돼요.", "결정 사항은 메일로 확인하기로 할까요?", "나머지는 계속 채팅방을 쓰면 돼요"],
-    reference: "The group chat is great for quick questions, but I'm worried that important decisions might get lost in all the messages. Could we agree to confirm decisions by email? We can keep using the chat for everything else.",
+    reference: "The group chat is great for quick questions. But I'm worried that important decisions might get lost in all the messages. Could we agree to confirm decisions by email? We can keep using the chat for everything else.",
     accepted: [
       "The group chat is great for quick questions, but I'm worried that important decisions might get lost in all the messages. Could we agree to confirm decisions by email? We can still use the chat for everything else.",
       "The group chat is great for quick questions, but I'm worried important decisions could get lost in all the messages. Could we agree to confirm decisions by email? We can keep using the chat for everything else.",
@@ -1227,6 +1228,7 @@ export const TALK_PHONE_2: Question[] = [
       "The group chat is good for quick questions, but I'm worried that important decisions might get buried in all the messages. Could we agree to confirm decisions by email? We can keep using the chat for everything else.",
       "The group chat is great for quick questions, but I'm worried that important decisions might be lost in all the messages. Could we agree to confirm decisions by email? We can keep using the chat for everything else.",
     ],
+    advanced: "The group chat is great for quick questions, but I'm worried that important decisions might get lost in all the messages. Could we agree to confirm decisions by email? We can keep using the chat for everything else.",
     meaning: [
       { id: "great-for", en: "the group chat is great for quick questions", ko: "빠른 질문에는 좋다", any: ["great|good|fine|useful|perfect|helpful|handy ... quick|questions|small|simple"], critical: true },
       { id: "but", en: "but", ko: "하지만", any: ["but|however"], critical: true },
@@ -1244,7 +1246,7 @@ export const TALK_PHONE_2: Question[] = [
       { id: "not-worried", pattern: "re:\\b(am|is|are) not (worried|afraid|concerned)\\b", category: "meaning-shift", severity: "critical", fix: "am worried", messageKo: "not이 들어가면 '걱정하지 않는다'는 반대 뜻이 됩니다: 'I'm worried that …'." },
       { id: "chat-not-great", pattern: "re:\\bchat (is|was) not (great|good|useful|fine)\\b", category: "meaning-shift", severity: "critical", fix: "chat is great", messageKo: "not이 들어가면 '채팅방이 좋지 않다'는 반대 뜻이 됩니다: 'The group chat is great for quick questions'." },
     ],
-    hints: { pattern: "… is great for …, but I'm worried that … might get lost … Could we agree to …?", skeleton: "The group chat is great for quick questions, but I'm _______ that important decisions might ___ ____ in all the messages. …", partial: "The group chat is great for quick questions, but I'm worried that…" },
+    hints: { pattern: "… is great for …. But I'm worried that … might get lost … Could we agree to …?", skeleton: "The group chat is great for quick questions. But I'm _______ that important decisions might ___ ____ in all the messages. …", partial: "The group chat is great for quick questions. But I'm worried that…" },
     explanationKo: "상대 제안의 장점을 먼저 인정하고(… is great for …) 'but I'm worried that …'으로 우려를 말한 뒤 대안을 제안합니다. '묻히다, 사라지다'는 수동의 뜻이라 'get lost'라고 하고, '계속 ~하다'는 'keep + 동사ing'(keep using)입니다.",
     probes: [
       { answer: "The group chat is really good for quick questions, but I'm a bit worried that important decisions could get lost among all the messages. Could we agree to confirm decisions by email? We can keep using the chat for everything else.", expect: "pass" },

@@ -1254,9 +1254,9 @@ export const TALK_OFFICE_2: Question[] = [
     expression: "I understand …, but I'm afraid … Would a rough estimate be enough for now?",
     contextKo: "기획팀 하나 씨가 내일 이사회 보고용으로 새 건조기의 상세 원가 견적을 오늘 퇴근 전까지 달라고 합니다. 벤더 견적서가 아직 오지 않아 상세 견적은 최소 이틀이 걸립니다.",
     dialogue: [{ speaker: "Hana (planning team)", en: "We need a detailed cost estimate for the new dryer by the end of today. It's for tomorrow's board meeting.", ko: "오늘 퇴근 전까지 새 건조기 상세 원가 견적이 필요해요. 내일 이사회 보고용이에요." }],
-    promptKo: "이사회 보고용인 건 알지만, 죄송하지만 상세 견적은 최소 이틀은 걸려요. 벤더 견적서를 아직 못 받았거든요. 우선은 대략적인 견적으로 괜찮을까요? 상세 견적은 목요일까지 보내 드릴 수 있어요.",
+    promptKo: "이사회 보고용인 건 알아요. 하지만 죄송하지만 상세 견적은 최소 이틀은 걸려요. 벤더 견적서를 아직 못 받았거든요. 우선은 대략적인 견적으로 괜찮을까요? 상세 견적은 목요일까지 보내 드릴 수 있어요.",
     segments: ["이사회 보고용인 건 알지만", "죄송하지만 상세 견적은 최소 이틀은 걸려요", "벤더 견적서를 아직 못 받았거든요", "우선은 대략적인 견적으로 괜찮을까요?", "상세 견적은 목요일까지 보내 드릴 수 있어요"],
-    reference: "I understand it's for the board meeting, but I'm afraid a detailed estimate would take at least two days, because we haven't received the vendor's quote yet. Would a rough estimate be enough for now? I could send you the detailed one by Thursday.",
+    reference: "I understand it's for the board meeting. But I'm afraid a detailed estimate would take at least two days. We haven't received the vendor's quote yet. Would a rough estimate be enough for now? I could send you the detailed one by Thursday.",
     accepted: [
       "I understand it's for the board meeting, but I'm afraid a detailed estimate will take at least two days, because we haven't received the vendor's quote yet. Would a rough estimate be enough for now? I could send you the detailed one by Thursday.",
       "I understand it's for the board meeting, but I'm afraid a detailed estimate would take at least two days, because we haven't got the vendor's quote yet. Would a rough estimate be okay for now? I could send you the detailed one by Thursday.",
@@ -1265,6 +1265,7 @@ export const TALK_OFFICE_2: Question[] = [
       "I understand it's for the board meeting, but I'm afraid a detailed estimate would take at least two days, because we haven't received the vendor's quote yet. Could I give you a rough estimate for now? I could send you the detailed one by Thursday.",
       "I understand it's for the board meeting, but I'm afraid a detailed estimate takes at least two days, because we haven't received the vendor's quote yet. Would a rough estimate be enough for now? I could send you the detailed one by Thursday.",
     ],
+    advanced: "I understand it's for the board meeting, but I'm afraid a detailed estimate would take at least two days, because we haven't received the vendor's quote yet. Would a rough estimate be enough for now? I could send you the detailed one by Thursday.",
     meaning: [
       { id: "understand", en: "I understand it's for the board meeting", ko: "이사회 보고용인 건 알아요", any: ["understand|know|realize|realise|see"] },
       { id: "but", en: "but I'm afraid", ko: "하지만 죄송하지만", any: ["but|however|unfortunately|afraid"], critical: true },
@@ -1283,7 +1284,7 @@ export const TALK_OFFICE_2: Question[] = [
       { id: "send-until", pattern: "re:(?<=\\b(?:send|sent|give|finish|ready|done|prepare)\\b(?: \\w+){0,4} )until(?= thursday\\b)", category: "preposition", severity: "major", fix: "by", messageKo: "마감(그때까지 보내기)은 by입니다: 'send you the detailed one by Thursday'. until은 그때까지 계속되는 일에 씁니다.", skill: "verb-prep" },
       { id: "estimation", pattern: "=estimation", category: "word-choice", severity: "minor", fix: "estimate", messageKo: "'견적(서)'은 결과물이라 estimate라고 합니다. estimation은 '추정하는 과정'에 가깝습니다." },
     ],
-    hints: { pattern: "I understand …, but I'm afraid … because …. Would + 대안 + be enough for now? I could …", skeleton: "I understand …, but I'm ______ a detailed estimate would take __ _____ two days, … Would a rough estimate be ______ for now? …", partial: "I understand it's for the board meeting, but I'm afraid…" },
+    hints: { pattern: "I understand …. But I'm afraid … . Would + 대안 + be enough for now? I could …", skeleton: "I understand …. But I'm ______ a detailed estimate would take __ _____ two days. … Would a rough estimate be ______ for now? …", partial: "I understand it's for the board meeting. But I'm afraid…" },
     explanationKo: "무리한 요청에는 'I understand …, but I'm afraid …'로 상대 사정을 먼저 인정한 뒤 이유를 말하고, 'Would a rough estimate be enough for now?'처럼 대안을 묻습니다. '최소 이틀'은 at least two days, '아직 못 받았다'는 현재완료 haven't received … yet, 마감은 until이 아니라 by Thursday입니다.",
     probes: [
       { answer: "I know it's for the board meeting, but unfortunately a detailed estimate takes at least two days, because the vendor still hasn't sent us their quote. Would a rough estimate be okay for now? Then I can send the detailed version by Thursday.", expect: "pass" },

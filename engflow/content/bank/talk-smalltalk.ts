@@ -562,11 +562,12 @@ export const TALK_SMALLTALK: Question[] = [
     dialogue: [{ speaker: "Sari", en: "Minsu, some of us are going to karaoke after work tonight. You should come!", ko: "민수 씨, 오늘 퇴근 후에 몇 명이 노래방에 가요. 같이 가요!" }],
     promptKo: "초대해 줘서 고마워요. 정말 가고 싶은데, 아쉽게도 오늘 밤은 서울 본사와 화상회의가 있어서 못 가요. 혹시 다음 주 금요일에 하는 건 어때요?",
     segments: ["초대해 줘서 고마워요.", "정말 가고 싶지만", "아쉽게도 오늘 밤은 못 가요", "서울 본사와 화상회의가 있어서요.", "대신 다음 주 금요일에 하는 건 어때요?"],
-    reference: "Thanks for inviting me. I'd love to come, but I'm afraid I can't tonight because I have a video call with the Seoul office. Would it be possible to do it next Friday instead?",
+    reference: "Thanks for inviting me. I'd love to come, but I'm afraid I can't tonight. I have a video call with the Seoul office. Would it be possible to do it next Friday instead?",
     accepted: [
       "Thank you for inviting me. I'd really love to come, but I'm afraid I can't make it tonight because I have a video call with the head office in Seoul. Would it be possible to go next Friday instead?",
       "Thanks for inviting me. I'd love to join, but unfortunately I can't tonight because I have an online meeting with the Seoul office. Could we do it next Friday instead?",
       "Thanks for the invitation. I'd love to come, but I'm afraid I can't tonight because I have a video call with our Seoul office. Would it be possible to go next Friday instead?",
+      "Thanks for inviting me. I'd love to come, but I'm afraid I can't tonight because I have a video call with the Seoul office. Would it be possible to do it next Friday instead?",
     ],
     meaning: [
       { id: "thanks", en: "thanks for inviting me", ko: "초대해 줘서 고마워요", any: ["thank|thanks|appreciate"] },
@@ -581,7 +582,7 @@ export const TALK_SMALLTALK: Question[] = [
       { id: "for-invite", pattern: "for =invite|=invited me", category: "verb-form", severity: "major", fix: "for inviting me", messageKo: "'초대해 줘서 고마워요'는 'Thanks for inviting me'입니다. 전치사 for 뒤에는 동사ing가 옵니다.", skill: "prep-gerund" },
       { id: "because-of-clause", pattern: "because of i", category: "sentence-structure", severity: "major", fix: "because I", messageKo: "'because of' 뒤에는 명사만 옵니다. '주어 + 동사'(I have …)가 이어질 때는 of 없이 'because I have …'라고 합니다.", skill: "cause-effect" },
     ],
-    hints: { pattern: "Thanks for + V-ing. I'd love to, but I'm afraid I can't … because … Would it be possible to + V?", skeleton: "Thanks for ______ me. I'd love to come, but I'm ______ I can't tonight because … Would it be ______ to do it next Friday?", partial: "Thanks for inviting me. I'd love to come, but I'm afraid I can't tonight because…" },
+    hints: { pattern: "Thanks for + V-ing. I'd love to, but I'm afraid I can't …. 이유. Would it be possible to + V?", skeleton: "Thanks for ______ me. I'd love to come, but I'm ______ I can't tonight. I have … Would it be ______ to do it next Friday?", partial: "Thanks for inviting me. I'd love to come, but I'm afraid I can't tonight…" },
     explanationKo: "초대를 거절할 때는 'Thanks for inviting me'(for + 동사ing)로 먼저 감사하고, 'I'd love to, but I'm afraid I can't …'로 부드럽게 거절한 뒤 'Would it be possible to …?'로 대안을 묻습니다. because 뒤에 '주어 + 동사'가 오면 'because of'가 아니라 because만 씁니다.",
     probes: [
       { answer: "Thank you for inviting me. I'd love to come, but I'm afraid I can't go tonight because I have a video call with the Seoul office. Could we do it next Friday instead?", expect: "pass" },

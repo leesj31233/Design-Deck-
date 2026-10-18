@@ -723,19 +723,19 @@ export const TALK_OFFICE: Question[] = [
     level: "B1",
     difficulty: 5,
     skills: ["hedging", "countability"],
-    expression: "I'd love to, but I'm swamped today.",
+    expression: "I'd love to, but I'm really busy today.",
     contextKo: "사리 씨가 퇴근 후 팀 저녁 식사에 같이 가자고 합니다. 오늘은 끝내야 할 일이 산더미라서 갈 수 없습니다.",
     dialogue: [{ speaker: "Sari", en: "A few of us are going out for dinner after work. Want to join us?", ko: "몇 명이서 퇴근하고 저녁 먹으러 가요. 같이 갈래요?" }],
     promptKo: "정말 가고 싶은데, 오늘 일이 산더미예요. 다음에 같이 가요!",
     segments: ["정말 가고 싶은데", "오늘 일이 산더미예요", "다음에 같이 가요!"],
-    reference: "I'd love to, but I'm swamped today. Maybe next time!",
+    reference: "I'd love to, but I'm really busy today. Maybe next time!",
     accepted: [
-      "I'd love to, but I'm really busy today. Maybe next time!",
       "I'd love to, but I'm swamped today. Next time, for sure!",
       "I'd love to, but I have too much work today. Maybe next time!",
       "I'd really like to, but I'm swamped today. Maybe next time!",
       "I'd love to, but I've got a lot of work today. Maybe next time!",
       "Thanks, I'd love to, but I'm swamped today. Maybe next time!",
+      "I'd love to, but I'm swamped today. Maybe next time!",
     ],
     meaning: [
       { id: "love-to", en: "I'd love to", ko: "정말 가고 싶어요", any: ["love|like|want ... to", "wish"] },
@@ -748,8 +748,8 @@ export const TALK_OFFICE: Question[] = [
       { id: "join-with", pattern: "join with", category: "preposition", severity: "major", fix: "join", messageKo: "join은 목적어를 바로 받습니다: 'join you'. 'join with you'라고 하지 않습니다.", skill: "verb-object" },
       { id: "for-go", pattern: "for =go|=join|=come", category: "verb-form", severity: "major", fix: "to go", messageKo: "'~하기에는 너무 바쁘다'는 'too busy to + 동사원형'입니다. for 뒤에 동사원형을 쓰지 않습니다.", skill: "purpose-to" },
     ],
-    hints: { pattern: "I'd love to, but + 이유. Maybe next time!", skeleton: "I'd ____ __, but I'm ________ today. Maybe next time!", partial: "I'd love to, but…" },
-    explanationKo: "초대를 거절할 때는 먼저 'I'd love to, but …'으로 가고 싶은 마음을 보이고, 이유를 짧게 말한 뒤 'Maybe next time!'으로 마무리합니다. '일이 많다'는 'I'm swamped / I have a lot of work'이고, work는 셀 수 없는 명사라서 'many works'라고 하지 않습니다.",
+    hints: { pattern: "I'd love to, but + 이유. Maybe next time!", skeleton: "I'd ____ __, but I'm ______ ____ today. Maybe next time!", partial: "I'd love to, but…" },
+    explanationKo: "초대를 거절할 때는 먼저 'I'd love to, but …'으로 가고 싶은 마음을 보이고, 이유를 짧게 말한 뒤 'Maybe next time!'으로 마무리합니다. '일이 많다'는 'I'm really busy / I have a lot of work'(관용 표현으로 'I'm swamped'도 씁니다)이고, work는 셀 수 없는 명사라서 'many works'라고 하지 않습니다.",
     probes: [
       { answer: "Oh, I'd love to, but I'm really busy with a deadline today. Next time!", expect: "pass" },
       { answer: "I really want to, but I have so much work today. Maybe next time?", expect: "pass" },
@@ -903,7 +903,7 @@ export const TALK_OFFICE: Question[] = [
     dialogue: [{ speaker: "Budi", en: "Did you check the P&ID comments I uploaded to the shared folder?", ko: "제가 공유 폴더에 올린 P&ID 코멘트 확인했어요?" }],
     promptKo: "아직이요, 죄송해요. 아침부터 VPN 접속이 안 돼서 공유 폴더를 못 열고 있어요.",
     segments: ["아직이요, 죄송해요", "아침부터 VPN 접속이 안 돼요", "그래서 공유 폴더를 못 열고 있어요"],
-    reference: "Not yet, sorry. I haven't been able to connect to the VPN since this morning, so I can't open the shared folder.",
+    reference: "Not yet, sorry. I haven't been able to connect to the VPN since this morning. So I can't open the shared folder.",
     accepted: [
       "Not yet, sorry. I haven't been able to connect to the VPN since this morning, so I can't access the shared folder.",
       "Not yet, sorry. I haven't been able to get on the VPN since this morning, so I can't open the shared folder.",
@@ -913,6 +913,7 @@ export const TALK_OFFICE: Question[] = [
       "Not yet, sorry. The VPN hasn't worked since this morning, so I can't open the shared folder.",
       "Not yet, sorry. I've had problems with the VPN since this morning, so I can't open the shared folder.",
     ],
+    advanced: "Not yet, sorry. I haven't been able to connect to the VPN since this morning, so I can't open the shared folder.",
     meaning: [
       { id: "not-yet", en: "not yet", ko: "아직이요", any: ["yet", "not"] },
       { id: "vpn", en: "the VPN", ko: "VPN", any: ["vpn"], critical: true },
@@ -927,7 +928,7 @@ export const TALK_OFFICE: Question[] = [
       { id: "share-folder", pattern: "=share =folder|=drive", category: "word-choice", severity: "minor", fix: "shared folder", messageKo: "'공유 폴더'는 과거분사를 써서 'the shared folder'라고 합니다. 'share folder'라고 하지 않습니다." },
       { id: "open-shared-no-article", pattern: "re:(?<=\\b(?:open|access|use|check) )shared (folder|drive)\\b", category: "article", severity: "minor", fix: "the shared folder", messageKo: "정해진 그 공유 폴더를 가리키므로 관사 the가 필요합니다: 'open the shared folder'.", skill: "articles" },
     ],
-    hints: { pattern: "I haven't been able to + 동사 + since + 시점, so …", skeleton: "Not yet, sorry. I haven't ____ ____ to connect to the VPN _____ this morning, so I can't open the shared folder.", partial: "Not yet, sorry. I haven't been able to…" },
+    hints: { pattern: "I haven't been able to + 동사 + since + 시점. So …", skeleton: "Not yet, sorry. I haven't ____ ____ to connect to the VPN _____ this morning. So I can't open the shared folder.", partial: "Not yet, sorry. I haven't been able to…" },
     explanationKo: "아침부터 지금까지 계속 안 되는 일은 현재완료 'I haven't been able to + 동사 … since this morning'으로 말합니다. '~에 접속하다'는 'connect to'이고, 현재완료와 함께 쓰는 시작점은 from이 아니라 since입니다.",
     probes: [
       { answer: "Sorry, not yet. I haven't been able to get onto the VPN since this morning, so I can't open the folder.", expect: "pass" },
@@ -1611,9 +1612,9 @@ export const TALK_OFFICE: Question[] = [
     expression: "I'd really like to help, but I'm afraid … Would … work for you instead?",
     contextKo: "부디 씨가 오늘 오후에 물질수지 계산을 같이 봐 달라고 합니다. 하지만 5시까지 프리야 씨에게 데이터시트를 보내야 해서 오늘 오후는 어렵습니다.",
     dialogue: [{ speaker: "Budi", en: "Minsu, could you check the mass balance with me this afternoon? It shouldn't take long.", ko: "민수 씨, 오늘 오후에 물질수지 계산 같이 봐 줄 수 있어요? 오래 안 걸릴 거예요." }],
-    promptKo: "정말 돕고 싶은데, 죄송하지만 5시까지 프리야 씨에게 데이터시트를 보내야 해서 오늘 오후는 어려워요. 대신 내일 오전은 어때요? 급한 거면 점심시간에 잠깐 봐 줄 수도 있어요.",
+    promptKo: "정말 돕고 싶은데, 죄송하지만 5시까지 프리야 씨에게 데이터시트를 보내야 해요. 그래서 오늘 오후는 어려워요. 대신 내일 오전은 어때요? 급한 거면 점심시간에 잠깐 봐 줄 수도 있어요.",
     segments: ["정말 돕고 싶은데", "죄송하지만 5시까지 프리야 씨에게 데이터시트를 보내야 해요", "그래서 오늘 오후는 어려워요", "대신 내일 오전은 어때요?", "급한 거면 점심시간에 잠깐 봐 줄 수도 있어요"],
-    reference: "I'd really like to help, but I'm afraid I have to send the datasheets to Priya by five, so this afternoon is difficult. Would tomorrow morning work for you instead? If it's urgent, I could take a quick look at it during lunch.",
+    reference: "I'd really like to help, but I'm afraid I have to send the datasheets to Priya by five. So this afternoon is difficult. Would tomorrow morning work for you instead? If it's urgent, I could take a quick look at it during lunch.",
     accepted: [
       "I'd really like to help, but I'm afraid I need to send the datasheets to Priya by five, so this afternoon is difficult. Would tomorrow morning work for you instead? If it's urgent, I could take a quick look at it during lunch.",
       "I'd love to help, but I'm afraid I have to send the datasheets to Priya by five, so this afternoon is difficult. Would tomorrow morning work for you instead? If it's urgent, I could take a quick look at it during lunch.",
@@ -1622,6 +1623,7 @@ export const TALK_OFFICE: Question[] = [
       "I'd really like to help, but I'm afraid I have to send the datasheets to Priya by five, so this afternoon doesn't work for me. Would tomorrow morning work for you instead? If it's urgent, I could take a quick look at it during lunch.",
       "I'd really like to help, but I'm afraid I have to send the datasheets to Priya by five, so I can't do it this afternoon. Would tomorrow morning work for you instead? If it's urgent, I can take a quick look at it at lunchtime.",
     ],
+    advanced: "I'd really like to help, but I'm afraid I have to send the datasheets to Priya by five, so this afternoon is difficult. Would tomorrow morning work for you instead? If it's urgent, I could take a quick look at it during lunch.",
     meaning: [
       { id: "like-to-help", en: "I'd really like to help", ko: "정말 돕고 싶어요", any: ["like|love|want|happy ... help", "help"] },
       { id: "but", en: "but I'm afraid", ko: "하지만 죄송하지만", any: ["but|unfortunately|however|afraid"], critical: true },
@@ -1763,7 +1765,7 @@ export const TALK_OFFICE: Question[] = [
     dialogue: [{ speaker: "Sari", en: "I'm on holiday next week. Could you take over all my vendor follow-ups while I'm away?", ko: "다음 주에 휴가예요. 저 없는 동안 벤더 후속 업무 전부 맡아 줄 수 있어요?" }],
     promptKo: "기꺼이 돕고 싶은데, 죄송하지만 데이터시트 일정이 이미 밀려 있어서 전부 맡기는 어려워요. 제가 급한 건만 처리하고 나머지는 부디 씨가 맡으면 어떨까요? 그러면 사리 씨가 없는 동안 놓치는 일이 없을 거예요.",
     segments: ["기꺼이 돕고 싶은데", "죄송하지만 전부 맡기는 어려워요", "데이터시트 일정이 이미 밀려 있거든요", "제가 급한 건만 처리하고 나머지는 부디 씨가 맡으면 어떨까요?", "그러면 사리 씨가 없는 동안 놓치는 일이 없을 거예요"],
-    reference: "I'd be happy to help, but I'm afraid I can't take over all of them, because I'm already behind on the datasheets. Would it be okay if I handled the urgent ones and Budi took care of the rest? That way, nothing would be missed while you're away.",
+    reference: "I'd be happy to help, but I'm afraid I can't take over all of them. I'm already behind on the datasheets. Would it be okay if I handled the urgent ones and Budi took care of the rest? That way, nothing would be missed while you're away.",
     accepted: [
       "I'd be happy to help, but I'm afraid I can't take over all of them, because I'm already behind on the datasheets. Would it be all right if I handled the urgent ones and Budi took care of the rest? That way, nothing would be missed while you're away.",
       "I'd be happy to help, but I'm afraid I can't take over all of them because I'm already behind on the datasheets. Would it be okay if I handled the urgent ones and Budi took care of the rest? That way, nothing would be missed while you're away.",
@@ -1772,6 +1774,7 @@ export const TALK_OFFICE: Question[] = [
       "I'd be glad to help, but I'm afraid I can't take over all of them, because I'm already behind on the datasheets. Would it be okay if I handled the urgent ones and Budi took care of the others? That way, nothing would be missed while you're away.",
       "I'd be happy to help, but I'm afraid I can't take over all of them, because I'm already behind on the datasheets. Would it be okay if I just handled the urgent ones and Budi took care of the rest? That way, we wouldn't miss anything while you're away.",
     ],
+    advanced: "I'd be happy to help, but I'm afraid I can't take over all of them, because I'm already behind on the datasheets. Would it be okay if I handled the urgent ones and Budi took care of the rest? That way, nothing would be missed while you're away.",
     meaning: [
       { id: "happy-help", en: "I'd be happy to help", ko: "기꺼이 돕고 싶어요", any: ["happy|glad|love|like ... help", "help"] },
       { id: "but", en: "but I'm afraid", ko: "하지만 죄송하지만", any: ["but|however|unfortunately"], critical: true },
@@ -1794,7 +1797,7 @@ export const TALK_OFFICE: Question[] = [
       { id: "budi-take", pattern: "budi =take|=handle|=do", category: "agreement", severity: "major", fix: "Budi takes", messageKo: "주어 Budi는 3인칭 단수라서 'Budi takes'입니다(정중한 가정이면 'Budi took').", skill: "agreement" },
       { id: "the-rests", pattern: "the =rests", category: "countability", severity: "minor", fix: "the rest", messageKo: "'나머지'는 'the rest'입니다. rests처럼 -s를 붙이지 않습니다.", skill: "countability" },
     ],
-    hints: { pattern: "I'd be happy to …, but I'm afraid … Would it be okay if I + 과거동사 … and + 사람 + 과거동사 …?", skeleton: "I'd be happy to help, but I'm afraid I can't take over all of them, because I'm already ______ on the datasheets. …", partial: "I'd be happy to help, but I'm afraid I can't take over all of them, …" },
+    hints: { pattern: "I'd be happy to …, but I'm afraid … Would it be okay if I + 과거동사 … and + 사람 + 과거동사 …?", skeleton: "I'd be happy to help, but I'm afraid I can't take over all of them. I'm already ______ on the datasheets. …", partial: "I'd be happy to help, but I'm afraid I can't take over all of them…" },
     explanationKo: "동료의 부탁을 전부 들어줄 수 없을 때는 'I'd be happy to help, but I'm afraid I can't …'으로 돕고 싶은 마음과 한계를 함께 말하고, 'Would it be okay if I + 과거동사 … and Budi + 과거동사 …?'로 업무 분담을 제안합니다. '일정이 밀려 있다'는 'I'm behind on …'이고, 일이 '놓쳐지는' 것은 수동태 'nothing would be missed'입니다.",
     probes: [
       { answer: "I'd love to help, but unfortunately I can't take all of them, since I'm already behind schedule with the datasheets. What if I handle the urgent ones and Budi takes the rest? Then nothing will get missed while you're on holiday.", expect: "pass" },

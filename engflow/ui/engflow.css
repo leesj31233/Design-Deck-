@@ -198,36 +198,7 @@
   to { width: 100%; }
 }
 .ef-grade-bar { width: 4%; animation-name: ef-grade-fill; animation-timing-function: linear; animation-fill-mode: forwards; }
-@keyframes ef-shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: 200px 0; }
-}
-.ef-skeleton {
-  background: linear-gradient(90deg, var(--ef-track) 0px, color-mix(in srgb, var(--ef-track) 40%, transparent) 80px, var(--ef-track) 160px);
-  background-size: 400px 100%;
-  animation: ef-shimmer 1.4s linear infinite;
-  border-radius: 8px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .ef-skeleton { animation: none; }
-}
-.ef-reduce-motion .ef-skeleton { animation: none; }
 
-/* Voice answers: a soft ring breathes around the microphone while it listens. */
-@keyframes ef-mic-ring {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ef-bad) 45%, transparent); }
-  100% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--ef-bad) 0%, transparent); }
-}
-@keyframes ef-mic-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .25; }
-}
-.ef-mic-ring { animation: ef-mic-ring 1.1s ease-out infinite; }
-.ef-mic-dot { animation: ef-mic-dot 1s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) {
-  .ef-mic-ring, .ef-mic-dot { animation: none; }
-}
-.ef-reduce-motion .ef-mic-ring, .ef-reduce-motion .ef-mic-dot { animation: none; }
 /* The in-app "reduce motion" setting also quiets Design Deck's CSS effects. */
 .ef-reduce-motion .dd-shimmer { animation: none; color: var(--muted); background: none; }
 .ef-reduce-motion .dd-beam { display: none; }

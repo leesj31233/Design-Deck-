@@ -1008,13 +1008,14 @@ export const TALK_DISCUSSION_3: Question[] = [
     dialogue: [{ speaker: "Budi", en: "To save time, the maintenance team can clean the dryer right after shutdown.", ko: "시간을 아끼려면 정비팀이 정지 직후에 바로 건조기를 청소하면 돼요." }],
     promptKo: "그건 좀 걱정돼요. 정지 직후에는 건조기가 아직 아주 뜨거워서, 누가 문을 열면 크게 화상을 입을 수 있어요. 절차에 냉각 단계를 추가할 수 있을까요?",
     segments: ["그건 좀 걱정돼요", "정지 직후에는 건조기가 아직 아주 뜨거워요", "그래서 누가 문을 연다면", "크게 화상을 입을 수 있어요", "절차에 냉각 단계를 추가할 수 있을까요?"],
-    reference: "I'm a bit worried about that. The dryer is still very hot right after shutdown, so if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?",
+    reference: "I'm a bit worried about that. The dryer is still very hot right after shutdown. So if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?",
     accepted: [
       "I'm a little worried about that. The dryer is still very hot right after shutdown, so if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?",
       "I'm a bit worried about that. The dryer is still very hot right after shutdown, so if someone opens the door, they could get badly burned. Could we add a cool-down step to the procedure?",
       "I'm a bit concerned about that. The dryer is still very hot right after shutdown, so if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?",
       "I'm a bit worried about that. The dryer is still very hot right after shutdown, so if someone opened the door, they might get badly burned. Could we add a cool-down step to the procedure?",
       "I'm a bit worried about that. The dryer is still very hot right after shutdown, so if someone opened the door, they could get seriously burned. Could we add a cooling step to the procedure?",
+      "I'm a bit worried about that. The dryer is still very hot right after shutdown, so if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?",
     ],
     meaning: [
       { id: "worried", en: "I'm a bit worried", ko: "좀 걱정된다", any: ["worried|worry|concerned|concern|nervous|afraid|sure"], critical: true },
@@ -1032,7 +1033,7 @@ export const TALK_DISCUSSION_3: Question[] = [
       { id: "opened-will", pattern: "re:(?<=\\bif someone opened\\b.{0,30})\\bthey will\\b", category: "tense", severity: "major", fix: "they could", messageKo: "if절에 과거형(opened)을 쓴 가정이라면 결과절은 could/would입니다." },
       { id: "can-get-burn-not", pattern: "could|might not get", category: "meaning-shift", severity: "critical", fix: "could get", messageKo: "화상을 '입을 수 있다'는 위험을 말하는 문장입니다. not을 넣으면 반대 의미가 됩니다." },
     ],
-    hints: { pattern: "I'm a bit worried about that. 이유 + so if someone + 과거형, they could + 동사원형. Could we + 동사원형 …?", skeleton: "I'm a bit _______ about that. … so if someone ______ the door, they could get badly ______. Could we ___ a cool-down step …?", partial: "I'm a bit worried about that. The dryer is still very hot…" },
+    hints: { pattern: "I'm a bit worried about that. 이유. So if someone + 과거형, they could + 동사원형. Could we + 동사원형 …?", skeleton: "I'm a bit _______ about that. … So if someone ______ the door, they could get badly ______. Could we ___ a cool-down step …?", partial: "I'm a bit worried about that. The dryer is still very hot…" },
     explanationKo: "안전 문제를 제기할 때는 '우려 → 이유와 가정(if someone opened …, they could …) → 대책 제안(Could we add …?)' 순서로 말합니다. 가정은 2형 조건문(opened … could)이나 1형(opens … could) 모두 자연스럽고, '화상을 입다'는 'get burned'입니다.",
     probes: [
       { answer: "I'm a bit worried about that. The dryer is still really hot right after shutdown, so if someone opened the door, they could get badly burned. Could we add a cool-down step to the procedure?", expect: "pass" },
@@ -1156,15 +1157,16 @@ export const TALK_DISCUSSION_3: Question[] = [
     expression: "There's one risk that I don't think we've discussed. … I'm not saying …, but could we …?",
     contextKo: "Sari가 다른 의견이 없으면 오늘 부지 배치를 확정하자고 합니다. 새 부지가 주거 지역과 가까워 악취 민원 위험이 있다는 점을 짚고, 계획을 뒤집자는 것이 아니라 벤더에게 먼저 확인하자고 제안합니다.",
     dialogue: [{ speaker: "Sari", en: "So if there are no other comments, we can finalize the site layout today.", ko: "다른 의견이 없으면 오늘 부지 배치를 확정할게요." }],
-    promptKo: "확정하기 전에, 아직 논의하지 않은 것 같은 위험이 하나 있어요. 새 부지가 주거 지역과 가까워서, 건조기 배기에서 냄새가 나면 주민들의 민원을 받을 수 있어요. 계획을 바꾸자는 건 아니지만, 먼저 벤더에게 악취 관리에 대해 물어볼 수 있을까요?",
+    promptKo: "확정하기 전에, 아직 논의하지 않은 것 같은 위험이 하나 있어요. 새 부지가 주거 지역과 가까워요. 그래서 건조기 배기에서 냄새가 나면 주민들의 민원을 받을 수 있어요. 계획을 바꾸자는 건 아니지만, 먼저 벤더에게 악취 관리에 대해 물어볼 수 있을까요?",
     segments: ["확정하기 전에", "아직 논의하지 않은 위험이 하나 있어요", "새 부지가 주거 지역과 가까워요", "그래서 건조기 배기에서 냄새가 나면 주민 민원을 받을 수 있어요", "계획을 바꾸자는 건 아니지만", "먼저 벤더에게 악취 관리에 대해 물어볼 수 있을까요?"],
-    reference: "Before we finalize it, there's one risk that I don't think we've discussed. The new site is close to a residential area, so if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",
+    reference: "Before we finalize it, there's one risk that I don't think we've discussed. The new site is close to a residential area. So if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",
     accepted: [
       "Before we finalize it, there's one risk that I don't think we've talked about. The new site is close to a residential area, so if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",
       "Before we finalize it, there's one risk that I don't think we've discussed. The new site is close to a residential area, so if the dryer exhaust smells, we could get complaints from the neighbours. I'm not saying we should change the plan, but could we ask the vendor about odour control first?",
       "Before we finalize it, there's one risk I don't think we've discussed. The new site is near a residential area, so if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",
       "Before we finalize it, there's one risk that I don't think we've discussed. The new site is close to a residential area, so if the dryer exhaust smells, we might get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",
       "Before we finalize it, there's one risk that I don't think we've discussed. The new site is close to a residential area, so if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we need to change the plan, but could we check odor control with the vendor first?",
+      "Before we finalize it, there's one risk that I don't think we've discussed. The new site is close to a residential area, so if the dryer exhaust smells, we could get complaints from the neighbors. I'm not saying we should change the plan, but could we ask the vendor about odor control first?",
     ],
     meaning: [
       { id: "before", en: "before we finalize it", ko: "확정하기 전에", any: ["before ... finalize|finalise|decide|finish|confirm|close"], weight: 0.5 },

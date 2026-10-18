@@ -15,7 +15,7 @@ import { CEFR_ORDER, type Cefr, type DiagnosticResultRecord, type DiagnosticShee
 import { useApp } from "../store";
 import { useNav } from "../app";
 import { useStartLesson } from "./today";
-import { Badge, Button, Card, ConfirmDialog, Eyebrow, IconButton, Kbd, LevelBadge, Meter, Pressable, Progress, RevealGroup, RevealItem, SegmentedControl, Spotlight, cn, dateKo, scoreTone, useReduced } from "../kit";
+import { Badge, Button, Card, ConfirmDialog, Eyebrow, IconButton, Kbd, Tag, LevelBadge, Meter, Pressable, Progress, RevealGroup, RevealItem, SegmentedControl, Spotlight, cn, dateKo, scoreTone, useReduced } from "../kit";
 import { CefrScale } from "../charts";
 import { AnswerHighlight, CATEGORY_KO, DiffLine, SEVERITY_KO, SPEAK_FIRST_HINT_KO } from "../practice/parts";
 
@@ -242,7 +242,7 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
         <motion.div key={item.id} className="mt-6" initial={reduced ? { opacity: 0 } : { opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? { opacity: 0 } : { opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
           {item.kind === "choice" ? (
             <div>
-              {item.stemKo ? <p className="ef-ko text-[15px] text-[var(--ef-ink-2)]">{item.stemKo}</p> : null}
+              {item.stemKo ? <p className="ef-ko whitespace-pre-line text-[15px] text-[var(--ef-ink-2)]">{item.stemKo}</p> : null}
               {item.stemEn ? <p className="ef-en mt-2 text-[20px] font-semibold tracking-[-.01em]">{item.stemEn}</p> : null}
               <div className="mt-5 grid gap-2" role="radiogroup" aria-label="보기">
                 {item.options!.map((o, i) => (
@@ -410,7 +410,7 @@ function TestResult({ r, onBack }: { r: DiagnosticResultRecord; onBack: () => vo
           <div>
             <Eyebrow>강점</Eyebrow>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {r.strengths.length ? r.strengths.map((s) => <span key={s} className="rounded-full bg-[var(--ef-ok-soft)] px-2.5 py-1 text-[12px] font-medium text-[var(--ef-ok)]">{skillName(s)}</span>) : <span className="text-[13px] text-[var(--muted)]">뚜렷한 강점 문법이 아직 없습니다.</span>}
+              {r.strengths.length ? r.strengths.map((s) => <Tag key={s} tone="ok" className="px-2.5 py-1 text-[12px] font-medium">{skillName(s)}</Tag>) : <span className="text-[13px] text-[var(--muted)]">뚜렷한 강점 문법이 아직 없습니다.</span>}
             </div>
           </div>
           <div>
@@ -456,7 +456,7 @@ function TestResult({ r, onBack }: { r: DiagnosticResultRecord; onBack: () => vo
       <Card className="p-4 md:p-5">
         <div className="flex items-center justify-between gap-2">
           <Eyebrow>TOEIC Speaking 참고 (비공식 추정)</Eyebrow>
-          <span className="rounded-full bg-[var(--ef-warn-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-warn)]">점수 아님</span>
+          <Tag tone="warn">점수 아님</Tag>
         </div>
         <p className="ef-ko mt-2 text-[14px]">
           {toeic.minScore

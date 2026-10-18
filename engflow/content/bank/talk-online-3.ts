@@ -1193,7 +1193,7 @@ export const TALK_ONLINE_3: Question[] = [
     dialogue: [{ speaker: "Daniel", en: "Our team is busiest in the mornings, so 9 pm Seoul time would work best for us. Is that okay?", ko: "저희 팀은 오전에 가장 바빠서, 서울 시간 밤 9시가 저희한테 제일 좋아요. 괜찮으세요?" }],
     promptKo: "오전이 바쁘신 건 알지만, 밤 9시는 저희 팀, 특히 현장 엔지니어들한테는 꽤 늦은 시간이에요. 한 주는 밤 9시, 다음 주는 오후 4시로 번갈아 하면 어떨까요? 그러면 양쪽 팀 모두에게 공평할 것 같아요.",
     segments: ["오전이 바쁘신 건 알지만", "밤 9시는 저희 팀에겐 꽤 늦어요", "특히 현장 엔지니어들한테는요.", "번갈아 하면 어떨까요?", "한 주는 밤 9시, 다음 주는 오후 4시로요.", "그러면 양쪽 팀 모두 공평할 거예요"],
-    reference: "I understand that mornings are busy for you, but 9 pm is quite late for our team, especially for the site engineers. Could we take turns, with 9 pm one week and 4 pm the next? That way, it would be fair for both teams.",
+    reference: "I understand that mornings are busy for you. But 9 pm is quite late for our team, especially for the site engineers. Could we take turns, with 9 pm one week and 4 pm the next? That way, it would be fair for both teams.",
     accepted: [
       "I understand that mornings are busy for you, but 9 pm is quite late for our team, especially for the site engineers. Could we take turns, with 9 pm one week and 4 pm the next? That way, it would be fairer for both teams.",
       "I understand that your mornings are busy, but 9 pm is quite late for our team, especially for the site engineers. Could we take turns, with 9 pm one week and 4 pm the next? That way, it would be fair for both teams.",
@@ -1202,6 +1202,7 @@ export const TALK_ONLINE_3: Question[] = [
       "I understand that mornings are busy for you, but 9 pm is quite late for our team, especially for the site engineers. Why don't we take turns, with 9 pm one week and 4 pm the next? That way, it would be fair to both teams.",
       "I understand that mornings are busy for you, but 9 pm is quite late for our team, especially the site engineers. Could we take turns, with 9 pm one week and 4 pm the next? That way, it would be fair for both teams.",
     ],
+    advanced: "I understand that mornings are busy for you, but 9 pm is quite late for our team, especially for the site engineers. Could we take turns, with 9 pm one week and 4 pm the next? That way, it would be fair for both teams.",
     meaning: [
       { id: "understand", en: "I understand that mornings are busy for you", ko: "오전이 바쁘신 건 알지만", any: ["understand|see|know|appreciate", "busy"], weight: 0.5 },
       { id: "nine", en: "9 pm", ko: "밤 9시", any: ["nine|9"], critical: true },
@@ -1216,7 +1217,7 @@ export const TALK_ONLINE_3: Question[] = [
       { id: "both-team", pattern: "both =team", category: "countability", severity: "major", fix: "both teams", messageKo: "both 뒤에는 복수 명사가 옵니다: 'both teams'." },
       { id: "late-to", pattern: "re:(?<=\\blate )to(?= (?:our|us|the|my)\\b)", category: "preposition", severity: "minor", fix: "for", messageKo: "'~에게 늦은 시간'은 'late for our team'처럼 for를 씁니다." },
     ],
-    hints: { pattern: "I understand that …, but …. Could we take turns, with A one week and B the next? That way, it would be …", skeleton: "I understand that …, but 9 pm is quite ____ for our team, …. Could we ____ _____, with 9 pm one week and 4 pm the next? …", partial: "I understand that mornings are busy for you, but 9 pm is quite late for our team, …" },
+    hints: { pattern: "I understand that …. But …. Could we take turns, with A one week and B the next? That way, it would be …", skeleton: "I understand that …. But 9 pm is quite ____ for our team, …. Could we ____ _____, with 9 pm one week and 4 pm the next? …", partial: "I understand that mornings are busy for you. But 9 pm is quite late for our team, …" },
     explanationKo: "상대 사정을 'I understand that …, but …'으로 먼저 인정한 뒤, 'Could we take turns, with A one week and B the next?'로 대안을 냅니다. '번갈아 하다'는 항상 복수형 'take turns'이고, both 뒤에는 복수 명사(both teams)가 옵니다.",
     probes: [
       { answer: "I understand that mornings are busy for you, but 9 pm is quite late for us, especially for the site engineers. Could we take turns, with 9 pm one week and 4 pm the next? That way, it would be fair for both teams.", expect: "pass" },

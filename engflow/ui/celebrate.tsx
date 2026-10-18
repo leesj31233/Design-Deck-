@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { motion } from "motion/react";
 import { CalendarCheck, Crown, Flame, Library, Medal, PartyPopper, Rocket, ShieldCheck, Sparkles, Target, TrendingUp, Trophy, Zap } from "lucide-react";
 import type { Celebration } from "../core/celebration";
-import { cn, useReduced } from "./kit";
+import { Tag, cn, useReduced } from "./kit";
 
 /* ───────────── Particle bursts (canvas, no dependencies) ───────────── */
 
@@ -391,10 +391,12 @@ export function StreakChip({ n }: { n: number }) {
       initial={reduced ? false : { scale: 0.6, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: "spring", stiffness: 500, damping: 22 }}
-      className="ef-num inline-flex items-center gap-0.5 rounded-full bg-[#ff9f0a]/15 px-2 py-0.5 text-[11px] font-semibold text-[#c25e00] dark:text-[#ffb340]"
+      className="inline-flex"
       aria-label={`${n}연속 정답`}
     >
-      <Flame className="size-3" /> {n}
+      <Tag tone="warn" className="ef-num gap-0.5">
+        <Flame className="size-3" /> {n}
+      </Tag>
     </motion.span>
   );
 }

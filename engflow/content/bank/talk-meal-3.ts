@@ -944,12 +944,13 @@ export const TALK_MEAL_3: Question[] = [
     dialogue: [{ speaker: "Ms. Kim", en: "Is everything ready for the dinner with Mr. Tan tonight?", ko: "오늘 저녁 탄 씨와의 식사 준비는 다 됐죠?" }],
     promptKo: "아직이요. 오늘 아침에 식당에 전화했더니 예약이 실수로 다음 주 금요일로 되어 있었대요. 오늘 밤엔 룸이 없지만 홀에 큰 테이블을 주겠다고 했어요. 그걸로 할까요, 아니면 다른 곳을 알아볼까요?",
     segments: ["아직이요.", "오늘 아침 식당에 전화했더니", "예약이 실수로 다음 주 금요일로 돼 있었대요.", "오늘 밤엔 룸이 없지만", "홀에 큰 테이블을 주겠대요.", "그걸로 할까요, 아니면 다른 곳을 찾을까요?"],
-    reference: "Not quite. I called the restaurant this morning, and they said our booking had been made for next Friday by mistake. They don't have a private room tonight, but they offered us a large table in the main hall. Should I take it, or should I look for another place?",
+    reference: "Not quite. I called the restaurant this morning. They said our booking had been made for next Friday by mistake. They don't have a private room tonight, but they offered us a large table in the main hall. Should I take it, or should I look for another place?",
     accepted: [
       "Not quite. I called the restaurant this morning, and they told me our booking had been made for next Friday by mistake. They don't have a private room tonight, but they offered us a large table in the main hall. Should I take it, or should I look for another place?",
       "Not yet. I called the restaurant this morning, and they said our reservation was made for next Friday by mistake. They don't have a private room tonight, but they offered us a big table in the main hall. Should I take it, or should I look for another place?",
       "Not quite. I called the restaurant this morning, and they said our booking had been made for next Friday by mistake. They don't have a private room tonight, but they offered us a large table in the main hall. Should I take it or look for another restaurant?",
       "Not quite. When I called the restaurant this morning, they said our booking had been made for next Friday by mistake. There's no private room available tonight, but they offered us a large table in the main hall. Should I accept that, or should I find another place?",
+      "Not quite. I called the restaurant this morning, and they said our booking had been made for next Friday by mistake. They don't have a private room tonight, but they offered us a large table in the main hall. Should I take it, or should I look for another place?",
     ],
     meaning: [
       { id: "not-quite", en: "not quite", ko: "아직이요", any: ["not|almost|problem|actually"] },
@@ -966,7 +967,7 @@ export const TALK_MEAL_3: Question[] = [
       { id: "made-to-friday", pattern: "made =to next? friday", category: "preposition", severity: "major", fix: "made for next Friday", messageKo: "'~날짜로 예약되다'는 'be made for + 날짜'입니다: 'made for next Friday'." },
       { id: "other-place", pattern: "=other =place|=restaurant", category: "article", severity: "major", fix: "another place", messageKo: "other는 단수 명사 앞에 혼자 쓰지 않습니다. '다른 곳 하나'는 'another place'라고 합니다." },
     ],
-    hints: { pattern: "I called …, and they said (that) + 과거완료 수동(had been made) … / Should I …, or should I …?", skeleton: "… they ____ our booking ___ ____ made for next Friday by mistake. … Should I take it, or should I look for _______ place?", partial: "Not quite. I called the restaurant this morning, and they said our booking had been made…" },
+    hints: { pattern: "I called …. They said (that) + 과거완료 수동(had been made) … / Should I …, or should I …?", skeleton: "… They ____ our booking ___ ____ made for next Friday by mistake. … Should I take it, or should I look for _______ place?", partial: "Not quite. I called the restaurant this morning. They said our booking had been made…" },
     explanationKo: "들은 내용을 'they said …'로 전할 때는 시제를 한 단계 뒤로 옮겨 'had been made'(과거완료 수동)처럼 말합니다. 날짜는 'made for next Friday', 단수의 '다른 곳'은 'another place'이고, 선택지는 'Should I …, or should I …?'로 묻습니다.",
     probes: [
       { answer: "Not quite. I called the restaurant this morning, and they said our booking had accidentally been made for next Friday. They don't have a private room tonight, but they offered us a large table in the main hall. Should I take it, or should I look for somewhere else?", expect: "pass" },
@@ -1036,11 +1037,13 @@ export const TALK_MEAL_3: Question[] = [
     dialogue: [{ speaker: "Sari", en: "So, what do you think is the biggest difference between Korean and Indonesian food?", ko: "그럼 한국 음식과 인도네시아 음식의 가장 큰 차이가 뭐라고 생각해요?" }],
     promptKo: "가장 큰 차이는 반찬인 것 같아요. 한국에서는 작은 반찬을 여러 개 나눠 먹는데, 인도네시아에서는 보통 한 접시에 다 담겨 나오잖아요. 그리고 한국 음식이 인도네시아 음식보다 조금 덜 달아요.",
     segments: ["가장 큰 차이는 반찬인 것 같아요.", "한국에서는 작은 반찬을 여러 개 나눠 먹지만", "인도네시아에서는 보통 한 접시에 다 나와요.", "그리고 한국 음식이 인도네시아 음식보다", "조금 덜 달아요"],
-    reference: "I think the biggest difference is the side dishes. In Korea, we share lots of small side dishes, but in Indonesia, everything is usually served on one plate. Also, Korean food is a little less sweet than Indonesian food.",
+    reference: "I think the biggest difference is the side dishes. In Korea, we share lots of small side dishes. But in Indonesia, everything is usually served on one plate. Also, Korean food is a little less sweet than Indonesian food.",
     accepted: [
       "I think the biggest difference is the side dishes. In Korea, we share a lot of small side dishes, but in Indonesia, everything is usually served on one plate. Also, Korean food is a bit less sweet than Indonesian food.",
       "I'd say the biggest difference is the side dishes. In Korea, we share lots of small side dishes, but in Indonesia, everything usually comes on one plate. Also, Korean food is a little less sweet than Indonesian food.",
       "I think the main difference is the side dishes. In Korea, we share many small side dishes, while in Indonesia, everything is usually served on one plate. Also, Indonesian food is a little sweeter than Korean food.",
+      "I think the biggest difference is the side dishes. In Korea, we share lots of small side dishes, but in Indonesia, everything is usually served on one plate. Also, Korean food is a little less sweet than Indonesian food.",
+      "I think the biggest difference is the side dishes. In Korea, we share many small side dishes. But in Indonesia, everything usually comes on one plate. Also, Korean food is a bit less sweet than Indonesian food.",
     ],
     meaning: [
       { id: "biggest", en: "the biggest difference", ko: "가장 큰 차이", any: ["biggest|main|largest|greatest ... difference"], critical: true },
@@ -1124,11 +1127,12 @@ export const TALK_MEAL_3: Question[] = [
     dialogue: [{ speaker: "Server", en: "I'm so sorry. The kitchen is very busy tonight. It'll be another thirty minutes.", ko: "정말 죄송합니다. 오늘 주방이 너무 바빠서요. 30분 더 걸릴 것 같습니다." }],
     promptKo: "바쁘신 건 알지만, 저희가 벌써 거의 한 시간이나 기다렸고 손님들이 9시 기차를 타야 해요. 준비된 음식부터 먼저 내주실 수 있을까요? 안 그러면 나머지 주문은 취소해야 할 수도 있어요.",
     segments: ["바쁘신 건 알지만", "벌써 거의 한 시간 기다렸어요", "그리고 손님들이 9시 기차를 타야 해요.", "준비된 음식부터 내주실 수 있을까요?", "안 그러면 나머지 주문은 취소해야 할 수도 있어요"],
-    reference: "I understand you're busy, but we've already waited almost an hour, and our guests have a train to catch at nine. Would it be possible to bring out the dishes that are ready first? Otherwise, we might have to cancel the rest of our order.",
+    reference: "I understand you're busy, but we've already waited almost an hour. Our guests have a train to catch at nine. Would it be possible to bring out the dishes that are ready first? Otherwise, we might have to cancel the rest of our order.",
     accepted: [
       "I understand you're busy, but we've already been waiting for almost an hour, and our guests have to catch a train at nine. Could you bring out the dishes that are ready first? Otherwise, we might have to cancel the rest of our order.",
       "I understand that you're busy, but we've already waited almost an hour, and our guests have a train to catch at nine. Would it be possible to serve the dishes that are ready first? If not, we may have to cancel the rest of the order.",
       "I know you're busy, but we've already waited nearly an hour, and our guests need to catch a train at nine. Would it be possible to bring out the dishes that are ready first? Otherwise, we might have to cancel the rest of our order.",
+      "I understand you're busy, but we've already waited almost an hour, and our guests have a train to catch at nine. Would it be possible to bring out the dishes that are ready first? Otherwise, we might have to cancel the rest of our order.",
     ],
     meaning: [
       { id: "understand", en: "I understand you're busy", ko: "바쁘신 건 알지만", any: ["understand|know|see|appreciate"] },
@@ -1144,7 +1148,7 @@ export const TALK_MEAL_3: Question[] = [
       { id: "are-waiting-for-hour", pattern: "we =are =waiting for almost|nearly? an hour", category: "tense", severity: "major", fix: "we've been waiting for almost an hour", messageKo: "과거부터 지금까지 계속 기다린 시간은 현재완료(진행)로 말합니다: 'we've already waited / we've been waiting for almost an hour'.", skill: "present-perfect" },
       { id: "dishes-that-is", pattern: "dishes|food =that|=which =is ready", category: "agreement", severity: "major", fix: "dishes that are ready", messageKo: "관계절의 동사는 앞의 명사에 맞춥니다. dishes는 복수라서 'the dishes that are ready'입니다.", skill: "agreement" },
     ],
-    hints: { pattern: "I understand …, but we've already + 과거분사 … Would it be possible to + 동사원형 …? Otherwise, we might have to + 동사원형 …", skeleton: "I understand you're busy, but we've already ______ almost an hour … Would it be ________ to bring out the dishes … Otherwise, …", partial: "I understand you're busy, but we've already waited almost an hour, …" },
+    hints: { pattern: "I understand …, but we've already + 과거분사 … Would it be possible to + 동사원형 …? Otherwise, we might have to + 동사원형 …", skeleton: "I understand you're busy, but we've already ______ almost an hour … Would it be ________ to bring out the dishes … Otherwise, …", partial: "I understand you're busy, but we've already waited almost an hour…" },
     explanationKo: "불만을 말할 때는 'I understand …, but …'으로 상대 사정을 먼저 인정하고, 지금까지 기다린 시간은 현재완료로 'we've already waited almost an hour'라고 합니다. 요청은 'Would it be possible to …?'로 정중하게 하고, 기간에는 since가 아니라 for를 씁니다.",
     probes: [
       { answer: "I understand you're busy, but we've already waited for almost an hour, and our guests have a train to catch at nine. Would it be possible to bring out the dishes that are ready first? Otherwise, we might need to cancel the rest of our order.", expect: "pass" },

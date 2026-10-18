@@ -1034,14 +1034,15 @@ export const TALK_VISIT_3: Question[] = [
     contextKo: "견학 중 Mr. Tan이 물었던 열교환기 청소 주기를 운전원들에게 확인했습니다. 보통 2주마다 청소하지만 우기에는 원료가 훨씬 더러워서 가끔 매주 청소해야 한다고 전합니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Did you find out how often they clean the heat exchanger?", ko: "열교환기를 얼마나 자주 청소하는지 알아보셨어요?" }],
     promptKo: "네, 운전원들에게 물어봤어요. 보통 2주마다 청소한다고 하더라고요. 그런데 우기에는 원료가 훨씬 더러워서 가끔 매주 청소해야 한대요.",
-    segments: ["네, 운전원들에게 물어봤어요.", "보통 2주마다 청소한대요.", "그런데 우기에는 가끔 매주 청소해야 한대요", "원료가 훨씬 더러워서요"],
-    reference: "Yes, I asked the operators. They said they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.",
+    segments: ["네, 운전원들에게 물어봤어요.", "보통 2주마다 청소한대요.", "그런데 우기에는 원료가 훨씬 더러워서", "가끔 매주 청소해야 한대요"],
+    reference: "Yes, I asked the operators. They said they usually clean it every two weeks. But in the rainy season, the feed is much dirtier, so they sometimes have to clean it every week.",
     accepted: [
       "Yes, I checked with the operators. They said they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.",
       "Yes, I asked the operators. They told me they usually clean it every two weeks. But during the rainy season, they sometimes have to clean it every week because the feed is much dirtier.",
       "Yes, I asked the operators, and they said they usually clean it every two weeks. During the rainy season, though, they sometimes need to clean it every week, because the feed is a lot dirtier.",
       "Yes, I asked the operators. They said they normally clean it every 2 weeks. In the rainy season, though, they sometimes have to clean it weekly because the feed is much dirtier.",
       "Yes, I asked the operators. They said they usually cleaned it every two weeks. During the rainy season, though, they sometimes had to clean it every week because the feed was much dirtier.",
+      "Yes, I asked the operators. They said they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.",
     ],
     meaning: [
       { id: "asked", en: "I asked the operators", ko: "운전원들에게 물어봤어요", any: ["ask|=asked|check|=checked|=talked|=spoke"] },
@@ -1056,7 +1057,7 @@ export const TALK_VISIT_3: Question[] = [
       { id: "two-week", pattern: "re:\\bevery (two|2) week\\b", category: "countability", severity: "major", fix: "every two weeks", messageKo: "'2주마다'는 'every two weeks'입니다. 숫자가 붙으면 week를 복수로 씁니다." },
       { id: "more-dirtier", pattern: "more =dirtier|dirty", category: "word-choice", severity: "major", fix: "much dirtier", messageKo: "dirty의 비교급은 dirtier입니다. more를 함께 쓰지 않고, '훨씬'은 much로 강조합니다: 'much dirtier'.", skill: "comparative" },
     ],
-    hints: { pattern: "They said (that) + 주어 + 동사. …, though, they sometimes have to + 동사원형 … because …", skeleton: "… They ____ they usually clean it every two _____. …, though, they sometimes ____ __ clean it every week because …", partial: "Yes, I asked the operators. They said they usually clean it…" },
+    hints: { pattern: "They said (that) + 주어 + 동사. But …, so they sometimes have to + 동사원형 …", skeleton: "… They ____ they usually clean it every two _____. But in the rainy season, …, so they sometimes ____ __ clean it every week.", partial: "Yes, I asked the operators. They said they usually clean it…" },
     explanationKo: "들은 내용을 전할 때는 'They said (that) …' 또는 'They told me …'를 씁니다('said me'는 틀림). 지금도 사실인 습관은 현재형(they usually clean)을 그대로 써도 됩니다. '2주마다'는 every two weeks, '매주'는 every week이고, dirty의 비교급은 dirtier입니다.",
     probes: [
       { answer: "Yes, I asked the operators. They said that they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.", expect: "pass" },
@@ -1080,13 +1081,14 @@ export const TALK_VISIT_3: Question[] = [
     dialogue: [{ speaker: "Daniel", en: "Can I step over the line for a minute? I'd like a closer look at the dryer seals.", ko: "잠깐만 선 밖으로 나가도 될까요? 건조기 실을 좀 더 가까이서 보고 싶어서요." }],
     promptKo: "가까이서 보고 싶으신 건 알지만, 죄송하게도 방문객은 잠깐이라도 표시된 보행로 안에 계셔야 해요. 건조기 주변은 아주 뜨거워지고 움직이는 장비도 많거든요. 괜찮으시면 운전원에게 최근 점검 사진을 회의실로 가져다 달라고 부탁할 수 있어요.",
     segments: ["가까이서 보고 싶으신 건 알지만", "방문객은 표시된 보행로에 계셔야 해요", "잠깐이라도요.", "건조기 주변은 아주 뜨겁고 움직이는 장비도 많아요.", "괜찮으시면 운전원에게 부탁할 수 있어요", "최근 점검 사진을 회의실로 가져오라고"],
-    reference: "I know you'd like a closer look, but I'm afraid visitors have to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you'd like, I can ask an operator to bring the latest inspection photos to the meeting room.",
+    reference: "I know you'd like a closer look. But I'm afraid visitors have to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you'd like, I can ask an operator to bring the latest inspection photos to the meeting room.",
     accepted: [
       "I know you'd like a closer look, but I'm afraid visitors need to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you like, I can ask an operator to bring the latest inspection photos to the meeting room.",
       "I understand you'd like a closer look, but I'm afraid visitors have to stay on the marked walkway, even for a minute. It gets very hot around the dryer, and there's a lot of moving equipment. If you'd like, I can ask one of the operators to bring the latest inspection photos to the meeting room.",
       "I know you'd like to take a closer look, but I'm afraid visitors aren't allowed to leave the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you'd like, I can ask an operator to bring the latest inspection photos to the meeting room.",
       "I know you'd like a closer look, but I'm afraid visitors have to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you'd like, I can have an operator bring the latest inspection photos to the meeting room.",
       "I know you'd like a closer look, but unfortunately visitors have to stay on the marked walkway, even for a minute, because the area around the dryer gets very hot and there's a lot of moving equipment. If you'd like, I can ask an operator to bring the latest inspection photos to the meeting room.",
+      "I know you'd like a closer look, but I'm afraid visitors have to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you'd like, I can ask an operator to bring the latest inspection photos to the meeting room.",
     ],
     meaning: [
       { id: "know", en: "I know you'd like a closer look", ko: "가까이서 보고 싶으신 건 알아요", any: ["know|understand|see"] },
@@ -1104,7 +1106,7 @@ export const TALK_VISIT_3: Question[] = [
       { id: "is-many-equipment", pattern: "re:\\bthere (is|are|were|was) many (moving )?equipments?\\b", category: "countability", severity: "major", fix: "there's a lot of moving equipment", messageKo: "equipment는 셀 수 없는 명사라서 many 대신 'a lot of'를 쓰고 동사는 단수입니다: 'there's a lot of moving equipment'." },
       { id: "have-to-staying", pattern: "have|has|need to =staying", category: "verb-form", severity: "major", fix: "have to stay", messageKo: "'have to / need to' 뒤에는 동사원형이 옵니다: 'have to stay'." },
     ],
-    hints: { pattern: "I know …, but I'm afraid visitors have to …. (이유). If you'd like, I can ask + 사람 + to + 동사원형 …", skeleton: "I know you'd like a closer look, but I'm ______ visitors ____ __ stay on the marked walkway, even for a minute. …", partial: "I know you'd like a closer look, but I'm afraid visitors have to…" },
+    hints: { pattern: "I know …. But I'm afraid visitors have to …. (이유). If you'd like, I can ask + 사람 + to + 동사원형 …", skeleton: "I know you'd like a closer look. But I'm ______ visitors ____ __ stay on the marked walkway, even for a minute. …", partial: "I know you'd like a closer look. But I'm afraid visitors have to…" },
     explanationKo: "손님의 요청을 거절할 때는 마음을 먼저 인정하고(I know you'd like …), 'I'm afraid'로 규칙을 전한 뒤 이유와 대안을 덧붙입니다. equipment는 셀 수 없는 명사라 'there's a lot of equipment'이고, 부탁은 'ask + 사람 + to + 동사원형'입니다.",
     probes: [
       { answer: "I know you'd like a closer look, but I'm afraid all visitors have to stay on the marked walkway, even for a minute. The area around the dryer gets very hot, and there's a lot of moving equipment. If you'd like, I can ask an operator to bring the latest inspection photos to the meeting room.", expect: "pass" },
@@ -1126,13 +1128,14 @@ export const TALK_VISIT_3: Question[] = [
     dialogue: [{ speaker: "Priya", en: "I'm sorry, the test bench is fully booked this week. Could we show you the pump test on your next visit?", ko: "죄송해요, 이번 주는 시험대 일정이 꽉 차 있어요. 펌프 시험은 다음 방문 때 보여 드려도 될까요?" }],
     promptKo: "시험대가 바쁜 건 이해하지만, 펌프가 돌아가는 걸 보는 게 저희 방문의 주된 이유예요. 경영진이 다음 주문을 승인하기 전에 시험 결과가 필요하거든요. 대신 내일 오전에 한 시간이라도 짧게 시험해 주실 수 있을까요?",
     segments: ["시험대가 바쁜 건 이해하지만", "펌프가 돌아가는 걸 보는 게 방문의 주된 이유예요.", "경영진이 시험 결과가 필요해요", "다음 주문을 승인하기 전에.", "대신 내일 오전에 짧게 시험할 수 있을까요?", "한 시간이라도요"],
-    reference: "I understand the test bench is busy, but seeing the pump run is the main reason for our visit. Our management needs the test results before they approve the next order. Would it be possible to run a shorter test tomorrow morning instead, even for just an hour?",
+    reference: "I understand the test bench is busy. But seeing the pump run is the main reason for our visit. Our management needs the test results before they approve the next order. Would it be possible to run a shorter test tomorrow morning instead, even for just an hour?",
     accepted: [
       "I understand the test bench is busy, but seeing the pump running is the main reason for our visit. Our management needs the test results before they approve the next order. Would it be possible to run a shorter test tomorrow morning instead, even for just an hour?",
       "I understand that the test bench is busy, but seeing the pump run is the main reason for our visit. Our management needs the test results before they approve the next order. Could you run a shorter test tomorrow morning instead, even for just an hour?",
       "I know the test bench is busy, but seeing the pump run is the main reason we came. Our management needs the test results before approving the next order. Would it be possible to do a shorter test tomorrow morning instead, even for just one hour?",
       "I understand the test bench is fully booked, but the main reason we came here is to see the pump run. Our management needs the test results before they approve the next order. Could we do a shorter test tomorrow morning instead, even just for one hour?",
       "I understand the test bench is busy, but the main reason for our visit is to see the pump run. Our management needs the test results before they approve the next order, so would it be possible to run a shorter test tomorrow morning instead, even for just an hour?",
+      "I understand the test bench is busy, but seeing the pump run is the main reason for our visit. Our management needs the test results before they approve the next order. Would it be possible to run a shorter test tomorrow morning instead, even for just an hour?",
     ],
     meaning: [
       { id: "understand", en: "I understand the test bench is busy", ko: "시험대가 바쁜 건 이해해요", any: ["understand|know|see"] },
@@ -1149,7 +1152,7 @@ export const TALK_VISIT_3: Question[] = [
       { id: "possible-to-running", pattern: "possible to =running|=doing", category: "verb-form", severity: "major", fix: "possible to run", messageKo: "'Would it be possible to + 동사원형?'입니다: 'possible to run a shorter test'." },
       { id: "reason-of", pattern: "reason of our|the visit", category: "preposition", severity: "minor", fix: "reason for our visit", messageKo: "'~의 이유'는 보통 'the reason for + 명사'라고 합니다: 'the main reason for our visit'." },
     ],
-    hints: { pattern: "I understand …, but …. Our management needs … before + 주어 + 현재형. Would it be possible to + 동사원형 … instead?", skeleton: "I understand the test bench is busy, but ______ the pump run is the main reason for our visit. …", partial: "I understand the test bench is busy, but seeing the pump run is…" },
+    hints: { pattern: "I understand …. But …. Our management needs … before + 주어 + 현재형. Would it be possible to + 동사원형 … instead?", skeleton: "I understand the test bench is busy. But ______ the pump run is the main reason for our visit. …", partial: "I understand the test bench is busy. But seeing the pump run is…" },
     explanationKo: "상대 사정을 먼저 인정한 뒤(I understand …, but), 왜 꼭 필요한지 이유를 대고, 'Would it be possible to … instead?'로 현실적인 대안을 묻습니다. '펌프가 돌아가는 걸 보는 것'은 'seeing the pump run'이고, before 절에는 will을 쓰지 않습니다.",
     probes: [
       { answer: "I understand the test bench is busy, but seeing the pump run is the main reason for our visit. Our management needs the test results before they approve the next order. Would it be possible to run a short test tomorrow morning instead, even for just an hour?", expect: "pass" },

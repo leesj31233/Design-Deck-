@@ -633,12 +633,14 @@ export const TALK_MEAL_2: Question[] = [
     dialogue: [{ speaker: "Mr. Tan", en: "Good morning, Minsu! Did everyone get back to the hotel safely last night?", ko: "좋은 아침이에요, 민수 씨! 어젯밤에 다들 호텔에 잘 들어갔어요?" }],
     promptKo: "어젯밤 저녁 다시 한번 감사드려요. 다들 음식에 정말 감탄했고, 사리 씨는 이번 출장에서 최고의 식사였다고 했어요. 다음에 서울에 오시면 저녁은 제가 살게요.",
     segments: ["어젯밤 저녁 다시 한번 감사드려요.", "다들 음식에 정말 감탄했어요", "사리 씨는 이번 출장 최고의 식사였대요.", "다음에 서울에 오시면", "저녁은 제가 살게요"],
-    reference: "Thank you again for dinner last night. Everyone was really impressed with the food, and Sari said it was the best meal of the whole trip. Next time you come to Seoul, dinner is on me.",
+    reference: "Thank you again for dinner last night. Everyone was really impressed with the food. Sari said it was the best meal of the whole trip. Next time you come to Seoul, dinner is on me.",
     accepted: [
       "Thank you again for dinner last night. Everyone was really impressed with the food, and Sari said it was the best meal of the trip. Next time you come to Seoul, dinner is on me.",
       "Thanks again for dinner last night. Everyone was really impressed with the food, and Sari said it was the best meal of the whole trip. Next time you're in Seoul, dinner is on me.",
       "Thank you again for dinner last night. Everyone was very impressed with the food, and Sari told me it was the best meal of the whole trip. Next time you come to Seoul, it's my treat.",
       "Thanks again for dinner last night. Everyone really loved the food, and Sari said it was the best meal of the whole trip. Next time you're in Seoul, dinner's on me.",
+      "Thank you again for dinner last night. Everyone was really impressed with the food, and Sari said it was the best meal of the whole trip. Next time you come to Seoul, dinner is on me.",
+      "Thanks again for dinner last night. Everyone really liked the food. Sari said it was the best meal of the trip. Next time you come to Seoul, I'll buy you dinner.",
     ],
     meaning: [
       { id: "thanks", en: "thank you again", ko: "다시 한번 감사드려요", any: ["thank|thanks|appreciate"], critical: true },
@@ -652,7 +654,7 @@ export const TALK_MEAL_2: Question[] = [
       { id: "everyone-were", pattern: "re:(?<=\\b(everyone|everybody) (really )?)(were|are)\\b", category: "agreement", severity: "major", fix: "was", messageKo: "everyone은 '모든 사람'이지만 문법적으로 단수라서 'Everyone was …'처럼 단수 동사를 씁니다.", skill: "agreement" },
       { id: "time-will", pattern: "time you =will", category: "tense", severity: "major", fix: "time you", messageKo: "'next time + 주어 + 동사'는 시간 부사절이라 미래 일이라도 현재시제를 씁니다: 'Next time you come to Seoul, …'.", skill: "time-clause" },
     ],
-    hints: { pattern: "Thank you again for + 명사. Everyone was … / 주어 said (that) … / Next time + 주어 + 현재형, …", skeleton: "Thank you again for dinner last night. Everyone ___ really impressed …, and Sari ____ it was … Next time you ____ to Seoul, …", partial: "Thank you again for dinner last night. Everyone was…" },
+    hints: { pattern: "Thank you again for + 명사. Everyone was … / 주어 said (that) … / Next time + 주어 + 현재형, …", skeleton: "Thank you again for dinner last night. Everyone ___ really impressed …. Sari ____ it was … Next time you ____ to Seoul, …", partial: "Thank you again for dinner last night. Everyone was…" },
     explanationKo: "다음 날 감사 인사는 'Thank you again for …'로 시작합니다. everyone은 단수 취급이라 'Everyone was …'이고, 들은 말은 'Sari said (that) it was …'처럼 과거형으로 전하며, 'next time you come'처럼 시간 부사절에는 will을 쓰지 않습니다.",
     probes: [
       { answer: "Thank you again for dinner last night. Everyone was really impressed with the food, and Sari said it was the best meal she had on the trip. Next time you come to Seoul, dinner is on me.", expect: "pass" },

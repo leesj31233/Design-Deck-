@@ -6,7 +6,7 @@ import type { GuideEntry } from "../content/types";
 import type { Evaluation, Question } from "../core/types";
 import type { ExplainKind } from "../core/ai";
 import { AIUnavailableError } from "../platform/types";
-import { Sheet, cn, Eyebrow } from "./kit";
+import { Button, Sheet, ShimmerText, cn, Eyebrow } from "./kit";
 import { CATEGORY_KO } from "./practice/parts";
 import { useApp } from "./store";
 
@@ -120,19 +120,18 @@ export function GuideSheet({
         <div className="ef-scroll-x -mx-5 px-5">
           <div className="flex w-max gap-1.5" role="tablist" aria-label="문법 설명 보기 방식">
             {TABS.filter((t) => t.id !== "ask" || canAsk).map((t) => (
-              <button
+              <Button
                 key={t.id}
+                variant={tab === t.id ? "primary" : "secondary"}
+                size="sm"
                 role="tab"
                 aria-selected={tab === t.id}
                 onClick={() => setTab(t.id)}
-                className={cn(
-                  "dd-focus h-9 whitespace-nowrap rounded-full border px-3.5 text-[13px] font-medium transition",
-                  tab === t.id ? "border-transparent bg-[var(--foreground)] text-[var(--background)]" : "border-[var(--line)] text-[var(--ef-ink-2)] hover:bg-black/[.04] dark:hover:bg-white/[.06]",
-                )}
+                className={cn("h-9 gap-0 whitespace-nowrap rounded-full px-3.5 text-[13px] shadow-none", tab !== t.id && "text-[var(--ef-ink-2)]")}
               >
                 {t.id === "ask" ? <Sparkles className="mr-1 inline size-3.5" /> : null}
                 {t.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -189,10 +188,10 @@ export function GuideSheet({
               })}
             </ul>
             {examples.length > 3 ? (
-              <button className="dd-focus inline-flex h-10 items-center gap-2 rounded-xl border border-[var(--line)] px-3.5 text-[13px] font-medium" onClick={() => setExampleStart((s) => (s + 3) % examples.length)}>
+              <Button variant="secondary" className="px-3.5 text-[13px]" onClick={() => setExampleStart((s) => (s + 3) % examples.length)}>
                 <RefreshCw className="size-3.5" />
                 다른 예문 보기
-              </button>
+              </Button>
             ) : null}
           </div>
         ) : null}
@@ -235,9 +234,9 @@ export function GuideSheet({
             <p className="ef-ko text-[13px] text-[var(--muted)]">Claude가 내 문장을 보고 설명합니다. {app.platform.target === "artifact" ? "내 Claude 사용량이 쓰입니다." : ""}</p>
             <div className="flex flex-wrap gap-1.5">
               {(["why", "simpler", "example", "compare"] as ExplainKind[]).map((k) => (
-                <button key={k} disabled={aiState === "loading"} onClick={() => runAI(k)} className="dd-focus h-9 rounded-full border border-[var(--line)] px-3 text-[13px] disabled:opacity-50">
+                <Button key={k} variant="secondary" size="sm" disabled={aiState === "loading"} onClick={() => runAI(k)} className="h-9 rounded-full px-3 text-[13px] font-normal disabled:opacity-50">
                   {TABS.find((t) => t.id === k)?.label}
-                </button>
+                </Button>
               ))}
             </div>
             <form
@@ -255,16 +254,16 @@ export function GuideSheet({
                 placeholder="예: 여기서 might 대신 may를 써도 되나요?"
                 className="dd-focus h-11 min-w-0 flex-1 rounded-xl border border-[var(--line)] bg-[var(--background)] px-3 text-[16px]"
               />
-              <button type="submit" disabled={!ask.trim() || aiState === "loading"} className="dd-focus h-11 shrink-0 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)] disabled:opacity-40">
+              <Button type="submit" variant="primary" disabled={!ask.trim() || aiState === "loading"} className="h-11 shrink-0 text-[14px] font-semibold">
                 질문
-              </button>
+              </Button>
             </form>
             {aiState === "loading" && !aiText ? (
               <div className="flex items-center gap-2 text-[13px] text-[var(--muted)]">
-                <Loader2 className="size-4 animate-spin" /> Claude가 생각하는 중…
-                <button className="ml-auto inline-flex items-center gap-1 text-[12px]" onClick={() => ctl.current?.abort()}>
+                <ShimmerText>Claude가 생각하는 중…</ShimmerText>
+                <Button variant="ghost" size="sm" className="ml-auto h-7 gap-1 px-2 text-[12px] font-normal text-[var(--muted)]" onClick={() => ctl.current?.abort()}>
                   <Square className="size-3" /> 중지
-                </button>
+                </Button>
               </div>
             ) : null}
             {aiText ? <div className="ef-ko whitespace-pre-wrap rounded-2xl border border-[var(--line)] bg-[var(--background)] p-3.5 text-[15px]">{aiText}</div> : null}
@@ -273,12 +272,9 @@ export function GuideSheet({
         ) : null}
 
         {onPractice ? (
-          <button
-            className="dd-focus flex h-12 w-full items-center justify-center gap-2 rounded-[14px] bg-[var(--foreground)] text-[15px] font-semibold text-[var(--background)]"
-            onClick={() => onPractice(skill)}
-          >
+          <Button variant="primary" size="lg" className="w-full text-[15px] font-semibold" onClick={() => onPractice(skill)}>
             이 문법 다시 연습하기 <ArrowRight className="size-4" />
-          </button>
+          </Button>
         ) : null}
       </div>
     </Sheet>

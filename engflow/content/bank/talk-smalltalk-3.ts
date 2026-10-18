@@ -716,7 +716,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     dialogue: [{ speaker: "Priya", en: "Minsu? Is that you? What a surprise!", ko: "민수 씨? 민수 씨 맞죠? 이게 웬일이에요!" }],
     promptKo: "프리야 씨! 정말 반가워요. 뭄바이 킥오프 미팅 이후로 처음 뵙네요!",
     segments: ["프리야 씨! 정말 반가워요", "처음 뵙네요", "뭄바이 킥오프 미팅 이후로!"],
-    reference: "Priya! It's so good to see you. I haven't seen you since the kickoff meeting in Mumbai!",
+    reference: "Priya! It's so good to see you. I haven't seen you since the first meeting in Mumbai!",
     accepted: [
       "Priya! Great to see you! I haven't seen you since the kickoff meeting in Mumbai!",
       "Priya! It's so good to see you! I haven't seen you since the kickoff in Mumbai.",
@@ -725,6 +725,7 @@ export const TALK_SMALLTALK_3: Question[] = [
       "Priya! It's so good to see you. The last time I saw you was at the kickoff meeting in Mumbai!",
       "Priya! It's so good to see you again. I haven't seen you since the kickoff meeting in Mumbai!",
     ],
+    advanced: "Priya! It's so good to see you. I haven't seen you since the kickoff meeting in Mumbai!",
     meaning: [
       { id: "good-to-see", en: "it's so good to see you", ko: "정말 반가워요", any: ["good|great|nice|lovely|wonderful|happy|glad ... see", "see ... again"] },
       { id: "havent-seen", en: "I haven't seen you", ko: "못 봤어요", any: ["not ... seen|see|saw|met|meet", "last time"], critical: true },
@@ -739,7 +740,7 @@ export const TALK_SMALLTALK_3: Question[] = [
       { id: "meet-you", pattern: "re:\\bmeet you\\b(?! again)", category: "word-choice", severity: "major", fix: "see you", messageKo: "'Nice to meet you.'는 처음 만난 사람에게 하는 인사입니다. 아는 사람을 다시 만나면 'It's so good to see you!'라고 합니다." },
       { id: "meet-you-again", pattern: "meet you again", category: "word-choice", severity: "minor", fix: "see you again", messageKo: "다시 만난 사람에게는 meet보다 see를 써서 'It's good to see you again!'이라고 하는 것이 자연스럽습니다." },
     ],
-    hints: { pattern: "I haven't + p.p. + you + since + 과거 시점", skeleton: "Priya! It's so good to see you. I ______ ____ you _____ the kickoff meeting in Mumbai!", partial: "Priya! It's so good to see you. I haven't seen you…" },
+    hints: { pattern: "I haven't + p.p. + you + since + 과거 시점", skeleton: "Priya! It's so good to see you. I ______ ____ you _____ the first meeting in Mumbai!", partial: "Priya! It's so good to see you. I haven't seen you…" },
     explanationKo: "'~이후로 (지금까지) 못 봤다'는 since와 함께 현재완료 'I haven't seen you since …'를 씁니다. 'I didn't see you since …'나 'from the kickoff'는 틀린 형태이고, 아는 사람을 다시 만났을 때는 'Nice to meet you'가 아니라 'It's so good to see you'라고 인사합니다.",
     probes: [
       { answer: "Priya! It's so great to see you! We haven't met since the kickoff meeting in Mumbai.", expect: "pass" },
@@ -1276,7 +1277,7 @@ export const TALK_SMALLTALK_3: Question[] = [
     dialogue: [{ speaker: "Daniel", en: "I'm thinking of renting a car on Saturday and driving up to the DMZ by myself.", ko: "토요일에 차를 빌려서 혼자 DMZ까지 운전해서 가 볼까 해요." }],
     promptKo: "좋은 계획이긴 한데, 그냥 차를 몰고 들어가실 수는 없을 거예요. 대부분의 DMZ 견학지는 공식 투어에 참여해야 하고, 여권도 가져가셔야 해요. 괜찮으시면 서울에서 출발하는 투어 예약을 도와드릴게요.",
     segments: ["좋은 계획이지만", "그냥 차로 들어가실 수 있을지 모르겠어요.", "DMZ 견학지 대부분은 공식 투어로만 갈 수 있고", "여권도 가져가셔야 해요.", "괜찮으시면 투어 예약을 도와드릴게요", "서울에서 출발하는"],
-    reference: "That sounds like a great plan, but I'm not sure you can just drive in. For most of the DMZ sites, you have to join an official tour, and you need to bring your passport. If you'd like, I can help you book a tour that leaves from Seoul.",
+    reference: "That sounds like a great plan, but I'm not sure you can just drive in. For most of the DMZ sites, you have to join an official tour. You also need to bring your passport. If you'd like, I can help you book a tour that leaves from Seoul.",
     accepted: [
       "That sounds like a great plan, but I don't think you can just drive in. For most of the DMZ sites, you have to join an official tour, and you need to bring your passport. If you'd like, I can help you book a tour that leaves from Seoul.",
       "That sounds like a great plan, but I'm not sure you can just drive there. For most of the DMZ sites, you need to join an official tour, and you have to bring your passport. If you'd like, I can help you book a tour from Seoul.",
@@ -1285,6 +1286,7 @@ export const TALK_SMALLTALK_3: Question[] = [
       "That sounds like a great plan, but I'm afraid you can't just drive in. For most of the DMZ sites, you have to join an official tour, and you need to bring your passport. If you want, I can help you book a tour that leaves from Seoul.",
       "That sounds like a great plan, but I'm not sure you can just drive in. Most of the DMZ sites are only open to official tours, and you need to bring your passport. If you'd like, I can help you book a tour that leaves from Seoul.",
     ],
+    advanced: "That sounds like a great plan, but I'm not sure you can just drive in. For most of the DMZ sites, you have to join an official tour, and you need to bring your passport. If you'd like, I can help you book a tour that leaves from Seoul.",
     meaning: [
       { id: "great-plan", en: "that sounds like a great plan", ko: "좋은 계획이긴 한데", any: ["sound|sounds ... great|good|nice|plan|fun|interesting", "great|good|nice ... plan|idea"] },
       { id: "cant-just-drive", en: "I'm not sure you can just drive in", ko: "그냥 차로 들어갈 수는 없을 거예요", any: ["not ... drive|driving|go|enter|car|allowed", "afraid ... drive|driving|car"], critical: true },

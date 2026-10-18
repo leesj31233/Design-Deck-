@@ -950,14 +950,14 @@ export const TALK_TROUBLE_3: Question[] = [
     dialogue: [{ speaker: "Ms. Kim", en: "How did the drying test go today?", ko: "오늘 건조 시험은 어떻게 됐어요?" }],
     promptKo: "오늘 아침 공장에 정전이 나서 건조기가 3시간 정도 멈췄어요. 시험을 하루 연장하면 좋겠습니다.",
     segments: ["오늘 아침 공장에 정전이 났어요", "그래서 건조기가 3시간 정도 멈췄어요", "시험을 하루 연장하면 좋겠습니다"],
-    reference: "We had a power cut at the plant this morning, so the dryer was down for about three hours. I suggest we extend the test by one day.",
+    reference: "We had a power cut at the plant this morning, so the dryer stopped for about three hours. I suggest we extend the test by one day.",
     accepted: [
       "We had a power outage at the plant this morning, so the dryer was down for about three hours. I suggest we extend the test by one day.",
       "There was a power cut at the plant this morning, so the dryer was down for about three hours. I suggest we extend the test by one day.",
-      "We had a power cut at the plant this morning, so the dryer stopped for about three hours. I suggest we extend the test by one day.",
       "We had a power cut at the plant this morning, so the dryer was down for about 3 hours. I suggest we extend the test by one day.",
       "We had a power cut at the plant this morning, so the dryer was down for about three hours. I suggest extending the test by one day.",
       "We had a power cut at the plant this morning, so the dryer was down for about three hours. Why don't we extend the test by one day?",
+      "We had a power cut at the plant this morning, so the dryer was down for about three hours. I suggest we extend the test by one day.",
     ],
     meaning: [
       { id: "power-cut", en: "a power cut", ko: "정전", any: ["power|outage|blackout|electricity"], critical: true },
@@ -972,7 +972,7 @@ export const TALK_TROUBLE_3: Question[] = [
       { id: "suggest-will", pattern: "suggest that? we =will", category: "verb-form", severity: "major", fix: "suggest we", skill: "offer-suggest", messageKo: "'I suggest (that) we + 동사원형'으로 말합니다. will을 넣지 않습니다: 'I suggest we extend the test.'" },
       { id: "electric-cut", pattern: "=electric|=electricity =cut|=cutting", category: "word-choice", severity: "minor", fix: "power cut", messageKo: "'정전'은 'a power cut' 또는 'a power outage'라고 합니다." },
     ],
-    hints: { pattern: "We had …, so … . I suggest we + 동사원형 …", skeleton: "We had a _____ cut at the plant this morning, so the dryer was ____ for about three hours. I _______ we extend the test by one day.", partial: "We had a power cut at the plant this morning, so…" },
+    hints: { pattern: "We had …, so … . I suggest we + 동사원형 …", skeleton: "We had a _____ cut at the plant this morning, so the dryer _______ for about three hours. I _______ we extend the test by one day.", partial: "We had a power cut at the plant this morning, so…" },
     explanationKo: "원인과 결과를 'We had a power cut …, so the dryer was down …'으로 말한 뒤, 제안은 'I suggest we + 동사원형'으로 합니다. suggest 뒤에 to부정사는 쓰지 않으며('suggest to extend' ✗), '하루만큼 연장하다'는 'extend … by one day'입니다.",
     probes: [
       { answer: "We had a power outage at the plant this morning, so the dryer was down for about three hours. I'd suggest we extend the test by one day.", expect: "pass" },
@@ -1129,9 +1129,9 @@ export const TALK_TROUBLE_3: Question[] = [
     expression: "Priya said their warehouse had sent … won't arrive until …",
     contextKo: "열교환기용 새 개스킷이 도착했는데 사이즈가 맞지 않습니다. 프리야 씨에게 확인해 보니 창고에서 다른 주문 건의 부품을 보냈고, 맞는 부품은 금요일에야 도착한다고 합니다. 김 팀장님께 보고합니다.",
     dialogue: [{ speaker: "Ms. Kim", en: "Did the new gaskets for the heat exchanger arrive?", ko: "열교환기용 새 개스킷은 도착했어요?" }],
-    promptKo: "도착은 했는데 사이즈가 안 맞아요. 프리야 씨 말로는 창고에서 다른 주문 건의 부품을 보냈고, 맞는 부품은 금요일에야 도착한대요. 그러면 설치를 이틀 미뤄야 해요.",
-    segments: ["도착은 했는데 사이즈가 안 맞아요", "프리야 씨 말로는 창고에서 다른 주문 건의 부품을 보냈대요", "그리고 맞는 부품은 금요일에야 도착한대요", "그러면 설치를 이틀 미뤄야 해요"],
-    reference: "They arrived, but they're the wrong size. Priya said their warehouse had sent us parts for another order, and the correct ones won't arrive until Friday. That means we'll have to push the installation back by two days.",
+    promptKo: "도착은 했는데 사이즈가 안 맞아요. 프리야 씨 말로는 창고에서 다른 주문 건의 부품을 보냈대요. 맞는 부품은 금요일에야 도착한대요. 그러면 설치를 이틀 미뤄야 해요.",
+    segments: ["도착은 했는데 사이즈가 안 맞아요", "프리야 씨 말로는 창고에서 다른 주문 건의 부품을 보냈대요", "맞는 부품은 금요일에야 도착한대요", "그러면 설치를 이틀 미뤄야 해요"],
+    reference: "They arrived, but they're the wrong size. Priya said their warehouse had sent us parts for another order. The correct ones won't arrive until Friday. That means we'll have to push the installation back by two days.",
     accepted: [
       "They arrived, but they're the wrong size. Priya said their warehouse had sent us parts for another order, and the right ones won't arrive until Friday. That means we'll have to push the installation back by two days.",
       "They arrived, but they're the wrong size. Priya said their warehouse sent us parts for another order, and the correct ones won't arrive until Friday. That means we'll have to push the installation back by two days.",
@@ -1140,6 +1140,7 @@ export const TALK_TROUBLE_3: Question[] = [
       "They arrived, but they're the wrong size. Priya said their warehouse had sent us parts for another order, and the correct ones won't be here until Friday. That means we'll have to push the installation back by 2 days.",
       "They arrived, but they're the wrong size. Priya said their warehouse had sent us parts for another order, and the correct ones won't arrive until Friday. So we'll have to push back the installation by two days.",
     ],
+    advanced: "They arrived, but they're the wrong size. Priya said their warehouse had sent us parts for another order, and the correct ones won't arrive until Friday. That means we'll have to push the installation back by two days.",
     meaning: [
       { id: "wrong-size", en: "they're the wrong size", ko: "사이즈가 안 맞아요", any: ["wrong|different|incorrect ... size", "not ... fit"], critical: true },
       { id: "said", en: "Priya said", ko: "프리야 씨 말로는", any: ["=said|=told|=says|according|=mentioned|=explained"], weight: 0.5 },
@@ -1154,7 +1155,7 @@ export const TALK_TROUBLE_3: Question[] = [
       { id: "are-wrong-size", pattern: "are|=is =wrong size", category: "article", severity: "minor", fix: "are the wrong size", messageKo: "'사이즈가 틀리다'는 'they're the wrong size'처럼 the를 붙입니다." },
       { id: "have-to-pushing", pattern: "have to =pushing|=delaying", category: "verb-form", severity: "major", fix: "have to push", skill: "modal-necessity", messageKo: "have to 뒤에는 동사원형을 씁니다: 'we'll have to push the installation back'." },
     ],
-    hints: { pattern: "Priya said + 과거완료 …, and … won't arrive until … That means we'll have to …", skeleton: "… Priya said their warehouse ___ ____ us parts for another order, and the correct ones won't arrive _____ Friday. …", partial: "They arrived, but they're the wrong size. Priya said…" },
+    hints: { pattern: "Priya said + 과거완료 …. … won't arrive until … That means we'll have to …", skeleton: "… Priya said their warehouse ___ ____ us parts for another order. The correct ones won't arrive _____ Friday. …", partial: "They arrived, but they're the wrong size. Priya said…" },
     explanationKo: "다른 사람의 말을 전할 때는 'Priya said (that) their warehouse had sent …'처럼 시제를 한 단계 과거로 맞춥니다. '금요일에야 도착한다'는 'won't arrive until Friday'이고, by를 쓰면 '금요일까지 못 온다'는 다른 뜻이 됩니다. 결과는 'That means we'll have to …'로 정리합니다.",
     probes: [
       { answer: "They arrived, but they're the wrong size. Priya said their warehouse had sent us parts for another order, and the correct ones won't get here until Friday. That means we'll have to push the installation back by two days.", expect: "pass" },
@@ -1176,9 +1177,9 @@ export const TALK_TROUBLE_3: Question[] = [
     expression: "You're absolutely right … Let me suggest … so this doesn't happen again. Would that work for you?",
     contextKo: "시험용 시료가 또 늦게 도착해서 Mr. Tan이 화가 났습니다. 변명하지 않고 사과한 뒤, 재발 방지를 위한 두 가지 구체적인 조치를 제안하고 의견을 묻습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "This is the second time the samples have arrived late. Frankly, it's unacceptable.", ko: "시료가 늦게 도착한 게 벌써 두 번째예요. 솔직히 용납할 수 없습니다." }],
-    promptKo: "말씀이 전적으로 맞습니다. 죄송합니다. 이런 일이 다시 없도록 두 가지를 제안드릴게요. 앞으로는 시료를 이틀 일찍 발송하고, 발송 당일에 운송장 번호를 보내 드리겠습니다. 그렇게 하면 괜찮으시겠어요?",
-    segments: ["말씀이 전적으로 맞습니다. 죄송합니다", "이런 일이 다시 없도록 두 가지를 제안드릴게요", "앞으로는 시료를 이틀 일찍 발송하고", "발송 당일에 운송장 번호를 보내 드리겠습니다", "그렇게 하면 괜찮으시겠어요?"],
-    reference: "You're absolutely right, and I'm sorry. Let me suggest two changes so this doesn't happen again. From now on, we'll ship the samples two days earlier, and I'll send you the tracking number on the same day. Would that work for you?",
+    promptKo: "말씀이 전적으로 맞습니다. 죄송합니다. 이런 일이 다시 없도록 두 가지를 제안드릴게요. 앞으로는 시료를 이틀 일찍 발송할게요. 발송 당일에 운송장 번호도 보내 드릴게요. 그렇게 하면 괜찮으시겠어요?",
+    segments: ["말씀이 전적으로 맞습니다. 죄송합니다", "이런 일이 다시 없도록 두 가지를 제안드릴게요", "앞으로는 시료를 이틀 일찍 발송할게요", "발송 당일에 운송장 번호도 보내 드릴게요", "그렇게 하면 괜찮으시겠어요?"],
+    reference: "You're absolutely right, and I'm sorry. Let me suggest two changes so this doesn't happen again. From now on, we'll ship the samples two days earlier. I'll also send you the tracking number on the same day. Would that work for you?",
     accepted: [
       "You're completely right, and I'm sorry. Let me suggest two changes so this doesn't happen again. From now on, we'll ship the samples two days earlier, and I'll send you the tracking number on the same day. Would that work for you?",
       "You're absolutely right, and I'm sorry. Let me suggest two changes so that this doesn't happen again. From now on, we'll ship the samples two days earlier, and I'll send you the tracking number on the same day. Would that work for you?",
@@ -1187,6 +1188,7 @@ export const TALK_TROUBLE_3: Question[] = [
       "You're absolutely right, and I'm sorry. Let me suggest two changes so this doesn't happen again. From now on, we'll ship the samples two days earlier, and I'll send you the tracking number on the same day. Would that be okay with you?",
       "You're absolutely right, and I'm sorry. Let me suggest two changes so this doesn't happen again. From now on, we'll ship the samples two days earlier, and I'll send you the tracking number the same day. Would that work for you?",
     ],
+    advanced: "You're absolutely right, and I'm sorry. Let me suggest two changes so this doesn't happen again. From now on, we'll ship the samples two days earlier, and I'll send you the tracking number on the same day. Would that work for you?",
     meaning: [
       { id: "right", en: "you're absolutely right", ko: "말씀이 전적으로 맞습니다", any: ["right|true|fair|understand|point|correct"], critical: true },
       { id: "sorry", en: "I'm sorry", ko: "죄송합니다", any: ["sorry|apologize|apologise|apologies"], critical: true },
@@ -1223,9 +1225,9 @@ export const TALK_TROUBLE_3: Question[] = [
     expression: "I understand …, but … Would it be possible to … or to … instead?",
     contextKo: "항공사가 항공편을 취소하는 바람에 호텔 예약을 취소해야 했습니다. 호텔 매니저는 환불 불가 예약이라 돈을 돌려줄 수 없다고 합니다. 정중하게 사정을 설명하고 대안을 요청합니다.",
     dialogue: [{ speaker: "Hotel manager", en: "I'm sorry, but your booking was non-refundable, so we can't give you any money back.", ko: "죄송하지만 환불 불가 예약이라 돈을 돌려드릴 수 없습니다." }],
-    promptKo: "환불 불가 예약인 건 알지만, 항공사가 제 항공편을 취소해서 어쩔 수 없이 취소한 거예요. 증거로 항공사 메일을 보내 드릴 수 있어요. 일부라도 환불받거나, 아니면 예약을 다음 달로 옮길 수 있을까요?",
+    promptKo: "환불 불가 예약인 건 알지만, 항공사가 제 항공편을 취소해서 어쩔 수 없이 취소한 거예요. 증거로 항공사 메일을 보내 드릴 수 있어요. 일부라도 환불받을 수 있을까요? 아니면 예약을 다음 달로 옮길 수 있을까요?",
     segments: ["환불 불가 예약인 건 알지만", "항공사가 제 항공편을 취소해서 어쩔 수 없이 취소한 거예요", "증거로 항공사 메일을 보내 드릴 수 있어요", "일부라도 환불받을 수 있을까요?", "아니면 예약을 다음 달로 옮길 수 있을까요?"],
-    reference: "I understand the booking was non-refundable, but I only cancelled because the airline cancelled my flight. I can send you their email as proof. Would it be possible to get at least a partial refund, or to move my booking to next month instead?",
+    reference: "I understand the booking was non-refundable, but I only cancelled because the airline cancelled my flight. I can send you their email as proof. Would it be possible to get at least a partial refund? Or could I move my booking to next month instead?",
     accepted: [
       "I understand the booking was non-refundable, but I only cancelled because the airline cancelled my flight. I can send you their email as proof. Would it be possible to get at least a partial refund, or to change my booking to next month instead?",
       "I understand the booking was non-refundable, but I only canceled because the airline canceled my flight. I can send you their email as proof. Would it be possible to get at least a partial refund, or to move my booking to next month instead?",
@@ -1234,6 +1236,7 @@ export const TALK_TROUBLE_3: Question[] = [
       "I understand the booking was non-refundable, but I only cancelled because the airline cancelled my flight. I can send you their email as proof. Could I get at least a partial refund, or could I move my booking to next month instead?",
       "I know the booking was non-refundable, but I only cancelled because the airline cancelled my flight. I can send you their email as proof. Would it be possible to get at least a partial refund, or to move my booking to next month instead?",
     ],
+    advanced: "I understand the booking was non-refundable, but I only cancelled because the airline cancelled my flight. I can send you their email as proof. Would it be possible to get at least a partial refund, or to move my booking to next month instead?",
     meaning: [
       { id: "understand", en: "I understand the booking was non-refundable", ko: "환불 불가 예약인 건 알지만", any: ["understand|see|know|realize|realise|aware"], critical: true },
       { id: "non-refundable", en: "non-refundable", ko: "환불 불가", any: ["refundable|=non-refundable|=nonrefundable|policy|refund"], critical: true },
@@ -1249,7 +1252,7 @@ export const TALK_TROUBLE_3: Question[] = [
       { id: "partial-refund-article", pattern: "least|get =partial refund", category: "article", severity: "minor", fix: "a partial refund", messageKo: "refund는 셀 수 있는 명사라서 'a partial refund'처럼 a를 붙입니다." },
       { id: "the-next-month", pattern: "to the next month", category: "article", severity: "minor", fix: "to next month", messageKo: "지금 기준 '다음 달'은 the 없이 'next month'라고 합니다." },
     ],
-    hints: { pattern: "I understand …, but … because … Would it be possible to …, or to … instead?", skeleton: "I understand …, but I only cancelled _______ the airline cancelled my flight. … Would it be ________ to get …?", partial: "I understand the booking was non-refundable, but…" },
+    hints: { pattern: "I understand …, but … because … Would it be possible to …? Or could I … instead?", skeleton: "I understand …, but I only cancelled _______ the airline cancelled my flight. … Would it be ________ to get …?", partial: "I understand the booking was non-refundable, but…" },
     explanationKo: "규정을 먼저 인정하고('I understand …, but …') 내 사정을 because로 설명한 뒤, 'Would it be possible to …, or to … instead?'로 두 가지 대안을 정중하게 제시합니다. because of 뒤에는 문장이 올 수 없고, 'Would it be possible' 뒤에는 to부정사를 씁니다.",
     probes: [
       { answer: "I understand the booking was non-refundable, but I only cancelled because the airline cancelled my flight. I can send you their email as proof. Would it be possible to get at least a partial refund, or to move my booking to next month?", expect: "pass" },

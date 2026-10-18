@@ -1204,9 +1204,9 @@ export const TALK_TROUBLE_2: Question[] = [
     expression: "Since we replaced …, it has been running … It looks like the problem has been solved.",
     contextKo: "다니엘 씨가 지적했던 원료 펌프 누설 문제를 지난주 월요일에 기계적 실(seal)을 교체해 해결했습니다. 일주일 동안 지켜본 결과를 다니엘 씨에게 알려 줍니다.",
     dialogue: [{ speaker: "Daniel", en: "Hi Minsu, any news on the feed pump?", ko: "민수 씨, 원료 펌프 관련 소식 있어요?" }],
-    promptKo: "원료 펌프 상황을 간단히 알려 드릴게요. 지난주 월요일에 실을 교체한 뒤로 누설 없이 잘 돌아가고 있어요. 이달 말까지 계속 확인하겠지만, 문제는 해결된 것 같아요.",
-    segments: ["원료 펌프 상황을 간단히 알려 드릴게요", "지난주 월요일에 실을 교체한 뒤로", "누설 없이 잘 돌아가고 있어요", "이달 말까지 계속 확인하겠지만", "문제는 해결된 것 같아요"],
-    reference: "Just a quick update on the feed pump. Since we replaced the seal last Monday, it has been running without any leaks. We'll keep checking it until the end of the month, but it looks like the problem has been solved.",
+    promptKo: "원료 펌프 상황을 간단히 알려 드릴게요. 지난주 월요일에 실을 교체한 뒤로 누설 없이 잘 돌아가고 있어요. 이달 말까지 계속 확인할 거예요. 하지만 문제는 해결된 것 같아요.",
+    segments: ["원료 펌프 상황을 간단히 알려 드릴게요", "지난주 월요일에 실을 교체한 뒤로", "누설 없이 잘 돌아가고 있어요", "이달 말까지 계속 확인할 거예요", "하지만 문제는 해결된 것 같아요"],
+    reference: "Just a quick update on the feed pump. Since we replaced the seal last Monday, it has been running without any leaks. We'll keep checking it until the end of the month. But it looks like the problem has been solved.",
     accepted: [
       "Just a quick update on the feed pump. Since we replaced the seal last Monday, it's been running without any leaks. We'll keep checking it until the end of the month, but it looks like the problem has been solved.",
       "Just a quick update on the feed pump. Since we replaced the seal last Monday, it has been running without any leaks. We'll keep checking it until the end of the month, but it seems the problem has been solved.",
@@ -1215,6 +1215,7 @@ export const TALK_TROUBLE_2: Question[] = [
       "Here's a quick update on the feed pump. Since we replaced the seal last Monday, it has been running without any leaks. We'll keep checking it until the end of the month, but it looks like the problem has been solved.",
       "Just a quick update on the feed pump. Since we replaced the seal last Monday, it has been running without any leaks. We'll keep checking it until the end of this month, but it looks like the problem is solved.",
     ],
+    advanced: "Just a quick update on the feed pump. Since we replaced the seal last Monday, it has been running without any leaks. We'll keep checking it until the end of the month, but it looks like the problem has been solved.",
     meaning: [
       { id: "update", en: "just a quick update", ko: "간단히 알려 드릴게요", any: ["update|news|know|report"], weight: 0.5 },
       { id: "since-replaced", en: "since we replaced the seal", ko: "실을 교체한 이후로", any: ["replace|replaced|replacing|changed|change|installed|fitted|new"], critical: true },
@@ -1364,7 +1365,7 @@ export const TALK_TROUBLE_2: Question[] = [
     dialogue: [{ speaker: "Daniel", en: "I think your operators didn't follow our start-up procedure.", ko: "그쪽 운전원들이 저희 시작 절차를 안 지킨 것 같아요." }],
     promptKo: "왜 그렇게 보이는지는 이해합니다. 하지만 운전 기록을 보면 운전원들은 모든 단계를 지켰어요. 오히려 공급 스크루 설계가 문제일 수도 있다고 생각해요. 결론을 내리기 전에 데이터를 같이 검토해 주실 수 있을까요?",
     segments: ["왜 그렇게 보이는지는 이해합니다", "하지만 운전 기록을 보면 운전원들은 모든 단계를 지켰어요", "오히려 공급 스크루 설계가 문제일 수도 있어요", "데이터를 같이 검토해 주실 수 있을까요?", "결론을 내리기 전에요"],
-    reference: "I can see why it might look that way, but according to our logs, the operators followed every step. I think the problem might be the design of the feed screw. Would you be willing to review the data with us before we draw any conclusions?",
+    reference: "I can see why it might look that way. But according to our logs, the operators followed every step. I think the problem might be the design of the feed screw. Would you be willing to review the data with us before we draw any conclusions?",
     accepted: [
       "I can see why it might look that way, but according to our logs, the operators followed every step. I think the problem might be the feed screw design. Would you be willing to review the data with us before we draw any conclusions?",
       "I understand why it might look that way, but according to our logs, the operators followed every step. I think the problem might be the design of the feed screw. Would you be willing to review the data with us before we draw any conclusions?",
@@ -1373,6 +1374,7 @@ export const TALK_TROUBLE_2: Question[] = [
       "I can see why it might look that way, but our logs show that the operators followed every step. I think the problem might be the design of the feed screw. Would you be willing to review the data with us before we draw any conclusions?",
       "I can see why it might look that way, but according to our logs, the operators followed every step. I think the problem might be the design of the feed screw. Could you review the data with us before we draw any conclusions?",
     ],
+    advanced: "I can see why it might look that way, but according to our logs, the operators followed every step. I think the problem might be the design of the feed screw. Would you be willing to review the data with us before we draw any conclusions?",
     meaning: [
       { id: "see-why", en: "I can see why it might look that way", ko: "왜 그렇게 보이는지 이해합니다", any: ["see|understand|know|get ... why|point|how|reason", "point"], critical: true },
       { id: "logs", en: "according to our logs", ko: "운전 기록에 따르면", any: ["log|logs|record|records|data|according|show|shows|trend|trends"], critical: true },
@@ -1391,7 +1393,7 @@ export const TALK_TROUBLE_2: Question[] = [
       { id: "before-will", pattern: "before we will", category: "tense", severity: "major", fix: "before we", skill: "time-clause", messageKo: "before 같은 시간 부사절에서는 미래 일이라도 현재시제를 씁니다: 'before we draw any conclusions'." },
       { id: "look-like-that", pattern: "re:\\blook like (?:that|this) way\\b", category: "word-choice", severity: "minor", fix: "look that way", messageKo: "'그렇게 보이다'는 like 없이 'look that way'라고 합니다." },
     ],
-    hints: { pattern: "I can see why …, but according to … I think … might be … Would you be willing to + 동사원형 …?", skeleton: "… but according __ our logs, the operators followed every step. … Would you be _______ to review the data with us …?", partial: "I can see why it might look that way, but according to our logs…" },
+    hints: { pattern: "I can see why …. But according to … I think … might be … Would you be willing to + 동사원형 …?", skeleton: "… But according __ our logs, the operators followed every step. … Would you be _______ to review the data with us …?", partial: "I can see why it might look that way. But according to our logs…" },
     explanationKo: "상대의 주장에 반박할 때는 'I can see why it might look that way, but …'으로 먼저 인정하고 'according to our logs'처럼 근거를 댑니다. 원인은 'might be'로 완곡하게 말하고 'Would you be willing to + 동사원형 …?'으로 대안을 정중히 제안하며, 'You're wrong'처럼 직접 반박하지 않습니다.",
     probes: [
       { answer: "I can see why it might look that way, but according to our logs, the operators followed every single step. I think the problem might be the design of the feed screw. Would you be willing to look at the data with us before we draw any conclusions?", expect: "pass" },

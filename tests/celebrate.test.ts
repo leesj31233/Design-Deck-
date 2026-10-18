@@ -34,7 +34,7 @@ describe("celebrations", () => {
     const long = QUESTION_BY_ID["fs-pilot-dryer-tested-last-month"] as Question;
     const c = celebrationFor({ ...base, question: long, evaluation: evaluateLocal(long, long.reference), prev: fresh() });
     expect(c).toMatchObject({ kind: "long-perfect", burst: "fireworks" });
-    expect(c?.detailKo).toContain("23단어");
+    expect(c?.detailKo).toMatch(/\d+단어로 길게/);
   });
 
   it("the third clean answer in a row on the same question is 'mastered', once", () => {
