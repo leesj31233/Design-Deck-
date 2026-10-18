@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, Sparkles, Trophy, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, ChevronLeft, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, Sparkles, Trophy, X } from "lucide-react";
 import { evaluateLocal, scoredErrors } from "../../core/evaluate";
 import { claudeApproved } from "../../core/learned";
 import { createGrader, gradeBudgetMs, type GradeVia } from "../../core/grader";
@@ -128,6 +128,9 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
   const [committed, setCommitted] = React.useState<RecordResult | null>(null);
   const [practiceRetry, setPracticeRetry] = React.useState(false);
   const [done, setDone] = React.useState<Done[]>([]);
+  // Positions already answered in this session: going back to one re-asks it as practice (the first answer stays the record).
+  const answeredAt = React.useRef(new Set<number>());
+  const [revisit, setRevisit] = React.useState(false);
   // Consecutive clean answers, and the learner's own lines per role-play (by step) for the chat.
   const [streak, setStreak] = React.useState(0);
   const [bestStreak, setBestStreak] = React.useState(0);
@@ -226,7 +229,9 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     stopSpeaking();
     dictation.cancel();
     setCommitted(null);
-    setPracticeRetry(false);
+    const again = answeredAt.current.has(idx);
+    setRevisit(again);
+    setPracticeRetry(again);
     t0.current = app.now();
     firstKey.current = null;
     submittedAt.current = null;
@@ -339,6 +344,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       gradeMs: opts.skipped ? undefined : gradeInfo?.ms,
     });
     setCommitted(result);
+    answeredAt.current.add(idx);
     setDone((d) => [...d, { item, question: q, result, evaluation: ev }]);
     const ok = !opts.skipped && isSuccess(ev, hint);
     setStreak((n) => {
@@ -374,6 +380,14 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     if (phase === "feedback") commit();
     if (idx + 1 >= queue.length) setFinished(true);
     else setIdx((i) => i + 1);
+  };
+
+  /** Back to the previous question to answer it again (practice: graded and explained, not recorded again). */
+  const previous = () => {
+    if (phase === "grading" || idx === 0) return;
+    if (phase === "feedback") commit();
+    dictation.cancel();
+    setIdx((i) => i - 1);
   };
 
   const skip = () => {
@@ -468,11 +482,15 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
           <IconButton label="세션 종료" variant="ghost" onClick={requestExit} className="-ml-2 text-[var(--muted)]">
             <X className="size-5" />
           </IconButton>
+          <IconButton label="이전 문제" variant="ghost" onClick={previous} disabled={idx === 0 || phase === "grading"} className="-ml-2 text-[var(--muted)]">
+            <ChevronLeft className="size-5" />
+          </IconButton>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2 text-[12px]">
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="truncate font-semibold">{spec.title}</span>
                 <StreakChip n={streak} />
+                {revisit ? <span className="shrink-0 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[10px] font-semibold text-[var(--ef-accent-ink)]" data-testid="revisit-badge">다시 풀기 · 기록은 처음 답</span> : null}
                 {spec.speed && q ? <SpeedTimer key={`${idx}-${q.id}`} stoppedAt={phase === "answer" ? null : submittedAt.current} now={app.now} /> : null}
               </span>
               <span className="ef-num shrink-0 text-[var(--muted)]">

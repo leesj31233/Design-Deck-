@@ -1035,7 +1035,7 @@ export const TALK_VISIT_3: Question[] = [
     dialogue: [{ speaker: "Mr. Tan", en: "Did you find out how often they clean the heat exchanger?", ko: "열교환기를 얼마나 자주 청소하는지 알아보셨어요?" }],
     promptKo: "네, 운전원들에게 물어봤어요. 보통 2주마다 청소한다고 하더라고요. 그런데 우기에는 원료가 훨씬 더러워서 가끔 매주 청소해야 한대요.",
     segments: ["네, 운전원들에게 물어봤어요.", "보통 2주마다 청소한대요.", "그런데 우기에는 원료가 훨씬 더러워서", "가끔 매주 청소해야 한대요"],
-    reference: "Yes, I asked the operators. They said they usually clean it every two weeks. But in the rainy season, the feed is much dirtier, so they sometimes have to clean it every week.",
+    reference: "Yes, I asked the operators. They said they usually clean it every two weeks. But in the rainy season, the feed is much dirtier. So they sometimes have to clean it every week.",
     accepted: [
       "Yes, I checked with the operators. They said they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.",
       "Yes, I asked the operators. They told me they usually clean it every two weeks. But during the rainy season, they sometimes have to clean it every week because the feed is much dirtier.",
@@ -1057,7 +1057,7 @@ export const TALK_VISIT_3: Question[] = [
       { id: "two-week", pattern: "re:\\bevery (two|2) week\\b", category: "countability", severity: "major", fix: "every two weeks", messageKo: "'2주마다'는 'every two weeks'입니다. 숫자가 붙으면 week를 복수로 씁니다." },
       { id: "more-dirtier", pattern: "more =dirtier|dirty", category: "word-choice", severity: "major", fix: "much dirtier", messageKo: "dirty의 비교급은 dirtier입니다. more를 함께 쓰지 않고, '훨씬'은 much로 강조합니다: 'much dirtier'.", skill: "comparative" },
     ],
-    hints: { pattern: "They said (that) + 주어 + 동사. But …, so they sometimes have to + 동사원형 …", skeleton: "… They ____ they usually clean it every two _____. But in the rainy season, …, so they sometimes ____ __ clean it every week.", partial: "Yes, I asked the operators. They said they usually clean it…" },
+    hints: { pattern: "They said (that) + 주어 + 동사. But …. So they sometimes have to + 동사원형 …", skeleton: "… They ____ they usually clean it every two _____. But in the rainy season, …. So they sometimes ____ __ clean it every week.", partial: "Yes, I asked the operators. They said they usually clean it…" },
     explanationKo: "들은 내용을 전할 때는 'They said (that) …' 또는 'They told me …'를 씁니다('said me'는 틀림). 지금도 사실인 습관은 현재형(they usually clean)을 그대로 써도 됩니다. '2주마다'는 every two weeks, '매주'는 every week이고, dirty의 비교급은 dirtier입니다.",
     probes: [
       { answer: "Yes, I asked the operators. They said that they usually clean it every two weeks. During the rainy season, though, they sometimes have to clean it every week because the feed is much dirtier.", expect: "pass" },

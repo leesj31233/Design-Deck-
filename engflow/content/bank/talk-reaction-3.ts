@@ -856,10 +856,10 @@ export const TALK_REACTION_3: Question[] = [
     accepted: [
       "Better than I expected. He said they couldn't reduce the license fee, but they'd be willing to include extra training for our operators. I think that's a fair deal.",
       "It went better than I expected. He said they can't reduce the license fee, but they'd be willing to include extra training for our operators. I think it's a fair deal.",
-      "Better than I expected. He said they can't lower the license fee, but they'd be happy to include extra training for our operators. I think that's a fair deal.",
+      "It went better than I expected. He said they can't reduce the license fee. But they're happy to include extra training for our operators. I think that's a fair deal.",
       "Better than I expected. He told me they can't reduce the license fee, but they're willing to include extra training for our operators. I think that's a good deal.",
       "Better than I expected. Daniel said they can't reduce the license fee, but they'd be willing to include extra training for our operators. I think that's fair.",
-      "It went better than I expected. He said they can't reduce the license fee. But they're happy to include extra training for our operators. I think that's a fair deal.",
+      "It went better than I expected. He said they can't reduce the license fee, but they're happy to include extra training for our operators. I think that's a fair deal.",
     ],
     advanced: "Better than I expected. He said they can't reduce the license fee, but they'd be willing to include extra training for our operators. I think that's a fair deal.",
     meaning: [
@@ -1008,7 +1008,7 @@ export const TALK_REACTION_3: Question[] = [
     dialogue: [{ speaker: "Ms. Kim (manager)", en: "We'd like you to lead the site team in Jakarta for six months. What do you think?", ko: "민수 씨가 6개월 동안 자카르타 현장팀을 이끌어 줬으면 해요. 어떻게 생각해요?" }],
     promptKo: "와, 감사합니다. 정말 영광이에요. 그런데 6개월은 떨어져 있기엔 긴 시간이라 가족과 먼저 이야기해 봐야 할 것 같아요. 다음 주에 답을 드리면 괜찮을까요?",
     segments: ["와, 감사합니다.", "정말 영광이에요", "하지만 가족과 먼저 얘기해 봐야 할 것 같아요", "6개월은 떨어져 있기엔 긴 시간이라서요.", "다음 주에 답을 드려도 괜찮을까요?"],
-    reference: "Wow, thank you. I'm really honored. But I'd need to talk to my family first, because six months is a long time to be away. Would it be okay if I gave you my answer next week?",
+    reference: "Wow, thank you. I'm really honored. But I'd need to talk to my family first. Six months is a long time to be away. Would it be okay if I gave you my answer next week?",
     accepted: [
       "Wow, thank you. That's very kind of you. But I need to talk to my family first, because six months is a long time to be away. Could I give you my answer next week?",
       "Wow, thank you so much. I'm really flattered, but I'd need to talk to my family first, because six months is a long time to be away. Would it be okay if I got back to you next week?",
@@ -1030,7 +1030,7 @@ export const TALK_REACTION_3: Question[] = [
       { id: "six-month", pattern: "re:\\b(six|6) month\\b", category: "countability", severity: "major", fix: "six months", messageKo: "six 뒤에는 복수형이 옵니다: 'six months'." },
       { id: "is-long-time", pattern: "re:\\bis long time\\b", category: "article", severity: "minor", fix: "is a long time", messageKo: "'긴 시간'은 a를 넣어 'a long time'이라고 합니다." },
     ],
-    hints: { pattern: "I'm really honored. But I'd need to … + because … + Would it be okay if I + 과거형 …?", skeleton: "Wow, thank you. I'm really _______. But I'd need to talk to my family first, because … Would it be okay if I ____ you my answer next week?", partial: "Wow, thank you. I'm really honored. But I'd need to…" },
+    hints: { pattern: "I'm really honored. But I'd need to …. + 이유. + Would it be okay if I + 과거형 …?", skeleton: "Wow, thank you. I'm really _______. But I'd need to talk to my family first. … Would it be okay if I ____ you my answer next week?", partial: "Wow, thank you. I'm really honored. But I'd need to…" },
     explanationKo: "좋은 제안을 바로 수락하기 어려울 때는 'I'm really honored.'(또는 'That's very kind of you.')로 감사를 먼저 표현하고, 'But I'd need to …'로 부드럽게 이유를 말합니다. 'Would it be okay if I gave …?'처럼 if절에 과거형을 쓰면 현재형보다 한층 공손하게 허락을 구할 수 있습니다. flattering은 '아첨하는'이라는 뜻이라 내 기분은 flattered로 말합니다.",
     probes: [
       { answer: "Wow, thank you so much. I'm really honored, but I'd have to discuss it with my family first, because six months is a long time to be away from home. Would it be all right if I got back to you next week?", expect: "pass" },

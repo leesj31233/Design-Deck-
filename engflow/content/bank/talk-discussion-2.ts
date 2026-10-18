@@ -742,7 +742,7 @@ export const TALK_DISCUSSION_2: Question[] = [
     dialogue: [{ speaker: "Budi", en: "So, can we agree on Option B, the new decanter?", ko: "그럼 B안, 새 디캔터로 합의할 수 있을까요?" }],
     promptKo: "벤더가 케이크 수분이 60% 이하로 유지된다고 보장해 준다면 B안으로 가도 좋아요. Priya 씨가 가능하다고는 했지만, 서면으로 받아 두고 싶어요.",
     segments: ["B안으로 가도 좋아요", "벤더가 케이크 수분 60% 이하를 보장해 주기만 하면", "Priya 씨가 가능하다고는 했지만", "서면으로 받아 두고 싶어요"],
-    reference: "I'm happy to go with Option B, as long as the vendor guarantees the cake moisture stays below 60%. Priya said that they could do it, but I'd like to have it in writing.",
+    reference: "I'm okay with Option B, as long as the vendor guarantees the cake moisture stays below 60%. Priya said that they could do it, but I'd like to have it in writing.",
     accepted: [
       "I'm happy to go with Option B, as long as the vendor can guarantee that the cake moisture stays below 60%. Priya said they could do it, but I'd like to have it in writing.",
       "I'm happy to go with Option B, as long as the vendor guarantees that the cake moisture stays below 60%. Priya said that they could do it, but I'd like to get it in writing.",
@@ -770,7 +770,7 @@ export const TALK_DISCUSSION_2: Question[] = [
       { id: "told-that", pattern: "re:\\btold(?= that\\b)", category: "sentence-structure", severity: "major", fix: "told us", messageKo: "tell은 듣는 사람을 목적어로 받습니다: 'Priya told us that …' 또는 'Priya said that …'." },
       { id: "by-writing", pattern: "=by writing", category: "word-choice", severity: "major", fix: "in writing", messageKo: "'서면으로'는 'in writing'입니다." },
     ],
-    hints: { pattern: "I'm happy to …, as long as + 주어 + 동사. 사람 + said (that) + 주어 + could …, but I'd like to …", skeleton: "I'm happy to go with Option B, as long as the vendor __________ the cake moisture stays below 60%. Priya ____ that …", partial: "I'm happy to go with Option B, as long as…" },
+    hints: { pattern: "I'm okay with …, as long as + 주어 + 동사. 사람 + said (that) + 주어 + could …, but I'd like to …", skeleton: "I'm okay with Option B, as long as the vendor __________ the cake moisture stays below 60%. Priya ____ that …", partial: "I'm okay with Option B, as long as…" },
     explanationKo: "조건부로 찬성할 때는 'I'm happy to …, as long as …'를 쓰고, 다른 사람의 말은 'Priya said (that) they could …'처럼 전달합니다. say는 사람을 목적어로 바로 받지 않으므로 'said me'가 아니라 'told me/us'이고, '서면으로'는 'in writing'입니다.",
     probes: [
       { answer: "I'm happy to go with Option B, as long as the vendor can guarantee that the cake moisture stays below 60%. Priya told me that they could do it, but I'd like to have it in writing.", expect: "pass" },

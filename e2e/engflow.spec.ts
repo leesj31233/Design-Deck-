@@ -87,6 +87,10 @@ test("full-sentence lesson: feedback, grammar guide, mistake saved", async ({ pa
   await page.getByRole("tab", { name: "다른 예문" }).click();
   await page.getByRole("button", { name: "닫기" }).click();
   await page.getByRole("button", { name: /^다음/ }).click();
+  // Back to the question just answered: it is asked again as practice, and the first answer stays the record.
+  await page.getByRole("button", { name: "이전 문제" }).click();
+  await expect(page.getByTestId("revisit-badge")).toBeVisible();
+  await expect(page.locator("#ef-answer")).toHaveValue("");
   await page.getByRole("button", { name: "세션 종료" }).click();
   await nav(page, "표현 노트");
   await expect(page.getByText("If we will decide it now, we must change it later because data different.").first()).toBeVisible();
