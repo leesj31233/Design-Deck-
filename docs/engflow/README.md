@@ -158,6 +158,10 @@ The test uses 5 parts: grammar and construction, phrase translation, full senten
 
 The TOEIC Speaking panel shows the ETS **minimum scores** per CEFR level (Speaking A1 50, A2 90, B1 120, B2 160, C1 180; Writing A1 30, A2 70, B1 120, B2 150, C1 180) and the Korean score-report labels. It is clearly marked as a contextual, non-official comparison. These figures were collected from search excerpts of ETS and YBM pages, because the build environment could not open those hosts. **Check them against the official PDFs linked in the app before relying on them.**
 
+## Built on Design Deck
+
+EngFlow's UI uses the Design Deck primitives (Button, IconButton, Badge/Tag, GlassPanel cards, Progress, SegmentedControl, EmptyState, Skeleton, Tooltip, Kbd) through `engflow/ui/kit.tsx`, and the deck's effects (`components/motion/effects.tsx`) where they explain state: a light sweep while Claude grades, a once-round border beam on a 100-point answer, numbers that count up, lists that reveal in order, pressable cards with a pointer spotlight, a live dot while listening. All effects follow the system and in-app "reduce motion" settings.
+
 ## Speak first
 
 Sentence practice trains saying what you think in a meeting, not assembling long written sentences. Korean hint chips are meaning-sized chunks in speaking order (2 under 10 words, 3 under 16, 4 under 24, at most 6). Model answers lead with the main point, then the reason, then extra detail, and two or three short sentences count as fully correct. The complex one-sentence form stays available as an accepted or advanced answer. See "Speak first" in CONTENT_AUTHORING.md and GRADER_BENCH.md.
