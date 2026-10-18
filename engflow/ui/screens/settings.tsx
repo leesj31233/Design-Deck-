@@ -9,7 +9,7 @@ import { learnerKey, setLearnerKey } from "../../platform/web";
 import { clock, useApp } from "../store";
 import { claudeLatencyQuantiles, claudeLatencyStats } from "../latency";
 import { gradeBudgetMs } from "../../core/grader";
-import { Card, ConfirmDialog, Eyebrow, cn } from "../kit";
+import { Button, Card, ConfirmDialog, Eyebrow, Tag, cn } from "../kit";
 import { canListen } from "../listen";
 
 /** Claude's own response time on this device (from grading requests, including ones that finished late). */
@@ -112,26 +112,28 @@ export function SettingsScreen() {
 
       <Card className="divide-y divide-[var(--line)] px-4 md:px-5">
         <Row label="저장 위치" hint={app.storage.detailKo}>
-          <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold", app.storage.durable ? "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]" : "bg-[var(--ef-warn-soft)] text-[var(--ef-warn)]")}>
+          <Tag tone={app.storage.durable ? "ok" : "warn"} className="gap-1.5 px-2.5 py-1 text-[12px]">
             {app.storage.kind === "local" ? <HardDrive className="size-3.5" /> : <Cloud className="size-3.5" />}
             {app.storage.labelKo}
-          </span>
+          </Tag>
         </Row>
         <Row label="답안 평가" hint={app.ai.detailKo}>
-          <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold", app.ai.available ? "bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)]" : "bg-[var(--ef-track)] text-[var(--ef-ink-2)]")}>
+          <Tag tone={app.ai.available ? "accent" : "neutral"} className="gap-1.5 px-2.5 py-1 text-[12px]">
             {app.ai.available ? <Sparkles className="size-3.5" /> : <Cpu className="size-3.5" />}
             {app.ai.labelKo}
-          </span>
+          </Tag>
         </Row>
         {isWeb && app.storage.kind === "server" ? (
           <Row label="동기화 키" hint="다른 기기에서 같은 학습 기록을 쓰려면 이 키를 그 기기의 설정에 입력하세요. 비밀번호처럼 보관하세요.">
             <div className="flex flex-col gap-2 sm:items-end">
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => navigator.clipboard?.writeText(learnerKey()).then(() => toast.success("복사했습니다."), () => toast.error("복사하지 못했습니다."))}
-                className="dd-focus inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] px-3 text-[12px]"
+                className="h-9 gap-1.5 px-3 text-[12px] font-normal"
               >
                 <KeyRound className="size-3.5" /> <span className="ef-mono">{learnerKey().slice(0, 8)}…</span> <Copy className="size-3.5" />
-              </button>
+              </Button>
               <form
                 className="flex gap-1.5"
                 onSubmit={(e) => {
@@ -142,7 +144,7 @@ export function SettingsScreen() {
               >
                 <label htmlFor="ef-sync-key" className="sr-only">동기화 키 입력</label>
                 <input id="ef-sync-key" value={keyInput} onChange={(e) => setKeyInput(e.target.value)} placeholder="다른 기기의 키 붙여넣기" className="dd-focus h-9 w-56 rounded-xl border border-[var(--line)] bg-[var(--background)] px-3 text-[16px] sm:text-[13px]" />
-                <button className="dd-focus h-9 rounded-xl bg-[var(--foreground)] px-3 text-[12px] font-semibold text-[var(--background)]">연결</button>
+                <Button type="submit" variant="primary" size="sm" className="h-9 px-3 text-[12px] font-semibold">연결</Button>
               </form>
             </div>
           </Row>
@@ -170,14 +172,14 @@ export function SettingsScreen() {
         <Row label="상황별 난이도" hint="학습 화면에서 상황마다 고른 난이도(1–10)입니다. 고르지 않은 상황은 레벨에 맞춰 자동으로 정합니다.">
           <div className="flex flex-wrap items-center justify-end gap-1.5">
             {SITUATIONS.filter((sc) => s.difficulty?.[sc]).map((sc) => (
-              <span key={sc} className="ef-num rounded-full border border-[var(--line)] px-2.5 py-1 text-[12px]">
+              <Tag key={sc} className="ef-num px-2.5 py-1 text-[12px] font-normal text-[var(--foreground)]">
                 {SITUATION_INFO[sc].ko} {s.difficulty![sc]}
-              </span>
+              </Tag>
             ))}
             {Object.keys(s.difficulty ?? {}).length ? (
-              <button onClick={() => set({ difficulty: {} })} className="dd-focus h-8 rounded-lg border border-[var(--line)] px-3 text-[12px] font-medium">
+              <Button variant="secondary" size="sm" onClick={() => set({ difficulty: {} })} className="rounded-lg text-[12px]">
                 모두 자동으로
-              </button>
+              </Button>
             ) : (
               <span className="text-[12px] text-[var(--muted)]">모두 자동</span>
             )}
@@ -228,22 +230,22 @@ export function SettingsScreen() {
 
       <Card className="divide-y divide-[var(--line)] px-4 md:px-5">
         <Row label="학습 기록 내보내기" hint="JSON 파일로 백업합니다.">
-          <button onClick={doExport} className="dd-focus inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] px-3 text-[13px] font-medium">
+          <Button variant="secondary" size="sm" onClick={doExport} className="h-9 gap-1.5 px-3 text-[13px]">
             <Download className="size-3.5" /> 내보내기
-          </button>
+          </Button>
         </Row>
         <Row label="학습 기록 가져오기" hint="내보낸 JSON 파일로 현재 기록을 바꿉니다.">
           <>
             <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => e.target.files?.[0] && doImport(e.target.files[0])} />
-            <button onClick={() => fileRef.current?.click()} className="dd-focus inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] px-3 text-[13px] font-medium">
+            <Button variant="secondary" size="sm" onClick={() => fileRef.current?.click()} className="h-9 gap-1.5 px-3 text-[13px]">
               <Upload className="size-3.5" /> 가져오기
-            </button>
+            </Button>
           </>
         </Row>
         <Row label="처음부터 다시 시작" hint="모든 답변·복습·실수 기록을 지우고 가져온 과거 실수 7개만 남깁니다.">
-          <button onClick={() => setConfirmReset(true)} className="dd-focus inline-flex h-9 items-center gap-1.5 rounded-xl bg-[var(--ef-bad-soft)] px-3 text-[13px] font-semibold text-[var(--ef-bad)]">
+          <Button variant="danger" size="sm" onClick={() => setConfirmReset(true)} className="h-9 gap-1.5 px-3 text-[13px] font-semibold">
             <Trash2 className="size-3.5" /> 초기화
-          </button>
+          </Button>
         </Row>
       </Card>
 
@@ -265,11 +267,11 @@ export function SettingsScreen() {
         <p className="ef-ko mt-1.5 text-[12px] text-[var(--muted)]">시간을 앞당겨 며칠 뒤 복습 문제가 어떻게 나오는지 확인합니다. 학습 기록의 시간도 이 기준으로 저장되니 확인 후 반드시 해제하세요.</p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {[1, 3, 7, 14].map((d) => (
-            <button key={d} onClick={() => shift(d)} className="dd-focus h-9 rounded-xl border border-[var(--line)] px-3 text-[13px]">+{d}일</button>
+            <Button key={d} variant="secondary" size="sm" onClick={() => shift(d)} className="h-9 px-3 text-[13px] font-normal">+{d}일</Button>
           ))}
-          <button onClick={() => shift(0)} disabled={!offsetDays} className="dd-focus h-9 rounded-xl bg-[var(--foreground)] px-3 text-[13px] font-semibold text-[var(--background)] disabled:opacity-40">
+          <Button variant="primary" size="sm" onClick={() => shift(0)} disabled={!offsetDays} className="h-9 px-3 text-[13px] font-semibold">
             실제 시간으로 {offsetDays ? `(현재 +${offsetDays}일)` : ""}
-          </button>
+          </Button>
         </div>
       </Card>
 
