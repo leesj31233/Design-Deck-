@@ -23,7 +23,7 @@ export async function feedOwner(admin: SupabaseClient) {
 }
 
 /** Words that mark NAYSOR speaking about itself (its plans, assumptions, what to do), not a fact about the market. */
-const SELF = /NAYSOR|나이소르|네이소르|우리\s?(회사|사업|팀|가|는|의)|당사/i;
+export const SELF = /NAYSOR|나이소르|네이소르|우리\s?(회사|사업|팀|가|는|의)|당사/i;
 /** Headings of judgement: implications, actions, the pilot plan, negotiation positions, gaps to chase. */
 const JUDGEMENT = /NAYSOR|나이소르|시사점|해야 할 일|다음 (단계|행동)|Next Actions?|Implications?|Pilot|파일럿|협상|권고|제안|Research Gaps|공백과 다음|매출 가정|우선 접촉/i;
 const PRIVATE_BRIEFS = /^brief-(06-pilot|08-gaps)/;
@@ -67,7 +67,7 @@ const base = (admin: SupabaseClient, userId: string, columns: string) => admin.f
  * Every row under a prefix. The ids come first (small), then the rows in small groups a few at a time: items
  * carry whole documents now, and a hundred of them in one statement runs past the database's time limit.
  */
-async function rows(admin: SupabaseClient, userId: string, prefix: string, columns = "id, data, updated_at") {
+export async function rows(admin: SupabaseClient, userId: string, prefix: string, columns = "id, data, updated_at") {
   const ids: string[] = [];
   for (let from = 0; from < 20000; from += 1000) {
     const { data, error } = await base(admin, userId, "id").like("id", `${prefix}%`).order("id").range(from, from + 999);
@@ -90,7 +90,7 @@ async function rows(admin: SupabaseClient, userId: string, prefix: string, colum
   return out.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-const version = (at: string) => Date.parse(at).toString(36);
+export const version = (at: string) => Date.parse(at).toString(36);
 export function mediaUrl(base: string, id: string, at: string, figure?: number) {
   return `${base}/api/public/intel/media?item=${encodeURIComponent(id)}${figure === undefined ? "&cover=1" : `&fig=${figure}`}&v=${version(at)}`;
 }
@@ -166,7 +166,7 @@ export function publicFeed(admin: SupabaseClient, base: string) {
   feed.catch(() => { if (built?.feed === feed) built = null; });
   return feed;
 }
-async function buildFeed(admin: SupabaseClient, base: string) {
+export async function buildFeed(admin: SupabaseClient, base: string) {
   const userId = await feedOwner(admin);
   if (!userId) return null;
   const [items, briefs, media] = await Promise.all([rows(admin, userId, "intel:"), rows(admin, userId, "intelbrief:"), rows(admin, userId, "intelmedia:", "id, updated_at")]);

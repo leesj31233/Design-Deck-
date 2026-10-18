@@ -21,6 +21,7 @@ import { PanelMarks } from "./panel-marks";
 import { SourceTree } from "./source-tree";
 import { CardCover, CoverImage } from "./card-cover";
 import { ItemArticle } from "./item-article";
+import { IntelProgressBar } from "./intel-progress";
 import { CompanyMark, CompanyPage, companyName } from "./company-page";
 import { IntelMap } from "./intel-map";
 import { EntityDirectory } from "./entity-directory";
@@ -300,6 +301,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
   const scopeLabel = scope.type === "all" ? "전체" : scope.type === "star" ? "핵심 표시" : scope.type === "pdf" ? "PDF 보고서" : scope.type === "folder" ? folders.find(folder => folder.id === scope.id)?.name ?? "폴더" : scope.type === "kind" ? KIND_LABEL[scope.kind] : TOPIC_LABEL.get(scope.id) ?? scope.id;
 
   return <section className="pf-intel" aria-label="인텔리전스">
+    <IntelProgressBar/>
     <header className="pf-intel-head">
       <div><p className="pf-intel-eyebrow"><Radar size={14}/> Information flow</p><h2>{klass === "all" ? "NAYSOR 인텔리전스" : `Class ${klass === "c1" ? 1 : 2} · ${CLASS_LABEL[klass]}`}</h2><p>검증된 논문·정부 보고서·기업 자료·장비 벤더·시장 정보만 모아, 근거와 신뢰도를 함께 봅니다.</p>
         <div className="pf-intel-classes" role="tablist" aria-label="사업 분류">

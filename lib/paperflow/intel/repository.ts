@@ -12,6 +12,10 @@ const KINDS: IntelKind[] = ["source", "company", "project", "vendor", "equipment
 const STATUSES: IntelStatus[] = ["verified", "claimed", "estimate", "unverified"];
 const STAGES: IntelStage[] = ["research", "pilot", "construction", "commissioning", "commercial-production", "commercial-sales", "stopped"];
 export const INTEL_EVENT = "paperflow:intel";
+/** Progress of a large download (a first sync, NAYSOR News' first visit): what is happening and how far along it is; null when done. */
+export const INTEL_PROGRESS = "paperflow:intel-progress";
+export interface IntelProgress { label: string; done: number; total: number }
+export function reportProgress(progress: IntelProgress | null) { if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent<IntelProgress | null>(INTEL_PROGRESS, { detail: progress })); }
 
 const text = (value: unknown, max = 600) => typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max) || undefined : undefined;
 const longText = (value: unknown, max = 4000) => typeof value === "string" ? value.trim().slice(0, max) || undefined : undefined;
@@ -229,6 +233,22 @@ export const intelRepository = {
     const now = new Date().toISOString();
     store.put({ ...item, user: { ...item.user, ...patch, updatedAt: now }, updatedAt: now });
     await done; emitLocalChange({ kind: "intel", id }); announce();
+  },
+  /** Sync only: many items and covers in one transaction and one announcement (a first sync brings hundreds). */
+  async putManyRaw(raws: IntelItem[], covers: { id: string; cover: string; updatedAt: string }[] = []) {
+    if (!raws.length && !covers.length) return;
+    const db = await openDatabase(), tx = db.transaction(["intel", "intelMedia"], "readwrite"), done = transactionDone(tx), media = tx.objectStore("intelMedia"), store = tx.objectStore("intel");
+    const withCover = new Set((await requestResult<IDBValidKey[]>(media.getAllKeys())).map(String));
+    for (const entry of covers) { media.put(entry); withCover.add(entry.id); coverUrls.delete(entry.id); }
+    const written = new Set<string>();
+    for (const raw of raws) {
+      const { item, cover } = splitCover(raw);
+      if (cover) { media.put({ id: item.id, cover, updatedAt: item.updatedAt ?? new Date().toISOString() }); withCover.add(item.id); coverUrls.delete(item.id); }
+      store.put({ ...item, hasCover: item.hasCover || withCover.has(item.id) || undefined }); written.add(item.id);
+    }
+    // A cover that arrived for an item already on the device marks it.
+    for (const entry of covers) if (!written.has(entry.id)) { const item = await requestResult<IntelItem | undefined>(store.get(entry.id)); if (item && !item.hasCover) store.put({ ...item, hasCover: true }); }
+    await done; announce();
   },
   /** Sync only: write what the account holds without announcing a local change. */
   async putRaw(raw: IntelItem) {

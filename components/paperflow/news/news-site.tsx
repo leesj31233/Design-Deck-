@@ -13,13 +13,17 @@ import { PaperflowContext, type PaperflowContextValue } from "../shell/paperflow
 import { NotificationStack } from "../shell/notification-stack";
 import { ConfirmHost } from "../shell/confirm-host";
 import { notifyText } from "@/lib/paperflow/notifications";
-import { intelRepository, setRemoteCovers } from "@/lib/paperflow/intel/repository";
+import { intelRepository, reportProgress, setRemoteCovers } from "@/lib/paperflow/intel/repository";
+import { cloudUrl } from "@/lib/paperflow/cloud/config";
 import type { IntelBrief, IntelItem } from "@/lib/paperflow/intel/types";
 import "./news.css";
 
 const IntelView = dynamic(() => import("../intel/intel-view").then(module => module.IntelView), { ssr: false, loading: () => <div className="pf-empty" role="status">NAYSOR News를 여는 중…</div> });
 /** Where a reader with an account translates and marks a PDF. */
 const PAPERFLOW = "https://temporary-speedy-thunder-fmo0cqz.vercel.app";
+/** The ready-made copy of the list (a public storage bucket on the CDN), and what this device last took from it. */
+const SNAPSHOT = cloudUrl ? `${cloudUrl}/storage/v1/object/public/naysor-news` : "";
+const VERSION_KEY = "naysor-news-version", COVERS_KEY = "naysor-news-covers";
 
 /**
  * NAYSOR News: the research programme's intelligence for anyone, without an account. The list comes from
@@ -39,16 +43,38 @@ export function NewsSite() {
   useEffect(() => {
     let alive = true;
     (async () => {
+      type Part = { items: IntelItem[]; briefs: IntelBrief[]; covers: Record<string, string>; parts?: number };
+      type Manifest = { version: string; total: number; parts: string[] };
+      const read = (key: string) => { try { return localStorage.getItem(key); } catch { return null; } };
+      const write = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch { /* the next visit downloads again */ } };
+      const held = (await intelRepository.list()).length;
+      try { const covers = read(COVERS_KEY); if (covers) setRemoteCovers(JSON.parse(covers)); } catch { /* covers come with the next download */ }
+      if (held) setLoading(false);
       try {
-        // The list comes in parts; the first says how many there are and carries the briefings.
-        type Part = { items: IntelItem[]; briefs: IntelBrief[]; covers: Record<string, string>; parts?: number };
-        const get = async (part: number) => { const response = await fetch(`/api/public/intel?part=${part}`); if (!response.ok) throw new Error(String(response.status)); return await response.json() as Part; };
-        const first = await get(0), rest = await Promise.all(Array.from({ length: Math.max(0, (first.parts ?? 1) - 1) }, (_, index) => get(index + 1)));
-        const all = [first, ...rest];
-        setRemoteCovers(Object.assign({}, ...all.map(part => part.covers ?? {})));
-        await intelRepository.replaceFeed(all.flatMap(part => part.items ?? []), first.briefs ?? []);
+        // The site keeps a ready-made copy on the CDN; the device downloads it only when it has changed.
+        let manifest: Manifest | null = null;
+        if (SNAPSHOT) try { const response = await fetch(`${SNAPSHOT}/manifest.json?t=${Math.floor(Date.now() / 60_000)}`); if (response.ok) manifest = await response.json() as Manifest; } catch { /* the server assembles it instead */ }
+        if (manifest && held && read(VERSION_KEY) === manifest.version) return;
+        const label = held ? "일일 업데이트 및 기존 뉴스 반영 중" : "NAYSOR News 전체 자료를 받는 중";
+        let received = 0;
+        const progress = (total: number) => reportProgress({ label, done: received, total });
+        let all: Part[];
+        if (manifest) {
+          progress(manifest.total);
+          all = await Promise.all(manifest.parts.map(async url => { const response = await fetch(url); if (!response.ok) throw new Error(String(response.status)); const part = await response.json() as Part; received += part.items.length; progress(manifest!.total); return part; }));
+        } else {
+          // No copy yet: the server assembles the list in parts; the first says how many there are.
+          const get = async (part: number) => { const response = await fetch(`/api/public/intel?part=${part}`); if (!response.ok) throw new Error(String(response.status)); const body = await response.json() as Part & { total?: number }; received += body.items.length; progress(body.total ?? received); return body; };
+          const first = await get(0);
+          all = [first, ...await Promise.all(Array.from({ length: Math.max(0, (first.parts ?? 1) - 1) }, (_, index) => get(index + 1)))];
+        }
+        const covers = Object.assign({}, ...all.map(part => part.covers ?? {}));
+        setRemoteCovers(covers); write(COVERS_KEY, JSON.stringify(covers));
+        reportProgress({ label: "기기에 반영하는 중", done: received, total: received });
+        await intelRepository.replaceFeed(all.flatMap(part => part.items ?? []), all[0]?.briefs ?? []);
+        if (manifest) write(VERSION_KEY, manifest.version);
       } catch { if (alive) notifyText("새 자료를 불러오지 못했습니다. 이 기기에 저장된 자료를 보여 줍니다."); }
-      finally { if (alive) setLoading(false); }
+      finally { reportProgress(null); if (alive) setLoading(false); }
     })();
     return () => { alive = false; };
   }, []);

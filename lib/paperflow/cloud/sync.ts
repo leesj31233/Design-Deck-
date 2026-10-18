@@ -13,7 +13,7 @@ import { recordOf, rowOf, type DocumentRow } from "./records";
 import type { Annotation } from "../anchors/types";
 import { forgetTombstone, noteRepository, noteTombstones } from "../notes/note-repository";
 import type { QuickNote } from "../notes/notebook";
-import { intelRepository } from "../intel/repository";
+import { intelRepository, reportProgress } from "../intel/repository";
 import type { IntelBrief, IntelItem } from "../intel/types";
 
 /**
@@ -184,15 +184,28 @@ export async function syncAll() {
       if (id.startsWith("intelmedia:")) return row.updated_at > (localMedia.get(id.slice(11)) ?? "");
       const mine = id.startsWith("intelbrief:") ? localBriefs.get(id.slice(11)) : localIntel.get(id.slice(6)); return !mine || row.updated_at > (mine.updatedAt ?? "");
     }).map(row => String(row.id));
-    const fetched = new Map<string, unknown>();
-    for (let at = 0; at < newer.length; at += 40) { const { data } = await db.from("annotations").select("id, data").eq("document_id", INTEL).in("id", newer.slice(at, at + 40)); for (const row of data ?? []) fetched.set(String(row.id), row.data); }
+    // Rows come forty at a time, six requests at once, with progress shown: a new device pulls the whole base.
+    const fetched = new Map<string, unknown>(), groups: string[][] = [];
+    for (let at = 0; at < newer.length; at += 40) groups.push(newer.slice(at, at + 40));
+    const label = localIntel.size ? "인텔리전스 업데이트 반영 중" : "인텔리전스 전체 자료를 받는 중";
+    if (newer.length > 40) reportProgress({ label, done: 0, total: newer.length });
+    let received = 0;
+    for (let at = 0; at < groups.length; at += 6) {
+      await Promise.all(groups.slice(at, at + 6).map(async group => {
+        const { data } = await db.from("annotations").select("id, data").eq("document_id", INTEL).in("id", group);
+        for (const row of data ?? []) fetched.set(String(row.id), row.data);
+        received += group.length;
+        if (newer.length > 40) reportProgress({ label, done: received, total: newer.length });
+      }));
+    }
     const intelRows = (intelIndex ?? []).map(row => ({ ...row, data: fetched.get(String(row.id)) }));
     const intelPush: string[] = [], briefPush: string[] = [], seenIntel = new Set<string>(), seenBriefs = new Set<string>();
+    const itemWrites: IntelItem[] = [], coverWrites: { id: string; cover: string; updatedAt: string }[] = [];
     for (const row of intelRows) {
       const rowId = String(row.id);
       if (rowId.startsWith("intelmedia:")) {
         const id = rowId.slice(11), cover = (row.data as { cover?: string } | undefined)?.cover;
-        if (cover && row.updated_at > (localMedia.get(id) ?? "")) await intelRepository.putCover(id, cover, row.updated_at);
+        if (cover && row.updated_at > (localMedia.get(id) ?? "")) coverWrites.push({ id, cover, updatedAt: row.updated_at });
       } else if (rowId.startsWith("intelbrief:")) {
         const id = rowId.slice(11), mine = localBriefs.get(id); seenBriefs.add(id);
         if (!mine || row.updated_at > (mine.updatedAt ?? "")) { if (row.data) await intelRepository.putBriefRaw(row.data as IntelBrief); }
@@ -200,10 +213,14 @@ export async function syncAll() {
       } else if (rowId.startsWith("intel:")) {
         const id = rowId.slice(6), mine = localIntel.get(id); seenIntel.add(id);
         // A pack delivered by the research routine carries the facts; the reader's star, folder and memo stay.
-        if (!mine || row.updated_at > (mine.updatedAt ?? "")) { if (!row.data) continue; const remote = row.data as IntelItem; const keep = mine?.user && (mine.user.updatedAt ?? "") > (remote.user?.updatedAt ?? ""); await intelRepository.putRaw(keep ? { ...remote, user: mine!.user } : remote); if (keep) intelPush.push(id); }
+        if (!mine || row.updated_at > (mine.updatedAt ?? "")) { if (!row.data) continue; const remote = row.data as IntelItem; const keep = mine?.user && (mine.user.updatedAt ?? "") > (remote.user?.updatedAt ?? ""); itemWrites.push(keep ? { ...remote, user: mine!.user } : remote); if (keep) intelPush.push(id); }
         else if ((mine.updatedAt ?? "") > row.updated_at) intelPush.push(id);
       }
     }
+    // Written in a few large transactions, so the list fills at once instead of item by item.
+    if (itemWrites.length + coverWrites.length > 40) reportProgress({ label: "기기에 저장하는 중", done: 0, total: itemWrites.length + coverWrites.length });
+    for (let at = 0; at < Math.max(itemWrites.length, coverWrites.length); at += 400) await intelRepository.putManyRaw(itemWrites.slice(at, at + 400), coverWrites.slice(at, at + 400));
+    reportProgress(null);
     for (const id of localIntel.keys()) if (!seenIntel.has(id)) intelPush.push(id);
     for (const id of localBriefs.keys()) if (!seenBriefs.has(id)) briefPush.push(id);
     await pushIntel(intelPush, briefPush);
