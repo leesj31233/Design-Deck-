@@ -108,7 +108,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
   const [prices, setPrices] = useState<PriceBoardData | null>(null), [places, setPlaces] = useState<BasePlaces | null>(null);
   const load = useCallback(async () => {
     const [list, written] = await Promise.all([intelRepository.list(), intelRepository.briefs()]);
-    setItems(list); setBriefs(written.filter(brief => brief.id !== "__glossary__" && brief.id !== REGISTRY_BRIEF && brief.id !== PRICES_BRIEF && brief.id !== PLACES_BRIEF));
+    setItems(list); setBriefs(written.filter(brief => !brief.id.startsWith("__")));
     try { const stored = written.find(brief => brief.id === PLACES_BRIEF); setPlaces(stored ? cleanPlaces(JSON.parse(stored.body)) : null); } catch { setPlaces(null); }
     try { const stored = written.find(brief => brief.id === PRICES_BRIEF); setPrices(stored ? cleanPrices(JSON.parse(stored.body)) : null); } catch { setPrices(null); }
     try { const stored = written.find(brief => brief.id === REGISTRY_BRIEF); setRegistry(stored ? JSON.parse(stored.body) : null); } catch { setRegistry(null); }

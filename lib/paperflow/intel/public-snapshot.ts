@@ -23,6 +23,17 @@ async function readJson<T>(admin: SupabaseClient, path: string, fallback: T): Pr
   if (!data) return fallback;
   try { return JSON.parse(await data.text()) as T; } catch { return fallback; }
 }
+/** The covers already in the bucket, as "<id>.<v>" (file names are <id>.<v>.webp). */
+async function uploadedCovers(admin: SupabaseClient) {
+  const found = new Set<string>();
+  for (let offset = 0; offset < 20_000; offset += 1000) {
+    const { data, error } = await admin.storage.from(NEWS_BUCKET).list("covers", { limit: 1000, offset, sortBy: { column: "name", order: "asc" } });
+    if (error) throw new Error(error.message);
+    for (const file of data ?? []) if (file.name.endsWith(".webp")) found.add(file.name.slice(0, -5));
+    if (!data || data.length < 1000) break;
+  }
+  return found;
+}
 const put = (admin: SupabaseClient, path: string, body: Blob | string, type: string, cache: number) =>
   admin.storage.from(NEWS_BUCKET).upload(path, typeof body === "string" ? new Blob([body], { type }) : body, { contentType: type, cacheControl: String(cache), upsert: true });
 
@@ -31,17 +42,18 @@ export async function syncCovers(admin: SupabaseClient, budgetMs = 40_000) {
   const started = Date.now(), userId = await feedOwner(admin);
   if (!userId) throw new Error("owner not found");
   await ensureBucket(admin);
-  const index = await readJson<Record<string, string>>(admin, "covers/index.json", {});
+  const index = await readJson<Record<string, string>>(admin, "covers/index.json", {}), uploaded = await uploadedCovers(admin);
   // Which items are public: not an open question, not NAYSOR speaking about itself (the same rule as the feed).
   const heads = await rows(admin, userId, "intel:", "id, updated_at, kind:data->>kind, title:data->>title, titleKo:data->>titleKo, org:data->>org") as unknown as { id: string; kind: string; title?: string; titleKo?: string; org?: string }[];
   const shown = new Set(heads.filter(head => head.kind !== "gap" && !SELF.test(`${head.title ?? ""} ${head.titleKo ?? ""} ${head.org ?? ""}`)).map(head => head.id.slice(6)));
   const media = await rows(admin, userId, "intelmedia:", "id, updated_at");
-  const todo = media.map(row => ({ id: row.id.slice(11), v: version(row.updated_at) })).filter(entry => shown.has(entry.id) && index[entry.id] !== entry.v);
+  const todo = media.map(row => ({ id: row.id.slice(11), v: version(row.updated_at) })).filter(entry => shown.has(entry.id) && !uploaded.has(`${entry.id}.${entry.v}`) && index[entry.id] !== `-${entry.v}`);
   let done = 0;
   for (let at = 0; at < todo.length && Date.now() - started < budgetMs; at += 8) {
     await Promise.all(todo.slice(at, at + 8).map(async entry => {
       const picture = await publicMedia(admin, entry.id, null);
-      if (!picture) return;
+      // No picture to serve (not a WebP/PNG/JPEG data URL): remembered, so it is not tried on every call.
+      if (!picture) { index[entry.id] = `-${entry.v}`; return; }
       const { error } = await put(admin, `covers/${entry.id}.${entry.v}.webp`, new Blob([new Uint8Array(picture.bytes)], { type: picture.type }), picture.type, 31_536_000);
       if (!error) { index[entry.id] = entry.v; done++; }
     }));
@@ -55,9 +67,9 @@ export async function writeSnapshot(admin: SupabaseClient, origin: string) {
   await ensureBucket(admin);
   const feed = await buildFeed(admin, origin);
   if (!feed) throw new Error("no feed");
-  const index = await readJson<Record<string, string>>(admin, "covers/index.json", {});
+  const uploaded = await uploadedCovers(admin);
   const covers: Record<string, string> = {};
-  for (const [id, url] of Object.entries(feed.covers)) { const v = /[?&]v=([\w]+)/.exec(url)?.[1]; covers[id] = v && index[id] === v ? publicUrl(`covers/${id}.${v}.webp`) : url; }
+  for (const [id, url] of Object.entries(feed.covers)) { const v = /[?&]v=([\w]+)/.exec(url)?.[1]; covers[id] = v && uploaded.has(`${id}.${v}`) ? publicUrl(`covers/${id}.${v}.webp`) : url; }
   const stamp = Date.now().toString(36), parts: string[] = [];
   for (let at = 0, n = 0; at < Math.max(feed.items.length, 1); at += PART, n++) {
     const items = feed.items.slice(at, at + PART), ids = new Set(items.map(item => item.id)), path = `v/${stamp}/part-${n}.json`;

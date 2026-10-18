@@ -56,6 +56,8 @@ export function publicBrief(brief: IntelBrief): IntelBrief | null {
   // A price worked out by NAYSOR is shown as worked out, without the name.
   if (brief.id === PRICES_BRIEF) return { ...brief, body: brief.body.replace(/\s*NAYSOR\s*(계산|추정|산정)/g, " $1").replace(/NAYSOR|나이소르|네이소르/g, "") };
   if (brief.id === "__glossary__" || brief.id === PLACES_BRIEF) return brief;
+  // The research routine's own instructions (__guides__) and any other hidden briefing stay private.
+  if (brief.id.startsWith("__")) return null;
   if (PRIVATE_BRIEFS.test(brief.id) || JUDGEMENT.test(brief.title)) return null;
   const body = publicMarkdown(brief.body);
   return body ? { ...brief, body } : null;
