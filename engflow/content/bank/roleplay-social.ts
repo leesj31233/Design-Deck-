@@ -1776,14 +1776,14 @@ export const ROLEPLAY_SOCIAL: Question[] = [
       { speaker: "Linh", en: "Thank you. I learned a lot. I'll probably have more questions when I'm back in Hanoi, though.", ko: "고마워요. 많이 배웠어요. 그래도 하노이에 돌아가면 질문이 더 생길 것 같아요." },
     ],
     promptKo: "그럼요. 질문이 생기면 그냥 메일 주세요. 최대한 빨리 답장 드릴게요.",
-    segments: ["그럼요.", "질문 있으면 그냥 메일 주세요,", "최대한 빨리 답장 드릴게요"],
-    reference: "Of course. Just send me an email if you have any questions, and I'll get back to you as soon as I can.",
+    segments: ["그럼요.", "질문 있으면 그냥 메일 주세요.", "최대한 빨리 답장 드릴게요"],
+    reference: "Of course. Just send me an email if you have any questions. I'll get back to you as soon as I can.",
     accepted: [
       "Of course. Just email me if you have any questions, and I'll get back to you as soon as I can.",
       "Sure. If you have any questions, just send me an email, and I'll get back to you as soon as I can.",
       "Of course. Just send me an email if you have any questions, and I'll get back to you as soon as possible.",
-      "Of course. Just send me an email if you have any questions. I'll get back to you as soon as I can.",
       "Of course. Feel free to email me if you have any questions, and I'll reply as soon as I can.",
+      "Of course. Just send me an email if you have any questions, and I'll get back to you as soon as I can.",
     ],
     meaning: [
       { id: "sure", en: "of course", ko: "그럼요", any: ["course|sure|problem|definitely|absolutely|okay|ok"] },
@@ -1795,7 +1795,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
     pitfalls: [
       { id: "get-back-you", pattern: "get back =you", category: "preposition", severity: "major", fix: "get back to you", messageKo: "'(답을 갖고) 다시 연락하다'는 'get back to + 사람'입니다. to를 빠뜨리지 않습니다." },
     ],
-    hints: { pattern: "Just + 명령문 + if you have …, and I'll get back to you as soon as I can.", skeleton: "Of course. Just send me an email if you have any questions, and I'll ___ ____ __ you as soon as I can.", partial: "Of course. Just send me an email if you have any questions, and I'll…" },
+    hints: { pattern: "Just + 명령문 + if you have …. I'll get back to you as soon as I can.", skeleton: "Of course. Just send me an email if you have any questions. I'll ___ ____ __ you as soon as I can.", partial: "Of course. Just send me an email if you have any questions. I'll…" },
     explanationKo: "'다시 연락드릴게요/답 드릴게요'는 'I'll get back to you.'라고 하며, 사람 앞에 to가 꼭 필요합니다. if로 시작하는 조건절은 미래 일이라도 현재형(if you have)을 씁니다.",
     probes: [
       { answer: "Sure. If you have any questions, feel free to email me, and I'll get back to you as soon as possible.", expect: "pass" },
@@ -1816,7 +1816,7 @@ export const ROLEPLAY_SOCIAL: Question[] = [
     expression: "You too. Let's keep in touch.",
     contextKo: "린 씨가 이번 주에 함께 일해서 정말 좋았다고 합니다. 당신도 같은 마음이고, 앞으로도 연락하며 지내자고 말하고 싶습니다.",
     dialogue: [
-      { speaker: "Minsu", en: "Of course. Just send me an email if you have any questions, and I'll get back to you as soon as I can.", ko: "그럼요. 질문이 생기면 그냥 메일 주세요. 최대한 빨리 답장 드릴게요." },
+      { speaker: "Minsu", en: "Of course. Just send me an email if you have any questions. I'll get back to you as soon as I can.", ko: "그럼요. 질문이 생기면 그냥 메일 주세요. 최대한 빨리 답장 드릴게요." },
       { speaker: "Linh", en: "Thanks, Minsu. It was really nice working with you this week.", ko: "고마워요, 민수 씨. 이번 주에 같이 일해서 정말 좋았어요." },
     ],
     promptKo: "저도요. 앞으로도 연락하고 지내요.",

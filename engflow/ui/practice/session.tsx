@@ -2,7 +2,6 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, CheckCircle2, ChevronDown, CornerDownLeft, Eye, Languages, Lightbulb, Loader2, RotateCcw, SkipForward, Sparkles, Trophy, X } from "lucide-react";
-import { Kbd } from "@/components/ui/kbd";
 import { evaluateLocal, scoredErrors } from "../../core/evaluate";
 import { claudeApproved } from "../../core/learned";
 import { createGrader, gradeBudgetMs, type GradeVia } from "../../core/grader";
@@ -19,7 +18,7 @@ import { GRADE_LABEL_KO } from "../../core/scheduler";
 import { skillName } from "../../content";
 import { AIUnavailableError } from "../../platform/types";
 import { useApp } from "../store";
-import { Card, ConfirmDialog, Eyebrow, LevelBadge, ScoreRing, StatusChip, TONE_TEXT, cn, relTimeKo, scoreTone, useReduced } from "../kit";
+import { Button, Card, ConfirmDialog, Eyebrow, IconButton, Kbd, LevelBadge, NumberTicker, RevealGroup, RevealItem, ScoreRing, ShimmerText, StatusChip, TONE_TEXT, Tag, cn, relTimeKo, scoreTone, useReduced } from "../kit";
 import { ChatThread, MeaningChunks, MyTurn, SentencePrompt, type SaidLine } from "./parts";
 import { situationOf } from "../../core/situations";
 import { SITUATION_INFO } from "../../content";
@@ -102,9 +101,9 @@ function Hints({ q, level, onReveal }: { q: Question; level: HintLevel; onReveal
       </AnimatePresence>
       {level === 1 ? <p className="ef-ko px-1 text-[11px] text-[var(--muted)]">힌트를 쓰면 이 답은 독립 숙련 증거로 덜 반영됩니다(복습 간격도 짧아집니다).</p> : null}
       {level === 3 ? (
-        <button onClick={onReveal} className="dd-focus inline-flex items-center gap-1 px-1 text-[12px] text-[var(--muted)] underline underline-offset-4">
+        <Button type="button" variant="ghost" size="sm" onClick={onReveal} className="-ml-1 h-7 gap-1 px-2 text-[12px] text-[var(--muted)]">
           <Eye className="size-3" /> 정답 보기
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -452,7 +451,7 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <p className="ef-ko text-[15px] text-[var(--muted)]">이 세션에 표시할 문항이 없습니다.</p>
-        <button className="mt-4 h-11 rounded-xl border border-[var(--line)] px-4" onClick={onExit}>돌아가기</button>
+        <Button variant="secondary" className="mt-4 h-11" onClick={onExit}>돌아가기</Button>
       </div>
     );
   }
@@ -466,9 +465,9 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       {/* Top bar */}
       <header className="sticky top-[env(safe-area-inset-top,0px)] z-20 border-b border-[var(--line)] bg-[var(--background)]/85 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-3xl items-center gap-3 px-4">
-          <button onClick={requestExit} className="dd-focus -ml-2 grid size-10 place-items-center rounded-xl text-[var(--muted)] hover:bg-black/5 dark:hover:bg-white/10" aria-label="세션 종료">
+          <IconButton label="세션 종료" variant="ghost" onClick={requestExit} className="-ml-2 text-[var(--muted)]">
             <X className="size-5" />
-          </button>
+          </IconButton>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2 text-[12px]">
               <span className="flex min-w-0 items-center gap-1.5">
@@ -506,16 +505,16 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
         >
           {/* Meta */}
           <div className="flex flex-wrap items-center gap-1.5 text-[12px]">
-            <span className="rounded-full border border-[var(--line)] px-2 py-0.5 font-medium text-[var(--ef-ink-2)]">{isSentence ? "문장 말하기" : "짧은 표현"}</span>
-            <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[var(--ef-ink-2)]">
+            <Tag className="text-[12px] text-[var(--ef-ink-2)]">{isSentence ? "문장 말하기" : "짧은 표현"}</Tag>
+            <Tag className="text-[12px] font-medium text-[var(--ef-ink-2)]">
               {SITUATION_INFO[situationOf(q)].ko}
               {situationOf(q) === "technical" ? ` · ${CATEGORY_LABEL[q.category]}` : ""}
-            </span>
+            </Tag>
             <LevelBadge level={q.level} />
-            <span className="ef-num rounded-full bg-[var(--ef-track)] px-2 py-0.5 font-semibold text-[var(--ef-ink-2)]" aria-label={`난이도 ${q.difficulty}/10`}>
+            <Tag className="ef-num text-[12px] text-[var(--ef-ink-2)]" aria-label={`난이도 ${q.difficulty}/10`}>
               난이도 {q.difficulty}
-            </span>
-            {item.kind === "review" ? <span className="rounded-full bg-[var(--ef-warn-soft)] px-2 py-0.5 font-semibold text-[var(--ef-warn)]">{item.reasonKo}</span> : <span className="text-[var(--muted)]">{item.reasonKo}</span>}
+            </Tag>
+            {item.kind === "review" ? <Tag tone="warn" className="text-[12px]">{item.reasonKo}</Tag> : <span className="text-[var(--muted)]">{item.reasonKo}</span>}
           </div>
 
           <h1 className="mt-3 text-[22px] font-semibold tracking-[-.03em] md:text-[26px]" style={{ textWrap: "balance" }}>
@@ -528,9 +527,9 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
           {q.dialogue?.length ? (
             <div className="mt-5">
               <ChatThread turns={q.dialogue} showKo={showKo} slow={settings.slowSpeech} mine={q.scenario ? said[q.scenario.id]?.slice(0, q.scenario.step - 1) : undefined} />
-              <button onClick={() => setShowKo((v) => !v)} className="dd-focus ml-10 mt-1.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={showKo}>
+              <Button variant="ghost" size="sm" onClick={() => setShowKo((v) => !v)} className="ml-8 mt-1 h-7 gap-1 px-2 text-[12px] text-[var(--muted)]" aria-expanded={showKo}>
                 <Languages className="size-3.5" /> 번역 {showKo ? "숨기기" : "보기"}
-              </button>
+              </Button>
             </div>
           ) : null}
 
@@ -631,30 +630,32 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                 {practiceRetry ? <p className="ef-ko mt-1.5 px-1 text-[12px] text-[var(--muted)]">연습 재시도 — 학습 기록에는 첫 답이 반영됩니다.</p> : null}
 
                 <div className="mt-3 flex items-center gap-2">
-                  <button type="button" onClick={showHint} disabled={hint >= 4} className={cn("dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl border border-[var(--line)] px-3.5 text-[14px] font-medium disabled:opacity-40", flash === "hint" && "[animation:ef-flash_.45s_ease]")}>
+                  <Button type="button" variant="secondary" onClick={showHint} disabled={hint >= 4} className={cn("h-11 gap-1.5 px-3.5 text-[14px]", flash === "hint" && "[animation:ef-flash_.45s_ease]")}>
                     <Lightbulb className="size-4" /> 힌트 {hint ? `${hint}/4` : ""}
                     <Kbd className="ef-kbd-hint ml-1">⌥H</Kbd>
-                  </button>
+                  </Button>
                   {!practiceRetry ? (
-                    <button type="button" onClick={skip} className={cn("dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-[14px] text-[var(--muted)] hover:bg-black/5 dark:hover:bg-white/10", flash === "skip" && "[animation:ef-flash_.45s_ease]")}>
+                    <Button type="button" variant="ghost" onClick={skip} className={cn("h-11 gap-1.5 px-3 text-[14px] font-normal text-[var(--muted)]", flash === "skip" && "[animation:ef-flash_.45s_ease]")}>
                       <SkipForward className="size-4" /> 건너뛰기
-                    </button>
+                    </Button>
                   ) : null}
-                  <button
+                  <Button
                     type="submit"
+                    variant="primary"
                     disabled={phase === "grading"}
-                    className={cn("dd-focus ml-auto inline-flex h-11 min-w-[92px] items-center justify-center gap-2 rounded-xl bg-[var(--foreground)] px-5 text-[15px] font-semibold text-[var(--background)] transition active:scale-[.98] disabled:opacity-80", flash === "submit" && "opacity-80")}
+                    className={cn("ml-auto h-11 min-w-[92px] px-5 text-[15px] font-semibold disabled:opacity-80", flash === "submit" && "opacity-80")}
                   >
                     {phase === "grading" ? (
                       <>
-                        <Loader2 className="size-4 animate-spin" /> 채점 중
+                        {/* One moving thing at a time: the wait bar below takes over from the spinner. */}
+                        {wait ? null : <Loader2 className="size-4 animate-spin" />} 채점 중
                       </>
                     ) : (
                       <>
                         제출 <CornerDownLeft className="ef-kbd-hint size-4 opacity-70" />
                       </>
                     )}
-                  </button>
+                  </Button>
                 </div>
                 {phase === "grading" && wait ? (
                   <div className="mt-2" aria-live="polite">
@@ -662,12 +663,12 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
                       <div className="ef-grade-bar h-full rounded-full bg-[var(--accent)]" style={{ animationDuration: `${wait.budgetMs}ms` }} />
                     </div>
                     {wait.reworded && wait.budgetMs > 1500 ? (
-                      <p className="ef-ko mt-1.5 text-[12px] text-[var(--muted)]">표현이 기준 답안과 달라 Claude가 문법을 확인하고 있습니다.</p>
+                      <p className="ef-ko mt-1.5 text-[12px] text-[var(--muted)]"><ShimmerText>표현이 기준 답안과 달라 Claude가 문법을 확인하고 있습니다.</ShimmerText></p>
                     ) : null}
                     {slow ? (
-                      <button type="button" onClick={() => grader.skip()} className="dd-focus mt-1 text-[12px] text-[var(--muted)] underline underline-offset-4">
+                      <Button type="button" variant="ghost" size="sm" onClick={() => grader.skip()} className="-ml-2 mt-1 h-auto min-h-7 whitespace-normal px-2 py-1 text-left text-[12px] font-normal text-[var(--muted)] underline underline-offset-4">
                         기다리지 않고 바로 보기 (규칙 기반 — 놓친 오류가 있을 수 있음)
-                      </button>
+                      </Button>
                     ) : null}
                   </div>
                 ) : null}
@@ -731,17 +732,19 @@ export function SessionRunner({ spec, onExit, onPracticeSkill }: { spec: Session
       {phase === "feedback" ? (
         <div className="ef-safe-bottom sticky bottom-0 z-20 border-t border-[var(--line)] bg-[var(--background)]/90 pt-2 backdrop-blur-xl">
           <div className="mx-auto flex max-w-3xl items-center gap-2 px-4">
-            <button onClick={retry} className={cn("dd-focus inline-flex h-12 items-center gap-1.5 rounded-[14px] border border-[var(--line)] px-4 text-[14px] font-medium", flash === "retry" && "[animation:ef-flash_.45s_ease]")}>
+            <Button variant="secondary" size="lg" onClick={retry} className={cn("gap-1.5 px-4 text-[14px]", flash === "retry" && "[animation:ef-flash_.45s_ease]")}>
               <RotateCcw className="size-4" /> 다시 풀기 <Kbd className="ef-kbd-hint">⌥R</Kbd>
-            </button>
-            <button
+            </Button>
+            <Button
               ref={nextRef}
+              variant="primary"
+              size="lg"
               onClick={next}
-              className={cn("dd-focus ml-auto inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-[14px] bg-[var(--foreground)] px-5 text-[15px] font-semibold text-[var(--background)] sm:flex-none sm:min-w-44", flash === "next" && "opacity-80")}
+              className={cn("ml-auto flex-1 text-[15px] font-semibold sm:min-w-44 sm:flex-none", flash === "next" && "opacity-80")}
             >
               {idx + 1 >= queue.length ? "결과 보기" : "다음"} <ArrowRight className="size-4" />
               <Kbd className="ef-kbd-hint border-white/20 bg-white/10 text-inherit">Enter</Kbd>
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}
@@ -785,15 +788,9 @@ function SpeedTimer({ stoppedAt, now }: { stoppedAt: number | null; now: () => n
   }, [stoppedAt, now]);
   const s = Math.max(0, ((stoppedAt ?? t) - startedAt) / 1000);
   return (
-    <span
-      className={cn(
-        "ef-num inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums",
-        s < 5 ? "bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]" : s < 10 ? "bg-[var(--ef-warn-soft)] text-[var(--ef-warn)]" : "bg-[var(--ef-bad-soft)] text-[var(--ef-bad)]",
-      )}
-      aria-label={`응답 시간 ${s.toFixed(1)}초`}
-    >
+    <Tag tone={s < 5 ? "ok" : s < 10 ? "warn" : "bad"} className="ef-num tabular-nums" aria-label={`응답 시간 ${s.toFixed(1)}초`}>
       ⏱ {s.toFixed(1)}초
-    </span>
+    </Tag>
   );
 }
 
@@ -845,9 +842,9 @@ function SessionSummary({ spec, done, bestStreak, onExit, badgesBefore }: { spec
         <p className="ef-ko mt-1 text-[14px] text-[var(--muted)]">{spec.title}</p>
         {perfects || bestStreak >= 3 || goalNow ? (
           <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[12px]">
-            {goalNow ? <span className="rounded-full bg-[var(--ef-ok-soft)] px-2.5 py-1 font-semibold text-[var(--ef-ok)]">오늘 목표 달성 · {todayAnswered}문항</span> : null}
-            {perfects ? <span className="rounded-full bg-[var(--ef-accent-soft)] px-2.5 py-1 font-semibold text-[var(--ef-accent-ink)]">100점 {perfects}개</span> : null}
-            {bestStreak >= 3 ? <span className="rounded-full bg-[#ff9f0a]/15 px-2.5 py-1 font-semibold text-[#c25e00] dark:text-[#ffb340]">최고 {bestStreak}연속 정답</span> : null}
+            {goalNow ? <Tag tone="ok" className="px-2.5 py-1 text-[12px]">오늘 목표 달성 · {todayAnswered}문항</Tag> : null}
+            {perfects ? <Tag tone="accent" className="px-2.5 py-1 text-[12px]">100점 {perfects}개</Tag> : null}
+            {bestStreak >= 3 ? <Tag tone="warn" className="px-2.5 py-1 text-[12px]">최고 {bestStreak}연속 정답</Tag> : null}
           </div>
         ) : null}
         <NewBadgeList items={gained} />
@@ -857,7 +854,7 @@ function SessionSummary({ spec, done, bestStreak, onExit, badgesBefore }: { spec
           <Eyebrow>순발력</Eyebrow>
           <div className="mt-2 grid grid-cols-3 gap-2 text-center">
             <div>
-              <div className={cn("ef-num text-[22px] font-semibold", speedAvg < 5 ? "text-[var(--ef-ok)]" : speedAvg < 10 ? "text-[var(--ef-warn)]" : "text-[var(--ef-bad)]")}>{speedAvg.toFixed(1)}초</div>
+              <div className={cn("ef-num text-[22px] font-semibold", speedAvg < 5 ? "text-[var(--ef-ok)]" : speedAvg < 10 ? "text-[var(--ef-warn)]" : "text-[var(--ef-bad)]")}><NumberTicker value={speedAvg} format={(n) => n.toFixed(1)} />초</div>
               <div className="text-[11px] text-[var(--muted)]">평균 응답</div>
             </div>
             <div>
@@ -904,34 +901,40 @@ function SessionSummary({ spec, done, bestStreak, onExit, badgesBefore }: { spec
           <RoleplayReplay turns={roleplay.map((d) => ({ question: d.question, evaluation: d.evaluation }))} slow={app.state.settings.slowSpeech} />
         </div>
       ) : null}
-      <div className="mt-6 grid grid-cols-3 gap-2">
-        <Card className="p-4 text-center">
-          <div className="ef-num text-[24px] font-semibold">{done.length}</div>
-          <div className="text-[11px] text-[var(--muted)]">문항</div>
-        </Card>
-        <Card className="p-4 text-center">
-          <div className={cn("ef-num text-[24px] font-semibold", TONE_TEXT[scoreTone(avg)])}>{avg}</div>
-          <div className="text-[11px] text-[var(--muted)]">평균 점수</div>
-        </Card>
-        <Card className="p-4 text-center">
-          <div className="ef-num text-[24px] font-semibold">{good}/{done.length}</div>
-          <div className="text-[11px] text-[var(--muted)]">통과(좋음 이상)</div>
-        </Card>
-      </div>
+      <RevealGroup className="mt-6 grid grid-cols-3 gap-2">
+        <RevealItem>
+          <Card className="h-full p-4 text-center">
+            <div className="ef-num text-[24px] font-semibold"><NumberTicker value={done.length} /></div>
+            <div className="text-[11px] text-[var(--muted)]">문항</div>
+          </Card>
+        </RevealItem>
+        <RevealItem>
+          <Card className="h-full p-4 text-center">
+            <div className={cn("ef-num text-[24px] font-semibold", TONE_TEXT[scoreTone(avg)])}><NumberTicker value={avg} /></div>
+            <div className="text-[11px] text-[var(--muted)]">평균 점수</div>
+          </Card>
+        </RevealItem>
+        <RevealItem>
+          <Card className="h-full p-4 text-center">
+            <div className="ef-num text-[24px] font-semibold"><NumberTicker value={good} />/{done.length}</div>
+            <div className="text-[11px] text-[var(--muted)]">통과(좋음 이상)</div>
+          </Card>
+        </RevealItem>
+      </RevealGroup>
 
       {lastChange.size ? (
         <Card className="mt-3 p-4">
           <Eyebrow>숙련도 변화</Eyebrow>
-          <ul className="mt-2 space-y-2">
-            {[...lastChange.values()].map((c, i) => (
-              <motion.li key={c.skill} initial={reduced ? false : { opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 * i }} className="flex flex-wrap items-center gap-2 text-[14px]">
+          <RevealGroup as="ul" className="mt-2 space-y-2">
+            {[...lastChange.values()].map((c) => (
+              <RevealItem as="li" key={c.skill} className="flex flex-wrap items-center gap-2 text-[14px]">
                 <span className="font-medium">{skillName(c.skill)}</span>
                 <StatusChip status={c.from as never} />
                 <ArrowRight className="size-3.5 text-[var(--muted)]" />
                 <StatusChip status={c.to as never} />
-              </motion.li>
+              </RevealItem>
             ))}
-          </ul>
+          </RevealGroup>
         </Card>
       ) : null}
 
@@ -960,21 +963,23 @@ function SessionSummary({ spec, done, bestStreak, onExit, badgesBefore }: { spec
         </Card>
       ) : null}
 
-      <Card className="mt-3 divide-y divide-[var(--line)]">
+      <RevealGroup className="mt-3">
+      <Card className="divide-y divide-[var(--line)]">
         {done.map((d, i) => (
-          <div key={i} className="flex items-center gap-3 px-4 py-3">
+          <RevealItem key={i} className="flex items-center gap-3 px-4 py-3">
             <ScoreRing score={d.result.attempt.overall} size={40} stroke={4} />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[14px] font-medium">{d.question.topic}</div>
               <div className="ef-en truncate text-[12px] text-[var(--muted)]">{d.result.attempt.skipped ? "건너뜀" : d.evaluation.answer}</div>
             </div>
             <span className="shrink-0 text-[11px] font-semibold text-[var(--muted)]">{GRADE_LABEL_KO[d.result.grade]}</span>
-          </div>
+          </RevealItem>
         ))}
       </Card>
+      </RevealGroup>
 
       <div className="mt-6 flex gap-2">
-        <button onClick={onExit} className="dd-focus h-12 flex-1 rounded-[14px] bg-[var(--foreground)] text-[15px] font-semibold text-[var(--background)]">완료</button>
+        <Button variant="primary" size="lg" onClick={onExit} className="flex-1 text-[15px] font-semibold">완료</Button>
       </div>
       <p className="ef-ko mt-3 text-center text-[11px] text-[var(--muted)]">{Object.keys(STATUS_LABEL_KO).length ? "숙달은 서로 다른 날, 서로 다른 문장에서 힌트 없이 반복해 맞혀야 인정됩니다." : null}</p>
     </div>

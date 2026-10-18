@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DIAGNOSTIC_ITEMS } from "@/engflow/content";
+import { DIAGNOSTIC_ITEMS, DIAGNOSTIC_POOL } from "@/engflow/content";
 import { cefrOf, creditFromOrder, finishDiagnostic, nextDiagnosticItem, recordDiagnosticResponse, startDiagnostic, totalItems, type DiagnosticLength } from "@/engflow/core/diagnostic";
 
 /** Simulated learner: succeeds on items easier than their true ability. */
@@ -70,5 +70,36 @@ describe("grading sheets", () => {
     let st = createInitialState(0);
     for (let k = 0; k < 5; k++) st = applyDiagnostic(st, { ...r, id: `r${k}`, at: k + 1 });
     expect(st.diagnostics.map((d) => !!d.sheets)).toEqual([false, false, true, true, true]);
+  });
+});
+
+describe("item variety", () => {
+  function run(seed: number, theta: number, avoid = new Set<string>()) {
+    let s = startDiagnostic("standard", seed);
+    const ids: string[] = [];
+    for (;;) {
+      const item = nextDiagnosticItem(s, DIAGNOSTIC_POOL, avoid);
+      if (!item) break;
+      ids.push(item.id);
+      const p = 1 / (1 + Math.exp(-1.7 * (theta - item.b)));
+      s = recordDiagnosticResponse(s, { itemId: item.id, part: item.part, kind: item.kind, b: item.b, score: p > 0.5 ? 0.9 : 0.2, skills: item.skills, responseMs: 20000, firstKeyMs: 2000, words: 12 });
+    }
+    return { ids, r: finishDiagnostic(s, 1) };
+  }
+
+  it("every part has a large pool, so retakes differ", () => {
+    for (let p = 1; p <= 5; p++) expect(DIAGNOSTIC_POOL.filter((i) => i.part === p).length).toBeGreaterThan(100);
+    const a = run(1000, 0.5).ids;
+    const b = run(2000, 0.5).ids;
+    const shared = a.filter((id) => b.includes(id)).length;
+    expect(shared).toBeLessThan(a.length / 3);
+  });
+
+  it("items from recent tests are not asked again, and placement stays right", () => {
+    const first = run(3000, 1.2);
+    const second = run(4000, 1.2, new Set(first.ids));
+    expect(second.ids.filter((id) => first.ids.includes(id))).toEqual([]);
+    expect(Math.abs(second.r.theta - first.r.theta)).toBeLessThan(0.8);
+    expect(run(5000, -1).r.theta).toBeLessThan(run(6000, 1.5).r.theta - 1);
   });
 });

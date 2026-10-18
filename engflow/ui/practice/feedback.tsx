@@ -3,7 +3,7 @@ import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { AlertTriangle, BadgeCheck, BookOpen, CheckCircle2, ChevronDown, Copy, Cpu, Info, RotateCcw, Sparkles, TrendingDown } from "lucide-react";
 import type { Evaluation, Question } from "../../core/types";
-import { Card, Eyebrow, Meter, ScoreRing, TONE_TEXT, cn, scoreTone, useReduced } from "../kit";
+import { BorderBeam, Button, Card, Eyebrow, Meter, Pressable, ScoreRing, TONE_TEXT, Tag, cn, scoreTone, useReduced } from "../kit";
 import { AnswerHighlight, BUCKET_COLOR, CATEGORY_KO, DiffLine, MeaningCheckList, SEVERITY_KO, markClass } from "./parts";
 import type { GuideTab } from "../guide";
 import type { Celebration } from "../../core/celebration";
@@ -54,7 +54,9 @@ export function FeedbackPanel({
       {celebration ? <CelebrationBanner c={celebration} effects={effects} sound={sound} /> : null}
       {/* Verdict */}
       <motion.div {...stagger(0)}>
-        <Card className="p-4 md:p-5">
+        <Card className="relative p-4 md:p-5">
+          {/* A perfect answer: one light runs around the verdict, once. */}
+          {s.overall === 100 ? <BorderBeam duration={2.2} /> : null}
           <div className="flex items-start gap-4">
             <ScoreRing score={s.overall} size={compact ? 64 : 84} label="종합" />
             <div className="min-w-0 flex-1">
@@ -114,9 +116,11 @@ export function FeedbackPanel({
                 const cls = markClass(er);
                 return (
                   <li key={er.id}>
-                    <button
+                    <Pressable
+                      type="button"
+                      lift={1}
                       onClick={() => setActive((a) => (a === er.id ? null : er.id))}
-                      className={cn("dd-focus w-full rounded-2xl border p-3 text-left transition", active === er.id ? "border-[var(--foreground)]/30 bg-[var(--background)]" : "border-[var(--line)]")}
+                      className={cn("w-full rounded-2xl border p-3 transition-colors", active === er.id ? "border-[var(--foreground)]/30 bg-[var(--background)]" : "border-[var(--line)]")}
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold">
@@ -124,7 +128,7 @@ export function FeedbackPanel({
                           {CATEGORY_KO[er.category] ?? er.category}
                         </span>
                         {er.advisory ? (
-                          <span className="rounded-full border border-dashed border-[var(--line)] px-1.5 text-[10px] font-semibold text-[var(--muted)]">참고 · 점수 미반영</span>
+                          <Tag className="border-dashed bg-transparent px-1.5 py-0 text-[10px] dark:bg-transparent">참고 · 점수 미반영</Tag>
                         ) : er.category === "spelling" ? (
                           <span className="text-[10px] font-semibold text-[var(--muted)]">감점 거의 없음</span>
                         ) : (
@@ -137,7 +141,7 @@ export function FeedbackPanel({
                         </span>
                       </div>
                       <p className="ef-ko mt-1.5 text-[14px] text-[var(--ef-ink-2)]">{er.messageKo}</p>
-                    </button>
+                    </Pressable>
                   </li>
                 );
               })}
@@ -177,24 +181,24 @@ export function FeedbackPanel({
             <p className="ef-en mt-2 text-[17px] font-medium leading-7">{e.recommended}</p>
             {question.expression ? (
               <p className="mt-2 flex flex-wrap items-baseline gap-x-2 text-[13px]">
-                <span className="rounded bg-[var(--ef-accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--ef-accent-ink)]">핵심 표현</span>
+                <Tag tone="accent" className="rounded-md px-1.5 text-[10px]">핵심 표현</Tag>
                 <span className="ef-en font-medium">{question.expression}</span>
               </p>
             ) : null}
           </div>
           {e.advanced || e.alternatives.length ? (
             <div className="p-4 md:p-5">
-              <button className="dd-focus flex w-full items-center justify-between rounded-lg text-left" onClick={() => setShowMore((v) => !v)} aria-expanded={showMore}>
+              <Button variant="ghost" size="sm" className="-mx-2 h-8 w-[calc(100%+16px)] justify-between px-2" onClick={() => setShowMore((v) => !v)} aria-expanded={showMore}>
                 <Eyebrow>다른 자연스러운 표현</Eyebrow>
                 <ChevronDown className={cn("size-4 text-[var(--muted)] transition", showMore && "rotate-180")} />
-              </button>
+              </Button>
               <AnimatePresence initial={false}>
                 {showMore ? (
                   <motion.div initial={reduced ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduced ? undefined : { height: 0, opacity: 0 }} className="overflow-hidden">
                     <div className="space-y-2 pt-2">
                       {e.advanced ? (
                         <p className="ef-en text-[15px]">
-                          <span className="mr-2 rounded bg-[var(--ef-accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--ef-accent-ink)]">고급 · 선택</span>
+                          <Tag tone="accent" className="mr-2 rounded-md px-1.5 align-[1px] text-[10px]">고급 · 선택</Tag>
                           {e.advanced}
                         </p>
                       ) : null}
@@ -232,9 +236,9 @@ export function FeedbackPanel({
                   ["compare", "비슷한 표현 비교"],
                 ] as [GuideTab, string][]
               ).map(([t, label]) => (
-                <button key={t} onClick={() => onGuide(mainSkill, t)} className="dd-focus h-9 whitespace-nowrap rounded-full border border-[var(--line)] px-3 text-[13px] font-medium hover:bg-black/[.04] dark:hover:bg-white/[.06]">
+                <Button key={t} variant="secondary" size="sm" onClick={() => onGuide(mainSkill, t)} className="h-9 whitespace-nowrap rounded-full px-3 text-[13px]">
                   {label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -273,28 +277,30 @@ function EvaluatorBadge({ evaluation, ms }: { evaluation: Evaluation; ms: number
   const time = ms !== null ? <span className="ef-num font-normal opacity-80">· {secondsKo(ms)}</span> : null;
   if (evaluation.exact && evaluation.learned)
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-ok-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-ok)]" title="전에 Claude가 정확하다고 확인한 내 표현이라 기다리지 않고 바로 채점했습니다.">
+      <Tag tone="ok" title="전에 Claude가 정확하다고 확인한 내 표현이라 기다리지 않고 바로 채점했습니다.">
         <BadgeCheck className="size-3" /> Claude 확인한 내 표현 {time}
-      </span>
+      </Tag>
     );
   if (evaluation.evaluator === "ai")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ef-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--ef-accent-ink)]" title="Claude가 문법을 정밀 채점했습니다. 점수는 오류 목록으로 계산합니다.">
+      <Tag tone="accent" title="Claude가 문법을 정밀 채점했습니다. 점수는 오류 목록으로 계산합니다.">
         <Sparkles className="size-3" /> Claude 채점 {time}
-      </span>
+      </Tag>
     );
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium text-[var(--muted)]" title="기준 답안·의미 단위·문법 규칙으로 즉시 채점">
+    <Tag className="font-medium" title="기준 답안·의미 단위·문법 규칙으로 즉시 채점">
       <Cpu className="size-3" /> 규칙 기반 {time}
-    </span>
+    </Tag>
   );
 }
 
 function CopyButton({ text }: { text: string }) {
   const [done, setDone] = React.useState(false);
   return (
-    <button
-      className="dd-focus inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] text-[var(--muted)] hover:bg-black/5 dark:hover:bg-white/10"
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-7 gap-1 rounded-lg px-2 text-[11px] font-normal text-[var(--muted)]"
       onClick={() => {
         navigator.clipboard
           ?.writeText(text)
@@ -308,6 +314,6 @@ function CopyButton({ text }: { text: string }) {
     >
       <Copy className="size-3" />
       {done ? "복사됨" : "복사"}
-    </button>
+    </Button>
   );
 }

@@ -2,8 +2,7 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, ClipboardCheck, ExternalLink, Info, MessageCircle, MicOff, RotateCcw, Timer, X } from "lucide-react";
-import { Kbd } from "@/components/ui/kbd";
-import { DIAGNOSTIC_ITEMS, skillName } from "../../content";
+import { DIAGNOSTIC_POOL, skillName } from "../../content";
 import type { DiagnosticItem } from "../../content/types";
 import { CEFR_DESCRIPTORS, TOEIC_SPEAKING, toeicContext } from "../../content/cefr";
 import {
@@ -16,7 +15,7 @@ import { CEFR_ORDER, type Cefr, type DiagnosticResultRecord, type DiagnosticShee
 import { useApp } from "../store";
 import { useNav } from "../app";
 import { useStartLesson } from "./today";
-import { Badge, Button, Card, ConfirmDialog, Eyebrow, LevelBadge, Meter, RevealGroup, RevealItem, SegmentedControl, cn, dateKo, scoreTone, useReduced } from "../kit";
+import { Badge, Button, Card, ConfirmDialog, Eyebrow, IconButton, Kbd, LevelBadge, Meter, Pressable, Progress, RevealGroup, RevealItem, SegmentedControl, Spotlight, cn, dateKo, scoreTone, useReduced } from "../kit";
 import { CefrScale } from "../charts";
 import { AnswerHighlight, CATEGORY_KO, DiffLine, SEVERITY_KO, SPEAK_FIRST_HINT_KO } from "../practice/parts";
 
@@ -72,26 +71,30 @@ function TestHome({ onStart, onOpen }: { onStart: (l: DiagnosticLength) => void;
         </ol>
       </Card>
       <div className="grid gap-3 md:grid-cols-2">
-        <button onClick={() => onStart("standard")} className="dd-focus rounded-[var(--radius)] text-left">
-          <Card className="h-full p-5 transition hover:border-[var(--foreground)]/30">
+        <Pressable type="button" onClick={() => onStart("standard")} className="rounded-[var(--radius)]">
+          <Card className="h-full overflow-hidden p-0 transition hover:border-[var(--foreground)]/30">
+            <Spotlight className="h-full p-5">
             <div className="flex items-center justify-between">
               <span className="text-[17px] font-semibold">기본 테스트</span>
               <span className="ef-num text-[13px] text-[var(--muted)]">{totalItems("standard")}문항 · 15–20분</span>
             </div>
             <p className="ef-ko mt-1.5 text-[13px] text-[var(--muted)]">학습 시작 수준을 정하기에 충분합니다.</p>
             <span className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold">시작 <ArrowRight className="size-4" /></span>
+            </Spotlight>
           </Card>
-        </button>
-        <button onClick={() => onStart("extended")} className="dd-focus rounded-[var(--radius)] text-left">
-          <Card className="h-full p-5 transition hover:border-[var(--foreground)]/30">
+        </Pressable>
+        <Pressable type="button" onClick={() => onStart("extended")} className="rounded-[var(--radius)]">
+          <Card className="h-full overflow-hidden p-0 transition hover:border-[var(--foreground)]/30">
+            <Spotlight className="h-full p-5">
             <div className="flex items-center justify-between">
               <span className="text-[17px] font-semibold">정밀 테스트</span>
               <span className="ef-num text-[13px] text-[var(--muted)]">{totalItems("extended")}문항 · 25–35분</span>
             </div>
             <p className="ef-ko mt-1.5 text-[13px] text-[var(--muted)]">문항이 많을수록 추정 범위가 좁아지고 신뢰도가 올라갑니다.</p>
             <span className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold">시작 <ArrowRight className="size-4" /></span>
+            </Spotlight>
           </Card>
-        </button>
+        </Pressable>
       </div>
       <p className="ef-ko flex items-start gap-1.5 text-[12px] text-[var(--muted)]">
         <Info className="mt-0.5 size-3.5 shrink-0" /> 테스트 중에는 힌트와 정답 피드백이 없습니다. 작문 문항은 규칙 기반 자동 채점(기준 답안·의미 단위·문법 규칙)으로 일관되게 채점됩니다.
@@ -103,10 +106,10 @@ function TestHome({ onStart, onOpen }: { onStart: (l: DiagnosticLength) => void;
             <ul className="divide-y divide-[var(--line)]">
               {history.map((r) => (
                 <li key={r.id}>
-                  <button onClick={() => onOpen(r)} className="dd-focus flex w-full items-center justify-between px-4 py-3 text-left text-[14px]">
+                  <Button variant="ghost" onClick={() => onOpen(r)} className="h-auto w-full justify-between rounded-none px-4 py-3 text-left text-[14px] font-normal first:rounded-t-[inherit]">
                     <span>{dateKo(r.at)} · {r.length === "extended" ? "정밀" : "기본"} {r.items}문항</span>
                     <span className="font-semibold">{r.cefrLow === r.cefrHigh ? r.cefrPoint : `${r.cefrLow}–${r.cefrHigh}`}</span>
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -134,7 +137,9 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
   const app = useApp();
   const reduced = useReduced();
   const [session, setSession] = React.useState<DiagnosticSession>(() => startDiagnostic(length, app.now()));
-  const item = React.useMemo(() => nextDiagnosticItem(session, DIAGNOSTIC_ITEMS), [session]);
+  // Items from the last three tests are passed over, so a retake asks different questions.
+  const avoid = React.useMemo(() => new Set(app.state.diagnostics.slice(-3).flatMap((d) => d.sheets?.map((x) => x.itemId) ?? [])), [app.state.diagnostics]);
+  const item = React.useMemo(() => nextDiagnosticItem(session, DIAGNOSTIC_POOL, avoid), [session, avoid]);
   const [choice, setChoice] = React.useState<number | null>(null);
   const [order, setOrder] = React.useState<string[]>([]);
   const [text, setText] = React.useState("");
@@ -221,17 +226,15 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex items-center gap-3">
-        <button onClick={() => setConfirm(true)} className="dd-focus -ml-2 grid size-10 place-items-center rounded-xl text-[var(--muted)]" aria-label="테스트 중단">
+        <IconButton label="테스트 중단" variant="ghost" onClick={() => setConfirm(true)} className="-ml-2 text-[var(--muted)]">
           <X className="size-5" />
-        </button>
+        </IconButton>
         <div className="min-w-0 flex-1">
           <div className="flex justify-between text-[12px]">
             <span className="font-semibold">Part {part} · {PART_NAMES_KO[(part ?? 1) - 1]}</span>
             <span className="ef-num text-[var(--muted)]" data-testid="test-progress">{n + 1} / {total}</span>
           </div>
-          <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-[var(--ef-track)]">
-            <div className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-300" style={{ width: `${(n / total) * 100}%` }} />
-          </div>
+          <Progress className="mt-1.5" value={(n / total) * 100} />
         </div>
       </div>
 
@@ -243,16 +246,18 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
               {item.stemEn ? <p className="ef-en mt-2 text-[20px] font-semibold tracking-[-.01em]">{item.stemEn}</p> : null}
               <div className="mt-5 grid gap-2" role="radiogroup" aria-label="보기">
                 {item.options!.map((o, i) => (
-                  <button
+                  <Pressable
                     key={o}
+                    type="button"
+                    lift={1}
                     role="radio"
                     aria-checked={choice === i}
                     onClick={() => setChoice(i)}
-                    className={cn("dd-focus flex min-h-12 items-center gap-3 rounded-2xl border px-4 py-3 text-left transition", choice === i ? "border-[var(--foreground)] bg-[var(--surface-strong)] ring-2 ring-[var(--foreground)]/10" : "border-[var(--line)] bg-[var(--surface-strong)] hover:border-[var(--foreground)]/30")}
+                    className={cn("flex min-h-12 items-center gap-3 rounded-2xl border px-4 py-3 transition-colors", choice === i ? "border-[var(--foreground)] bg-[var(--surface-strong)] ring-2 ring-[var(--foreground)]/10" : "border-[var(--line)] bg-[var(--surface-strong)] hover:border-[var(--foreground)]/30")}
                   >
                     <Kbd className="shrink-0">{i + 1}</Kbd>
                     <span className="ef-en text-[16px]">{o}</span>
-                  </button>
+                  </Pressable>
                 ))}
               </div>
             </div>
@@ -266,9 +271,9 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
                 {order.length ? (
                   <div className="flex flex-wrap gap-1.5">
                     {order.map((c, i) => (
-                      <button key={`${c}-${i}`} data-chunk="placed" aria-label={`${c} (빼기)`} onClick={() => setOrder((o) => o.filter((_, k) => k !== i))} className="dd-focus ef-en rounded-xl bg-[var(--foreground)] px-3 py-2 text-[15px] text-[var(--background)]">
+                      <Button key={`${c}-${i}`} variant="primary" data-chunk="placed" aria-label={`${c} (빼기)`} onClick={() => setOrder((o) => o.filter((_, k) => k !== i))} className="ef-en h-auto min-h-10 px-3 py-2 text-[15px] font-normal">
                         {c}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 ) : (
@@ -279,16 +284,16 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
                 {shuffleFor(item.id, item.chunks!)
                   .filter((c) => !order.includes(c))
                   .map((c, i) => (
-                    <button key={c} data-chunk="pool" onClick={() => setOrder((o) => [...o, c])} className="dd-focus ef-en inline-flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-2 text-[15px]">
+                    <Button key={c} variant="secondary" data-chunk="pool" onClick={() => setOrder((o) => [...o, c])} className="ef-en h-auto min-h-10 px-3 py-2 text-[15px] font-normal">
                       <Kbd className="ef-kbd-hint">{i + 1}</Kbd>
                       {c}
-                    </button>
+                    </Button>
                   ))}
               </div>
               {order.length ? (
-                <button onClick={() => setOrder([])} className="mt-3 inline-flex items-center gap-1 text-[12px] text-[var(--muted)]">
+                <Button variant="ghost" size="sm" onClick={() => setOrder([])} className="-ml-2 mt-2 h-7 gap-1 px-2 text-[12px] font-normal text-[var(--muted)]">
                   <RotateCcw className="size-3" /> 처음부터
-                </button>
+                </Button>
               ) : null}
             </div>
           ) : null}
@@ -342,9 +347,9 @@ function TestRunner({ length, onCancel, onDone }: { length: DiagnosticLength; on
         <span className="flex items-center gap-1 text-[12px] text-[var(--muted)]">
           <Timer className="size-3.5" /> 응답 시간이 기록됩니다
         </span>
-        <button onClick={submit} disabled={!ready} className="dd-focus ml-auto inline-flex h-12 items-center gap-2 rounded-[14px] bg-[var(--foreground)] px-6 text-[15px] font-semibold text-[var(--background)] disabled:opacity-40">
+        <Button variant="primary" size="lg" onClick={submit} disabled={!ready} className="ml-auto px-6 text-[15px] font-semibold">
           {n + 1 >= total ? "결과 보기" : "다음"} <ArrowRight className="size-4" />
-        </button>
+        </Button>
       </div>
       <ConfirmDialog open={confirm} onOpenChange={setConfirm} title="테스트를 중단할까요?" body="지금까지의 답은 저장되지 않고, 레벨 추정도 바뀌지 않습니다." confirmLabel="중단" onConfirm={onCancel} />
     </div>
@@ -364,7 +369,7 @@ function TestResult({ r, onBack }: { r: DiagnosticResultRecord; onBack: () => vo
   const highCtx = toeicContext(r.cefrHigh);
   return (
     <div className="space-y-4">
-      <button onClick={onBack} className="text-[13px] text-[var(--muted)] hover:text-[var(--foreground)]">← 레벨 테스트</button>
+      <Button variant="ghost" size="sm" onClick={onBack} className="-ml-2 self-start px-2 text-[13px] font-normal text-[var(--muted)] hover:text-[var(--foreground)]">← 레벨 테스트</Button>
       <div>
         <Eyebrow>Written Production / Meeting English Estimate</Eyebrow>
         <h1 className="mt-1.5 text-[26px] font-semibold tracking-[-.04em]">작문 기반 회의 영어 추정: {range}</h1>
@@ -411,7 +416,7 @@ function TestResult({ r, onBack }: { r: DiagnosticResultRecord; onBack: () => vo
           <div>
             <Eyebrow>약점</Eyebrow>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {r.weaknesses.length ? r.weaknesses.map((s) => <button key={s} onClick={() => nav.openGuide(s)} className="rounded-full bg-[var(--ef-bad-soft)] px-2.5 py-1 text-[12px] font-medium text-[var(--ef-bad)]">{skillName(s)}</button>) : <span className="text-[13px] text-[var(--muted)]">뚜렷한 약점 문법이 없습니다.</span>}
+              {r.weaknesses.length ? r.weaknesses.map((s) => <Button key={s} variant="ghost" size="sm" onClick={() => nav.openGuide(s)} className="h-7 rounded-full border-red-500/20 bg-[var(--ef-bad-soft)] px-2.5 text-[12px] text-[var(--ef-bad)] hover:bg-[var(--ef-bad-soft)] hover:brightness-95 dark:hover:bg-[var(--ef-bad-soft)]">{skillName(s)}</Button>) : <span className="text-[13px] text-[var(--muted)]">뚜렷한 약점 문법이 없습니다.</span>}
             </div>
           </div>
           <div className="rounded-2xl bg-[var(--ef-accent-soft)] p-4">
@@ -422,9 +427,9 @@ function TestResult({ r, onBack }: { r: DiagnosticResultRecord; onBack: () => vo
               <li>· {r.sub.construction < r.sub.grammar ? "문장 구성이 약해 처음 2주는 짧은 표현 비중을 높입니다." : "문장 말하기로 긴 회의 문장을 꾸준히 연습합니다."}</li>
               {r.weaknesses.length ? <li>· 집중 문법: {r.weaknesses.slice(0, 3).map(skillName).join(", ")}</li> : null}
             </ul>
-            <button onClick={() => start({ title: "맞춤 학습", size: 10 })} className="dd-focus mt-3 inline-flex h-11 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]">
+            <Button variant="primary" onClick={() => start({ title: "맞춤 학습", size: 10 })} className="mt-3 h-11 gap-1.5 text-[14px] font-semibold">
               맞춤 학습 시작 <ArrowRight className="size-4" />
-            </button>
+            </Button>
           </div>
         </Card>
       </div>
@@ -554,10 +559,12 @@ function AnswerSheets({ r }: { r: DiagnosticResultRecord }) {
             const tone = scoreTone(s.score);
             return (
               <RevealItem as="li" key={s.itemId} className="py-1">
-                <button
+                <Pressable
+                  type="button"
+                  lift={0}
                   onClick={() => setOpen(isOpen ? null : s.itemId)}
                   aria-expanded={isOpen}
-                  className="dd-focus flex w-full items-center gap-3 rounded-xl px-1 py-2.5 text-left hover:bg-black/[.03] dark:hover:bg-white/[.04]"
+                  className="flex w-full items-center gap-3 rounded-xl px-1 py-2.5 hover:bg-black/[.03] dark:hover:bg-white/[.04]"
                 >
                   <span className="ef-num w-6 shrink-0 text-[12px] text-[var(--muted)]">{i + 1}</span>
                   <span className="min-w-0 flex-1">
@@ -567,7 +574,7 @@ function AnswerSheets({ r }: { r: DiagnosticResultRecord }) {
                     <span className="ef-ko mt-0.5 block truncate text-[14px]">{s.promptKo || s.promptEn}</span>
                   </span>
                   <span className={cn("ef-num shrink-0 text-[17px] font-semibold", tone === "ok" ? "text-[var(--ef-ok)]" : tone === "warn" ? "text-[var(--ef-warn)]" : "text-[var(--ef-bad)]")}>{s.score}</span>
-                </button>
+                </Pressable>
                 {isOpen ? <SheetDetail s={s} /> : null}
               </RevealItem>
             );

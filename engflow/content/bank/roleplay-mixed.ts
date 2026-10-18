@@ -832,7 +832,7 @@ export const ROLEPLAY_MIXED: Question[] = [
     level: "B2",
     difficulty: 7,
     skills: ["passive", "relative-clause"],
-    expression: "The operating cost was underestimated by about 8%, which could affect the payback period.",
+    expression: "The operating cost was calculated about 8% too low, which could affect the payback period.",
     contextKo: "팀장님이 영향이 얼마나 크냐고 묻습니다. 그 결과 운영비가 약 8% 낮게 계산되었고, 투자 회수 기간에도 영향을 줄 수 있다고 설명합니다.",
     dialogue: [
       { speaker: "Minsu", en: "I'm really sorry. I've just realized that I used last year's steam price in the calculation.", ko: "정말 죄송합니다. 계산할 때 작년 스팀 단가를 썼다는 걸 방금 알았어요." },
@@ -840,7 +840,7 @@ export const ROLEPLAY_MIXED: Question[] = [
     ],
     promptKo: "그 결과 운영비가 약 8% 낮게 계산됐는데, 그게 투자 회수 기간에 영향을 줄 수 있어요.",
     segments: ["그 결과 운영비가 약 8% 낮게 계산됐어요", "그게 투자 회수 기간에 영향을 줄 수 있어요"],
-    reference: "As a result, the operating cost was underestimated by about 8%, which could affect the payback period.",
+    reference: "As a result, the operating cost was calculated about 8% too low, which could affect the payback period.",
     accepted: [
       "As a result, the operating cost was underestimated by around 8%, which could affect the payback period.",
       "As a result, the operating cost is about 8% too low, which could affect the payback period.",
@@ -849,6 +849,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       "As a result, the operating cost was about 8% too low, which could affect the payback period.",
       "As a result, the operating cost has been underestimated by about 8%, which could affect the payback period.",
     ],
+    advanced: "As a result, the operating cost was underestimated by about 8%, which could affect the payback period.",
     meaning: [
       { id: "result", en: "as a result", ko: "그 결과", any: ["result|so|because|therefore|means"], weight: 0.5 },
       { id: "opex", en: "the operating cost", ko: "운영비", any: ["operating|running|operation ... cost|costs", "opex"], critical: true },
@@ -862,8 +863,8 @@ export const ROLEPLAY_MIXED: Question[] = [
       { id: "effect-verb", pattern: "re:(?<=\\b(?:could|can|might|may|will|would) )effect\\b", category: "word-choice", severity: "major", fix: "affect", messageKo: "'~에 영향을 주다'는 동사 affect입니다. effect는 명사(영향)라서 'could affect the payback period'라고 합니다." },
       { id: "affect-to", pattern: "re:(?<=\\baffect(?:s|ed)? )(to|on)(?= the\\b)", category: "preposition", severity: "major", fix: "", messageKo: "affect는 목적어를 바로 받으므로 to나 on 없이 'affect the payback period'라고 합니다. (명사로는 'have an effect on'.)" },
     ],
-    hints: { pattern: "As a result, + 주어 + was + 과거분사 + by + 수치, which could + 동사 …", skeleton: "As a result, the operating cost was ______________ by about 8%, _____ could affect the payback period.", partial: "As a result, the operating cost was underestimated…" },
-    explanationKo: "비용이 '낮게 계산되었다'는 수동태 'was underestimated'로 말하고, 차이는 'by about 8%'처럼 by로 나타냅니다. 앞 문장 전체를 받아 '그게 ~할 수 있어요'라고 덧붙일 때는 ', which could …'를 쓰며, affect는 동사라서 to/on 없이 목적어를 바로 받습니다.",
+    hints: { pattern: "As a result, + 주어 + was + 과거분사 + 수치 + too low, which could + 동사 …", skeleton: "As a result, the operating cost was __________ about 8% too low, _____ could affect the payback period.", partial: "As a result, the operating cost was calculated…" },
+    explanationKo: "비용이 '낮게 계산되었다'는 수동태로 'was calculated … too low'라고 하면 쉽습니다('was underestimated by about 8%'도 맞습니다). 앞 문장 전체를 받아 '그게 ~할 수 있어요'라고 덧붙일 때는 ', which could …'를 쓰며, affect는 동사라서 to/on 없이 목적어를 바로 받습니다.",
     probes: [
       { answer: "As a result, the operating cost was underestimated by roughly eight percent, which could affect the payback period.", expect: "pass" },
       { answer: "As a result, the operating cost was underestimate by about 8%, which could effect to the payback period.", expect: "fail" },
@@ -884,7 +885,7 @@ export const ROLEPLAY_MIXED: Question[] = [
     expression: "I'll fix it today and update the report by noon tomorrow. That way, we'll have enough time to review it.",
     contextKo: "팀장님이 고객사가 금요일에 최종 보고서를 받기로 되어 있다고 합니다. 오늘 계산을 고치고 내일 정오까지 보고서를 업데이트하면 금요일 전에 검토할 시간이 충분하다고 제안합니다.",
     dialogue: [
-      { speaker: "Minsu", en: "As a result, the operating cost was underestimated by about 8%, which could affect the payback period.", ko: "그 결과 운영비가 약 8% 낮게 계산됐는데, 그게 투자 회수 기간에 영향을 줄 수 있어요." },
+      { speaker: "Minsu", en: "As a result, the operating cost was calculated about 8% too low, which could affect the payback period.", ko: "그 결과 운영비가 약 8% 낮게 계산됐는데, 그게 투자 회수 기간에 영향을 줄 수 있어요." },
       { speaker: "Ms. Kim (manager)", en: "I see. The client is expecting the final report on Friday.", ko: "그렇군요. 고객사는 금요일에 최종 보고서를 받기로 되어 있는데요." },
     ],
     promptKo: "오늘 계산을 고치고 내일 정오까지 보고서를 업데이트할게요. 그러면 금요일 전에 검토할 시간이 충분할 거예요.",
@@ -1464,9 +1465,9 @@ export const ROLEPLAY_MIXED: Question[] = [
     expression: "The client has decided to change the material from … to …, so we need to update our order.",
     contextKo: "POME의 염소 성분 때문에 고객사가 디캔터 재질을 316 스테인리스에서 듀플렉스로 바꾸기로 했습니다. 인도 벤더의 프리야와 화상회의를 시작하자, 프리야가 변경 내용을 정리해 달라고 합니다.",
     dialogue: [{ speaker: "Priya", en: "Hi Minsu. I saw your email about the change, but could you summarize it for me?", ko: "안녕하세요, 민수 씨. 변경 건 메일은 봤는데, 간단히 정리해 주실 수 있을까요?" }],
-    promptKo: "네. 고객사가 재질을 316 스테인리스강에서 듀플렉스로 바꾸기로 해서, 저희 주문을 수정해야 해요.",
+    promptKo: "네. 고객사가 재질을 316 스테인리스강에서 듀플렉스로 바꾸기로 했어요. 그래서 저희 주문을 수정해야 해요.",
     segments: ["네", "고객사가 재질을 316 스테인리스강에서 듀플렉스로 바꾸기로 했어요", "그래서 저희 주문을 수정해야 해요"],
-    reference: "Sure. The client has decided to change the material from 316 stainless steel to duplex, so we need to update our order.",
+    reference: "Sure. The client has decided to change the material from 316 stainless steel to duplex. So we need to update our order.",
     accepted: [
       "Sure. The client has decided to change the material from 316 stainless steel to duplex, so we need to revise our order.",
       "Sure. The client has decided to change the material from 316 stainless to duplex, so we need to update our order.",
@@ -1475,6 +1476,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       "Sure. The client has decided to change the material from 316 stainless steel to duplex, so we have to update our order.",
       "Sure. The client has decided to use duplex instead of 316 stainless steel, so we need to update our order.",
     ],
+    advanced: "Sure. The client has decided to change the material from 316 stainless steel to duplex, so we need to update our order.",
     meaning: [
       { id: "client", en: "the client", ko: "고객사", any: ["client|customer"], weight: 0.5 },
       { id: "decided", en: "has decided to", ko: "~하기로 했다", any: ["decide|decided|want|wants|asked|chose|choose|requested|requires"], weight: 0.5 },
@@ -1488,7 +1490,7 @@ export const ROLEPLAY_MIXED: Question[] = [
       { id: "decided-base", pattern: "decided =change|=switch|=use", category: "verb-form", severity: "major", fix: "decided to change", messageKo: "decide 뒤에는 to + 동사원형이 옵니다: 'has decided to change'." },
       { id: "material-no-from", pattern: "re:\\bmaterial(?= (ss)?316 (stainless )?(steel )?(in)?to\\b)", category: "preposition", severity: "major", fix: "material from", messageKo: "'A에서 B로 바꾸다'는 'change … from A to B'입니다. from을 빼먹지 않습니다." },
     ],
-    hints: { pattern: "The client has decided to + 동사원형 + from A to B, so we need to + 동사원형 …", skeleton: "The client has _______ to change the material ____ 316 stainless steel __ duplex, so we need to …", partial: "Sure. The client has decided to change…" },
+    hints: { pattern: "The client has decided to + 동사원형 + from A to B, so we need to + 동사원형 …", skeleton: "The client has _______ to change the material ____ 316 stainless steel __ duplex. So we need to …", partial: "Sure. The client has decided to change…" },
     explanationKo: "결정이 지금 영향을 주므로 'The client has decided to + 동사원형'(현재완료, 능동태)으로 말합니다. 'A에서 B로 바꾸다'는 'change … from A to B'이며 from을 빼먹지 않고, 그 결과는 'so we need to …'로 잇습니다.",
     probes: [
       { answer: "Sure. The client has decided to change the material from SS316 to duplex stainless steel, so we need to update the order.", expect: "pass" },
@@ -1509,7 +1511,7 @@ export const ROLEPLAY_MIXED: Question[] = [
     expression: "Could you tell me how much this change will affect the price and the delivery date?",
     contextKo: "프리야가 자기 회사에는 꽤 큰 변경이라고 합니다. 이 변경이 가격과 납기에 얼마나 영향을 줄지 정중하게 묻습니다.",
     dialogue: [
-      { speaker: "Minsu", en: "Sure. The client has decided to change the material from 316 stainless steel to duplex, so we need to update our order.", ko: "네. 고객사가 재질을 316 스테인리스강에서 듀플렉스로 바꾸기로 해서, 저희 주문을 수정해야 해요." },
+      { speaker: "Minsu", en: "Sure. The client has decided to change the material from 316 stainless steel to duplex. So we need to update our order.", ko: "네. 고객사가 재질을 316 스테인리스강에서 듀플렉스로 바꾸기로 해서, 저희 주문을 수정해야 해요." },
       { speaker: "Priya", en: "I see. That's quite a big change for us.", ko: "그렇군요. 저희한테는 꽤 큰 변경이네요." },
     ],
     promptKo: "이해합니다. 이 변경이 가격과 납기에 얼마나 영향을 줄지 알려 주실 수 있을까요?",

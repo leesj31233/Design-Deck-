@@ -106,7 +106,22 @@ export function totalItems(length: DiagnosticLength): number {
   return DIAGNOSTIC_PLANS[length].reduce((a, b) => a + b, 0);
 }
 
-export function nextDiagnosticItem(s: DiagnosticSession, items: DiagnosticItem[]): DiagnosticItem | null {
+/** Deterministic 0–1 hash: the same session and step always pick the same item (stable across re-renders). */
+function unitHash(text: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619) >>> 0;
+  return h / 4294967296;
+}
+
+/** How far from the target difficulty an item may be and still be picked (logits). */
+const PICK_WINDOW = 0.35;
+
+/**
+ * The next item: one of the unused items of the current part whose difficulty is near the current estimate,
+ * picked at random (seeded by the session) so a retake shows different items. Items the learner saw in recent
+ * tests (`avoid`) and items on the same grammar point as the previous item are passed over while others remain.
+ */
+export function nextDiagnosticItem(s: DiagnosticSession, items: DiagnosticItem[], avoid: ReadonlySet<string> = new Set()): DiagnosticItem | null {
   const part = currentPart(s);
   if (part === null) return null;
   const used = new Set(s.responses.map((r) => r.itemId));
@@ -115,7 +130,13 @@ export function nextDiagnosticItem(s: DiagnosticSession, items: DiagnosticItem[]
   if (!pool.length) return null;
   // First item of the test starts near B1 (θ = 0) regardless of the prior mean.
   const target = s.responses.length === 0 ? 0 : mean;
-  return pool.reduce((best, i) => (Math.abs(i.b - target) < Math.abs(best.b - target) ? i : best));
+  const lastSkill = s.responses[s.responses.length - 1]?.skills[0];
+  const fresh = pool.filter((i) => !avoid.has(i.id));
+  const varied = (fresh.length ? fresh : pool).filter((i) => i.skills[0] !== lastSkill);
+  const candidates = varied.length ? varied : fresh.length ? fresh : pool;
+  const nearest = Math.min(...candidates.map((i) => Math.abs(i.b - target)));
+  const near = candidates.filter((i) => Math.abs(i.b - target) <= nearest + PICK_WINDOW);
+  return near[Math.floor(unitHash(`${s.id}:${s.responses.length}`) * near.length)];
 }
 
 /** Map an evaluation's overall score (0–100) to partial credit. */

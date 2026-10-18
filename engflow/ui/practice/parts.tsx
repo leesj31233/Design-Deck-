@@ -2,7 +2,7 @@
 import * as React from "react";
 import { motion } from "motion/react";
 import { Check, ChevronRight, X } from "lucide-react";
-import { cn, useReduced } from "../kit";
+import { Button, Tag, cn, useReduced } from "../kit";
 import { SpeakButton } from "../speech";
 import type { DialogueTurn, ErrorSpan, MeaningCheck, ScoreBucket } from "../../core/types";
 
@@ -53,9 +53,9 @@ export function SentencePrompt({ q, size, open, onToggle }: { q: { promptKo: str
       {long ? <p className="ef-ko mt-1.5 text-[12px] text-[var(--muted)]" data-testid="speak-first-hint">{SPEAK_FIRST_HINT_KO}</p> : null}
       {q.segments.length > 1 ? (
         <>
-          <button onClick={onToggle} className="dd-focus mt-2.5 inline-flex items-center gap-1 rounded-lg text-[12px] text-[var(--muted)]" aria-expanded={open}>
+          <Button type="button" variant="ghost" size="sm" onClick={onToggle} className="-ml-2 mt-1.5 h-7 gap-1 px-2 text-[12px] font-normal text-[var(--muted)]" aria-expanded={open}>
             <ChevronRight className={cn("size-3.5 transition", open && "rotate-90")} /> 말하는 순서 힌트 {open ? "숨기기" : "보기"}
-          </button>
+          </Button>
           {open ? (
             <div className="mt-2">
               <MeaningChunks segments={q.segments} size="md" />
@@ -199,22 +199,16 @@ export function MeaningCheckList({ items }: { items: MeaningCheck[] }) {
         // A non-critical term slot is reference only: wording differs between plants.
         const reference = m.term && !m.critical;
         return (
-          <li
-            key={m.id}
-            className={cn(
-              "ef-ko inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[12px]",
-              m.present
-                ? "border-transparent bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]"
-                : reference
-                  ? "border-dashed border-[var(--line)] text-[var(--muted)]"
-                  : "border-[var(--ef-bad)]/30 bg-[var(--ef-bad-soft)] text-[var(--ef-bad)]",
-            )}
-            title={reference && !m.present ? `기준 답안 용어: ${m.en} (현장마다 달라 점수에 반영하지 않음)` : m.en}
-          >
-            {m.present ? <Check className="size-3" /> : reference ? null : <X className="size-3" />}
-            {m.ko}
-            {reference && !m.present ? <span className="ef-en ml-0.5 text-[11px]">· {m.en}</span> : null}
-            {m.term ? <span className="ml-0.5 rounded bg-black/5 px-1 text-[9px] font-semibold tracking-wide dark:bg-white/10">{reference ? "용어 참고" : "용어"}</span> : null}
+          <li key={m.id} className="flex" title={reference && !m.present ? `기준 답안 용어: ${m.en} (현장마다 달라 점수에 반영하지 않음)` : m.en}>
+            <Tag
+              tone={m.present ? "ok" : reference ? "neutral" : "bad"}
+              className={cn("ef-ko px-2.5 py-1 text-[12px] font-medium", reference && !m.present && "border-dashed bg-transparent dark:bg-transparent")}
+            >
+              {m.present ? <Check className="size-3" /> : reference ? null : <X className="size-3" />}
+              {m.ko}
+              {reference && !m.present ? <span className="ef-en ml-0.5 text-[11px]">· {m.en}</span> : null}
+              {m.term ? <span className="ml-0.5 rounded bg-black/5 px-1 text-[9px] font-semibold tracking-wide dark:bg-white/10">{reference ? "용어 참고" : "용어"}</span> : null}
+            </Tag>
           </li>
         );
       })}

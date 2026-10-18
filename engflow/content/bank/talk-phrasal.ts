@@ -1285,9 +1285,10 @@ export const TALK_PHRASAL: Question[] = [
     contextKo: "말레이시아 고객사 현장의 시운전을 준비하고 있습니다. Mr. Tan이 다음 주 월요일 시운전이 계획대로 진행되는지 묻습니다. 어제 디캔터에 문제가 생겨 며칠 늦어질 수 있습니다.",
     dialogue: [{ speaker: "Mr. Tan", en: "Is everything on track for the start-up next Monday?", ko: "다음 주 월요일 시운전은 계획대로 되고 있나요?" }],
     promptKo: "죄송하지만 디캔터에 문제가 생겨서, 시운전이 며칠 늦어질 수도 있어요.",
-    segments: ["죄송하지만 디캔터에 문제가 생겼어요", "그래서 시운전이 며칠 늦어질 수도 있어요"],
-    reference: "I'm afraid we've run into a problem with the decanter, so the start-up might be delayed by a few days.",
+    segments: ["죄송하지만 디캔터에 문제가 생겼어요", "시운전이 며칠 늦어질 수도 있어요"],
+    reference: "I'm afraid we've run into a problem with the decanter. The start-up might be delayed by a few days.",
     accepted: [
+      "I'm afraid we've run into a problem with the decanter, so the start-up might be delayed by a few days.",
       "I'm afraid we've run into a problem with the decanter, so the start-up might be delayed a few days.",
       "I'm afraid we've had a problem with the decanter, so the start-up might be delayed by a few days.",
       "I'm afraid we've run into a problem with the decanter, so the start-up may be delayed by a few days.",
@@ -1307,7 +1308,7 @@ export const TALK_PHRASAL: Question[] = [
       { id: "run-in-to", pattern: "re:(?<=\\b(run|ran) )(in|to)(?= (a|an|the|some)\\b)", category: "preposition", severity: "major", fix: "into", messageKo: "예상하지 못한 문제를 '만나다, 겪다'는 'run into'입니다. 'run in'이나 'run to'라고 하지 않습니다." },
       { id: "might-delay", pattern: "re:(?<=\\b(might|may|could|will) )delay\\b", category: "verb-form", severity: "major", fix: "be delayed", messageKo: "시운전은 스스로 늦추는 것이 아니라 '늦어지는' 것이라 수동태 'might be delayed'를 씁니다.", skill: "passive" },
     ],
-    hints: { pattern: "I'm afraid we've + run into + 명사, so … might be + p.p.", skeleton: "I'm afraid we've ___ ____ a problem with the decanter, so the start-up might __ _______ by a few days.", partial: "I'm afraid we've run into a problem with the decanter, so…" },
+    hints: { pattern: "I'm afraid we've + run into + 명사. … might be + p.p.", skeleton: "I'm afraid we've ___ ____ a problem with the decanter. The start-up might __ _______ by a few days.", partial: "I'm afraid we've run into a problem with the decanter. The…" },
     explanationKo: "예상하지 못한 문제가 '생기다, 부딪히다'는 'run into a problem'이라고 합니다. 현재완료에서는 과거분사 run을 써서 'we've run into'(ran이 아님)라고 하고, 시운전이 '늦어지는' 것은 수동태 'might be delayed'로 말합니다.",
     probes: [
       { answer: "I'm afraid we've run into a problem with the decanter, so the start-up might be delayed by two or three days.", expect: "pass" },

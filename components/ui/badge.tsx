@@ -9,7 +9,8 @@ const badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 p
       blue: "border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-300",
       green: "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
       red: "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300",
-      violet: "border-violet-500/20 bg-violet-500/10 text-violet-600 dark:text-violet-300"
+      violet: "border-violet-500/20 bg-violet-500/10 text-violet-600 dark:text-violet-300",
+      amber: "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
     }
   }, defaultVariants: { tone: "neutral" }
 });

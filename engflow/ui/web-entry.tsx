@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { EngFlowApp } from "./app";
+import { Skeleton } from "./kit";
 import { webPlatform } from "../platform/web";
 import type { Platform } from "../platform/types";
 
@@ -14,9 +15,9 @@ export function EngFlowWeb() {
     return (
       <div className="ef-root grid min-h-[100dvh] place-items-center" lang="ko">
         <div className="w-64 space-y-3" aria-label="불러오는 중">
-          <div className="ef-skeleton h-6 w-40" />
-          <div className="ef-skeleton h-24 w-full" />
-          <div className="ef-skeleton h-10 w-full" />
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-24 w-full rounded-[18px]" />
+          <Skeleton className="h-10 w-full rounded-xl" />
         </div>
       </div>
     );

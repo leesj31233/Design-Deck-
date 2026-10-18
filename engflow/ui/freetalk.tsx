@@ -7,7 +7,7 @@ import { SITUATION_INFO } from "../content";
 import { AIUnavailableError } from "../platform/types";
 import { useApp } from "./store";
 import { useNav } from "./app";
-import { Card, Eyebrow, cn, scoreTone, TONE_TEXT, useReduced } from "./kit";
+import { Button, Card, Eyebrow, IconButton, LiveDot, NumberTicker, RevealGroup, RevealItem, Tag, cn, scoreTone, TONE_TEXT, useReduced } from "./kit";
 import { DiffLine, tintFor } from "./practice/parts";
 import { SpeakButton, speak, stopSpeaking } from "./speech";
 import { DictationNote, MicButton, useDictation } from "./listen";
@@ -39,18 +39,17 @@ export function TalkCard({ compact, scene }: { compact?: boolean; scene?: string
         <div className="-mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="대화 주제">
           {/* Topics of the scene chosen on Learn come first. */}
           {[...TALK_TOPICS.filter((t) => t.scene === scene), ...TALK_TOPICS.filter((t) => t.scene !== scene)].map((t) => (
-            <button
+            <Button
               key={t.id}
+              variant={pick === t.id ? "primary" : "secondary"}
+              size="sm"
               role="radio"
               aria-checked={pick === t.id}
               onClick={() => setPick(t.id)}
-              className={cn(
-                "dd-focus shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-medium",
-                pick === t.id ? "border-transparent bg-[var(--foreground)] text-[var(--background)]" : "border-[var(--line)] text-[var(--ef-ink-2)]",
-              )}
+              className={cn("shrink-0 rounded-full px-3 text-[12px] shadow-none", pick !== t.id && "text-[var(--ef-ink-2)]")}
             >
               {t.titleKo}
-            </button>
+            </Button>
           ))}
         </div>
       ) : null}
@@ -64,14 +63,15 @@ export function TalkCard({ compact, scene }: { compact?: boolean; scene?: string
           </div>
           <div className="ef-en truncate text-[14px]">“{topic.opener.en}”</div>
         </div>
-        <button
+        <Button
+          variant="primary"
           onClick={() => nav.startTalk(topic.id)}
           disabled={!ai}
-          className="dd-focus inline-flex h-10 shrink-0 items-center gap-1 rounded-xl bg-[var(--foreground)] px-3.5 text-[14px] font-semibold text-[var(--background)] disabled:opacity-40"
+          className="shrink-0 gap-1 px-3.5 text-[14px] font-semibold"
           aria-label={`${topic.titleKo} 자유 대화 시작`}
         >
           시작 <ArrowRight className="size-4" />
-        </button>
+        </Button>
       </div>
       {!ai ? <p className="ef-ko mt-2 text-[12px] text-[var(--ef-warn)]">자유 대화는 Claude 연결이 필요합니다. (설정에서 Claude 채점을 켜 주세요.)</p> : null}
     </Card>
@@ -88,20 +88,14 @@ function Avatar({ name }: { name: string }) {
   );
 }
 
+/** Claude is answering live: one pulsing dot, the only moving thing while we wait. */
 function Typing({ name }: { name: string }) {
-  const reduced = useReduced();
   return (
     <li className="flex items-end gap-2" aria-label={`${name}이(가) 입력 중`}>
       <Avatar name={name} />
-      <div className="flex gap-1 rounded-[18px] rounded-bl-[6px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3">
-        {[0, 1, 2].map((i) => (
-          <motion.span
-            key={i}
-            className="size-1.5 rounded-full bg-[var(--muted)]"
-            animate={reduced ? undefined : { opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
-            transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }}
-          />
-        ))}
+      <div className="flex items-center gap-2 rounded-[18px] rounded-bl-[6px] border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-2.5 text-[13px] text-[var(--muted)]">
+        <LiveDot tone="blue" className="size-2" />
+        <span className="ef-ko" aria-hidden>답하는 중…</span>
       </div>
     </li>
   );
@@ -117,7 +111,7 @@ function LineFeedback({ line, slow }: { line: TalkLine; slow?: boolean }) {
       <div className="flex items-center gap-1.5 text-[12px]">
         {clean ? <CheckCircle2 className="size-3.5 text-[var(--ef-ok)]" /> : null}
         <span className={cn("font-semibold", clean ? "text-[var(--ef-ok)]" : TONE_TEXT[tone])}>{clean ? "자연스러워요" : "이렇게 고쳐요"}</span>
-        <span className={cn("ef-num ml-auto rounded-full px-1.5 text-[11px] font-semibold", TONE_TEXT[tone])}>{fb.score}</span>
+        <Tag tone={tone} className="ef-num ml-auto px-1.5 py-0">{fb.score}</Tag>
       </div>
       {!clean ? (
         <>
@@ -256,22 +250,24 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
       {party ? <Burst kind="fireworks" shells={5} onDone={() => setParty(false)} /> : null}
       <header className="sticky top-0 z-20 border-b border-[var(--line)] bg-[var(--background)]/90 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <button onClick={onExit} className="dd-focus grid size-9 place-items-center rounded-full hover:bg-black/5 dark:hover:bg-white/10" aria-label="자유 대화 닫기">
+          <IconButton label="자유 대화 닫기" variant="ghost" onClick={onExit} className="size-9 rounded-full">
             <X className="size-5" />
-          </button>
+          </IconButton>
           <div className="min-w-0 flex-1">
             <div className="truncate text-[15px] font-semibold">자유 대화 · {topic.titleKo}</div>
             <div className="text-[12px] text-[var(--muted)]">
               {topic.partner} · {SITUATION_INFO[topic.scene].ko} · <span className="ef-num">{Math.min(turn, TALK_TURNS)}/{TALK_TURNS}</span>
             </div>
           </div>
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => setShowKo((v) => !v)}
             aria-pressed={showKo}
-            className={cn("dd-focus inline-flex h-8 items-center gap-1 rounded-lg border px-2 text-[12px]", showKo ? "border-transparent bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)]" : "border-[var(--line)] text-[var(--muted)]")}
+            className={cn("gap-1 rounded-lg px-2 text-[12px] font-normal", showKo ? "border-transparent bg-[var(--ef-accent-soft)] text-[var(--ef-accent-ink)] hover:bg-[var(--ef-accent-soft)] dark:hover:bg-[var(--ef-accent-soft)]" : "text-[var(--muted)]")}
           >
             <Languages className="size-3.5" /> 번역
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -313,9 +309,9 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
         {error ? (
           <div className="mt-3 flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] p-3 text-[13px]" role="alert">
             <span className="ef-ko min-w-0 flex-1 text-[var(--ef-bad)]">{error}</span>
-            <button onClick={() => void ask(lines)} className="dd-focus inline-flex h-8 shrink-0 items-center gap-1 rounded-lg border border-[var(--line)] px-2.5 text-[12px] font-semibold">
+            <Button variant="secondary" size="sm" onClick={() => void ask(lines)} className="shrink-0 gap-1 rounded-lg px-2.5 text-[12px] font-semibold">
               <RotateCcw className="size-3.5" /> 다시 보내기
-            </button>
+            </Button>
           </div>
         ) : null}
 
@@ -326,41 +322,41 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
               <div className="mt-1 text-[18px] font-semibold">{summary.clean === summary.turns && summary.turns ? "한 번도 안 틀렸어요!" : "대화 완료!"}</div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <div className="ef-num text-[22px] font-semibold">{summary.turns}</div>
+                  <div className="ef-num text-[22px] font-semibold"><NumberTicker value={summary.turns} /></div>
                   <div className="text-[11px] text-[var(--muted)]">내가 한 말</div>
                 </div>
                 <div>
-                  <div className={cn("ef-num text-[22px] font-semibold", TONE_TEXT[scoreTone(summary.average)])}>{summary.average}</div>
+                  <div className={cn("ef-num text-[22px] font-semibold", TONE_TEXT[scoreTone(summary.average)])}><NumberTicker value={summary.average} /></div>
                   <div className="text-[11px] text-[var(--muted)]">평균 점수</div>
                 </div>
                 <div>
-                  <div className="ef-num text-[22px] font-semibold">{summary.clean}/{summary.turns}</div>
+                  <div className="ef-num text-[22px] font-semibold"><NumberTicker value={summary.clean} />/{summary.turns}</div>
                   <div className="text-[11px] text-[var(--muted)]">고칠 것 없음</div>
                 </div>
               </div>
               {summary.fixes.length ? (
                 <div className="mt-4">
                   <div className="text-[12px] font-semibold text-[var(--muted)]">다음엔 이렇게 말해 봐요</div>
-                  <ul className="mt-2 space-y-2" aria-label="고칠 표현">
+                  <RevealGroup as="ul" className="mt-2 space-y-2" aria-label="고칠 표현">
                     {summary.fixes.map((f, i) => (
-                      <li key={i} className="rounded-xl bg-[var(--background)] p-2.5">
+                      <RevealItem as="li" key={i} className="rounded-xl bg-[var(--background)] p-2.5">
                         <p className="ef-en text-[13px] text-[var(--muted)] line-through decoration-[var(--ef-bad)]/50">{f.said}</p>
                         <div className="flex items-start gap-1">
                           <p className="ef-en min-w-0 flex-1 text-[15px] font-medium">{f.better}</p>
                           <SpeakButton text={f.better} slow={slow} className="-mr-1 -mt-1" label="고친 문장 읽어 주기" />
                         </div>
-                      </li>
+                      </RevealItem>
                     ))}
-                  </ul>
+                  </RevealGroup>
                 </div>
               ) : null}
               <div className="mt-4 flex flex-wrap gap-2">
-                <button onClick={restart} className="dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl border border-[var(--line)] px-4 text-[14px] font-medium">
+                <Button variant="secondary" onClick={restart} className="h-11 gap-1.5 text-[14px]">
                   <RotateCcw className="size-4" /> 다시 대화하기
-                </button>
-                <button onClick={onExit} className="dd-focus inline-flex h-11 items-center gap-1.5 rounded-xl bg-[var(--foreground)] px-4 text-[14px] font-semibold text-[var(--background)]">
+                </Button>
+                <Button variant="primary" onClick={onExit} className="h-11 gap-1.5 text-[14px] font-semibold">
                   다른 주제 고르기 <ArrowRight className="size-4" />
-                </button>
+                </Button>
               </div>
             </Card>
           </motion.div>
@@ -372,14 +368,16 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
         <div className="ef-safe-bottom sticky bottom-0 z-20 border-t border-[var(--line)] bg-[var(--background)]/92 px-4 pt-2 backdrop-blur-xl">
           {hint ? (
             <div className="mb-1.5 flex items-start gap-2 text-[12px]">
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setHintLevel((h) => Math.min(2, h + 1))}
                 disabled={hintLevel >= 2}
-                className="dd-focus inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-[var(--line)] px-2.5 font-medium text-[var(--muted)] disabled:opacity-60"
+                className="h-7 shrink-0 gap-1 rounded-full px-2.5 text-[12px] text-[var(--muted)] disabled:opacity-60"
                 aria-label={hintLevel === 0 ? "힌트 보기" : "영어 문장 보기"}
               >
                 <Lightbulb className="size-3.5" /> {hintLevel === 0 ? "힌트" : hintLevel === 1 ? "영어로 보기" : "힌트"}
-              </button>
+              </Button>
               {hintLevel === 1 ? <p className="ef-ko min-w-0 flex-1 pt-1 text-[var(--ef-ink-2)]">이런 뜻으로 말해 보세요: {hint.ko ?? hint.en}</p> : null}
               {hintLevel === 2 ? (
                 <div className="flex min-w-0 flex-1 items-start gap-1 pt-0.5">
@@ -412,14 +410,9 @@ export function FreeTalk({ topicId, onExit }: { topicId: string; onExit: () => v
               className="ef-en dd-focus max-h-32 min-h-11 min-w-0 flex-1 resize-none rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-2.5 text-[16px] leading-snug"
             />
             <MicButton dictation={dictation} disabled={waiting} className="mb-0.5" />
-            <button
-              onClick={send}
-              disabled={!text.trim() || waiting}
-              className="dd-focus grid size-11 shrink-0 place-items-center rounded-full bg-[var(--foreground)] text-[var(--background)] disabled:opacity-30"
-              aria-label="보내기"
-            >
+            <IconButton label="보내기" variant="primary" onClick={send} disabled={!text.trim() || waiting} className="size-11 shrink-0 rounded-full disabled:opacity-30">
               <ArrowUp className="size-5" />
-            </button>
+            </IconButton>
           </div>
           <DictationNote dictation={dictation} />
         </div>

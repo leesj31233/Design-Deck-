@@ -6,6 +6,8 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { Badge } from "@/components/ui/badge";
 import type { Cefr, MasteryStatus } from "../core/types";
 import { STATUS_LABEL_KO } from "../core/mastery";
 
@@ -177,19 +179,23 @@ export function Meter({ label, value, weight, note, delay = 0, compact }: { labe
 
 /* ───────────── Chips ───────────── */
 
-const STATUS_STYLE: Record<MasteryStatus, string> = {
-  new: "border-[var(--line)] text-[var(--muted)] bg-transparent",
-  learning: "border-transparent bg-[var(--ef-bad-soft)] text-[var(--ef-bad)]",
-  improving: "border-transparent bg-[var(--ef-warn-soft)] text-[var(--ef-warn)]",
-  mastered: "border-transparent bg-[var(--ef-ok-soft)] text-[var(--ef-ok)]",
-};
+/** EngFlow tones on Design Deck Badge tones. */
+export type EfTone = "ok" | "warn" | "bad" | "accent" | "violet" | "neutral";
+const BADGE_TONE = { ok: "green", warn: "amber", bad: "red", accent: "blue", violet: "violet", neutral: "neutral" } as const;
+
+/** A compact Design Deck Badge for status and meta tags. */
+export function Tag({ tone = "neutral", className, ...props }: React.HTMLAttributes<HTMLSpanElement> & { tone?: EfTone }) {
+  return <Badge tone={BADGE_TONE[tone]} className={cn("shrink-0 gap-1 px-2 py-0.5", className)} {...props} />;
+}
+
+const STATUS_TONE: Record<MasteryStatus, EfTone> = { new: "neutral", learning: "bad", improving: "warn", mastered: "ok" };
 
 export function StatusChip({ status, className }: { status: MasteryStatus; className?: string }) {
   return (
-    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold", STATUS_STYLE[status], className)}>
+    <Tag tone={STATUS_TONE[status]} className={className}>
       <span className="size-1.5 rounded-full bg-current" aria-hidden />
       {STATUS_LABEL_KO[status]}
-    </span>
+    </Tag>
   );
 }
 
@@ -210,7 +216,7 @@ export function MasteryTrack({ status, mastery }: { status: MasteryStatus; maste
 }
 
 export function LevelBadge({ level, className }: { level: Cefr | string; className?: string }) {
-  return <span className={cn("ef-mono inline-flex items-center rounded-md border border-[var(--line)] bg-[var(--surface-strong)] px-1.5 py-0.5 text-[11px] font-semibold", className)}>{level}</span>;
+  return <Badge className={cn("ef-mono rounded-md bg-[var(--surface-strong)] px-1.5 py-0.5 text-[var(--foreground)] dark:bg-[var(--surface-strong)]", className)}>{level}</Badge>;
 }
 
 export function Eyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -258,8 +264,10 @@ export function Sheet({ open, onOpenChange, title, description, children, wide }
                     <DialogPrimitive.Title className="text-[17px] font-semibold tracking-[-.02em]">{title}</DialogPrimitive.Title>
                     {description ? <DialogPrimitive.Description className="ef-ko mt-0.5 text-[13px] text-[var(--muted)]">{description}</DialogPrimitive.Description> : null}
                   </div>
-                  <DialogPrimitive.Close className="dd-focus -mr-1 grid size-9 shrink-0 place-items-center rounded-xl text-[var(--muted)] hover:bg-black/5 dark:hover:bg-white/10" aria-label="닫기">
-                    <X className="size-4" />
+                  <DialogPrimitive.Close asChild>
+                    <IconButton label="닫기" variant="ghost" className="-mr-1 size-9 shrink-0 text-[var(--muted)]">
+                      <X className="size-4" />
+                    </IconButton>
                   </DialogPrimitive.Close>
                 </div>
                 <div className="dd-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">{children}</div>

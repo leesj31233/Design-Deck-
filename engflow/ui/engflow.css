@@ -228,6 +228,11 @@
   .ef-mic-ring, .ef-mic-dot { animation: none; }
 }
 .ef-reduce-motion .ef-mic-ring, .ef-reduce-motion .ef-mic-dot { animation: none; }
+/* The in-app "reduce motion" setting also quiets Design Deck's CSS effects. */
+.ef-reduce-motion .dd-shimmer { animation: none; color: var(--muted); background: none; }
+.ef-reduce-motion .dd-beam { display: none; }
+@media (prefers-reduced-motion: reduce) { .ef-root .animate-pulse { animation: none; } }
+.ef-reduce-motion .animate-pulse { animation: none; }
 
 /* Design Deck glass card, quieter for long reading (kit Card). */
 .ef-root .ef-card {

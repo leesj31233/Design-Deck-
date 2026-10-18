@@ -1,7 +1,7 @@
 "use client";
 /**
  * Design Deck effects — motion that explains state, never decoration on a loop.
- * Every effect honours prefers-reduced-motion (it renders the final state at once).
+ * Every effect honours prefers-reduced-motion, or a surrounding <MotionConfig reducedMotion> (it renders the final state at once).
  *
  * - NumberTicker   a value that counts up to its target (scores, streaks, totals)
  * - ShimmerText    a light sweep across text while something is working ("grading…")
@@ -12,7 +12,7 @@
  * - LiveDot        a pulsing status dot (connected, recording, working)
  */
 import * as React from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type HTMLMotionProps } from "motion/react";
+import { motion, useMotionValue, useReducedMotionConfig, useSpring, useTransform, type HTMLMotionProps } from "motion/react";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.2, 0.8, 0.2, 1] as const;
@@ -20,7 +20,7 @@ const EASE = [0.2, 0.8, 0.2, 1] as const;
 /* ───────────── NumberTicker ───────────── */
 
 export function NumberTicker({ value, delay = 0, className, format = (n) => String(Math.round(n)) }: { value: number; delay?: number; className?: string; format?: (n: number) => string }) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionConfig();
   const mv = useMotionValue(reduced ? value : 0);
   const spring = useSpring(mv, { stiffness: 90, damping: 22, mass: 0.8 });
   const text = useTransform(spring, (n) => format(n));
@@ -45,7 +45,7 @@ export function ShimmerText({ children, className }: { children: React.ReactNode
 /* ───────────── Reveal / RevealGroup ───────────── */
 
 export function Reveal({ children, delay = 0, y = 8, className, ...props }: { children: React.ReactNode; delay?: number; y?: number; className?: string } & Omit<HTMLMotionProps<"div">, "children">) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionConfig();
   return (
     <motion.div className={className} initial={reduced ? false : { opacity: 0, y }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32, ease: EASE, delay }} {...props}>
       {children}
@@ -57,11 +57,11 @@ const groupVariants = { hidden: {}, shown: { transition: { staggerChildren: 0.04
 const itemVariants = { hidden: { opacity: 0, y: 8 }, shown: { opacity: 1, y: 0, transition: { duration: 0.3, ease: EASE } } };
 
 /** Staggers its direct children in. Wrap each child in <RevealItem>. */
-export function RevealGroup({ children, className, as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "ul" | "ol" }) {
-  const reduced = useReducedMotion();
+export function RevealGroup({ children, className, as = "div", "aria-label": ariaLabel }: { children: React.ReactNode; className?: string; as?: "div" | "ul" | "ol"; "aria-label"?: string }) {
+  const reduced = useReducedMotionConfig();
   const Comp = as === "ul" ? motion.ul : as === "ol" ? motion.ol : motion.div;
   return (
-    <Comp className={className} variants={groupVariants} initial={reduced ? false : "hidden"} animate="shown">
+    <Comp className={className} aria-label={ariaLabel} variants={groupVariants} initial={reduced ? false : "hidden"} animate="shown">
       {children}
     </Comp>
   );
@@ -79,7 +79,7 @@ export function RevealItem({ children, className, as = "div" }: { children: Reac
 
 /** A card or row that is one big control: lifts on hover, presses on tap (a <button>). */
 export const Pressable = React.forwardRef<HTMLButtonElement, HTMLMotionProps<"button"> & { lift?: number }>(function Pressable({ className, lift = 2, ...props }, ref) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionConfig();
   return (
     <motion.button
       ref={ref}
@@ -97,7 +97,7 @@ export const Pressable = React.forwardRef<HTMLButtonElement, HTMLMotionProps<"bu
 /** Soft radial highlight under the pointer. Purely visual; children keep their own semantics. */
 export function Spotlight({ children, className, color = "rgba(10,132,255,.10)" }: { children: React.ReactNode; className?: string; color?: string }) {
   const ref = React.useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionConfig();
   const onMove = (e: React.PointerEvent) => {
     if (reduced || e.pointerType !== "mouse" || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
@@ -115,7 +115,7 @@ export function Spotlight({ children, className, color = "rgba(10,132,255,.10)" 
 
 /** A light that travels once around the border (or loops while `loop`): place inside a relative, rounded panel. */
 export function BorderBeam({ loop = false, duration = 2.4, className }: { loop?: boolean; duration?: number; className?: string }) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionConfig();
   if (reduced) return null;
   return <span aria-hidden className={cn("dd-beam", loop && "dd-beam-loop", className)} style={{ ["--dd-beam-dur" as string]: `${duration}s` }} />;
 }
@@ -123,7 +123,7 @@ export function BorderBeam({ loop = false, duration = 2.4, className }: { loop?:
 /* ───────────── LiveDot ───────────── */
 
 export function LiveDot({ tone = "green", className }: { tone?: "green" | "blue" | "red" | "amber"; className?: string }) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionConfig();
   const color = { green: "bg-emerald-500", blue: "bg-[var(--accent)]", red: "bg-red-500", amber: "bg-amber-500" }[tone];
   return (
     <span className={cn("relative inline-flex size-2.5", className)} aria-hidden>

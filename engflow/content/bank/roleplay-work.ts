@@ -1802,15 +1802,16 @@ export const ROLEPLAY_WORK: Question[] = [
       { speaker: "Minsu", en: "That's right, but the steam pressure was also lower than usual, so the dryer couldn't remove enough water.", ko: "맞아요. 그런데 스팀 압력도 평소보다 낮아서, 건조기가 수분을 충분히 제거하지 못했어요." },
       { speaker: "Daniel", en: "Okay. So what are you going to change for the next run?", ko: "알겠어요. 그럼 다음 운전에서는 무엇을 바꿀 건가요?" },
     ],
-    promptKo: "스팀 압력을 다시 8 bar로 올리고 피드량을 10% 정도 줄일 거예요. 그러면 출구 수분이 목표치 아래로 내려갈 거예요.",
-    segments: ["스팀 압력을 다시 8 bar로 올리고", "피드량을 10% 정도 줄일 거예요", "그러면 출구 수분이 목표치 아래로 내려갈 거예요"],
-    reference: "We're going to raise the steam pressure back to 8 bar and reduce the feed rate by about 10%. That should bring the outlet moisture below the target.",
+    promptKo: "스팀 압력을 다시 8 bar로 올릴 거예요. 피드량도 10% 정도 줄일 거예요. 그러면 출구 수분이 목표치 아래로 내려갈 거예요.",
+    segments: ["스팀 압력을 다시 8 bar로 올릴 거예요", "피드량도 10% 정도 줄일 거예요", "그러면 출구 수분이 목표치 아래로 내려갈 거예요"],
+    reference: "We're going to raise the steam pressure back to 8 bar. We'll also reduce the feed rate by about 10%. That should bring the outlet moisture below the target.",
     accepted: [
       "We're going to increase the steam pressure back to 8 bar and reduce the feed rate by about 10%. That should bring the outlet moisture below the target.",
       "We're going to raise the steam pressure back to 8 bar and lower the feed rate by about 10%. That should bring the outlet moisture below the target.",
       "We'll raise the steam pressure back to 8 bar and reduce the feed rate by about 10%. That should bring the outlet moisture below the target.",
       "We're going to raise the steam pressure back to 8 bar and reduce the feed rate by about 10%. That should get the outlet moisture below the target.",
       "We're going to raise the steam pressure back to 8 bar and cut the feed rate by about 10%. That should bring the outlet moisture under the target.",
+      "We're going to raise the steam pressure back to 8 bar and reduce the feed rate by about 10%. That should bring the outlet moisture below the target.",
     ],
     meaning: [
       { id: "raise-pressure", en: "raise the steam pressure", ko: "스팀 압력을 올리다", any: ["raise|increase|bring|put|set ... pressure", "pressure ... up|back"], critical: true },
@@ -1825,7 +1826,7 @@ export const ROLEPLAY_WORK: Question[] = [
       { id: "going-to-ing", pattern: "going to =raising|=increasing|=reducing|=lowering", category: "verb-form", severity: "major", fix: "going to raise", messageKo: "be going to 뒤에는 동사원형이 옵니다: 'We're going to raise …'.", skill: "future-plan" },
       { id: "rise-the-pressure", pattern: "re:\\brise(?= the (?:steam )?pressure\\b)", category: "word-choice", severity: "major", fix: "raise", messageKo: "'(무엇을) 올리다'는 목적어를 받는 raise입니다. rise는 '(스스로) 오르다'라서 목적어를 받지 않습니다: 'raise the steam pressure'." },
     ],
-    hints: { pattern: "We're going to + 동사원형 … and + 동사원형 … by about 10%. That should + 동사원형 …", skeleton: "We're going to _____ the steam pressure back to 8 bar and reduce the feed rate __ about 10%. That ______ bring …", partial: "We're going to raise the steam pressure back to 8 bar…" },
+    hints: { pattern: "We're going to + 동사원형 …. We'll also + 동사원형 … by about 10%. That should + 동사원형 …", skeleton: "We're going to _____ the steam pressure back to 8 bar. We'll also reduce the feed rate __ about 10%. That ______ bring …", partial: "We're going to raise the steam pressure back to 8 bar…" },
     explanationKo: "이미 정한 계획은 'We're going to + 동사원형'으로 말합니다. '10% 줄이다'는 'reduce … by 10%'('to 10%'는 '10%로'), 기대하는 결과는 'That should …'로 부드럽게 말합니다.",
     probes: [
       { answer: "We're going to raise the steam pressure back to 8 bar and reduce the feed rate by roughly 10%. That should bring the outlet moisture below the target.", expect: "pass" },
@@ -1847,7 +1848,7 @@ export const ROLEPLAY_WORK: Question[] = [
     expression: "If …, we'll … We tried that …, and it …",
     contextKo: "Daniel이 다음 시험 중에 또 비가 오면 어떻게 할 거냐고 묻습니다. 피드가 다시 너무 젖으면 먼저 스크루 프레스로 짜낼 것이고, 지난달 실험실에서 해 보니 피드 수분이 약 5% 줄었다고 설명합니다.",
     dialogue: [
-      { speaker: "Minsu", en: "We're going to raise the steam pressure back to 8 bar and reduce the feed rate by about 10%. That should bring the outlet moisture below the target.", ko: "스팀 압력을 다시 8 bar로 올리고 피드량을 10% 정도 줄일 거예요. 그러면 출구 수분이 목표치 아래로 내려갈 거예요." },
+      { speaker: "Minsu", en: "We're going to raise the steam pressure back to 8 bar. We'll also reduce the feed rate by about 10%. That should bring the outlet moisture below the target.", ko: "스팀 압력을 다시 8 bar로 올리고 피드량을 10% 정도 줄일 거예요. 그러면 출구 수분이 목표치 아래로 내려갈 거예요." },
       { speaker: "Daniel", en: "Sounds reasonable. And what happens if it rains again during the next test?", ko: "합리적이네요. 그런데 다음 시험 중에 또 비가 오면 어떻게 하죠?" },
     ],
     promptKo: "피드가 다시 너무 젖어 있으면, 먼저 스크루 프레스로 짜낼 거예요. 지난달에 실험실에서 해 봤는데, 피드 수분이 약 5% 줄었어요.",

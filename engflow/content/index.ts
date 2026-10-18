@@ -4,6 +4,7 @@ import { SENTENCES_B } from "./bank/sentences-b";
 import { PHRASES } from "./bank/phrases";
 import { VARIATIONS } from "./bank/variations";
 import { DIAGNOSTIC_ITEMS } from "./bank/diagnostic";
+import { bankDiagnosticItems } from "./diagnostic-pool";
 import { TALK_ONLINE } from "./bank/talk-online";
 import { TALK_PRESENTATION } from "./bank/talk-presentation";
 import { TALK_DISCUSSION } from "./bank/talk-discussion";
@@ -138,3 +139,6 @@ export const QUESTIONS: Question[] = [
 }));
 
 export const QUESTION_BY_ID: Record<string, Question> = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));
+
+/** Every level-test item: the hand-written ones first, then items drawn from the curated bank (diagnostic-pool.ts). */
+export const DIAGNOSTIC_POOL = [...DIAGNOSTIC_ITEMS, ...bankDiagnosticItems(QUESTIONS)];
