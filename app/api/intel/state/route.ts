@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const userId = await feedOwner(admin);
     if (!userId) return Response.json({ error: "owner not found" }, { status: 404 });
     // ?full=<id>,brief:<id>,… : those items and briefings whole (the owner's computer catching up on a cloud run).
-    const full = (new URL(request.url).searchParams.get("full") ?? "").split(",").map(id => id.trim()).filter(id => /^(brief:)?[w.:-]{1,120}$/.test(id)).slice(0, 40);
+    const full = (new URL(request.url).searchParams.get("full") ?? "").split(",").map(id => id.trim()).filter(id => /^(brief:)?[\w.:-]{1,120}$/.test(id)).slice(0, 40);
     if (full.length) {
       const wanted = full.map(id => id.startsWith("brief:") ? `intelbrief:${id.slice(6)}` : `intel:${id}`);
       const { data, error } = await admin.from("annotations").select("id, data, updated_at").eq("user_id", userId).eq("document_id", "__intel__").eq("deleted", false).in("id", wanted);
