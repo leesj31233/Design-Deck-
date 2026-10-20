@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   // picture itself changed, so a text edit never makes every device download the pictures again.
   const mediaIds = pack.items.map(item => `intelmedia:${item.id}`), knownHash = new Map<string, string>();
   for (let at = 0; at < mediaIds.length; at += 200) {
-    const { data } = await admin.from("annotations").select("id, data->>hash").eq("user_id", userId).in("id", mediaIds.slice(at, at + 200));
+    const { data } = await admin.from("annotations").select("id, data->>hash").eq("user_id", userId).eq("deleted", false).in("id", mediaIds.slice(at, at + 200));
     for (const row of (data ?? []) as { id: string; hash: string | null }[]) knownHash.set(row.id, row.hash ?? "");
   }
   const mediaRows = pack.items.flatMap(item => {
