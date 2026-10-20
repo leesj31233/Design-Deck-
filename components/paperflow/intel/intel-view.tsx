@@ -128,7 +128,8 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
   const setKlass = (next: IntelClass | "all") => { setKlassState(next); try { localStorage.setItem("pf-intel-class", next); } catch { /* remembered for this visit only */ } };
   const inClass = useCallback((item: IntelItem) => klass === "all" || itemClasses(item).includes(klass), [klass]);
   const visible = useMemo(() => (items ?? []).filter(item => (showHidden || !item.user?.hidden) && inClass(item)), [items, showHidden, inClass]);
-  const classBriefs = useMemo(() => briefs.filter(brief => klass === "all" || (brief.classes ?? (/^brief-c2-/.test(brief.id) ? ["c2"] : ["c1"])).includes(klass)), [briefs, klass]);
+  // A dated briefing (daily, weekly, monthly) is the day's news for every class: it shows whichever class is chosen.
+  const classBriefs = useMemo(() => briefs.filter(brief => klass === "all" || (brief.period && brief.period !== "core") || (brief.classes ?? (/^brief-c2-/.test(brief.id) ? ["c2"] : ["c1"])).includes(klass)), [briefs, klass]);
   const classPrices = useMemo(() => { if (!prices) return null; const series = prices.series.filter(entry => klass === "all" || productClass(entry.product) === klass); return series.length ? { ...prices, series } : null; }, [prices, klass]);
   const inScope = useCallback((item: IntelItem) => {
     if (scope.type === "star") return Boolean(item.user?.star);
