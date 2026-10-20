@@ -1,0 +1,66 @@
+/* 연결망: a radial map of an organisation's links and the same links as grouped lists. */
+.pf-web { display:grid; gap:12px; min-width:0; }
+.pf-web svg { width:100%; height:auto; max-height:420px; border:1px solid var(--i-line); border-radius:16px; background:color-mix(in srgb,var(--i-card) 70%,var(--background)); }
+.pf-web-center circle { fill:var(--i-ink); }
+.pf-web-center text { fill:var(--background); font:700 15px/1 var(--i-sans,system-ui); }
+.pf-web-center .pf-web-code { font:600 10px/1 var(--font-mono,ui-monospace,monospace); opacity:.75; }
+.pf-web-node { cursor:pointer; outline:none; }
+.pf-web-node text { fill:var(--i-ink); font:600 14px/1 var(--i-sans,system-ui); paint-order:stroke; stroke:var(--background); stroke-width:3px; }
+.pf-web-node:hover circle, .pf-web-node:focus circle { stroke:var(--i-ink); stroke-width:2px; }
+.pf-web-legend { display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12px; color:var(--i-muted); }
+.pf-web-legend span { display:inline-flex; align-items:center; gap:5px; }
+.pf-web-legend i { width:9px; height:9px; border-radius:50%; }
+.pf-web-groups { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; }
+.pf-web-groups section { padding:10px 12px; border:1px solid var(--i-line); border-radius:12px; background:var(--i-card); min-width:0; }
+.pf-web-groups h4 { margin:0 0 6px; font-size:12px; letter-spacing:.04em; }
+.pf-web-groups ul { display:grid; gap:4px; margin:0; padding:0; list-style:none; }
+
+.pf-web-groups li > button { display:flex; align-items:baseline; gap:6px; min-width:0; padding:3px 0; border:0; background:none; color:var(--i-ink); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
+.pf-web-groups li > button b { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-web-groups li > button:hover b { text-decoration:underline; }
+.pf-web-groups code { flex:none; padding:0 4px; border-radius:4px; background:var(--i-ink); color:var(--background); font:700 9.5px/1.6 var(--font-mono,ui-monospace,monospace); }
+.pf-web-groups small { color:var(--i-muted); font-size:11px; white-space:nowrap; }
+.pf-web-via { flex:none; font-size:11px; color:var(--i-muted); }
+.pf-web-via button { margin-left:3px; padding:0 4px; border:1px solid var(--i-line); border-radius:5px; background:transparent; color:var(--i-muted); font:inherit; cursor:pointer; }
+@media (max-width:760px) { .pf-web svg { max-height:300px; } .pf-web-node text { font-size:13px; } }
+
+/* Why a link exists: a card next to the pointed node, and under each row its first reason (all of them on hover). */
+.pf-web-stage { position:relative; }
+.pf-web-tip { position:absolute; z-index:5; width:min(360px,70%); transform:translate(16px,-50%); padding:12px 14px; border:1px solid var(--i-line); border-radius:14px; background:var(--background); box-shadow:0 18px 40px -18px rgba(10,30,24,.45); }
+.pf-web-tip[data-side="left"] { transform:translate(calc(-100% - 16px),-50%); }
+.pf-web-tip-actions { display:flex; gap:6px; margin-top:8px; }
+.pf-web-tip-actions button { height:28px; padding:0 10px; border:1px solid var(--i-line); border-radius:8px; background:transparent; color:var(--i-ink); font-size:12px; font-weight:600; cursor:pointer; }
+.pf-web-reasons-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 6px; margin:0 0 6px; font-size:13px; }
+.pf-web-reasons-head code { padding:0 4px; border-radius:4px; background:var(--i-ink); color:var(--background); font:700 9.5px/1.6 var(--font-mono,ui-monospace,monospace); }
+.pf-web-reasons-head span { flex-basis:100%; font-size:11.5px; color:var(--i-muted); }
+.pf-web-reasons ul { display:grid; gap:8px; margin:0; padding:0; list-style:none; }
+.pf-web-reasons li { display:grid; gap:3px; padding-top:7px; border-top:1px dashed var(--i-line); }
+.pf-web-reasons li small { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--i-muted); font-weight:600; }
+.pf-web-reasons li small i { width:7px; height:7px; border-radius:50%; }
+.pf-web-reasons q { font-size:12.5px; line-height:1.5; color:var(--i-ink); quotes:none; }
+.pf-web-reasons q[data-quoted]::before { content:"“"; } .pf-web-reasons q[data-quoted]::after { content:"”"; }
+.pf-web-reasons li button { justify-self:start; padding:0; border:0; background:none; color:var(--i-accent); font-size:11.5px; font-weight:600; text-align:left; cursor:pointer; }
+.pf-web-more { font-size:11px; color:var(--i-muted); }
+.pf-web-row { position:relative; display:grid !important; gap:2px; padding:4px 0; }
+.pf-web-row-main { display:flex; align-items:baseline; gap:6px; min-width:0; padding:0; border:0; background:none; color:var(--i-ink); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
+.pf-web-row-main b { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-web-row-main:hover b { text-decoration:underline; }
+.pf-web-row-why { margin:0; font-size:11.5px; line-height:1.45; color:var(--i-muted); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-web-row-why time { margin-right:5px; font-weight:700; color:var(--i-ink); font-variant-numeric:tabular-nums; }
+.pf-web-row-tip { display:none; position:absolute; left:0; top:100%; z-index:6; width:min(380px,92vw); padding:12px 14px; border:1px solid var(--i-line); border-radius:14px; background:var(--background); box-shadow:0 18px 40px -18px rgba(10,30,24,.45); }
+.pf-web-row:hover .pf-web-row-tip, .pf-web-row:focus-within .pf-web-row-tip { display:block; }
+@media (hover:none) { .pf-web-row-tip { display:none !important; } }
+@media (max-width:760px) { .pf-web-tip { left:4% !important; right:4%; width:auto; transform:translateY(-50%) !important; } }
+.pf-web-context { height:26px; padding:0 10px; border:1px dashed var(--i-line); border-radius:999px; background:transparent; color:var(--i-muted); font-size:11.5px; font-weight:600; cursor:pointer; }
+.pf-web-context[aria-pressed="true"] { border-style:solid; color:var(--i-ink); }
+.pf-web-empty { margin:0; padding:18px; border:1px dashed var(--i-line); border-radius:14px; font-size:13px; color:var(--i-muted); }
+/* Map and reasons side by side: the reasons never cover the web. */
+.pf-web-stage { display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,340px); gap:12px; align-items:start; }
+.pf-web-stage svg { max-height:440px; }
+.pf-web-detail { position:sticky; top:12px; min-height:200px; max-height:440px; overflow:auto; padding:14px 16px; border:1px solid var(--i-line); border-radius:16px; background:var(--i-card); }
+.pf-web-detail-empty b { display:block; margin-bottom:6px; font-size:13.5px; color:var(--i-ink); }
+.pf-web-detail-empty p { margin:0 0 6px; font-size:12.5px; line-height:1.55; color:var(--i-muted); }
+.pf-web-tip { display:none !important; }
+@media (max-width:980px) { .pf-web-stage { grid-template-columns:minmax(0,1fr); } .pf-web-detail { position:static; max-height:none; min-height:0; } }
+.pf-web-edge { font:700 13px/1 var(--i-sans,system-ui); paint-order:stroke; stroke:var(--background); stroke-width:4px; pointer-events:none; }
+.pf-web-unquoted { color:var(--i-muted) !important; font-style:italic; }
