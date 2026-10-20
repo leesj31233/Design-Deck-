@@ -261,7 +261,9 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
 
   /** A figure placed in a briefing: the item's case-file figure n (or its cover), its caption and a way to the item. */
   const briefFigure = (id: string, index: number, caption: string, key: number) => {
-    const item = byId.get(id), figures = [...(item?.dossier?.figures ?? []), ...(item?.user?.figures ?? [])], picked = figures[index - 1] ?? (item?.cover || item?.hasCover ? { src: item.cover, caption: display(item) } : undefined);
+    const item = byId.get(id), figures = [...(item?.dossier?.figures ?? []), ...(item?.user?.figures ?? [])], images = item?.images ?? [];
+    // #pn: a full-quality picture; #0 or a missing figure: the lead picture (full quality first, else the cover).
+    const picked = index >= 100 ? images[index - 101] : (index > 0 ? figures[index - 1] : undefined) ?? images[0] ?? (item?.cover || item?.hasCover ? { src: item.cover, caption: display(item) } : undefined);
     if (!item || !picked) return null;
     return <figure key={key} className="pf-brief-figure"><button type="button" onClick={() => setSelected(id)} aria-label={`${display(item)} 자세히`}>{picked.src ? <img src={picked.src} alt={caption || picked.caption} loading="lazy"/> : <CoverImage item={item} alt={caption || picked.caption}/>}</button><figcaption><b>{caption || picked.caption}</b><span>{item.kind === "company" || item.kind === "project" ? companyName(item) : display(item)}</span></figcaption></figure>;
   };

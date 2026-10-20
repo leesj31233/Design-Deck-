@@ -29,15 +29,19 @@ export function ItemArticle({ item, entity, terms, figure }: { item: IntelItem; 
   figure?: (id: string, index: number, caption: string, key: number) => ReactNode }) {
   const source = item.article ?? "";
   const refs = useMemo(() => new Map(articleRefs(source).map(ref => [ref.n, ref])), [source]);
-  // The item's own pictures: #0 is its cover, #n its n-th case-file figure.
+  // The item's own pictures: #0 its lead picture (a full-quality picture when it has one, else its cover),
+  // #n its n-th case-file figure, #pn (100 + n) its n-th full-quality picture.
   const own = (id: string, index: number, caption: string, key: number) => {
     if (id !== item.id) return figure ? figure(id, index, caption, key) : null;
-    const pictures = [...(item.dossier?.figures ?? []), ...(item.user?.figures ?? [])];
-    const picked = index > 0 ? pictures[index - 1] : undefined;
-    if (!picked && !(item.cover || item.hasCover || pictures.length)) return null;
-    return <figure key={key} className="pf-article-figure" data-hero={key === 0 || undefined}>
-      {picked ? <img src={picked.src} alt={caption || picked.caption} loading="lazy"/> : <CoverImage item={item} alt={caption}/>}
-      {(caption || picked?.caption) && <figcaption>{caption || picked?.caption}</figcaption>}
+    const images = item.images ?? [], pictures = [...(item.dossier?.figures ?? []), ...(item.user?.figures ?? [])];
+    const full = index >= 100 ? images[index - 101] : index === 0 ? images[0] : undefined;
+    const picked = !full && index > 0 && index < 100 ? pictures[index - 1] : undefined;
+    if (!full && !picked && !(index === 0 && (item.cover || item.hasCover))) return null;
+    const text = caption || full?.caption || picked?.caption;
+    return <figure key={key} className="pf-article-figure" data-hero={key === 0 || undefined} data-kind={full?.kind}>
+      {full ? <a href={full.src} target="_blank" rel="noreferrer noopener" title="원본 크기로 보기"><img src={full.src} alt={text ?? ""} loading="lazy" width={full.w} height={full.h}/></a>
+        : picked ? <img src={picked.src} alt={text ?? ""} loading="lazy"/> : <CoverImage item={item} alt={text ?? ""}/>}
+      {text && <figcaption>{text}{full?.credit && <small> · 출처: {full.from ? <a href={full.from} target="_blank" rel="noreferrer noopener">{full.credit}</a> : full.credit}</small>}</figcaption>}
     </figure>;
   };
   const cite = (list: string[], key: number) => <sup key={key} className="pf-article-cite">{list.map((n, index) => { const ref = refs.get(n); return <a key={n} href={ref?.url ?? `#art-ref-${item.id}-${n}`} target={ref?.url ? "_blank" : undefined} rel="noreferrer noopener" title={ref ? ref.rest : undefined} onClick={ref?.url ? undefined : event => { event.preventDefault(); document.getElementById(`art-ref-${item.id}-${n}`)?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>{index > 0 ? "," : "["}{n}{index === list.length - 1 ? "]" : ""}</a>; })}</sup>;

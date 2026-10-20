@@ -13,7 +13,7 @@ const ICON = { paper: BookOpen, gov: Landmark, "test-report": Gauge, "annual-rep
  * image, fetched only when the card comes into view. Over it: what the document is and its date.
  */
 export function CardCover({ item, library }: { item: IntelItem; /** The first page of the reader's library copy, when linked. */ library?: string }) {
-  const stored = item.cover ?? library ?? (item.hasCover ? undefined : item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src);
+  const stored = item.images?.[0]?.src ?? item.cover ?? library ?? (item.hasCover ? undefined : item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src);
   const [image, setImage] = useState<string | undefined>(stored), [broken, setBroken] = useState(false), box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setImage(stored); setBroken(false);
@@ -44,8 +44,8 @@ export function CardCover({ item, library }: { item: IntelItem; /** The first pa
 
 /** The item's cover (or a case-file figure) as a plain image, loaded from the device store when needed. */
 export function CoverImage({ item, alt, loading = "lazy" }: { item: IntelItem; alt: string; loading?: "lazy" | "eager" }) {
-  const fallback = item.cover ?? item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src;
-  const [src, setSrc] = useState<string | undefined>(item.cover ?? (item.hasCover ? undefined : fallback));
-  useEffect(() => { let alive = true; if (!item.cover && item.hasCover) void intelRepository.cover(item.id).then(url => { if (alive) setSrc(url ?? fallback); }); return () => { alive = false; }; }, [item.id, item.cover, item.hasCover, fallback]);
+  const fallback = item.images?.[0]?.src ?? item.cover ?? item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src;
+  const [src, setSrc] = useState<string | undefined>(item.images?.[0]?.src ?? item.cover ?? (item.hasCover ? undefined : fallback));
+  useEffect(() => { let alive = true; if (!item.images?.length && !item.cover && item.hasCover) void intelRepository.cover(item.id).then(url => { if (alive) setSrc(url ?? fallback); }); return () => { alive = false; }; }, [item.id, item.cover, item.hasCover, fallback]);
   return src ? <img src={src} alt={alt} loading={loading} decoding="async"/> : null;
 }

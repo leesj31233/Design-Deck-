@@ -26,6 +26,8 @@ export interface IntelUserState { star?: boolean; folderId?: string | null; note
 export interface IntelItem {
   id: string; kind: IntelKind; topics: string[]; classes?: IntelClass[];
   title: string; titleKo?: string; summaryKo?: string;
+  /** Pictures that show what the item is about, in full quality (CDN URLs): the first is its lead picture. */
+  images?: IntelImage[];
   /** A patent document (kind "patent"): its number, office, status, dates, applicants and technology group. */
   patent?: IntelPatent;
   /** The item written up as a short document (Markdown): agenda, sections, conclusion, figures with one-line captions, numbered references at the end. Never repeats the title. */
@@ -193,3 +195,6 @@ export const PATENT_GROUPS: [string, string][] = [
   ["cofiring", "혼소·연소"], ["coal-drying", "저품위탄 건조·고품위화"], ["coal-coating", "석탄 코팅·자연발화 억제"], ["coal-briquette", "석탄 성형·브리켓"],
   ["cnsl", "CNSL 추출·카다놀"], ["cashew-shell", "캐슈 껍질 열분해·연료"], ["other", "기타"]
 ];
+
+/** A picture of an item, kept in full quality on the CDN: what it shows (caption), where it comes from. */
+export interface IntelImage { src: string; w?: number; h?: number; caption: string; credit?: string; from?: string; kind?: "photo" | "chart" | "page" | "diagram" | "map" }

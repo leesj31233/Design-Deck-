@@ -22,3 +22,7 @@
 .pf-intel-tail > h4.pf-intel-tail-head { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; opacity: .6; margin-bottom: 6px; }
 details.pf-intel-raw { margin: 16px 0; }
 details.pf-intel-raw > summary { cursor: pointer; font-weight: 650; font-size: 14px; padding: 6px 0; }
+.pf-article-figure a { display:block; cursor:zoom-in; }
+.pf-article-figure img { height:auto; }
+.pf-article-figure[data-kind=page] img, .pf-article-figure[data-kind=chart] img, .pf-article-figure[data-kind=diagram] img { object-fit:contain; max-height:640px; background:#fff; }
+.pf-article-figure figcaption small { opacity:.7; }

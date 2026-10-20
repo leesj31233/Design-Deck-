@@ -75,8 +75,9 @@ export function Markdown({ source, entity, terms, figure, cite }: { source: stri
   for (let at = 0; at < lines.length;) {
     const current = lines[at];
     if (!current.trim()) { at++; continue; }
-    const picture = /^!\[([^\]]*)\]\(intel:([\w.:-]+)(?:#(\d+))?\)\s*$/.exec(current.trim());
-    if (picture && figure) { blocks.push(figure(picture[2], Number(picture[3] ?? 1), picture[1], at)); at++; continue; }
+    const picture = /^!\[([^\]]*)\]\(intel:([\w.:-]+)(?:#(p?)(\d+))?\)\s*$/.exec(current.trim());
+    // #n: the n-th case-file figure (#0 the lead picture); #pn: the n-th full-quality picture (passed as 100 + n).
+    if (picture && figure) { blocks.push(figure(picture[2], picture[3] ? 100 + Number(picture[4]) : Number(picture[4] ?? 1), picture[1], at)); at++; continue; }
     const heading = /^(#{1,4})\s+(.*)$/.exec(current);
     if (heading) { const level = Math.min(4, Math.max(2, heading[1].length)); const Tag = `h${level}` as "h2"; blocks.push(<Tag key={at}>{line(heading[2])}</Tag>); at++; continue; }
     if (/^\s*\|/.test(current)) {
