@@ -3,6 +3,13 @@ import { factsOnly, publicBrief, publicItem, publicMarkdown } from "@/lib/paperf
 import type { IntelItem } from "@/lib/paperflow/intel/types";
 
 describe("NAYSOR News keeps facts and leaves NAYSOR's judgement out", () => {
+  it("keeps pictures stored in the public bucket", () => {
+    const src = "https://abc.supabase.co/storage/v1/object/public/naysor-news/images/a/0123abcd.webp";
+    const item = publicItem({ id: "a", kind: "source", topics: [], title: "a", url: "https://example.org", images: [{ src, caption: "공장 전경", credit: "NAYSOR" }] } as IntelItem, "https://x", "2026-10-16T00:00:00Z", false);
+    expect(item?.images).toEqual([]);
+    const kept = publicItem({ id: "a", kind: "source", topics: [], title: "a", url: "https://example.org", images: [{ src, caption: "공장 전경", credit: "Antara" }] } as IntelItem, "https://x", "2026-10-16T00:00:00Z", false);
+    expect(kept?.images?.[0]?.src).toBe(src);
+  });
   it("drops judgement sections and lines in which NAYSOR speaks about itself", () => {
     const body = "## 시장\nEFB 펠릿은 137.5 $/t이다.\nNAYSOR는 이 가격을 매출 가정으로 쓴다.\n### 세부\n회분 5%.\n## NAYSOR에 주는 의미\n협상 하한은 120 $/t.\n## 출처\n[Argus](https://example.org)";
     const out = publicMarkdown(body);

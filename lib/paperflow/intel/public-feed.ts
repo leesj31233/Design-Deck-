@@ -102,14 +102,17 @@ export function mediaUrl(base: string, id: string, at: string, figure?: number) 
  * point, a fact, a timeline entry, an equipment line); a long text keeps its other sentences; Markdown keeps its
  * other sections and lines.
  */
+/** A picture in the public bucket: its address names the bucket, not the company, so it is not scrubbed. */
+const BUCKET_URL = /^https:\/\/[\w.-]+\.supabase\.co\/storage\/v1\/object\/public\/naysor-news\/[\w./-]+$/;
+const ownWords = (field: unknown) => typeof field === "string" && field.length <= 160 && !BUCKET_URL.test(field) && SELF.test(field);
 function scrub(value: unknown, key = ""): unknown {
   if (typeof value === "string") {
-    if (!SELF.test(value)) return value;
+    if (!SELF.test(value) || BUCKET_URL.test(value)) return value;
     if (key === "body" || key === "article") return publicMarkdown(value) || undefined;
     return value.length > 160 ? factsOnly(value) || undefined : undefined;
   }
   if (Array.isArray(value)) return value.flatMap(entry => {
-    if (entry && typeof entry === "object" && !Array.isArray(entry) && Object.values(entry).some(field => typeof field === "string" && field.length <= 160 && SELF.test(field))) return [];
+    if (entry && typeof entry === "object" && !Array.isArray(entry) && Object.values(entry).some(ownWords)) return [];
     const clean = scrub(entry, key);
     return clean === undefined ? [] : [clean];
   });
