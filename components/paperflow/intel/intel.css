@@ -181,3 +181,11 @@ html[data-pf-theme="dark"] .pf-intel-tier[data-tier="6"], html[data-pf-theme="da
 .pf-class-tag[data-class="c3"] { background:#a5652a; }
 .pf-dir-name .pf-class-tag { margin:0 0 0 6px; }
 @media (max-width:760px) { .pf-intel-classes button { height:34px; padding:0 10px; font-size:12px; } }
+/* The view tabs never squeeze: on a narrow screen they keep their size and scroll sideways. */
+.pf-intel-modes { max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+.pf-intel-modes::-webkit-scrollbar { display:none; }
+.pf-intel-modes button { flex:0 0 auto; }
+@media (max-width: 760px) {
+  .pf-intel-modes { display:flex; width:100%; }
+  .pf-intel-modes button { padding:8px 12px; min-height:36px; }
+}

@@ -154,7 +154,9 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
   const byId = useMemo(() => new Map((items ?? []).map(item => [item.id, item])), [items]);
   // Items that point at the one open (a company's projects, the reports that mention it).
   /** News items (reports, plans, articles, withdrawals…), newest first. */
-  const updates = useMemo(() => (items ?? []).filter(item => item.update && !item.user?.hidden && inClass(item)).sort((a, b) => b.update!.date.localeCompare(a.update!.date) || (b.addedAt ?? "").localeCompare(a.addedAt ?? "")), [items, inClass]);
+  // News that has happened: an update dated in the future (an event announced ahead) is not "today's".
+  const todayKey = useMemo(() => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`; }, []);
+  const updates = useMemo(() => (items ?? []).filter(item => item.update && item.update.date <= todayKey && !item.user?.hidden && inClass(item)).sort((a, b) => b.update!.date.localeCompare(a.update!.date) || (b.addedAt ?? "").localeCompare(a.addedAt ?? "")), [items, inClass, todayKey]);
   const latestDay = updates[0]?.update!.date ?? null;
   const [allRecent, setAllRecent] = useState(false);
   const shownUpdates = useMemo(() => { if (!latestDay) return []; if (!allRecent) return updates.filter(item => item.update!.date === latestDay); const week = new Date(Date.parse(latestDay) - 7 * 864e5).toISOString().slice(0, 10); return updates.filter(item => item.update!.date >= week); }, [updates, latestDay, allRecent]);
