@@ -40,6 +40,8 @@ export async function GET(request: Request) {
       entities: (registry.entities ?? []).map(({ code, name, aliases, category, parentCode, canonicalItemId }) => ({ code, name, aliases, category, parentCode, canonicalItemId })),
       briefs: briefs.filter(row => !row.id.startsWith("intelbrief:__")).map(row => { const data = row.data as { id: string; title: string; period?: string; date?: string; classes?: string[] }; return { id: data.id, title: data.title, period: data.period, date: data.date, classes: data.classes, updatedAt: row.updated_at }; }),
       guides: brief("__guides__")?.body ?? null,
+      // What to watch every morning (the owner's observer registry), with the last check the cloud run recorded.
+      observers: (() => { const log = json<Record<string, { lastChecked?: string; lastFound?: string | null }>>("__observer-log__", {}); return json<{ id: string }[]>("__observers__", []).map(observer => ({ ...observer, ...log[observer.id] })); })(),
       glossary: json<{ term: string }[]>("__glossary__", []).map(term => term.term),
       prices: (prices.series ?? []).map(series => ({ id: series.id, name: series.name, unit: series.unit, last: series.points?.at(-1) }))
     });
