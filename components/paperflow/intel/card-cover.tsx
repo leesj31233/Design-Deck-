@@ -13,11 +13,11 @@ const ICON = { paper: BookOpen, gov: Landmark, "test-report": Gauge, "annual-rep
  * image, fetched only when the card comes into view. Over it: what the document is and its date.
  */
 export function CardCover({ item, library }: { item: IntelItem; /** The first page of the reader's library copy, when linked. */ library?: string }) {
-  const stored = item.images?.[0]?.src ?? item.cover ?? library ?? (item.hasCover ? undefined : item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src);
+  const stored = item.images?.[0]?.src ?? (item.coverOff ? undefined : item.cover) ?? library ?? (item.hasCover ? undefined : item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src);
   const [image, setImage] = useState<string | undefined>(stored), [broken, setBroken] = useState(false), box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setImage(stored); setBroken(false);
-    if (stored || item.kind === "gap" || (!item.hasCover && !item.url)) return;
+    if (stored || item.kind === "gap" || item.coverOff || (!item.hasCover && !item.url)) return;
     const element = box.current;
     if (!element) return;
     let alive = true;
@@ -30,7 +30,7 @@ export function CardCover({ item, library }: { item: IntelItem; /** The first pa
     }, { rootMargin: "300px" });
     observer.observe(element);
     return () => { alive = false; observer.disconnect(); };
-  }, [stored, item.url, item.kind, item.hasCover, item.id, item.dossier, item.user]);
+  }, [stored, item.url, item.kind, item.hasCover, item.coverOff, item.id, item.dossier, item.user]);
   const Icon = item.kind === "gap" ? HelpCircle : ICON[item.sourceType ?? ""] ?? FileText;
   const label = item.update ? UPDATE_LABEL[item.update.type] : item.kind === "gap" ? "확인 필요" : SOURCE_LABEL[item.sourceType ?? ""] ?? "자료";
   // The newest real date behind the item (its own, its news, its sources), top right like a dateline.

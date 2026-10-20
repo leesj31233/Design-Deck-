@@ -45,6 +45,8 @@ export interface IntelItem {
   cover?: string;
   /** The cover is kept apart from the item (its own store and sync row); this says one exists. */
   hasCover?: boolean;
+  /** The cover was judged unrelated or unreadable: it is removed and not looked up again. */
+  coverOff?: boolean;
   /** A company's (or project owner's) logo, from its own website (WebP/PNG data URL, small). */
   logo?: string;
   /** The logo is light on a dark ground, so its tile is dark. */

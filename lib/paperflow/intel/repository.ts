@@ -95,7 +95,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     patent: kind === "patent" ? patentOf(value.patent) : undefined,
     images: Array.isArray(value.images) ? value.images.slice(0, 6).flatMap(entry => { const image = entry as Record<string, unknown>, src = link(image.src), caption = text(image.caption, 300); const kinds = ["photo", "chart", "page", "diagram", "map"]; return src && caption ? [{ src, caption, w: Number.isFinite(Number(image.w)) ? Number(image.w) : undefined, h: Number.isFinite(Number(image.h)) ? Number(image.h) : undefined, credit: text(image.credit, 160), from: link(image.from), kind: kinds.includes(image.kind as string) ? image.kind as IntelImage["kind"] : undefined }] : []; }) : undefined,
     logoDark: value.logoDark === true ? true : undefined, geo: placesOf(value.geo), financials: financialsOf(value.financials), profileRefs: refsOf(value.profileRefs), people: peopleOf(value.people), logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
-    hasCover: value.hasCover === true ? true : undefined,
+    hasCover: value.hasCover === true && value.coverOff !== true ? true : undefined, coverOff: value.coverOff === true ? true : undefined,
     cover: typeof value.cover === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.cover) && value.cover.length < 140_000 ? value.cover : undefined,
     checkedAt: text(value.checkedAt, 20), pack
   };

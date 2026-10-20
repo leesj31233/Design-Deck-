@@ -35,12 +35,14 @@ export async function POST(request: Request) {
     for (const row of (data ?? []) as { id: string; hash: string | null }[]) knownHash.set(row.id, row.hash ?? "");
   }
   const mediaRows = pack.items.flatMap(item => {
+    // A cover judged unrelated or unreadable is withdrawn (the row is marked deleted, so every device drops it).
+    if (item.coverOff) return knownHash.has(`intelmedia:${item.id}`) ? [{ user_id: userId, id: `intelmedia:${item.id}`, document_id: "__intel__", data: {}, deleted: true, updated_at: now }] : [];
     if (!item.cover) return [];
     const hash = createHash("sha1").update(item.cover).digest("hex");
     return knownHash.get(`intelmedia:${item.id}`) === hash ? [] : [{ user_id: userId, id: `intelmedia:${item.id}`, document_id: "__intel__", data: { cover: item.cover, hash }, deleted: false, updated_at: now }];
   });
   const rows = [
-    ...pack.items.map(({ cover, ...item }) => ({ user_id: userId, id: `intel:${item.id}`, document_id: "__intel__", data: { ...item, hasCover: Boolean(cover) || knownHash.has(`intelmedia:${item.id}`) || item.hasCover || undefined, addedAt: item.addedAt ?? now, updatedAt: now }, deleted: false, updated_at: now })),
+    ...pack.items.map(({ cover, ...item }) => ({ user_id: userId, id: `intel:${item.id}`, document_id: "__intel__", data: { ...item, hasCover: item.coverOff ? undefined : Boolean(cover) || knownHash.has(`intelmedia:${item.id}`) || item.hasCover || undefined, addedAt: item.addedAt ?? now, updatedAt: now }, deleted: false, updated_at: now })),
     ...mediaRows,
     ...(pack.briefs ?? []).map(brief => ({ user_id: userId, id: `intelbrief:${brief.id}`, document_id: "__intel__", data: { ...brief, updatedAt: now }, deleted: false, updated_at: now }))
   ];
