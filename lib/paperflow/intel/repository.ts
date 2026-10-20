@@ -3,12 +3,20 @@ import { emitLocalChange } from "../persistence/changes";
 import { REGISTRY_BRIEF, cleanRegistry } from "./registry";
 import { PRICES_BRIEF, cleanPrices } from "./prices";
 import { PLACES_BRIEF, cleanPlaces } from "./places";
-import { isClass, type IntelBrief, type IntelClass, type IntelItem, type IntelKind, type IntelPack, type IntelStage, type IntelStatus, type IntelUserState } from "./types";
+import { isClass, type IntelBrief, type IntelClass, type IntelItem, type IntelKind, type IntelPack, type IntelPatent, type PatentStatus, type IntelStage, type IntelStatus, type IntelUserState } from "./types";
 
 /** Class 1 / Class 2 tags, known ones only, each once. */
 export const classesOf = (value: unknown): IntelClass[] | undefined => { const list = Array.isArray(value) ? [...new Set(value.filter(isClass))] : []; return list.length ? list : undefined; };
 
-const KINDS: IntelKind[] = ["source", "company", "project", "vendor", "equipment", "market", "gap"];
+const KINDS: IntelKind[] = ["source", "company", "project", "vendor", "equipment", "market", "patent", "gap"];
+const PATENT_STATUSES = ["application", "published", "granted", "expired", "withdrawn"];
+function patentOf(input: unknown): IntelPatent | undefined {
+  if (!input || typeof input !== "object") return undefined;
+  const value = input as Record<string, unknown>, number = text(value.number, 40), office = text(value.office, 8);
+  if (!number || !office || !PATENT_STATUSES.includes(value.status as string)) return undefined;
+  const strings = (entry: unknown, max: number, length = 160) => Array.isArray(entry) ? entry.flatMap(item => text(item, length) ? [text(item, length)!] : []).slice(0, max) : undefined;
+  return { number, office: office.toUpperCase(), status: value.status as PatentStatus, applicants: strings(value.applicants, 12) ?? [], inventors: strings(value.inventors, 20, 80), filingDate: text(value.filingDate, 10), publicationDate: text(value.publicationDate, 10), grantDate: text(value.grantDate, 10), priorityDate: text(value.priorityDate, 10), cpc: strings(value.cpc, 16, 24), group: text(value.group, 30), family: strings(value.family, 30, 40), entityCodes: strings(value.entityCodes, 8, 12) };
+}
 const STATUSES: IntelStatus[] = ["verified", "claimed", "estimate", "unverified"];
 const STAGES: IntelStage[] = ["research", "pilot", "construction", "commissioning", "commercial-production", "commercial-sales", "stopped"];
 export const INTEL_EVENT = "paperflow:intel";
@@ -84,6 +92,7 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
     profile: record(value.profile),
     dossier: dossierOf(value.dossier),
     update: updateOf(value.update),
+    patent: kind === "patent" ? patentOf(value.patent) : undefined,
     logoDark: value.logoDark === true ? true : undefined, geo: placesOf(value.geo), financials: financialsOf(value.financials), profileRefs: refsOf(value.profileRefs), people: peopleOf(value.people), logo: typeof value.logo === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.logo) && value.logo.length < 60_000 ? value.logo : undefined,
     hasCover: value.hasCover === true ? true : undefined,
     cover: typeof value.cover === "string" && /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(value.cover) && value.cover.length < 140_000 ? value.cover : undefined,

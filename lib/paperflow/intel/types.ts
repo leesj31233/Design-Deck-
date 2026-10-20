@@ -4,7 +4,7 @@
  * torrefaction, biochar). Each item keeps its evidence: where it came from, how reliable the source
  * type is, and whether the fact is independently confirmed, a company claim or an estimate.
  */
-export type IntelKind = "source" | "company" | "project" | "vendor" | "equipment" | "market" | "gap";
+export type IntelKind = "source" | "company" | "project" | "vendor" | "equipment" | "market" | "patent" | "gap";
 export type IntelStatus = "verified" | "claimed" | "estimate" | "unverified";
 export type IntelStage = "research" | "pilot" | "construction" | "commissioning" | "commercial-production" | "commercial-sales" | "stopped";
 
@@ -26,6 +26,8 @@ export interface IntelUserState { star?: boolean; folderId?: string | null; note
 export interface IntelItem {
   id: string; kind: IntelKind; topics: string[]; classes?: IntelClass[];
   title: string; titleKo?: string; summaryKo?: string;
+  /** A patent document (kind "patent"): its number, office, status, dates, applicants and technology group. */
+  patent?: IntelPatent;
   /** The item written up as a short document (Markdown): agenda, sections, conclusion, figures with one-line captions, numbered references at the end. Never repeats the title. */
   article?: string;
   org?: string; authors?: string; date?: string; url: string; pdfUrl?: string;
@@ -130,7 +132,7 @@ export function itemClasses(item: Pick<IntelItem, "classes" | "topics">): IntelC
 export const TOPIC_LABEL = new Map(TOPIC_TREE.flatMap(group => [[group.id, group.label] as const, ...(group.children ?? []).map(child => [child.id, child.label] as const)]));
 export const topicIds = (node: TopicNode): string[] => [node.id, ...(node.children ?? []).flatMap(topicIds)];
 
-export const KIND_LABEL: Record<IntelKind, string> = { source: "자료", company: "기업", project: "프로젝트", vendor: "벤더", equipment: "장비", market: "시장", gap: "확인 필요" };
+export const KIND_LABEL: Record<IntelKind, string> = { source: "자료", company: "기업", project: "프로젝트", vendor: "벤더", equipment: "장비", market: "시장", patent: "특허", gap: "확인 필요" };
 export const STATUS_LABEL: Record<IntelStatus, string> = { verified: "확인됨", claimed: "기업 주장", estimate: "추정", unverified: "미확인" };
 export const STAGE_LABEL: Record<IntelStage, string> = { research: "연구", pilot: "파일럿", construction: "건설", commissioning: "시운전", "commercial-production": "상업생산", "commercial-sales": "상업판매", stopped: "중단" };
 /** Source priority 1–7 (lower is stronger), as in the research brief. */
@@ -162,3 +164,32 @@ export function itemDate(item: Pick<IntelItem, "date" | "update" | "dossier">, t
 }
 /** What kind of document the original is. */
 export const SOURCE_TYPE_LABEL: Record<string, string> = { press: "보도·기사", gov: "정부·공공 자료", paper: "논문", "market-analyst": "시장 분석", "vendor-catalog": "제조사 자료", "annual-report": "연차·지속가능 보고서", "test-report": "시험 성적서", patent: "특허", ir: "IR 자료", company: "기업 자료" };
+
+/** A patent or patent application, as the office publishes it. */
+export type PatentStatus = "application" | "published" | "granted" | "expired" | "withdrawn";
+export interface IntelPatent {
+  /** Publication or grant number as printed, e.g. "KR102345678B1", "US2021123456A1", "WO2020123456A1". */
+  number: string;
+  /** Patent office: KR, US, EP, WO, JP, CN, ID, MY, TH, VN, IN, BR, AU, DE, … */
+  office: string;
+  status: PatentStatus;
+  applicants: string[];
+  inventors?: string[];
+  filingDate?: string; publicationDate?: string; grantDate?: string; priorityDate?: string;
+  /** CPC/IPC classes, e.g. "C10L 5/44". */
+  cpc?: string[];
+  /** Technology group (PATENT_GROUPS key). */
+  group?: string;
+  /** Other members of the same family (numbers). */
+  family?: string[];
+  /** Entity codes of the applicants in the registry, when known. */
+  entityCodes?: string[];
+}
+export const PATENT_STATUS_LABEL: Record<PatentStatus, string> = { application: "출원", published: "공개", granted: "등록", expired: "소멸", withdrawn: "취하·거절" };
+/** Technology groups for patents across the three classes. */
+export const PATENT_GROUPS: [string, string][] = [
+  ["washing", "세척·탈회(EFB·바이오매스)"], ["dewatering", "탈수·압착"], ["integrated", "바이오매스 통합공정"], ["drying", "건조"],
+  ["pelletizing", "펠릿화·성형"], ["torrefaction", "반탄화·블랙펠릿"], ["biochar", "바이오차·탄화·열분해"], ["pome", "POME·바이오가스"],
+  ["cofiring", "혼소·연소"], ["coal-drying", "저품위탄 건조·고품위화"], ["coal-coating", "석탄 코팅·자연발화 억제"], ["coal-briquette", "석탄 성형·브리켓"],
+  ["cnsl", "CNSL 추출·카다놀"], ["cashew-shell", "캐슈 껍질 열분해·연료"], ["other", "기타"]
+];

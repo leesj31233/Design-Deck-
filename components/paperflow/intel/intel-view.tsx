@@ -11,7 +11,7 @@ import { importDocument } from "@/lib/paperflow/pdf/import-document";
 import { INTEL_EVENT, intelRepository, readPack } from "@/lib/paperflow/intel/repository";
 import { registerCsv, registerMarkdown } from "@/lib/paperflow/intel/export";
 import { linkedDoc, libraryName, pdfUrlOf, suggestDoc } from "@/lib/paperflow/intel/library-link";
-import { APPLICABILITY_LABEL, SOURCE_TYPE_LABEL, UPDATE_LABEL, KIND_LABEL, LANG_LABEL, PERIOD_LABEL, PROFILE_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, TOPIC_LABEL, TOPIC_TREE, topicIds, type BriefPeriod, type IntelBrief, type IntelItem, type IntelKind, type IntelStatus, CLASS_LABEL, CLASS_ORDER, CLASS_SHORT, itemClasses, itemDate, type IntelClass } from "@/lib/paperflow/intel/types";
+import { APPLICABILITY_LABEL, PATENT_STATUS_LABEL, SOURCE_TYPE_LABEL, UPDATE_LABEL, KIND_LABEL, LANG_LABEL, PERIOD_LABEL, PROFILE_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, TOPIC_LABEL, TOPIC_TREE, topicIds, type BriefPeriod, type IntelBrief, type IntelItem, type IntelKind, type IntelStatus, CLASS_LABEL, CLASS_ORDER, CLASS_SHORT, itemClasses, itemDate, type IntelClass } from "@/lib/paperflow/intel/types";
 import { usePaperflow } from "../shell/paperflow-context";
 import { FolderGlyph } from "../library/archive-folders";
 import { BriefDocument } from "./brief-document";
@@ -21,6 +21,7 @@ import { PanelMarks } from "./panel-marks";
 import { SourceTree } from "./source-tree";
 import { CardCover, CoverImage } from "./card-cover";
 import { ItemArticle } from "./item-article";
+import { PatentBoard, patentLink } from "./patent-board";
 import { IntelProgressBar } from "./intel-progress";
 import { CompanyMark, CompanyPage, companyName } from "./company-page";
 import { IntelMap } from "./intel-map";
@@ -58,7 +59,7 @@ export type IntelSite = { loading: boolean; paperflow: string };
 
 export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site?: IntelSite; launch?: { item: string; read: boolean; related?: boolean } }) {
   const [items, setItems] = useState<IntelItem[] | null>(null), [briefs, setBriefs] = useState<IntelBrief[]>([]);
-  const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "prices" | "briefs" | "analysis" | "companies" | "map">("items");
+  const [scope, setScope] = useState<Scope>({ type: "all" }), [mode, setMode] = useState<"items" | "prices" | "briefs" | "analysis" | "companies" | "patents" | "map">("items");
   const [query, setQuery] = useState(""), [kinds, setKinds] = useState<Set<IntelKind>>(new Set()), [statuses, setStatuses] = useState<Set<IntelStatus>>(new Set());
   const [sort, setSort] = useState<"reliability" | "date">("date"), [showHidden, setShowHidden] = useState(false);
   const [selected, setSelected] = useState<string | null>(null), [briefId, setBriefId] = useState<string | null>(null);
@@ -173,6 +174,15 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
   }, [items, pageId, registryIndex]);
   // A company page knows its organisation: code, parent, subsidiaries, and everything collected about them.
   const pageEntity = pageItem ? (pageItem.id.startsWith("entity:") ? registryIndex.byCode.get(pageItem.id.slice(7)) : registryIndex.byItem.get(pageItem.id)) : undefined;
+  // 특허(IP): patents, and the organisation the patent tab is narrowed to (from a company page).
+  const [patentEntity, setPatentEntity] = useState<IntelEntity | null>(null);
+  const patents = useMemo(() => visible.filter(item => item.kind === "patent" && item.patent), [visible]);
+  const patentOf = useCallback((item: IntelItem, entity: IntelEntity) => {
+    const names = [entity.name, ...entity.aliases].map(name => name.replace(/(.*?)/g, "").replace(/^(PT|CV)s+/i, "").trim().toLowerCase()).filter(name => name.length >= 3);
+    const own = new Set([entity.canonicalItemId, ...entity.itemIds].filter(Boolean));
+    return Boolean(item.patent?.entityCodes?.includes(entity.code) || item.patent?.applicants.some(applicant => names.some(name => applicant.toLowerCase().includes(name))) || item.relations?.some(relation => own.has(relation.to)));
+  }, []);
+  const openPatents = useCallback((entity: IntelEntity | null) => { setPatentEntity(entity); setPageId(null); setSelected(null); setMode("patents"); window.scrollTo({ top: 0 }); }, []);
   const openEntity = useCallback((entity: IntelEntity) => { setPageId(entity.canonicalItemId ?? `entity:${entity.code}`); setSelected(null); window.scrollTo({ top: 0 }); }, []);
   const relatedOf = useCallback((item: IntelItem) => { const ids = new Set([...(item.relations ?? []).map(relation => relation.to), ...newsOf(item.id).map(entry => entry.id)]); return (items ?? []).filter(entry => entry.id !== item.id && (ids.has(entry.id) || entry.relations?.some(relation => relation.to === item.id))).slice(0, 24); }, [items, newsOf]);
   const mentions = useMemo(() => current ? (items ?? []).filter(item => item.id !== current.id && item.relations?.some(relation => relation.to === current.id)) : [], [items, current]);
@@ -340,7 +350,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
         </div>}
       </nav>
 
-      {pageItem ? <CompanyPage article={pageItem.article ? <ItemArticle item={pageItem} entity={entity} terms={terms} figure={briefFigure}/> : undefined} item={pageItem} web={pageEntity ? entityWeb(pageEntity, registryIndex, byId, items ?? []) : undefined} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} read={site ? (pdfUrlOf(pageItem) ? { label: "PAPERFLOW에서 번역·마킹", run: () => void window.open(inPaperflow(pageItem), "_blank", "noopener") } : undefined) : docOf(pageItem) ? { label: "리더에서 읽기·번역", run: () => router.push(`/reader/${docOf(pageItem)}`) } : pdfUrlOf(pageItem) ? { label: "PDF 번역해서 읽기", run: () => void toLibrary(pageItem) } : undefined} news={newsOf(pageItem.id)} related={pageEntity ? entityItems(pageEntity, registryIndex, byId) : relatedOf(pageItem)} org={pageEntity ? { entity: pageEntity, parent: pageEntity.parentCode ? registryIndex.byCode.get(pageEntity.parentCode) : undefined, children: registryIndex.children.get(pageEntity.code) ?? [], open: openEntity } : undefined} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
+      {pageItem ? <CompanyPage patents={pageEntity ? { count: patents.filter(item => patentOf(item, pageEntity)).length, open: () => openPatents(pageEntity) } : undefined} reports={(pageEntity ? entityItems(pageEntity, registryIndex, byId) : [pageItem]).flatMap(entry => pdfUrlOf(entry) && entry.kind !== "patent" ? [{ id: entry.id, title: display(entry), url: pdfUrlOf(entry)!, date: itemDate(entry) }] : []).sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")).slice(0, 12)} article={pageItem.article ? <ItemArticle item={pageItem} entity={entity} terms={terms} figure={briefFigure}/> : undefined} item={pageItem} web={pageEntity ? entityWeb(pageEntity, registryIndex, byId, items ?? []) : undefined} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} read={site ? (pdfUrlOf(pageItem) ? { label: "PAPERFLOW에서 번역·마킹", run: () => void window.open(inPaperflow(pageItem), "_blank", "noopener") } : undefined) : docOf(pageItem) ? { label: "리더에서 읽기·번역", run: () => router.push(`/reader/${docOf(pageItem)}`) } : pdfUrlOf(pageItem) ? { label: "PDF 번역해서 읽기", run: () => void toLibrary(pageItem) } : undefined} news={newsOf(pageItem.id)} related={pageEntity ? entityItems(pageEntity, registryIndex, byId) : relatedOf(pageItem)} org={pageEntity ? { entity: pageEntity, parent: pageEntity.parentCode ? registryIndex.byCode.get(pageEntity.parentCode) : undefined, children: registryIndex.children.get(pageEntity.code) ?? [], open: openEntity } : undefined} byId={byId} mentions={(items ?? []).filter(entry => entry.id !== pageItem.id && entry.relations?.some(relation => relation.to === pageItem.id))} entity={entity} terms={terms}
         onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}
         onBack={() => setPageId(null)} onPdf={source => site ? void window.open(source.pdfUrl!, "_blank", "noopener") : void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)} busy={fetching} notify={notify}/> : <div className="pf-intel-main">
         <div className="pf-intel-toolbar">
@@ -351,6 +361,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
             <button type="button" role="tab" aria-selected={mode === "briefs"} onClick={() => setMode("briefs")}><BookOpenText size={14}/>브리핑<i>{readingBriefs.length}</i></button>
             <button type="button" role="tab" aria-selected={mode === "analysis"} onClick={() => setMode("analysis")}><Layers size={14}/>분석 업데이트<i>{analysisBriefs.length}</i></button>
             <button type="button" role="tab" aria-selected={mode === "companies"} onClick={() => setMode("companies")}><Building2 size={14}/>기업 분석<i>{registry ? (klass === "all" ? registry.entities.length : registry.entities.filter(entity => entityClasses(entity, byId).includes(klass)).length) : companies.length}</i></button>
+            <button type="button" role="tab" aria-selected={mode === "patents"} onClick={() => { setPatentEntity(null); setMode("patents"); }}><FileText size={14}/>특허(IP)<i>{patents.length}</i></button>
             <button type="button" role="tab" aria-selected={mode === "map"} onClick={() => setMode("map")}><MapPinned size={14}/>지도<i>{visible.filter(item => item.geo?.length).length}</i></button>
           </div>
         </div>
@@ -370,7 +381,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
           <label className="pf-intel-hidden"><input type="checkbox" checked={showHidden} onChange={event => setShowHidden(event.target.checked)}/>숨긴 항목</label>
         </div>}
 
-        {mode === "prices" ? (classPrices ? <PriceBoard board={classPrices} title={klass === "c2" ? "석탄 가격 (저품위탄·기준가)" : klass === "c3" ? "캐슈넛·껍질·CNSL 가격" : klass === "c1" ? "펠릿·바이오차 가격" : "가격 보드 — 펠릿·바이오차·석탄·캐슈넛"} onItem={setSelected}/> : <p className="pf-intel-none">이 분류에는 아직 가격 시리즈가 없습니다.</p>) : mode === "map" ? <IntelMap items={visible} query={query} selected={selected} places={places} klass={klass} onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}/> : mode === "companies" && registry ? <EntityDirectory index={registryIndex} byId={byId} query={query} klass={klass} onOpen={openEntity}/> : mode === "companies" ? <ul className="pf-intel-companies">
+        {mode === "prices" ? (classPrices ? <PriceBoard board={classPrices} title={klass === "c2" ? "석탄 가격 (저품위탄·기준가)" : klass === "c3" ? "캐슈넛·껍질·CNSL 가격" : klass === "c1" ? "펠릿·바이오차 가격" : "가격 보드 — 펠릿·바이오차·석탄·캐슈넛"} onItem={setSelected}/> : <p className="pf-intel-none">이 분류에는 아직 가격 시리즈가 없습니다.</p>) : mode === "map" ? <IntelMap items={visible} query={query} selected={selected} places={places} klass={klass} onOpen={id => { const target = byId.get(id); if (target && (target.kind === "company" || target.kind === "project")) { setPageId(id); setSelected(null); window.scrollTo({ top: 0 }); } else setSelected(id); }}/> : mode === "patents" ? <PatentBoard items={patents} entity={patentEntity} onClearEntity={() => setPatentEntity(null)} onOpen={setSelected} matches={patentOf}/> : mode === "companies" && registry ? <EntityDirectory index={registryIndex} byId={byId} query={query} klass={klass} onOpen={openEntity}/> : mode === "companies" ? <ul className="pf-intel-companies">
           {companies.filter(({ item }) => !query || [display(item), item.title, item.org, item.country, ...Object.values(item.profile ?? {})].join(" ").toLowerCase().includes(query.toLowerCase())).map(({ item, news }) => { const cover = item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src; return <li key={item.id}>
             <article className="pf-intel-company" data-selected={selected === item.id || undefined} tabIndex={0} onClick={() => { setPageId(item.id); setSelected(null); window.scrollTo({ top: 0 }); }} onKeyDown={event => { if (event.key === "Enter") { setPageId(item.id); setSelected(null); } }}>
               <div className="pf-intel-company-cover">{cover ? <img src={cover} alt="" loading="lazy"/> : item.logo ? <span className="pf-intel-company-logo-big"><img src={item.logo} alt=""/></span> : <CompanyMark item={item} size={64}/>}{item.logo && <i className="pf-intel-company-logo" data-dark={item.logoDark || undefined}><img src={item.logo} alt=""/></i>}{item.dossier && <span>케이스 파일</span>}</div>
@@ -433,6 +444,7 @@ export function IntelView({ docs, site, launch }: { docs: StoredDocument[]; site
         <h3>{display(current)}</h3>
         {current.titleKo && current.titleKo !== current.title && <p className="pf-intel-original" lang={current.lang}>{current.title}</p>}
         <ul className="pf-meta-chips" aria-label="원문 정보">{([["원문 날짜", current.date], ["발행", current.org], ["저자", current.authors], ["원문 언어", current.lang ? LANG_LABEL[current.lang] ?? current.lang : undefined], ["국가", current.country], ["자료 유형", current.sourceType ? SOURCE_TYPE_LABEL[current.sourceType] ?? current.sourceType : undefined]] as const).filter(([, value]) => value).map(([label, value]) => <li key={label}><small>{label}</small>{value}</li>)}</ul>
+        {current.patent && <dl className="pf-intel-specs pf-intel-patent">{([["번호", current.patent.number], ["특허청", current.patent.office], ["상태", PATENT_STATUS_LABEL[current.patent.status]], ["출원인", current.patent.applicants.join(", ")], ["발명자", current.patent.inventors?.join(", ")], ["우선일", current.patent.priorityDate], ["출원일", current.patent.filingDate], ["공개일", current.patent.publicationDate], ["등록일", current.patent.grantDate], ["분류(CPC/IPC)", current.patent.cpc?.join(" · ")], ["패밀리", current.patent.family?.join(", ")]] as const).filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}<div><dt>공보</dt><dd><a href={patentLink(current.patent.number)} target="_blank" rel="noreferrer noopener">Google Patents에서 열기</a></dd></div></dl>}
         {current.dossier && !current.article && <DossierView dossier={current.dossier} layout={focusDetail ? "page" : "panel"} library={{ has: id => docs.some(doc => doc.id === id && !doc.deletedAt), open: id => router.push(`/reader/${id}`) }} entity={entity} terms={terms} busy={fetching} onOpenPage={current.kind === "company" || current.kind === "project" ? () => { setPageId(current.id); setSelected(null); window.scrollTo({ top: 0 }); } : undefined} onPdf={source => void pdfToLibrary(source.pdfUrl!, source.title, source.pdfUrl!)}/>}
 
         <div className="pf-intel-buttons">

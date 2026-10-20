@@ -174,3 +174,10 @@
 .pf-cdoc-family small { grid-column:2; font-size:11.5px; color:var(--i-muted); }
 @media (max-width:1180px) { .pf-cdoc-hero { width:220px; height:130px; } }
 @media (max-width:900px) { .pf-cdoc-visual { grid-auto-flow:row; } .pf-cdoc-hero { display:none; } }
+.pf-company-reports { position:relative; }
+.pf-company-reports > summary { list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 11px; border:1px solid var(--i-line); border-radius:8px; background:var(--background); color:var(--i-ink); font-size:12.5px; }
+.pf-company-reports > summary::-webkit-details-marker { display:none; }
+.pf-company-reports[open] > ul { position:absolute; z-index:40; top:calc(100% + 6px); left:0; min-width:320px; max-width:min(520px, 90vw); max-height:360px; overflow:auto; margin:0; padding:6px; list-style:none; border-radius:10px; border:1px solid var(--i-line, rgba(0,0,0,.15)); background:var(--background, #fff); box-shadow:0 12px 32px rgba(0,0,0,.18); }
+.pf-company-reports li a { display:flex; gap:8px; padding:8px 10px; border-radius:7px; font-size:13px; color:inherit; text-decoration:none; }
+.pf-company-reports li a:hover { background:color-mix(in srgb, currentColor 7%, transparent); }
+.pf-company-reports time { opacity:.6; font-variant-numeric:tabular-nums; white-space:nowrap; }

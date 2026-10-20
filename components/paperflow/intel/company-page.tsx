@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowLeft, ArrowUpRight, BookOpenText, Building2, Star } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowUpRight, BookOpenText, Building2, FileText, ScrollText, Star } from "lucide-react";
 import { intelRepository } from "@/lib/paperflow/intel/repository";
 import { FINANCIAL_LABEL, KIND_LABEL, RELIABILITY_LABEL, STAGE_LABEL, STATUS_LABEL, UPDATE_LABEL, type DossierEvent, type DossierFigure, type DossierSource, type IntelItem } from "@/lib/paperflow/intel/types";
 import { Markdown, type EntityRenderer, type TermMarker } from "./markdown";
@@ -39,10 +39,13 @@ const STATUS_SHORT: Record<string, string> = { verified: "확인됨", claimed: "
  * and the numbered sources. The history sits in a column on the right (a fold on phones). Every
  * statement keeps its source number; the card shows the source on hover.
  */
-export function CompanyPage({ article, item, read, library, org, web, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
+export function CompanyPage({ patents, reports, article, item, read, library, org, web, news, related, byId, mentions, entity, terms, onOpen, onBack, onPdf, busy, notify }: {
   item: IntelItem; read?: { label: string; run: () => void };
   /** The item written up as a document; it replaces the overview. */
   article?: React.ReactNode;
+  /** The organisation's patents in the 특허(IP) tab, and the PDF reports among its items. */
+  patents?: { count: number; open: () => void };
+  reports?: { id: string; title: string; url: string; date?: string }[];
   /** The organisation in the registry: its code, parent and subsidiaries, and a way to open them. */
   org?: { entity: IntelEntity; parent?: IntelEntity; children: IntelEntity[]; open: (entity: IntelEntity) => void };
   /** Everything the organisation is linked to (partners, suppliers, buyers, certifiers…), for the 연결망 map. */
@@ -116,6 +119,8 @@ export function CompanyPage({ article, item, read, library, org, web, news, rela
         <div className="pf-cdoc-actions">
           {item.profile?.website && /^https?:/.test(item.profile.website) && <a href={item.profile.website} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={14}/>{siteOf(item.profile.website)}</a>}
           {read && <button type="button" className="pf-company-read" onClick={read.run}><BookOpenText size={14}/>{read.label}</button>}
+          {reports && reports.length > 0 && <details className="pf-company-reports"><summary><FileText size={14}/>보고서 보기(PDF) · {reports.length}</summary><ul>{reports.map(report => <li key={report.id}><a href={report.url} target="_blank" rel="noreferrer noopener">{report.date && <time>{report.date}</time>}{report.title}</a></li>)}</ul></details>}
+          {patents && <button type="button" onClick={patents.open}><ScrollText size={14}/>IP 특허 확인 · {patents.count}</button>}
           {item.url && <a href={item.url} target="_blank" rel="noreferrer noopener"><ArrowUpRight size={14}/>대표 원문</a>}
           <button type="button" aria-pressed={Boolean(item.user?.star)} onClick={() => void intelRepository.setUser(item.id, { star: !item.user?.star })}><Star size={14}/>{item.user?.star ? "핵심" : "핵심 표시"}</button>
           {checked && <span className="pf-cdoc-checked">자료 확인 {checked}</span>}
