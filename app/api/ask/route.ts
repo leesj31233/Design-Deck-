@@ -1,3 +1,4 @@
+import { openaiKey } from "@/lib/paperflow/openai-key";
 import { creditGate } from "@/lib/paperflow/cloud/server";
 import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
 import { ASK_INSTRUCTIONS, ASK_MODEL, WEB_SEARCH_CREDITS, askCreditEstimate, askSchema, termsOf, validateAnswer, type AskPassage, type Literature } from "@/lib/paperflow/ask/ask";
@@ -44,7 +45,7 @@ async function relatedPapers(question: string, keywords: string[], exclude: stri
  * text, and finally {t:"done"} with the checked answer and its credits.
  */
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
+  if (!openaiKey()) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
   const origin = request.headers.get("origin");
   if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
   let body: { question?: unknown; passages?: unknown; overview?: unknown; history?: unknown; focus?: unknown; title?: unknown; keywords?: unknown; options?: { speed?: unknown; web?: unknown; literature?: unknown } };
@@ -73,7 +74,7 @@ export async function POST(request: Request) {
         if (options.literature) { send({ t: "status", s: "literature" }); literature = await relatedPapers(question, keywords, title); }
         send({ t: "status", s: "thinking" });
         const upstream = await fetch("https://api.openai.com/v1/responses", {
-          method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+          method: "POST", headers: { Authorization: `Bearer ${openaiKey()}`, "Content-Type": "application/json" },
           signal: AbortSignal.any([request.signal, AbortSignal.timeout(110_000)]),
           body: JSON.stringify({
             model, store: false, stream: true, prompt_cache_key: "paperflow-ask",

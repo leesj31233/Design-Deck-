@@ -1,3 +1,4 @@
+import { openaiKey } from "@/lib/paperflow/openai-key";
 import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
 import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
@@ -12,7 +13,7 @@ export const maxDuration = 60;
  */
 export async function POST(request: Request) {
   if (foreignOrigin(request)) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
-  if (!process.env.OPENAI_API_KEY) return Response.json({ briefs: [] });
+  if (!openaiKey()) return Response.json({ briefs: [] });
   let body: { items?: unknown };
   try { body = await request.json(); } catch { return Response.json({ error: "잘못된 요청입니다." }, { status: 400 }); }
   const items = (Array.isArray(body.items) ? body.items : []).filter((item): item is { id: string; title: string; abstract?: string } => typeof item?.id === "string" && /^W\d{3,14}$/.test(item.id) && typeof item.title === "string").slice(0, 16)
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
   if (gate instanceof Response) return Response.json({ briefs: cached, error: "크레딧이 부족해 한국어 소개를 만들지 못했습니다." });
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+      method: "POST", headers: { Authorization: `Bearer ${openaiKey()}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(50_000)]),
       body: JSON.stringify({ model, store: false, reasoning: { effort: "minimal" }, prompt_cache_key: "paperflow-paper-brief", instructions: BRIEF_INSTRUCTIONS, input: JSON.stringify(missing), text: briefSchema(missing.map(item => item.id)), max_output_tokens: 3000 })
     });

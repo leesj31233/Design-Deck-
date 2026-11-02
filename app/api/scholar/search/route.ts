@@ -1,3 +1,4 @@
+import { openaiKey } from "@/lib/paperflow/openai-key";
 import { creditGate } from "@/lib/paperflow/cloud/server";
 import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
 import { normalizeWork } from "@/lib/paperflow/scholar/openalex";
@@ -30,13 +31,13 @@ export async function POST(request: Request) {
   let plan = validatePlan(null, query), credits = 0;
   // Plain English keywords need no model; anything else is turned into a plan.
   const needsPlan = /[^\x00-\x7F]/.test(query) || query.split(/\s+/).length > 6;
-  if (needsPlan && process.env.OPENAI_API_KEY) {
+  if (needsPlan && openaiKey()) {
     const gate = await creditGate(2);
     if (gate instanceof Response) return gate;
     try {
       const model = DISCOVER_MODEL();
       const upstream = await fetch("https://api.openai.com/v1/responses", {
-        method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+        method: "POST", headers: { Authorization: `Bearer ${openaiKey()}`, "Content-Type": "application/json" },
         signal: AbortSignal.any([request.signal, AbortSignal.timeout(30_000)]),
         body: JSON.stringify({ model, store: false, reasoning: { effort: "minimal" }, prompt_cache_key: "paperflow-search-plan", instructions: PLAN_INSTRUCTIONS, input: query, text: planSchema, max_output_tokens: 600 })
       });

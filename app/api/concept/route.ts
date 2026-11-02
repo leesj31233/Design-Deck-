@@ -1,3 +1,4 @@
+import { openaiKey } from "@/lib/paperflow/openai-key";
 import { CONCEPT_INSTRUCTIONS, CONCEPT_VERSION, conceptSchema, validateConcept } from "@/lib/paperflow/concept/concept";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
@@ -19,7 +20,7 @@ function limited(request: Request) {
  * so the same term in the same paragraph is explained once.
  */
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
+  if (!openaiKey()) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
   const origin = request.headers.get("origin");
   if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
   let body: { term?: unknown; passage?: unknown; neighbors?: unknown; paper?: unknown };
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
   if (limited(request)) return Response.json({ error: "개념 설명 요청이 많습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+      method: "POST", headers: { Authorization: `Bearer ${openaiKey()}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(45_000)]),
       body: JSON.stringify({ model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, instructions: CONCEPT_INSTRUCTIONS, prompt_cache_key: "paperflow-concept", input: JSON.stringify({ paper, passage, neighbors, term }), text: conceptSchema(), max_output_tokens: 1200 })
     });

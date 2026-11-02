@@ -1,3 +1,4 @@
+import { openaiKey } from "@/lib/paperflow/openai-key";
 import { polishKorean, researchTranslationInstructions } from "@/lib/paperflow/translation/research-style";
 import { CELL_PROMPT_VERSION, TRANSLATION_PROMPT_VERSION, passageHash } from "@/lib/paperflow/translation/prompt-version";
 import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
@@ -57,10 +58,10 @@ async function shareTranslations(passages: TranslationPassage[], results: { id: 
   } catch { /* The cache is an optimisation; a failed write never fails the translation. */ }
 }
 
-export async function GET() { return Response.json({ available: Boolean(process.env.OPENAI_API_KEY), provider: "OpenAI" }); }
+export async function GET() { return Response.json({ available: Boolean(openaiKey()), provider: "OpenAI" }); }
 
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다.", kind: "configuration" }, { status: 503 });
+  if (!openaiKey()) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다.", kind: "configuration" }, { status: 503 });
   const origin = request.headers.get("origin");
   if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다.", kind: "configuration" }, { status: 403 });
   if (rateLimited(request)) return Response.json({ error: "번역 요청이 일시적으로 많습니다. 잠시 후 다시 시도해 주세요.", kind: "rate_limit" }, { status: 429, headers: { "Retry-After": "20" } });
@@ -81,7 +82,7 @@ export async function POST(request: Request) {
   const schema = { format: { type: "json_schema", name: "translation_blocks", strict: true, schema: { type: "object", properties: { translations: { type: "array", items: { type: "object", properties: { id: { type: "string", enum: passages.every(item => WIRE_IDS.includes(item.id)) ? WIRE_IDS : passages.map(item => item.id) }, text: { type: "string" } }, required: ["id", "text"], additionalProperties: false } } }, required: ["translations"], additionalProperties: false } } };
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+      method: "POST", headers: { Authorization: `Bearer ${openaiKey()}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(100_000)]),
       body: JSON.stringify({ model: process.env.OPENAI_MODEL || "gpt-4.1-mini", store: false, temperature: .2, instructions, prompt_cache_key: PROMPT_CACHE_KEY, input: JSON.stringify(glossary.length ? { glossary, passages } : { passages }), text: schema, max_output_tokens: Math.min(16000, Math.ceil(chars * 1.4) + 600) })
     });

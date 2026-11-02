@@ -1,3 +1,4 @@
+import { openaiKey } from "@/lib/paperflow/openai-key";
 import { BRIEF_INSTRUCTIONS, GUIDE_PROMPT_REVISION, GUIDE_VERSION, PAGES_INSTRUCTIONS, briefSchema, pagesSchema, type GuideUnit } from "@/lib/paperflow/guide/guide";
 import { sourceHash } from "@/lib/paperflow/translation/prompt-version";
 import { adminClient, creditGate } from "@/lib/paperflow/cloud/server";
@@ -25,7 +26,7 @@ function limited(request: Request) {
  * second reader of the same PDF gets it instantly and at no cost.
  */
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
+  if (!openaiKey()) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
   const origin = request.headers.get("origin");
   if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
   let body: { units?: unknown; mode?: unknown; pages?: unknown; fast?: unknown };
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
   const reasoning = /^(?:gpt-5|o\d)/.test(model) ? { reasoning: { effort: "low" } } : { temperature: .2 };
   try {
     const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+      method: "POST", headers: { Authorization: `Bearer ${openaiKey()}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(285_000)]),
       body: JSON.stringify({
         model, store: false, ...reasoning, prompt_cache_key: `paperflow-guide-${mode}`,

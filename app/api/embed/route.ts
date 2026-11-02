@@ -1,3 +1,4 @@
+import { openaiKey } from "@/lib/paperflow/openai-key";
 import { creditGate } from "@/lib/paperflow/cloud/server";
 import { creditsForUsage } from "@/lib/paperflow/cloud/plans";
 import { EMBED_DIMENSIONS, EMBED_MODEL } from "@/lib/paperflow/ask/ask";
@@ -19,7 +20,7 @@ function limited(request: Request) {
  * (a few dozen tokens, not charged). Vectors are 256-dimensional and rounded to keep them small.
  */
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
+  if (!openaiKey()) return Response.json({ error: "서버의 OpenAI 연결이 아직 설정되지 않았습니다." }, { status: 503 });
   const origin = request.headers.get("origin");
   if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "이 사이트에서만 사용할 수 있습니다." }, { status: 403 });
   let body: { texts?: unknown };
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
   if (limited(request)) return Response.json({ error: "요청이 많습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
   try {
     const upstream = await fetch("https://api.openai.com/v1/embeddings", {
-      method: "POST", headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" },
+      method: "POST", headers: { Authorization: `Bearer ${openaiKey()}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(55_000)]),
       body: JSON.stringify({ model: EMBED_MODEL, input: texts, dimensions: EMBED_DIMENSIONS })
     });
