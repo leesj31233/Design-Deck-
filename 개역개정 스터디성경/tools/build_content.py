@@ -54,9 +54,10 @@ def main():
         merged.append(bid)
     # Books without content get no study file; drop stale ones.
     for f in OUT.glob("*.json"):
-        if f.stem not in merged:
+        if f.stem not in merged and f.stem != "index":
             f.unlink()
     data = ROOT / "app" / "data"
+    (OUT / "index.json").write_text(json.dumps(merged), encoding="utf-8")
     (data / "people.json").write_text(json.dumps(people, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (data / "index.json").write_text(json.dumps({"h": index_h, "t": index_t, "p": index_p}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (ROOT / "work" / "image_queries.json").write_text(json.dumps(queries, ensure_ascii=False, indent=1), encoding="utf-8")

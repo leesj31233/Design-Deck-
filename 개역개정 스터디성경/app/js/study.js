@@ -2,8 +2,9 @@ import { lib, esc, parse, R, label, verseText, verseTextAsync, loadBook, words, 
 import { rich } from "./layout.js";
 import { describeMorph } from "../morph.js";
 import { describeHebrew } from "./hebrew.js";
-import { staticMap, geo, eraOf, ERAS } from "./map.js";
+import { staticMap, geo, eraOf, ERAS, TYPE_KO } from "./map.js";
 import { parseText, saveText, saveSettings } from "./store.js";
+import { card as personCard } from "./people.js";
 
 const $ = s => document.querySelector(s);
 const KINDS = { linguistic: "원어·문법", historical: "역사·지리", interpretation: "해석", scripture: "성경 안의 연결", tradition: "후대 전승", caution: "주의" };
@@ -57,12 +58,13 @@ export function createStudy(ctx) {
     const eras = new Map();
     for (const r of p.refs) { const e = eraOf(r); if (e) eras.set(e, (eras.get(e) || 0) + 1); }
     const eraText = ERAS.filter(e => eras.get(e.id)).map(e => `${e.id} ${eras.get(e.id)}`).join(" · ");
-    const type = { settlement: "도시·마을", region: "지역", mountain: "산", river: "강", water: "바다·호수", spring: "샘", valley: "골짜기", road: "길", island: "섬" }[p.type] || p.type || "장소";
+    const type = TYPE_KO[p.type] || p.type || "장소";
     return [p.ko || p.en, `
       ${im ? `<figure class="d-img hero"><img src="${esc(im.src)}" alt="" style="aspect-ratio:${im.w}/${im.h}"><figcaption>${esc(p.ko)} · 오늘날 모습<span>${esc(im.credit)} · ${esc(im.license)}</span></figcaption></figure>` : ""}
       <div class="t-head"><h3>${esc(p.ko || p.en)} <span class="en">(${esc(p.en)})</span></h3>
         <div class="t-sub"><span class="t-kind">지명 · ${esc(type)}</span><span class="draft">OpenBible.info 지명 자료</span></div></div>
-      <div class="here"><span>성경에서</span>${esc(p.ko || p.en)}은(는) 성경에 <b>${p.refs.length}회</b> 언급됨. 처음 나오는 곳은 ${refLink(p.refs[0])}.</div>
+      ${lib.placeIntros[pid] ? `<div class="here"><span>소개</span>${rich(lib.placeIntros[pid])}</div>` : ""}
+      <div class="here soft"><span>성경에서</span>${esc(p.ko || p.en)}은(는) 성경에 <b>${p.refs.length}회</b> 언급됨. 처음 나오는 곳은 ${refLink(p.refs[0])}.</div>
       <table class="facts">
         <tr><th>위치</th><td>북위 ${p.ll[0].toFixed(2)}° · 동경 ${p.ll[1].toFixed(2)}°</td></tr>
         <tr><th>유형</th><td>${esc(type)}</td></tr>
@@ -78,9 +80,29 @@ export function createStudy(ctx) {
       <p class="credit">지명·좌표 OpenBible.info Bible Geocoding Data (CC BY 4.0)${im ? " · 사진 Wikimedia Commons" : ""}</p>`];
   }
 
+  // A person: the collectible card itself (flippable) and its details laid out for reading.
+  async function personView(pid) {
+    const p = lib.personById.get(pid);
+    if (!p) return ["인물", ""];
+    const book = lib.byId.get(p.book);
+    const row = r => { const x = parseKoRef(r[0] || ""); return `<li>${x ? refLink(x.ref, r[0]) : esc(r[0])} <span class="why">${rich(r[1] || "")}</span>${x ? snip(x.ref) : ""}</li>`; };
+    return [p.name, `
+      <div class="d-card">${personCard(p, "")}</div>
+      <div class="t-head"><h3>${esc(p.name)} <span class="en">(${esc(p.en)})</span></h3>
+        <div class="t-sub"><span class="t-kind">인물 · ${esc(p.era)} · ${esc(book.ko)}</span><span class="draft">초안 · 검수 전</span></div></div>
+      ${p.orig ? `<div class="t-orig"><span class="${book.t === "OT" ? "he" : "gr"}">${esc(p.orig)}</span>${p.meaning ? ` <span class="tl">${esc(p.meaning)}</span>` : ""}</div>` : ""}
+      <div class="here"><span>요약</span>${rich(p.summary || "")}</div>
+      ${p.facts?.length ? `<table class="facts">${p.years ? `<tr><th>연대</th><td>${esc(p.years)}</td></tr>` : ""}${p.facts.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${rich(String(v))}</td></tr>`).join("")}</table>` : ""}
+      ${p.place && geo.byFid.get(p.place) ? `<div class="d-map" data-map='${esc(JSON.stringify({ places: [p.place], title: p.name }))}'>${staticMap([p.place], { W: 400, H: 200 })}<div class="d-map-cap"><b>${esc(geo.byFid.get(p.place).ko)}</b> <span>지도에서 보기 ›</span></div></div>` : ""}
+      ${p.life?.length ? `<section><h5>생애</h5><ol class="life">${p.life.map(row).join("")}</ol></section>` : ""}
+      ${p.nt?.length ? `<section><h5>${book.t === "OT" ? "신약에서" : "구약에서"}</h5><ul class="links">${p.nt.map(row).join("")}</ul></section>` : ""}
+      <p class="credit"><a href="#" data-people="${esc(p.id)}">인물 카드 모음에서 보기 ›</a></p>`];
+  }
+
   async function termView(key) {
     const [bid, id] = key.split("|");
     if (id.startsWith("@")) return placeView(id.slice(1));
+    if (id.startsWith("#")) return personView(id.slice(1));
     await loadBook(bid);
     const st = lib.study.get(bid);
     const t = st?.termById.get(id);
@@ -238,6 +260,10 @@ export function createStudy(ctx) {
   // ---------- drawer events ----------
 
   body.addEventListener("click", async e => {
+    const pc = e.target.closest(".d-card .pcard");
+    if (pc && !e.target.closest("[data-go]")) { pc.classList.toggle("flipped"); return; }
+    const pl = e.target.closest("[data-people]");
+    if (pl) { e.preventDefault(); close(); import("./people.js").then(m => m.openPeople(ctx.goToRef, pl.dataset.people)); return; }
     const a = e.target.closest("[data-go],[data-book],[data-term],[data-strong],[data-word],[data-view],[data-memo-add],[data-memo-del],[data-import-save],[data-import-clear],[data-backup='export'],[data-fs],[data-map],[data-photo]");
     if (!a) return;
     e.preventDefault();
@@ -316,6 +342,7 @@ export function createStudy(ctx) {
   function showTip(el) {
     const bid = parse(el.closest(".vs").dataset.ref).b;
     if (el.dataset.term.startsWith("@")) return showPlaceTip(el);
+    if (el.dataset.term.startsWith("#")) return showPersonTip(el);
     const t = lib.study.get(bid)?.termById.get(el.dataset.term);
     if (!t) return;
     tipFor = el.dataset.term;
@@ -342,8 +369,21 @@ export function createStudy(ctx) {
     tip.innerHTML = `${im ? `<img class="tip-img" src="${esc(im.src)}" alt="">` : `<div class="tip-map">${staticMap([p.fid], { W: 160, H: 120 })}</div>`}<div class="tip-b">
       <div class="tip-h"><b>${esc(p.ko)} <span class="en">(${esc(p.en)})</span></b><span>지명</span></div>
       <div class="tip-tl">북위 ${p.ll[0].toFixed(1)}° · 동경 ${p.ll[1].toFixed(1)}° · 성경 ${p.refs.length}회 언급</div>
+      ${lib.placeIntros[p.id] ? `<p>${rich(lib.placeIntros[p.id])}</p>` : ""}
       ${im ? `<div class="tip-map small">${staticMap([p.fid], { W: 220, H: 90 })}</div>` : ""}
       <div class="tip-more">누르면 지도와 언급 구절</div></div>`;
+    tip.hidden = false;
+    placeTip(el);
+  }
+  function showPersonTip(el) {
+    const p = lib.personById.get(el.dataset.term.slice(1));
+    if (!p) return;
+    tipFor = el.dataset.term;
+    const im = p.img && lib.images[p.img.query];
+    tip.innerHTML = `${im ? `<img class="tip-img" src="${esc(im.src)}" alt="">` : ""}<div class="tip-b">
+      <div class="tip-h"><b>${esc(p.name)} <span class="en">(${esc(p.en)})</span></b><span>인물 · ${esc(p.era)}</span></div>
+      ${p.orig ? `<div class="tip-tl">${esc(p.orig)}${p.meaning ? ` · ${esc(p.meaning)}` : ""}</div>` : ""}
+      <p>${rich(p.summary || "")}</p><div class="tip-more">누르면 인물 카드와 상세 정보</div></div>`;
     tip.hidden = false;
     placeTip(el);
   }

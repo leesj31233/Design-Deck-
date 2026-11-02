@@ -22,6 +22,8 @@ export const lib = {
   user: { niv: {} },   // pasted NIV: "Book.c.v" -> text
   placesByVerse: new Map(), // id -> Map("c:v" -> [place]) for place names in the text
   placeById: new Map(),
+  people: [], personById: new Map(),
+  peopleByBook: new Map(),  // id -> [{p, names, verses: Set("c:v") | null for the whole book}]
   placeImages: {},
   images: {},          // query -> {src, credit, license, page}
 };
@@ -37,11 +39,13 @@ export async function loadBooks() {
   });
   lib.images = await json("data/images.json", {});
   lib.placeImages = await json("data/place_images.json", {});
+  lib.placeIntros = await json("data/place_intros.json", {});
 }
 
 export async function loadBook(id) {
   if (lib.text.has(id) && lib.study.has(id)) return;
-  const [t, s] = await Promise.all([json(`data/text/${id}.json`, { c: [], red: {} }), json(`data/study/${id}.json`, null)]);
+  const have = await json("data/study/index.json", []);
+  const [t, s] = await Promise.all([json(`data/text/${id}.json`, { c: [], red: {} }), have.includes(id) ? json(`data/study/${id}.json`, null) : null]);
   lib.text.set(id, t);
   lib.study.set(id, normalizeStudy(s || {}, id));
 }
@@ -172,6 +176,37 @@ export function termMarks(id, ed) {
       }
     }
   }
+  // Person names: in the card's own book, and in the verses its life and NT lines cite.
+  if (ed === "krv") {
+    const entries = lib.peopleByBook.get(id) || [];
+    if (entries.length) {
+      const book = lib.byId.get(id);
+      for (let c = 1; c <= book.chapters; c++) {
+        for (let v = 1; v <= book.v[c - 1]; v++) {
+          const cv = `${c}:${v}`;
+          const txt = verseText(R(id, c, v), ed);
+          if (!txt) continue;
+          let toks = null, marks = out.get(cv) || null;
+          for (const e of entries) {
+            if (e.verses && !e.verses.has(cv)) continue;
+            for (const name of e.names) {
+              let at = txt.indexOf(name);
+              while (at >= 0) {
+                toks ||= tokenize(txt);
+                marks ||= new Array(toks.length).fill(null);
+                const end = at + name.length;
+                const hit = toks.map((tk, i) => (tk.b > at && tk.a < end ? i : -1)).filter(i => i >= 0);
+                // Names start a word in Korean (particles follow them), so "손에서" is not 에서 (Esau).
+                if (hit.length && toks[hit[0]].a === at && hit.every(i => marks[i] === null)) hit.forEach(i => { marks[i] = `#${e.p.id}`; });
+                at = txt.indexOf(name, end);
+              }
+            }
+          }
+          if (marks?.some(Boolean)) out.set(cv, marks);
+        }
+      }
+    }
+  }
   // Place names are marked in the verses where that place is actually meant (OpenBible.info),
   // wherever a study term has not already claimed the words.
   if (ed === "krv") {
@@ -186,7 +221,7 @@ export function termMarks(id, ed) {
         while (at >= 0) {
           const end = at + p.ko.length;
           const hit = toks.map((tk, i) => (tk.b > at && tk.a < end ? i : -1)).filter(i => i >= 0);
-          if (hit.length && hit.every(i => marks[i] === null)) hit.forEach(i => { marks[i] = `@${p.id}`; });
+          if (hit.length && toks[hit[0]].a === at && hit.every(i => marks[i] === null)) hit.forEach(i => { marks[i] = `@${p.id}`; });
           at = txt.indexOf(p.ko, end);
         }
       }
@@ -195,6 +230,51 @@ export function termMarks(id, ed) {
   }
   lib.marks.set(key, out);
   return out;
+}
+
+// "요셉 (마리아의 남편)" -> ["요셉"], "본디오 빌라도" -> ["본디오 빌라도", "빌라도"].
+function nameVariants(name) {
+  const base = name.replace(/\s*\(.*?\)\s*/g, "").trim();
+  const out = [base];
+  const parts = base.split(/\s+/);
+  if (parts.length > 1 && parts[parts.length - 1].length >= 2) out.push(parts[parts.length - 1]);
+  return [...new Set(out)].filter(n => n.length >= 2);
+}
+
+export function indexPeople(people) {
+  lib.people = people;
+  const add = (bid, entry) => { if (!lib.peopleByBook.has(bid)) lib.peopleByBook.set(bid, []); lib.peopleByBook.get(bid).push(entry); };
+  for (const p of people) {
+    lib.personById.set(p.id, p);
+    const names = nameVariants(p.name);
+    if (!names.length) continue;
+    add(p.book, { p, names, verses: null });
+    // Cited verses in other books.
+    const cited = new Map();
+    for (const row of [...(p.life || []), ...(p.nt || [])]) {
+      const m = parseKoRefRange(row[0] || "");
+      if (!m || m.b === p.book) continue;
+      if (!cited.has(m.b)) cited.set(m.b, new Set());
+      for (const cv of m.verses) cited.get(m.b).add(cv);
+    }
+    for (const [bid, set] of cited) add(bid, { p, names, verses: set });
+  }
+}
+
+function parseKoRefRange(s) {
+  const re = xrefRegex();
+  const m = re.exec(s.trim());
+  if (!m) return null;
+  const bk = lib.byAbbr.get(m[1]);
+  const c = +m[2], v = +m[3];
+  let zc = c, zv = v;
+  if (m[4] && m[5]) { zc = +m[4]; zv = +m[5]; } else if (m[4]) zv = +m[4];
+  const verses = [];
+  for (let cc = c; cc <= zc && cc <= bk.chapters; cc++) {
+    const from = cc === c ? v : 1, to = cc === zc ? zv : bk.v[cc - 1];
+    for (let vv = from; vv <= to; vv++) verses.push(`${cc}:${vv}`);
+  }
+  return { b: bk.id, verses };
 }
 
 export function indexPlaces(places) {

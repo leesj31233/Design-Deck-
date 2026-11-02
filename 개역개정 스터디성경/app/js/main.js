@@ -1,4 +1,4 @@
-import { lib, loadBooks, loadBook, parse, R, label, indexPlaces } from "./data.js";
+import { lib, loadBooks, loadBook, parse, R, label, indexPlaces, indexPeople, json } from "./data.js";
 import { partsList, paginate, pageHtml } from "./layout.js";
 import { Annotations, loadSettings, saveSettings, loadPosition, savePosition, loadText } from "./store.js";
 import { createStudy } from "./study.js";
@@ -571,6 +571,8 @@ attachPen(bookEl, ann, () => S.tool, () => study.refreshIfOpen());
 
 // ---------- start ----------
 
+document.addEventListener("open-place", e => study.open("term", "Gen|@" + e.detail));
+
 let resizeTimer;
 addEventListener("resize", () => {
   clearTimeout(resizeTimer);
@@ -586,6 +588,7 @@ async function main() {
   lib.user.niv = loadText("niv") || {};
   await loadGeo();
   indexPlaces(geo.places);
+  indexPeople(await json("data/people.json", []));
   buildTabs();
   const ctx = {
     lib, ann, settings, goToRef, goToPart, refresh,

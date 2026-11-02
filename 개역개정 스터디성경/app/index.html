@@ -58,7 +58,12 @@
 </aside>
 
 <section id="mapDlg" class="overlay map-dlg" hidden>
-  <header><h2 id="mapTitle">성경 지도</h2><span class="muted">점을 누르면 그 장소가 나오는 구절</span><button id="mapClose" class="icon" aria-label="닫기">×</button></header>
+  <header><h2 id="mapTitle">성경 지도</h2>
+    <div id="mapLayers" class="map-layers" role="group" aria-label="지도 표시">
+      <label><input type="checkbox" data-layer="regions" checked> 시대별 나라 영역</label>
+      <label><input type="checkbox" data-layer="borders" checked> 현재 국경</label>
+    </div>
+    <span id="mapNote" class="muted"></span><button id="mapClose" class="icon" aria-label="닫기">×</button></header>
   <div id="mapCanvas" class="map-canvas"></div>
   <nav id="mapEras" class="map-eras" aria-label="시대"></nav>
 </section>

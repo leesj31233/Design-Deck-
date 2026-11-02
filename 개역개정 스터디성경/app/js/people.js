@@ -35,7 +35,7 @@ function renderBar() {
     books.map(id => `<option value="${id}" ${filter.book === id ? "selected" : ""}>${esc(lib.byId.get(id).ko)}</option>`).join("");
 }
 
-function card(p, n) {
+export function card(p, n) {
   const im = p.img && lib.images[p.img.query];
   const book = lib.byId.get(p.book);
   const refLink = row => { const r = parseKoRef(row[0]); return `<li>${r ? `<a href="#" data-go="${r.ref}">${esc(row[0])}</a>` : esc(row[0])}<span>${rich(row[1] || "")}</span></li>`; };

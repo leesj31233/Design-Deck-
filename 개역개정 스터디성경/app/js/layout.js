@@ -166,7 +166,7 @@ function verseHtml(b, ann, from, to) {
   for (let i = from; i < end; i++) {
     const cls = ["t"];
     let extra = "";
-    if (terms?.[i]) { cls.push(terms[i][0] === "@" ? "tm pl" : "tm"); extra = ` data-term="${terms[i]}"`; }
+    if (terms?.[i]) { cls.push(terms[i][0] === "@" ? "tm pl" : terms[i][0] === "#" ? "tm pp" : "tm"); extra = ` data-term="${terms[i]}"`; }
     if (red && i >= red[0] && i <= red[1]) cls.push("wj");
     const hl = hls.find(h => i >= h.a && i <= h.b);
     if (hl) cls.push(`hl-${hl.c}`);
