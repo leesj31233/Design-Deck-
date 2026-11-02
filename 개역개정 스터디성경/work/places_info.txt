@@ -1,0 +1,1278 @@
+Jerusalem | settlement | 955회 | Josh.10.1, Josh.10.2, Josh.10.3
+Egypt | region | 658회 | Gen.12.10, Gen.12.11, Gen.12.14
+Babylon 1 | settlement | 296회 | 2Kgs.17.24, 2Kgs.17.30, 2Kgs.20.12
+Jordan | river | 202회 | Gen.32.10, Gen.50.10, Gen.50.11
+Moab 1 | region | 162회 | Gen.36.35, Exod.15.15, Num.21.11
+Zion | settlement | 148회 | 2Sam.5.7, 1Kgs.8.1, 2Kgs.19.21
+Assyria | region | 141회 | Gen.2.14, Gen.10.11, Gen.25.18
+Samaria 1 | settlement | 113회 | 1Kgs.13.32, 1Kgs.16.24, 1Kgs.16.28
+Edom | region | 111회 | Gen.32.3, Gen.36.9, Gen.36.16
+Ammon | region | 106회 | Gen.19.38, Num.21.24, Deut.2.19
+Canaan | region | 101회 | Gen.10.19, Gen.11.31, Gen.12.5
+Syria 1 | region | 89회 | Josh.1.4, Judg.10.6, 2Sam.8.5
+Gilead 1 | region | 86회 | Gen.31.21, Gen.31.23, Gen.31.25
+Chaldea | region | 85회 | Gen.11.28, Gen.11.31, Gen.15.7
+Galilee 1 | region | 78회 | Josh.20.7, Josh.21.32, 1Kgs.9.11
+Bethel 1 | settlement | 69회 | Gen.12.8, Gen.13.3, Gen.28.19
+Tyre | settlement | 64회 | Josh.19.29, 2Sam.5.11, 2Sam.24.7
+Jericho 1 | settlement | 63회 | Num.22.1, Num.26.3, Num.26.63
+Hebron | settlement | 62회 | Gen.13.18, Gen.23.2, Gen.23.19
+Damascus | settlement | 58회 | Gen.14.15, Gen.15.2, 2Sam.8.5
+Lebanon | region | 57회 | Deut.1.7, Deut.3.25, Deut.11.24
+Bashan | region | 53회 | Num.21.33, Num.32.33, Deut.1.4
+Bethlehem 1 | settlement | 52회 | Gen.35.19, Gen.48.7, Judg.17.7
+Judea 1 | region | 52회 | Matt.2.1, Matt.2.5, Matt.2.22
+Midian | region | 51회 | Gen.36.35, Exod.2.15, Exod.2.16
+Sodom | settlement | 50회 | Gen.10.19, Gen.13.10, Gen.13.12
+City of David | settlement | 46회 | 2Sam.5.7, 2Sam.5.9, 2Sam.6.10
+Gibeah 1 | settlement | 45회 | Judg.19.12, Judg.19.13, Judg.19.14
+Nile | river | 45회 | Gen.41.1, Gen.41.2, Gen.41.3
+Shechem | settlement | 45회 | Gen.12.6, Gen.33.18, Gen.35.4
+Euphrates | river | 44회 | Gen.2.14, Gen.15.18, Gen.31.21
+Negeb | region | 43회 | Gen.12.9, Gen.13.1, Gen.13.3
+Gibeon | settlement | 39회 | Josh.9.3, Josh.9.17, Josh.10.1
+Gath 1 | settlement | 38회 | Josh.11.22, Josh.13.3, 1Sam.5.8
+Heshbon | settlement | 37회 | Num.21.25, Num.21.26, Num.21.27
+Shiloh | settlement | 37회 | Gen.49.10, Josh.18.1, Josh.18.8
+Sidon | settlement | 37회 | Gen.10.19, Gen.49.13, Josh.11.8
+Great Sea | body of water | 36회 | Exod.23.31, Num.13.29, Num.34.5
+Mount Seir 1 | mountain range | 34회 | Gen.14.6, Gen.32.3, Gen.33.14
+Gilgal 1 | settlement | 33회 | Josh.4.19, Josh.4.20, Josh.5.9
+Ai 1 | settlement | 32회 | Gen.12.8, Gen.13.3, Josh.7.2
+Mizpah 3 | settlement | 32회 | Judg.20.1, Judg.20.3, Judg.21.1
+Nazareth | settlement | 32회 | Matt.2.23, Matt.4.13, Matt.13.54
+Mount Sinai | mountain | 30회 | Exod.16.1, Exod.19.2, Exod.19.11
+Nineveh | settlement | 30회 | Gen.10.11, Gen.10.12, 2Kgs.19.36
+Jezreel 2 | settlement | 29회 | Josh.19.18, 1Sam.29.1, 1Sam.29.11
+Amalek | region | 28회 | Exod.17.8, Exod.17.9, Exod.17.10
+Persia | region | 27회 | 2Chr.36.20, 2Chr.36.22, 2Chr.36.23
+Arabah | region | 26회 | Deut.1.1, Deut.1.7, Deut.2.8
+Dan | settlement | 25회 | Gen.14.14, Josh.19.47, Judg.18.7
+Mount Zion | hill | 25회 | 2Kgs.19.31, Ps.48.2, Ps.48.11
+Gomorrah | settlement | 24회 | Gen.10.19, Gen.13.10, Gen.14.2
+Kadesh-barnea | settlement | 24회 | Gen.14.7, Gen.16.14, Gen.20.1
+Macedonia | region | 24회 | Acts.16.9, Acts.16.10, Acts.16.12
+Most Holy Place 2 | altar | 24회 | 1Kgs.6.16, 1Kgs.6.17, 1Kgs.6.21
+Beersheba 1 | settlement | 23회 | Josh.15.28, Josh.19.2, Judg.20.1
+Holy Place 2 | room | 23회 | 1Kgs.6.5, 1Kgs.8.8, 1Kgs.8.10
+Gaza | settlement | 22회 | Gen.10.19, Deut.2.23, Josh.10.41
+Lachish | settlement | 22회 | Josh.10.3, Josh.10.5, Josh.10.23
+Philistia | region | 22회 | Exod.15.14, Judg.10.6, 1Sam.31.9
+Ashdod | settlement | 21회 | Josh.11.22, Josh.13.3, Josh.15.46
+Asia | region | 21회 | Acts.2.9, Acts.6.9, Acts.16.6
+Hamath 1 | settlement | 21회 | 2Sam.8.9, 2Kgs.14.28, 2Kgs.18.34
+Red Sea 1 | body of water | 21회 | Exod.13.18, Exod.15.4, Exod.15.22
+Salt Sea | body of water | 21회 | Gen.14.3, Num.34.3, Num.34.12
+Ekron | settlement | 20회 | Josh.13.3, Josh.15.11, Josh.15.45
+Ephesus | settlement | 20회 | Acts.18.19, Acts.18.21, Acts.18.24
+Jabesh-gilead | settlement | 20회 | Judg.21.8, Judg.21.9, Judg.21.10
+Ramoth-gilead | settlement | 20회 | 1Kgs.4.13, 1Kgs.22.3, 1Kgs.22.4
+Susa | settlement | 20회 | Ezra.4.9, Neh.1.1, Esth.1.2
+Cush 1 | region | 19회 | 2Kgs.19.9, Ps.68.31, Ps.87.4
+Kiriath-jearim | settlement | 19회 | Josh.9.17, Josh.15.9, Josh.15.60
+Shephelah | region | 19회 | Deut.1.7, Josh.9.1, Josh.10.40
+Anathoth | settlement | 18회 | Josh.21.18, 2Sam.23.27, 1Kgs.2.26
+Antioch 1 | settlement | 18회 | Acts.6.5, Acts.11.19, Acts.11.20
+Caesarea | settlement | 18회 | Acts.8.40, Acts.9.30, Acts.10.1
+Capernaum | settlement | 18회 | Matt.4.13, Matt.8.5, Matt.11.23
+East | region | 18회 | Gen.25.6, Gen.29.1, Num.23.7
+Mount Carmel | mountain | 18회 | Josh.12.22, Josh.19.26, 1Kgs.18.19
+Mount of Olives | hill | 18회 | 2Sam.15.30, 2Sam.15.32, 2Sam.16.1
+Sheba 1 | region | 18회 | 1Kgs.10.1, 1Kgs.10.4, 1Kgs.10.10
+Beth-shemesh 1 | settlement | 17회 | Josh.15.10, Josh.21.16, 1Sam.6.9
+Mount Horeb | mountain | 17회 | Exod.3.1, Exod.17.6, Exod.33.6
+Rabbah 1 | settlement | 17회 | Deut.3.11, Josh.13.25, 2Sam.11.1
+Beyond the River | region | 16회 | Ezra.4.10, Ezra.4.11, Ezra.4.16
+Elam | region | 16회 | Gen.14.1, Gen.14.9, Ezra.4.9
+Libnah 1 | settlement | 16회 | Josh.10.29, Josh.10.30, Josh.10.31
+Mahanaim | settlement | 16회 | Gen.32.2, Josh.13.26, Josh.13.30
+Mount Hermon | mountain | 16회 | Deut.3.8, Deut.3.9, Deut.4.48
+Ramah 1 | settlement | 16회 | Josh.18.25, Judg.4.5, Judg.19.13
+Tarshish 1 | island | 16회 | 2Chr.9.21, 2Chr.20.36, 2Chr.20.37
+Babylonia | region | 15회 | Ezra.1.11, Ezra.2.1, Ezra.5.12
+Keilah | settlement | 15회 | Josh.15.44, 1Sam.23.1, 1Sam.23.2
+Rome | settlement | 15회 | Acts.2.10, Acts.18.2, Acts.19.21
+Carmel 1 | settlement | 14회 | Josh.15.55, 1Sam.15.12, 1Sam.25.2
+Geba 1 | settlement | 14회 | Josh.21.17, 1Sam.13.3, 1Sam.13.4
+Gezer | settlement | 14회 | Josh.10.33, Josh.12.12, Josh.16.3
+Joppa | settlement | 14회 | Josh.19.46, 2Chr.2.16, Ezra.3.7
+Kidron | river | 14회 | 2Sam.15.22, 2Sam.15.23, 1Kgs.2.37
+Tekoa | settlement | 14회 | 2Sam.14.2, 2Sam.14.4, 2Sam.14.9
+Zobah | region | 14회 | 1Sam.14.47, 2Sam.8.3, 2Sam.8.5
+Aroer 1 | settlement | 13회 | Num.32.34, Deut.2.36, Deut.3.12
+Eden 1 | garden | 13회 | Gen.2.8, Gen.2.10, Gen.2.15
+Jazer | settlement | 13회 | Num.21.24, Num.21.32, Num.32.1
+Ramah 4 | settlement | 13회 | 1Sam.1.19, 1Sam.2.11, 1Sam.7.17
+Samaria 2 | region | 13회 | Luke.17.11, John.4.4, John.4.5
+Tirzah | settlement | 13회 | Josh.12.24, 1Kgs.14.17, 1Kgs.15.21
+Wilderness of Sinai | region | 13회 | Exod.19.1, Exod.19.2, Lev.7.38
+Ziklag | settlement | 13회 | Josh.15.31, Josh.19.5, 1Sam.27.6
+Arnon | river | 12회 | Num.21.13, Num.21.14, Num.21.24
+Ashkelon | settlement | 12회 | Josh.13.3, Judg.1.18, Judg.14.19
+Bethany 1 | settlement | 12회 | Matt.21.17, Matt.26.6, Mark.11.1
+Cyprus | island | 12회 | Isa.23.1, Isa.23.12, Jer.2.10
+Haran | settlement | 12회 | Gen.11.31, Gen.11.32, Gen.12.4
+Lebo-hamath | settlement | 12회 | Num.13.21, Num.34.8, Josh.13.5
+Megiddo | settlement | 12회 | Josh.12.21, Josh.17.11, Judg.1.27
+Moab 2 | region | 12회 | Num.22.1, Num.26.3, Num.26.63
+South 3 | region | 12회 | Dan.11.5, Dan.11.6, Dan.11.7
+Valley of Hinnom | valley | 12회 | Josh.15.8, Josh.18.16, 2Kgs.23.10
+Aram | region | 11회 | Num.23.7, Judg.18.7, Judg.18.28
+Corinth | settlement | 11회 | Acts.18.1, Acts.18.8, Acts.18.11
+Debir 1 | settlement | 11회 | Josh.10.38, Josh.10.39, Josh.11.21
+Geshur | region | 11회 | Josh.12.5, Josh.13.11, Josh.13.13
+Goshen 1 | region | 11회 | Gen.45.10, Gen.46.28, Gen.46.29
+Hazor 1 | settlement | 11회 | Josh.11.1, Josh.11.10, Josh.11.11
+Media | region | 11회 | Ezra.6.2, Esth.1.3, Esth.1.14
+Michmash | settlement | 11회 | 1Sam.13.2, 1Sam.13.5, 1Sam.13.11
+Paddan-aram | region | 11회 | Gen.25.20, Gen.28.2, Gen.28.5
+Riblah 1 | settlement | 11회 | 2Kgs.23.33, 2Kgs.25.6, 2Kgs.25.20
+Valley of the Arnon | valley | 11회 | Deut.2.24, Deut.2.36, Deut.3.8
+Zorah | settlement | 11회 | Josh.15.33, Josh.19.41, Judg.13.2
+Achaia | region | 10회 | Acts.18.12, Acts.18.27, Acts.19.21
+Beersheba 2 | settlement | 10회 | Gen.21.14, Gen.21.31, Gen.21.32
+Dibon 1 | settlement | 10회 | Num.21.30, Num.32.3, Num.32.34
+Mount Hor 1 | mountain | 10회 | Num.20.22, Num.20.23, Num.20.25
+North | region | 10회 | Dan.11.6, Dan.11.7, Dan.11.8
+Ophir | island | 10회 | 1Kgs.9.28, 1Kgs.10.11, 1Kgs.22.48
+Sea of Galilee | body of water | 10회 | Num.34.11, Josh.12.3, Josh.13.27
+Succoth 1 | settlement | 10회 | Gen.33.17, Josh.13.27, Judg.8.5
+Adullam | settlement | 9회 | Gen.38.1, Josh.12.15, Josh.15.35
+Beeroth | settlement | 9회 | Josh.9.17, Josh.18.25, 2Sam.4.2
+Brook of Egypt | river | 9회 | Num.34.5, Josh.15.4, Josh.15.47
+Crete | island | 9회 | Zeph.2.5, Acts.27.7, Acts.27.8
+Gerar | settlement | 9회 | Gen.10.19, Gen.20.1, Gen.20.2
+Hormah | settlement | 9회 | Num.14.45, Num.21.3, Deut.1.44
+Jahaz | settlement | 9회 | Num.21.23, Deut.2.32, Josh.13.18
+Kedar | people group | 9회 | Ps.120.5, Song.1.5, Isa.21.16
+Meribah 1 | settlement | 9회 | Num.20.13, Num.20.24, Num.27.14
+Mount Tabor | mountain | 9회 | Josh.19.22, Judg.4.6, Judg.4.12
+Shunem | settlement | 9회 | Josh.19.18, 1Sam.28.4, 1Kgs.1.3
+Thessalonica | settlement | 9회 | Acts.17.1, Acts.17.11, Acts.17.13
+Timnah 1 | settlement | 9회 | Josh.15.10, Josh.19.43, Judg.14.1
+Topheth | altar | 9회 | 2Kgs.23.10, Isa.30.33, Jer.7.31
+Zoar | settlement | 9회 | Gen.13.10, Gen.14.2, Gen.14.8
+Aijalon 1 | settlement | 8회 | Josh.19.42, Josh.21.24, Judg.1.35
+Beth-shan | settlement | 8회 | Josh.17.11, Josh.17.16, Judg.1.27
+Bozrah 1 | settlement | 8회 | Gen.36.33, 1Chr.1.44, Isa.34.6
+Chebar | river | 8회 | Ezek.1.1, Ezek.1.3, Ezek.3.15
+Cilicia | region | 8회 | Acts.6.9, Acts.15.23, Acts.15.41
+Eglon | settlement | 8회 | Josh.10.3, Josh.10.5, Josh.10.23
+Eshtaol | settlement | 8회 | Josh.15.33, Josh.19.41, Judg.13.25
+Jordan Valley | valley | 8회 | Gen.13.10, Gen.13.11, Gen.13.12
+Maacah | region | 8회 | Josh.12.5, Josh.13.11, Josh.13.13
+Makkedah | settlement | 8회 | Josh.10.10, Josh.10.16, Josh.10.17
+Memphis | settlement | 8회 | Isa.19.13, Jer.2.16, Jer.44.1
+Mount Gilboa | mountain | 8회 | 1Sam.28.4, 1Sam.31.1, 1Sam.31.8
+Netophah | settlement | 8회 | 2Sam.23.28, 2Sam.23.29, 1Chr.9.16
+Paran | region | 8회 | Gen.21.21, Num.10.12, Num.12.16
+Peor | mountain | 8회 | Num.23.28, Num.25.3, Num.25.5
+Pisgah | mountain | 8회 | Num.21.20, Num.23.14, Deut.3.17
+Shinar | region | 8회 | Gen.10.10, Gen.11.2, Gen.14.1
+Syria 2 | region | 8회 | Matt.4.24, Luke.2.2, Acts.15.23
+Valley of Rephaim | valley | 8회 | Josh.15.8, Josh.18.16, 2Sam.5.18
+Zin 1 | region | 8회 | Num.13.21, Num.20.1, Num.27.14
+Ar | settlement | 7회 | Num.21.15, Num.21.28, Deut.2.9
+Ashtaroth | settlement | 7회 | Deut.1.4, Josh.9.10, Josh.12.4
+Azekah | settlement | 7회 | Josh.10.10, Josh.10.11, Josh.15.35
+Bahurim | settlement | 7회 | 2Sam.3.16, 2Sam.16.5, 2Sam.17.18
+Beth-horon | settlement | 7회 | Josh.10.10, Josh.10.11, Josh.18.14
+Cyrene | settlement | 7회 | Matt.27.32, Mark.15.21, Luke.23.26
+Dedan | settlement | 7회 | Isa.21.13, Jer.25.23, Jer.49.8
+Edrei 1 | settlement | 7회 | Num.21.33, Deut.1.4, Deut.3.1
+Ethiopia | region | 7회 | 2Sam.18.21, 2Sam.18.31, Esth.1.1
+Ezion-geber | island | 7회 | Num.33.35, Num.33.36, Deut.2.8
+Greece | region | 7회 | Dan.8.21, Dan.10.20, Dan.11.2
+Harim | settlement | 7회 | Ezra.2.32, Ezra.2.39, Ezra.10.31
+Jabbok | river | 7회 | Gen.32.22, Num.21.24, Deut.2.37
+Jebus | settlement | 7회 | Josh.15.8, Josh.18.16, Josh.18.28
+Lod | settlement | 7회 | 1Chr.8.12, Ezra.2.33, Neh.7.37
+Meshech | region | 7회 | Ps.120.5, Isa.66.19, Ezek.27.13
+Mesopotamia | region | 7회 | Gen.24.10, Deut.23.4, Judg.3.8
+Nebo 1 | settlement | 7회 | Num.32.3, Num.32.38, Num.33.47
+Nob | settlement | 7회 | 1Sam.21.1, 1Sam.22.9, 1Sam.22.11
+Taanach | settlement | 7회 | Josh.12.21, Josh.17.11, Josh.21.25
+Tahpanhes | settlement | 7회 | Jer.2.16, Jer.43.7, Jer.43.8
+Zoan | settlement | 7회 | Num.13.22, Ps.78.12, Ps.78.43
+Abel-beth-maacah | settlement | 6회 | 2Sam.20.14, 2Sam.20.15, 2Sam.20.18
+Arabia 1 | region | 6회 | 1Kgs.10.15, 2Chr.9.14, Isa.21.13
+Arpad | settlement | 6회 | 2Kgs.18.34, 2Kgs.19.13, Isa.10.9
+Athens | settlement | 6회 | Acts.17.15, Acts.17.16, Acts.17.21
+Babylon 3 | settlement | 6회 | Rev.14.8, Rev.16.19, Rev.17.5
+Berea | settlement | 6회 | Acts.17.10, Acts.17.11, Acts.17.13
+Elath | island | 6회 | Deut.2.8, 1Kgs.9.26, 2Kgs.14.22
+Engedi | region | 6회 | Josh.15.62, 1Sam.23.29, 1Sam.24.1
+En-rogel | spring | 6회 | Josh.15.7, Josh.18.16, Josh.18.17
+Galatia | region | 6회 | Acts.16.6, Acts.18.23, 1Cor.16.1
+Gihon 2 | spring | 6회 | 1Kgs.1.33, 1Kgs.1.38, 1Kgs.1.44
+Havvoth-jair | region | 6회 | Num.32.41, Deut.3.14, Josh.13.30
+Hazeroth | settlement | 6회 | Num.11.35, Num.12.1, Num.12.16
+House of the Forest of Lebanon | structure | 6회 | 1Kgs.7.2, 1Kgs.10.17, 1Kgs.10.21
+Hushah | settlement | 6회 | 2Sam.21.18, 2Sam.23.27, 1Chr.4.4
+Iconium | settlement | 6회 | Acts.13.51, Acts.14.1, Acts.14.19
+Jarmuth 1 | settlement | 6회 | Josh.10.3, Josh.10.5, Josh.10.23
+Jattir | settlement | 6회 | Josh.15.48, Josh.21.14, 1Sam.30.27
+Jeshimon | region | 6회 | Num.21.20, Num.23.28, 1Sam.23.19
+Jezreel 3 | settlement | 6회 | 1Sam.25.43, 1Sam.27.3, 1Sam.30.5
+Laodicea | settlement | 6회 | Col.2.1, Col.4.13, Col.4.15
+Luz 1 | settlement | 6회 | Gen.28.19, Gen.35.6, Gen.48.3
+Lystra | settlement | 6회 | Acts.14.6, Acts.14.8, Acts.14.21
+Machpelah | settlement | 6회 | Gen.23.9, Gen.23.17, Gen.23.19
+Mamre | settlement | 6회 | Gen.23.17, Gen.23.19, Gen.25.9
+Mareshah | settlement | 6회 | Josh.15.44, 2Chr.11.8, 2Chr.14.9
+Millo | fortification | 6회 | 2Sam.5.9, 1Kgs.9.15, 1Kgs.9.24
+Naioth | settlement | 6회 | 1Sam.19.18, 1Sam.19.19, 1Sam.19.22
+Penuel | settlement | 6회 | Gen.32.30, Gen.32.31, Judg.8.8
+Put | region | 6회 | Isa.66.19, Jer.46.9, Ezek.27.10
+Sepharvaim | settlement | 6회 | 2Kgs.17.24, 2Kgs.17.31, 2Kgs.18.34
+Sharon 1 | region | 6회 | 1Chr.27.29, Song.2.1, Isa.33.9
+Shur | region | 6회 | Gen.16.7, Gen.20.1, Gen.25.18
+Sibmah | settlement | 6회 | Num.32.3, Num.32.38, Josh.13.19
+Teman | region | 6회 | Jer.49.7, Jer.49.20, Ezek.25.13
+Thebes | settlement | 6회 | Jer.46.25, Ezek.30.14, Ezek.30.15
+Troas | settlement | 6회 | Acts.16.8, Acts.16.11, Acts.20.5
+Abarim | mountain range | 5회 | Num.27.12, Num.33.47, Num.33.48
+Admah | settlement | 5회 | Gen.10.19, Gen.14.2, Gen.14.8
+Angle | structure | 5회 | 2Chr.26.9, Neh.3.19, Neh.3.20
+Caphtor | island | 5회 | Gen.10.14, Deut.2.23, 1Chr.1.12
+Corner Gate | gate | 5회 | 2Kgs.14.13, 2Chr.25.23, 2Chr.26.9
+Derbe | settlement | 5회 | Acts.14.6, Acts.14.20, Acts.14.21
+Elealeh | settlement | 5회 | Num.32.3, Num.32.37, Isa.15.4
+Gibbethon | settlement | 5회 | Josh.19.44, Josh.21.23, 1Kgs.15.27
+Gozan | settlement | 5회 | 2Kgs.17.6, 2Kgs.18.11, 2Kgs.19.12
+Heliopolis | settlement | 5회 | Gen.41.45, Gen.41.50, Gen.46.20
+Jericho 2 | settlement | 5회 | Matt.20.29, Mark.10.46, Luke.10.30
+Kibroth-hattaavah | settlement | 5회 | Num.11.34, Num.11.35, Num.33.16
+Kir-hareseth | settlement | 5회 | 2Kgs.3.25, Isa.16.7, Isa.16.11
+Kiriathaim 1 | settlement | 5회 | Num.32.37, Josh.13.19, Jer.48.1
+Kishon | river | 5회 | Judg.4.7, Judg.4.13, Judg.5.21
+Lower Beth-horon | settlement | 5회 | Josh.16.3, Josh.18.13, 1Kgs.9.17
+Marah | body of water | 5회 | Exod.15.23, Exod.15.25, Exod.15.27
+Massah | campsite | 5회 | Exod.17.7, Deut.6.16, Deut.9.22
+Medeba | settlement | 5회 | Num.21.30, Josh.13.9, Josh.13.16
+Mizpah 1 | settlement | 5회 | Judg.10.17, Judg.11.11, Judg.11.29
+Mount Ebal | mountain | 5회 | Deut.11.29, Deut.27.4, Deut.27.13
+Mount Gerizim | mountain | 5회 | Deut.11.29, Deut.27.12, Josh.8.33
+Ono | settlement | 5회 | 1Chr.8.12, Ezra.2.33, Neh.6.2
+Ophel | hill | 5회 | 2Chr.27.3, 2Chr.33.14, Neh.3.26
+Ophrah 2 | settlement | 5회 | Judg.6.11, Judg.6.24, Judg.8.27
+Pamphylia | region | 5회 | Acts.2.10, Acts.13.13, Acts.14.24
+Pathros | region | 5회 | Isa.11.11, Jer.44.1, Jer.44.15
+Pirathon | settlement | 5회 | Judg.12.13, Judg.12.15, 2Sam.23.30
+Rameses | settlement | 5회 | Gen.47.11, Exod.1.11, Exod.12.37
+Red Sea 2 | body of water | 5회 | Exod.23.31, Judg.11.16, 1Kgs.9.26
+Rephidim | campsite | 5회 | Exod.17.1, Exod.17.8, Exod.19.2
+Shittim | campsite | 5회 | Num.25.1, Josh.2.1, Josh.3.1
+Siloam | pool | 5회 | Neh.2.14, Neh.3.15, Luke.13.4
+Tarshish 2 | island | 5회 | 1Kgs.10.22, 1Kgs.22.48, Ps.48.7
+Tarsus | settlement | 5회 | Acts.9.11, Acts.9.30, Acts.11.25
+Tubal | region | 5회 | Isa.66.19, Ezek.27.13, Ezek.38.2
+Valley of Achor | valley | 5회 | Josh.7.24, Josh.7.26, Josh.15.7
+Valley of Jezreel | valley | 5회 | Josh.17.16, Judg.6.33, 1Sam.31.7
+Valley of Salt | special | 5회 | 2Sam.8.13, 2Kgs.14.7, 1Chr.18.12
+Water Gate | gate | 5회 | Neh.3.26, Neh.8.1, Neh.8.3
+Zeboiim | settlement | 5회 | Gen.10.19, Gen.14.2, Gen.14.8
+Ziph 1 | settlement | 5회 | Josh.15.55, 1Sam.23.19, 1Sam.23.24
+Alexandria | settlement | 4회 | Acts.6.9, Acts.18.24, Acts.27.6
+Antioch 2 | settlement | 4회 | Acts.13.14, Acts.14.19, Acts.14.21
+Aphek 2 | settlement | 4회 | Josh.12.18, 1Sam.4.1, 1Sam.29.1
+Ararat | region | 4회 | Gen.8.4, 2Kgs.19.37, Isa.37.38
+Argob | region | 4회 | Deut.3.4, Deut.3.13, Deut.3.14
+Arimathea | settlement | 4회 | Matt.27.57, Mark.15.43, Luke.23.50
+Ashan | settlement | 4회 | Josh.15.42, Josh.19.7, 1Chr.4.32
+Asshur | settlement | 4회 | Num.24.22, Num.24.24, Ps.83.8
+Baal-meon | settlement | 4회 | Num.32.38, Josh.13.17, 1Chr.5.8
+Benjamin Gate | gate | 4회 | Jer.20.2, Jer.37.13, Jer.38.7
+Beth-arabah | settlement | 4회 | Josh.15.6, Josh.15.61, Josh.18.18
+Beth-aven 1 | settlement | 4회 | Josh.7.2, Josh.18.12, 1Sam.13.5
+Beth-jeshimoth | settlement | 4회 | Num.33.49, Josh.12.3, Josh.13.20
+Beth-peor | settlement | 4회 | Deut.3.29, Deut.4.46, Deut.34.6
+Bethsaida 1 | settlement | 4회 | Matt.11.21, Luke.10.13, John.1.44
+Beth-zur | settlement | 4회 | Josh.15.58, 1Chr.2.45, 2Chr.11.7
+Bezer | settlement | 4회 | Deut.4.43, Josh.20.8, Josh.21.36
+Cana | settlement | 4회 | John.2.1, John.2.11, John.4.46
+Chephirah | settlement | 4회 | Josh.9.17, Josh.18.26, Ezra.2.25
+Chinnereth | body of water | 4회 | Deut.3.17, Josh.11.2, Josh.19.35
+Dor | settlement | 4회 | Josh.12.23, Josh.17.11, Judg.1.27
+Dung Gate | gate | 4회 | Neh.2.13, Neh.3.13, Neh.3.14
+East Gate | gate | 4회 | 1Chr.26.14, 2Chr.31.14, Neh.3.29
+Elim | settlement | 4회 | Exod.15.27, Exod.16.1, Num.33.9
+Ephraim Gate | gate | 4회 | 2Kgs.14.13, 2Chr.25.23, Neh.8.16
+Eshtemoa | settlement | 4회 | Josh.15.50, Josh.21.14, 1Sam.30.28
+Etham | settlement | 4회 | Exod.13.20, Num.33.6, Num.33.7
+Fish Gate | gate | 4회 | 2Chr.33.14, Neh.3.3, Neh.12.39
+Gaash | mountain | 4회 | Josh.24.30, Judg.2.9, 2Sam.23.30
+Golan | settlement | 4회 | Deut.4.43, Josh.20.8, Josh.21.27
+Golgotha | hill | 4회 | Matt.27.33, Mark.15.22, Luke.23.33
+Halah | region | 4회 | 2Kgs.17.6, 2Kgs.18.11, 1Chr.5.26
+Ham 2 | region | 4회 | Ps.78.51, Ps.105.23, Ps.105.27
+Hazar-enan | settlement | 4회 | Num.34.9, Num.34.10, Ezek.47.17
+Hazar-shual | settlement | 4회 | Josh.15.28, Josh.19.3, 1Chr.4.28
+Horesh | natural area | 4회 | 1Sam.23.15, 1Sam.23.16, 1Sam.23.18
+Horonaim 1 | settlement | 4회 | Isa.15.5, Jer.48.3, Jer.48.5
+Ibleam | settlement | 4회 | Josh.17.11, Judg.1.27, 2Kgs.9.27
+Italy | region | 4회 | Acts.18.2, Acts.27.1, Acts.27.6
+Jokneam | settlement | 4회 | Josh.12.22, Josh.19.11, Josh.21.34
+Kabzeel | settlement | 4회 | Josh.15.21, 2Sam.23.20, 1Chr.11.22
+Kedemoth | settlement | 4회 | Deut.2.26, Josh.13.18, Josh.21.37
+Kedesh 1 | settlement | 4회 | Josh.12.22, Josh.21.32, 2Kgs.15.29
+Kir 1 | mountain range | 4회 | 2Kgs.16.9, Isa.22.6, Amos.1.5
+Lehi | settlement | 4회 | Judg.15.9, Judg.15.14, Judg.15.19
+Lo-debar | settlement | 4회 | 2Sam.9.4, 2Sam.9.5, 2Sam.17.27
+Mephaath | settlement | 4회 | Josh.13.18, Josh.21.37, 1Chr.6.79
+Moladah | settlement | 4회 | Josh.15.26, Josh.19.2, 1Chr.4.28
+Mount Esau | mountain range | 4회 | Obad.1.8, Obad.1.9, Obad.1.19
+Naamah 2 | mountain | 4회 | Job.2.11, Job.11.1, Job.20.1
+Naphoth-dor | region | 4회 | Josh.11.2, Josh.12.23, Josh.17.11
+Oboth | campsite | 4회 | Num.21.10, Num.21.11, Num.33.43
+Philippi | settlement | 4회 | Acts.16.12, Acts.20.6, Phil.1.1
+Phoenicia | region | 4회 | Mark.7.26, Acts.11.19, Acts.15.3
+Pi-hahiroth | mountain | 4회 | Exod.14.2, Exod.14.9, Num.33.7
+Ramoth 3 | settlement | 4회 | Deut.4.43, Josh.20.8, Josh.21.38
+Rehob 3 | settlement | 4회 | Josh.19.30, Josh.21.31, Judg.1.31
+Rimmon 1 | natural area | 4회 | Judg.20.45, Judg.20.47, Judg.21.13
+Rimmon 2 | settlement | 4회 | Josh.15.32, Josh.19.7, 1Chr.4.32
+Salecah | settlement | 4회 | Deut.3.10, Josh.12.5, Josh.13.11
+Salem | settlement | 4회 | Gen.14.18, Ps.76.2, Heb.7.1
+Second Quarter | district in settlement | 4회 | 2Kgs.22.14, 2Chr.34.22, Neh.11.9
+Senir | mountain | 4회 | Deut.3.9, 1Chr.5.23, Song.4.8
+Sheep Gate | gate | 4회 | Neh.3.1, Neh.3.32, Neh.12.39
+Sin | region | 4회 | Exod.16.1, Exod.17.1, Num.33.11
+Socoh 1 | settlement | 4회 | Josh.15.35, 1Sam.17.1, 2Chr.11.7
+Succoth 2 | settlement | 4회 | Exod.12.37, Exod.13.20, Num.33.5
+Thyatira | settlement | 4회 | Acts.16.14, Rev.1.11, Rev.2.18
+Tishbe | settlement | 4회 | 1Kgs.17.1, 2Kgs.1.3, 2Kgs.1.8
+Tob | settlement | 4회 | Judg.11.3, Judg.11.5, 2Sam.10.6
+Tower of Hananel | structure | 4회 | Neh.3.1, Neh.12.39, Jer.31.38
+Ur 1 | region | 4회 | Gen.11.28, Gen.11.31, Gen.15.7
+Valley Gate | gate | 4회 | 2Chr.26.9, Neh.2.13, Neh.2.15
+Valley of Eshcol | valley | 4회 | Num.13.23, Num.13.24, Num.32.9
+Way of the Red Sea | road | 4회 | Num.14.25, Num.21.4, Deut.1.40
+Zarephath | settlement | 4회 | 1Kgs.17.9, 1Kgs.17.10, Obad.1.20
+Abel-meholah | settlement | 3회 | Judg.7.22, 1Kgs.4.12, 1Kgs.19.16
+Achshaph | settlement | 3회 | Josh.11.1, Josh.12.20, Josh.19.25
+Ahava | canal | 3회 | Ezra.8.15, Ezra.8.21, Ezra.8.31
+Ain 2 | settlement | 3회 | Josh.15.32, Josh.19.7, 1Chr.4.32
+Akrabbim | mountain pass | 3회 | Num.34.4, Josh.15.3, Judg.1.36
+Aphek 3 | settlement | 3회 | 1Kgs.20.26, 1Kgs.20.30, 2Kgs.13.17
+Arad 1 | settlement | 3회 | Num.21.1, Num.33.40, Josh.12.14
+Areopagus | hill | 3회 | Acts.17.19, Acts.17.22, Acts.17.33
+Ariel | settlement | 3회 | Isa.29.1, Isa.29.2, Isa.29.7
+Azmaveth | settlement | 3회 | Ezra.2.24, Neh.7.28, Neh.12.29
+Azmon | settlement | 3회 | Num.34.4, Num.34.5, Josh.15.4
+Baalah 2 | settlement | 3회 | Josh.15.9, Josh.15.10, 1Chr.13.6
+Baal-gad | settlement | 3회 | Josh.11.17, Josh.12.7, Josh.13.5
+Baal-zephon | campsite | 3회 | Exod.14.2, Exod.14.9, Num.33.7
+Beer-lahai-roi | well | 3회 | Gen.16.14, Gen.24.62, Gen.25.11
+Besor | river | 3회 | 1Sam.30.9, 1Sam.30.10, 1Sam.30.21
+Beth-aven 2 | settlement | 3회 | Hos.4.15, Hos.5.8, Hos.10.5
+Beth-hoglah | settlement | 3회 | Josh.15.6, Josh.18.19, Josh.18.21
+Beth-millo | structure | 3회 | Judg.9.6, Judg.9.20, 2Kgs.12.20
+Bethphage | settlement | 3회 | Matt.21.1, Mark.11.1, Luke.19.29
+Bethsaida 2 | settlement | 3회 | Mark.6.45, Mark.8.22, Luke.9.10
+Carchemish | settlement | 3회 | 2Chr.35.20, Isa.10.9, Jer.46.2
+City of Palms 1 | settlement | 3회 | Deut.34.3, Judg.3.13, 2Chr.28.15
+Daberath | settlement | 3회 | Josh.19.12, Josh.21.28, 1Chr.6.72
+Decapolis | region | 3회 | Matt.4.25, Mark.5.20, Mark.7.31
+Eden 2 | region | 3회 | 2Kgs.19.12, Isa.37.12, Ezek.27.23
+Eltolad | settlement | 3회 | Josh.15.30, Josh.19.4, 1Chr.4.29
+Emmaus | settlement | 3회 | Luke.24.13, Luke.24.28, Luke.24.35
+En-dor | settlement | 3회 | Josh.17.11, 1Sam.28.7, Ps.83.10
+Ephes-dammim | settlement | 3회 | 1Sam.17.1, 2Sam.23.9, 1Chr.11.13
+Ephrath | settlement | 3회 | Gen.35.16, Gen.35.19, Gen.48.7
+Ezem | settlement | 3회 | Josh.15.29, Josh.19.3, 1Chr.4.29
+Fountain Gate | gate | 3회 | Neh.2.14, Neh.3.15, Neh.12.37
+Gath-rimmon 1 | settlement | 3회 | Josh.19.45, Josh.21.24, 1Chr.6.69
+Gebal 1 | settlement | 3회 | Josh.13.5, 1Kgs.5.18, Ezek.27.9
+Geliloth | settlement | 3회 | Josh.18.17, Josh.22.10, Josh.22.11
+Gennesaret | region | 3회 | Matt.14.34, Mark.6.53, Luke.5.1
+Gerasa | settlement | 3회 | Mark.5.1, Luke.8.26, Luke.8.37
+Giloh | settlement | 3회 | Josh.15.51, 2Sam.15.12, 2Sam.23.34
+Habor | river | 3회 | 2Kgs.17.6, 2Kgs.18.11, 1Chr.5.26
+Hachilah | settlement | 3회 | 1Sam.23.19, 1Sam.26.1, 1Sam.26.3
+Hadid | settlement | 3회 | Ezra.2.33, Neh.7.37, Neh.11.34
+Harosheth-hagoyim | region | 3회 | Judg.4.2, Judg.4.13, Judg.4.16
+Hazor 5 | region | 3회 | Jer.49.28, Jer.49.30, Jer.49.33
+Hena | settlement | 3회 | 2Kgs.18.34, 2Kgs.19.13, Isa.37.13
+Holon 1 | settlement | 3회 | Josh.15.51, Josh.21.15, 1Chr.6.58
+Hor-haggidgad | campsite | 3회 | Num.33.32, Num.33.33, Deut.10.7
+Horse Gate | gate | 3회 | 2Chr.23.15, Neh.3.28, Jer.31.40
+Ijon | settlement | 3회 | 1Kgs.15.20, 2Kgs.15.29, 2Chr.16.4
+Ivvah | settlement | 3회 | 2Kgs.18.34, 2Kgs.19.13, Isa.37.13
+Iye-abarim | campsite | 3회 | Num.21.11, Num.33.44, Num.33.45
+Jotbathah | settlement | 3회 | Num.33.33, Num.33.34, Deut.10.7
+Juttah | settlement | 3회 | Josh.15.55, Josh.21.16, 1Chr.6.59
+Kedesh 4 | settlement | 3회 | Judg.4.9, Judg.4.10, Judg.4.11
+Kerioth | settlement | 3회 | Jer.48.24, Jer.48.41, Amos.2.2
+Libya | region | 3회 | Ezek.30.5, Nah.3.9, Acts.2.10
+Magog | region | 3회 | Ezek.38.2, Ezek.39.6, Rev.20.8
+Maon | settlement | 3회 | Josh.15.55, Judg.10.12, 1Sam.25.2
+Meribah 2 | campsite | 3회 | Exod.17.7, Deut.33.8, Ps.95.8
+Miletus | settlement | 3회 | Acts.20.15, Acts.20.17, 2Tim.4.20
+Mishal | settlement | 3회 | Josh.19.26, Josh.21.30, 1Chr.6.74
+Mizpah 4 | stone heap | 3회 | Gen.31.47, Gen.31.48, Gen.31.49
+Moresheth-gath | settlement | 3회 | Jer.26.18, Mic.1.1, Mic.1.14
+Moseroth | campsite | 3회 | Num.33.30, Num.33.31, Deut.10.6
+Mount Ephraim | region | 3회 | Jer.4.15, Jer.31.6, Jer.50.19
+Nahalal | settlement | 3회 | Josh.19.15, Josh.21.35, Judg.1.30
+Nehelam | settlement | 3회 | Jer.29.24, Jer.29.31, Jer.29.32
+Perga | settlement | 3회 | Acts.13.13, Acts.13.14, Acts.14.25
+Phrygia | region | 3회 | Acts.2.10, Acts.16.6, Acts.18.23
+Pontus | region | 3회 | Acts.2.9, Acts.18.2, 1Pet.1.1
+Red Sea 3 | body of water | 3회 | Exod.10.19, Num.33.10, Num.33.11
+Sardis | settlement | 3회 | Rev.1.11, Rev.3.1, Rev.3.4
+Senaah | settlement | 3회 | Ezra.2.35, Neh.3.3, Neh.7.38
+Shaalbim | settlement | 3회 | Josh.19.42, Judg.1.35, 1Kgs.4.9
+Shepham | settlement | 3회 | Num.34.10, Num.34.11, 1Chr.27.27
+Solomon’s Portico | structure | 3회 | John.10.23, Acts.3.11, Acts.5.12
+Syene | settlement | 3회 | Isa.49.12, Ezek.29.10, Ezek.30.6
+Tamar 2 | settlement | 3회 | Ezek.47.18, Ezek.47.19, Ezek.48.28
+Tappuah 1 | settlement | 3회 | Josh.12.17, Josh.16.8, Josh.17.8
+Tema | settlement | 3회 | Job.6.19, Isa.21.14, Jer.25.23
+Timnah 3 | settlement | 3회 | Gen.38.12, Gen.38.13, Gen.38.14
+Timnath-heres | settlement | 3회 | Josh.19.50, Josh.24.30, Judg.2.9
+Tower of Shechem | structure | 3회 | Judg.9.46, Judg.9.47, Judg.9.49
+Upper Beth-horon | settlement | 3회 | Josh.16.5, 1Chr.7.24, 2Chr.8.5
+Upper Pool | pool | 3회 | 2Kgs.18.17, Isa.7.3, Isa.36.2
+Uz | region | 3회 | Job.1.1, Jer.25.20, Lam.4.21
+Valley of Elah | valley | 3회 | 1Sam.17.2, 1Sam.17.19, 1Sam.21.9
+Valley of Siddim | valley | 3회 | Gen.14.3, Gen.14.8, Gen.14.10
+Washer’s Field | field | 3회 | 2Kgs.18.17, Isa.7.3, Isa.36.2
+Wilderness of Ziph | region | 3회 | 1Sam.23.14, 1Sam.23.15, 1Sam.26.2
+Zanoah 1 | settlement | 3회 | Josh.15.34, Neh.3.13, Neh.11.30
+Zaphon 2 | mountain | 3회 | Job.26.7, Ps.48.2, Isa.14.13
+Zarethan | settlement | 3회 | Josh.3.16, 1Kgs.4.12, 1Kgs.7.46
+Abdon | settlement | 2회 | Josh.21.30, 1Chr.6.74
+Abronah | campsite | 2회 | Num.33.34, Num.33.35
+Achzib 1 | settlement | 2회 | Josh.15.44, Mic.1.14
+Achzib 2 | settlement | 2회 | Josh.19.29, Judg.1.31
+Addon | settlement | 2회 | Ezra.2.59, Neh.7.61
+Adummim | road | 2회 | Josh.15.7, Josh.18.17
+Ai 3 | settlement | 2회 | Ezra.2.28, Neh.7.32
+Akeldama | field | 2회 | Matt.27.8, Acts.1.19
+Almon-diblathaim | settlement | 2회 | Num.33.46, Num.33.47
+Alush | campsite | 2회 | Num.33.13, Num.33.14
+Anab | settlement | 2회 | Josh.11.21, Josh.15.50
+Arabia 2 | region | 2회 | Gal.1.17, Gal.4.25
+Aroer 2 | settlement | 2회 | Josh.13.25, Judg.11.33
+Arumah | settlement | 2회 | Judg.9.31, Judg.9.41
+Arvad | settlement | 2회 | Ezek.27.8, Ezek.27.11
+Assos | settlement | 2회 | Acts.20.13, Acts.20.14
+Atad | settlement | 2회 | Gen.50.10, Gen.50.11
+Ataroth 1 | settlement | 2회 | Num.32.3, Num.32.34
+Ataroth-addar | settlement | 2회 | Josh.16.5, Josh.18.13
+Attalia | settlement | 2회 | Acts.14.25, Acts.14.26
+Avith | settlement | 2회 | Gen.36.35, 1Chr.1.46
+Baalath 2 | settlement | 2회 | 1Kgs.9.18, 2Chr.8.6
+Baalath-beer | settlement | 2회 | Josh.19.8, 1Chr.4.33
+Baal-peor | mountain | 2회 | Deut.4.3, Hos.9.10
+Baal-perazim | settlement | 2회 | 2Sam.5.20, 1Chr.14.11
+Babel | settlement | 2회 | Gen.10.10, Gen.11.9
+Bamoth | settlement | 2회 | Num.21.19, Num.21.20
+Bamoth-baal | settlement | 2회 | Num.22.41, Josh.13.17
+Beautiful Gate | gate | 2회 | Acts.3.2, Acts.3.10
+Bene-jaakan | settlement | 2회 | Num.33.31, Num.33.32
+Beth-anath | settlement | 2회 | Josh.19.38, Judg.1.33
+Beth-eked | settlement | 2회 | 2Kgs.10.12, 2Kgs.10.14
+Bethel 3 | settlement | 2회 | Jer.48.13, Zech.7.2
+Beth-haccherem | settlement | 2회 | Neh.3.14, Jer.6.1
+Beth-haram | settlement | 2회 | Num.32.36, Josh.13.27
+Bethlehem 3 | settlement | 2회 | Judg.12.8, Judg.12.10
+Beth-marcaboth | settlement | 2회 | Josh.19.5, 1Chr.4.31
+Beth-nimrah | settlement | 2회 | Num.32.36, Josh.13.27
+Beth-pelet | settlement | 2회 | Josh.15.27, Neh.11.26
+Beth-rehob | region | 2회 | Judg.18.28, 2Sam.10.6
+Beth-shemesh 3 | settlement | 2회 | Josh.19.38, Judg.1.33
+Beth-togarmah | settlement | 2회 | Ezek.27.14, Ezek.38.6
+Bezek 1 | settlement | 2회 | Judg.1.4, Judg.1.5
+Bithynia | region | 2회 | Acts.16.7, 1Pet.1.1
+Bochim | settlement | 2회 | Judg.2.1, Judg.2.5
+Bozkath | settlement | 2회 | Josh.15.39, 2Kgs.22.1
+Broad Wall | structure | 2회 | Neh.3.8, Neh.12.38
+Caesarea Philippi | settlement | 2회 | Matt.16.13, Mark.8.27
+Calah | settlement | 2회 | Gen.10.11, Gen.10.12
+Calneh 2 | settlement | 2회 | Isa.10.9, Amos.6.2
+Cappadocia | region | 2회 | Acts.2.9, 1Pet.1.1
+Cenchreae | settlement | 2회 | Acts.18.18, Rom.16.1
+Cherith | settlement | 2회 | 1Kgs.17.3, 1Kgs.17.5
+Cherub | settlement | 2회 | Ezra.2.59, Neh.7.61
+Chorazin | settlement | 2회 | Matt.11.21, Luke.10.13
+Cuth | settlement | 2회 | 2Kgs.17.24, 2Kgs.17.30
+Dinhabah | settlement | 2회 | Gen.36.32, 1Chr.1.43
+Dophkah | settlement | 2회 | Num.33.12, Num.33.13
+Dothan | settlement | 2회 | Gen.37.17, 2Kgs.6.13
+Ebenezer 1 | settlement | 2회 | 1Sam.4.1, 1Sam.5.1
+Eglath-shelishiyah | settlement | 2회 | Isa.15.5, Jer.48.34
+Ellasar | region | 2회 | Gen.14.1, Gen.14.9
+Eltekeh | settlement | 2회 | Josh.19.44, Josh.21.23
+Enaim | settlement | 2회 | Gen.38.14, Gen.38.21
+En-gannim 2 | settlement | 2회 | Josh.19.21, Josh.21.29
+En-shemesh | spring | 2회 | Josh.15.7, Josh.18.17
+En-tappuah | spring | 2회 | Josh.17.7, Josh.17.9
+Ephrathah | settlement | 2회 | Ruth.4.11, Ps.132.6
+Erech | settlement | 2회 | Gen.10.10, Ezra.4.9
+Etam 1 | settlement | 2회 | Judg.15.8, Judg.15.11
+Ezel | special | 2회 | 1Sam.20.19, 1Sam.20.41
+Fair Havens | settlement | 2회 | Acts.27.8, Acts.27.12
+Gallim | settlement | 2회 | 1Sam.25.44, Isa.10.30
+Gate of Yeshanah | gate | 2회 | Neh.3.6, Neh.12.39
+Gath 2 | settlement | 2회 | 1Chr.7.21, 1Chr.8.13
+Gath 3 | settlement | 2회 | 2Sam.6.10, 1Chr.13.13
+Gath-hepher | settlement | 2회 | Josh.19.13, 2Kgs.14.25
+Geba 3 | settlement | 2회 | 2Kgs.23.8, Zech.14.10
+Geder | settlement | 2회 | Josh.12.13, 1Chr.27.28
+Gederoth | settlement | 2회 | Josh.15.41, 2Chr.28.18
+Gedor 1 | settlement | 2회 | Josh.15.58, 1Chr.4.4
+Ge-harashim | special | 2회 | 1Chr.4.14, Neh.11.35
+Gethsemane | garden | 2회 | Matt.26.36, Mark.14.32
+Gibeah 2 | settlement | 2회 | Josh.15.57, 2Chr.13.2
+Gilgal 2 | settlement | 2회 | 2Kgs.2.1, 2Kgs.4.38
+Gittaim | settlement | 2회 | 2Sam.4.3, Neh.11.33
+Gob | settlement | 2회 | 2Sam.21.18, 2Sam.21.19
+Goiim 1 | region | 2회 | Gen.14.1, Gen.14.9
+Goshen 2 | region | 2회 | Josh.10.41, Josh.11.16
+Gulloth-mayim | spring | 2회 | Josh.15.19, Judg.1.15
+Hamath 2 | settlement | 2회 | 2Kgs.17.24, 2Kgs.17.30
+Hamath-zobah | region | 2회 | 1Chr.18.3, 2Chr.8.3
+Haradah | campsite | 2회 | Num.33.24, Num.33.25
+Harod 2 | settlement | 2회 | 2Sam.23.25, 1Chr.11.27
+Hashmonah | campsite | 2회 | Num.33.29, Num.33.30
+Hauran | region | 2회 | Ezek.47.16, Ezek.47.18
+Hazar-susah | settlement | 2회 | Josh.19.5, 1Chr.4.31
+Helam | settlement | 2회 | 2Sam.10.16, 2Sam.10.17
+Heleph | settlement | 2회 | Josh.19.33, Josh.19.34
+Helkath | settlement | 2회 | Josh.19.25, Josh.21.31
+Hepher | settlement | 2회 | Josh.12.17, 1Kgs.4.10
+Hethlon | settlement | 2회 | Ezek.47.15, Ezek.48.1
+Immer | settlement | 2회 | Ezra.2.59, Neh.7.61
+India | region | 2회 | Esth.1.1, Esth.8.9
+Jabneel 1 | settlement | 2회 | Josh.15.11, 2Chr.26.6
+Janoah 1 | settlement | 2회 | Josh.16.6, Josh.16.7
+Javan | region | 2회 | Isa.66.19, Ezek.27.13
+Jogbehah | settlement | 2회 | Num.32.35, Judg.8.11
+Judea 2 | region | 2회 | Ezra.5.8, Ezra.9.9
+Kain | settlement | 2회 | Num.24.22, Josh.15.57
+Kanah 1 | river | 2회 | Josh.16.8, Josh.17.9
+Kartah | settlement | 2회 | Josh.21.34, 1Chr.6.77
+Kedesh 5 | settlement | 2회 | Josh.19.37, Josh.20.7
+Kehelathah | campsite | 2회 | Num.33.22, Num.33.23
+Kenath | settlement | 2회 | Num.32.42, 1Chr.2.23
+King’s Highway | road | 2회 | Num.20.17, Num.21.22
+King’s Valley | valley | 2회 | Gen.14.17, 2Sam.18.18
+Kishion | settlement | 2회 | Josh.19.20, Josh.21.28
+Kittim | island | 2회 | Num.24.24, Dan.11.30
+Kue | region | 2회 | 1Kgs.10.28, 2Chr.1.16
+Libnah 2 | campsite | 2회 | Num.33.20, Num.33.21
+Lower Gulloth | spring | 2회 | Josh.15.19, Judg.1.15
+Lud 1 | region | 2회 | Isa.66.19, Ezek.27.10
+Lud 2 | region | 2회 | Jer.46.9, Ezek.30.5
+Luhith | settlement | 2회 | Isa.15.5, Jer.48.5
+Lycaonia | region | 2회 | Acts.14.6, Acts.14.11
+Madmannah | settlement | 2회 | Josh.15.31, 1Chr.2.49
+Madon | settlement | 2회 | Josh.11.1, Josh.12.19
+Makheloth | campsite | 2회 | Num.33.25, Num.33.26
+Masrekah | settlement | 2회 | Gen.36.36, 1Chr.1.47
+Mattanah | settlement | 2회 | Num.21.18, Num.21.19
+Meronoth | settlement | 2회 | 1Chr.27.30, Neh.3.7
+Mezahab | settlement | 2회 | Gen.36.39, 1Chr.1.50
+Michmethath | mountain | 2회 | Josh.16.6, Josh.17.7
+Migdol 1 | settlement | 2회 | Exod.14.2, Num.33.7
+Migdol 2 | settlement | 2회 | Jer.44.1, Jer.46.14
+Migdol 3 | settlement | 2회 | Ezek.29.10, Ezek.30.6
+Minnith | settlement | 2회 | Judg.11.33, Ezek.27.17
+Misrephoth-maim | hill | 2회 | Josh.11.8, Josh.13.6
+Mithkah | campsite | 2회 | Num.33.28, Num.33.29
+Moreh 1 | tree | 2회 | Gen.12.6, Deut.11.30
+Mount Halak | mountain | 2회 | Josh.11.17, Josh.12.7
+Mount Hor 2 | mountain | 2회 | Num.34.7, Num.34.8
+Mount Nebo | mountain | 2회 | Deut.32.49, Deut.34.1
+Mount Paran | mountain | 2회 | Deut.33.2, Hab.3.3
+Mount Shepher | mountain | 2회 | Num.33.23, Num.33.24
+Mysia | region | 2회 | Acts.16.7, Acts.16.8
+Neah | settlement | 2회 | Josh.19.13, Josh.19.14
+Nebo 2 | settlement | 2회 | Ezra.2.29, Neh.7.33
+Nephtoah | spring | 2회 | Josh.15.9, Josh.18.15
+New Gate | gate | 2회 | Jer.26.10, Jer.36.10
+Nimrim | wadi | 2회 | Isa.15.6, Jer.48.34
+Ophrah 1 | settlement | 2회 | Josh.18.23, 1Sam.13.17
+Paphos | settlement | 2회 | Acts.13.6, Acts.13.13
+Pau | settlement | 2회 | Gen.36.39, 1Chr.1.50
+Pekod | region | 2회 | Jer.50.21, Ezek.23.23
+Pelusium | settlement | 2회 | Ezek.30.15, Ezek.30.16
+Perez-uzzah | settlement | 2회 | 2Sam.6.8, 1Chr.13.11
+Pergamum | settlement | 2회 | Rev.1.11, Rev.2.12
+Pethor | settlement | 2회 | Num.22.5, Deut.23.4
+Philadelphia | settlement | 2회 | Rev.1.11, Rev.3.7
+Pisidia | region | 2회 | Acts.13.14, Acts.14.24
+Punon | settlement | 2회 | Num.33.42, Num.33.43
+Ramah 5 | settlement | 2회 | 2Kgs.8.29, 2Chr.22.6
+Rehob 1 | settlement | 2회 | Num.13.21, 2Sam.10.8
+Rehoboth 2 | settlement | 2회 | Gen.36.37, 1Chr.1.48
+Rezeph | settlement | 2회 | 2Kgs.19.12, Isa.37.12
+Rimmon-perez | campsite | 2회 | Num.33.19, Num.33.20
+Rissah | campsite | 2회 | Num.33.21, Num.33.22
+Rithmah | campsite | 2회 | Num.33.18, Num.33.19
+River 3 | river | 2회 | Gen.36.37, 1Chr.1.48
+Rogelim | settlement | 2회 | 2Sam.17.27, 2Sam.19.31
+Sarid | settlement | 2회 | Josh.19.10, Josh.19.12
+Seirah | natural area | 2회 | Judg.3.26, Judg.3.27
+Sela 1 | settlement | 2회 | Judg.1.36, 2Chr.25.12
+Sela 2 | settlement | 2회 | 2Kgs.14.7, Isa.42.11
+Shaalbon | settlement | 2회 | 2Sam.23.32, 1Chr.11.33
+Shaaraim 1 | settlement | 2회 | Josh.15.36, 1Sam.17.52
+Shamir 2 | settlement | 2회 | Judg.10.1, Judg.10.2
+Sheshach | settlement | 2회 | Jer.25.26, Jer.51.41
+Shihor 1 | river | 2회 | Josh.13.3, 1Chr.13.5
+Shimron | settlement | 2회 | Josh.11.1, Josh.19.15
+Smyrna | settlement | 2회 | Rev.1.11, Rev.2.8
+South 2 | region | 2회 | Matt.12.42, Luke.11.31
+Spain | region | 2회 | Rom.15.24, Rom.15.28
+Taberah | campsite | 2회 | Num.11.3, Deut.9.22
+Tahath | campsite | 2회 | Num.33.26, Num.33.27
+Telassar | settlement | 2회 | 2Kgs.19.12, Isa.37.12
+Telem | settlement | 2회 | Josh.15.24, 1Sam.15.4
+Tel-harsha | settlement | 2회 | Ezra.2.59, Neh.7.61
+Tel-melah | settlement | 2회 | Ezra.2.59, Neh.7.61
+Terah | campsite | 2회 | Num.33.27, Num.33.28
+Thebez | settlement | 2회 | Judg.9.50, 2Sam.11.21
+Tibhath | settlement | 2회 | 2Sam.8.8, 1Chr.18.8
+Tigris | river | 2회 | Gen.2.14, Dan.10.4
+Tower of the Hundred | structure | 2회 | Neh.3.1, Neh.12.39
+Tower of the Ovens | structure | 2회 | Neh.3.11, Neh.12.38
+Ulai | river | 2회 | Dan.8.2, Dan.8.16
+Uphaz | island | 2회 | Jer.10.9, Dan.10.5
+Upper Gulloth | spring | 2회 | Josh.15.19, Judg.1.15
+Uzza | garden | 2회 | 2Kgs.21.18, 2Kgs.21.26
+Valley of Gerar | valley | 2회 | Gen.26.17, Gen.26.19
+Valley of Hamon-gog | special | 2회 | Ezek.39.11, Ezek.39.15
+Valley of Iphtahel | valley | 2회 | Josh.19.14, Josh.19.27
+Valley of Jehoshaphat | valley | 2회 | Joel.3.2, Joel.3.12
+Valley of Lebanon | valley | 2회 | Josh.11.17, Josh.12.7
+Valley of Succoth | valley | 2회 | Ps.60.6, Ps.108.7
+Waters of Merom | body of water | 2회 | Josh.11.5, Josh.11.7
+Wilderness of Maon | region | 2회 | 1Sam.23.24, 1Sam.23.25
+Zaanannim | settlement | 2회 | Josh.19.33, Judg.4.11
+Zalmonah | campsite | 2회 | Num.33.41, Num.33.42
+Zaphon 1 | settlement | 2회 | Josh.13.27, Judg.12.1
+Zedad | settlement | 2회 | Num.34.8, Ezek.47.15
+Zela | settlement | 2회 | Josh.18.28, 2Sam.21.14
+Zered | river | 2회 | Deut.2.13, Deut.2.14
+Zin 2 | region | 2회 | Num.34.4, Josh.15.3
+Abana | river | 1회 | 2Kgs.5.12
+Abel-keramim | settlement | 1회 | Judg.11.33
+Abel-mizraim | settlement | 1회 | Gen.50.11
+Abel-shittim | campsite | 1회 | Num.33.49
+Abiezer | people group | 1회 | Judg.8.2
+Abilene | region | 1회 | Luke.3.1
+Accad | settlement | 1회 | Gen.10.10
+Acco | settlement | 1회 | Judg.1.31
+Adadah | settlement | 1회 | Josh.15.22
+Adam | settlement | 1회 | Josh.3.16
+Adamah | settlement | 1회 | Josh.19.36
+Adami-nekeb | settlement | 1회 | Josh.19.33
+Addar | settlement | 1회 | Josh.15.3
+Adithaim | settlement | 1회 | Josh.15.36
+Adoraim | settlement | 1회 | 2Chr.11.9
+Adramyttium | settlement | 1회 | Acts.27.2
+Adriatic Sea | body of water | 1회 | Acts.27.27
+Aenon | settlement | 1회 | John.3.23
+Ahlab | settlement | 1회 | Judg.1.31
+Ai 2 | settlement | 1회 | Jer.49.3
+Aiath | settlement | 1회 | Isa.10.28
+Aija | settlement | 1회 | Neh.11.31
+Aijalon 2 | settlement | 1회 | Judg.12.12
+Ain 1 | settlement | 1회 | Num.34.11
+Ain 3 | settlement | 1회 | Josh.21.16
+Alemeth | settlement | 1회 | 1Chr.6.60
+Allammelech | settlement | 1회 | Josh.19.26
+Allon | tree | 1회 | Josh.19.33
+Allon-bacuth | tree | 1회 | Gen.35.8
+Almon | settlement | 1회 | Josh.21.18
+Amad | settlement | 1회 | Josh.19.26
+Amam | settlement | 1회 | Josh.15.26
+Amana | mountain | 1회 | Song.4.8
+Amaw | region | 1회 | Num.22.5
+Ammah | hill | 1회 | 2Sam.2.24
+Amphipolis | settlement | 1회 | Acts.17.1
+Anaharath | settlement | 1회 | Josh.19.19
+Ananiah | settlement | 1회 | Neh.11.32
+Anem | settlement | 1회 | 1Chr.6.73
+Aner | settlement | 1회 | 1Chr.6.70
+Anim | settlement | 1회 | Josh.15.50
+Aphek 1 | settlement | 1회 | Josh.19.30
+Aphek 4 | settlement | 1회 | Josh.13.4
+Aphekah | settlement | 1회 | Josh.15.53
+Aphik | settlement | 1회 | Judg.1.31
+Apollonia | settlement | 1회 | Acts.17.1
+Arab | settlement | 1회 | Josh.15.52
+Arad 2 | settlement | 1회 | Judg.1.16
+Aram-naharaim | region | 1회 | Ps.60.1
+Armageddon | mountain | 1회 | Rev.16.16
+Aroer 3 | settlement | 1회 | 1Sam.30.28
+Aroer 4 | settlement | 1회 | 1Chr.11.44
+Arubboth | settlement | 1회 | 1Kgs.4.10
+Ashkenaz | region | 1회 | Jer.51.27
+Ashnah 1 | settlement | 1회 | Josh.15.33
+Ashnah 2 | settlement | 1회 | Josh.15.43
+Ashteroth-karnaim | settlement | 1회 | Gen.14.5
+Ataroth 2 | settlement | 1회 | Josh.16.2
+Ataroth 3 | settlement | 1회 | Josh.16.7
+Athach | settlement | 1회 | 1Sam.30.30
+Atharim | road | 1회 | Num.21.1
+Atroth-beth-joab | settlement | 1회 | 1Chr.2.54
+Atroth-shophan | settlement | 1회 | Num.32.35
+Aven | settlement | 1회 | Hos.10.8
+Avva | settlement | 1회 | 2Kgs.17.24
+Avvim | settlement | 1회 | Josh.18.23
+Ayyah | settlement | 1회 | 1Chr.7.28
+Azal | river | 1회 | Zech.14.5
+Aznoth-tabor | settlement | 1회 | Josh.19.34
+Baalah 1 | settlement | 1회 | Josh.15.29
+Baalath 1 | hill | 1회 | Josh.19.44
+Baale-judah | settlement | 1회 | 2Sam.6.2
+Baal-hamon | settlement | 1회 | Song.8.11
+Baal-hazor | mountain | 1회 | 2Sam.13.23
+Baal-hermon | mountain | 1회 | 1Chr.5.23
+Baal-shalishah | settlement | 1회 | 2Kgs.4.42
+Baal-tamar | settlement | 1회 | Judg.20.33
+Babylon 2 | settlement | 1회 | 1Pet.5.13
+Balah | settlement | 1회 | Josh.19.3
+Bath-rabbim | gate | 1회 | Song.7.4
+Bealoth 1 | settlement | 1회 | Josh.15.24
+Bealoth 2 | settlement | 1회 | 1Kgs.4.16
+Beer 1 | campsite | 1회 | Num.21.16
+Beer 2 | settlement | 1회 | Judg.9.21
+Beer-elim | campsite | 1회 | Isa.15.8
+Beeroth Bene-jaakan | settlement | 1회 | Deut.10.6
+Beeshterah | settlement | 1회 | Josh.21.27
+Bene-berak | settlement | 1회 | Josh.19.45
+Beon | settlement | 1회 | Num.32.3
+Bered | mountain | 1회 | Gen.16.14
+Berothah | settlement | 1회 | Ezek.47.16
+Berothai | settlement | 1회 | 2Sam.8.8
+Beten | settlement | 1회 | Josh.19.25
+Beth-anoth | settlement | 1회 | Josh.15.59
+Bethany 2 | ford | 1회 | John.1.28
+Beth-arbel | settlement | 1회 | Hos.10.14
+Beth-ashbea | settlement | 1회 | 1Chr.4.21
+Beth-barah | ford | 1회 | Judg.7.24
+Beth-biri | settlement | 1회 | 1Chr.4.31
+Beth-car | settlement | 1회 | 1Sam.7.11
+Beth-dagon 1 | settlement | 1회 | Josh.15.41
+Beth-dagon 2 | settlement | 1회 | Josh.19.27
+Beth-diblathaim | settlement | 1회 | Jer.48.22
+Beth-eden | region | 1회 | Amos.1.5
+Bethel 2 | settlement | 1회 | 1Sam.30.27
+Beth-emek | settlement | 1회 | Josh.19.27
+Bether 1 | settlement | 1회 | Song.2.17
+Bethesda | pool | 1회 | John.5.2
+Beth-ezel | settlement | 1회 | Mic.1.11
+Beth-gader | settlement | 1회 | 1Chr.2.51
+Beth-gamul | settlement | 1회 | Jer.48.23
+Beth-gilgal | settlement | 1회 | Neh.12.29
+Beth-haggan | settlement | 1회 | 2Kgs.9.27
+Beth-le-aphrah | settlement | 1회 | Mic.1.10
+Beth-lebaoth | settlement | 1회 | Josh.19.6
+Bethlehem 2 | settlement | 1회 | Josh.19.15
+Beth-meon | settlement | 1회 | Jer.48.23
+Beth-pazzez | settlement | 1회 | Josh.19.21
+Beth-shemesh 2 | settlement | 1회 | Josh.19.22
+Beth-shittah | settlement | 1회 | Judg.7.22
+Beth-tappuah | settlement | 1회 | Josh.15.53
+Bethuel | settlement | 1회 | 1Chr.4.30
+Bethul | settlement | 1회 | Josh.19.4
+Betonim | settlement | 1회 | Josh.13.26
+Bezek 2 | settlement | 1회 | 1Sam.11.8
+Bileam | settlement | 1회 | 1Chr.6.70
+Bilhah | settlement | 1회 | 1Chr.4.29
+Bor-ashan | settlement | 1회 | 1Sam.30.30
+Bozez | cliff | 1회 | 1Sam.14.4
+Bozrah 2 | settlement | 1회 | Jer.48.24
+Brook of the Arabah | body of water | 1회 | Amos.6.14
+Brook of the Willows | body of water | 1회 | Isa.15.7
+Buz | region | 1회 | Jer.25.23
+Cabbon | settlement | 1회 | Josh.15.40
+Cabul 1 | settlement | 1회 | Josh.19.27
+Cabul 2 | region | 1회 | 1Kgs.9.13
+Caleb Ephrathah | settlement | 1회 | 1Chr.2.24
+Calneh 1 | settlement | 1회 | Gen.10.10
+Canneh | settlement | 1회 | Ezek.27.23
+Casiphia | settlement | 1회 | Ezra.8.17
+Cauda | island | 1회 | Acts.27.16
+Chephar-ammoni | settlement | 1회 | Josh.18.24
+Chesalon | settlement | 1회 | Josh.15.10
+Chesil | settlement | 1회 | Josh.15.30
+Chesulloth | settlement | 1회 | Josh.19.18
+Chezib | settlement | 1회 | Gen.38.5
+Chilmad | region | 1회 | Ezek.27.23
+Chios | island | 1회 | Acts.20.15
+Chisloth-tabor | settlement | 1회 | Josh.19.12
+Chitlish | settlement | 1회 | Josh.15.40
+City of Destruction | settlement | 1회 | Isa.19.18
+City of Palms 2 | settlement | 1회 | Judg.1.16
+City of Salt | settlement | 1회 | Josh.15.62
+Cnidus | settlement | 1회 | Acts.27.7
+Colossae | settlement | 1회 | Col.1.2
+Cos | island | 1회 | Acts.21.1
+Cozeba | settlement | 1회 | 1Chr.4.22
+Cun | settlement | 1회 | 1Chr.18.8
+Cush 2 | region | 1회 | Gen.2.13
+Cushan | region | 1회 | Hab.3.7
+Dabbesheth | settlement | 1회 | Josh.19.11
+Dalmanutha | settlement | 1회 | Mark.8.10
+Dalmatia | region | 1회 | 2Tim.4.10
+Dannah | settlement | 1회 | Josh.15.49
+Debir 2 | settlement | 1회 | Josh.15.7
+Debir 3 | settlement | 1회 | Josh.13.26
+Dibon 2 | settlement | 1회 | Neh.11.25
+Dibon 3 | settlement | 1회 | Isa.15.9
+Dilean | settlement | 1회 | Josh.15.38
+Dimnah | settlement | 1회 | Josh.21.35
+Dimonah | settlement | 1회 | Josh.15.22
+Diviners’ Oak | tree | 1회 | Judg.9.37
+Dizahab | settlement | 1회 | Deut.1.1
+Dragon Spring | spring | 1회 | Neh.2.13
+Dumah 1 | settlement | 1회 | Josh.15.52
+Dumah 2 | region | 1회 | Isa.21.11
+Dura | district in settlement | 1회 | Dan.3.1
+East Square | district in settlement | 1회 | 2Chr.29.4
+Ebenezer 2 | rock | 1회 | 1Sam.7.12
+Ebez | settlement | 1회 | Josh.19.20
+Ebron | settlement | 1회 | Josh.19.28
+Ecbatana | settlement | 1회 | Ezra.6.2
+Eder 1 | settlement | 1회 | Gen.35.21
+Eder 2 | settlement | 1회 | Josh.15.21
+Edrei 2 | settlement | 1회 | Josh.19.37
+Eglaim | settlement | 1회 | Isa.15.8
+El-bethel | altar | 1회 | Gen.35.7
+Elishah | island | 1회 | Ezek.27.7
+Elkosh | settlement | 1회 | Nah.1.1
+Elon | settlement | 1회 | Josh.19.43
+Elonbeth-hanan | settlement | 1회 | 1Kgs.4.9
+El-paran | island | 1회 | Gen.14.6
+Eltekon | settlement | 1회 | Josh.15.59
+Emek-keziz | settlement | 1회 | Josh.18.21
+Enam | settlement | 1회 | Josh.15.34
+Eneglaim | settlement | 1회 | Ezek.47.10
+En-gannim 1 | settlement | 1회 | Josh.15.34
+En-haddah | settlement | 1회 | Josh.19.21
+En-hakkore | special | 1회 | Judg.15.19
+En-hazor | settlement | 1회 | Josh.19.37
+En-rimmon | settlement | 1회 | Neh.11.29
+Ephah | people group | 1회 | Isa.60.6
+Ephraim 1 | mountain | 1회 | 2Sam.13.23
+Ephraim 2 | settlement | 1회 | John.11.54
+Ephraim 3 | region | 1회 | 2Sam.18.6
+Ephron 1 | settlement | 1회 | Josh.18.15
+Ephron 2 | settlement | 1회 | 2Chr.13.19
+Esek | well | 1회 | Gen.26.20
+Eshan | settlement | 1회 | Josh.15.52
+Etam 2 | settlement | 1회 | 1Chr.4.32
+Etam 3 | settlement | 1회 | 2Chr.11.6
+Ether 1 | settlement | 1회 | Josh.15.42
+Ether 2 | settlement | 1회 | Josh.19.7
+Eth-kazin | settlement | 1회 | Josh.19.13
+Forum of Appius | settlement | 1회 | Acts.28.15
+Gabbatha | structure | 1회 | John.19.13
+Gadara | settlement | 1회 | Matt.8.28
+Galilee 2 | region | 1회 | Josh.12.23
+Gamad | settlement | 1회 | Ezek.27.11
+Gareb | hill | 1회 | Jer.31.39
+Gate of the Foundation | gate | 1회 | 2Chr.23.5
+Gate of the Guard | gate | 1회 | Neh.12.39
+Gath-rimmon 2 | settlement | 1회 | Josh.21.25
+Geba 2 | settlement | 1회 | 2Sam.5.25
+Geba 4 | settlement | 1회 | Josh.18.24
+Gebal 2 | region | 1회 | Ps.83.7
+Gebim | settlement | 1회 | Isa.10.31
+Gederah 1 | settlement | 1회 | Josh.15.36
+Gederah 2 | settlement | 1회 | 1Chr.12.4
+Gederah 3 | settlement | 1회 | 1Chr.4.23
+Gederothaim | settlement | 1회 | Josh.15.36
+Gedor 2 | settlement | 1회 | 1Chr.4.39
+Gedor 3 | settlement | 1회 | 1Chr.4.18
+Gedor 4 | settlement | 1회 | 1Chr.12.7
+Geruth Chimham | natural area | 1회 | Jer.41.17
+Giah | natural area | 1회 | 2Sam.2.24
+Gibbar | settlement | 1회 | Ezra.2.20
+Gibea | settlement | 1회 | 1Chr.2.49
+Gibeah 3 | settlement | 1회 | Josh.24.33
+Gibeah 4 | hill | 1회 | Josh.18.28
+Gibeath-elohim | settlement | 1회 | 1Sam.10.5
+Gibeath-haaraloth | hill | 1회 | Josh.5.3
+Gidom | natural area | 1회 | Judg.20.45
+Gihon 1 | river | 1회 | Gen.2.13
+Gilead 2 | region | 1회 | Hos.6.8
+Gilgal 3 | settlement | 1회 | Josh.15.7
+Gilgal 4 | settlement | 1회 | Deut.11.30
+Gimzo | settlement | 1회 | 2Chr.28.18
+Goah | hill | 1회 | Jer.31.39
+Gog | region | 1회 | Rev.20.8
+Goiim 2 | region | 1회 | Josh.12.23
+Gomer | region | 1회 | Ezek.38.6
+Goshen 3 | settlement | 1회 | Josh.15.51
+Gur | hill | 1회 | 2Kgs.9.27
+Gurbaal | settlement | 1회 | 2Chr.26.7
+Hadad-rimmon | settlement | 1회 | Zech.12.11
+Hadashah | settlement | 1회 | Josh.15.37
+Hadrach | settlement | 1회 | Zech.9.1
+Haeleph | settlement | 1회 | Josh.18.28
+Hakkephirim | settlement | 1회 | Neh.6.2
+Halhul | settlement | 1회 | Josh.15.58
+Hali | settlement | 1회 | Josh.19.25
+Hall of Judgment | hall | 1회 | 1Kgs.7.7
+Hall of Pillars | hall | 1회 | 1Kgs.7.6
+Hall of the Throne | hall | 1회 | 1Kgs.7.7
+Ham 1 | settlement | 1회 | Gen.14.5
+Hammath 1 | settlement | 1회 | Josh.19.35
+Hammath 2 | settlement | 1회 | 1Chr.2.55
+Hammon 1 | settlement | 1회 | Josh.19.28
+Hammon 2 | settlement | 1회 | 1Chr.6.76
+Hammoth-dor | settlement | 1회 | Josh.21.32
+Hamonah | settlement | 1회 | Ezek.39.16
+Hanes | settlement | 1회 | Isa.30.4
+Hannathon | settlement | 1회 | Josh.19.14
+Hapharaim | settlement | 1회 | Josh.19.19
+Hara | mountain range | 1회 | 1Chr.5.26
+Harmon | mountain | 1회 | Amos.4.3
+Harod 1 | spring | 1회 | Judg.7.1
+Havilah 1 | region | 1회 | Gen.2.11
+Havilah 2 | region | 1회 | Gen.25.18
+Havilah 3 | region | 1회 | 1Sam.15.7
+Hazar-addar | settlement | 1회 | Num.34.4
+Hazar-gaddah | settlement | 1회 | Josh.15.27
+Hazazon-tamar 1 | region | 1회 | Gen.14.7
+Hazazon-tamar 2 | region | 1회 | 2Chr.20.2
+Hazer-hatticon | settlement | 1회 | Ezek.47.16
+Hazor 2 | settlement | 1회 | Josh.15.23
+Hazor 3 | settlement | 1회 | Josh.15.25
+Hazor 4 | mountain | 1회 | Neh.11.33
+Hazor-hadattah | settlement | 1회 | Josh.15.25
+Helbah | settlement | 1회 | Judg.1.31
+Helbon | settlement | 1회 | Ezek.27.18
+Helech | region | 1회 | Ezek.27.11
+Helkath-hazzurim | field | 1회 | 2Sam.2.16
+Heres | hill | 1회 | Judg.8.13
+Hereth | forest | 1회 | 1Sam.22.5
+Heshmon | settlement | 1회 | Josh.15.27
+Hezron | settlement | 1회 | Josh.15.3
+Hierapolis | settlement | 1회 | Col.4.13
+Hobah | region | 1회 | Gen.14.15
+Holon 2 | settlement | 1회 | Jer.48.21
+Horem | settlement | 1회 | Josh.19.38
+Horonaim 2 | settlement | 1회 | 2Sam.13.34
+Hosah | settlement | 1회 | Josh.19.29
+Hukkok | settlement | 1회 | Josh.19.34
+Hukok | settlement | 1회 | 1Chr.6.75
+Humtah | settlement | 1회 | Josh.15.54
+Idalah | settlement | 1회 | Josh.19.15
+Idumea | region | 1회 | Mark.3.8
+Iim | settlement | 1회 | Josh.15.29
+Illyricum | region | 1회 | Rom.15.19
+Iphtah | settlement | 1회 | Josh.15.43
+Ir-moab | settlement | 1회 | Num.22.36
+Ir-nahash | settlement | 1회 | 1Chr.4.12
+Irpeel | settlement | 1회 | Josh.18.27
+Ir-shemesh | settlement | 1회 | Josh.19.41
+Ithlah | settlement | 1회 | Josh.19.42
+Ithnan | settlement | 1회 | Josh.15.23
+Ituraea | region | 1회 | Luke.3.1
+Jaar | settlement | 1회 | Ps.132.6
+Jabez | settlement | 1회 | 1Chr.2.55
+Jabneel 2 | settlement | 1회 | Josh.19.33
+Jagur | settlement | 1회 | Josh.15.21
+Janim | settlement | 1회 | Josh.15.53
+Janoah 2 | settlement | 1회 | 2Kgs.15.29
+Japhia | settlement | 1회 | Josh.19.12
+Jarmuth 2 | settlement | 1회 | Josh.21.29
+Jehud | settlement | 1회 | Josh.19.45
+Jeruel | region | 1회 | 2Chr.20.16
+Jeshanah | settlement | 1회 | 2Chr.13.19
+Jeshua | settlement | 1회 | Neh.11.26
+Jezreel 1 | settlement | 1회 | Josh.15.56
+Jokdeam | settlement | 1회 | Josh.15.56
+Jokmeam 1 | settlement | 1회 | 1Kgs.4.12
+Jokmeam 2 | settlement | 1회 | 1Chr.6.68
+Joktheel 1 | settlement | 1회 | Josh.15.38
+Jorkeam | settlement | 1회 | 1Chr.2.44
+Jotbah | settlement | 1회 | 2Kgs.21.19
+Kadesh 2 | settlement | 1회 | 2Sam.24.6
+Kamon | settlement | 1회 | Judg.10.5
+Kanah 2 | settlement | 1회 | Josh.19.28
+Karka | settlement | 1회 | Josh.15.3
+Karkor | settlement | 1회 | Judg.8.10
+Karnaim | settlement | 1회 | Amos.6.13
+Kartan | settlement | 1회 | Josh.21.32
+Kattath | settlement | 1회 | Josh.19.15
+Kedesh 2 | settlement | 1회 | Josh.15.23
+Kedesh 3 | settlement | 1회 | 1Chr.6.72
+Kedesh-naphtali | settlement | 1회 | Judg.4.6
+Kerioth-hezron | settlement | 1회 | Josh.15.25
+Kibzaim | settlement | 1회 | Josh.21.22
+Kinah | settlement | 1회 | Josh.15.22
+Kir 2 | settlement | 1회 | Isa.15.1
+Kiriathaim 2 | settlement | 1회 | 1Chr.6.76
+Kiriath-huzoth | settlement | 1회 | Num.22.39
+Kitron | settlement | 1회 | Judg.1.30
+Koa | region | 1회 | Ezek.23.23
+Laban | campsite | 1회 | Deut.1.1
+Lahmam | settlement | 1회 | Josh.15.40
+Laishah | settlement | 1회 | Isa.10.30
+Lakkum | settlement | 1회 | Josh.19.33
+Lasea | settlement | 1회 | Acts.27.8
+Lasha | region | 1회 | Gen.10.19
+Lasharon | region | 1회 | Josh.12.18
+Lebaoth | settlement | 1회 | Josh.15.32
+Leb-kamai | region | 1회 | Jer.51.1
+Lebonah | settlement | 1회 | Judg.21.19
+Lehem | settlement | 1회 | 1Chr.4.22
+Lower Pool | pool | 1회 | Isa.22.9
+Luz 2 | settlement | 1회 | Judg.1.26
+Lycia | region | 1회 | Acts.27.5
+Maarath | settlement | 1회 | Josh.15.59
+Maareh-geba | natural area | 1회 | Judg.20.33
+Machbenah | settlement | 1회 | 1Chr.2.49
+Madmen | settlement | 1회 | Jer.48.2
+Madmenah | settlement | 1회 | Isa.10.31
+Magadan | settlement | 1회 | Matt.15.39
+Magbish | settlement | 1회 | Ezra.2.30
+Mahalab | settlement | 1회 | Josh.19.29
+Mahaneh-dan 1 | campsite | 1회 | Judg.13.25
+Mahaneh-dan 2 | campsite | 1회 | Judg.18.12
+Makaz | settlement | 1회 | 1Kgs.4.9
+Malta | island | 1회 | Acts.28.1
+Manahath | settlement | 1회 | 1Chr.8.6
+Mareal | settlement | 1회 | Josh.19.11
+Maroth | settlement | 1회 | Mic.1.12
+Mearah | settlement | 1회 | Josh.13.4
+Meconah | settlement | 1회 | Neh.11.28
+Me-jarkon | river | 1회 | Josh.19.46
+Merathaim | settlement | 1회 | Jer.50.21
+Meroz | settlement | 1회 | Judg.5.23
+Mesha | region | 1회 | Gen.10.30
+Metheg-ammah | settlement | 1회 | 2Sam.8.1
+Middin | settlement | 1회 | Josh.15.61
+Middle Gate | gate | 1회 | Jer.39.3
+Migdal-el | settlement | 1회 | Josh.19.38
+Migdal-gad | settlement | 1회 | Josh.15.37
+Migron 1 | region | 1회 | 1Sam.14.2
+Migron 2 | river | 1회 | Isa.10.28
+Minni | region | 1회 | Jer.51.27
+Misgab | settlement | 1회 | Jer.48.1
+Mitylene | settlement | 1회 | Acts.20.14
+Mizpah 2 | region | 1회 | Josh.11.3
+Mizpeh 1 | settlement | 1회 | Josh.18.26
+Mizpeh 2 | settlement | 1회 | Josh.15.38
+Mizpeh 3 | settlement | 1회 | 1Sam.22.3
+Moreh 2 | hill | 1회 | Judg.7.1
+Moriah | region | 1회 | Gen.22.2
+Mortar | district in settlement | 1회 | Zeph.1.11
+Mount Baalah | hill | 1회 | Josh.15.11
+Mount Baal-hermon | mountain | 1회 | Judg.3.3
+Mount Bashan | mountain | 1회 | Ps.68.15
+Mount Ephron | mountain | 1회 | Josh.15.9
+Mount Gilead | mountain | 1회 | Judg.7.3
+Mount Heres | settlement | 1회 | Judg.1.35
+Mount Jearim | mountain | 1회 | Josh.15.10
+Mount Lebanon | mountain range | 1회 | Judg.3.3
+Mount Mizar | hill | 1회 | Ps.42.6
+Mount Moriah | hill | 1회 | 2Chr.3.1
+Mount Perazim | mountain | 1회 | Isa.28.21
+Mount Seir 2 | mountain | 1회 | Josh.15.10
+Mount Zalmon | mountain | 1회 | Judg.9.48
+Mount Zemaraim | mountain | 1회 | 2Chr.13.4
+Mozah | settlement | 1회 | Josh.18.26
+Muster Gate | gate | 1회 | Neh.3.31
+Myra | settlement | 1회 | Acts.27.5
+Naamah 1 | settlement | 1회 | Josh.15.41
+Naarah | settlement | 1회 | Josh.16.7
+Naaran | settlement | 1회 | 1Chr.7.28
+Nahaliel | campsite | 1회 | Num.21.19
+Nahor | settlement | 1회 | Gen.24.10
+Nain | settlement | 1회 | Luke.7.11
+Neapolis | settlement | 1회 | Acts.16.11
+Neballat | settlement | 1회 | Neh.11.34
+Nebo 3 | settlement | 1회 | Ezra.10.43
+Neiel | settlement | 1회 | Josh.19.27
+Netaim | settlement | 1회 | 1Chr.4.23
+Nezib | settlement | 1회 | Josh.15.43
+Nibshan | settlement | 1회 | Josh.15.62
+Nicopolis | settlement | 1회 | Titus.3.12
+Nimrah | settlement | 1회 | Num.32.3
+Nimrod | region | 1회 | Mic.5.6
+Nobah 1 | settlement | 1회 | Num.32.42
+Nobah 2 | settlement | 1회 | Judg.8.11
+Nophah | settlement | 1회 | Num.21.30
+North Gate | gate | 1회 | 1Chr.26.14
+Old Pool | pool | 1회 | Isa.22.11
+Ophni | settlement | 1회 | Josh.18.24
+Parah | settlement | 1회 | Josh.18.23
+Parbar | structure | 1회 | 1Chr.26.18
+Parvaim | settlement | 1회 | 2Chr.3.6
+Patara | settlement | 1회 | Acts.21.1
+Patmos | island | 1회 | Rev.1.9
+People’s Gate | gate | 1회 | Jer.17.19
+Pharpar | river | 1회 | 2Kgs.5.12
+Phoenix | settlement | 1회 | Acts.27.12
+Pi-beseth | settlement | 1회 | Ezek.30.17
+Pishon | body of water | 1회 | Gen.2.11
+Pithom | settlement | 1회 | Exod.1.11
+Potsherd Gate | gate | 1회 | Jer.19.2
+Ptolemais | settlement | 1회 | Acts.21.7
+Puteoli | settlement | 1회 | Acts.28.13
+Raamah | settlement | 1회 | Ezek.27.22
+Rabbah 2 | settlement | 1회 | Josh.15.60
+Rabbith | settlement | 1회 | Josh.19.20
+Racal | settlement | 1회 | 1Sam.30.29
+Rakkath | settlement | 1회 | Josh.19.35
+Rakkon | river | 1회 | Josh.19.46
+Ramah 2 | settlement | 1회 | Josh.19.29
+Ramah 3 | settlement | 1회 | Josh.19.36
+Ramah 6 | settlement | 1회 | Josh.19.8
+Ramah 7 | settlement | 1회 | Neh.11.33
+Ramah 8 | hill | 1회 | 1Sam.22.6
+Ramah 9 | settlement | 1회 | 1Chr.27.27
+Ramathaim-zophim | settlement | 1회 | 1Sam.1.1
+Ramath-lehi | settlement | 1회 | Judg.15.17
+Ramath-mizpeh | settlement | 1회 | Josh.13.26
+Ramoth 1 | settlement | 1회 | 1Chr.6.73
+Ramoth 2 | settlement | 1회 | 1Sam.30.27
+Recah | settlement | 1회 | 1Chr.4.12
+Rehob 2 | settlement | 1회 | Josh.19.28
+Rehoboth 1 | well | 1회 | Gen.26.22
+Rehoboth-Ir | district in settlement | 1회 | Gen.10.11
+Rekem | settlement | 1회 | Josh.18.27
+Remeth | settlement | 1회 | Josh.19.21
+Resen | settlement | 1회 | Gen.10.12
+Rhegium | settlement | 1회 | Acts.28.13
+Rhodes 1 | island | 1회 | Acts.21.1
+Rhodes 2 | island | 1회 | Ezek.27.15
+Riblah 2 | settlement | 1회 | Num.34.11
+Rimmon 3 | settlement | 1회 | Josh.19.13
+Rimmono | settlement | 1회 | 1Chr.6.77
+River 2 | river | 1회 | Num.22.5
+Rock of Escape | natural area | 1회 | 1Sam.23.28
+Rumah | settlement | 1회 | 2Kgs.23.36
+Sahar | settlement | 1회 | Ezek.27.18
+Salamis | settlement | 1회 | Acts.13.5
+Salim | settlement | 1회 | John.3.23
+Salmone | promontory | 1회 | Acts.27.7
+Samos | island | 1회 | Acts.20.15
+Samothrace | island | 1회 | Acts.16.11
+Sansannah | settlement | 1회 | Josh.15.31
+Sea of Egypt | body of water | 1회 | Isa.11.15
+Sea of Jazer | body of water | 1회 | Jer.48.32
+Secacah | settlement | 1회 | Josh.15.61
+Secu | settlement | 1회 | 1Sam.19.22
+Sela 3 | settlement | 1회 | Isa.16.1
+Seleucia | settlement | 1회 | Acts.13.4
+Seneh | cliff | 1회 | 1Sam.14.4
+Sephar | settlement | 1회 | Gen.10.30
+Sepharad | settlement | 1회 | Obad.1.20
+Serpent’s Stone | rock | 1회 | 1Kgs.1.9
+Shaalim | region | 1회 | 1Sam.9.4
+Shaaraim 2 | settlement | 1회 | 1Chr.4.31
+Shahazumah | settlement | 1회 | Josh.19.22
+Shalishah | region | 1회 | 1Sam.9.4
+Shallecheth | gate | 1회 | 1Chr.26.16
+Shamir 1 | settlement | 1회 | Josh.15.48
+Shaphir | settlement | 1회 | Mic.1.11
+Sharon 2 | region | 1회 | 1Chr.5.16
+Sharuhen | settlement | 1회 | Josh.19.6
+Shaveh-kiriathaim | natural area | 1회 | Gen.14.5
+Sheba 2 | settlement | 1회 | Josh.19.2
+Shebarim | natural area | 1회 | Josh.7.5
+Shema | settlement | 1회 | Josh.15.26
+Shen | settlement | 1회 | 1Sam.7.12
+Shihor 2 | river | 1회 | Isa.23.3
+Shihor-libnath | natural area | 1회 | Josh.19.26
+Shikkeron | settlement | 1회 | Josh.15.11
+Shilhim | settlement | 1회 | Josh.15.32
+Shiloah | pool | 1회 | Isa.8.6
+Shimron-meron | settlement | 1회 | Josh.12.20
+Shion | settlement | 1회 | Josh.19.19
+Shoa | people group | 1회 | Ezek.23.23
+Shual | region | 1회 | 1Sam.13.17
+Sibraim | settlement | 1회 | Ezek.47.16
+Silla | fortification | 1회 | 2Kgs.12.20
+Siphmoth | settlement | 1회 | 1Sam.30.28
+Sirah | well | 1회 | 2Sam.3.26
+Sitnah | well | 1회 | Gen.26.21
+Socoh 2 | settlement | 1회 | Josh.15.48
+Socoh 3 | settlement | 1회 | 1Kgs.4.10
+South 1 | region | 1회 | Zech.7.7
+South Gate | gate | 1회 | 1Chr.26.15
+Straight Street | road | 1회 | Acts.9.11
+Suph | body of water | 1회 | Deut.1.1
+Suphah | body of water | 1회 | Num.21.14
+Sur | gate | 1회 | 2Kgs.11.6
+Sychar | settlement | 1회 | John.4.5
+Syracuse | settlement | 1회 | Acts.28.12
+Syrtis | body of water | 1회 | Acts.27.17
+Taanath-shiloh | settlement | 1회 | Josh.16.6
+Tabbath | settlement | 1회 | Judg.7.22
+Tabbur-erez | mountain | 1회 | Judg.9.37
+Tabor 2 | mountain | 1회 | 1Chr.6.77
+Tabor 3 | tree | 1회 | 1Sam.10.3
+Tadmor | settlement | 1회 | 2Chr.8.4
+Tamar 1 | settlement | 1회 | 1Kgs.9.18
+Tappuah 2 | settlement | 1회 | Josh.15.34
+Taralah | settlement | 1회 | Josh.18.27
+Tel-abib | settlement | 1회 | Ezek.3.15
+The Lord Is There | settlement | 1회 | Ezek.48.35
+The Lord Will Provide | hill | 1회 | Gen.22.14
+Three Taverns | settlement | 1회 | Acts.28.15
+Tiberias | settlement | 1회 | John.6.23
+Timnah 2 | settlement | 1회 | Josh.15.57
+Tiphsah 1 | settlement | 1회 | 1Kgs.4.24
+Tiphsah 2 | settlement | 1회 | 2Kgs.15.16
+Tochen | settlement | 1회 | 1Chr.4.32
+Tophel | settlement | 1회 | Deut.1.1
+Trachonitis | region | 1회 | Luke.3.1
+Trogyllium | promontory | 1회 | Acts.20.15
+Ummah | settlement | 1회 | Josh.19.30
+Uzal | mountain | 1회 | Ezek.27.19
+Uzzen-sheerah | settlement | 1회 | 1Chr.7.24
+Valley of Aijalon | valley | 1회 | Josh.10.12
+Valley of Aven | valley | 1회 | Amos.1.5
+Valley of Baca | special | 1회 | Ps.84.6
+Valley of Beracah | valley | 1회 | 2Chr.20.26
+Valley of Decision | valley | 1회 | Joel.3.14
+Valley of Gibeon | valley | 1회 | Isa.28.21
+Valley of Hebron | valley | 1회 | Gen.37.14
+Valley of Jericho | valley | 1회 | Deut.34.3
+Valley of Mizpeh | valley | 1회 | Josh.11.8
+Valley of Shaveh | valley | 1회 | Gen.14.17
+Valley of Shittim | river | 1회 | Joel.3.18
+Valley of Sorek | valley | 1회 | Judg.16.4
+Valley of Zeboim | valley | 1회 | 1Sam.13.18
+Valley of Zephathah | special | 1회 | 2Chr.14.10
+Valley of Zered | valley | 1회 | Num.21.12
+Waheb | campsite | 1회 | Num.21.14
+Waters of Jericho | river | 1회 | Josh.16.1
+Way of Holiness | road | 1회 | Isa.35.8
+West Gate | gate | 1회 | 1Chr.26.16
+Wildgoats’ Rocks | natural area | 1회 | 1Sam.24.2
+Yiron | settlement | 1회 | Josh.19.38
+Zaanan | settlement | 1회 | Mic.1.11
+Zair | settlement | 1회 | 2Kgs.8.21
+Zalmon | mountain | 1회 | Ps.68.14
+Zanoah 2 | settlement | 1회 | Josh.15.56
+Zeboim | settlement | 1회 | Neh.11.34
+Zelzah | settlement | 1회 | 1Sam.10.2
+Zemaraim | settlement | 1회 | Josh.18.22
+Zenan | settlement | 1회 | Josh.15.37
+Zephath | settlement | 1회 | Judg.1.17
+Zer | settlement | 1회 | Josh.19.35
+Zeredah 1 | settlement | 1회 | 1Kgs.11.26
+Zeredah 2 | settlement | 1회 | 2Chr.4.17
+Zererah | settlement | 1회 | Judg.7.22
+Zereth-shahar | settlement | 1회 | Josh.13.19
+Ziddim | settlement | 1회 | Josh.19.35
+Zimri | region | 1회 | Jer.25.25
+Zior | settlement | 1회 | Josh.15.54
+Ziph 2 | settlement | 1회 | Josh.15.24
+Ziphron | settlement | 1회 | Num.34.9
+Ziz | region | 1회 | 2Chr.20.16
+Zophim | natural area | 1회 | Num.23.14
+Zuph | region | 1회 | 1Sam.9.5

@@ -1,0 +1,10 @@
+{
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "rm -rf public && cp -r \"개역개정 스터디성경/app\" public",
+  "outputDirectory": "public",
+  "headers": [
+    { "source": "/data/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }] },
+    { "source": "/images/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }] }
+  ]
+}

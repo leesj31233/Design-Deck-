@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>개역한글 스터디 성경</title>
+<meta name="description" content="개역한글 전자책 스터디 성경 · 원어 해설 · 지도 · 인물 카드 · 형광펜 · 필기 · PDF">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#e4ded2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400&family=Noto+Serif+Hebrew:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="book.css">
+<link rel="stylesheet" href="book2.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="b-ko">성경전서</span><span class="b-sub">개역한글 스터디</span></div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+    <input id="q" type="search" placeholder="검색 · 마2:1 · 갈라디아서 · 헤롯" autocomplete="off" aria-label="성경 검색">
+    <ul id="qList" class="q-list" hidden></ul>
+  </div>
+  <nav class="tools" aria-label="도구">
+    <button data-open="toc" title="목차"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>목차</span></button>
+    <button data-act="map" title="성경 지도"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>지도</span></button>
+    <button data-act="people" title="인물 카드"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M8 17c1-2 2.5-3 4-3s3 1 4 3"/></svg><span>인물</span></button>
+    <button data-open="notes" title="독서 노트"><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M9 10h6M9 14h6"/></svg><span>노트</span></button>
+    <button data-act="pen" id="penBtn" title="필기"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg><span>필기</span></button>
+    <button data-act="mark" id="markBtn" title="책갈피"><svg viewBox="0 0 24 24"><path d="M7 3h10v18l-5-4-5 4z"/></svg><span>책갈피</span></button>
+    <button data-open="settings" title="보기 설정"><svg viewBox="0 0 24 24"><path d="M5 19L10 5h1l5 14M7 14h7"/><path d="M17 19l2.5-7h.5l2 7"/></svg><span>보기</span></button>
+    <button data-open="import" title="NIV 본문 넣기"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>NIV</span></button>
+    <button data-act="pdf" title="지금 권을 PDF로"><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M9 13h6M12 10v6"/></svg><span>PDF</span></button>
+  </nav>
+</header>
+
+<main class="stage">
+  <button id="prevBtn" class="side prev" aria-label="이전 쪽 (길게 누르면 빠르게)">‹</button>
+  <div class="volume">
+    <div class="edge left" aria-hidden="true"></div>
+    <div id="book" class="book" aria-live="polite"></div>
+    <div class="edge right" aria-hidden="true"></div>
+    <nav id="tabs" class="tabs" aria-label="권 색인"></nav>
+  </div>
+  <button id="nextBtn" class="side next" aria-label="다음 쪽 (길게 누르면 빠르게)">›</button>
+</main>
+
+<footer class="bottombar">
+  <span id="placeLabel" class="place"></span>
+  <input id="slider" type="range" min="1" value="1" aria-label="쪽 이동">
+  <span id="pageLabel" class="pages"></span>
+</footer>
+
+<aside id="drawer" class="drawer" hidden>
+  <header><button id="drawerBack" class="icon" aria-label="뒤로" hidden>‹</button><h2 id="drawerTitle"></h2><button id="drawerClose" class="icon" aria-label="닫기">×</button></header>
+  <div id="drawerBody" class="dr-body"></div>
+</aside>
+
+<section id="mapDlg" class="overlay map-dlg" hidden>
+  <header><h2 id="mapTitle">성경 지도</h2><span class="muted">점을 누르면 그 장소가 나오는 구절</span><button id="mapClose" class="icon" aria-label="닫기">×</button></header>
+  <div id="mapCanvas" class="map-canvas"></div>
+  <nav id="mapEras" class="map-eras" aria-label="시대"></nav>
+</section>
+
+<section id="peopleDlg" class="overlay people-dlg" hidden>
+  <header><h2>성경 인물 카드</h2><select id="peopleBook" aria-label="권"></select><button id="peopleClose" class="icon" aria-label="닫기">×</button></header>
+  <nav id="peopleEras" class="people-eras" aria-label="시대"></nav>
+  <div id="peopleGrid" class="people-grid"></div>
+</section>
+
+<div id="tip" class="tip" hidden></div>
+<div id="toast" class="toast" hidden></div>
+<div id="selbar" class="floatbar" hidden>
+  <button data-act="hl" data-c="y" class="sw hl-y" aria-label="노랑 형광펜"></button>
+  <button data-act="hl" data-c="g" class="sw hl-g" aria-label="연두 형광펜"></button>
+  <button data-act="hl" data-c="b" class="sw hl-b" aria-label="하늘 형광펜"></button>
+  <button data-act="hl" data-c="p" class="sw hl-p" aria-label="분홍 형광펜"></button>
+  <button data-act="hl" data-c="u" class="sw ul" aria-label="밑줄">U</button>
+  <span class="sep"></span>
+  <button data-act="clear">지우기</button><button data-act="memo">메모</button><button data-act="copy">복사</button><button data-act="find">찾기</button>
+</div>
+<div id="penbar" class="floatbar penbar" hidden></div>
+<div id="measure" class="measure-host" aria-hidden="true"></div>
+<div id="print" class="print-root"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

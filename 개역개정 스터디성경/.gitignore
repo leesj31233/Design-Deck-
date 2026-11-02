@@ -1,0 +1,6 @@
+data/raw/
+app/data/user/
+work/text/
+work/places_ko_input.txt
+__pycache__/
+*.pyc

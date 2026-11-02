@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" role="img" aria-label="마태복음 2장의 여정 개략도">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--map-route, #8a3b12)"/>
+    </marker>
+  </defs>
+  <rect width="300" height="250" fill="var(--map-land, #efe6d2)"/>
+  <!-- Mediterranean -->
+  <path d="M0,0 H128 C122,40 118,70 112,100 C106,125 96,150 80,170 C60,190 30,196 0,198 Z" fill="var(--map-sea, #cfdde3)"/>
+  <text x="34" y="80" font-size="11" fill="var(--map-ink-soft, #5b6b73)" font-style="italic">지중해</text>
+  <!-- Nile delta -->
+  <path d="M8,250 C20,228 26,214 30,200 M30,200 C22,196 12,194 2,196 M30,200 C38,196 46,193 54,192" stroke="var(--map-sea-line, #8fb0bd)" stroke-width="2" fill="none"/>
+  <!-- Sea of Galilee, Jordan, Dead Sea -->
+  <ellipse cx="196" cy="46" rx="6" ry="9" fill="var(--map-sea, #cfdde3)" stroke="var(--map-sea-line, #8fb0bd)"/>
+  <path d="M196,55 C200,75 194,92 199,110" stroke="var(--map-sea-line, #8fb0bd)" stroke-width="1.6" fill="none"/>
+  <path d="M195,112 C190,118 190,140 196,150 C202,142 204,120 199,110 Z" fill="var(--map-sea, #cfdde3)" stroke="var(--map-sea-line, #8fb0bd)"/>
+  <!-- Routes -->
+  <path d="M176,128 C150,160 100,190 46,206" stroke="var(--map-route, #8a3b12)" stroke-width="1.8" stroke-dasharray="5 4" fill="none" marker-end="url(#arr)"/>
+  <path d="M52,198 C90,160 130,110 172,52" stroke="var(--map-route-2, #2f5d8a)" stroke-width="1.8" stroke-dasharray="5 4" fill="none" marker-end="url(#arr)"/>
+  <path d="M292,96 C260,104 222,112 186,118" stroke="var(--map-route-3, #7a6a2a)" stroke-width="1.6" fill="none" marker-end="url(#arr)"/>
+  <!-- Places -->
+  <g font-size="11" fill="var(--map-ink, #2b261d)">
+    <circle cx="176" cy="48" r="3.2" fill="var(--map-ink, #2b261d)"/><text x="138" y="44">나사렛</text>
+    <circle cx="180" cy="118" r="3.2" fill="var(--map-ink, #2b261d)"/><text x="136" y="114">예루살렘</text>
+    <circle cx="176" cy="130" r="3.2" fill="var(--map-route, #8a3b12)"/><text x="132" y="142" fill="var(--map-route, #8a3b12)" font-weight="600">베들레헴</text>
+    <text x="210" y="40">갈릴리</text>
+    <text x="206" y="138" font-size="9.5" fill="var(--map-ink-soft, #5b6b73)">사해</text>
+    <text x="22" y="226" font-weight="600">애굽</text>
+  </g>
+  <g font-size="9.5" fill="var(--map-ink-soft, #5b6b73)">
+    <text x="214" y="90">동방에서 온 박사들</text>
+    <text x="70" y="178" fill="var(--map-route, #8a3b12)">① 애굽으로 피하심 2:13–15</text>
+    <text x="96" y="86" fill="var(--map-route-2, #2f5d8a)">② 나사렛으로 2:19–23</text>
+  </g>
+</svg>
