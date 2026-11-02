@@ -57,7 +57,8 @@ export async function translationSummary(documentId: string): Promise<{ translat
 }
 export function cancelTranslationJob(documentId: string) { jobs.get(documentId)?.controller.abort(); }
 
-const roleOf = (unit: TranslationUnit): PassageRole => unit.role === "HEADING" ? "heading" : unit.role === "CAPTION" ? "caption" : unit.role === "TABLE" ? "cell" : "body";
+// A slide label or a figure's text is written like a table cell (a short noun phrase); a long one is prose.
+const roleOf = (unit: TranslationUnit): PassageRole => unit.role === "HEADING" ? "heading" : unit.role === "CAPTION" ? "caption" : unit.role === "TABLE" || unit.role === "FIGURE_TEXT" && unit.text.length <= 90 ? "cell" : "body";
 
 async function openManifest(documentId: string, signal: AbortSignal, onPage?: (page: number) => void): Promise<TranslationManifest> {
   const manifest = await ensureManifest(documentId, async buildSignal => {

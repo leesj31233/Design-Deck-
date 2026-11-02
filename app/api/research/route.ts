@@ -90,6 +90,11 @@ export async function POST(request: Request) {
       const detail = await upstream.clone().json().catch(() => null) as { error?: { type?: string; code?: string } } | null;
       if (detail?.error?.type === "insufficient_quota") return Response.json({ error: "번역 서비스의 사용 한도가 소진되어 잠시 번역할 수 없습니다. 관리자가 충전하면 이어서 번역할 수 있습니다.", kind: "configuration" }, { status: 503 });
     }
+    // A rejected key (expired, revoked, mistyped) stops every translation: say exactly that, once.
+    if (upstream.status === 401) {
+      const detail = await upstream.clone().json().catch(() => null) as { error?: { code?: string } } | null;
+      return Response.json({ error: detail?.error?.code === "expired_secret_key" ? "번역 서버의 OpenAI API 키가 만료되었습니다. 관리자가 새 키를 등록하면 이어서 번역할 수 있습니다." : "번역 서버의 OpenAI API 키가 유효하지 않습니다. 관리자가 키를 다시 등록해야 합니다.", kind: "configuration" }, { status: 503 });
+    }
     if (!upstream.ok) return Response.json({ error: upstream.status === 429 ? "OpenAI 사용량 또는 요청 한도에 도달했습니다. 잠시 후 자동으로 다시 시도합니다." : "OpenAI 요청을 완료하지 못했습니다.", kind: upstream.status === 429 ? "rate_limit" : upstream.status >= 500 ? "transient" : "configuration" }, { status: upstream.status === 429 ? 429 : upstream.status >= 500 ? 503 : 502, headers: { "Retry-After": upstream.headers.get("retry-after") || "20" } });
     const data = await upstream.json();
     const text = outputText(data);

@@ -36,6 +36,8 @@ export function BatchProgress({ bulk, onCancel, onResume }: { bulk: TranslationJ
       {bulk.failed > 0 && state !== "running" && <small className="pf-batch-failed">실패 {bulk.failed}</small>}
       {bulk.running && bulk.rateLimitHits > 0 && <small>한도 대기 {bulk.rateLimitHits}회</small>}
     </span>
+    {/* Why the run stopped (an expired key, the month's credits, a network failure): never a silent 0%. */}
+    {!bulk.running && bulk.error && !bulk.complete && <span className="pf-batch-error" role="alert" title={bulk.error}>{bulk.error}</span>}
     <span className="pf-batch-track" aria-hidden="true">
       {analysing ? <span className="pf-batch-indeterminate"/> : <motion.span className="pf-batch-fill" initial={false} animate={{ width: `${Math.max(state === "complete" ? 100 : 2, percent)}%` }} transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 120, damping: 22 }}/>}
     </span>

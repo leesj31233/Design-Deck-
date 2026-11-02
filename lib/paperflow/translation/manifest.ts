@@ -1,5 +1,5 @@
 import type { PdfDocumentHandle, PdfPageHandle, PdfTextItem } from "../pdf/pdf-adapter";
-import { letterCount, textHealth } from "../pdf/ocr";
+import { letterCount, ocrLanguages, textHealth } from "../pdf/ocr";
 import { openDatabase, requestResult, transactionDone } from "../persistence/indexeddb";
 import { analyzePage, proseScore } from "../layout/page-blocks";
 import { buildTextLines, type TextLine } from "../layout/text-lines";
@@ -10,7 +10,7 @@ import type { PageSize, PdfParagraph } from "../layout/types";
 import { buildScriptTable, type ScriptTable } from "../typeset/scripts";
 
 export type { BlockRole } from "../layout/classify";
-export const EXTRACTOR_VERSION = "layout-v3.40";
+export const EXTRACTOR_VERSION = "layout-v3.41";
 
 export interface ManifestBlock extends PdfParagraph { role: BlockRole; readingOrder: number; columnIndex: number; translatable: boolean; exclusionReason: string | null; unitId?: string }
 /** A logical paragraph. Column and page breaks split blocks, never the sentence sent to the translator. */
@@ -27,7 +27,7 @@ export interface TranslationManifest {
 }
 
 /** Reads a page from its pixels (scanned pages, unusable embedded fonts). */
-export type OcrProvider = (page: PdfPageHandle, signal?: AbortSignal) => Promise<PdfTextItem[]>;
+export type OcrProvider = (page: PdfPageHandle, signal?: AbortSignal, languages?: string) => Promise<PdfTextItem[]>;
 
 async function sha(value: string) {
   const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)));
@@ -41,6 +41,23 @@ export async function stableBlockId(documentId: string, pageIndex: number, role:
 }
 
 const TRANSLATABLE: ReadonlySet<BlockRole> = new Set(["ABSTRACT", "HEADING", "BODY", "CAPTION", "TABLE"]);
+/** A slide (landscape page: presentations, brochures, decks saved as PDF) says what it means in labels and boxes. */
+export const isSlidePage = (width: number, height: number) => width > height * 1.15;
+const CJK = /[぀-ヿ一-鿿]/g;
+/** Real words, not a number, a unit or a stray glyph: a label worth translating. */
+function hasWords(text: string) {
+  return (text.match(/[A-Za-z]{3,}/g) ?? []).length >= 1 && (text.match(/[A-Za-z]/g) ?? []).length >= 4 || (text.match(CJK) ?? []).length >= 2;
+}
+/**
+ * Labels the paper layout leaves as printed (figure text, table data, short fragments) that a slide or a
+ * report needs translated: on a slide every label with words; on a portrait page a Chinese or Japanese
+ * line long enough to be a title or a sentence (written without spaces, it reads as "short").
+ */
+function readerText(role: BlockRole, reason: string | null, text: string, slide: boolean) {
+  if (!hasWords(text) || isKorean(text)) return false;
+  if (slide) return (role === "FIGURE_TEXT" || role === "TABLE") && reason !== null && ["short-fragment", "small-label", "figure-label", "table-data", "table-column", "numeric-cells"].includes(reason);
+  return role === "FIGURE_TEXT" && (reason === "figure-label" || reason === "short-fragment") && (text.match(CJK) ?? []).length >= 8;
+}
 /** Mostly Hangul among the letters (English terms inside Korean prose do not count against it). */
 export function isKorean(text: string) {
   const hangul = (text.match(/[가-힣]/g) ?? []).length, others = (text.match(/[A-Za-z぀-ヿ一-鿿]/g) ?? []).length;
@@ -110,7 +127,7 @@ export async function buildPageBlocks(documentId: string, pageIndex: number, raw
     if ((reason === "journal-masthead" || reason === "front-matter") && proseScore(paragraph.text).words >= 30 && readsAsProse(paragraph.text)) { role = "BODY"; reason = null; }
     // Text already in Korean is shown as printed: never spend a credit translating Korean into Korean.
     if (reason === null && isKorean(paragraph.text)) reason = "korean-source";
-    const translatable = TRANSLATABLE.has(role) && reason === null;
+    const translatable = TRANSLATABLE.has(role) && reason === null || readerText(role, reason, paragraph.text, isSlidePage(width, height));
     const id = await stableBlockId(documentId, pageIndex, role, paragraph.text, paragraph);
     blocks.push({ ...paragraph, id, role, readingOrder: blocks.length, columnIndex, translatable, exclusionReason: translatable ? null : reason ?? "not-translated" });
   }
@@ -385,7 +402,7 @@ const SENTENCE_END = /[.!?:。！？](?:["”’)\]]|\[[\d,–−-]+\])*\s*$/;
 const MAX_UNIT_CHARS = 6000;
 
 /** Join paragraph fragments split by a column or page break; headings and display equations always end a paragraph. */
-export async function buildUnits(documentId: string, blocks: ManifestBlock[]): Promise<TranslationUnit[]> {
+export async function buildUnits(documentId: string, blocks: ManifestBlock[], slidePages: ReadonlySet<number> = new Set()): Promise<TranslationUnit[]> {
   const units: TranslationUnit[] = [];
   let open: { unit: TranslationUnit; last: ManifestBlock } | null = null;
   for (const block of blocks) {
@@ -406,7 +423,7 @@ export async function buildUnits(documentId: string, blocks: ManifestBlock[]): P
       open.last = block;
       continue;
     }
-    const unit: TranslationUnit = { id: "", role: block.role, blockIds: [block.id], pages: [block.pageIndex], text: block.text, pageChars: { [block.pageIndex]: block.text.length }, ...(block.role === "HEADING" || block.role === "TABLE" ? { manual: true } : {}) };
+    const unit: TranslationUnit = { id: "", role: block.role, blockIds: [block.id], pages: [block.pageIndex], text: block.text, pageChars: { [block.pageIndex]: block.text.length }, ...((block.role === "HEADING" || block.role === "TABLE") && !slidePages.has(block.pageIndex) ? { manual: true } : {}) };
     units.push(unit);
     open = prose ? { unit, last: block } : block.role === "CAPTION" ? open : null;
   }
@@ -418,7 +435,7 @@ export async function buildUnits(documentId: string, blocks: ManifestBlock[]): P
 
 export async function buildTranslationManifest(documentId: string, pdf: PdfDocumentHandle, signal?: AbortSignal, onPage?: (completed: number) => void, ocr?: OcrProvider): Promise<TranslationManifest> {
   const blocks: ManifestBlock[] = [], ids = new Set<string>(), ocrCandidates: number[] = [], pages: PageSize[] = [], keywords: string[] = [];
-  let ocrPages = 0, section: Section = "none";
+  let ocrPages = 0, section: Section = "none", sample = "";
   const marks: string[] = [], texts: string[] = [], citations = { raised: 0, total: 0 };
   const timing = { text: 0, images: 0, ocr: 0, layout: 0, total: 0 }, started = performance.now();
   let mark = started;
@@ -435,11 +452,13 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
     lap("images");
     if (scanned) {
       let read: PdfTextItem[] | null = null;
-      if (ocr) { try { read = await ocr(page, signal); } catch (error) { if (signal?.aborted) throw error; } }
+      if (ocr) { try { read = await ocr(page, signal, ocrLanguages(sample)); } catch (error) { if (signal?.aborted) throw error; } }
       if (read && letterCount(read) > letterCount(raw) * 1.2 + 40) { raw = read; ocrPages++; }
       else if (!read) ocrCandidates.push(pageIndex);
       lap("ocr");
     }
+    // The script of the text read so far picks the OCR language for later pages (a Japanese deck's slides).
+    if (sample.length < 4000) sample += raw.map(item => item.text).join("").slice(0, 2000);
     // The page's own drawing: ruled tables keep their cells, pictures are kept clear of translated text.
     const graphics = await page.getGraphics?.().catch(() => undefined);
     const found = { tables: [] as Region[] };
@@ -467,7 +486,7 @@ export async function buildTranslationManifest(documentId: string, pdf: PdfDocum
   }
   markRunningHeads(blocks);
   markReferenceRuns(blocks);
-  const units = await buildUnits(documentId, blocks);
+  const units = await buildUnits(documentId, blocks, new Set(pages.flatMap((page, index) => isSlidePage(page.width, page.height) ? [index] : [])));
   timing.total = performance.now() - started;
   for (const key of Object.keys(timing) as (keyof typeof timing)[]) timing[key] = Math.round(timing[key]);
   return { documentId, version: EXTRACTOR_VERSION, createdAt: new Date().toISOString(), pageCount: pdf.pageCount, pages, blocks, units, keywords: [...new Set(keywords)], extractedPages: pdf.pageCount, ocrPages, ocrCandidates, scripts: buildScriptTable(marks, texts, citations), timing };

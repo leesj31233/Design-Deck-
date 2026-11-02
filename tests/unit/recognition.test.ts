@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { ocrLineItems, textHealth, type OcrLine } from "../../lib/paperflow/pdf/ocr";
+import { ocrLanguages, ocrLineItems, textHealth, type OcrLine } from "../../lib/paperflow/pdf/ocr";
 import { buildTextLines } from "../../lib/paperflow/layout/text-lines";
 import { analyzePage } from "../../lib/paperflow/layout/page-blocks";
-import { buildPageBlocks, isKorean } from "../../lib/paperflow/translation/manifest";
+import { buildPageBlocks, buildUnits, isKorean } from "../../lib/paperflow/translation/manifest";
 import type { PdfTextItem } from "../../lib/paperflow/pdf/pdf-adapter";
 
 const W = 600, H = 800;
@@ -77,6 +77,31 @@ describe("papers in Japanese, Chinese and Korean", () => {
     const spaced = "み に お け る 温 度 を 測 定 し た".split(" ").map((char, index) => item(char, 60 + index * 12, 100, 8, 8));
     expect(buildTextLines(spaced)[0].text).toBe("みにおける温度を測定した");
     expect(buildTextLines([item("흡수탑은 높은 압력에서", 60, 100, 90, 8)])[0].text).toBe("흡수탑은 높은 압력에서");
+  });
+});
+
+describe("reports, decks and brochures in any language", () => {
+  it("reads a Japanese deck with the Japanese OCR model and joins its characters without spaces", () => {
+    expect(ocrLanguages("当社は、2001年より電力小売事業を開始しました。")).toBe("jpn+eng");
+    expect(ocrLanguages("本研究以棕榈空果串为原料制备生物质颗粒燃料，并测定其灰分与热值的变化规律和影响因素以及应用前景分析")).toBe("chi_sim+eng");
+    expect(ocrLanguages("Perusahaan berencana membangun pabrik pelet")).toBe("eng");
+    const line: OcrLine = { words: [word("中期", 0, 100, 130), word("経営", 22, 100, 130), word("計画", 44, 100, 130), word("ROIC", 70, 100, 130), word("5.5%", 112, 100, 130)], bbox: { x0: 0, y0: 100, x1: 160, y1: 130 } };
+    expect(ocrLineItems(line, 1).map(value => value.text)).toEqual(["中期経営計画 ROIC 5.5%"]);
+  });
+  it("translates a slide's labels and table text in the whole-document run, not only on request", async () => {
+    // A landscape page (a slide): short labels, a stack of row labels and a heading.
+    const slide = [item("Market outlook", 60, 60, 160, 20), item("Black pellet demand", 60, 140, 110, 10), item("Japan FIT plants", 60, 220, 100, 10), item("2030", 60, 300, 30, 10)];
+    const blocks = await buildPageBlocks("doc", 3, slide, 800, 450);
+    const translated = blocks.filter(block => block.translatable).map(block => block.text);
+    expect(translated).toEqual(expect.arrayContaining(["Black pellet demand", "Japan FIT plants"]));
+    expect(translated).not.toContain("2030");
+    const units = await buildUnits("doc", blocks, new Set([3]));
+    expect(units.every(unit => !unit.manual)).toBe(true);
+  });
+  it("translates a Japanese title line on a portrait page instead of leaving it as figure text", async () => {
+    const blocks = await buildPageBlocks("doc", 0, [item("中期経営計画（2027 年 3 月期～2029 年 3 月期）の策定に関するお知らせ", 150, 380, 320, 11), ...["当社は、2001 年より電力小売事業を開始し、電力トレーディング事業のノウハウを駆使しながら、成長基盤を確立してまいりました。", "また、2013 年には、日本初の PKS を燃料とするバイオマス発電所の運転を開始しました。"].map((text, index) => item(text, 60, 420 + index * 14, 470, 11))], W, H);
+    const title = blocks.find(block => block.text.startsWith("中期経営計画"));
+    expect(title?.translatable).toBe(true);
   });
 });
 

@@ -831,6 +831,8 @@ html[data-pf-theme="dark"] .paperflow .dd-glass { box-shadow:var(--shadow-soft);
 .pf-batch[data-state="complete"] .pf-batch-label b { color:var(--accent); font-size:13px; }
 .pf-batch-label small { font-size:11px; color:var(--muted); }
 .pf-batch-failed { color:var(--danger)!important; }
+.pf-batch:has(.pf-batch-error) { flex-wrap:wrap; }
+.pf-batch-error { flex:1 1 100%; order:9; color:var(--danger); font-size:11.5px; line-height:1.45; }
 .pf-batch-track { position:relative; flex:1; min-width:60px; height:6px; overflow:hidden; border-radius:999px; background:color-mix(in srgb,var(--accent) 12%,var(--line)); }
 .pf-batch-fill { position:absolute; inset:0 auto 0 0; border-radius:inherit; background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 75%,white),var(--accent)); }
 .pf-batch[data-state="running"] .pf-batch-fill::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); background-size:50% 100%; background-repeat:no-repeat; animation:pf-batch-sheen 1.4s ease-in-out infinite; }
