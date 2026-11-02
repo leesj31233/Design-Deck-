@@ -15,6 +15,11 @@
   --radius: 18px;
   --shadow-soft: 0 18px 60px rgba(31, 35, 48, .10), 0 2px 8px rgba(31, 35, 48, .05);
   --shadow-float: 0 28px 90px rgba(0, 0, 0, .16), 0 8px 22px rgba(0, 0, 0, .08);
+  /* Motion: settle without overshoot for surfaces, a small spring for things the finger presses. */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-spring: cubic-bezier(.34, 1.45, .64, 1);
+  --dur-fast: 140ms;
+  --dur-med: 240ms;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -57,11 +62,33 @@ button, input, textarea { font: inherit; }
 }
 .dd-focus {
   outline: none;
-  transition: box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+  /* Tailwind v4 moves and scales with the individual translate/scale properties, so both are listed. */
+  transition:
+    background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out), color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out),
+    translate var(--dur-med) var(--ease-spring), scale var(--dur-med) var(--ease-spring), transform var(--dur-med) var(--ease-spring);
 }
+/* Pressing is immediate; the release springs back. */
+.dd-focus:active { transition-duration: 70ms; }
 .dd-focus:focus-visible {
   border-color: rgba(10,132,255,.62) !important;
   box-shadow: 0 0 0 4px rgba(10,132,255,.12);
 }
 .dd-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(127,127,127,.34) transparent; }
 .dd-hairline { border-color: var(--line); }
+
+@keyframes dd-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes dd-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .dd-focus { transition-duration: 0ms !important; }
+  [role="tabpanel"] { animation: none !important; }
+}
+
+/* Overlay entrances (dialogs, popovers, menus, tooltips). The individual scale property composes with
+   the translate that centres a dialog, so nothing jumps. */
+@keyframes dd-enter { from { opacity: var(--dd-enter-opacity, 1); scale: var(--dd-enter-scale, 1); } }
+.animate-in { animation: dd-enter 240ms var(--ease-spring) both; }
+.fade-in { --dd-enter-opacity: 0; }
+.zoom-in-95 { --dd-enter-scale: .95; }
+@media (prefers-reduced-motion: reduce) { .animate-in { animation: none; } }

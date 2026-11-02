@@ -1,0 +1,79 @@
+/* 노트: marks by paper (left) and the notebook (right). Research-workspace look, one sans family. */
+.pf-notes { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:start; font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.pf-notes-marks, .pf-notes-book { display:grid; gap:12px; min-width:0; padding:16px; border:1px solid var(--line); border-radius:16px; background:var(--surface-strong); box-shadow:var(--shadow-soft); }
+.pf-notes-book { position:sticky; top:12px; }
+.pf-notes-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; }
+.pf-notes-head h2 { display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:700; }
+.pf-notes-head > label { flex:1 1 200px; max-width:280px; height:36px; }
+.pf-notes-head-tools { display:flex; align-items:center; gap:8px; flex:1 1 260px; justify-content:flex-end; }
+.pf-notes-head-tools > label { flex:1; max-width:220px; height:36px; }
+.pf-notes-label { font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+.pf-notes-empty { display:grid; justify-items:center; gap:6px; padding:36px 16px; text-align:center; color:var(--muted); }
+.pf-notes-empty h3 { margin:4px 0 0; font-size:14px; color:var(--foreground); }
+.pf-notes-empty p { margin:0 0 6px; font-size:12.5px; line-height:1.6; max-width:300px; }
+
+/* Left: paper groups */
+.pf-paper-groups { display:grid; gap:10px; }
+.pf-paper-group { border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface); }
+.pf-paper-group-head { display:grid; grid-template-columns:44px 1fr; gap:12px; align-items:center; width:100%; padding:10px 12px; border:0; background:none; color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.pf-paper-group[data-open] .pf-paper-group-head { border-bottom:1px solid var(--line); }
+.pf-paper-group-cover { display:block; width:44px; aspect-ratio:3/4; border-radius:4px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.pf-paper-group-cover .pf-book-cover { width:100%; height:100%; }
+.pf-paper-group-cover .pf-cover-placeholder span { display:none; }
+.pf-paper-group-meta { display:grid; gap:3px; min-width:0; }
+.pf-paper-group-meta b { font-size:13px; font-weight:700; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-paper-group-meta small { font-size:11.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pf-paper-group-counts { display:flex; gap:6px; }
+.pf-paper-group-counts em { padding:1px 7px; border-radius:6px; background:color-mix(in srgb,var(--foreground) 6%,transparent); font-size:11px; font-style:normal; font-weight:700; color:var(--muted); }
+.pf-mark-list { display:grid; margin:0; padding:4px; list-style:none; }
+.pf-mark-row { display:grid; grid-template-columns:10px 1fr auto; gap:10px; align-items:start; padding:8px 8px; border-radius:8px; color:inherit; text-decoration:none; }
+@media (hover:hover) { .pf-mark-row:hover { background:color-mix(in srgb,var(--foreground) 4%,transparent); } }
+.pf-mark-dot { width:9px; height:9px; margin-top:6px; border-radius:50%; }
+.pf-mark-body { display:grid; gap:4px; min-width:0; }
+.pf-mark-body q { quotes:none; font-family:"Times New Roman",Georgia,"Noto Serif KR",serif; font-size:13px; line-height:1.55; color:var(--foreground); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-mark-body q[data-type="ink"], .pf-mark-body q[data-type="text"] { font-family:inherit; color:var(--muted); }
+.pf-mark-note { padding-left:8px; border-left:2px solid var(--accent); font-size:12.5px; line-height:1.5; white-space:pre-wrap; }
+.pf-mark-page { font-size:11px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; padding-top:3px; }
+
+/* Right: notebook */
+.pf-notes-split { display:grid; grid-template-columns:minmax(150px,200px) 1fr; gap:12px; min-height:420px; }
+.pf-notes-list { display:grid; align-content:start; gap:2px; margin:0; padding:0 10px 0 0; border-right:1px solid var(--line); list-style:none; max-height:620px; overflow:auto; }
+.pf-notes-list button { display:grid; gap:2px; width:100%; padding:8px 9px; border:0; border-radius:8px; background:none; color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.pf-notes-list button[aria-selected="true"] { background:var(--accent-soft); }
+.pf-notes-list-title { display:block; min-width:0; font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pf-notes-list-title svg { display:inline; margin-right:4px; vertical-align:-1px; color:var(--accent); }
+.pf-notes-list small { min-width:0; font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pf-notes-list-empty { padding:10px; font-size:12px; color:var(--muted); }
+.pf-note-editor { display:grid; align-content:start; gap:10px; min-width:0; }
+.pf-note-editor-top { display:flex; align-items:center; gap:4px; }
+.pf-note-title { flex:1; min-width:0; padding:4px 2px; border:0; border-bottom:1px solid transparent; background:none; color:var(--foreground); font:inherit; font-size:16px; font-weight:700; outline:none; }
+.pf-note-title:focus { border-bottom-color:var(--accent); }
+.pf-note-write { position:relative; }
+.pf-note-write textarea { width:100%; min-height:300px; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--foreground); font:inherit; font-size:13.5px; line-height:1.7; resize:vertical; outline:none; background-image:repeating-linear-gradient(transparent 0 calc(1.7em - 1px), color-mix(in srgb,var(--foreground) 5%,transparent) calc(1.7em - 1px) 1.7em); background-attachment:local; background-position:0 12px; }
+.pf-note-write textarea:focus { border-color:color-mix(in srgb,var(--accent) 55%,var(--line)); box-shadow:0 0 0 4px var(--accent-soft); }
+.pf-mention-menu { position:absolute; left:10px; right:10px; top:calc(100% - 8px); z-index:30; display:grid; gap:2px; max-height:300px; overflow:auto; padding:6px; border:1px solid var(--line); border-radius:12px; background:var(--surface-strong); box-shadow:var(--shadow-float); }
+.pf-mention-hint { display:flex; align-items:center; gap:5px; margin:2px 6px 4px; font-size:11px; font-weight:700; color:var(--muted); }
+.pf-mention-menu button { display:grid; grid-template-columns:62px 1fr; gap:8px; align-items:start; padding:7px 8px; border:0; border-radius:8px; background:none; color:inherit; font:inherit; text-align:left; cursor:pointer; min-height:0; }
+.pf-mention-menu button[aria-selected="true"] { background:var(--accent-soft); }
+.pf-mention-kind { display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; letter-spacing:.04em; color:var(--muted); padding-top:2px; }
+.pf-mention-kind[data-kind="paper"] { color:var(--accent); }
+.pf-mention-kind i { width:7px; height:7px; border-radius:50%; }
+.pf-mention-copy { display:grid; gap:1px; min-width:0; }
+.pf-mention-copy b { font-size:12.5px; font-weight:600; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pf-mention-copy small { font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pf-mention-none { margin:4px 8px 6px; font-size:12px; color:var(--muted); }
+.pf-note-preview { display:grid; gap:4px; padding:10px 12px; border-radius:10px; background:color-mix(in srgb,var(--foreground) 3%,transparent); }
+.pf-note-preview p { margin:0; font-size:13.5px; line-height:1.9; white-space:pre-wrap; word-break:keep-all; }
+.pf-cite-pill { display:inline; padding:2px 8px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; text-decoration:none; box-decoration-break:clone; -webkit-box-decoration-break:clone; border:1px solid color-mix(in srgb,var(--accent) 25%,transparent); }
+@media (hover:hover) { .pf-cite-pill:hover { background:var(--accent); color:var(--accent-ink); } }
+.pf-note-saved { font-size:11px; color:var(--muted); }
+
+@media (max-width:1100px) { .pf-notes { grid-template-columns:1fr; } .pf-notes-book { position:static; } }
+@media (max-width:640px) { .pf-notes-split { grid-template-columns:1fr; } .pf-notes-list { max-height:180px; padding:0 0 8px; border-right:0; border-bottom:1px solid var(--line); } }
+
+/* The writing surface: citations are chips inline with the text. */
+.pf-chip-editor { min-height:22em; padding:14px 16px; border-radius:14px; border:1px solid var(--line); background:var(--surface-strong); color:var(--foreground); font:14px/1.75 "Malgun Gothic","Apple SD Gothic Neo",Pretendard,"Noto Sans KR",sans-serif; white-space:pre-wrap; word-break:keep-all; overflow-wrap:anywhere; outline:none; transition:border-color .15s ease,box-shadow .15s ease; }
+.pf-chip-editor:focus { border-color:color-mix(in srgb,var(--accent) 55%,transparent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent); }
+.pf-chip-editor:empty::before { content:attr(data-placeholder); color:var(--muted); pointer-events:none; }
+.pf-cite-chip { display:inline-flex; align-items:center; margin:0 2px; padding:1px 9px; border-radius:999px; background:color-mix(in srgb,var(--accent) 12%,transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent); color:var(--accent); font-size:.88em; font-weight:600; line-height:1.6; white-space:nowrap; cursor:pointer; user-select:all; }
+.pf-cite-chip:hover { background:color-mix(in srgb,var(--accent) 20%,transparent); }

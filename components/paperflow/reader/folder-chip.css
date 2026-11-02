@@ -1,0 +1,5 @@
+/* Reader: the paper's archive folder beside its title. */
+.pf-reader-folder { --folder:var(--accent); display:inline-flex; align-items:center; gap:6px; flex-shrink:0; height:28px; margin-left:10px; padding:0 11px 0 9px; border-radius:999px; border:1px dashed color-mix(in srgb,var(--foreground) 22%,transparent); background:transparent; color:var(--muted); font-size:12px; font-weight:600; cursor:pointer; transition:background .15s ease,border-color .15s ease,color .15s ease; }
+.pf-reader-folder:hover { background:color-mix(in srgb,var(--folder) 8%,transparent); color:var(--foreground); }
+.pf-reader-folder[data-filed] { border-style:solid; border-color:color-mix(in srgb,var(--folder) 45%,transparent); background:color-mix(in srgb,var(--folder) 10%,transparent); color:color-mix(in srgb,var(--folder) 80%,var(--foreground)); }
+.pf-reader-folder span { max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

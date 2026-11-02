@@ -1,0 +1,5 @@
+.pf-intel-progress { position: sticky; top: 8px; z-index: 30; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 10px; margin: 0 0 14px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--pf-accent, #2f6fdb) 10%, var(--pf-surface, #fff)); border: 1px solid color-mix(in srgb, var(--pf-accent, #2f6fdb) 30%, transparent); box-shadow: 0 6px 20px rgba(0,0,0,.08); font-size: 14px; }
+.pf-intel-progress-label { font-weight: 650; }
+.pf-intel-progress-count { font-variant-numeric: tabular-nums; opacity: .75; font-size: 13px; }
+.pf-intel-progress-track { grid-column: 1 / -1; height: 4px; border-radius: 4px; background: color-mix(in srgb, currentColor 10%, transparent); overflow: hidden; }
+.pf-intel-progress-track i { display: block; height: 100%; background: var(--pf-accent, #2f6fdb); transition: width .3s ease; }
