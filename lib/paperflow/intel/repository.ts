@@ -3,6 +3,7 @@ import { emitLocalChange } from "../persistence/changes";
 import { REGISTRY_BRIEF, cleanRegistry } from "./registry";
 import { PRICES_BRIEF, cleanPrices } from "./prices";
 import { PLACES_BRIEF, cleanPlaces } from "./places";
+import { englishFromPack } from "../i18n/content";
 import { isClass, type IntelBrief, type IntelClass, type IntelItem, type IntelKind, type IntelPack, type IntelImage, type IntelPatent, type PatentStatus, type IntelStage, type IntelStatus, type IntelUserState } from "./types";
 
 /** Class 1 / Class 2 tags, known ones only, each once. */
@@ -72,6 +73,12 @@ export function cleanItem(raw: unknown, pack?: string): IntelItem | null {
   const kind = KINDS.includes(value.kind as IntelKind) ? value.kind as IntelKind : "source";
   // A gap (an open question) may have no source yet; everything else needs one.
   if (!url && kind !== "gap") return null;
+  const item = cleanFields(value, id, title, url, kind, pack);
+  // English written by the research routine (a mirror of the fields, in English): kept as English by text.
+  const en = englishFromPack(value.en, item);
+  return en ? { ...item, en } : item;
+}
+function cleanFields(value: Record<string, unknown>, id: string, title: string, url: string | undefined, kind: IntelKind, pack?: string): IntelItem {
   const list = <T,>(input: unknown, map: (entry: Record<string, unknown>) => T | null, max = 40) => Array.isArray(input) ? input.slice(0, max).flatMap(entry => entry && typeof entry === "object" ? [map(entry as Record<string, unknown>)].filter((item): item is T => item !== null) : []) : undefined;
   const reliability = Number(value.reliability);
   const naysor = value.naysor && typeof value.naysor === "object" ? Object.fromEntries(Object.entries(value.naysor as Record<string, unknown>).flatMap(([key, entry]) => ["new", "fit", "designChange", "testVars", "capex", "quality", "scaleup", "questions"].includes(key) && text(entry, 1500) ? [[key, text(entry, 1500)]] : [])) : undefined;
@@ -109,13 +116,15 @@ export function readPack(json: string): IntelPack {
   if (!raw || !Array.isArray(raw.items)) throw new Error("자료 팩에 items 목록이 없습니다.");
   const id = text(raw.id, 80) ?? `pack-${Date.now().toString(36)}`;
   const items = raw.items.slice(0, 5000).map(item => cleanItem(item, id)).filter((item): item is IntelItem => item !== null);
-  const briefs: IntelBrief[] = (Array.isArray(raw.briefs) ? raw.briefs : []).slice(0, 40).flatMap((brief, index) => { const value = brief as Partial<IntelBrief>; const briefId = text(value?.id, 80), title = text(value?.title, 200), body = longText(value?.body, briefId?.startsWith("__") ? 600_000 : 60_000); return briefId && /^[\w.:-]+$/.test(briefId) && title && body ? [{ id: briefId, title, body, order: Number.isFinite(value.order) ? Number(value.order) : index, period: PERIODS.includes(value.period as string) ? value.period : "core", date: text(value.date, 20), pack: id, classes: classesOf(value.classes) }] : []; });
+  const briefs: IntelBrief[] = (Array.isArray(raw.briefs) ? raw.briefs : []).slice(0, 40).flatMap((brief, index) => { const value = brief as Partial<IntelBrief>; const briefId = text(value?.id, 80), title = text(value?.title, 200), body = longText(value?.body, briefId?.startsWith("__") ? 600_000 : 60_000); if (!briefId || !/^[\w.:-]+$/.test(briefId) || !title || !body) return []; const en = englishFromPack((value as { en?: unknown }).en, { title, body }); return [{ id: briefId, title, body, order: Number.isFinite(value.order) ? Number(value.order) : index, period: PERIODS.includes(value.period as string) ? value.period : "core", date: text(value.date, 20), pack: id, classes: classesOf(value.classes), ...(en ? { en } : {}) }]; });
   // Terms the briefings use (FIT, LCA, GGL…), kept as a hidden briefing so they sync like the rest.
   const glossary = (Array.isArray((raw as { glossary?: unknown }).glossary) ? (raw as { glossary: unknown[] }).glossary : []).slice(0, 500).flatMap(entry => {
     const value = entry as Record<string, unknown>, term = text(value?.term, 60), full = text(value?.full, 200), meaning = text(value?.meaning, 600);
     return term && full && meaning ? [{ term, full, meaning, note: text(value.note, 600), aliases: Array.isArray(value.aliases) ? value.aliases.flatMap(alias => text(alias, 60) ? [text(alias, 60)!] : []).slice(0, 6) : undefined }] : [];
   });
-  if (glossary.length) briefs.push({ id: "__glossary__", title: "용어집", body: JSON.stringify(glossary), order: 999, period: "core", date: undefined, pack: id });
+  // A term may carry its English ({ en: { full, meaning, note } }); it goes with the glossary briefing.
+  const glossaryEnglish = Object.assign({}, ...(Array.isArray((raw as { glossary?: unknown }).glossary) ? (raw as { glossary: unknown[] }).glossary : []).slice(0, 500).map(entry => { const term = glossary.find(item => item.term === text((entry as Record<string, unknown>)?.term, 60)); return term ? englishFromPack((entry as { en?: unknown }).en, { full: term.full, meaning: term.meaning, note: term.note })?.t ?? {} : {}; }));
+  if (glossary.length) briefs.push({ id: "__glossary__", title: "용어집", body: JSON.stringify(glossary), order: 999, period: "core", date: undefined, pack: id, ...(Object.keys(glossaryEnglish).length ? { en: { t: glossaryEnglish } } : {}) });
   // The entity registry (organisations, their codes and items) travels as a hidden briefing too.
   const registry = cleanRegistry((raw as { registry?: unknown }).registry);
   if (registry) briefs.push({ id: REGISTRY_BRIEF, title: "기업 레지스트리", body: JSON.stringify(registry), order: 998, period: "core", date: undefined, pack: id });

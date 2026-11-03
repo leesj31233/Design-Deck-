@@ -4,7 +4,7 @@
 import { selectDatabase } from "@/lib/paperflow/persistence/indexeddb";
 selectDatabase("naysor-news-v1");
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "motion/react";
@@ -17,8 +17,17 @@ import { intelRepository, reportProgress, setRemoteCovers } from "@/lib/paperflo
 import { cloudUrl } from "@/lib/paperflow/cloud/config";
 import type { IntelBrief, IntelItem } from "@/lib/paperflow/intel/types";
 import "./news.css";
+import { NEWS_DESCRIPTION, NEWS_TITLE } from "./meta";
+import { DeviceEnglish } from "./device-english";
+import { prepare } from "@/lib/paperflow/i18n/device-translate";
+import { LangProvider, useLang } from "@/lib/paperflow/i18n/context";
+import type { Lang } from "@/lib/paperflow/i18n";
 
-const IntelView = dynamic(() => import("../intel/intel-view").then(module => module.IntelView), { ssr: false, loading: () => <div className="pf-empty" role="status">NAYSOR News를 여는 중…</div> });
+const IntelView = dynamic(() => import("../intel/intel-view").then(module => module.IntelView), { ssr: false, loading: () => <Opening/> });
+function Opening() {
+  const { t } = useLang();
+  return <div className="pf-empty" role="status">{t("NAYSOR News를 여는 중…")}</div>;
+}
 /** Where a reader with an account translates and marks a PDF. */
 const PAPERFLOW = "https://temporary-speedy-thunder-fmo0cqz.vercel.app";
 /** The ready-made copy of the list (a public storage bucket on the CDN), and what this device last took from it. */
@@ -32,6 +41,30 @@ const VERSION_KEY = "naysor-news-version", COVERS_KEY = "naysor-news-covers";
  * their own browser. PDFs open in PAPERFLOW, where an account translates and marks them.
  */
 export function NewsSite() {
+  // The reader picks Korean or English at the top right; the choice stays on this device.
+  return <LangProvider storageKey="naysor-news-lang"><NewsPage/></LangProvider>;
+}
+
+/**
+ * KR | EN: the interface, and every item and briefing — in the English the research routine wrote, or else
+ * translated on this device by the browser (the click also lets the browser download its model).
+ */
+function LangSwitch() {
+  const { lang, setLang, t } = useLang();
+  return <div className="pf-news-lang" role="group" aria-label={t("언어")}>
+    {([["ko", "KR", "한국어"], ["en", "EN", "English"]] as [Lang, string, string][]).map(([value, short, name]) => <button key={value} type="button" lang={value} aria-pressed={lang === value} title={name} aria-label={name} onClick={() => { setLang(value); if (value === "en") void prepare(); }}>{short}</button>)}
+  </div>;
+}
+
+function NewsPage() {
+  const { t, lang } = useLang();
+  // The download below runs once; its messages are shown in the language chosen by then.
+  const tRef = useRef(t); tRef.current = t;
+  // The tab title and description follow the language (the server sends the Korean ones).
+  useEffect(() => {
+    document.title = t(NEWS_TITLE);
+    document.querySelector('meta[name="description"]')?.setAttribute("content", t(NEWS_DESCRIPTION));
+  }, [t]);
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }));
   const [loading, setLoading] = useState(true), [dark, setDark] = useState(false);
   useEffect(() => {
@@ -57,6 +90,7 @@ export function NewsSite() {
         let manifest: Manifest | null = early?.manifest ?? null;
         if (!manifest && SNAPSHOT) try { const response = await fetch(`${SNAPSHOT}/manifest.json?t=${Math.floor(Date.now() / 60_000)}`); if (response.ok) manifest = await response.json() as Manifest; } catch { /* the server assembles it instead */ }
         if (manifest && held && read(VERSION_KEY) === manifest.version) return;
+        // Korean keys: the progress bar shows them in the reader's language.
         const label = held ? "일일 업데이트 및 기존 뉴스 반영 중" : "NAYSOR News 전체 자료를 받는 중";
         let received = 0;
         const progress = (total: number) => reportProgress({ label, done: received, total });
@@ -76,7 +110,7 @@ export function NewsSite() {
         reportProgress({ label: "기기에 반영하는 중", done: received, total: received });
         await intelRepository.replaceFeed(all.flatMap(part => part.items ?? []), all[0]?.briefs ?? []);
         if (manifest) write(VERSION_KEY, manifest.version);
-      } catch { if (alive) notifyText("새 자료를 불러오지 못했습니다. 이 기기에 저장된 자료를 보여 줍니다."); }
+      } catch { if (alive) notifyText(tRef.current("새 자료를 불러오지 못했습니다. 이 기기에 저장된 자료를 보여 줍니다.")); }
       finally { reportProgress(null); if (alive) setLoading(false); }
     })();
     return () => { alive = false; };
@@ -87,22 +121,24 @@ export function NewsSite() {
   }), [toggleTheme, dark]);
 
   return <QueryClientProvider client={client}><MotionConfig reducedMotion="user"><PaperflowContext.Provider value={context}>
-    <div className="paperflow pf-news" lang="ko">
+    <div className="paperflow pf-news" lang={lang}>
       <header className="pf-news-bar">
-        <a href="/" className="pf-news-brand" aria-label="NAYSOR News 처음으로">
+        <a href="/" className="pf-news-brand" aria-label={t("NAYSOR News 처음으로")}>
           <img src={dark ? "/naysor/naysor-logo-light.png" : "/naysor/naysor-logo.png"} alt="NAYSOR" width={132} height={25}/>
           <span>News</span>
         </a>
-        <p>팜 잔재 펠릿·바이오차 · 저품위탄 고품위화 · 캐슈넛 부산물</p>
+        <p>{t("팜 잔재 펠릿·바이오차 · 저품위탄 고품위화 · 캐슈넛 부산물")}</p>
         <nav>
-          <button type="button" onClick={toggleTheme} aria-label={dark ? "밝은 화면" : "어두운 화면"}>{dark ? <Sun size={16}/> : <Moon size={16}/>}</button>
-          <a href={`${PAPERFLOW}/login`} title="PAPERFLOW 계정으로 PDF를 번역하고 마킹·메모합니다"><LogIn size={15}/>PAPERFLOW 로그인</a>
+          <LangSwitch/>
+          <button type="button" onClick={toggleTheme} aria-label={dark ? t("밝은 화면") : t("어두운 화면")}>{dark ? <Sun size={16}/> : <Moon size={16}/>}</button>
+          <a href={`${PAPERFLOW}/login`} title={t("PAPERFLOW 계정으로 PDF를 번역하고 마킹·메모합니다")}><LogIn size={15}/>{t("PAPERFLOW 로그인")}</a>
         </nav>
       </header>
+      <DeviceEnglish/>
       <main className="pf-news-main">
         <IntelView docs={[]} site={{ loading, paperflow: PAPERFLOW }}/>
       </main>
-      <footer className="pf-news-foot">자료마다 출처와 확인 수준(공식·보도·추정)을 표시합니다. 형광펜·메모·핵심 표시는 이 브라우저에만 저장됩니다.</footer>
+      <footer className="pf-news-foot">{t("자료마다 출처와 확인 수준(공식·보도·추정)을 표시합니다. 형광펜·메모·핵심 표시는 이 브라우저에만 저장됩니다.")}</footer>
     </div>
     <NotificationStack/>
     <ConfirmHost/>

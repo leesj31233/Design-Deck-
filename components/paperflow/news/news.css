@@ -10,13 +10,31 @@
 .pf-news-bar nav { display:flex; align-items:center; gap:8px; margin-left:auto; flex:none; }
 .pf-news-bar nav button, .pf-news-bar nav a { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 12px; border:1px solid var(--border, rgba(0,0,0,.1)); border-radius:10px; background:transparent; color:inherit; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; }
 .pf-news-bar nav button { width:34px; padding:0; justify-content:center; }
+/* KR | EN: one pill with two halves; the chosen half is filled. */
+.pf-news-bar nav .pf-news-lang { display:inline-flex; align-items:center; height:34px; padding:2px; gap:2px; border:1px solid var(--border, rgba(0,0,0,.1)); border-radius:10px; }
+.pf-news-bar nav .pf-news-lang button { width:auto; min-width:34px; height:28px; padding:0 8px; border:0; border-radius:7px; font:700 12px/1 var(--font-guide-sans, system-ui), sans-serif; letter-spacing:.04em; color:var(--muted-foreground, #667); }
+.pf-news-bar nav .pf-news-lang button:hover { color:inherit; background:color-mix(in srgb, currentColor 7%, transparent); }
+.pf-news-bar nav .pf-news-lang button[aria-pressed="true"] { background:#1d4434; color:#fff; }
+:root[data-pf-theme="dark"] .pf-news-bar nav .pf-news-lang button[aria-pressed="true"] { background:#e86f45; color:#fff; }
+.pf-news-bar nav .pf-news-lang button:focus-visible { outline:2px solid #2f6fdb; outline-offset:1px; }
+/* On-device translation: a one-line notice under the bar, or a small pill while it works. */
+.pf-news-device { display:flex; align-items:center; gap:8px; margin:0; font-size:12.5px; color:var(--muted-foreground, #556); }
+.pf-news-device[data-kind="notice"] { max-width:1720px; margin:10px auto 0; padding:8px 12px; border:1px solid var(--border, rgba(0,0,0,.1)); border-radius:10px; background:color-mix(in srgb, #2f6fdb 6%, var(--background)); width:calc(100% - 56px); }
+.pf-news-device[data-kind="notice"] span { flex:1; min-width:0; }
+.pf-news-device button { flex:none; display:inline-flex; align-items:center; gap:4px; height:26px; padding:0 8px; border:1px solid var(--border, rgba(0,0,0,.12)); border-radius:7px; background:transparent; color:inherit; font-size:12px; cursor:pointer; }
+.pf-news-device .pf-news-device-go { background:#1d4434; border-color:#1d4434; color:#fff; font-weight:600; }
+:root[data-pf-theme="dark"] .pf-news-device .pf-news-device-go { background:#e86f45; border-color:#e86f45; }
+.pf-news-device[data-kind="pill"] { position:fixed; right:16px; bottom:16px; z-index:60; padding:7px 12px; border-radius:999px; border:1px solid var(--border, rgba(0,0,0,.1)); background:var(--background); box-shadow:0 4px 18px rgba(0,0,0,.12); }
 .pf-news-main { max-width:min(1720px, 100%); margin:0 auto; padding:22px 28px 12px; }
 .pf-news-foot { max-width:1720px; margin:0 auto; padding:18px 28px 40px; font-size:12px; color:var(--muted-foreground, #667); }
 @media (max-width:760px) {
+  .pf-news-bar nav { gap:6px; }
+  .pf-news-bar nav .pf-news-lang button { min-width:30px; padding:0 6px; }
   .pf-news-bar { gap:10px; padding:10px 16px; }
   .pf-news-bar p { display:none; }
   .pf-news-bar nav a { padding:0 10px; font-size:12px; }
   .pf-news-main { padding:14px 16px 8px; }
+  .pf-news-device[data-kind="notice"] { width:calc(100% - 32px); align-items:flex-start; }
   .pf-news-foot { padding:14px 16px 32px; }
 }
 @media (max-width:400px) { .pf-news-bar nav a span, .pf-news-bar nav a { font-size:0; gap:0; width:34px; padding:0; justify-content:center; } .pf-news-bar nav a svg { width:16px; height:16px; } }

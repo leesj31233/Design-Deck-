@@ -1,6 +1,7 @@
 import { PaperFonts } from "@/components/paperflow/shell/paper-fonts";
 import { guideSansKr, handKr, paperSerifKr } from "../(paperflow)/fonts";
 import "@/components/paperflow/paperflow.css";
+import { NEWS_DESCRIPTION, NEWS_TITLE } from "@/components/paperflow/news/meta";
 
 const SNAPSHOT = process.env.NEXT_PUBLIC_SUPABASE_URL ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/naysor-news` : "";
 /**
@@ -11,8 +12,8 @@ const EARLY = SNAPSHOT ? `(function(){try{var s=${JSON.stringify(SNAPSHOT)},v=nu
 
 export const viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" as const };
 export const metadata = {
-  title: "NAYSOR News — EFB·저품위탄·캐슈넛 인텔리전스",
-  description: "팜 잔재 펠릿·바이오차, 저품위탄 고품위화, 캐슈넛 부산물의 시장·가격·기업·기술 자료를 근거와 함께 모았습니다.",
+  title: NEWS_TITLE,
+  description: NEWS_DESCRIPTION,
   icons: { icon: "/naysor/naysor-mark.png" }
 };
 

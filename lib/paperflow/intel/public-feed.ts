@@ -3,7 +3,8 @@ import { ownerId } from "./ingest-auth";
 import { PRICES_BRIEF } from "./prices";
 import { PLACES_BRIEF } from "./places";
 import { REGISTRY_BRIEF } from "./registry";
-import type { IntelBrief, IntelItem } from "./types";
+import type { IntelBrief, IntelEnglish, IntelItem } from "./types";
+import { briefTexts, itemTexts, pruneEnglish } from "@/lib/paperflow/i18n/content";
 
 /**
  * NAYSOR News: the owner's intelligence, readable by anyone without an account. Only the collected facts go
@@ -48,7 +49,25 @@ export function publicMarkdown(body: string) {
   }
   return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
-export function publicBrief(brief: IntelBrief): IntelBrief | null {
+/**
+ * The English that goes out with a public item or briefing: only the English of texts the public copy still has
+ * (it was made from the public copy, and anything else is dropped here as well), with the same scrub as the rest.
+ */
+function publicEnglish(en: IntelEnglish | undefined, texts: Map<string, string>): IntelEnglish | undefined {
+  const kept = pruneEnglish(en, texts);
+  if (!kept) return undefined;
+  const t = scrub(kept.t) as Record<string, string>;
+  return Object.keys(t).length ? { t, ...(kept.h ? { h: kept.h } : {}) } : undefined;
+}
+/** A briefing as the public sees it, with its English (see publicEnglish). */
+export function publicBrief(raw: IntelBrief): IntelBrief | null {
+  const { en, ...brief } = raw;
+  const shown = publicBriefText(brief);
+  if (!shown) return null;
+  const english = publicEnglish(en, briefTexts(shown));
+  return english ? { ...shown, en: english } : shown;
+}
+function publicBriefText(brief: IntelBrief): IntelBrief | null {
   if (brief.id === REGISTRY_BRIEF) {
     // NAYSOR itself is not one of the organisations the site describes.
     try { const registry = JSON.parse(brief.body); registry.entities = (registry.entities ?? []).filter((entity: { name?: string }) => !SELF.test(entity.name ?? "")); for (const entity of registry.entities) delete entity.note; return { ...brief, body: JSON.stringify(registry) }; } catch { return null; }
@@ -132,7 +151,7 @@ function scrub(value: unknown, key = ""): unknown {
 /** An item as the public sees it (null: an open question, or NAYSOR's own analysis, which stay internal). */
 export function publicItem(raw: IntelItem, base: string, at: string, hasCover: boolean): IntelItem | null {
   if (raw.kind === "gap" || SELF.test(`${raw.title} ${raw.titleKo ?? ""} ${raw.org ?? ""}`)) return null;
-  const { user: _user, libraryDoc: _doc, cover: _cover, naysor: _naysor, ...rest } = raw;
+  const { user: _user, libraryDoc: _doc, cover: _cover, naysor: _naysor, en, ...rest } = raw;
   // Pictures become URLs first, by their place in the stored list (the media route reads that same place).
   if (rest.dossier?.figures) rest.dossier = { ...rest.dossier, figures: rest.dossier.figures.map((figure, index) => ({ ...figure, src: figure.src.startsWith("data:") ? mediaUrl(base, rest.id, at, index) : figure.src })) };
   const item = scrub(rest) as typeof rest;
@@ -143,7 +162,9 @@ export function publicItem(raw: IntelItem, base: string, at: string, hasCover: b
     sections: item.dossier.sections?.flatMap(section => JUDGEMENT.test(section.title) ? [] : [{ ...section, body: publicMarkdown(section.body) }]).filter(section => section.body),
     sources: item.dossier.sources?.map(source => { const { libraryDoc: _lib, ...rest } = source; void _lib; return rest; })
   } : undefined;
-  return { ...item, summaryKo: item.summaryKo ? factsOnly(item.summaryKo) : item.summaryKo, dossier, hasCover: hasCover || undefined, updatedAt: at };
+  const shown: IntelItem = { ...item, summaryKo: item.summaryKo ? factsOnly(item.summaryKo) : item.summaryKo, dossier, hasCover: hasCover || undefined, updatedAt: at };
+  const english = publicEnglish(en, itemTexts(shown));
+  return english ? { ...shown, en: english } : shown;
 }
 
 type RegistryEntity = { code: string; parentCode?: string; canonicalItemId?: string; itemIds?: string[]; mentionIds?: string[] };

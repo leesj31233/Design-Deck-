@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { adminClient } from "@/lib/paperflow/cloud/server";
 import { readPack } from "@/lib/paperflow/intel/repository";
 import { ingestAuthorized, ownerId } from "@/lib/paperflow/intel/ingest-auth";
+import type { IntelEnglish } from "@/lib/paperflow/intel/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -12,6 +13,8 @@ const LIMIT = 8 * 1024 * 1024;
  * and written into the owner's account, where every signed-in device picks it up on its next sync.
  * Only a caller holding INTEL_INGEST_TOKEN (set on the server and in the routine, never in the code)
  * may write; items keep the reader's own decisions (star, folder, memo), which live on the devices.
+ * English (`en`, NAYSOR News in English) is written by the routine with each item and briefing; an item delivered
+ * again without it keeps the English it had, and new English is laid over the old text by text.
  */
 export async function POST(request: Request) {
   if (!ingestAuthorized(request)) return Response.json({ error: "unauthorized" }, { status: 401 });
@@ -27,6 +30,12 @@ export async function POST(request: Request) {
   if (!userId) return Response.json({ error: "owner account not found" }, { status: 404 });
 
   const now = new Date().toISOString();
+  const englishIds = [...pack.items.map(item => `intel:${item.id}`), ...(pack.briefs ?? []).map(brief => `intelbrief:${brief.id}`)], englishOf = new Map<string, IntelEnglish>();
+  for (let at = 0; at < englishIds.length; at += 200) {
+    const { data } = await admin.from("annotations").select("id, en:data->en").eq("user_id", userId).eq("deleted", false).in("id", englishIds.slice(at, at + 200));
+    for (const row of (data ?? []) as { id: string; en: IntelEnglish | null }[]) if (row.en && typeof row.en === "object" && row.en.t) englishOf.set(row.id, row.en);
+  }
+  const withEnglish = <T extends { en?: IntelEnglish }>(rowId: string, value: T): T => { const before = englishOf.get(rowId); return before ? { ...value, en: { ...before, ...value.en, t: { ...before.t, ...value.en?.t } } } : value; };
   // Covers are big and change rarely: each lives on its own row ("intelmedia:<id>"), rewritten only when the
   // picture itself changed, so a text edit never makes every device download the pictures again.
   const mediaIds = pack.items.map(item => `intelmedia:${item.id}`), knownHash = new Map<string, string>();
@@ -42,9 +51,9 @@ export async function POST(request: Request) {
     return knownHash.get(`intelmedia:${item.id}`) === hash ? [] : [{ user_id: userId, id: `intelmedia:${item.id}`, document_id: "__intel__", data: { cover: item.cover, hash }, deleted: false, updated_at: now }];
   });
   const rows = [
-    ...pack.items.map(({ cover, ...item }) => ({ user_id: userId, id: `intel:${item.id}`, document_id: "__intel__", data: { ...item, hasCover: item.coverOff ? undefined : Boolean(cover) || knownHash.has(`intelmedia:${item.id}`) || item.hasCover || undefined, addedAt: item.addedAt ?? now, updatedAt: now }, deleted: false, updated_at: now })),
+    ...pack.items.map(({ cover, ...item }) => ({ user_id: userId, id: `intel:${item.id}`, document_id: "__intel__", data: { ...withEnglish(`intel:${item.id}`, item), hasCover: item.coverOff ? undefined : Boolean(cover) || knownHash.has(`intelmedia:${item.id}`) || item.hasCover || undefined, addedAt: item.addedAt ?? now, updatedAt: now }, deleted: false, updated_at: now })),
     ...mediaRows,
-    ...(pack.briefs ?? []).map(brief => ({ user_id: userId, id: `intelbrief:${brief.id}`, document_id: "__intel__", data: { ...brief, updatedAt: now }, deleted: false, updated_at: now }))
+    ...(pack.briefs ?? []).map(brief => ({ user_id: userId, id: `intelbrief:${brief.id}`, document_id: "__intel__", data: { ...withEnglish(`intelbrief:${brief.id}`, brief), updatedAt: now }, deleted: false, updated_at: now }))
   ];
   // A glossary merges with the one already in the account rather than replacing it.
   const glossary = rows.find(row => row.id === "intelbrief:__glossary__");
