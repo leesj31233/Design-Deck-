@@ -6,6 +6,7 @@ import { duration, useNotices, type Notice } from "@/lib/paperflow/notifications
 import { documentRepository } from "@/lib/paperflow/persistence/document-repository";
 import { PARAGRAPHS_PER_PAPER } from "@/lib/paperflow/cloud/plans";
 import "./notifications.css";
+import { useLang } from "@/lib/paperflow/i18n/context";
 
 const ICON = { info: Info, success: Check, error: AlertTriangle, progress: Loader2, credit: Coins } as const;
 
@@ -26,6 +27,7 @@ function creditMeter(credits: Credits | undefined): Notice["meter"] {
 
 /** One notice: icon, title, optional figures and a meter; a thin bar counts down and stops while pointed at. */
 function NoticeCard({ notice }: { notice: Notice }) {
+  const { t } = useLang();
   const dismiss = useNotices(state => state.dismiss), [paused, setPaused] = useState(false), left = useRef(notice.timeout), started = useRef(Date.now());
   useEffect(() => {
     if (!notice.timeout || paused) return;
@@ -46,7 +48,7 @@ function NoticeCard({ notice }: { notice: Notice }) {
         {meter.caption && <small>{meter.caption}</small>}
       </div>}
     </div>
-    <button type="button" className="pf-notice-close" aria-label="알림 닫기" onClick={() => dismiss(notice.id)}><X size={13}/></button>
+    <button type="button" className="pf-notice-close" aria-label={t("알림 닫기")} onClick={() => dismiss(notice.id)}><X size={13}/></button>
     {notice.timeout > 0 && <span className="pf-notice-timer" style={{ animationDuration: `${notice.timeout}ms` }}/>}
   </div>;
 }

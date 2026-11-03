@@ -4,6 +4,7 @@ import { Building2, Factory, MapPinOff, Route, X, Zap } from "lucide-react";
 import { KIND_LABEL, PLACE_LABEL, UPDATE_LABEL, type IntelClass, type IntelItem, type IntelPlace } from "@/lib/paperflow/intel/types";
 import type { BasePlaces } from "@/lib/paperflow/intel/places";
 import "./intel-map.css";
+import { useLang } from "@/lib/paperflow/i18n/context";
 
 /* Leaflet comes from a CDN when the map is first shown (the app ships no map library). The base map is Esri's quiet
    Light / Dark Gray Canvas (no key needed), with its labels as a separate layer above the research's dots, so
@@ -54,6 +55,7 @@ type Pin = { key: string; lat: number; lng: number; entries: { item: IntelItem; 
  * opens the item's page or panel. Only places a source states are on the map.
  */
 export function IntelMap({ items, query, selected, onOpen, places, klass = "all" }: { items: IntelItem[]; query: string; selected: string | null; onOpen: (id: string) => void; places?: BasePlaces | null; klass?: IntelClass | "all" }) {
+  const { t } = useLang();
   const box = useRef<HTMLDivElement>(null), mapRef = useRef<Leaflet>(null), layerRef = useRef<Leaflet>(null), linesRef = useRef<Leaflet>(null), baseRef = useRef<Leaflet>(null), tilesRef = useRef<Leaflet>(null), labelsRef = useRef<Leaflet>(null);
   const [ready, setReady] = useState<"loading" | "ready" | "failed">("loading");
   // Relation lines only for the place opened (all of them at once is a web); the base layers follow the class.
@@ -117,10 +119,10 @@ export function IntelMap({ items, query, selected, onOpen, places, klass = "all"
     layer.clearLayers();
     const renderer = L.canvas({ padding: .3 });
     if (showMills) for (const mill of places?.mills ?? []) L.circleMarker([mill.lat, mill.lng], { renderer, radius: Math.max(2.2, Math.min(7, Math.sqrt(mill.capacity ?? 30) * .7)), stroke: false, fillColor: "#c98a2b", fillOpacity: .55 })
-      .bindPopup(`<div class="pf-map-pop"><small>팜오일 공장 (Trase)</small><b>${esc(mill.name)}</b><span>${esc([mill.company, mill.group].filter(Boolean).join(" · "))}</span><span>${esc([mill.regency, mill.province].filter(Boolean).join(", "))}</span>${mill.capacity ? `<span>처리능력 ${mill.capacity} t FFB/h</span>` : ""}</div>`).addTo(layer);
+      .bindPopup(`<div class="pf-map-pop"><small>${esc(t("팜오일 공장 (Trase)"))}</small><b>${esc(mill.name)}</b><span>${esc([mill.company, mill.group].filter(Boolean).join(" · "))}</span><span>${esc([mill.regency, mill.province].filter(Boolean).join(", "))}</span>${mill.capacity ? `<span>${esc(t("처리능력 {capacity} t FFB/h", { capacity: mill.capacity }))}</span>` : ""}</div>`).addTo(layer);
     if (showPlants) for (const plant of places?.plants ?? []) L.circleMarker([plant.lat, plant.lng], { renderer, radius: Math.max(4, Math.min(11, Math.sqrt(plant.capacityMw ?? 100) / 7)), color: "#fff", weight: 1.5, fillColor: plant.cofiring && plant.cofiring !== "none" ? "#2b7a78" : "#4a5563", fillOpacity: .85 })
-      .bindPopup(`<div class="pf-map-pop"><small>석탄화력 발전소 (WRI)</small><b>${esc(plant.name)}</b><span>${esc(plant.owner ?? "")}</span><span>${plant.capacityMw ? `${plant.capacityMw.toLocaleString()} MW` : ""}${plant.island ? ` · ${esc(plant.island)}` : ""}</span>${plant.cofiring ? `<span>바이오매스 혼소: ${esc(plant.cofiring === "reported" ? "보고됨" : plant.cofiring === "trial" ? "시험" : plant.cofiring)}</span>` : ""}</div>`).addTo(layer);
-  }, [places, showMills, showPlants, ready]);
+      .bindPopup(`<div class="pf-map-pop"><small>${esc(t("석탄화력 발전소 (WRI)"))}</small><b>${esc(plant.name)}</b><span>${esc(plant.owner ?? "")}</span><span>${plant.capacityMw ? `${plant.capacityMw.toLocaleString()} MW` : ""}${plant.island ? ` · ${esc(plant.island)}` : ""}</span>${plant.cofiring ? `<span>${esc(t("바이오매스 혼소: {state}", { state: plant.cofiring === "reported" ? t("보고됨") : plant.cofiring === "trial" ? t("시험") : plant.cofiring }))}</span>` : ""}</div>`).addTo(layer);
+  }, [places, showMills, showPlants, ready, t]);
 
   // Pins and lines follow the filters.
   const fitted = useRef(false);
@@ -137,7 +139,7 @@ export function IntelMap({ items, query, selected, onOpen, places, klass = "all"
     for (const group of cells.values()) {
       if (group.length === 1 || zoom >= 12) { single.push(...group); continue; }
       const lat = group.reduce((sum, pin) => sum + pin.lat, 0) / group.length, lng = group.reduce((sum, pin) => sum + pin.lng, 0) / group.length, count = group.reduce((sum, pin) => sum + pin.entries.length, 0);
-      const marker = L.marker([lat, lng], { icon: L.divIcon({ className: "pf-map-pin-wrap", html: `<span class="pf-map-cluster">${count}</span>`, iconSize: [34, 34], iconAnchor: [17, 17] }), title: `${count}건` });
+      const marker = L.marker([lat, lng], { icon: L.divIcon({ className: "pf-map-pin-wrap", html: `<span class="pf-map-cluster">${count}</span>`, iconSize: [34, 34], iconAnchor: [17, 17] }), title: t("{count}건", { count }) });
       marker.on("click", () => map.fitBounds(group.map(pin => [pin.lat, pin.lng]), { padding: [60, 60], maxZoom: Math.min(zoom + 3, 13) }));
       marker.addTo(layer);
       for (const pin of group) for (const entry of pin.entries) if (!place.has(entry.item.id)) place.set(entry.item.id, [lat, lng]);
@@ -147,7 +149,7 @@ export function IntelMap({ items, query, selected, onOpen, places, klass = "all"
       const isSelected = pin.entries.some(entry => entry.item.id === selected), hasNews = pin.entries.some(entry => entry.item.update?.date && dayDiff(entry.item.update.date) <= 90);
       const html = `<span class="pf-map-pin" data-kind="${kind}"${isSelected ? " data-selected" : ""}${hasNews ? " data-news" : ""}>${pin.entries.length > 1 ? pin.entries.length : ""}</span>`;
       const marker = L.marker([pin.lat, pin.lng], { icon: L.divIcon({ className: "pf-map-pin-wrap", html, iconSize: [26, 26], iconAnchor: [13, 13] }), keyboard: true, title: pin.entries.map(entry => companyLabel(entry.item)).slice(0, 3).join(", ") });
-      marker.bindTooltip(pin.entries.slice(0, 4).map(entry => `${companyLabel(entry.item)} · ${PLACE_LABEL[entry.place.kind]}`).join("<br>") + (pin.entries.length > 4 ? `<br>+${pin.entries.length - 4}` : ""), { direction: "top", offset: [0, -10] });
+      marker.bindTooltip(pin.entries.slice(0, 4).map(entry => `${companyLabel(entry.item)} · ${t(PLACE_LABEL[entry.place.kind])}`).join("<br>") + (pin.entries.length > 4 ? `<br>+${pin.entries.length - 4}` : ""), { direction: "top", offset: [0, -10] });
       marker.on("click", () => setActive(pin));
       marker.addTo(layer);
       for (const entry of pin.entries) if (!place.has(entry.item.id)) place.set(entry.item.id, [pin.lat, pin.lng]);
@@ -157,7 +159,7 @@ export function IntelMap({ items, query, selected, onOpen, places, klass = "all"
       if (!lines && !focus.has(link.from.id) && !focus.has(link.to.id)) continue;
       const a = place.get(link.from.id), b = place.get(link.to.id);
       if (!a || !b || (a[0] === b[0] && a[1] === b[1])) continue;
-      L.polyline([a, b], { className: `pf-map-line pf-map-line-${link.type}`, weight: 1.5, opacity: .55 }).bindTooltip(`${companyLabel(link.from)} → ${companyLabel(link.to)} · ${RELATION_LABEL[link.type] ?? link.type}`, { sticky: true }).addTo(lineLayer);
+      L.polyline([a, b], { className: `pf-map-line pf-map-line-${link.type}`, weight: 1.5, opacity: .55 }).bindTooltip(`${companyLabel(link.from)} → ${companyLabel(link.to)} · ${t(RELATION_LABEL[link.type]) ?? link.type}`, { sticky: true }).addTo(lineLayer);
     }
     // First view: Sumatra, Malaysia and Kalimantan, where the mills and most of the research are; a far-away
     // class (cashew in West Africa, say) gets its own pins in view instead.
@@ -165,34 +167,34 @@ export function IntelMap({ items, query, selected, onOpen, places, klass = "all"
       fitted.current = true;
       if (klass !== "c3") map.fitBounds([[-6.5, 95], [6.5, 119]], { padding: [10, 10] }); else map.fitBounds(pins.map(pin => [pin.lat, pin.lng]), { padding: [40, 40], maxZoom: 6 });
     }
-  }, [pins, links, lines, selected, ready, zoom, active, klass]);
+  }, [pins, links, lines, selected, ready, zoom, active, klass, t]);
 
   const toggle = <T,>(set: Set<T>, value: T) => { const next = new Set(set); if (next.has(value)) next.delete(value); else next.add(value); return next; };
   const missing = items.length - located.length;
-  return <section className="pf-map" aria-label="지도">
+  return <section className="pf-map" aria-label={t("지도")}>
     <div className="pf-map-filters">
-      <div role="group" aria-label="국가">{regionCounts.map(([region, count]) => <button type="button" key={region} aria-pressed={regions.has(region)} onClick={() => setRegions(toggle(regions, region))}>{region}<i>{count}</i></button>)}</div>
-      <div role="group" aria-label="구분">{KIND_ORDER.filter(kind => located.some(item => item.kind === kind)).map(kind => <button type="button" key={kind} data-kind={kind} aria-pressed={kinds.has(kind)} onClick={() => setKinds(toggle(kinds, kind))}><b/>{KIND_LABEL[kind]}</button>)}</div>
-      <button type="button" aria-pressed={recent} onClick={() => setRecent(!recent)}>최근 90일 소식</button>
-      <button type="button" aria-pressed={lines} title="꺼져 있으면 연 위치의 관계만 그립니다" onClick={() => setLines(!lines)}><Route size={13}/>관계선 전체 {links.length}</button>
-      {places?.mills.length ? <button type="button" className="pf-map-layer" data-layer="mill" aria-pressed={showMills} onClick={() => setShowMills(!showMills)}><Factory size={13}/>팜오일 공장<i>{places.mills.length.toLocaleString()}</i></button> : null}
-      {places?.plants.length ? <button type="button" className="pf-map-layer" data-layer="plant" aria-pressed={showPlants} onClick={() => setShowPlants(!showPlants)}><Zap size={13}/>석탄화력<i>{places.plants.length}</i></button> : null}
-      <span className="pf-map-count">{pins.reduce((sum, pin) => sum + pin.entries.length, 0)}곳 · {shown.length}건{missing > 0 && <> · <MapPinOff size={12}/>위치 미확인 {missing}건</>}</span>
+      <div role="group" aria-label={t("국가")}>{regionCounts.map(([region, count]) => <button type="button" key={region} aria-pressed={regions.has(region)} onClick={() => setRegions(toggle(regions, region))}>{t(region)}<i>{count}</i></button>)}</div>
+      <div role="group" aria-label={t("구분")}>{KIND_ORDER.filter(kind => located.some(item => item.kind === kind)).map(kind => <button type="button" key={kind} data-kind={kind} aria-pressed={kinds.has(kind)} onClick={() => setKinds(toggle(kinds, kind))}><b/>{t(KIND_LABEL[kind])}</button>)}</div>
+      <button type="button" aria-pressed={recent} onClick={() => setRecent(!recent)}>{t("최근 90일 소식")}</button>
+      <button type="button" aria-pressed={lines} title={t("꺼져 있으면 연 위치의 관계만 그립니다")} onClick={() => setLines(!lines)}><Route size={13}/>{t("관계선 전체")} {links.length}</button>
+      {places?.mills.length ? <button type="button" className="pf-map-layer" data-layer="mill" aria-pressed={showMills} onClick={() => setShowMills(!showMills)}><Factory size={13}/>{t("팜오일 공장")}<i>{places.mills.length.toLocaleString()}</i></button> : null}
+      {places?.plants.length ? <button type="button" className="pf-map-layer" data-layer="plant" aria-pressed={showPlants} onClick={() => setShowPlants(!showPlants)}><Zap size={13}/>{t("석탄화력")}<i>{places.plants.length}</i></button> : null}
+      <span className="pf-map-count">{pins.reduce((sum, pin) => sum + pin.entries.length, 0)}{t("곳 ·")} {shown.length}{t("건")}{missing > 0 && <> · <MapPinOff size={12}/>{t("위치 미확인")} {missing}{t("건")}</>}</span>
     </div>
     <div className="pf-map-stage">
-      <div ref={box} className="pf-map-canvas" role="application" aria-label="기업·공장·프로젝트 지도"/>
-      {ready === "loading" && <p className="pf-map-note">지도를 불러오는 중…</p>}
+      <div ref={box} className="pf-map-canvas" role="application" aria-label={t("기업·공장·프로젝트 지도")}/>
+      {ready === "loading" && <p className="pf-map-note">{t("지도를 불러오는 중…")}</p>}
       {(showMills || showPlants) && places && <p className="pf-map-credit">{[showMills && places.sources.mills, showPlants && places.sources.plants].filter(Boolean).map(source => (source as { title: string }).title).join(" · ")}</p>}
-      {ready === "failed" && <p className="pf-map-note">지도 라이브러리를 불러오지 못했습니다. 네트워크를 확인한 뒤 다시 여세요.</p>}
-      {active && <aside className="pf-map-list" aria-label="이 위치의 항목">
-        <header><b>{active.entries[0].place.address ?? active.entries[0].place.label}</b><small>{active.entries.length}건</small><button type="button" aria-label="닫기" onClick={() => setActive(null)}><X size={15}/></button></header>
+      {ready === "failed" && <p className="pf-map-note">{t("지도 라이브러리를 불러오지 못했습니다. 네트워크를 확인한 뒤 다시 여세요.")}</p>}
+      {active && <aside className="pf-map-list" aria-label={t("이 위치의 항목")}>
+        <header><b>{active.entries[0].place.address ?? active.entries[0].place.label}</b><small>{active.entries.length}{t("건")}</small><button type="button" aria-label={t("닫기")} onClick={() => setActive(null)}><X size={15}/></button></header>
         <ul>{active.entries.map(({ item, place }, index) => <li key={`${item.id}-${index}`}>
           <button type="button" onClick={() => onOpen(item.id)}>
             {item.logo ? <span className="pf-map-logo" data-dark={item.logoDark || undefined}><img src={item.logo} alt=""/></span> : <span className="pf-map-logo"><Building2 size={16}/></span>}
             <span>
               <b>{companyLabel(item)}</b>
-              <small>{[KIND_LABEL[item.kind], PLACE_LABEL[place.kind], place.label].filter(Boolean).join(" · ")}{place.precision !== "exact" && place.precision !== "street" ? ` · ${place.precision === "city" ? "도시 단위" : "지역 단위"}` : ""}</small>
-              {item.update && <small className="pf-map-news"><em>{UPDATE_LABEL[item.update.type]}</em> {item.update.date} {item.update.headline ?? ""}</small>}
+              <small>{[t(KIND_LABEL[item.kind]), t(PLACE_LABEL[place.kind]), place.label].filter(Boolean).join(" · ")}{place.precision !== "exact" && place.precision !== "street" ? ` · ${place.precision === "city" ? t("도시 단위") : t("지역 단위")}` : ""}</small>
+              {item.update && <small className="pf-map-news"><em>{t(UPDATE_LABEL[item.update.type])}</em> {item.update.date} {item.update.headline ?? ""}</small>}
             </span>
           </button>
         </li>)}</ul>

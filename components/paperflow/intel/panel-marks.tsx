@@ -5,6 +5,7 @@ import type { Annotation, AnnotationColor } from "@/lib/paperflow/anchors/types"
 import { annotationRepository } from "@/lib/paperflow/persistence/annotation-repository";
 import { createAnnotation, removeAnnotation, updateAnnotation } from "@/lib/paperflow/state/history";
 import { locate, offsetAtPoint, offsetOf, quoteOf, rangeOf, textIndex } from "@/lib/paperflow/intel/brief-anchors";
+import { useLang } from "@/lib/paperflow/i18n/context";
 
 const COLORS: AnnotationColor[] = ["yellow", "green", "blue", "pink", "purple"];
 const SWATCH: Record<AnnotationColor, string> = { yellow: "#d3a000", green: "#219960", blue: "#257acb", pink: "#ce4b7a", purple: "#8c58cc" };
@@ -16,6 +17,7 @@ const supported = () => typeof CSS !== "undefined" && "highlights" in CSS && typ
  * Marks belong to the item (`intel:<id>`), are found again by their text, and sync with the account.
  */
 export function PanelMarks({ itemId, children }: { itemId: string; children: ReactNode }) {
+  const { t } = useLang();
   const documentId = `intel:${itemId}`, root = useRef<HTMLDivElement>(null);
   const [marks, setMarks] = useState<Annotation[]>([]), [tool, setTool] = useState<"select" | "highlight" | "eraser">("select"), [color, setColor] = useState<AnnotationColor>("yellow");
   const [open, setOpen] = useState<{ id: string; top: number } | null>(null);
@@ -55,30 +57,30 @@ export function PanelMarks({ itemId, children }: { itemId: string; children: Rea
       if (start === null || end === null || start === end) return;
       const quote = quoteOf(index, Math.min(start, end), Math.max(start, end)), now = new Date().toISOString();
       if (!quote.textQuote.trim()) return;
-      await createAnnotation({ id: crypto.randomUUID(), type: "highlight", documentId, pageIndex: 0, color, anchor: { version: 1, documentId, pageIndex: 0, ...quote, rects: [], normalizedRects: [], createdAt: now }, createdAt: now, updatedAt: now, resolutionStatus: "resolved" }, "형광펜");
+      await createAnnotation({ id: crypto.randomUUID(), type: "highlight", documentId, pageIndex: 0, color, anchor: { version: 1, documentId, pageIndex: 0, ...quote, rects: [], normalizedRects: [], createdAt: now }, createdAt: now, updatedAt: now, resolutionStatus: "resolved" }, t("형광펜"));
       selection.removeAllRanges(); await reload();
       return;
     }
     const hit = markAt(event.clientX, event.clientY);
-    if (tool === "eraser") { if (hit) { await removeAnnotation(hit, "형광펜 지우기"); await reload(); } return; }
+    if (tool === "eraser") { if (hit) { await removeAnnotation(hit, t("형광펜 지우기")); await reload(); } return; }
     if (!window.getSelection()?.toString()) setOpen(hit ? { id: hit.id, top: event.clientY - element.getBoundingClientRect().top + 14 } : null);
   };
   const current = open ? marks.find(mark => mark.id === open.id) : null;
 
   return <div className="pf-panel-marks" data-tool={tool}>
-    <div className="pf-panel-tools" data-marks-ui role="toolbar" aria-label="오른쪽 패널 마킹">
-      <button type="button" aria-pressed={tool === "select"} title="선택" onClick={() => setTool("select")}><MousePointer2 size={14}/></button>
-      <button type="button" aria-pressed={tool === "highlight"} title="형광펜 (드래그해서 표시)" onClick={() => setTool("highlight")}><Highlighter size={14}/><span>형광펜</span></button>
+    <div className="pf-panel-tools" data-marks-ui role="toolbar" aria-label={t("오른쪽 패널 마킹")}>
+      <button type="button" aria-pressed={tool === "select"} title={t("선택")} onClick={() => setTool("select")}><MousePointer2 size={14}/></button>
+      <button type="button" aria-pressed={tool === "highlight"} title={t("형광펜 (드래그해서 표시)")} onClick={() => setTool("highlight")}><Highlighter size={14}/><span>{t("형광펜")}</span></button>
       <span className="pf-brief-colors">{COLORS.map(item => <button key={item} type="button" role="radio" aria-checked={color === item} aria-label={item} style={{ "--swatch": SWATCH[item] } as React.CSSProperties} onClick={() => { setColor(item); setTool("highlight"); }}/>)}</span>
-      <button type="button" aria-pressed={tool === "eraser"} title="지우개" onClick={() => setTool("eraser")}><Eraser size={14}/></button>
-      {marks.length > 0 && <small>마킹 {marks.length}{marks.some(mark => mark.note) ? ` · 메모 ${marks.filter(mark => mark.note).length}` : ""}</small>}
+      <button type="button" aria-pressed={tool === "eraser"} title={t("지우개")} onClick={() => setTool("eraser")}><Eraser size={14}/></button>
+      {marks.length > 0 && <small>{t("마킹")} {marks.length}{marks.some(mark => mark.note) ? t(" · 메모 {length}", { length: marks.filter(mark => mark.note).length }) : ""}</small>}
     </div>
     <div ref={root} className="pf-panel-marks-body" onPointerUp={event => void onPointerUp(event)}>{children}</div>
     {current && open && <div className="pf-brief-markpop pf-panel-markpop" data-marks-ui style={{ top: open.top + 44 }}>
       <q>{current.anchor.textQuote.slice(0, 120)}</q>
-      <span className="pf-brief-colors">{COLORS.map(item => <button key={item} type="button" aria-label={item} aria-pressed={current.color === item} style={{ "--swatch": SWATCH[item] } as React.CSSProperties} onClick={() => void updateAnnotation(current, { ...current, color: item, updatedAt: new Date().toISOString() }, "색 바꾸기").then(reload)}/>)}</span>
-      <textarea key={current.id} defaultValue={current.note ?? ""} placeholder="이 부분에 대한 메모" aria-label="마킹 메모" onBlur={event => { const note = event.target.value.trim(); if (note !== (current.note ?? "")) void updateAnnotation(current, { ...current, note: note || undefined, updatedAt: new Date().toISOString() }, "메모").then(reload); }}/>
-      <div><button type="button" onClick={() => void removeAnnotation(current, "형광펜 지우기").then(() => { setOpen(null); return reload(); })}><Trash2 size={13}/>지우기</button><button type="button" onClick={() => setOpen(null)}>닫기</button></div>
+      <span className="pf-brief-colors">{COLORS.map(item => <button key={item} type="button" aria-label={item} aria-pressed={current.color === item} style={{ "--swatch": SWATCH[item] } as React.CSSProperties} onClick={() => void updateAnnotation(current, { ...current, color: item, updatedAt: new Date().toISOString() }, t("색 바꾸기")).then(reload)}/>)}</span>
+      <textarea key={current.id} defaultValue={current.note ?? ""} placeholder={t("이 부분에 대한 메모")} aria-label={t("마킹 메모")} onBlur={event => { const note = event.target.value.trim(); if (note !== (current.note ?? "")) void updateAnnotation(current, { ...current, note: note || undefined, updatedAt: new Date().toISOString() }, t("메모")).then(reload); }}/>
+      <div><button type="button" onClick={() => void removeAnnotation(current, t("형광펜 지우기")).then(() => { setOpen(null); return reload(); })}><Trash2 size={13}/>{t("지우기")}</button><button type="button" onClick={() => setOpen(null)}>{t("닫기")}</button></div>
     </div>}
   </div>;
 }

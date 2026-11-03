@@ -4,6 +4,7 @@ import { BookOpen, Building2, FileText, Gauge, HelpCircle, Landmark, Newspaper, 
 import { SOURCE_LABEL, UPDATE_LABEL, itemDate, type IntelItem } from "@/lib/paperflow/intel/types";
 import { intelRepository } from "@/lib/paperflow/intel/repository";
 import { previewOf } from "./source-tree";
+import { useLang } from "@/lib/paperflow/i18n/context";
 
 const ICON = { paper: BookOpen, gov: Landmark, "test-report": Gauge, "annual-report": Building2, patent: FileText, "vendor-catalog": Wrench, "market-analyst": Gauge, press: Newspaper } as Record<string, typeof BookOpen>;
 
@@ -13,6 +14,7 @@ const ICON = { paper: BookOpen, gov: Landmark, "test-report": Gauge, "annual-rep
  * image, fetched only when the card comes into view. Over it: what the document is and its date.
  */
 export function CardCover({ item, library }: { item: IntelItem; /** The first page of the reader's library copy, when linked. */ library?: string }) {
+  const { t } = useLang();
   const stored = item.images?.[0]?.src ?? (item.coverOff ? undefined : item.cover) ?? library ?? (item.hasCover ? undefined : item.dossier?.figures?.[0]?.src ?? item.user?.figures?.[0]?.src);
   const [image, setImage] = useState<string | undefined>(stored), [broken, setBroken] = useState(false), box = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -32,7 +34,7 @@ export function CardCover({ item, library }: { item: IntelItem; /** The first pa
     return () => { alive = false; observer.disconnect(); };
   }, [stored, item.url, item.kind, item.hasCover, item.coverOff, item.id, item.dossier, item.user]);
   const Icon = item.kind === "gap" ? HelpCircle : ICON[item.sourceType ?? ""] ?? FileText;
-  const label = item.update ? UPDATE_LABEL[item.update.type] : item.kind === "gap" ? "확인 필요" : SOURCE_LABEL[item.sourceType ?? ""] ?? "자료";
+  const label = item.update ? t(UPDATE_LABEL[item.update.type]) : item.kind === "gap" ? t("확인 필요") : t(SOURCE_LABEL[item.sourceType ?? ""]) ?? t("자료");
   // The newest real date behind the item (its own, its news, its sources), top right like a dateline.
   const date = itemDate(item);
   return <div ref={box} className="pf-card-cover" data-source={item.sourceType} data-kind={item.kind} data-empty={!image || broken || undefined} data-pdf={item.cover && !item.dossier ? undefined : undefined}>

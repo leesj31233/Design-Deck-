@@ -23,6 +23,17 @@ export interface IntelUserState { star?: boolean; folderId?: string | null; note
   /** Figures the reader added (a pasted screenshot, a photo), compressed to WebP; shown with the case's own. */
   figures?: { src: string; caption: string; addedAt: string }[] }
 
+/**
+ * The English of an item's (or briefing's) Korean texts, for NAYSOR News in English. Stored as `t`: textKey(korean)
+ * (lib/paperflow/i18n/content.ts) → English, for every displayed text — titleKo, summaryKo, the article, the case
+ * file (headline, facts, timeline, conflicts, sections, figure captions, sources), profile, data, update, people,
+ * image captions, places. A pack writes it the easy way, as a mirror of the item with English in the same fields
+ * (`en: { titleKo, summaryKo, article, dossier: { headline, facts: [{ label, value }] … } }`); the import turns that
+ * into `t` (englishFromPack). `h`: the hash of the Korean texts the English was written for. `naysor` (internal
+ * judgement) is never given English, and the public copy carries only the English of its own texts.
+ */
+export interface IntelEnglish { t: Record<string, string>; h?: string; at?: string }
+
 export interface IntelItem {
   id: string; kind: IntelKind; topics: string[]; classes?: IntelClass[];
   title: string; titleKo?: string; summaryKo?: string;
@@ -65,6 +76,8 @@ export interface IntelItem {
   /** The pack it came in and when it was stored here. */
   pack?: string; addedAt?: string; updatedAt?: string;
   user?: IntelUserState;
+  /** English versions of the Korean texts (NAYSOR News in English); see IntelEnglish. */
+  en?: IntelEnglish;
 }
 
 export type UpdateType = "report" | "vision" | "news" | "contract" | "plant" | "certification" | "exit" | "price" | "policy" | "research";
@@ -91,7 +104,9 @@ export interface IntelDossier {
 /** core: the standing analysis; daily/weekly/monthly/quarterly: dated updates, newest first. */
 export type BriefPeriod = "core" | "daily" | "weekly" | "monthly" | "quarterly";
 export const PERIOD_LABEL: Record<BriefPeriod, string> = { core: "핵심 분석", daily: "일간", weekly: "주간", monthly: "월간", quarterly: "분기" };
-export interface IntelBrief { id: string; title: string; body: string; order?: number; period?: BriefPeriod; date?: string; pack?: string; updatedAt?: string; classes?: IntelClass[] }
+export interface IntelBrief { id: string; title: string; body: string; order?: number; period?: BriefPeriod; date?: string; pack?: string; updatedAt?: string; classes?: IntelClass[];
+  /** English of the title and body (a hidden JSON briefing: of its texts); see IntelEnglish. */
+  en?: IntelEnglish }
 export interface IntelPack { format: "paperflow-intel"; version: 1; id: string; title?: string; generatedAt: string; items: IntelItem[]; briefs?: IntelBrief[] }
 
 export interface TopicNode { id: string; label: string; children?: TopicNode[] }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import type { DossierEvent, DossierFigure, DossierSource } from "@/lib/paperflow/intel/types";
+import { useLang } from "@/lib/paperflow/i18n/context";
 
 /** A source's PDF: its pdfUrl, or its own URL when that is a PDF. */
 export const pdfOf = (source: DossierSource) => source.pdfUrl ?? (source.url && /\.pdf($|[?#])/i.test(source.url) ? source.url : undefined);
@@ -16,11 +17,12 @@ export const siteOf = (url?: string) => { if (!url) return undefined; try { retu
  * the card carries the detail.
  */
 export function SourceChip({ refs, sources }: { refs: string[]; sources: Map<string, DossierSource> }) {
+  const { t } = useLang();
   const found = refs.map(ref => sources.get(ref)).filter((source): source is DossierSource => Boolean(source));
   if (!found.length) return <span className="pf-cite" data-missing>[{refs.join(", ")}]</span>;
   const first = found[0];
   return <span className="pf-cite-wrap" tabIndex={0}>
-    <a className="pf-cite" href={first.url ?? `#dossier-src-${first.ref}`} target={first.url ? "_blank" : undefined} rel="noreferrer noopener" aria-label={`출처 ${found.map(source => source.ref).join(", ")}`}>{found.map(source => source.ref).join("·")}</a>
+    <a className="pf-cite" href={first.url ?? `#dossier-src-${first.ref}`} target={first.url ? "_blank" : undefined} rel="noreferrer noopener" aria-label={t("출처 {v0}", { v0: found.map(source => source.ref).join(", ") })}>{found.map(source => source.ref).join("·")}</a>
     <span className="pf-cite-card" role="tooltip">{found.map(source => <span key={source.ref}>
       <small>[{source.ref}] {[siteOf(source.url) ?? source.org, source.date].filter(Boolean).join(" · ")}</small>
       {source.url ? <a href={source.url} target="_blank" rel="noreferrer noopener">{source.title}</a> : <b>{source.title}</b>}
@@ -31,10 +33,11 @@ export function SourceChip({ refs, sources }: { refs: string[]; sources: Map<str
 
 /** A figure opened full size over the page; Escape or a click outside closes it. */
 export function Lightbox({ figure, source, onClose }: { figure: DossierFigure | null; source?: DossierSource; onClose: () => void }) {
+  const { t } = useLang();
   useEffect(() => { if (!figure) return; const key = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); }; window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key); }, [figure, onClose]);
   if (!figure) return null;
   return createPortal(<div className="pf-dossier-lightbox" role="dialog" aria-label={figure.caption} onClick={onClose}>
-    <button type="button" className="pf-dossier-close" aria-label="닫기"><X size={20}/></button>
+    <button type="button" className="pf-dossier-close" aria-label={t("닫기")}><X size={20}/></button>
     <figure onClick={event => event.stopPropagation()}><img src={figure.src} alt={figure.caption}/><figcaption>{figure.caption}{figure.where && ` · ${figure.where}`}{source ? ` — ${source.title}` : ""}</figcaption></figure>
   </div>, document.body);
 }
@@ -75,6 +78,7 @@ function dedupe(events: DossierEvent[]) {
  * Facts and plans are told apart; each line keeps its source.
  */
 export function CompactTimeline({ events, cite, newestFirst = false }: { events: DossierEvent[]; cite: (ref?: string) => React.ReactNode; newestFirst?: boolean }) {
+  const { t } = useLang();
   const [open, setOpen] = useState<number | null>(null);
   const sorted = [...dedupe(events)].sort((a, b) => a.date.replace(/^~/, "").localeCompare(b.date.replace(/^~/, "")) * (newestFirst ? -1 : 1));
   return <ol className="pf-tl">{sorted.map((event, index) => {
@@ -87,9 +91,9 @@ export function CompactTimeline({ events, cite, newestFirst = false }: { events:
       <time dateTime={event.date}>{shortDate(event.date)}{cite(event.ref)}</time>
       <div>
         <button type="button" onClick={() => setOpen(open === index ? null : index)} aria-expanded={open === index}>
-          {tag && <i>{tag}</i>}{title}{planned && <em>계획</em>}
+          {tag && <i>{tag}</i>}{title}{planned && <em>{t("계획")}</em>}
         </button>
-        {(open === index) && <p>{detail ?? (title === text ? null : text)}{event.status && <small>{event.status === "verified" ? "확인됨" : event.status === "claimed" ? "회사 발표" : event.status === "estimate" ? "추정" : "미확인"}</small>}</p>}
+        {(open === index) && <p>{detail ?? (title === text ? null : text)}{event.status && <small>{event.status === "verified" ? t("확인됨") : event.status === "claimed" ? t("회사 발표") : event.status === "estimate" ? t("추정") : t("미확인")}</small>}</p>}
       </div>
     </li>;
   })}</ol>;

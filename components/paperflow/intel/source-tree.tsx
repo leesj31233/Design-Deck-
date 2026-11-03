@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronRight, FileText, Globe, Link2 } from "lucide-react";
 import { KIND_LABEL, STATUS_LABEL, type IntelItem } from "@/lib/paperflow/intel/types";
+import { useLang } from "@/lib/paperflow/i18n/context";
 
 export interface LinkPreview { kind: "page" | "pdf"; url: string; host: string; title?: string; site?: string; description?: string; published?: string; image?: string; size?: number; status?: number }
 
@@ -29,6 +30,7 @@ export function previewOf(url: string): Promise<LinkPreview | null> {
 
 /** A source as a card: its lead image, publisher, date, title and summary; opens the real page. */
 export function LinkCard({ url, label, where, compact }: { url: string; label?: string; where?: string; compact?: boolean }) {
+  const { t } = useLang();
   const [preview, setPreview] = useState<LinkPreview | null | undefined>(undefined), [broken, setBroken] = useState(false);
   useEffect(() => { let alive = true; setPreview(undefined); void previewOf(url).then(result => { if (alive) setPreview(result); }); return () => { alive = false; }; }, [url]);
   let host = url; try { host = new URL(url).hostname.replace(/^www\./, ""); } catch { /* shown as given */ }
@@ -39,7 +41,7 @@ export function LinkCard({ url, label, where, compact }: { url: string; label?: 
       <small>{[preview?.site ?? host, preview?.published?.slice(0, 10), pdf ? "PDF" : null, where].filter(Boolean).join(" · ")}</small>
       <strong>{preview?.title || label || host}</strong>
       {!compact && preview?.description && <em>{preview.description}</em>}
-      <i><ArrowUpRight size={12}/>원문 페이지 열기</i>
+      <i><ArrowUpRight size={12}/>{t("원문 페이지 열기")}</i>
     </span>
   </a>;
 }
@@ -50,26 +52,28 @@ export function LinkCard({ url, label, where, compact }: { url: string; label?: 
  * pages. A branch opens one level at a time (three at most) and never loops back on itself.
  */
 export function SourceTree({ item, byId, mentions, onOpen }: { item: IntelItem; byId: Map<string, IntelItem>; mentions: IntelItem[]; onOpen: (id: string) => void }) {
+  const { t } = useLang();
   const children = (node: IntelItem) => (node.relations ?? []).map(relation => ({ relation, target: byId.get(relation.to) })).filter(entry => entry.target);
   if (!item.dossier?.sources?.length && !children(item).length && !mentions.length) return null;
-  return <section className="pf-sourcetree"><h4><Link2 size={13}/>이 항목과 이어진 자료</h4>
-    {item.dossier?.sources?.length ? <div className="pf-sourcetree-group"><span>케이스 파일 출처</span>{item.dossier.sources.filter(source => source.url).map(source => <LinkCard key={source.ref} url={source.url!} label={`[${source.ref}] ${source.title}`} where={source.where} compact/>)}</div> : null}
-    {children(item).length > 0 && <div className="pf-sourcetree-group"><span>이 항목이 기대는 자료</span><ul>{children(item).map(({ relation, target }) => <Branch key={target!.id} item={target!} type={relation.type} byId={byId} onOpen={onOpen} depth={1} seen={new Set([item.id])} children={children}/>)}</ul></div>}
-    {mentions.length > 0 && <div className="pf-sourcetree-group"><span>이 항목을 근거로 쓰는 자료</span><ul>{mentions.slice(0, 12).map(mention => <Branch key={mention.id} item={mention} type="cites" byId={byId} onOpen={onOpen} depth={1} seen={new Set([item.id])} children={children}/>)}</ul></div>}
+  return <section className="pf-sourcetree"><h4><Link2 size={13}/>{t("이 항목과 이어진 자료")}</h4>
+    {item.dossier?.sources?.length ? <div className="pf-sourcetree-group"><span>{t("케이스 파일 출처")}</span>{item.dossier.sources.filter(source => source.url).map(source => <LinkCard key={source.ref} url={source.url!} label={`[${source.ref}] ${source.title}`} where={source.where} compact/>)}</div> : null}
+    {children(item).length > 0 && <div className="pf-sourcetree-group"><span>{t("이 항목이 기대는 자료")}</span><ul>{children(item).map(({ relation, target }) => <Branch key={target!.id} item={target!} type={relation.type} byId={byId} onOpen={onOpen} depth={1} seen={new Set([item.id])} children={children}/>)}</ul></div>}
+    {mentions.length > 0 && <div className="pf-sourcetree-group"><span>{t("이 항목을 근거로 쓰는 자료")}</span><ul>{mentions.slice(0, 12).map(mention => <Branch key={mention.id} item={mention} type="cites" byId={byId} onOpen={onOpen} depth={1} seen={new Set([item.id])} children={children}/>)}</ul></div>}
   </section>;
 }
 
 function Branch({ item, type, byId, onOpen, depth, seen, children }: { item: IntelItem; type: string; byId: Map<string, IntelItem>; onOpen: (id: string) => void; depth: number; seen: Set<string>; children: (node: IntelItem) => { relation: { to: string; type: string }; target?: IntelItem }[] }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const next = children(item).filter(({ target }) => !seen.has(target!.id) && target!.id !== item.id);
   return <li className="pf-branch" data-open={open || undefined}>
     <div className="pf-branch-head">
-      <button type="button" className="pf-branch-toggle" aria-expanded={open} aria-label={open ? "접기" : "펼치기"} onClick={() => setOpen(!open)}><ChevronRight size={14}/></button>
-      <button type="button" className="pf-branch-title" onClick={() => setOpen(!open)}><span>{type} · {KIND_LABEL[item.kind]}{item.status ? ` · ${STATUS_LABEL[item.status]}` : ""}{item.date ? ` · ${item.date}` : ""}</span>{item.titleKo || item.title}</button>
-      <button type="button" className="pf-branch-go" onClick={() => onOpen(item.id)} title="이 항목을 오른쪽에 열기">열기</button>
+      <button type="button" className="pf-branch-toggle" aria-expanded={open} aria-label={open ? t("접기") : t("펼치기")} onClick={() => setOpen(!open)}><ChevronRight size={14}/></button>
+      <button type="button" className="pf-branch-title" onClick={() => setOpen(!open)}><span>{type} · {t(KIND_LABEL[item.kind])}{item.status ? ` · ${t(STATUS_LABEL[item.status])}` : ""}{item.date ? ` · ${item.date}` : ""}</span>{item.titleKo || item.title}</button>
+      <button type="button" className="pf-branch-go" onClick={() => onOpen(item.id)} title={t("이 항목을 오른쪽에 열기")}>{t("열기")}</button>
     </div>
     {open && <div className="pf-branch-body">
-      {item.url ? <LinkCard url={item.url} label={item.title} where={(item.data ?? []).map(datum => datum.where).filter(Boolean).slice(0, 3).join(", ") || undefined}/> : <p className="pf-branch-none">원문 링크 없음 (확인 필요 항목)</p>}
+      {item.url ? <LinkCard url={item.url} label={item.title} where={(item.data ?? []).map(datum => datum.where).filter(Boolean).slice(0, 3).join(", ") || undefined}/> : <p className="pf-branch-none">{t("원문 링크 없음 (확인 필요 항목)")}</p>}
       {depth < 3 && next.length > 0 && <ul>{next.map(({ relation, target }) => <Branch key={target!.id} item={target!} type={relation.type} byId={byId} onOpen={onOpen} depth={depth + 1} seen={new Set([...seen, item.id])} children={children}/>)}</ul>}
     </div>}
   </li>;

@@ -4,6 +4,7 @@ import type { IntelItem } from "@/lib/paperflow/intel/types";
 import { CoverImage } from "./card-cover";
 import { Markdown, type EntityRenderer, type TermMarker } from "./markdown";
 import "./item-article.css";
+import { useLang } from "@/lib/paperflow/i18n/context";
 
 /** A numbered reference of the article: `1. [title](url) — org, date` under its 참고문헌 heading. */
 interface ArticleRef { n: string; label: string; url?: string; rest: string }
@@ -27,6 +28,7 @@ export function articleRefs(source: string): ArticleRef[] {
 export function ItemArticle({ item, entity, terms, figure }: { item: IntelItem; entity: EntityRenderer; terms: Omit<TermMarker, "seen">;
   /** A figure of another item, rendered by the host. */
   figure?: (id: string, index: number, caption: string, key: number) => ReactNode }) {
+  const { t } = useLang();
   const source = item.article ?? "";
   const refs = useMemo(() => new Map(articleRefs(source).map(ref => [ref.n, ref])), [source]);
   // The item's own pictures: #0 its lead picture (a full-quality picture when it has one, else its cover),
@@ -39,9 +41,9 @@ export function ItemArticle({ item, entity, terms, figure }: { item: IntelItem; 
     if (!full && !picked && !(index === 0 && (item.cover || item.hasCover))) return null;
     const text = caption || full?.caption || picked?.caption;
     return <figure key={key} className="pf-article-figure" data-hero={key === 0 || undefined} data-kind={full?.kind}>
-      {full ? <a href={full.src} target="_blank" rel="noreferrer noopener" title="원본 크기로 보기"><img src={full.src} alt={text ?? ""} loading="lazy" width={full.w} height={full.h}/></a>
+      {full ? <a href={full.src} target="_blank" rel="noreferrer noopener" title={t("원본 크기로 보기")}><img src={full.src} alt={text ?? ""} loading="lazy" width={full.w} height={full.h}/></a>
         : picked ? <img src={picked.src} alt={text ?? ""} loading="lazy"/> : <CoverImage item={item} alt={text ?? ""}/>}
-      {text && <figcaption>{text}{full?.credit && <small> · 출처: {full.from ? <a href={full.from} target="_blank" rel="noreferrer noopener">{full.credit}</a> : full.credit}</small>}</figcaption>}
+      {text && <figcaption>{text}{full?.credit && <small> {t("· 출처:")} {full.from ? <a href={full.from} target="_blank" rel="noreferrer noopener">{full.credit}</a> : full.credit}</small>}</figcaption>}
     </figure>;
   };
   const cite = (list: string[], key: number) => <sup key={key} className="pf-article-cite">{list.map((n, index) => { const ref = refs.get(n); return <a key={n} href={ref?.url ?? `#art-ref-${item.id}-${n}`} target={ref?.url ? "_blank" : undefined} rel="noreferrer noopener" title={ref ? ref.rest : undefined} onClick={ref?.url ? undefined : event => { event.preventDefault(); document.getElementById(`art-ref-${item.id}-${n}`)?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>{index > 0 ? "," : "["}{n}{index === list.length - 1 ? "]" : ""}</a>; })}</sup>;
