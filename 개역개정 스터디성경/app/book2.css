@@ -322,3 +322,11 @@ body.phone #mapNote { display: none; }
 .life li { padding: 5px 0; border-bottom: 1px dotted var(--panel-line); }
 
 .here.soft { background: var(--chip); border-left-color: var(--muted); }
+
+/* ---------- fullscreen button ---------- */
+.fs-btn { flex: none; width: 36px; height: 36px; margin-left: 4px; display: grid; place-items: center; border: 1px solid var(--panel-line); border-radius: 8px; background: transparent; color: inherit; cursor: pointer; }
+.fs-btn:hover { background: var(--accent-soft); }
+.fs-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.fs-btn .fs-out, body.fullscreen .fs-btn .fs-in { display: none; }
+body.fullscreen .fs-btn .fs-out { display: inline; }
+body.phone .fs-btn { display: none; }

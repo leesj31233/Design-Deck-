@@ -542,7 +542,22 @@ document.querySelector(".topbar").addEventListener("click", e => {
   else if (act === "map") openMap({}, goToRef);
   else if (act === "people") openPeople(goToRef);
   else if (act === "pdf") { const part = parts[S.pos.pi]; exportPdf({ part, settings, ann }); }
+  else if (act === "fullscreen") toggleFullscreen();
 });
+
+// Fullscreen: the whole page (top bar, book and bottom bar) fills the screen; the resize that follows re-lays the pages.
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+function toggleFullscreen() {
+  const root = document.documentElement;
+  if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else (root.requestFullscreen || root.webkitRequestFullscreen)?.call(root)?.catch?.(() => toast("이 브라우저에서는 전체 화면을 쓸 수 없음"));
+}
+for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) document.addEventListener(ev, () => {
+  const on = !!fsEl();
+  document.body.classList.toggle("fullscreen", on);
+  $("#fsBtn").title = on ? "전체 화면 끝내기 (Esc)" : "전체 화면 (F11)";
+});
+if (!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)) $("#fsBtn").hidden = true;
 
 // ---------- pen ----------
 
