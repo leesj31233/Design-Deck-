@@ -63,7 +63,8 @@ export async function checkDevice(): Promise<DeviceState> {
   if (!api) { set({ state: "unsupported" }); return "unsupported"; }
   if (translator) { set({ state: "ready" }); return "ready"; }
   try {
-    const found = await api.availability(PAIR);
+    // Some embedded browsers expose the API but never answer: after a few seconds it counts as unavailable.
+    const found = await Promise.race([api.availability(PAIR), new Promise<"unavailable">(resolve => setTimeout(() => resolve("unavailable"), 6000))]);
     const state: DeviceState = found === "available" ? "ready" : found === "unavailable" ? "unavailable" : found;
     set({ state: state === "ready" ? "checking" : state });
     // A model already on the device opens without a click.

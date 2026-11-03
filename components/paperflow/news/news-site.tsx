@@ -62,8 +62,17 @@ function NewsPage() {
   const tRef = useRef(t); tRef.current = t;
   // The tab title and description follow the language (the server sends the Korean ones).
   useEffect(() => {
-    document.title = t(NEWS_TITLE);
-    document.querySelector('meta[name="description"]')?.setAttribute("content", t(NEWS_DESCRIPTION));
+    const title = t(NEWS_TITLE), description = t(NEWS_DESCRIPTION);
+    const apply = () => {
+      if (document.title !== title) document.title = title;
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta && meta.getAttribute("content") !== description) meta.setAttribute("content", description);
+    };
+    apply();
+    // Next.js writes its own (Korean) <title> back when it re-renders the head; put ours back each time.
+    const watch = new MutationObserver(apply);
+    watch.observe(document.head, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["content"] });
+    return () => watch.disconnect();
   }, [t]);
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }));
   const [loading, setLoading] = useState(true), [dark, setDark] = useState(false);
