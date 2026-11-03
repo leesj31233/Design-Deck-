@@ -76,4 +76,12 @@ describe("English written by the research routine", () => {
     expect(localItem(shown, "en").summaryKo).toBe("A company that makes washed EFB pellets in Johor, Malaysia.");
     expect(publicBrief({ id: "brief-06-pilot", title: "x", body: "y", en: { t: { a: "b" } } })).toBeNull();
   });
+  it("keeps a briefing's English when its internal section is cut from the public copy", () => {
+    const body = "### 전체 요약\nEFB 펠릿 가격이 올랐다.\n\n### NAYSOR 관점 (내부)\nNAYSOR는 계약을 서둘러야 한다.";
+    const english = "### Overview\nEFB pellet prices rose.\n\n### NAYSOR view (internal)\nNAYSOR should hurry the contract.";
+    const shown = publicBrief(readPack(JSON.stringify({ items: [], briefs: [{ id: "daily-2026-11-04", title: "일일 브리핑", body, period: "daily", en: { title: "Daily briefing", body: english } }] })).briefs![0])!;
+    const read = localBrief(shown, "en");
+    expect(read.body).toBe("### Overview\nEFB pellet prices rose.");
+    expect(JSON.stringify(shown.en)).not.toContain("hurry");
+  });
 });

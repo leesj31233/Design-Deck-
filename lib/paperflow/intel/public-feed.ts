@@ -4,7 +4,7 @@ import { PRICES_BRIEF } from "./prices";
 import { PLACES_BRIEF } from "./places";
 import { REGISTRY_BRIEF } from "./registry";
 import type { IntelBrief, IntelEnglish, IntelItem } from "./types";
-import { briefTexts, itemTexts, pruneEnglish } from "@/lib/paperflow/i18n/content";
+import { briefTexts, itemTexts, koreanTexts, pruneEnglish, textKey } from "@/lib/paperflow/i18n/content";
 
 /**
  * NAYSOR News: the owner's intelligence, readable by anyone without an account. Only the collected facts go
@@ -53,18 +53,35 @@ export function publicMarkdown(body: string) {
  * The English that goes out with a public item or briefing: only the English of texts the public copy still has
  * (it was made from the public copy, and anything else is dropped here as well), with the same scrub as the rest.
  */
-function publicEnglish(en: IntelEnglish | undefined, texts: Map<string, string>): IntelEnglish | undefined {
-  const kept = pruneEnglish(en, texts);
+function publicEnglish(en: IntelEnglish | undefined, texts: Map<string, string>, raw?: unknown): IntelEnglish | undefined {
+  const kept = pruneEnglish(withPublicForms(en, raw), texts);
   if (!kept) return undefined;
   const t = scrub(kept.t) as Record<string, string>;
   return Object.keys(t).length ? { t, ...(kept.h ? { h: kept.h } : {}) } : undefined;
+}
+/**
+ * The English is written for the full text; the public text may have lost a section or a sentence about NAYSOR.
+ * The same cut is made on both sides (the English heading or sentence names NAYSOR too, or is an implication,
+ * pilot or next-step heading), so the public text keeps its English.
+ */
+function withPublicForms(en: IntelEnglish | undefined, raw: unknown): IntelEnglish | undefined {
+  if (!en?.t || raw === undefined) return en;
+  const t = { ...en.t };
+  for (const [key, korean] of koreanTexts(raw)) {
+    const english = en.t[key];
+    if (typeof english !== "string") continue;
+    const markdown = publicMarkdown(korean), facts = factsOnly(korean);
+    if (markdown && markdown !== korean) t[textKey(markdown)] ??= publicMarkdown(english);
+    if (facts && facts !== korean) t[textKey(facts)] ??= factsOnly(english);
+  }
+  return { ...en, t };
 }
 /** A briefing as the public sees it, with its English (see publicEnglish). */
 export function publicBrief(raw: IntelBrief): IntelBrief | null {
   const { en, ...brief } = raw;
   const shown = publicBriefText(brief);
   if (!shown) return null;
-  const english = publicEnglish(en, briefTexts(shown));
+  const english = publicEnglish(en, briefTexts(shown), brief.id.startsWith("__") ? undefined : { title: brief.title, body: brief.body });
   return english ? { ...shown, en: english } : shown;
 }
 function publicBriefText(brief: IntelBrief): IntelBrief | null {
@@ -163,7 +180,7 @@ export function publicItem(raw: IntelItem, base: string, at: string, hasCover: b
     sources: item.dossier.sources?.map(source => { const { libraryDoc: _lib, ...rest } = source; void _lib; return rest; })
   } : undefined;
   const shown: IntelItem = { ...item, summaryKo: item.summaryKo ? factsOnly(item.summaryKo) : item.summaryKo, dossier, hasCover: hasCover || undefined, updatedAt: at };
-  const english = publicEnglish(en, itemTexts(shown));
+  const english = publicEnglish(en, itemTexts(shown), rest);
   return english ? { ...shown, en: english } : shown;
 }
 
