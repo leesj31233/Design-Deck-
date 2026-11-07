@@ -41,23 +41,33 @@ async function refreshPlan() {
 
 /** Upload one PDF if this account keeps PDFs in the cloud and the quota allows it. */
 async function uploadPdf(doc: StoredDocument): Promise<string | null> {
+  // The plan may not have arrived yet (a paper imported right after sign-in): ask before deciding.
+  if (!useCloud.getState().plan) await refreshPlan();
   if (useCloud.getState().plan?.mode !== "cloud") return null;
-  const blob = await documentRepository.getDocumentBlob(doc.id);
+  // Only a PDF kept on this device is uploaded; never fetch the cloud copy just to send it back.
+  const blob = await documentRepository.getDocumentBlob(doc.id, { remote: false });
   if (!blob) return null;
+  if (blob.size > MAX_PDF_BYTES) { set({ error: `"${doc.title}" PDF가 50MB를 넘어 클라우드에 올리지 못했습니다. 이 기기에만 있습니다.` }); return null; }
   const response = await fetch("/api/cloud/upload-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ documentId: doc.id, byteLength: blob.size }) });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) { if (response.status === 413) set({ error: body.error }); return null; }
+  if (!response.ok) { if (response.status !== 409) set({ error: body.error ?? `"${doc.title}" PDF를 클라우드에 올리지 못했습니다. 다음 동기화 때 다시 시도합니다.` }); return null; }
   const { error } = await supabase().storage.from(PAPER_BUCKET).uploadToSignedUrl(body.path, body.token, blob, { contentType: "application/pdf", upsert: true });
-  if (error) return null;
+  if (error) { set({ error: `"${doc.title}" PDF를 클라우드에 올리지 못했습니다. 다음 동기화 때 다시 시도합니다.` }); return null; }
   return body.path as string;
 }
+/** The bucket's per-file limit (supabase/migrations/20261003000001_paperflow_cloud.sql). */
+const MAX_PDF_BYTES = 52428800;
 
 async function pushDocument(doc: StoredDocument, remote?: DocumentRow) {
   if (!session) return;
   let storagePath = remote?.storage_path ?? doc.storagePath ?? null;
-  if (!storagePath && doc.sourceStatus !== "remote") storagePath = await uploadPdf(doc);
-  await supabase().from("documents").upsert(rowOf(session.user.id, doc, storagePath), { onConflict: "user_id,id" });
-  if (storagePath && doc.storagePath !== storagePath) await documentRepository.putRecord({ ...doc, storagePath, sourceStatus: "cloud" });
+  const uploaded = !storagePath && (storagePath = await uploadPdf(doc)) !== null;
+  // A PDF uploaded after the row was first written moves the row's date forward, so every other
+  // device sees the change and learns that the file is now in the account.
+  const row = rowOf(session.user.id, doc, storagePath);
+  if (uploaded) row.updated_at = new Date(Math.max(Date.now(), Date.parse(doc.updatedAt) + 1)).toISOString();
+  await supabase().from("documents").upsert(row, { onConflict: "user_id,id" });
+  if (storagePath && (doc.storagePath !== storagePath || uploaded)) await documentRepository.putRecord({ ...doc, storagePath, sourceStatus: "cloud", updatedAt: row.updated_at });
 }
 
 async function pushAnnotation(id: string, documentId: string, deleted: boolean) {
@@ -144,9 +154,12 @@ export async function syncAll() {
     for (const row of remote.values()) {
       const doc = mine.get(row.id);
       if (!doc || row.updated_at > doc.updatedAt) await documentRepository.putRecord(recordOf(row, doc));
+      // The file reached the account after this device last pulled the row (older versions kept the date).
+      else if (row.storage_path && !doc.storagePath) await documentRepository.putRecord({ ...doc, storagePath: row.storage_path, sourceStatus: doc.sourceStatus === "remote" ? "cloud" : doc.sourceStatus });
     }
     const uploads = useCloud.getState().plan?.mode === "cloud";
-    for (const doc of local) { if (purged.has(doc.id)) continue; const row = remote.get(doc.id); if (!row || doc.updatedAt > row.updated_at || (uploads && !row.storage_path && doc.sourceStatus !== "remote")) await pushDocument(doc, row); }
+    const kept = uploads ? new Set(await documentRepository.localBlobIds()) : new Set<string>();
+    for (const doc of local) { if (purged.has(doc.id)) continue; const row = remote.get(doc.id); if (!row || doc.updatedAt > row.updated_at || (uploads && !row.storage_path && kept.has(doc.id))) await pushDocument(doc, row); }
 
     const [{ data: notes }, { data: intelIndex }, localNotes] = await Promise.all([
       db.from("annotations").select("id, document_id, data, deleted, updated_at").neq("document_id", INTEL),
@@ -278,8 +291,16 @@ async function flush() {
 async function downloadPdf(documentId: string): Promise<Blob | null> {
   if (!session) return null;
   const doc = await documentRepository.getDocument(documentId);
-  if (!doc?.storagePath) return null;
-  const { data, error } = await supabase().storage.from(PAPER_BUCKET).download(doc.storagePath);
+  if (!doc) return null;
+  let storagePath = doc.storagePath;
+  // This device may not know yet that the file was uploaded since: ask the account directly.
+  if (!storagePath) {
+    const { data } = await supabase().from("documents").select("storage_path").eq("id", documentId).maybeSingle();
+    storagePath = (data?.storage_path as string | null) ?? undefined;
+    if (!storagePath) return null;
+    await documentRepository.putRecord({ ...doc, storagePath, sourceStatus: "cloud" });
+  }
+  const { data, error } = await supabase().storage.from(PAPER_BUCKET).download(storagePath);
   return error ? null : data;
 }
 

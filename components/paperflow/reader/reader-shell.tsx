@@ -127,7 +127,7 @@ export function ReaderShell({ documentId }: { documentId: string }) {
       const [record, blob] = await Promise.all([documentRepository.getDocument(documentId), documentRepository.getDocumentBlob(documentId)]);
       if (!record) throw new Error("이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
       // Listed by the account but kept on another device: the same file imported here links automatically.
-      if (!blob) throw new Error(record.sourceStatus === "remote" ? "이 논문의 PDF는 다른 기기에 저장되어 있습니다. 같은 PDF 파일을 이 기기에서 가져오면 메모·번역과 자동으로 연결됩니다." : "이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
+      if (!blob) throw new Error(record.sourceStatus === "remote" ? "이 논문의 PDF가 아직 계정에 올라가지 않았습니다. PDF를 가져온 기기에서 PAPERFLOW를 한 번 열면 자동으로 계정에 올라가고, 그 뒤에는 어느 기기에서나 열립니다. 지금 바로 보려면 같은 PDF 파일을 여기서 가져오세요. 메모·번역과 자동으로 연결되고 계정에도 올라갑니다." : "이 브라우저에 저장된 PDF가 없습니다. 라이브러리에서 파일을 가져와 주세요.");
       if (controller.signal.aborted) return;
       const params = new URLSearchParams(window.location.search), requestedPage = Number(params.get("page"));
       const initialPage = requestedPage >= 1 && requestedPage <= record.pageCount ? requestedPage : record.currentPage;

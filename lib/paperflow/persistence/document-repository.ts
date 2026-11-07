@@ -13,7 +13,12 @@ export const documentRepository: DocumentRepository = {
       // A paper listed by the account but stored on another device: importing the same file links it here.
       const blobs = tx.objectStore("blobs");
       if (!(await requestResult(blobs.getKey(id)))) blobs.put(blob, id);
-      await done; return existing;
+      // The file is now on this device too: it uploads to the account if the account lacks it.
+      const linked = existing.sourceStatus === "remote" ? { ...existing, sourceStatus: "local" as const } : existing;
+      if (linked !== existing) store.put(linked);
+      await done;
+      if (linked !== existing) emitLocalChange({ kind: "document", id });
+      return linked;
     }
     const now = new Date().toISOString();
     const record: StoredDocument = { id, filename, title: filename.replace(/\.pdf$/i, ""), mimeType: "application/pdf", byteLength: blob.size, createdAt: now, updatedAt: now, pageCount, fingerprint, blobKey: id, currentPage: 1, authors: [], researchPoolIds: [], archived: false, sourceStatus: "local" };
@@ -31,6 +36,7 @@ export const documentRepository: DocumentRepository = {
     return remote;
   },
   async putBlob(id, blob) { const db = await openDatabase(), tx = db.transaction("blobs", "readwrite"), done = transactionDone(tx); tx.objectStore("blobs").put(blob, id); await done; },
+  async localBlobIds() { const db = await openDatabase(); return (await requestResult<IDBValidKey[]>(db.transaction("blobs").objectStore("blobs").getAllKeys())).map(String); },
   async putRecord(record) { const db = await openDatabase(), tx = db.transaction("documents", "readwrite"), done = transactionDone(tx); tx.objectStore("documents").put(record); await done; },
   async listDocuments() { const db = await openDatabase(); const docs = await requestResult<StoredDocument[]>(db.transaction("documents").objectStore("documents").getAll()); return docs.sort((a, b) => (b.lastOpenedAt ?? b.createdAt).localeCompare(a.lastOpenedAt ?? a.createdAt)); },
   async updateDocument(id, patch) {

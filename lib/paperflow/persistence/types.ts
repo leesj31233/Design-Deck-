@@ -37,6 +37,8 @@ export interface DocumentRepository {
   /** Sync only: write a record as received from the account, without announcing a local change. */
   putRecord(record: StoredDocument): Promise<void>;
   putBlob(id: string, blob: Blob): Promise<void>;
+  /** Ids of the papers whose PDF is kept in this browser. */
+  localBlobIds(): Promise<string[]>;
   /** Permanent delete on this device: the record, the PDF, its marks, translations and layout manifest. */
   removeDocument(id: string): Promise<void>;
 }
