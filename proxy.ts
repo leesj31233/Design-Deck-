@@ -13,8 +13,9 @@ const adminEmails = () => (process.env.PAPERFLOW_OWNER_EMAILS ?? "").split(",").
  */
 export async function proxy(request: NextRequest) {
   // NAYSOR News (its own address): open to everyone, no account. Its front page is /news; the app's other
-  // pages are not part of it.
-  if (request.headers.get("host")?.startsWith("naysor-news.")) {
+  // pages are not part of it. NAYSOR_NEWS_ONLY=1 marks the separate Vercel project that serves News alone
+  // (no PAPERFLOW keys there), so its preview addresses are locked to News as well.
+  if (process.env.NAYSOR_NEWS_ONLY === "1" || request.headers.get("host")?.startsWith("naysor-news.")) {
     if (request.nextUrl.pathname === "/") return NextResponse.rewrite(new URL("/news", request.url));
     return NextResponse.redirect(new URL("/", request.url));
   }
