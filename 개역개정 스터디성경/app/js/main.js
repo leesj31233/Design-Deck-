@@ -25,18 +25,28 @@ let study, search;
 
 function computeGeom() {
   const W = innerWidth, H = innerHeight;
-  const phone = W < 640 || (H < 500 && W < 1000 && W / H > 1.6 && matchMedia("(pointer: coarse)").matches && W < 700);
+  const coarse = matchMedia("(pointer: coarse)").matches;
+  const phone = W < 560 || (H < 500 && W < 1000 && W / H > 1.6 && coarse && W < 700);
   const top = phone ? 0 : 52, bottom = phone ? 0 : 46;
   const availH = H - top - bottom - (phone ? 0 : 26);
-  const spread = !phone && W / H >= 1.12 && W >= 760;
-  let w, h;
+  // Touch screens and narrow windows get slim arrows, edges and margins, so the pages take the width.
+  const compact = !phone && (coarse || W < 1000);
+  const chrome = compact ? 104 : 150;  // arrows, page edges and thumb tabs beside the pages
+  const half = Math.floor((W - chrome) / 2);
+  // Near-square screens (an unfolded Fold, a small tablet on its side) open as a two-page spread too.
+  const spread = !phone && W / H >= 0.78 && half >= 290;
+  let w, h = availH;
   if (phone) { w = W; h = H; }
-  else if (spread) { h = availH; w = Math.min(Math.round(h * 0.72), Math.floor((W - 150) / 2)); }
-  else { h = availH; w = Math.min(Math.round(h * 0.74), W - 110); }
+  else if (spread) w = Math.min(Math.round(h * 0.72), half);
+  else w = Math.min(Math.round(h * 0.74), W - chrome + 40);
   const cols = settings.cols === "auto" ? (w >= 500 ? 2 : 1) : settings.cols;
-  return { mode: spread ? "spread" : "single", phone, w, h, cols, fs: settings.fs, lh: settings.lh };
+  // Narrow spread pages (a Fold) set the type a little smaller so a page still holds a good amount.
+  const narrow = spread && w < 360;
+  const fs = narrow ? Math.round(settings.fs * 1.8) / 2 : settings.fs;
+  const lh = narrow ? Math.min(settings.lh, 1.65) : settings.lh;
+  return { mode: spread ? "spread" : "single", phone, compact, w, h, cols, fs, lh };
 }
-const geomKey = g => [g.mode, g.w, g.h, g.cols, g.fs, g.lh, settings.main, settings.par].join("|");
+const geomKey = g => [g.mode, g.w, g.h, g.cols, g.fs, g.lh, g.compact ? "c" : "", settings.main, settings.par].join("|");
 
 // ---------- parts and pages ----------
 
@@ -396,6 +406,7 @@ async function rebuild() {
   S.geom = computeGeom();
   document.body.dataset.mode = S.geom.mode;
   document.body.classList.toggle("phone", S.geom.phone);
+  document.body.classList.toggle("compact", S.geom.compact);
   S.layouts.clear(); resolved.clear(); lib.marks.clear(); clearNodes();
   loadCounts();
   if (a && a.includes("@")) { const [id, pg] = a.split("@"); await goToPart(id, +pg); }
@@ -593,7 +604,7 @@ addEventListener("resize", () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     const g = computeGeom();
-    if (["mode", "w", "h", "cols"].some(k => g[k] !== S.geom?.[k])) rebuild();
+    if (["mode", "w", "h", "cols", "compact", "phone"].some(k => g[k] !== S.geom?.[k])) rebuild();
   }, 250);
 });
 

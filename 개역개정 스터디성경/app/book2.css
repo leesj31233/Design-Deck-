@@ -330,3 +330,13 @@ body.phone #mapNote { display: none; }
 .fs-btn .fs-out, body.fullscreen .fs-btn .fs-in { display: none; }
 body.fullscreen .fs-btn .fs-out { display: inline; }
 body.phone .fs-btn { display: none; }
+
+/* ---------- compact: touch screens and narrow windows (Fold, tablets) ---------- */
+body.compact .stage { gap: 0; }
+body.compact .side { width: 24px; height: 96px; font-size: 1.7rem; border-radius: 8px; opacity: .7; }
+body.compact .edge.left { width: calc(2px + var(--done, 0) * 10px); }
+body.compact .edge.right { width: calc(2px + (1 - var(--done, 0)) * 10px); }
+body.compact :is(.book, .measure-host) .page { padding: 22px 20px 14px; }
+body.compact .volume { margin-right: 30px; }
+body.compact .topbar { gap: 8px; padding: 0 10px; }
+body.compact .b-sub { display: none; }
